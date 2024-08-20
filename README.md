@@ -12,8 +12,8 @@ In English, "Samstraumr" can be pronounced as "SAHM-strahm-ur" (where "Sam" rhym
 * WHAT: Organizes code into self-contained "Tubes" that interact dynamically, simplifying development and maintenance.
 * WHY: Reduces technical debt and complexity, making code easier to update and scale over time.
 * WHEN: Ideal for any project where long-term maintainability and adaptability are priorities.
-* WHERE: Applied in software development, inspired by natural systems' interconnectedness and adaptability.
-* HOW: By using clear, modular structures with well-defined interactions, creating functional, efficient, and resilient systems.
+* WHERE: Test automation frameworks are the prime target of Samstraumr, because almost never can you re-architect a system under test, but almost always you can implement a lightweight, practical test automation approach to designing tests and test data for those systems.
+* HOW: In the language of your choice, design clear, modular structures with well-defined interactions, creating functional, efficient, and resilient transformations of data and outcomes.
 
 
 *Meaning and Core Philosophy*
@@ -44,14 +44,14 @@ Tube-Based Design is a software design philosophy and framework that organizes c
 
 The system assumes that breaking down complex problems into smaller, manageable parts (Tubes) leads to more efficient and maintainable code. Each Tube is a self-contained unit that handles specific functionality.
 
-***Interconnectedness and Interaction:***
+***Interconnectedness and Interaction***
 
 It assumes that the interactions between these Tubes are just as important as the Tubes themselves. The design pattern focuses on how data, signals, or energy flow between Tubes, mirroring natural systems where interconnectedness drives functionality.
 Adaptability and Resilience:
 
 The philosophy assumes that software should be able to adapt to changes and unexpected conditions. Tube-Based Design supports this by allowing Tubes to be easily modified, replaced, or extended without disrupting the entire system.
 
-***Future-Proofing Code:***
+***Future-Proofing Code***
 
 It assumes that code should be understandable and modifiable even years later. By using clear, modular structures, Tube-Based Design makes it easier for developers to pick up and work on code that wasn’t written by them, reducing technical debt and maintenance headaches.
 
