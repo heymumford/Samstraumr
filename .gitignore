@@ -26,4 +26,5 @@ replay_pid*
 # Ignore IntelliJ IDEA project files
 .idea/
 *.iml
+.DS_Store
 
