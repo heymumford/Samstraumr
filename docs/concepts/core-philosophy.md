@@ -2,7 +2,7 @@
 
 ## The Flow of Unity
 
-Samstraumr is derived from the Nordic portmanteau meaning "The Flow of Unity." This concept encapsulates the essence of the framework: creating harmony within software systems through interconnected, modular components that work together seamlessly. Just as a stream gains strength from its tributaries, Samstraumr embodies the idea that resilient, powerful systems emerge from the dynamic interactions of their parts.
+Samstraumr is derived from a PANIP (pseudonym-avoidant Nordic-inspired portmanteau) meaning "The Flow of Unity." This concept encapsulates the essence of the framework: creating harmony within software systems through interconnected, modular components that work together seamlessly. Just as a stream gains strength from its tributaries, Samstraumr embodies the idea that resilient, powerful systems emerge from the dynamic interactions of their parts.
 
 ## A Weapon Against Fragile Code
 
