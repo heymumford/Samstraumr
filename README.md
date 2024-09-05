@@ -10,7 +10,7 @@ In English, "Samstraumr" can be pronounced as "SAHM-strahm-ur" (where "Sam" rhym
 
 "Samstraumr" / "S8r" is a modular, adaptable design framework for building scalable, resilient software using Tube-Based Design principles.
 
-- **WHO**: Developed by E. C. Mumford, Samstraumr is designed for engineers seeking intuitive, future-proof code.
+- **WHO**: Developed by Eric C. Mumford from his little house in the forest in upstate New York, USA, Samstraumr is designed for engineers seeking intuitive, future-proof code.
 - **WHAT**: Organizes code into self-contained "Tubes" that interact dynamically, simplifying development and maintenance.
 - **WHY**: Reduces technical debt and complexity, making code easier to update and scale over time.
 - **WHEN**: Ideal for any project where long-term maintainability and adaptability are priorities.
