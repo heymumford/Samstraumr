@@ -2,17 +2,29 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>samstraumr-cli</artifactId>
-  <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <version>0.2</version>
   <name>samstraumr-cli</name>
 
   <parent>
     <groupId>org.samstraumr</groupId>
-    <artifactId>samstraumr</artifactId>
+    <artifactId>samstraumr-framework</artifactId>
     <version>0.2</version>
   </parent>
 
   <dependencies>
+    <!-- Dependency on samstraumr-core -->
+    <dependency>
+      <groupId>org.samstraumr</groupId>
+      <artifactId>samstraumr-core</artifactId>
+      <version>0.2</version>
+    </dependency>
+    <!-- Dependency on samstraumr-sisters -->
+    <dependency>
+      <groupId>org.samstraumr</groupId>
+      <artifactId>samstraumr-sisters</artifactId>
+      <version>0.2</version>
+    </dependency>
     <!-- Dependencies are inherited from the parent -->
     <!-- Include module-specific dependencies if any -->
   </dependencies>
