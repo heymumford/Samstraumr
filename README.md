@@ -2,7 +2,7 @@
 
 ## Introduction
 
-**Samstraumr** is a visionary framework that reimagines how we design, build, and interact with software systems. Drawing inspiration from Nordic mythology and the poetic narratives of *The Poetic Edda*, Samstraumr embodies the concept of guided flow—where data, technology, and human systems are modeled as interconnected tubes. This metaphor emphasizes structure, direction, and the transformation of inputs into meaningful outcomes.
+**Samstraumr** aims to be a software design framework that synthesizes several design, build, and interaction concepts together in a fun and possibly useful way. Drawing inspiration from Nordic mythology and the poetic narratives of *The Poetic Edda*, Samstraumr embodies the concept of guided flow—where data, technology, and human systems are modeled as interconnected tubes. This metaphor emphasizes structure, direction, and the transformation of inputs into meaningful outcomes.
 
 Whether you're a developer, a technologist, or simply curious about innovative approaches to software design, Samstraumr offers a harmonious blend of philosophy and practicality. It simplifies complexity, fosters collaboration, and paves the way for scalable and maintainable systems.
 
