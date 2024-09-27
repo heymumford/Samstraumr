@@ -18,6 +18,10 @@
 
 ## Why This Work Fuels My Joy
 
+Most code I've written professionally has been bound by time, scope, and resources of a project plan. I've always wanted to try my hand at designing a computing framework that emits glimmers of the bits of world I find elegant. For me, Samstraumr is my ever evolving attempt at creating that. I hope it never ends. 
+
+Some highlights of my goals:
+
 *Modularity:* Independent components ('tubes') that work together, allowing for flexible updates and easy maintenance, reducing complexity and technical debt without disrupting the entire system.
 
 *Self-Correction:* Systems with built-in quality controls that monitor performance, adjust based on real-time feedback, and scale as needed without manual intervention.
