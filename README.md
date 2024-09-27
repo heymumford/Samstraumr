@@ -10,8 +10,8 @@
 ## What is Samstraumr?
 
 * Samstraumr is a design framework based on a 'tube' structure, modeled on biological systems that process inputs and produce outcomes.
-* Each tube represents a system that continuously or periodically takes in time-series data or scalar/vector inputs, processes them, and produces outcomes.
-* Each tube has a specific purpose that drives its behavior and outcomes.
+* Each tube represents a microsystem that continuously or periodically takes in time-series data or scalar/vector inputs, processes them, and produces outcomes.
+* Each tube has a specific purpose that drives its behavior and outcomes. Tubes can combine with other tubes to create nearly anything.
 * A tube's behavior can change or remain constant, depending on its sensitivity to interactions with other tubes or external inputs.
 * Unlike rigid, single-use, or linear programming models, tube-based design allows for systems that "wiggle"—meaning they adapt, evolve, and respond dynamically to changes. 
 * Samstraumr acts as a living blueprint, empowering systems with adaptive behaviors and self-awareness, transforming traditionally mechanistic constructs into responsive, living components.
