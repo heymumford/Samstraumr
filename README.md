@@ -16,9 +16,9 @@
 * Unlike rigid, single-use, or linear programming models, tube-based design allows for systems that "wiggle"—meaning they adapt, evolve, and respond dynamically to changes. 
 * Samstraumr acts as a living blueprint, empowering systems with adaptive behaviors and self-awareness, transforming traditionally mechanistic constructs into responsive, living components.
 
-## Why It Matters:
+## Why This Work Fuels My Joy
 
-*Modularity:* Independent components ('tubes') that work together, allowing for flexible updates and easy maintenance without disrupting the entire system.
+*Modularity:* Independent components ('tubes') that work together, allowing for flexible updates and easy maintenance, reducing complexity and technical debt without disrupting the entire system.
 
 *Self-Correction:* Systems with built-in quality controls that monitor performance, adjust based on real-time feedback, and scale as needed without manual intervention.
 
@@ -26,5 +26,4 @@
 
 *Resilience:* Systems that can recover from failures, optimize resource use, and adapt to new conditions, all while maintaining coherence and stability.
 
-Explore examples and see how Samstraumr can bring flexibility and adaptability to your software. 
-Build code that breathes, allowing it to grow and evolve—without endless meetings and the usual headaches.
+Explore examples and see how Samstraumr can bring flexibility and adaptability to your software. Build code that grows and evolves—without endless meetings and headaches.
