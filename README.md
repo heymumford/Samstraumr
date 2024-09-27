@@ -18,7 +18,7 @@
 
 ## Why This Work Fuels My Joy
 
-Most code I've written professionally has been bound by time, scope, and resources of a project plan. I've always wanted to try my hand at designing a computing framework that emits glimmers of the bits of world I find elegant. For me, Samstraumr is my ever evolving attempt at creating that. I hope it never ends. 
+Most code I've written professionally has been bound by the time, scope, and resources of a project plan. I've dreamt of designing a computing framework that emits glimmers of the bits of world I find elegant. For me, Samstraumr is my evolving attempt at creating such a framework, extensible to all modern programming languages. My dream is that this framework finds applications useful to humanity, and that such applications outlive me.
 
 Some highlights of my goals:
 
