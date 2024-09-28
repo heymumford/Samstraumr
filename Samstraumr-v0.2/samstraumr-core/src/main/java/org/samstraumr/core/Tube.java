@@ -17,6 +17,14 @@ import java.util.UUID;
  */
 public abstract class Tube<I, O> {
 
+    /**
+     * Enum representing the classification of tubes:
+     * <ul>
+     *     <li><strong>VirtueTube</strong> - Focuses on higher purpose and system-level goals.</li>
+     *     <li><strong>CharacterTube</strong> - Represents strength, resilience, and adaptability.</li>
+     *     <li><strong>BodyTube</strong> - Executes tasks and handles input/output operations.</li>
+     * </ul>
+     */
     public enum TubeType { VIRTUE_TUBE, CHARACTER_TUBE, BODY_TUBE }
 
     private final String tubeID;        // Unique identifier for each tube
@@ -26,7 +34,7 @@ public abstract class Tube<I, O> {
     private Optional<O> output = Optional.empty();
     private boolean isActive = true;
     private String purpose;             // The "Virtue" or higher goal this tube is aligned with
-    private TubeStatus status = TubeStatus.RESTING;
+    private TubeStatus status = TubeStatus.INITIALIZING;
 
     /**
      * Constructs a Tube with the specified purpose, parent tube, and type.
@@ -40,6 +48,7 @@ public abstract class Tube<I, O> {
         this.tubeID = generateUUID("TUBE");
         this.motherTubeID = (motherTubeID != null) ? motherTubeID : "Yggdrasil";
         this.tubeType = tubeType;
+        this.status = TubeStatus.READY;  // Set tube status to READY after initialization
     }
 
     /**
@@ -61,14 +70,14 @@ public abstract class Tube<I, O> {
     protected abstract O process();
 
     /**
-     * Receives input to the tube. If no input is provided, the tube will wait for direction.
+     * Receives input to the tube. If no input is provided, the tube will wait for input.
      *
      * @param input The input data to be processed by the tube.
      */
     public void receive(I input) {
         if (input != null) {
             this.input = Optional.of(input);
-            this.status = TubeStatus.ACTIVE;
+            this.status = TubeStatus.RECEIVING_INPUT;
         } else {
             awaitInput();
         }
@@ -76,13 +85,14 @@ public abstract class Tube<I, O> {
 
     /**
      * Executes the tube's processing logic and passes the result to the next tube.
-     * If no output is produced, the tube waits for further instructions.
+     * If no output is produced, the tube enters a state of waiting.
      *
      * @param nextTube The next tube in the chain to receive the output of this tube.
      * @param <T> The type of data the next tube will receive.
      */
     public <T> void execute(Tube<O, T> nextTube) {
         if (isActive && input.isPresent()) {
+            this.status = TubeStatus.PROCESSING_INPUT;
             output = Optional.ofNullable(process());
             output.ifPresentOrElse(
                     nextTube::receive,
@@ -94,37 +104,39 @@ public abstract class Tube<I, O> {
     }
 
     /**
-     * Communicates with another tube based on its type.
-     * Tubes can adjust their behavior or processing logic based on the type of tube they are communicating with.
-     *
-     * @param otherTube The other tube with which communication is occurring.
-     */
-    public void communicateWith(Tube<?, ?> otherTube) {
-        switch (otherTube.getTubeType()) {
-            case VIRTUE_TUBE:
-                System.out.println("Communicating with Virtue Tube (Higher Purpose)");
-                break;
-            case CHARACTER_TUBE:
-                System.out.println("Communicating with Character Tube (Resilience)");
-                break;
-            case BODY_TUBE:
-                System.out.println("Communicating with Body Tube (Execution)");
-                break;
-        }
-    }
-
-    /**
-     * Waits for input and updates the tube's status to RECEIVING_INPUT.
+     * Transition the tube to "awaiting input" state when it is idle.
      */
     private void awaitInput() {
         status = TubeStatus.RECEIVING_INPUT;
     }
 
     /**
-     * Waits for output and updates the tube's status to PROCESSING_OUTPUT.
+     * Transition the tube to "awaiting output" state if no output is generated.
      */
     private void awaitOutput() {
-        status = TubeStatus.PROCESSING_OUTPUT;
+        status = TubeStatus.OUTPUTTING_RESULT;
+    }
+
+    /**
+     * Updates the status to RECOVERING in case of errors or processing failures.
+     */
+    public void recoverFromFailure() {
+        status = TubeStatus.RECOVERING;
+    }
+
+    /**
+     * Sets the tube's status to DORMANT, typically used when it's in an inactive state.
+     */
+    public void enterDormantState() {
+        status = TubeStatus.DORMANT;
+    }
+
+    /**
+     * Sets the tube's status to DEACTIVATING when it's being shut down or decommissioned.
+     */
+    public void deactivate() {
+        status = TubeStatus.DEACTIVATING;
+        isActive = false;
     }
 
     // Getters for essential fields
@@ -137,6 +149,11 @@ public abstract class Tube<I, O> {
     public String getTubeID() {
         return tubeID;
     }
+
+    public Optional<I> getInput() {
+        return input;
+    }
+
 
     /**
      * Returns the ID of the tube that instantiated this tube, or "Yggdrasil" if it's the first tube.

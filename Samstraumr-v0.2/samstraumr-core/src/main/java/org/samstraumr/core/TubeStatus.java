@@ -1,19 +1,12 @@
 package org.samstraumr.core;
 
-/**
- * Enum representing the phases of existence or situational conditions that a tube can experience.
- * These phases are inspired by biological stem cells and their life cycle.
- */
 public enum TubeStatus {
-    RESTING,           // Initial or quiescent state, waiting for input
-    ACTIVE,            // Actively processing input
-    RENEWING,          // Self-replicating or instantiating new tubes
-    DIFFERENTIATING,   // Specializing or adapting to a specific function
-    SIGNALING,         // Sending signals or communicating with other tubes
-    RECEIVING_INPUT,   // Receiving signals or input from other tubes
-    DORMANT,           // Inactive but poised for activation
-    STRESSED,          // Encountering environmental challenges
-    DEACTIVATING,      // Shutting down or entering self-destruction
-    RECOVERING,        // Recovering from errors or damage
-    REPOSITIONING      // Changing or migrating its function or configuration
+    INITIALIZING,         // Tube is being prepared and not yet ready
+    READY,                // Tube is initialized and ready for input
+    RECEIVING_INPUT,       // Tube is actively receiving input
+    PROCESSING_INPUT,      // Tube is instantly processing the received input
+    OUTPUTTING_RESULT,     // Tube is outputting its result after processing
+    RECOVERING,            // Tube encountered an issue and is recovering
+    DORMANT,               // Tube is inactive but ready to be reactivated
+    DEACTIVATING           // Tube is shutting down
 }
