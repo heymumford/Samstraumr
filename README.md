@@ -5,7 +5,7 @@
 <p align="center"><i><small>Fun portmanteau of "Sam" – together, unified, collective + "Straumr" – Old Norse for "stream or flow"</small></i></p>
 
 <h2 align="center">A living(*) blueprint for self-aware, adaptable code</h2>
-
+---
 
 # What is Samstraumr?
 
@@ -31,6 +31,9 @@ Some highlights of my goals:
 
 *Resilience:* Systems that can recover from failures, optimize resource use, and adapt to new conditions, all while maintaining coherence and stability.
 
+---
+
+---
 
 # TLDR
 
@@ -131,15 +134,18 @@ In a distributed system, if a tube responsible for database access fails, other 
 Technical Foundations ~ Standardized Interfaces
 
 - Use of APIs and messaging protocols (e.g., REST, gRPC, AMQP) for communication between tubes.
-Containerization and Orchestration:
+  
+Technical Foundations ~ Containerization and Orchestration:
 
 - Deployment of tubes within containers (e.g., Docker) for consistency across environments.
 Use of orchestration tools (e.g., Kubernetes) to manage scaling, deployment, and resilience.
-Observability:
+
+Technical Foundations ~ Observability:
 
 - Integration with logging, monitoring, and alerting systems to provide visibility into tube operations.
 Use of tools like Prometheus and Grafana for metrics and dashboards.
-Configuration Management:
+
+Technical Foundations ~ Configuration Management:
 
 - Tubes retrieve configuration from centralized services, allowing dynamic updates without redeployment.
 Feature flags and versioning enable controlled rollouts and A/B testing.
