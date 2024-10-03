@@ -1,12 +1,11 @@
 package org.samstraumr.core;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.message.ObjectMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Map;
 
 public class TubeLogger {
-    private static final Logger logger = LogManager.getLogger(TubeLogger.class);
+    private static final Logger logger = LoggerFactory.getLogger(TubeLogger.class);
     private final TubeLoggerInfo loggerInfo;
 
     public TubeLogger(String tubeId, String compositeId, String machineId) {
@@ -19,23 +18,22 @@ public class TubeLogger {
 
     public void logWithContext(String level, String message, Map<String, Object> context, String... tags) {
         Map<String, Object> logEntry = loggerInfo.assembleLogInfo(message, level, tags, context);
-        ObjectMessage objectMessage = new ObjectMessage(logEntry);
 
         switch (level.toLowerCase()) {
             case "debug":
-                logger.debug(objectMessage);
+                logger.debug("{}", logEntry);
                 break;
             case "info":
-                logger.info(objectMessage);
+                logger.info("{}", logEntry);
                 break;
             case "warn":
-                logger.warn(objectMessage);
+                logger.warn("{}", logEntry);
                 break;
             case "error":
-                logger.error(objectMessage);
+                logger.error("{}", logEntry);
                 break;
             default:
-                logger.info(objectMessage);
+                logger.info("{}", logEntry);
         }
     }
 }

@@ -12,11 +12,11 @@
 
 * Samstraumr is a design framework based on interconnected 'tubes', inspired by biological systems that process inputs and produce outputs.
 * Each tube is a unique entity with a singular reason for existence, processing inputs and producing outputs while realizing multiple purposes over time.
-* Tubes operate at various levels of abstraction—from simple atomic units to complex composites—connecting and interacting to form intricate systems with emergent behaviors.
+* Tubes operate at various levels of abstraction—from simple atomic units to complex Composite Tubes—connecting and interacting to form intricate systems with emergent behaviors.
+* Composite Tubes are designed by combining multiple fundamental tubes, working together to process more complex sets of data and logic, forming dynamic, multi-stage workflows.
 * A tube's behavior can change or remain constant, influenced by its interactions with other tubes or external inputs.
 * Unlike rigid, single-use, or linear programming models, tube-based design allows for systems that adapt, evolve, and respond dynamically to changes.
 * By combining tubes mindfully, developers can build complex, innovative solutions, reflecting the principles and creative potential of Samstraumr.
-
 
 # Why This Work Fuels My Joy
 
