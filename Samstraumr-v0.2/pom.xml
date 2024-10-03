@@ -11,8 +11,6 @@
 
     <modules>
         <module>samstraumr-core</module>
-        <module>samstraumr-sisters</module>
-        <module>samstraumr-utils</module>
         <module>samstraumr-cli</module>
     </modules>
 
