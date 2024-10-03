@@ -1,11 +1,11 @@
-### README.md (samstraumr-core)
+# README.md (samstraumr-core)
 
-#### Overview
+## Overview
 **Samstraumr-Core** is the foundation of the Tube-Based Design (TBD) framework. This module provides the basic building blocks of computation and interaction, including **Tubes** (atomic units) and **Composites** (higher-order assemblies), enabling dynamic, adaptive systems. The framework leverages Java21 for its core architecture while maintaining compatibility with other tools and libraries for testing and deployment.
 
 ---
 
-#### Vocabulary and Concepts
+## Vocabulary and Concepts
 
 - **Tube**: The fundamental unit of operation. Tubes process inputs, perform specific tasks, and produce outputs. They represent the atomic base of the framework.
 - **Composite**: A higher-level structure made from combinations of multiple tubes. Composites allow for more complex functionality by orchestrating tubes to work together.
@@ -18,14 +18,12 @@
 
 ---
 
-#### Structure
+## Structure
 
 - **Tubes**: Located in the `tube/` directory, representing the atomic components of the system.
 - **Composites**: Found in the `composites/` directory, containing more complex structures formed by multiple tubes working together.
 
----
-
-#### What the POM Defines
+### What the POM Defines
 
 The POM file (`pom.xml`) defines the key configuration settings for **samstraumr-core**, including dependencies, build settings, and plugins for testing and compiling the project.
 
@@ -38,20 +36,41 @@ The POM file (`pom.xml`) defines the key configuration settings for **samstraumr
 
 ---
 
-#### Key Components
+## Key Components
 
-- **Tubes** (`tube/`): This directory includes the foundational classes like `Tube.java`, `TubeLogger.java`, and `TubeOperations.java`, which are responsible for defining the behavior and structure of individual tubes.
-  
-- **Composites** (`composites/`): This directory will eventually house higher-level combinations of tubes that perform more complex processing.
+- **Tubes**: The fundamental building blocks of Samstraumr. Each tube encapsulates a distinct operation. Explore the following key classes:
+    - [`Tube.java`](./src/main/java/org/samstraumr/tube/Tube.java): The core structure that defines the basic behavior of tubes.
+    - [`TubeConnection.java`](./src/main/java/org/samstraumr/tube/TubeConnection.java): Manages the connections between tubes.
+    - [`TubeOperations.java`](./src/main/java/org/samstraumr/tube/TubeOperations.java): Encapsulates the core operations performed by tubes.
+    - [`TubeStatus.java`](./src/main/java/org/samstraumr/tube/TubeStatus.java): Tracks the status and health of each tube.
+    - [`TubeLogger.java`](./src/main/java/org/samstraumr/tube/TubeLogger.java): Logs relevant tube activity and performance.
 
-- **Testing** (`test/`): Behavior-driven tests using **Cucumber** (`*.feature` files) and JUnit 5 are implemented to ensure functionality, resilience, and collaboration between tubes and composites.
+- **Composites**: Higher-order structures composed of multiple tubes working together:
+    - [`composites`](./src/main/java/org/samstraumr/composites): Explore how multiple tubes are combined into composite structures.
+
+- **Environment**: Configurations and external conditions influencing tube behavior:
+    - [`Environment.java`](./src/main/java/org/samstraumr/tube/Environment.java): Manages environmental data and interactions.
+
+- **Testing**: Comprehensive test suites for validating tubes and composites:
+    - [`TubeCollaborationSteps.java`](./src/test/java/org/samstraumr/tube/steps/TubeCollaborationSteps.java): Tests the collaborative functionality of tubes.
+    - [`TubeResilienceSteps.java`](./src/test/java/org/samstraumr/tube/steps/TubeResilienceSteps.java): Ensures tubes maintain resilience under stress.
+    - [`tube_collaboration.feature`](./src/test/resources/features/tube_collaboration.feature): Feature test file demonstrating tube collaboration.
 
 ---
 
-#### How to Get Started
+## How To Get Started
 
-1. Explore the **tube** directory to understand how atomic tubes function.
-2. Look into the **composites** directory for examples of how multiple tubes can work together to form sophisticated systems.
-3. Use the **test** directory to see how the system is validated through JUnit and Cucumber BDD tests.
+1. **Explore the Tube Architecture**: Start with the core tube structures to understand how tubes operate individually.
+    - [`Tube.java`](./src/main/java/org/samstraumr/tube/Tube.java)
+    - [`TubeOperations.java`](./src/main/java/org/samstraumr/tube/TubeOperations.java)
 
----
+2. **Dive into Composites**: Learn how tubes combine to form more complex structures.
+    - [`composites`](./src/main/java/org/samstraumr/composites)
+
+3. **Run Tests**: Check the tests that validate the system’s robustness and collaborative nature.
+    - [`TubeCollaborationSteps.java`](./src/test/java/org/samstraumr/tube/steps/TubeCollaborationSteps.java)
+    - [`tube_resilience.feature`](./src/test/resources/features/tube_resilience.feature)
+
+4. **Review Logging and Monitoring**: Understand how tubes are monitored and their status tracked.
+    - [`TubeLogger.java`](./src/main/java/org/samstraumr/tube/TubeLogger.java)
+
