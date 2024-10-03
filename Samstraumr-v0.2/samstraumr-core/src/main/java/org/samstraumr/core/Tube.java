@@ -1,193 +1,358 @@
 package org.samstraumr.core;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.time.Instant;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
- * The Tube class represents a core building block in the Samstraumr system.
- * Each Tube is categorized into one of three types based on philosophical principles:
- * <ul>
- *     <li><strong>VirtueTube</strong> - Aligned with higher goals and purpose (Virtue), inspired by Aristotle's Virtue Ethics.</li>
- *     <li><strong>CharacterTube</strong> - Resilient and adaptive, focusing on strength and endurance, inspired by Stoic philosophy.</li>
- *     <li><strong>BodyTube</strong> - Task-oriented, focusing on execution and interaction with the external environment, aligned with materialism and functionalism.</li>
- * </ul>
- *
- * @param <I> The type of input data the tube will receive
- * @param <O> The type of output data the tube will produce
+ * Represents a Tube in the Samstraumr framework.
+ * A Tube is an autonomous, adaptive component with a unique identity and evolving purpose.
  */
-public abstract class Tube<I, O> {
 
-    /**
-     * Enum representing the classification of tubes:
-     * <ul>
-     *     <li><strong>VirtueTube</strong> - Focuses on higher purpose and system-level goals.</li>
-     *     <li><strong>CharacterTube</strong> - Represents strength, resilience, and adaptability.</li>
-     *     <li><strong>BodyTube</strong> - Executes tasks and handles input/output operations.</li>
-     * </ul>
-     */
-    public enum TubeType { VIRTUE_TUBE, CHARACTER_TUBE, BODY_TUBE }
+public class Tube {
+    private final TubeLogger tubeLogger;
+    private final String uniqueId;
+    private String reason;
+    private final List<String> lineage;
+    private final Environment environment;
+    private final List<Tube> parentTubes;
+    private final Map<String, String> connectedTubes; // Tube ID to Reason
+    private final List<OperationRecord> operationHistory;
+    private boolean paused;
+    private boolean terminated;
+    private Tube transformedTube;
+    private final List<Tube> replicas;
+    private int currentWorkload;
+    private int assignedWorkload;
 
-    private final String tubeID;        // Unique identifier for each tube
-    private final String motherTubeID;  // ID of the tube that instantiated this tube
-    private TubeType tubeType;          // Classification of this tube (Virtue, Character, or Body)
-    private Optional<I> input = Optional.empty();
-    private Optional<O> output = Optional.empty();
-    private boolean isActive = true;
-    private String purpose;             // The "Virtue" or higher goal this tube is aligned with
-    private TubeStatus status = TubeStatus.INITIALIZING;
+    private static final double MISALIGNMENT_THRESHOLD = 0.2;
+    private static final double PERFORMANCE_THRESHOLD = 0.8;
+    private static final double DANGEROUS_WORKLOAD_FACTOR = 1.5;
+    private static final double SCALING_UP_FACTOR = 1.2;
+    private static final double SCALING_DOWN_FACTOR = 0.5;
 
-    /**
-     * Constructs a Tube with the specified purpose, parent tube, and type.
-     *
-     * @param purpose The higher goal or purpose (Virtue) this tube serves.
-     * @param motherTubeID The ID of the tube that instantiated this tube, or "Yggdrasil" for the first tube.
-     * @param tubeType The classification of this tube (Virtue, Character, or Body).
-     */
-    public Tube(String purpose, String motherTubeID, TubeType tubeType) {
-        this.purpose = purpose;
-        this.tubeID = generateUUID("TUBE");
-        this.motherTubeID = (motherTubeID != null) ? motherTubeID : "Yggdrasil";
-        this.tubeType = tubeType;
-        this.status = TubeStatus.READY;  // Set tube status to READY after initialization
+    public Tube(String reason, Environment environment, String compositeId, String machineId) {
+        this.uniqueId = generateUniqueId(reason + environment.getParameters());
+        this.tubeLogger = new TubeLogger(this.uniqueId, compositeId, machineId);
+        this.reason = reason;
+        this.environment = environment;
+        this.lineage = new ArrayList<>(Collections.singletonList(reason));
+        this.parentTubes = new ArrayList<>();
+        this.connectedTubes = new HashMap<>();
+        this.operationHistory = new ArrayList<>();
+        this.replicas = new ArrayList<>();
+
+        tubeLogger.log("info", "Creating new Tube", "initialization");
+    }
+
+    public Tube(String reason, Environment environment, Tube parentTube, String compositeId, String machineId) {
+        this(reason, environment, compositeId, machineId);
+        this.parentTubes.add(parentTube);
+        this.lineage.addAll(0, parentTube.getLineage());
+        tubeLogger.log("info", "Created new Tube with parent", "initialization", "parentTube");
     }
 
     /**
-     * Generates a UUID for uniquely identifying this tube, with a specific prefix.
+     * Generates a unique identifier for the Tube.
      *
-     * @param prefix The prefix to use for the ID (e.g., "TUBE").
-     * @return A unique identifier string for the tube.
+     * @param parameters Combined parameters used to generate the unique ID
+     * @return A SHA-256 hash string representing the unique ID
      */
-    private String generateUUID(String prefix) {
-        return prefix + "-" + UUID.randomUUID().toString();
-    }
-
-    /**
-     * Processes the input data and produces an output.
-     * Subclasses are expected to implement the specific processing logic.
-     *
-     * @return The processed result, or null if no result is produced.
-     */
-    protected abstract O process();
-
-    /**
-     * Receives input to the tube. If no input is provided, the tube will wait for input.
-     *
-     * @param input The input data to be processed by the tube.
-     */
-    public void receive(I input) {
-        if (input != null) {
-            this.input = Optional.of(input);
-            this.status = TubeStatus.RECEIVING_INPUT;
-        } else {
-            awaitInput();
+    private String generateUniqueId(String parameters) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest((parameters + Instant.now().toString()).getBytes());
+            return bytesToHex(hash);
+        } catch (NoSuchAlgorithmException e) {
+            tubeLogger.log("error", "Failed to generate unique ID: " + e.getMessage(), "error", "initialization");
+            throw new RuntimeException("SHA-256 algorithm not found", e);
         }
     }
 
     /**
-     * Executes the tube's processing logic and passes the result to the next tube.
-     * If no output is produced, the tube enters a state of waiting.
+     * Converts a byte array to a hexadecimal string.
      *
-     * @param nextTube The next tube in the chain to receive the output of this tube.
-     * @param <T> The type of data the next tube will receive.
+     * @param hash The byte array to convert
+     * @return A hexadecimal string representation of the byte array
      */
-    public <T> void execute(Tube<O, T> nextTube) {
-        if (isActive && input.isPresent()) {
-            this.status = TubeStatus.PROCESSING_INPUT;
-            output = Optional.ofNullable(process());
-            output.ifPresentOrElse(
-                    nextTube::receive,
-                    this::awaitOutput
-            );
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (byte b : hash) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) hexString.append('0');
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
+    /**
+     * Gets the unique identifier of the Tube.
+     *
+     * @return The unique identifier
+     */
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
+    /**
+     * Gets the current reason or purpose of the Tube.
+     *
+     * @return The current reason
+     */
+    public String getReason() {
+        return reason;
+    }
+
+    /**
+     * Gets the lineage of the Tube.
+     *
+     * @return An unmodifiable list representing the Tube's lineage
+     */
+    public List<String> getLineage() {
+        return Collections.unmodifiableList(lineage);
+    }
+
+    /**
+     * Detects if the Tube's current behavior is misaligned with its reason.
+     */
+    public void detectMisalignment() {
+        tubeLogger.log("debug", "Detecting misalignment", "performance");
+        double failureRate = getFailureRate();
+        if (failureRate > MISALIGNMENT_THRESHOLD) {
+            tubeLogger.log("warn", "Misalignment detected. Failure rate: " + failureRate, "performance", "misalignment");
         } else {
-            awaitInput();
+            tubeLogger.log("info", "No misalignment detected. Failure rate: " + failureRate, "performance");
+        }
+    }
+
+
+    /**
+     * Calculates the failure rate of operations.
+     *
+     * @return The failure rate as a double between 0 and 1
+     */
+    private double getFailureRate() {
+        if (operationHistory.isEmpty()) {
+            return 0;
+        }
+        long failedOperations = operationHistory.stream()
+                .filter(record -> !record.isSuccess())
+                .count();
+        return (double) failedOperations / operationHistory.size();
+    }
+
+    /**
+     * Evolves the purpose of the Tube by updating its reason.
+     *
+     * @param newReason The new reason or purpose for the Tube
+     */
+    public void evolvePurpose(String newReason) {
+        this.reason = newReason;
+        this.lineage.add(newReason);
+        System.out.println("Purpose evolved to: " + newReason);
+    }
+
+    /**
+     * Connects this Tube to another Tube.
+     *
+     * @param otherTube The Tube to connect to
+     */
+    public void connectTo(Tube otherTube) {
+        this.connectedTubes.put(otherTube.getUniqueId(), otherTube.getReason());
+        otherTube.connectedTubes.put(this.uniqueId, this.reason);
+    }
+
+    /**
+     * Gets the connected Tubes.
+     *
+     * @return An unmodifiable map of connected Tube IDs to their reasons
+     */
+    public Map<String, String> getConnectedTubes() {
+        return Collections.unmodifiableMap(connectedTubes);
+    }
+
+    /**
+     * Records an operation performed by the Tube.
+     *
+     * @param operationName The name of the operation
+     * @param success       Whether the operation was successful
+     */
+    public void recordOperation(String operationName, boolean success) {
+        this.operationHistory.add(new OperationRecord(operationName, success));
+    }
+
+    /**
+     * Analyzes the Tube's performance and considers purpose evolution if necessary.
+     */
+    public void analyzePerformance() {
+        double successRate = 1 - getFailureRate();
+        if (successRate < PERFORMANCE_THRESHOLD) {
+            System.out.println("Performance below threshold. Considering purpose evolution.");
         }
     }
 
     /**
-     * Transition the tube to "awaiting input" state when it is idle.
+     * Detects dangerous conditions and takes appropriate action.
      */
-    private void awaitInput() {
-        status = TubeStatus.RECEIVING_INPUT;
+    public void detectDangerousConditions() {
+        if (isWorkloadDangerous()) {
+            this.paused = true;
+            System.out.println("Dangerous conditions detected. Tube paused.");
+        }
+
+        if (hasContinuousFailure()) {
+            this.terminated = true;
+            System.out.println("Continuous failure detected. Tube terminated.");
+        }
     }
 
     /**
-     * Transition the tube to "awaiting output" state if no output is generated.
-     */
-    private void awaitOutput() {
-        status = TubeStatus.OUTPUTTING_RESULT;
-    }
-
-    /**
-     * Updates the status to RECOVERING in case of errors or processing failures.
-     */
-    public void recoverFromFailure() {
-        status = TubeStatus.RECOVERING;
-    }
-
-    /**
-     * Sets the tube's status to DORMANT, typically used when it's in an inactive state.
-     */
-    public void enterDormantState() {
-        status = TubeStatus.DORMANT;
-    }
-
-    /**
-     * Sets the tube's status to DEACTIVATING when it's being shut down or decommissioned.
-     */
-    public void deactivate() {
-        status = TubeStatus.DEACTIVATING;
-        isActive = false;
-    }
-
-    // Getters for essential fields
-
-    /**
-     * Returns the unique ID of the tube.
+     * Checks if the current workload is dangerously high.
      *
-     * @return The tube's unique identifier.
+     * @return true if the workload is dangerous, false otherwise
      */
-    public String getTubeID() {
-        return tubeID;
-    }
-
-    public Optional<I> getInput() {
-        return input;
-    }
-
-
-    /**
-     * Returns the ID of the tube that instantiated this tube, or "Yggdrasil" if it's the first tube.
-     *
-     * @return The mother tube's ID.
-     */
-    public String getMotherTubeID() {
-        return motherTubeID;
+    private boolean isWorkloadDangerous() {
+        return currentWorkload > assignedWorkload * DANGEROUS_WORKLOAD_FACTOR;
     }
 
     /**
-     * Returns the type of this tube (Virtue, Character, or Body).
+     * Checks if the Tube has experienced continuous failure.
      *
-     * @return The classification of the tube.
+     * @return true if there's continuous failure, false otherwise
      */
-    public TubeType getTubeType() {
-        return tubeType;
+    private boolean hasContinuousFailure() {
+        return operationHistory.size() > 1000 && operationHistory.stream().noneMatch(OperationRecord::isSuccess);
     }
 
     /**
-     * Returns the current status of the tube.
+     * Checks if the Tube is paused.
      *
-     * @return The tube's status (e.g., ACTIVE, RESTING, RECEIVING_INPUT, etc.).
+     * @return true if the Tube is paused, false otherwise
      */
-    public TubeStatus getStatus() {
-        return status;
+    public boolean isPaused() {
+        return paused;
     }
 
     /**
-     * Sets the current status of the tube.
+     * Checks if the Tube is terminated.
      *
-     * @param status The new status to set for the tube.
+     * @return true if the Tube is terminated, false otherwise
      */
-    public void setStatus(TubeStatus status) {
-        this.status = status;
+    public boolean isTerminated() {
+        return terminated;
+    }
+
+    /**
+     * Transforms the Tube into a new entity with a new reason.
+     *
+     * @param newReason The reason for the new entity
+     */
+    public void transformIntoNewEntity(String newReason) {
+        this.transformedTube = new Tube(newReason, this.environment, this);
+        this.terminated = true;
+        System.out.println("Transformed into new entity with reason: " + newReason);
+    }
+
+    /**
+     * Gets the transformed Tube if a transformation has occurred.
+     *
+     * @return The transformed Tube, or null if no transformation has occurred
+     */
+    public Tube getTransformedTube() {
+        return transformedTube;
+    }
+
+    /**
+     * Sets the current workload of the Tube.
+     *
+     * @param workload The current workload
+     */
+    public void setCurrentWorkload(int workload) {
+        this.currentWorkload = workload;
+    }
+
+    /**
+     * Gets the current workload of the Tube.
+     *
+     * @return The current workload
+     */
+    public int getCurrentWorkload() {
+        return currentWorkload;
+    }
+
+    /**
+     * Detects if scaling is needed based on the current workload.
+     */
+    public void detectScalingNeed() {
+        if (currentWorkload > assignedWorkload * SCALING_UP_FACTOR) {
+            createReplica();
+        } else if (currentWorkload < assignedWorkload * SCALING_DOWN_FACTOR && !replicas.isEmpty()) {
+            removeReplica();
+        }
+    }
+
+    /**
+     * Creates a new replica of the Tube.
+     */
+    private void createReplica() {
+        Tube replica = new Tube(this.reason, this.environment, this);
+        this.replicas.add(replica);
+        System.out.println("New replica created due to high workload.");
+    }
+
+    /**
+     * Removes a replica of the Tube.
+     */
+    private void removeReplica() {
+        Tube removedReplica = this.replicas.remove(this.replicas.size() - 1);
+        removedReplica.terminated = true;
+        System.out.println("Replica removed due to low workload.");
+    }
+
+    /**
+     * Gets the replicas of the Tube.
+     *
+     * @return An unmodifiable list of replicas
+     */
+    public List<Tube> getReplicas() {
+        return Collections.unmodifiableList(replicas);
+    }
+
+    /**
+     * Gets the assigned workload of the Tube.
+     *
+     * @return The assigned workload
+     */
+    public int getAssignedWorkload() {
+        return assignedWorkload;
+    }
+
+    /**
+     * Represents a record of an operation performed by the Tube.
+     */
+    private static class OperationRecord {
+        private final String operationName;
+        private final boolean success;
+
+        /**
+         * Constructs a new OperationRecord.
+         *
+         * @param operationName The name of the operation
+         * @param success       Whether the operation was successful
+         */
+        public OperationRecord(String operationName, boolean success) {
+            this.operationName = operationName;
+            this.success = success;
+        }
+
+        /**
+         * Checks if the operation was successful.
+         *
+         * @return true if the operation was successful, false otherwise
+         */
+        public boolean isSuccess() {
+            return success;
+        }
     }
 }
