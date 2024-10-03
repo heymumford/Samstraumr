@@ -38,7 +38,30 @@ Some highlights of my goals:
 
 # TLDR
 
-## How
+---
+
+## The What
+
+Imagine you’re standing at the edge of a stream, watching the water flow over rocks, twisting and turning through the landscape. Each rock shapes the current, but no single rock controls the stream—it adapts, finding its way, always moving forward. This is the spirit behind **Tube-Based Design**.
+
+In Tube-Based Design, each **tube** is like one of those rocks. It has a purpose, a job to do, but it doesn’t work alone. Tubes are modular, meaning they fit together like puzzle pieces, each doing its own thing—processing data, handling tasks, or passing information along to the next tube. Together, they form a flowing system that’s flexible, reliable, and constantly in motion.
+
+### **Performance**:
+Because each tube focuses on a specific task, the whole system becomes faster and more efficient. It’s like a relay race: each runner (or tube) knows exactly what they need to do and when to pass the baton. Instead of one bulky program doing everything, Tube-Based Design breaks it down, allowing for smoother, faster execution. The stream flows naturally, never getting stuck behind a single obstacle.
+
+### **Reliability**:
+When something goes wrong in the system, it doesn’t need to bring the whole stream to a halt. Tubes can be swapped out or rerouted without affecting the rest of the flow. If one rock shifts in the stream, the water just finds a new path. This makes the system resilient—it keeps working, even when part of it needs attention. The beauty of Tube-Based Design is that it anticipates change and allows the system to recover gracefully, just like nature does.
+
+### **Maintenance and Cost**:
+Now, imagine you’re building a house, and every time you want to change a window or fix a leak, you don’t need to tear down the whole structure. Tubes are built to be modular, so you can easily update or replace a single part without touching the rest. This means fewer costly overhauls, fewer headaches, and more time spent doing what matters. Like planting a garden that keeps growing with little upkeep, Tube-Based Design makes long-term maintenance simple and affordable.
+
+In the end, **Tube-Based Design** empowers us to build systems that flow naturally—adapting, recovering, and thriving like a river finding its way to the ocean. It’s about letting go of rigid structures and embracing a more flexible, reliable, and cost-effective way to build for the future.
+
+Like watching geese fly in formation, each tube knows its place, its role, and when to pass the baton. And when they all work together, the journey becomes smoother, more graceful, and ultimately, easier to maintain.
+
+---
+
+## The How
 While the philosophy and metaphors provide a nice visionary backdrop I enjoy revisiting, Samstraumr is grounded in pragmatic engineering principles that bring this vision to life. 
 Here's how we achieve goals of modularity, self-correction, collaboration, and resilience:
 
