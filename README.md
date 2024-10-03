@@ -5,6 +5,7 @@
 <p align="center"><i><small>Fun portmanteau of "Sam" – together, unified, collective + "Straumr" – Old Norse for "stream or flow"</small></i></p>
 
 <h2 align="center">A living(*) blueprint for self-aware, adaptable code</h2>
+
 ---
 
 # What is Samstraumr?
