@@ -74,3 +74,8 @@ The POM file (`pom.xml`) defines the key configuration settings for **samstraumr
 4. **Review Logging and Monitoring**: Understand how tubes are monitored and their status tracked.
     - [`TubeLogger.java`](./src/main/java/org/samstraumr/tube/TubeLogger.java)
 
+
+## Documentation
+
+- [What is BDD?](WhatIsBDD.md)
+- [Rationale for Using BDD in Samstraumr](RationaleOnUsingBDD.md)
