@@ -1,44 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Log4j2 Configuration for Samstraumr Framework -->
-<!--
-    Last updated: 03-Oct-2024
-    Author: heymumford
-
-    This configuration file sets up logging for the Samstraumr framework.
-    It includes console output, file logging with rotation, and separate error logging.
-
-    Key features:
-    - Console logging for immediate feedback
-    - File logging with daily rotation and size limits
-    - Separate error log file
-    - Asynchronous logging for improved performance
-    - Dynamic reconfiguration capability
-
-    Modification Instructions:
-    1. Adjust LOG_PATTERN if different log format is needed
-    2. Change APP_LOG_ROOT to the appropriate log directory for your environment
-    3. Modify log levels as needed for different environments (e.g., DEBUG for development, INFO for production)
-    4. Add or remove Loggers as new packages are introduced or removed from the project
--->
 <Configuration status="WARN" monitorInterval="30">
-    <!--
-        status: Internal Log4j2 logging level. Set to WARN to avoid excessive internal logging.
-        monitorInterval: Specifies that Log4j2 will check for configuration changes every 30 seconds.
-    -->
-
     <Properties>
-        <!-- Defines reusable properties for the configuration -->
         <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
-        <Property name="APP_LOG_ROOT">/var/log/samstraumr</Property>
+        <Property name="APP_LOG_ROOT">logs</Property>
     </Properties>
 
     <Appenders>
-        <!-- Console Appender: Outputs logs to the console -->
         <Console name="ConsoleAppender" target="SYSTEM_OUT" follow="true">
             <PatternLayout pattern="${LOG_PATTERN}"/>
         </Console>
 
-        <!-- File Appender: Writes all logs to a file with rotation -->
         <RollingFile name="FileAppender" fileName="${APP_LOG_ROOT}/application.log"
                      filePattern="${APP_LOG_ROOT}/application-%d{yyyy-MM-dd}-%i.log">
             <PatternLayout pattern="${LOG_PATTERN}"/>
@@ -47,13 +18,8 @@
                 <TimeBasedTriggeringPolicy interval="1" modulate="true" />
             </Policies>
             <DefaultRolloverStrategy max="10"/>
-            <!--
-                Rotation occurs when the file reaches 10MB or at the start of each day.
-                Keeps up to 10 rotated log files before deleting the oldest.
-            -->
         </RollingFile>
 
-        <!-- Error File Appender: Writes only error logs to a separate file -->
         <RollingFile name="ErrorFileAppender" fileName="${APP_LOG_ROOT}/error.log"
                      filePattern="${APP_LOG_ROOT}/error-%d{yyyy-MM-dd}-%i.log">
             <PatternLayout pattern="${LOG_PATTERN}"/>
@@ -63,28 +29,20 @@
             </Policies>
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
-
-        <!-- Async Appender: Wraps FileAppender for improved performance -->
-        <Async name="AsyncAppender" includeLocation="true">
-            <AppenderRef ref="FileAppender"/>
-        </Async>
     </Appenders>
 
     <Loggers>
-        <!-- Root Logger: Handles all logs not caught by other loggers -->
         <Root level="info">
             <AppenderRef ref="ConsoleAppender"/>
-            <AppenderRef ref="AsyncAppender"/>
+            <AppenderRef ref="FileAppender"/>
         </Root>
 
-        <!-- Specific Logger for org.samstraumr.core package -->
-        <Logger name="org.samstraumr.core" level="debug" additivity="false">
+        <Logger name="org.samstraumr.tube" level="debug" additivity="false">
             <AppenderRef ref="ConsoleAppender"/>
-            <AppenderRef ref="AsyncAppender"/>
+            <AppenderRef ref="FileAppender"/>
         </Logger>
 
-        <!-- Error Logger: Captures all error level logs -->
-        <Logger name="ErrorLogger" level="error" additivity="false">
+        <Logger name="org.samstraumr.tube.error" level="error" additivity="false">
             <AppenderRef ref="ErrorFileAppender"/>
         </Logger>
     </Loggers>

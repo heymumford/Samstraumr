@@ -1,4 +1,4 @@
-package org.samstraumr.core;
+package org.samstraumr.tube;
 
 import java.awt.Color;
 import java.util.HashMap;

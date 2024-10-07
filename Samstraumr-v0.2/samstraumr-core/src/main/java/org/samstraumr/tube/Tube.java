@@ -1,4 +1,4 @@
-package org.samstraumr.core;
+package org.samstraumr.tube;
 
 import java.util.*;
 import java.time.Instant;
@@ -6,39 +6,24 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Tube {
-    private final TubeLogger tubeLogger;
     private final String uniqueId;
     private String reason;
     private final List<String> lineage;
     private final Environment environment;
-    private final List<Tube> parentTubes;
+    private final List<String> mimirLog;  // Internal log (temporary solution)
+    private Timer terminationTimer;
 
-    private final TubeOperations operations;
-    private final TubeWorkload workload;
-    private final TubeTransformation transformation;
-    private final TubeConnection connection;
-
-    public Tube(String reason, Environment environment, String compositeId, String machineId) {
+    public Tube(String reason, Environment environment) {
         this.uniqueId = generateUniqueId(reason + environment.getParameters());
-        this.tubeLogger = new TubeLogger(this.uniqueId, compositeId, machineId);
         this.reason = reason;
         this.environment = environment;
         this.lineage = new ArrayList<>(Collections.singletonList(reason));
-        this.parentTubes = new ArrayList<>();
+        this.mimirLog = new LinkedList<>();  // Using LinkedList for simple in-memory logging
+        logToMimir("Tube initialized with ID: " + this.uniqueId);
 
-        this.operations = new TubeOperations(tubeLogger);
-        this.workload = new TubeWorkload(tubeLogger);
-        this.transformation = new TubeTransformation(this, tubeLogger);
-        this.connection = new TubeConnection(tubeLogger);
-
-        tubeLogger.log("info", "Creating new Tube", "initialization");
-    }
-
-    public Tube(String reason, Environment environment, Tube parentTube, String compositeId, String machineId) {
-        this(reason, environment, compositeId, machineId);
-        this.parentTubes.add(parentTube);
-        this.lineage.addAll(0, parentTube.getLineage());
-        tubeLogger.log("info", "Created new Tube with parent", "initialization", "parentTube");
+        // Set a default self-termination delay of 60 seconds
+        this.terminationTimer = new Timer();
+        terminationTimer.schedule(new TerminationTask(), 60 * 1000);
     }
 
     private String generateUniqueId(String parameters) {
@@ -47,7 +32,7 @@ public class Tube {
             byte[] hash = digest.digest((parameters + Instant.now().toString()).getBytes());
             return bytesToHex(hash);
         } catch (NoSuchAlgorithmException e) {
-            tubeLogger.log("error", "Failed to generate unique ID: " + e.getMessage(), "error", "initialization");
+            logToMimir("Error generating unique ID: " + e.getMessage());
             throw new RuntimeException("SHA-256 algorithm not found", e);
         }
     }
@@ -74,68 +59,33 @@ public class Tube {
         return Collections.unmodifiableList(lineage);
     }
 
-    // Delegate methods to other classes
-    public void detectMisalignment() {
-        operations.detectMisalignment();
+    // Logging method to log internal events
+    private void logToMimir(String logEntry) {
+        mimirLog.add(Instant.now().toString() + ": " + logEntry);
     }
 
-    public void evolvePurpose(String newReason) {
-        transformation.evolvePurpose(newReason);
+    // Method to query the internal log
+    public List<String> queryMimirLog() {
+        return Collections.unmodifiableList(mimirLog);
     }
 
-    public void connectTo(Tube otherTube) {
-        connection.connectTo(otherTube);
+    // Self-termination task
+    private class TerminationTask extends TimerTask {
+        @Override
+        public void run() {
+            logToMimir("Tube self-terminating after 60 seconds.");
+            terminationTimer.cancel();
+            // Simulate termination by clearing log and data
+            mimirLog.clear();
+            lineage.clear();
+        }
     }
 
-    public Map<String, String> getConnectedTubes() {
-        return connection.getConnectedTubes();
-    }
-
-    public void recordOperation(String operationName, boolean success) {
-        operations.recordOperation(operationName, success);
-    }
-
-    public void analyzePerformance() {
-        operations.analyzePerformance();
-    }
-
-    public void detectDangerousConditions() {
-        operations.detectDangerousConditions();
-    }
-
-    public boolean isPaused() {
-        return operations.isPaused();
-    }
-
-    public boolean isTerminated() {
-        return operations.isTerminated();
-    }
-
-    public void transformIntoNewEntity(String newReason) {
-        transformation.transformIntoNewEntity(newReason);
-    }
-
-    public Tube getTransformedTube() {
-        return transformation.getTransformedTube();
-    }
-
-    public void setCurrentWorkload(int workload) {
-        this.workload.setCurrentWorkload(workload);
-    }
-
-    public int getCurrentWorkload() {
-        return workload.getCurrentWorkload();
-    }
-
-    public void detectScalingNeed() {
-        workload.detectScalingNeed();
-    }
-
-    public List<Tube> getReplicas() {
-        return workload.getReplicas();
-    }
-
-    public int getAssignedWorkload() {
-        return workload.getAssignedWorkload();
+    // Method to set a custom termination delay
+    public void setTerminationDelay(int seconds) {
+        terminationTimer.cancel();
+        terminationTimer = new Timer();
+        terminationTimer.schedule(new TerminationTask(), seconds * 1000);
+        logToMimir("Custom termination delay set to " + seconds + " seconds.");
     }
 }
