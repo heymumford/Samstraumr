@@ -1,10 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
-  <artifactId>samstraumr-core</artifactId>
-  <packaging>jar</packaging>
-  <version>0.2a</version>
 
   <parent>
     <groupId>org.samstraumr</groupId>
@@ -12,9 +9,11 @@
     <version>0.2</version>
   </parent>
 
-  <dependencies>
-    <!-- This is a child POM. Version numbers belong only in parent POM. -->
+  <artifactId>samstraumr-core</artifactId>
+  <packaging>jar</packaging>
+  <name>Samstraumr Core</name>
 
+  <dependencies>
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -23,20 +22,22 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j2-impl</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
+      <scope>runtime</scope>
     </dependency>
 
-    <!-- JSON handling with Jackson -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-    </dependency>
+    <!-- Jackson for JSON serialization -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
     </dependency>
 
     <!-- OSHI for system information -->
@@ -45,20 +46,20 @@
       <artifactId>oshi-core</artifactId>
     </dependency>
 
-    <!-- Testing dependencies -->
+    <!-- Testing -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-api</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
+      <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-suite-api</artifactId>
+      <artifactId>junit-platform-suite</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-java</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -67,45 +68,22 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-console-standalone</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>io.cucumber</groupId>
-      <artifactId>cucumber-java</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/*Test.java</include>
-            <include>**/*IT.java</include>
-          </includes>
-          <properties>
-            <configurationParameters>
-              cucumber.junit-platform.naming-strategy=long
-              cucumber.glue=org.samstraumr.tube.steps
-              cucumber.features=src/test/resources/tube/features
-            </configurationParameters>
-
-          </properties>
-        </configuration>
+        <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
-
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
     </plugins>
   </build>
-
 </project>

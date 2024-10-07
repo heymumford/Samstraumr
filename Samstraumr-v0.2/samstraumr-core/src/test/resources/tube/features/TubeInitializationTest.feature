@@ -6,5 +6,5 @@ Feature: Tube Initialization and Logging
     Then the Tube should initialize with a unique UUID
     And the Tube should log its environment details
     And the Tube should log the reason "Test Initialization"
-    And the Tube's log should be queryable
+    And the Tube log should be queryable
 

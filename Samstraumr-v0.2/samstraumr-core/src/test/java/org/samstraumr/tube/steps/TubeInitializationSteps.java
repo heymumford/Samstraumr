@@ -49,8 +49,8 @@ public class TubeInitializationSteps {
         assertTrue(log.contains(reason));  // Ensure the reason is logged
     }
 
-    @Then("the Tube's log should be queryable")
-    public void the_Tube_s_log_should_be_queryable() {
+    @Then("the Tube log should be queryable")
+    public void the_Tube_log_should_be_queryable() {
         assertFalse(testTube.queryMimirLog().isEmpty());  // Ensure the log is populated and queryable
     }
 }

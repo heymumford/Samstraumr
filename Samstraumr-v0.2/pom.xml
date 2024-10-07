@@ -20,21 +20,18 @@
         <java.version>21</java.version>
         <maven.compiler.release>${java.version}</maven.compiler.release>
 
-        <!-- List all product versions in this parent POM, not in child POMs -->
+        <!-- Dependency Versions -->
         <slf4j.version>2.0.16</slf4j.version>
         <log4j.version>2.24.0</log4j.version>
-        <oshi-core.version>6.6.5</oshi-core.version> <!-- Java 11+ compatible -->
+        <oshi-core.version>6.6.5</oshi-core.version>
         <jackson-databind.version>2.18.0</jackson-databind.version>
         <jackson-core.version>2.18.0</jackson-core.version>
         <junit.version>5.11.2</junit.version>
-        <junit-platform-suite-api.version>1.11.2</junit-platform-suite-api.version>
-        <junit-platform-console-standalone.version>1.11.2</junit-platform-console-standalone.version>
-        <mockito.version>3.9.0</mockito.version>
-        <cucumber-java.version>7.20.0</cucumber-java.version>
-        <cucumber-junit.version>5.0.0</cucumber-junit.version>
-        <cucumber-junit-platform-engine.version>7.20.0</cucumber-junit-platform-engine.version>
+        <junit-platform.version>1.11.2</junit-platform.version>
+        <mockito.version>5.11.0</mockito.version>
+        <cucumber.version>7.15.0</cucumber.version>
         <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
-        <maven.surefire.plugin.version>3.5.0</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -78,50 +75,34 @@
             <!-- Testing Dependencies (JUnit, Mockito, Cucumber) -->
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-api</artifactId>
+                <artifactId>junit-jupiter</artifactId>
                 <version>${junit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-engine</artifactId>
-                <version>${junit.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.junit.platform</groupId>
-                <artifactId>junit-platform-suite-api</artifactId>
-                <version>${junit-platform-suite-api.version}</version>
+                <artifactId>junit-platform-suite</artifactId>
+                <version>${junit-platform.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
                 <version>${mockito.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>io.cucumber</groupId>
                 <artifactId>cucumber-java</artifactId>
-                <version>${cucumber-java.version}</version>
+                <version>${cucumber.version}</version>
+                <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>io.cucumber</groupId>
-                <artifactId>cucumber-junit</artifactId>
-                <version>${cucumber-junit.version}</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/io.cucumber/cucumber-junit-platform-engine -->
             <dependency>
                 <groupId>io.cucumber</groupId>
                 <artifactId>cucumber-junit-platform-engine</artifactId>
-                <version>${cucumber-junit-platform-engine.version}</version>
+                <version>${cucumber.version}</version>
                 <scope>test</scope>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/org.junit.platform/junit-platform-console-standalone -->
-            <dependency>
-                <groupId>org.junit.platform</groupId>
-                <artifactId>junit-platform-console-standalone</artifactId>
-                <version>${junit-platform-console-standalone.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-
         </dependencies>
     </dependencyManagement>
 
@@ -144,10 +125,12 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven.surefire.plugin.version}</version>
                     <configuration>
-                        <testFailureIgnore>false</testFailureIgnore>  <!-- Fail the build if tests fail -->
-                        <includes>
-                            <include>**/*Test.java</include>
-                        </includes>
+                        <properties>
+                            <configurationParameters>
+                                cucumber.junit-platform.naming-strategy=long
+                                cucumber.plugin=pretty
+                            </configurationParameters>
+                        </properties>
                     </configuration>
                 </plugin>
             </plugins>
