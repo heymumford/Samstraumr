@@ -1,8 +1,9 @@
-# E. C. Mumford
+# Concept and Authorship by [Eric C. Mumford](mailto:heymumford@samstraumr.org), *Lifelong engineer and tinkerer*
 
-*Lifelong engineer and tinkerer*
+[https://github.com/heymumford](https://github.com/heymumford)
+[https://www.linkedin.com/in/eric-mumford/](https://www.linkedin.com/in/eric-mumford/)
 
-# Samstraumr
+# Introducing Samstraumr
 
 *A blend of "Sam" – together, unified + "Straumr" – Old Norse for "stream" or "flow"*
 
