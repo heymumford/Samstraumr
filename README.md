@@ -107,3 +107,6 @@ While it may take longer initially to design and implement software using TBD, i
 ## Sit Down < Flow Up!
 
 Samstraumr isn't just a framework; it's a philosophy that values elegance, efficiency, and collaboration. By adopting TBD, you can create maintainable, adaptable systems faster, leaving more time for creativity and less time spent on firefighting code issues.
+
+For more information and to view Composite Tube proposals, visit the [Proposals Documentation](./docs/proposals).
+To contact Eric, click his name at the top.
