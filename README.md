@@ -1,20 +1,26 @@
-<h1 align="center">E. C. Mumford</h1>
-<p align="center"><i><small>Lifelong engineer and tinkerer</small></i></p>
+# E. C. Mumford
 
-<h1 align="center">Samstraumr</h1>
-<p align="center"><i><small>A blend of "Sam" – together, unified + "Straumr" – Old Norse for "stream" or "flow"</small></i></p>
+*Lifelong engineer and tinkerer*
 
-<h2 align="center">A Living Blueprint for Self-Aware, Adaptable Code</h2>
+# Samstraumr
+
+*A blend of "Sam" – together, unified + "Straumr" – Old Norse for "stream" or "flow"*
+
+## A Living Blueprint for Self-Aware, Adaptable Code
 
 ---
 
-# What is Samstraumr?
+## What is Samstraumr?
 
-Samstraumr is a design framework that introduces **Tube-Based Development (TBD)**—a methodology where interconnected **tubes** process inputs and outputs, forming adaptive systems. Inspired by natural flows, each tube serves a unique purpose, operating at various abstraction levels, and can be combined to create complex, maintainable solutions rapidly.
+Samstraumr is a design framework that introduces **Tube-Based Development (TBD)**—a methodology where interconnected **tubes** process inputs and outputs, forming adaptive systems. Inspired by natural flows, each tube serves a unique purpose, operating at various levels of abstraction, and can be combined to rapidly create complex, maintainable solutions.
 
-# Why My Soul Sings Out That Samstraumr Matters
+---
 
-You are reading this as a result of me surviving decades of many thousands of lines of legacy code thinking, *there must be a better way*. This is my attempt at that way. In traditional development, timelines and milestones often force engineers to prioritize speed over elegance, leading to complex, hard-to-maintain code. Samstraumr and TBD offer a practical framework to build maintainable code faster by:
+## Why Samstraumr Matters to Me
+
+After decades of navigating thousands of lines of legacy code, I often thought, *there must be a better way*. Samstraumr is my attempt at that better way. In traditional development, timelines and milestones often force engineers to prioritize speed over elegance, leading to complex, hard-to-maintain code.
+
+Samstraumr and TBD offer a practical framework to build maintainable code faster by:
 
 - **Promoting Modularity**: Breaking down systems into independent, reusable components.
 - **Enhancing Maintainability**: Simplifying updates and reducing technical debt.
@@ -23,10 +29,13 @@ You are reading this as a result of me surviving decades of many thousands of li
 
 Samstraumr captures the essence of natural flows—systems that adapt and evolve without unnecessary complexity. It's about creating code that is as efficient and graceful as nature itself, enabling developers to focus on innovation rather than wrestling with tangled codebases.
 
-# Principles of Tube-Based Development
+---
 
-Functional and Object-Oriented programming are foundational tools rooted in science, process, and rigor. They have revolutionized software development, much like the invention of the airplane transformed transportation. 
-Just as airplanes led to helicopters and then drones, each utilizing flight principles differently for new applications, Samstraumr evolves from OOP and FP to emphasize adaptability and natural flow.
+## Principles of Tube-Based Development
+
+Functional and Object-Oriented programming are foundational tools rooted in science, process, and rigor. They have revolutionized software development, much like the invention of the airplane transformed transportation.
+
+Just as airplanes led to helicopters and then drones—each utilizing flight principles differently for new applications—Samstraumr evolves from OOP and FP to emphasize adaptability and natural flow.
 
 Inspired by the Agile Manifesto, TBD emphasizes:
 
@@ -44,6 +53,8 @@ Inspired by the Agile Manifesto, TBD emphasizes:
     - Eliminate superfluous elements to achieve graceful scaling.
 7. **Learning and Experimentation over Fear of Failure**
     - Embrace failures as stepping stones to growth.
+
+---
 
 ## Practical Implementation of TBD
 
@@ -79,18 +90,19 @@ Inspired by the Agile Manifesto, TBD emphasizes:
 
 *Example*: If a database tube fails, operations continue using a standby tube seamlessly.
 
-## How Samstraumr Intends to Reduce Maintenance Cost
+---
 
-It may take longer (at first) to design and implement software using TBD. Doing something new always requires a time investment. If you really need the outcomes and dynamic circumstance handling of tube-based design, you are going to pay for them whether you choose TBD or not.
+## How Samstraumr Reduces Maintenance Costs
 
-Samstraumr aims to practically implement TBD in such a way as to:
+While it may take longer initially to design and implement software using TBD, investing time upfront leads to significant long-term benefits. Samstraumr aims to:
 
-- **Reduce Complexity**: Focus on one tube at a time simplifies coding and debugging.
+- **Reduce Complexity**: Focusing on one tube at a time simplifies coding and debugging.
 - **Accelerate Testing**: Isolated tubes are easier and faster to test thoroughly.
 - **Simplify Deployment**: Update individual tubes without redeploying the entire system.
 - **Enhance Team Productivity**: Teams can work on different tubes simultaneously without conflicts.
 
+---
 
-# Sit Down < Flow Up! 
+## Sit Down < Flow Up!
 
 Samstraumr isn't just a framework; it's a philosophy that values elegance, efficiency, and collaboration. By adopting TBD, you can create maintainable, adaptable systems faster, leaving more time for creativity and less time spent on firefighting code issues.
