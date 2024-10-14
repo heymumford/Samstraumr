@@ -1,39 +1,65 @@
 package org.samstraumr.tube;
 
-import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Timer;
 import java.time.Instant;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.TimerTask;
+
 
 public class Tube {
+    private static final Logger logger = LoggerFactory.getLogger(Tube.class);
+    private static final int DEFAULT_TERMINATION_DELAY = 60; // seconds
+    private static final String DIGEST_ALGORITHM = "SHA-256";
+
     private final String uniqueId;
-    private String reason;
-    private final List<String> lineage;
+    private final String reason;
+    private static List<String> lineage;
+    private static List<String> mimirLog;
     private final Environment environment;
-    private final List<String> mimirLog;  // Internal log (temporary solution)
-    private Timer terminationTimer;
+    private volatile Timer terminationTimer;
 
     public Tube(String reason, Environment environment) {
-        this.uniqueId = generateUniqueId(reason + environment.getParameters());
-        this.reason = reason;
-        this.environment = environment;
-        this.lineage = new ArrayList<>(Collections.singletonList(reason));
-        this.mimirLog = new LinkedList<>();  // Using LinkedList for simple in-memory logging
-        logToMimir("Tube initialized with ID: " + this.uniqueId);
-
-        // Set a default self-termination delay of 60 seconds
-        this.terminationTimer = new Timer();
-        terminationTimer.schedule(new TerminationTask(), 60 * 1000);
+        logger.info("Initializing new Tube with reason: {}", reason);
+        try {
+            this.reason = reason;
+            this.environment = environment;
+            initializeLists(reason);
+            this.uniqueId = generateSHA256UniqueId(reason + environment.getParameters());
+            initializeTube();
+        } catch (Exception e) {
+            logger.error("Failed to initialize Tube", e);
+            throw new TubeInitializationException("Failed to initialize Tube", e);
+        }
     }
 
-    private String generateUniqueId(String parameters) {
+    private void initializeLists(String reason) {
+        this.lineage = Collections.synchronizedList(new ArrayList<>(Collections.singletonList(reason)));
+        this.mimirLog = Collections.synchronizedList(new LinkedList<>());
+    }
+
+    private void initializeTube() {
+        logToMimir("Tube initialized with ID: " + this.uniqueId);
+        logger.debug("Tube initialized with ID: {}", this.uniqueId);
+        setTerminationDelay(DEFAULT_TERMINATION_DELAY);
+        logToMimir("Environment: " + environment.getParameters());
+    }
+
+    private String generateSHA256UniqueId(String parameters) {
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            MessageDigest digest = MessageDigest.getInstance(DIGEST_ALGORITHM);
             byte[] hash = digest.digest((parameters + Instant.now().toString()).getBytes());
             return bytesToHex(hash);
         } catch (NoSuchAlgorithmException e) {
-            logToMimir("Error generating unique ID: " + e.getMessage());
-            throw new RuntimeException("SHA-256 algorithm not found", e);
+            logger.error("Failed to generate unique ID: SHA-256 algorithm not found", e);
+            throw new TubeInitializationException("Failed to generate unique ID", e);
         }
     }
 
@@ -59,33 +85,60 @@ public class Tube {
         return Collections.unmodifiableList(lineage);
     }
 
-    // Logging method to log internal events
-    private void logToMimir(String logEntry) {
-        mimirLog.add(Instant.now().toString() + ": " + logEntry);
-    }
-
-    // Method to query the internal log
     public List<String> queryMimirLog() {
+        logger.debug("Querying Mimir log. Current size: {}", mimirLog.size());
         return Collections.unmodifiableList(mimirLog);
     }
 
-    // Self-termination task
-    private class TerminationTask extends TimerTask {
-        @Override
-        public void run() {
-            logToMimir("Tube self-terminating after 60 seconds.");
-            terminationTimer.cancel();
-            // Simulate termination by clearing log and data
-            mimirLog.clear();
-            lineage.clear();
+    public synchronized void setTerminationDelay(int seconds) {
+        logger.info("Setting termination delay to {} seconds", seconds);
+        try {
+            synchronized (this) {
+                if (terminationTimer != null) {
+                    terminationTimer.cancel();
+                }
+                terminationTimer = new Timer();
+                terminationTimer.schedule(new TerminationTask(), seconds * 1000L);
+            }
+            logToMimir("Custom termination delay set to " + seconds + " seconds.");
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid termination delay: {}", seconds, e);
+            throw new IllegalArgumentException("Invalid termination delay", e);
         }
     }
 
-    // Method to set a custom termination delay
-    public void setTerminationDelay(int seconds) {
-        terminationTimer.cancel();
-        terminationTimer = new Timer();
-        terminationTimer.schedule(new TerminationTask(), seconds * 1000);
-        logToMimir("Custom termination delay set to " + seconds + " seconds.");
+    private void logToMimir(String logEntry) {
+        String timestampedEntry = Instant.now().toString() + ": " + logEntry;
+        mimirLog.add(timestampedEntry);
+        logger.trace("Mimir Log: {}", timestampedEntry);
+    }
+
+
+    private class TerminationTask extends TimerTask {
+        @Override
+        public void run() {
+            synchronized (Tube.this) {
+                logger.info("Executing termination task for Tube: {}", uniqueId);
+                logToMimir("Tube self-terminating.");
+                terminationTimer.cancel();
+                clearLogsAndLineage();
+                logger.debug("Tube {} terminated. Mimir log and lineage cleared.", uniqueId);
+            }
+        }
+
+        private void clearLogsAndLineage() {
+            synchronized (mimirLog) {
+                mimirLog.clear();
+            }
+            synchronized (lineage) {
+                lineage.clear();
+            }
+        }
+    }
+
+    public static class TubeInitializationException extends RuntimeException {
+        public TubeInitializationException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 }
