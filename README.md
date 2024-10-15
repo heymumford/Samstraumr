@@ -19,7 +19,8 @@ Samstraumr is a design framework that introduces **Tube-Based Development (TBD)*
 
 ## Why Samstraumr Matters to Me
 
-After decades of navigating thousands of lines of legacy code, I often thought, *there must be a better way*. Samstraumr is my attempt at that better way. In traditional development, timelines and milestones often force engineers to prioritize speed over elegance, leading to complex, hard-to-maintain code.
+After decades of navigating thousands of lines of choppy legacy code and writing test scripts and automation platforms to maintain and upgrade such products, I often thought, *there must be a better way*. Samstraumr is my attempt at that better way. 
+In traditional development, timelines and milestones often force engineers to prioritize speed of implementation over design elegance, reliability, and documentation, leading to complex, hard-to-maintain code.
 
 Samstraumr and TBD offer a practical framework to build maintainable code faster by:
 
