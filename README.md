@@ -96,6 +96,8 @@ Inspired by the Agile Manifesto, TBD emphasizes:
 
 ## How Samstraumr Reduces Maintenance Costs
 
+Every software product can be modeled in a Tube Based Design. By using the design templates and forcing yourself to think first, design first, test first, and then implement code and iterate, your mean time to deploy tested changes to production is reduced dramatically. And, its more fun to code and test!
+
 While it may take longer initially to design and implement software using TBD, investing time upfront leads to significant long-term benefits. Samstraumr aims to:
 
 - **Reduce Complexity**: Focusing on one tube at a time simplifies coding and debugging.
