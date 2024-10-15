@@ -10,7 +10,9 @@ If you haven't read about Tube Based Development, of which Samstraumr is one imp
 
 ## 🌟 **You Already Know Why This Document Exists**
 
-Our mission is to define a clear, concise, and MECE (Mutually Exclusive, Collectively Exhaustive) unit testing strategy for **Tube.java**, focusing on atomic-level testing. By following this guide, you'll have the best possible framework to test, build, and maintain the integrity of our **Samstraumr** components—from atomic Tubes to sprawling Machines that interact with the real world.
+Testing is like going to the dentist. You put it off for as long as possible until you feel just enough pain to need to do it, and when you end up in that chair, you hope the practitioner behind the blinding light knows what they're doing.
+
+Don't be an anti-dentite! Our mission here is to define a clear, concise, and MECE (Mutually Exclusive, Collectively Exhaustive) unit testing strategy for **Tube.java**, focusing on atomic-level testing. By following this guide, you'll have the best possible framework to test, build, and maintain the integrity of our **Samstraumr** components—from atomic Tubes to sprawling Machines that interact with the real world.
 
 **Key Concepts Covered**:
 - **ATL/BTL Testing** (Above The Line / Below The Line)
