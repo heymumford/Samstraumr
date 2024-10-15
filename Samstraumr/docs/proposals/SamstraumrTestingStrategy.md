@@ -4,6 +4,8 @@ Welcome, friend! You’re about to embark on a journey through the fascinating w
 
 This **Unit Test Strategy** will serve as your trusty guide for navigating the rigorous (but totally fun) terrain of **Tube.java Atomic Boundary Tests**, all the way up to the grand symphony of **Machine Construct Validation**. Buckle up, and let’s do this!
 
+If you haven't read about Tube Based Development, of which Samstraumr is one implementation of, you want to read [the top level README](../../../README.md) first.
+
 ---
 
 ## 🌟 **You Already Know Why This Document Exists**
@@ -176,4 +178,6 @@ At the highest level, we test **how Machines—composed of many Tubes and Compos
 
 ## 🌟 **Final Thoughts**
 
-Samstraumr is all about **building systems that grow, adapt, and scale**—just like Voltron, but with more tubes and less drama. Through **precise, playful testing**, we ensure that each Tube, Composite, and Machine works like a charm. This
+Samstraumr is all about building systems that grow, adapt, and scale—just like Voltron, but with more tubes and less drama. Through precise, playful testing, we ensure that each Tube, Composite, and Machine works like a charm. This is where the magic of Tube-Based Design shines: by creating self-aware, modular components that can evolve smoothly, even when the external world gets messy. Whether you're testing an atomic Tube that's happily working in isolation or a Composite Tube interacting with an API, the principles of Samstraumr keep things running efficiently.
+
+By focusing on clarity, resilience, and scalability, and by having a bit of fun along the way, we're not just building systems—we're creating an entire ecosystem of flexible, evolving technology that can handle anything the real world throws at it. After all, what's more fun than making sure your Tubes know their purpose, work together like a well-oiled machine, and keep the peace?
