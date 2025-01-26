@@ -1,144 +1,141 @@
 package org.samstraumr.tube;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Collections;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Timer;
 import java.time.Instant;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.TimerTask;
-
+import java.util.UUID;
+import java.util.Map;
+import java.util.HashMap;
+import com.fasterxml.jackson.databind.JsonNode;
+import org.samstraumr.tube.util.SystemInfoUtility;
+import org.samstraumr.tube.core.BirthCertificate;
+import org.samstraumr.tube.core.VitalStats;
+import org.samstraumr.tube.core.HealthAssessment;
+import org.samstraumr.tube.core.MetricData;
+import org.samstraumr.tube.api.TubeMonitor;
+import org.samstraumr.tube.api.TubeProcessor;
+import org.samstraumr.tube.api.TubeResourceManager;
+import org.samstraumr.tube.api.TubeState;
+import org.samstraumr.tube.logging.TubeLogger;
+import org.samstraumr.tube.util.TubeValidator;
 
 public class Tube {
-    private static final Logger logger = LoggerFactory.getLogger(Tube.class);
-    private static final int DEFAULT_TERMINATION_DELAY = 60; // seconds
-    private static final String DIGEST_ALGORITHM = "SHA-256";
+    // Immutable core identity fields
+    private final String uuid;
+    private final Instant birthTime;
+    private final JsonNode systemInfo;
+    private final BirthCertificate birthCertificate;
 
-    private final String uniqueId;
-    private final String reason;
-    private static List<String> lineage;
-    private static List<String> mimirLog;
-    private final Environment environment;
-    private volatile Timer terminationTimer;
+    // VitalStats object that tracks resource usage
+    private VitalStats vitalStats;
+    private HealthAssessment healthStatus;
+    private boolean monitoringActive;
 
-    public Tube(String reason, Environment environment) {
-        logger.info("Initializing new Tube with reason: {}", reason);
-        try {
-            this.reason = reason;
-            this.environment = environment;
-            initializeLists(reason);
-            this.uniqueId = generateSHA256UniqueId(reason + environment.getParameters());
-            initializeTube();
-        } catch (Exception e) {
-            logger.error("Failed to initialize Tube", e);
-            throw new TubeInitializationException("Failed to initialize Tube", e);
+    // Feedback mechanism state
+    private double adaptationRate;
+
+    // Externalized components
+    private final TubeMonitor tubeMonitor;
+    private final TubeProcessor tubeProcessor;
+    private final TubeResourceManager tubeResourceManager;
+    private final TubeState tubeState;
+
+    // Constructor
+    public Tube(String purpose) {
+        this.uuid = UUID.randomUUID().toString();
+        this.birthTime = Instant.now();
+        this.systemInfo = SystemInfoUtility.getSystemInfo();
+        this.birthCertificate = new BirthCertificate(uuid, birthTime, purpose);
+
+        // Initialize specialized components
+        this.tubeMonitor = new TubeMonitor(this);
+        this.tubeProcessor = new TubeProcessor(this);
+        this.tubeResourceManager = new TubeResourceManager(this);
+        this.tubeState = new TubeState();
+
+        initializeEnvironment();
+        TubeLogger.info("Tube created with identity: " + getIdentity());
+    }
+
+    // Initialize vital stats and monitoring status
+    private void initializeEnvironment() {
+        this.vitalStats = new VitalStats();
+        this.healthStatus = new HealthAssessment();
+        this.monitoringActive = true;
+        tubeResourceManager.initializeResources();
+        this.adaptationRate = 1.0; // Default adaptation rate for feedback loop
+    }
+
+    // Get identity information for the Tube
+    public String getIdentity() {
+        return String.format("UUID: %s, BirthTime: %s, SystemInfo: %s", uuid, birthTime, systemInfo.toString());
+    }
+
+    // Update vital stats with current memory and CPU usage
+    public void updateResourceUsage() {
+        long memoryUsage = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        int cpuCores = Runtime.getRuntime().availableProcessors();
+        vitalStats.updateStats(memoryUsage, cpuCores);
+    }
+
+    // Getters for vital stats
+    public VitalStats getVitalStats() {
+        return this.vitalStats;
+    }
+
+    // Check if monitoring is active
+    public boolean isMonitoringActive() {
+        return monitoringActive;
+    }
+
+    // Feedback loop simulation
+    public void adaptToFeedback(double newAdaptationRate) {
+        this.adaptationRate = newAdaptationRate;
+        tubeMonitor.adaptToFeedback(newAdaptationRate);
+        TubeLogger.info(String.format("Adaptation rate updated to: %.2f", newAdaptationRate));
+    }
+
+    // Method to perform a self-check and return vital stats
+    public VitalStats checkVitalStats() {
+        updateResourceUsage(); // Ensure stats are current
+        TubeValidator.areVitalStatsNormal(vitalStats); // Pass vitalStats directly
+        return vitalStats;
+    }
+
+    // Method to analyze resource usage patterns
+    public void analyzeResources() {
+        tubeResourceManager.analyzeResources();
+    }
+
+    // Health check
+    public HealthAssessment checkHealth() {
+        HealthAssessment assessment = tubeMonitor.checkHealth();
+        if (!assessment.isHealthy()) {
+            TubeLogger.warn("Health check indicates issues with Tube: " + getIdentity());
+        }
+        return assessment;
+    }
+
+    // Get birth certificate
+    public BirthCertificate getBirthCertificate() {
+        return birthCertificate;
+    }
+
+    // Transition state
+    public void transitionState(TubeState.State newState) {
+        if (TubeValidator.isValidStateTransition(this, tubeState.getCurrentState().toString(), newState.toString())) {
+            tubeState.setState(newState);
+            TubeLogger.info(String.format("State transitioned to: %s", newState));
+        } else {
+            TubeLogger.warn(String.format("Invalid state transition attempted from %s to %s", tubeState.getCurrentState(), newState));
         }
     }
 
-    private void initializeLists(String reason) {
-        this.lineage = Collections.synchronizedList(new ArrayList<>(Collections.singletonList(reason)));
-        this.mimirLog = Collections.synchronizedList(new LinkedList<>());
+    // Method to check if tube is fully initialized
+    public boolean isInitialized() {
+        return monitoringActive && vitalStats != null && healthStatus != null;
     }
 
-    private void initializeTube() {
-        logToMimir("Tube initialized with ID: " + this.uniqueId);
-        logger.debug("Tube initialized with ID: {}", this.uniqueId);
-        setTerminationDelay(DEFAULT_TERMINATION_DELAY);
-        logToMimir("Environment: " + environment.getParameters());
-    }
-
-    private String generateSHA256UniqueId(String parameters) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance(DIGEST_ALGORITHM);
-            byte[] hash = digest.digest((parameters + Instant.now().toString()).getBytes());
-            return bytesToHex(hash);
-        } catch (NoSuchAlgorithmException e) {
-            logger.error("Failed to generate unique ID: SHA-256 algorithm not found", e);
-            throw new TubeInitializationException("Failed to generate unique ID", e);
-        }
-    }
-
-    private static String bytesToHex(byte[] hash) {
-        StringBuilder hexString = new StringBuilder(2 * hash.length);
-        for (byte b : hash) {
-            String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1) hexString.append('0');
-            hexString.append(hex);
-        }
-        return hexString.toString();
-    }
-
-    public String getUniqueId() {
-        return uniqueId;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public List<String> getLineage() {
-        return Collections.unmodifiableList(lineage);
-    }
-
-    public List<String> queryMimirLog() {
-        logger.debug("Querying Mimir log. Current size: {}", mimirLog.size());
-        return Collections.unmodifiableList(mimirLog);
-    }
-
-    public synchronized void setTerminationDelay(int seconds) {
-        logger.info("Setting termination delay to {} seconds", seconds);
-        try {
-            synchronized (this) {
-                if (terminationTimer != null) {
-                    terminationTimer.cancel();
-                }
-                terminationTimer = new Timer();
-                terminationTimer.schedule(new TerminationTask(), seconds * 1000L);
-            }
-            logToMimir("Custom termination delay set to " + seconds + " seconds.");
-        } catch (IllegalArgumentException e) {
-            logger.error("Invalid termination delay: {}", seconds, e);
-            throw new IllegalArgumentException("Invalid termination delay", e);
-        }
-    }
-
-    private void logToMimir(String logEntry) {
-        String timestampedEntry = Instant.now().toString() + ": " + logEntry;
-        mimirLog.add(timestampedEntry);
-        logger.trace("Mimir Log: {}", timestampedEntry);
-    }
-
-
-    private class TerminationTask extends TimerTask {
-        @Override
-        public void run() {
-            synchronized (Tube.this) {
-                logger.info("Executing termination task for Tube: {}", uniqueId);
-                logToMimir("Tube self-terminating.");
-                terminationTimer.cancel();
-                clearLogsAndLineage();
-                logger.debug("Tube {} terminated. Mimir log and lineage cleared.", uniqueId);
-            }
-        }
-
-        private void clearLogsAndLineage() {
-            synchronized (mimirLog) {
-                mimirLog.clear();
-            }
-            synchronized (lineage) {
-                lineage.clear();
-            }
-        }
-    }
-
-    public static class TubeInitializationException extends RuntimeException {
-        public TubeInitializationException(String message, Throwable cause) {
-            super(message, cause);
-        }
+    // Placeholder for rolling metrics, can be an empty map for now
+    public Map<String, MetricData> getRollingMetrics() {
+        return new HashMap<>(); // Placeholder until more functionality is added
     }
 }
