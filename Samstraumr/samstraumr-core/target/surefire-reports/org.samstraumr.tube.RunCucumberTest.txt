@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 Test set: org.samstraumr.tube.RunCucumberTest
 -------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 3, Skipped: 0, Time elapsed: 3.604 s <<< FAILURE! -- in org.samstraumr.tube.RunCucumberTest
-Tube Initialization and Logging.Tube Initialization and Logging - Tube generates unique UUIDs across multiple instantiations -- Time elapsed: 0.079 s <<< ERROR!
+Tests run: 22, Failures: 0, Errors: 1, Skipped: 20, Time elapsed: 8.315 s <<< FAILURE! -- in org.samstraumr.tube.RunCucumberTest
+Tube Initialization and Logging.Tube Initialization and Logging - Tube generates unique UUIDs across multiple instantiations -- Time elapsed: 0.105 s <<< ERROR!
 io.cucumber.junit.platform.engine.UndefinedStepException: 
 The step '100 Tubes are instantiated simultaneously' and 3 other step(s) are undefined.
 You can implement these steps using the snippet(s) below:
@@ -24,77 +24,6 @@ public void no_two_tubes_should_share_the_same_uuid() {
 }
 @Then("all Tube logs should be queryable for their UUIDs")
 public void all_tube_logs_should_be_queryable_for_their_uui_ds() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
-}
-
-	at io.cucumber.core.runtime.TestCaseResultObserver.assertTestCasePassed(TestCaseResultObserver.java:69)
-	at io.cucumber.junit.platform.engine.TestCaseResultObserver.assertTestCasePassed(TestCaseResultObserver.java:22)
-	at io.cucumber.junit.platform.engine.CucumberEngineExecutionContext.lambda$runTestCase$4(CucumberEngineExecutionContext.java:114)
-	at io.cucumber.core.runtime.CucumberExecutionContext.lambda$runTestCase$5(CucumberExecutionContext.java:137)
-	at io.cucumber.core.runtime.RethrowingThrowableCollector.executeAndThrow(RethrowingThrowableCollector.java:23)
-	at io.cucumber.core.runtime.CucumberExecutionContext.runTestCase(CucumberExecutionContext.java:137)
-	at io.cucumber.junit.platform.engine.CucumberEngineExecutionContext.runTestCase(CucumberEngineExecutionContext.java:109)
-	at io.cucumber.junit.platform.engine.NodeDescriptor$PickleDescriptor.execute(NodeDescriptor.java:168)
-	at io.cucumber.junit.platform.engine.NodeDescriptor$PickleDescriptor.execute(NodeDescriptor.java:90)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
-
-Tube Initialization and Logging.Tube Initialization and Logging - Tube is self-contained and does not attempt external communications -- Time elapsed: 0.118 s <<< ERROR!
-io.cucumber.junit.platform.engine.UndefinedStepException: 
-The step 'the Tube should not establish any external network connections' and 2 other step(s) are undefined.
-You can implement these steps using the snippet(s) below:
-
-@Then("the Tube should not establish any external network connections")
-public void the_tube_should_not_establish_any_external_network_connections() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
-}
-@Then("the Tube should not log any external communication attempts")
-public void the_tube_should_not_log_any_external_communication_attempts() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
-}
-@Then("all Tube operations should remain confined to its internal environment")
-public void all_tube_operations_should_remain_confined_to_its_internal_environment() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
-}
-
-	at io.cucumber.core.runtime.TestCaseResultObserver.assertTestCasePassed(TestCaseResultObserver.java:69)
-	at io.cucumber.junit.platform.engine.TestCaseResultObserver.assertTestCasePassed(TestCaseResultObserver.java:22)
-	at io.cucumber.junit.platform.engine.CucumberEngineExecutionContext.lambda$runTestCase$4(CucumberEngineExecutionContext.java:114)
-	at io.cucumber.core.runtime.CucumberExecutionContext.lambda$runTestCase$5(CucumberExecutionContext.java:137)
-	at io.cucumber.core.runtime.RethrowingThrowableCollector.executeAndThrow(RethrowingThrowableCollector.java:23)
-	at io.cucumber.core.runtime.CucumberExecutionContext.runTestCase(CucumberExecutionContext.java:137)
-	at io.cucumber.junit.platform.engine.CucumberEngineExecutionContext.runTestCase(CucumberEngineExecutionContext.java:109)
-	at io.cucumber.junit.platform.engine.NodeDescriptor$PickleDescriptor.execute(NodeDescriptor.java:168)
-	at io.cucumber.junit.platform.engine.NodeDescriptor$PickleDescriptor.execute(NodeDescriptor.java:90)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
-	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
-
-Tube Initialization and Logging.Tube Initialization and Logging - Tube self-awareness during resource changes -- Time elapsed: 0.013 s <<< ERROR!
-io.cucumber.junit.platform.engine.UndefinedStepException: 
-The step 'the environment is ready with memory "8 GB"' and 3 other step(s) are undefined.
-You can implement these steps using the snippet(s) below:
-
-@Given("the environment is ready with memory {string}")
-public void the_environment_is_ready_with_memory(String string) {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
-}
-@When("the environment changes to {string}")
-public void the_environment_changes_to(String string) {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
-}
-@Then("the Tube should log {string} in the Tube log")
-public void the_tube_should_log_in_the_tube_log(String string) {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
-}
-@Then("the Tube should remain operational while logging resource adjustments")
-public void the_tube_should_remain_operational_while_logging_resource_adjustments() {
     // Write code here that turns the phrase above into concrete actions
     throw new io.cucumber.java.PendingException();
 }

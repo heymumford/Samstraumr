@@ -1,2 +1,5 @@
-org/samstraumr/tube/RunCucumberTest.class
+org/samstraumr/tube/steps/SystemResilienceSteps.class
 org/samstraumr/tube/steps/TubeInitializationSteps.class
+org/samstraumr/tube/steps/BundleConnectionSteps.class
+org/samstraumr/tube/steps/MachineStateSteps.class
+org/samstraumr/tube/RunCucumberTest.class
