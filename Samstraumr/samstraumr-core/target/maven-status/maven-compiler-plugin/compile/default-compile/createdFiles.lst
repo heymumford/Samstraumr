@@ -1,8 +1,0 @@
-org/samstraumr/tube/Environment.class
-org/samstraumr/tube/Tube$TerminationTask.class
-org/samstraumr/tube/TubeStatus.class
-org/samstraumr/tube/TubeLogger.class
-org/samstraumr/tube/TubeLoggerInfo.class
-org/samstraumr/tube/Environment$EnvironmentInfo.class
-org/samstraumr/tube/Tube$TubeInitializationException.class
-org/samstraumr/tube/Tube.class

@@ -28,3 +28,7 @@ replay_pid*
 *.iml
 .DS_Store
 
+# Maven
+target/
+**/target/
+
