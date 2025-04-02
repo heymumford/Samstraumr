@@ -20,6 +20,8 @@
     <cucumber.version>7.15.0</cucumber.version>
     <slf4j.version>2.0.12</slf4j.version>
     <log4j.version>2.22.1</log4j.version>
+    <jackson.version>2.16.1</jackson.version>
+    <oshi.version>6.4.7</oshi.version>
   </properties>
 
   <dependencies>
@@ -70,6 +72,30 @@
       <artifactId>log4j-core</artifactId>
       <version>${log4j.version}</version>
     </dependency>
+    
+    <!-- Jackson for JSON processing -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+
+    <!-- OSHI for system information -->
+    <dependency>
+      <groupId>com.github.oshi</groupId>
+      <artifactId>oshi-core</artifactId>
+      <version>${oshi.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -92,10 +118,18 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
+        <configuration>
+          <rulesets>
+            <ruleset>${project.parent.basedir}/pmd-ruleset.xml</ruleset>
+          </rulesets>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <configLocation>${project.parent.basedir}/checkstyle.xml</configLocation>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>com.github.spotbugs</groupId>

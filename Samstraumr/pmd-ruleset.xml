@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="Custom Ruleset"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+    
+    <description>
+        Custom PMD ruleset for Samstraumr project
+    </description>
+    
+    <!-- Basic ruleset -->
+    <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod" />
+    <rule ref="category/java/bestpractices.xml/UnusedLocalVariable" />
+    <rule ref="category/java/bestpractices.xml/SystemPrintln" />
+
+    <!-- Error-prone ruleset -->
+    <rule ref="category/java/errorprone.xml/UnnecessaryConversionTemporary" />
+    <rule ref="category/java/errorprone.xml/EmptyCatchBlock" />
+    <rule ref="category/java/errorprone.xml/EmptyWhileStmt" />
+
+    <!-- Style ruleset -->
+    <rule ref="category/java/codestyle.xml/EmptyMethodInAbstractClassShouldBeAbstract" />
+    <rule ref="category/java/codestyle.xml/ExtendsObject" />
+    <rule ref="category/java/codestyle.xml/ForLoopShouldBeWhileLoop" />
+</ruleset>

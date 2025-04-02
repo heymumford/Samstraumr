@@ -73,6 +73,10 @@
                     <version>${spotless.plugin.version}</version>
                     <configuration>
                         <java>
+                            <includes>
+                                <include>src/main/java/**/*.java</include>
+                                <include>src/test/java/**/*.java</include>
+                            </includes>
                             <importOrder>
                                 <order>java,javax,org,com,</order>
                             </importOrder>
@@ -85,15 +89,26 @@
                             <endWithNewline />
                         </java>
                         <pom>
+                            <includes>
+                                <include>pom.xml</include>
+                                <include>**/pom.xml</include>
+                            </includes>
                             <sortPom>
                                 <expandEmptyElements>false</expandEmptyElements>
                             </sortPom>
                         </pom>
                         <markdown>
+                            <includes>
+                                <include>**/*.md</include>
+                            </includes>
                             <endWithNewline />
                             <trimTrailingWhitespace />
                         </markdown>
                         <yaml>
+                            <includes>
+                                <include>**/*.yml</include>
+                                <include>**/*.yaml</include>
+                            </includes>
                             <endWithNewline />
                             <trimTrailingWhitespace />
                         </yaml>
@@ -134,9 +149,10 @@
                         <printFailingErrors>true</printFailingErrors>
                         <linkXRef>false</linkXRef>
                         <analysisCache>true</analysisCache>
+                        <includeTests>true</includeTests>
+                        <sourceEncoding>UTF-8</sourceEncoding>
                         <rulesets>
-                            <ruleset>rulesets/java/bestpractices.xml</ruleset>
-                            <ruleset>rulesets/java/errorprone.xml</ruleset>
+                            <ruleset>${project.basedir}/pmd-ruleset.xml</ruleset>
                         </rulesets>
                     </configuration>
                     <executions>
@@ -166,7 +182,7 @@
                         </dependency>
                     </dependencies>
                     <configuration>
-                        <configLocation>google_checks.xml</configLocation>
+                        <configLocation>${project.basedir}/checkstyle.xml</configLocation>
                         <encoding>UTF-8</encoding>
                         <consoleOutput>true</consoleOutput>
                         <failsOnError>true</failsOnError>
