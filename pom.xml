@@ -4,7 +4,7 @@
 
   <groupId>org.samstraumr</groupId>
   <artifactId>samstraumr</artifactId>
-  <version>0.3</version>
+  <version>0.4</version>
   <packaging>pom</packaging>
   <name>Samstraumr</name>
 
@@ -16,6 +16,10 @@
   </modules>
 
   <properties>
+    <!-- Version configuration - Import from the modules directory -->
+    <version.file.path>${project.basedir}/Samstraumr/version.properties</version.file.path>
+
+    <!-- Core properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <all.test.tags>@ATL or @BTL</all.test.tags>
     <atl.test.tags>@ATL</atl.test.tags>
@@ -30,6 +34,9 @@
     <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
     <pmd.version>6.55.0</pmd.version>
     <checkstyle.version>10.14.0</checkstyle.version>
+
+    <!-- Maven resources plugin for filtering -->
+    <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
   </properties>
 
   <build>
@@ -95,6 +102,26 @@
     </pluginManagement>
 
     <plugins>
+      <!-- Load version properties -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.2.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>read-project-properties</goal>
+            </goals>
+            <phase>initialize</phase>
+            <configuration>
+              <files>
+                <file>${version.file.path}</file>
+              </files>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>

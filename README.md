@@ -4,8 +4,8 @@
 
 ```
 Last updated: April 2, 2025
-Maintainer: Eric C. Mumford (@Vorthruna)
-Version: 1.2.0
+Maintainer: Eric C. Mumford (@heymumford)
+Version: 0.4
 License: Mozilla Public License 2.0
 ```
 
@@ -132,6 +132,7 @@ Samstraumr thrives within a garden of diverse practitioners tending their own im
 - **Line Endings:** Unix-style (LF) line endings for all text files except Windows batch files
 - **File Formats:** `.editorconfig` and `.gitattributes` ensure consistent formatting
 - **Quality Checks:** Run `./check-encoding.sh` to verify file encoding and line endings
+- **Version Management:** Run `./update-version.sh <new-version>` to update version across the codebase
 
 ## Connect
 

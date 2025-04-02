@@ -2,7 +2,7 @@
 
 ```
 Last updated: April 2, 2025
-Author: Eric C. Mumford (@Vorthruna)
+Author: Eric C. Mumford (@heymumford)
 Contributors: Samstraumr Core Team
 ```
 
@@ -42,7 +42,7 @@ Add the Samstraumr dependency to your Maven `pom.xml`:
 <dependency>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-core</artifactId>
-    <version>1.2.0</version>
+    <version>0.4</version>
 </dependency>
 ```
 

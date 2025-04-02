@@ -4,7 +4,7 @@
 
   <groupId>org.samstraumr</groupId>
   <artifactId>samstraumr-modules</artifactId>
-  <version>0.3</version>
+  <version>0.4</version>
   <packaging>pom</packaging>
   <name>Samstraumr Modules</name>
 
@@ -13,6 +13,10 @@
   </modules>
 
   <properties>
+    <!-- Load version properties from central file -->
+    <version.file.path>${project.basedir}/version.properties</version.file.path>
+
+    <!-- Core properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
@@ -28,6 +32,9 @@
     <pmd.version>6.55.0</pmd.version>
     <checkstyle.version>10.14.0</checkstyle.version>
 
+    <!-- Maven resources plugin for filtering -->
+    <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
+
     <!-- Test configuration properties -->
     <atl.test.tags>@ATL</atl.test.tags>
     <btl.test.tags>@BTL</btl.test.tags>
@@ -38,6 +45,25 @@
   <build>
     <pluginManagement>
       <plugins>
+        <!-- Properties file plugin to read version information -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>properties-maven-plugin</artifactId>
+          <version>1.2.0</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>read-project-properties</goal>
+              </goals>
+              <phase>initialize</phase>
+              <configuration>
+                <files>
+                  <file>${version.file.path}</file>
+                </files>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
@@ -291,6 +317,20 @@
         </plugin>
       </plugins>
     </pluginManagement>
+
+    <plugins>
+      <!-- Load version properties -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+      </plugin>
+
+      <!-- Code formatting -->
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
   </build>
 
   <!-- Profile definitions for ATL and BTL test execution -->

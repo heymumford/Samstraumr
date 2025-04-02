@@ -63,6 +63,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - Checkstyle: Coding standards
   - SpotBugs: Bug detection
   - JaCoCo: Code coverage
+- Version management
+  - Central version.properties file in Samstraumr/ directory
+  - Update version with: `./update-version.sh <new-version>`
+  - Resources filtered to include version information
 
 ## Quality Reports
 - Cucumber Reports: `target/cucumber-reports/cucumber.html`

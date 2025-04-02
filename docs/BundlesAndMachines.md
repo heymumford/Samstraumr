@@ -2,7 +2,7 @@
 
 ```
 Last updated: April 2, 2025
-Author: Eric C. Mumford (@Vorthruna)
+Author: Eric C. Mumford (@heymumford)
 Contributors: Samstraumr Core Team
 ```
 
