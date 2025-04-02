@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="org.samstraumr.tube.RunCucumberTest" time="3.604" tests="6" errors="3" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/mnt/c/Users/ericm/IdeaProjects/Samstraumr/Samstraumr/samstraumr-core/target/test-classes:/mnt/c/Users/ericm/IdeaProjects/Samstraumr/Samstraumr/samstraumr-core/target/classes:/home/emumford/.m2/repository/org/slf4j/slf4j-api/2.0.16/slf4j-api-2.0.16.jar:/home/emumford/.m2/repository/org/apache/logging/log4j/log4j-slf4j2-impl/2.24.0/log4j-slf4j2-impl-2.24.0.jar:/home/emumford/.m2/repository/org/apache/logging/log4j/log4j-api/2.24.0/log4j-api-2.24.0.jar:/home/emumford/.m2/repository/org/apache/logging/log4j/log4j-core/2.24.0/log4j-core-2.24.0.jar:/home/emumford/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.18.0/jackson-databind-2.18.0.jar:/home/emumford/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.18.0/jackson-annotations-2.18.0.jar:/home/emumford/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.18.0/jackson-core-2.18.0.jar:/home/emumford/.m2/repository/com/github/oshi/oshi-core/6.6.5/oshi-core-6.6.5.jar:/home/emumford/.m2/repository/net/java/dev/jna/jna/5.15.0/jna-5.15.0.jar:/home/emumford/.m2/repository/net/java/dev/jna/jna-platform/5.15.0/jna-platform-5.15.0.jar:/home/emumford/.m2/repository/org/junit/jupiter/junit-jupiter/5.11.2/junit-jupiter-5.11.2.jar:/home/emumford/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.11.2/junit-jupiter-api-5.11.2.jar:/home/emumford/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/emumford/.m2/repository/org/junit/platform/junit-platform-commons/1.11.2/junit-platform-commons-1.11.2.jar:/home/emumford/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.11.2/junit-jupiter-params-5.11.2.jar:/home/emumford/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.11.2/junit-jupiter-engine-5.11.2.jar:/home/emumford/.m2/repository/org/junit/platform/junit-platform-suite/1.11.2/junit-platform-suite-1.11.2.jar:/home/emumford/.m2/repository/org/junit/platform/junit-platform-suite-api/1.11.2/junit-platform-suite-api-1.11.2.jar:/home/emumford/.m2/repository/org/junit/platform/junit-platform-suite-engine/1.11.2/junit-platform-suite-engine-1.11.2.jar:/home/emumford/.m2/repository/org/junit/platform/junit-platform-suite-commons/1.11.2/junit-platform-suite-commons-1.11.2.jar:/home/emumford/.m2/repository/org/junit/platform/junit-platform-launcher/1.11.2/junit-platform-launcher-1.11.2.jar:/home/emumford/.m2/repository/io/cucumber/cucumber-java/7.15.0/cucumber-java-7.15.0.jar:/home/emumford/.m2/repository/io/cucumber/cucumber-core/7.15.0/cucumber-core-7.15.0.jar:/home/emumford/.m2/repository/io/cucumber/cucumber-gherkin/7.15.0/cucumber-gherkin-7.15.0.jar:/home/emumford/.m2/repository/io/cucumber/cucumber-gherkin-messages/7.15.0/cucumber-gherkin-messages-7.15.0.jar:/home/emumford/.m2/repository/io/cucumber/gherkin/26.2.0/gherkin-26.2.0.jar:/home/emumford/.m2/repository/io/cucumber/messages/22.0.0/messages-22.0.0.jar:/home/emumford/.m2/repository/io/cucumber/tag-expressions/6.0.0/tag-expressions-6.0.0.jar:/home/emumford/.m2/repository/io/cucumber/cucumber-expressions/17.0.1/cucumber-expressions-17.0.1.jar:/home/emumford/.m2/repository/io/cucumber/datatable/7.15.0/datatable-7.15.0.jar:/home/emumford/.m2/repository/io/cucumber/cucumber-plugin/7.15.0/cucumber-plugin-7.15.0.jar:/home/emumford/.m2/repository/io/cucumber/docstring/7.15.0/docstring-7.15.0.jar:/home/emumford/.m2/repository/io/cucumber/html-formatter/20.4.0/html-formatter-20.4.0.jar:/home/emumford/.m2/repository/io/cucumber/junit-xml-formatter/0.2.0/junit-xml-formatter-0.2.0.jar:/home/emumford/.m2/repository/io/cucumber/ci-environment/10.0.0/ci-environment-10.0.0.jar:/home/emumford/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/emumford/.m2/repository/io/cucumber/cucumber-junit-platform-engine/7.15.0/cucumber-junit-platform-engine-7.15.0.jar:/home/emumford/.m2/repository/org/junit/platform/junit-platform-engine/1.10.1/junit-platform-engine-1.10.1.jar:/home/emumford/.m2/repository/org/mockito/mockito-core/5.11.0/mockito-core-5.11.0.jar:/home/emumford/.m2/repository/net/bytebuddy/byte-buddy/1.14.12/byte-buddy-1.14.12.jar:/home/emumford/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.12/byte-buddy-agent-1.14.12.jar:/home/emumford/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:"/>
+    <property name="java.vm.vendor" value="Ubuntu"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://ubuntu.com/"/>
+    <property name="user.timezone" value="America/New_York"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-21-openjdk-amd64/lib"/>
+    <property name="sun.java.command" value="/mnt/c/Users/ericm/IdeaProjects/Samstraumr/Samstraumr/samstraumr-core/target/surefire/surefirebooter-20250402133030081_3.jar /mnt/c/Users/ericm/IdeaProjects/Samstraumr/Samstraumr/samstraumr-core/target/surefire 2025-04-02T13-30-29_921-jvmRun1 surefire-20250402133030081_1tmp surefire_0-20250402133030081_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/mnt/c/Users/ericm/IdeaProjects/Samstraumr/Samstraumr/samstraumr-core/target/test-classes:/mnt/c/Users/ericm/IdeaProjects/Samstraumr/Samstraumr/samstraumr-core/target/classes:/home/emumford/.m2/repository/org/slf4j/slf4j-api/2.0.16/slf4j-api-2.0.16.jar:/home/emumford/.m2/repository/org/apache/logging/log4j/log4j-slf4j2-impl/2.24.0/log4j-slf4j2-impl-2.24.0.jar:/home/emumford/.m2/repository/org/apache/logging/log4j/log4j-api/2.24.0/log4j-api-2.24.0.jar:/home/emumford/.m2/repository/org/apache/logging/log4j/log4j-core/2.24.0/log4j-core-2.24.0.jar:/home/emumford/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.18.0/jackson-databind-2.18.0.jar:/home/emumford/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.18.0/jackson-annotations-2.18.0.jar:/home/emumford/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.18.0/jackson-core-2.18.0.jar:/home/emumford/.m2/repository/com/github/oshi/oshi-core/6.6.5/oshi-core-6.6.5.jar:/home/emumford/.m2/repository/net/java/dev/jna/jna/5.15.0/jna-5.15.0.jar:/home/emumford/.m2/repository/net/java/dev/jna/jna-platform/5.15.0/jna-platform-5.15.0.jar:/home/emumford/.m2/repository/org/junit/jupiter/junit-jupiter/5.11.2/junit-jupiter-5.11.2.jar:/home/emumford/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.11.2/junit-jupiter-api-5.11.2.jar:/home/emumford/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/emumford/.m2/repository/org/junit/platform/junit-platform-commons/1.11.2/junit-platform-commons-1.11.2.jar:/home/emumford/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.11.2/junit-jupiter-params-5.11.2.jar:/home/emumford/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.11.2/junit-jupiter-engine-5.11.2.jar:/home/emumford/.m2/repository/org/junit/platform/junit-platform-suite/1.11.2/junit-platform-suite-1.11.2.jar:/home/emumford/.m2/repository/org/junit/platform/junit-platform-suite-api/1.11.2/junit-platform-suite-api-1.11.2.jar:/home/emumford/.m2/repository/org/junit/platform/junit-platform-suite-engine/1.11.2/junit-platform-suite-engine-1.11.2.jar:/home/emumford/.m2/repository/org/junit/platform/junit-platform-suite-commons/1.11.2/junit-platform-suite-commons-1.11.2.jar:/home/emumford/.m2/repository/org/junit/platform/junit-platform-launcher/1.11.2/junit-platform-launcher-1.11.2.jar:/home/emumford/.m2/repository/io/cucumber/cucumber-java/7.15.0/cucumber-java-7.15.0.jar:/home/emumford/.m2/repository/io/cucumber/cucumber-core/7.15.0/cucumber-core-7.15.0.jar:/home/emumford/.m2/repository/io/cucumber/cucumber-gherkin/7.15.0/cucumber-gherkin-7.15.0.jar:/home/emumford/.m2/repository/io/cucumber/cucumber-gherkin-messages/7.15.0/cucumber-gherkin-messages-7.15.0.jar:/home/emumford/.m2/repository/io/cucumber/gherkin/26.2.0/gherkin-26.2.0.jar:/home/emumford/.m2/repository/io/cucumber/messages/22.0.0/messages-22.0.0.jar:/home/emumford/.m2/repository/io/cucumber/tag-expressions/6.0.0/tag-expressions-6.0.0.jar:/home/emumford/.m2/repository/io/cucumber/cucumber-expressions/17.0.1/cucumber-expressions-17.0.1.jar:/home/emumford/.m2/repository/io/cucumber/datatable/7.15.0/datatable-7.15.0.jar:/home/emumford/.m2/repository/io/cucumber/cucumber-plugin/7.15.0/cucumber-plugin-7.15.0.jar:/home/emumford/.m2/repository/io/cucumber/docstring/7.15.0/docstring-7.15.0.jar:/home/emumford/.m2/repository/io/cucumber/html-formatter/20.4.0/html-formatter-20.4.0.jar:/home/emumford/.m2/repository/io/cucumber/junit-xml-formatter/0.2.0/junit-xml-formatter-0.2.0.jar:/home/emumford/.m2/repository/io/cucumber/ci-environment/10.0.0/ci-environment-10.0.0.jar:/home/emumford/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/emumford/.m2/repository/io/cucumber/cucumber-junit-platform-engine/7.15.0/cucumber-junit-platform-engine-7.15.0.jar:/home/emumford/.m2/repository/org/junit/platform/junit-platform-engine/1.10.1/junit-platform-engine-1.10.1.jar:/home/emumford/.m2/repository/org/mockito/mockito-core/5.11.0/mockito-core-5.11.0.jar:/home/emumford/.m2/repository/net/bytebuddy/byte-buddy/1.14.12/byte-buddy-1.14.12.jar:/home/emumford/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.12/byte-buddy-agent-1.14.12.jar:/home/emumford/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/emumford"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2025-01-21"/>
+    <property name="java.home" value="/usr/lib/jvm/java-21-openjdk-amd64"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/mnt/c/Users/ericm/IdeaProjects/Samstraumr/Samstraumr/samstraumr-core"/>
+    <property name="java.vm.compressedOopsMode" value="32-bit"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="surefire.real.class.path" value="/mnt/c/Users/ericm/IdeaProjects/Samstraumr/Samstraumr/samstraumr-core/target/surefire/surefirebooter-20250402133030081_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.6+7-Ubuntu-124.04.1"/>
+    <property name="user.name" value="emumford"/>
+    <property name="stdout.encoding" value="UTF-8"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="5.15.167.4-microsoft-standard-WSL2"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="jnidispatch.path" value="/home/emumford/.cache/JNA/temp/jna17340933046869207832.tmp"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="jna.platform.library.path" value="/usr/lib/x86_64-linux-gnu:/lib/x86_64-linux-gnu:/usr/lib64:/lib64:/usr/lib:/lib:/usr/lib/x86_64-linux-gnu/libfakeroot:/usr/lib/wsl/lib"/>
+    <property name="localRepository" value="/home/emumford/.m2/repository"/>
+    <property name="jna.loaded" value="true"/>
+    <property name="java.vendor.url.bug" value="https://bugs.launchpad.net/ubuntu/+source/openjdk-21"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="java.version" value="21.0.6"/>
+    <property name="cucumber.filter.tags" value="@ATL"/>
+    <property name="user.dir" value="/mnt/c/Users/ericm/IdeaProjects/Samstraumr/Samstraumr/samstraumr-core"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib"/>
+    <property name="stderr.encoding" value="UTF-8"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="java.vendor" value="Ubuntu"/>
+    <property name="java.vm.version" value="21.0.6+7-Ubuntu-124.04.1"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+  </properties>
+  <testcase name="Tube Initialization and Logging - Tube initializes with a unique ID and logs environment details" classname="Tube Initialization and Logging" time="2.961">
+    <system-out><![CDATA[
+@ATL @ATL @Initialization @UUID @Logging
+Scenario: Tube initializes with a unique ID and logs environment details &amp#27;[90m# tube/features/TubeInitializationTest.feature:44&amp#27;[0m
+2025-04-02 13:30:34.294 [main] INFO  org.samstraumr.tube.Environment - Environment initialized successfully
+2025-04-02 13:30:34.310 [main] INFO  org.samstraumr.tube.steps.TubeInitializationSteps - Environment object confirmed instantiated.
+  &amp#27;[32mGiven &amp#27;[0m&amp#27;[32mthe operating environment is ready&amp#27;[0m                               &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.the_operating_environment_is_ready()&amp#27;[0m
+2025-04-02 13:30:34.358 [main] INFO  org.samstraumr.tube.Tube - Initializing new Tube with reason: Test Initialization
+2025-04-02 13:30:34.668 [main] DEBUG org.samstraumr.tube.Tube - Tube initialized with ID: fc246e7206f4dc6ec3230e7b8caeb4d29d8f25f766fef0491e3ce157acf2a78a
+2025-04-02 13:30:34.669 [main] INFO  org.samstraumr.tube.Tube - Setting termination delay to 60 seconds
+  &amp#27;[32mWhen &amp#27;[0m&amp#27;[32ma new Tube is instantiated with reason &amp#27;[0m&amp#27;[32m&amp#27;[1m"Test Initialization"&amp#27;[0m      &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.a_new_Tube_is_instantiated_with_reason(java.lang.String)&amp#27;[0m
+  &amp#27;[32mThen &amp#27;[0m&amp#27;[32mthe Tube should initialize with a unique UUID&amp#27;[0m                     &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.the_Tube_should_initialize_with_a_unique_UUID()&amp#27;[0m
+2025-04-02 13:30:34.682 [main] DEBUG org.samstraumr.tube.Tube - Querying Mimir log. Current size: 4
+  &amp#27;[32mAnd &amp#27;[0m&amp#27;[32mthe Tube should log its environment details&amp#27;[0m                        &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.the_Tube_should_log_its_environment_details()&amp#27;[0m
+2025-04-02 13:30:34.687 [main] DEBUG org.samstraumr.tube.Tube - Querying Mimir log. Current size: 4
+  &amp#27;[32mAnd &amp#27;[0m&amp#27;[32mthe Tube should log the reason &amp#27;[0m&amp#27;[32m&amp#27;[1m"Test Initialization"&amp#27;[0m               &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.the_Tube_should_log_the_reason(java.lang.String)&amp#27;[0m
+2025-04-02 13:30:34.688 [main] DEBUG org.samstraumr.tube.Tube - Querying Mimir log. Current size: 4
+  &amp#27;[32mAnd &amp#27;[0m&amp#27;[32mthe Tube log should be queryable&amp#27;[0m                                   &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.the_Tube_log_should_be_queryable()&amp#27;[0m
+]]></system-out>
+  </testcase>
+  <testcase name="Tube Initialization and Logging - Tube handles invalid environment initialization gracefully" classname="Tube Initialization and Logging" time="0.017">
+    <system-out><![CDATA[
+@ATL @ATL @ErrorHandling
+Scenario: Tube handles invalid environment initialization gracefully            &amp#27;[90m# tube/features/TubeInitializationTest.feature:56&amp#27;[0m
+  &amp#27;[32mGiven &amp#27;[0m&amp#27;[32mthe operating environment is invalid&amp#27;[0m                                    &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.the_operating_environment_is_invalid()&amp#27;[0m
+2025-04-02 13:30:34.709 [main] INFO  org.samstraumr.tube.Tube - Initializing new Tube with reason: Invalid Environment Test
+2025-04-02 13:30:34.709 [main] ERROR org.samstraumr.tube.Tube - Environment cannot be null
+2025-04-02 13:30:34.710 [main] ERROR org.samstraumr.tube.Tube - Failed to initialize Tube: Invalid Environment Test - initialization failed
+  &amp#27;[32mWhen &amp#27;[0m&amp#27;[32ma new Tube is instantiated with reason &amp#27;[0m&amp#27;[32m&amp#27;[1m"Invalid Environment Test"&amp#27;[0m        &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.a_new_Tube_is_instantiated_with_reason(java.lang.String)&amp#27;[0m
+2025-04-02 13:30:34.711 [main] INFO  org.samstraumr.tube.Tube - Initializing new Tube with reason: Invalid Environment Test
+2025-04-02 13:30:34.711 [main] ERROR org.samstraumr.tube.Tube - Environment cannot be null
+2025-04-02 13:30:34.712 [main] ERROR org.samstraumr.tube.Tube - Failed to initialize Tube: Invalid Environment Test - initialization failed
+  &amp#27;[32mThen &amp#27;[0m&amp#27;[32mthe Tube initialization should fail with a &amp#27;[0m&amp#27;[32m&amp#27;[1m"TubeInitializationException"&amp#27;[0m &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.the_tube_initialization_should_fail_with_exception(java.lang.String)&amp#27;[0m
+  &amp#27;[32mAnd &amp#27;[0m&amp#27;[32mthe Tube should log &amp#27;[0m&amp#27;[32m&amp#27;[1m"Invalid Environment Test - initialization failed"&amp#27;[0m    &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.the_tube_should_log(java.lang.String)&amp#27;[0m
+  &amp#27;[32mAnd &amp#27;[0m&amp#27;[32mthe Tube log should capture the specific error message&amp#27;[0m                    &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.the_tube_log_should_capture_the_specific_error_message()&amp#27;[0m
+]]></system-out>
+  </testcase>
+  <testcase name="Tube Initialization and Logging - Tube generates unique UUIDs across multiple instantiations" classname="Tube Initialization and Logging" time="0.079">
+    <error message="The step &apos;100 Tubes are instantiated simultaneously&apos; and 3 other step(s) are undefined.&#10;You can implement these steps using the snippet(s) below:&#10;&#10;@When(&quot;{int} Tubes are instantiated simultaneously&quot;)&#10;public void tubes_are_instantiated_simultaneously(Integer int1) {&#10;    // Write code here that turns the phrase above into concrete actions&#10;    throw new io.cucumber.java.PendingException();&#10;}&#10;@Then(&quot;each Tube should have a unique UUID&quot;)&#10;public void each_tube_should_have_a_unique_uuid() {&#10;    // Write code here that turns the phrase above into concrete actions&#10;    throw new io.cucumber.java.PendingException();&#10;}&#10;@Then(&quot;no two Tubes should share the same UUID&quot;)&#10;public void no_two_tubes_should_share_the_same_uuid() {&#10;    // Write code here that turns the phrase above into concrete actions&#10;    throw new io.cucumber.java.PendingException();&#10;}&#10;@Then(&quot;all Tube logs should be queryable for their UUIDs&quot;)&#10;public void all_tube_logs_should_be_queryable_for_their_uui_ds() {&#10;    // Write code here that turns the phrase above into concrete actions&#10;    throw new io.cucumber.java.PendingException();&#10;}&#10;" type="io.cucumber.junit.platform.engine.UndefinedStepException"><![CDATA[io.cucumber.junit.platform.engine.UndefinedStepException: 
+The step '100 Tubes are instantiated simultaneously' and 3 other step(s) are undefined.
+You can implement these steps using the snippet(s) below:
+
+@When("{int} Tubes are instantiated simultaneously")
+public void tubes_are_instantiated_simultaneously(Integer int1) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("each Tube should have a unique UUID")
+public void each_tube_should_have_a_unique_uuid() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("no two Tubes should share the same UUID")
+public void no_two_tubes_should_share_the_same_uuid() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("all Tube logs should be queryable for their UUIDs")
+public void all_tube_logs_should_be_queryable_for_their_uui_ds() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+
+	at io.cucumber.core.runtime.TestCaseResultObserver.assertTestCasePassed(TestCaseResultObserver.java:69)
+	at io.cucumber.junit.platform.engine.TestCaseResultObserver.assertTestCasePassed(TestCaseResultObserver.java:22)
+	at io.cucumber.junit.platform.engine.CucumberEngineExecutionContext.lambda$runTestCase$4(CucumberEngineExecutionContext.java:114)
+	at io.cucumber.core.runtime.CucumberExecutionContext.lambda$runTestCase$5(CucumberExecutionContext.java:137)
+	at io.cucumber.core.runtime.RethrowingThrowableCollector.executeAndThrow(RethrowingThrowableCollector.java:23)
+	at io.cucumber.core.runtime.CucumberExecutionContext.runTestCase(CucumberExecutionContext.java:137)
+	at io.cucumber.junit.platform.engine.CucumberEngineExecutionContext.runTestCase(CucumberEngineExecutionContext.java:109)
+	at io.cucumber.junit.platform.engine.NodeDescriptor$PickleDescriptor.execute(NodeDescriptor.java:168)
+	at io.cucumber.junit.platform.engine.NodeDescriptor$PickleDescriptor.execute(NodeDescriptor.java:90)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+]]></error>
+    <system-out><![CDATA[
+@ATL @ATL @UUID @Boundary
+Scenario: Tube generates unique UUIDs across multiple instantiations &amp#27;[90m# tube/features/TubeInitializationTest.feature:67&amp#27;[0m
+2025-04-02 13:30:34.786 [main] INFO  org.samstraumr.tube.Environment - Environment initialized successfully
+2025-04-02 13:30:34.787 [main] INFO  org.samstraumr.tube.steps.TubeInitializationSteps - Environment object confirmed instantiated.
+  &amp#27;[32mGiven &amp#27;[0m&amp#27;[32mthe operating environment is ready&amp#27;[0m                           &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.the_operating_environment_is_ready()&amp#27;[0m
+  &amp#27;[33mWhen &amp#27;[0m&amp#27;[33m100 Tubes are instantiated simultaneously&amp#27;[0m
+  &amp#27;[36mThen &amp#27;[0m&amp#27;[36meach Tube should have a unique UUID&amp#27;[0m
+  &amp#27;[36mAnd &amp#27;[0m&amp#27;[36mno two Tubes should share the same UUID&amp#27;[0m
+  &amp#27;[36mAnd &amp#27;[0m&amp#27;[36mall Tube logs should be queryable for their UUIDs&amp#27;[0m
+]]></system-out>
+  </testcase>
+  <testcase name="Tube Initialization and Logging - Tube logs are generated in real-time and are queryable" classname="Tube Initialization and Logging" time="0.108">
+    <system-out><![CDATA[
+@ATL @ATL @Logging @Querying
+Scenario: Tube logs are generated in real-time and are queryable  &amp#27;[90m# tube/features/TubeInitializationTest.feature:77&amp#27;[0m
+2025-04-02 13:30:34.817 [main] INFO  org.samstraumr.tube.Environment - Environment initialized successfully
+2025-04-02 13:30:34.818 [main] INFO  org.samstraumr.tube.steps.TubeInitializationSteps - Environment object confirmed instantiated.
+  &amp#27;[32mGiven &amp#27;[0m&amp#27;[32mthe operating environment is ready&amp#27;[0m                        &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.the_operating_environment_is_ready()&amp#27;[0m
+2025-04-02 13:30:34.818 [main] INFO  org.samstraumr.tube.Tube - Initializing new Tube with reason: Log Query Test
+2025-04-02 13:30:34.908 [main] DEBUG org.samstraumr.tube.Tube - Tube initialized with ID: 299979909ca828cb956285dad4e1295dc89fa1223477697a56e6e87d67a1ea17
+2025-04-02 13:30:34.909 [main] INFO  org.samstraumr.tube.Tube - Setting termination delay to 60 seconds
+  &amp#27;[32mWhen &amp#27;[0m&amp#27;[32ma new Tube is instantiated with reason &amp#27;[0m&amp#27;[32m&amp#27;[1m"Log Query Test"&amp#27;[0m    &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.a_new_Tube_is_instantiated_with_reason(java.lang.String)&amp#27;[0m
+2025-04-02 13:30:34.918 [main] DEBUG org.samstraumr.tube.Tube - Querying Mimir log. Current size: 4
+  &amp#27;[32mThen &amp#27;[0m&amp#27;[32mthe Tube should log its initialization details immediately&amp#27;[0m &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.the_tube_should_log_its_initialization_details_immediately()&amp#27;[0m
+2025-04-02 13:30:34.919 [main] DEBUG org.samstraumr.tube.Tube - Querying Mimir log. Current size: 4
+  &amp#27;[32mAnd &amp#27;[0m&amp#27;[32mthe Tube logs should be queryable by timestamp&amp#27;[0m              &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.the_tube_logs_should_be_queryable_by_timestamp()&amp#27;[0m
+2025-04-02 13:30:34.920 [main] DEBUG org.samstraumr.tube.Tube - Querying Mimir log. Current size: 4
+  &amp#27;[32mAnd &amp#27;[0m&amp#27;[32mthe logs should contain the reason &amp#27;[0m&amp#27;[32m&amp#27;[1m"Log Query Test"&amp#27;[0m         &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.the_logs_should_contain_the_reason(java.lang.String)&amp#27;[0m
+]]></system-out>
+  </testcase>
+  <testcase name="Tube Initialization and Logging - Tube is self-contained and does not attempt external communications" classname="Tube Initialization and Logging" time="0.118">
+    <error message="The step &apos;the Tube should not establish any external network connections&apos; and 2 other step(s) are undefined.&#10;You can implement these steps using the snippet(s) below:&#10;&#10;@Then(&quot;the Tube should not establish any external network connections&quot;)&#10;public void the_tube_should_not_establish_any_external_network_connections() {&#10;    // Write code here that turns the phrase above into concrete actions&#10;    throw new io.cucumber.java.PendingException();&#10;}&#10;@Then(&quot;the Tube should not log any external communication attempts&quot;)&#10;public void the_tube_should_not_log_any_external_communication_attempts() {&#10;    // Write code here that turns the phrase above into concrete actions&#10;    throw new io.cucumber.java.PendingException();&#10;}&#10;@Then(&quot;all Tube operations should remain confined to its internal environment&quot;)&#10;public void all_tube_operations_should_remain_confined_to_its_internal_environment() {&#10;    // Write code here that turns the phrase above into concrete actions&#10;    throw new io.cucumber.java.PendingException();&#10;}&#10;" type="io.cucumber.junit.platform.engine.UndefinedStepException"><![CDATA[io.cucumber.junit.platform.engine.UndefinedStepException: 
+The step 'the Tube should not establish any external network connections' and 2 other step(s) are undefined.
+You can implement these steps using the snippet(s) below:
+
+@Then("the Tube should not establish any external network connections")
+public void the_tube_should_not_establish_any_external_network_connections() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("the Tube should not log any external communication attempts")
+public void the_tube_should_not_log_any_external_communication_attempts() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("all Tube operations should remain confined to its internal environment")
+public void all_tube_operations_should_remain_confined_to_its_internal_environment() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+
+	at io.cucumber.core.runtime.TestCaseResultObserver.assertTestCasePassed(TestCaseResultObserver.java:69)
+	at io.cucumber.junit.platform.engine.TestCaseResultObserver.assertTestCasePassed(TestCaseResultObserver.java:22)
+	at io.cucumber.junit.platform.engine.CucumberEngineExecutionContext.lambda$runTestCase$4(CucumberEngineExecutionContext.java:114)
+	at io.cucumber.core.runtime.CucumberExecutionContext.lambda$runTestCase$5(CucumberExecutionContext.java:137)
+	at io.cucumber.core.runtime.RethrowingThrowableCollector.executeAndThrow(RethrowingThrowableCollector.java:23)
+	at io.cucumber.core.runtime.CucumberExecutionContext.runTestCase(CucumberExecutionContext.java:137)
+	at io.cucumber.junit.platform.engine.CucumberEngineExecutionContext.runTestCase(CucumberEngineExecutionContext.java:109)
+	at io.cucumber.junit.platform.engine.NodeDescriptor$PickleDescriptor.execute(NodeDescriptor.java:168)
+	at io.cucumber.junit.platform.engine.NodeDescriptor$PickleDescriptor.execute(NodeDescriptor.java:90)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+]]></error>
+    <system-out><![CDATA[
+@ATL @ATL @Encapsulation
+Scenario: Tube is self-contained and does not attempt external communications &amp#27;[90m# tube/features/TubeInitializationTest.feature:87&amp#27;[0m
+2025-04-02 13:30:34.926 [main] INFO  org.samstraumr.tube.Environment - Environment initialized successfully
+2025-04-02 13:30:34.927 [main] INFO  org.samstraumr.tube.steps.TubeInitializationSteps - Environment object confirmed instantiated.
+  &amp#27;[32mGiven &amp#27;[0m&amp#27;[32mthe operating environment is ready&amp#27;[0m                                    &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.the_operating_environment_is_ready()&amp#27;[0m
+2025-04-02 13:30:34.929 [main] INFO  org.samstraumr.tube.Tube - Initializing new Tube with reason: Self-Containment Test
+2025-04-02 13:30:35.020 [main] DEBUG org.samstraumr.tube.Tube - Tube initialized with ID: 78bf97e9bde68a2303c2e331b847d2268994d1d3698137c1b1414cdec88f4a59
+2025-04-02 13:30:35.021 [main] INFO  org.samstraumr.tube.Tube - Setting termination delay to 60 seconds
+  &amp#27;[32mWhen &amp#27;[0m&amp#27;[32ma new Tube is instantiated with reason &amp#27;[0m&amp#27;[32m&amp#27;[1m"Self-Containment Test"&amp#27;[0m         &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.a_new_Tube_is_instantiated_with_reason(java.lang.String)&amp#27;[0m
+  &amp#27;[33mThen &amp#27;[0m&amp#27;[33mthe Tube should not establish any external network connections&amp#27;[0m
+  &amp#27;[36mAnd &amp#27;[0m&amp#27;[36mthe Tube should not log any external communication attempts&amp#27;[0m
+  &amp#27;[36mAnd &amp#27;[0m&amp#27;[36mall Tube operations should remain confined to its internal environment&amp#27;[0m
+]]></system-out>
+  </testcase>
+  <testcase name="Tube Initialization and Logging - Tube self-awareness during resource changes" classname="Tube Initialization and Logging" time="0.013">
+    <error message="The step &apos;the environment is ready with memory &quot;8 GB&quot;&apos; and 3 other step(s) are undefined.&#10;You can implement these steps using the snippet(s) below:&#10;&#10;@Given(&quot;the environment is ready with memory {string}&quot;)&#10;public void the_environment_is_ready_with_memory(String string) {&#10;    // Write code here that turns the phrase above into concrete actions&#10;    throw new io.cucumber.java.PendingException();&#10;}&#10;@When(&quot;the environment changes to {string}&quot;)&#10;public void the_environment_changes_to(String string) {&#10;    // Write code here that turns the phrase above into concrete actions&#10;    throw new io.cucumber.java.PendingException();&#10;}&#10;@Then(&quot;the Tube should log {string} in the Tube log&quot;)&#10;public void the_tube_should_log_in_the_tube_log(String string) {&#10;    // Write code here that turns the phrase above into concrete actions&#10;    throw new io.cucumber.java.PendingException();&#10;}&#10;@Then(&quot;the Tube should remain operational while logging resource adjustments&quot;)&#10;public void the_tube_should_remain_operational_while_logging_resource_adjustments() {&#10;    // Write code here that turns the phrase above into concrete actions&#10;    throw new io.cucumber.java.PendingException();&#10;}&#10;" type="io.cucumber.junit.platform.engine.UndefinedStepException"><![CDATA[io.cucumber.junit.platform.engine.UndefinedStepException: 
+The step 'the environment is ready with memory "8 GB"' and 3 other step(s) are undefined.
+You can implement these steps using the snippet(s) below:
+
+@Given("the environment is ready with memory {string}")
+public void the_environment_is_ready_with_memory(String string) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@When("the environment changes to {string}")
+public void the_environment_changes_to(String string) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("the Tube should log {string} in the Tube log")
+public void the_tube_should_log_in_the_tube_log(String string) {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+@Then("the Tube should remain operational while logging resource adjustments")
+public void the_tube_should_remain_operational_while_logging_resource_adjustments() {
+    // Write code here that turns the phrase above into concrete actions
+    throw new io.cucumber.java.PendingException();
+}
+
+	at io.cucumber.core.runtime.TestCaseResultObserver.assertTestCasePassed(TestCaseResultObserver.java:69)
+	at io.cucumber.junit.platform.engine.TestCaseResultObserver.assertTestCasePassed(TestCaseResultObserver.java:22)
+	at io.cucumber.junit.platform.engine.CucumberEngineExecutionContext.lambda$runTestCase$4(CucumberEngineExecutionContext.java:114)
+	at io.cucumber.core.runtime.CucumberExecutionContext.lambda$runTestCase$5(CucumberExecutionContext.java:137)
+	at io.cucumber.core.runtime.RethrowingThrowableCollector.executeAndThrow(RethrowingThrowableCollector.java:23)
+	at io.cucumber.core.runtime.CucumberExecutionContext.runTestCase(CucumberExecutionContext.java:137)
+	at io.cucumber.junit.platform.engine.CucumberEngineExecutionContext.runTestCase(CucumberEngineExecutionContext.java:109)
+	at io.cucumber.junit.platform.engine.NodeDescriptor$PickleDescriptor.execute(NodeDescriptor.java:168)
+	at io.cucumber.junit.platform.engine.NodeDescriptor$PickleDescriptor.execute(NodeDescriptor.java:90)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+]]></error>
+    <system-out><![CDATA[
+@ATL @ATL @SelfAwareness @EnvironmentMonitoring
+Scenario: Tube self-awareness during resource changes                       &amp#27;[90m# tube/features/TubeInitializationTest.feature:98&amp#27;[0m
+  &amp#27;[33mGiven &amp#27;[0m&amp#27;[33mthe environment is ready with memory "8 GB"&amp#27;[0m
+  &amp#27;[36mWhen &amp#27;[0m&amp#27;[36ma new Tube is instantiated with reason &amp#27;[0m&amp#27;[36m&amp#27;[1m"Self-Awareness Test"&amp#27;[0m         &amp#27;[90m# org.samstraumr.tube.steps.TubeInitializationSteps.a_new_Tube_is_instantiated_with_reason(java.lang.String)&amp#27;[0m
+  &amp#27;[36mAnd &amp#27;[0m&amp#27;[36mthe environment changes to "low memory"&amp#27;[0m
+  &amp#27;[36mThen &amp#27;[0m&amp#27;[36mthe Tube should log "Memory critically low" in the Tube log&amp#27;[0m
+  &amp#27;[36mAnd &amp#27;[0m&amp#27;[36mthe Tube should remain operational while logging resource adjustments&amp#27;[0m
+]]></system-out>
+  </testcase>
+</testsuite>
