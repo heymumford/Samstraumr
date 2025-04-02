@@ -6,8 +6,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Build project: `mvn clean install`
 - Build without tests: `mvn clean install -DskipTests`
 - Run all tests: `mvn test`
-- Run tagged tests: `mvn test -Dcucumber.filter.tags="@ATL"`
-- Run specific test categories: `mvn test -Dcucumber.filter.tags="@UUID"` or `mvn test -Dcucumber.filter.tags="@Logging"`
+
+## Test Commands
+### Test Categorization
+- Run ATL (critical) tests: `mvn test -P atl-tests`
+- Run BTL (robustness) tests: `mvn test -P btl-tests`
+- Run tests with specific tag: `mvn test -Dcucumber.filter.tags="@TagName"`
+- Run tests with tag combinations: `mvn test -Dcucumber.filter.tags="@L0_Tube and @Identity"`
+
+### Test Tag Hierarchy
+- Layer-based hierarchy: `@L0_Tube`, `@L1_Bundle`, `@L2_Machine`, `@L3_System`
+- Critical path: `@ATL` (critical), `@BTL` (robustness)
+- Capabilities: `@Identity`, `@Flow`, `@State`, `@Awareness`
+- Lifecycle: `@Init`, `@Runtime`, `@Termination`
+- Patterns: `@Observer`, `@Transformer`, `@Validator`, `@CircuitBreaker`
+- Non-functional: `@Performance`, `@Resilience`, `@Scale`
+
+## Quality Check Commands
+- Run all quality checks: `./build-checks.sh`
+- Skip quality checks: `mvn install -P skip-quality-checks`
+- Run specific checks:
+  - Formatting: `mvn spotless:check` (Fix: `mvn spotless:apply`)
+  - Code analysis: `mvn pmd:check`
+  - Coding standards: `mvn checkstyle:check`
+  - Bug detection: `mvn spotbugs:check`
+  - Code coverage: `mvn jacoco:report`
 
 ## Code Style Guidelines
 - **Imports**: Specific imports (no wildcards). Standard Java first, then third-party, then project imports.
@@ -22,3 +45,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Multi-module Maven project (Java 21)
 - BDD testing approach with Cucumber
 - Feature files contain detailed test documentation with tags for selective test execution
+- Quality checks integrated into the build process
+  - Spotless: Code formatting
+  - PMD: Static code analysis
+  - Checkstyle: Coding standards
+  - SpotBugs: Bug detection
+  - JaCoCo: Code coverage
+  
+## Quality Reports
+- Cucumber Reports: `target/cucumber-reports/cucumber.html`
+- JaCoCo Coverage: `target/site/jacoco/index.html`
+- CheckStyle: `target/checkstyle-result.xml`
+- PMD: `target/pmd.xml`
+- SpotBugs: `target/spotbugsXml.xml`
