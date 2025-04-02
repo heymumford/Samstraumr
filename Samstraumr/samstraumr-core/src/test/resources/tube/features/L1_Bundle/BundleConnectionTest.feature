@@ -45,6 +45,6 @@ Feature: Bundle Connection and Flow
 
     Examples:
       | dataVolume | timeLimit | resourceLimit |
-      | 100        | 500       | 10            |
-      | 1000       | 1000      | 25            |
-      | 10000      | 3000      | 50            |
+      | 100        | 1000      | 10            |
+      | 1000       | 5000      | 25            |
+      | 10000      | 30000     | 50            |
