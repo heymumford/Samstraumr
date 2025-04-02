@@ -47,8 +47,8 @@ A tube is a self-aware component with clear responsibilities, mindful of what fl
 
 This nested approach mirrors nature's elegant organization – from cells to organisms to ecosystems – allowing complex symphonies to emerge from simple melodies.
 
-[→ Discover detailed core concepts](./docs/CoreConcepts.md)  
-[→ Learn about tube design patterns](./docs/TubePatterns.md)  
+[→ Discover detailed core concepts](./docs/CoreConcepts.md)
+[→ Learn about tube design patterns](./docs/TubePatterns.md)
 [→ Understand bundles and machines](./docs/BundlesAndMachines.md)
 
 ### Identity Notation
@@ -107,7 +107,7 @@ For those ready to dive deeper:
 - **Testing approaches** – Verification through conversation
 - **Design patterns** – Recurring solutions to common challenges
 
-[→ Discover migration strategies](./docs/Migration.md)  
+[→ Discover migration strategies](./docs/Migration.md)
 [→ Explore testing approaches](./docs/Testing.md)
 
 ## Community

@@ -57,7 +57,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - Checkstyle: Coding standards
   - SpotBugs: Bug detection
   - JaCoCo: Code coverage
-  
+
 ## Quality Reports
 - Cucumber Reports: `target/cucumber-reports/cucumber.html`
 - JaCoCo Coverage: `target/site/jacoco/index.html`

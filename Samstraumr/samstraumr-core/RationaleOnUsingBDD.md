@@ -18,77 +18,77 @@ We propose using Behavior-Driven Development (BDD) with Cucumber tests to create
 
 ### Driving Principles
 
-1. **Alignment with Samstraumr Philosophy**: 
+1. **Alignment with Samstraumr Philosophy**:
    - BDD's focus on behavior meshes perfectly with Samstraumr's concept of tubes with evolving purposes.
    - Cucumber's natural language scenarios reflect the "ubiquitous language" principle, bridging technical and non-technical stakeholders.
 
-2. **Living Documentation**: 
+2. **Living Documentation**:
    - Cucumber features serve as executable specifications, evolving alongside the system they describe.
    - This aligns with Samstraumr's adaptive nature, ensuring documentation remains current.
 
-3. **Holistic Testing**: 
+3. **Holistic Testing**:
    - BDD scenarios can describe both unit-level tube behavior and system-wide interactions, capturing Samstraumr's multi-layered complexity.
 
-4. **Cynefin Framework Integration**: 
+4. **Cynefin Framework Integration**:
    - BDD supports different approaches for various Cynefin domains:
      - Simple: Straightforward scenarios for well-understood behaviors.
      - Complicated: Detailed scenarios with multiple steps for complex but knowable processes.
      - Complex: Scenarios that allow for emergent behaviors and multiple valid outcomes.
      - Chaotic: Rapid prototyping of scenarios to probe and respond to unpredictable situations.
 
-5. **TDD Principles**: 
+5. **TDD Principles**:
    - Writing scenarios before implementation encourages thoughtful design and clear specification of expected behaviors.
 
 ### Practical Concerns
 
-1. **Test Coverage**: 
+1. **Test Coverage**:
    - Ensures comprehensive testing of individual tubes and their interactions.
    - Facilitates testing of adaptive behaviors and purpose evolution.
 
-2. **Maintainability**: 
+2. **Maintainability**:
    - Natural language scenarios are easier to update as the system evolves.
    - Reduces the gap between specification and implementation.
 
-3. **Collaboration**: 
+3. **Collaboration**:
    - Encourages involvement of all stakeholders in defining system behavior.
    - Supports Samstraumr's emphasis on holistic system understanding.
 
-4. **Traceability**: 
+4. **Traceability**:
    - Links features directly to implementing code, aiding in impact analysis and debugging.
 
-5. **Continuous Integration/Deployment**: 
+5. **Continuous Integration/Deployment**:
    - Cucumber tests can be easily integrated into CI/CD pipelines, supporting Samstraumr's dynamic nature.
 
 ### Cost Considerations
 
 #### Costs of Implementation
 
-1. **Initial Setup**: 
+1. **Initial Setup**:
    - Investment in BDD tools and training for the team.
    - Time spent on defining an initial set of features and scenarios.
 
-2. **Learning Curve**: 
+2. **Learning Curve**:
    - Team members need to adapt to thinking in terms of behaviors and scenarios.
    - Potential initial slowdown in development velocity.
 
-3. **Ongoing Maintenance**: 
+3. **Ongoing Maintenance**:
    - Regular updates to scenarios as the system evolves.
    - Potential for scenario bloat if not managed carefully.
 
 #### Price of Not Implementing
 
-1. **Quality Risks**: 
+1. **Quality Risks**:
    - Increased likelihood of bugs and unexpected behaviors in Samstraumr's complex, adaptive systems.
    - Difficulty in verifying system-wide behaviors and emergent properties.
 
-2. **Documentation Drift**: 
+2. **Documentation Drift**:
    - Static documentation quickly becomes outdated, leading to misunderstandings and errors.
    - Loss of clear communication channel between technical and non-technical stakeholders.
 
-3. **Reduced Agility**: 
+3. **Reduced Agility**:
    - Without clear, executable specifications, adapting to changes becomes more challenging and risky.
 
-4. **Increased Technical Debt**: 
+4. **Increased Technical Debt**:
    - Lack of comprehensive, up-to-date testing leads to accumulation of hidden issues and complexity.
 
 ### Cost vs. Price Analysis

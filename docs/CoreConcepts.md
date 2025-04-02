@@ -47,7 +47,7 @@ public class DataValidatorTube implements Tube {
     private final TubeProcessor processor;
     private final TubeMonitor monitor;
     private final TubeResourceManager resources;
-    
+
     // Tube implementation methods
 }
 ```
@@ -143,7 +143,7 @@ public class BirthCertificate {
     private final String purpose;
     private final String version;
     private final String creator;
-    
+
     // Methods for identity verification and information
 }
 ```
@@ -212,18 +212,18 @@ This self-awareness manifests in practical behaviors:
 // Example of awareness in action (simplified)
 public void assessHealth() {
     VitalStats stats = gatherVitalStats();
-    
+
     if (stats.getErrorRate() > errorThreshold) {
         // Self-healing attempt
         performRecoveryProcedure();
-        
+
         if (gatherVitalStats().getErrorRate() > criticalThreshold) {
             // If recovery fails, change design state
             setDesignState(TubeState.ERROR);
             notifyBundle();
         }
     }
-    
+
     // Update dynamic state with latest metrics
     updateDynamicState(new DynamicState.Builder()
         .withMetrics(stats)

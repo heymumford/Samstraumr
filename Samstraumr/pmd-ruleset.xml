@@ -8,18 +8,16 @@
         Custom PMD ruleset for Samstraumr project
     </description>
     
-    <!-- Basic ruleset -->
-    <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod" />
-    <rule ref="category/java/bestpractices.xml/UnusedLocalVariable" />
-    <rule ref="category/java/bestpractices.xml/SystemPrintln" />
+    <!-- Include a subset of rules from the best practices category -->
+    <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod"/>
+    <rule ref="category/java/bestpractices.xml/UnusedLocalVariable"/>
+    <rule ref="category/java/bestpractices.xml/SystemPrintln"/>
 
-    <!-- Error-prone ruleset -->
-    <rule ref="category/java/errorprone.xml/UnnecessaryConversionTemporary" />
-    <rule ref="category/java/errorprone.xml/EmptyCatchBlock" />
-    <rule ref="category/java/errorprone.xml/EmptyWhileStmt" />
+    <!-- Include a subset of rules from the error-prone category -->
+    <rule ref="category/java/errorprone.xml/EmptyCatchBlock"/>
+    <rule ref="category/java/errorprone.xml/EmptyWhileStmt"/>
 
-    <!-- Style ruleset -->
-    <rule ref="category/java/codestyle.xml/EmptyMethodInAbstractClassShouldBeAbstract" />
-    <rule ref="category/java/codestyle.xml/ExtendsObject" />
-    <rule ref="category/java/codestyle.xml/ForLoopShouldBeWhileLoop" />
+    <!-- Include a subset of rules from the code style category -->
+    <rule ref="category/java/codestyle.xml/ExtendsObject"/>
+    <rule ref="category/java/codestyle.xml/ForLoopShouldBeWhileLoop"/>
 </ruleset>

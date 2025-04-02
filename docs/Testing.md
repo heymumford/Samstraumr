@@ -380,4 +380,4 @@ Scenario: Bundle processes large data volumes efficiently
 
 By embracing this comprehensive testing approach, your Samstraumr systems will grow with confidence, adapting to new requirements while maintaining the integrity and resilience that make them truly living software.
 
-[ê Return to Getting Started](./GettingStarted.md) | [Explore Core Concepts](./CoreConcepts.md)
+[Return to Getting Started](./GettingStarted.md) | [Explore Core Concepts](./CoreConcepts.md)

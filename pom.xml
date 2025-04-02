@@ -1,60 +1,129 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    
-    <groupId>org.samstraumr</groupId>
-    <artifactId>samstraumr</artifactId>
-    <version>0.3</version>
-    <packaging>pom</packaging>
-    <name>Samstraumr</name>
-    
-    <modules>
-        <module>Samstraumr</module>
-    </modules>
-    
-    <description>
-        Root POM that references the actual Samstraumr project structure.
-        This allows mvn commands to be run from the project root directory.
-    </description>
-    
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <all.test.tags>@ATL or @BTL</all.test.tags>
-        <atl.test.tags>@ATL</atl.test.tags>
-        <btl.test.tags>@BTL</btl.test.tags>
-        <skip.quality.checks>false</skip.quality.checks>
-    </properties>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-    <!-- Profile definitions for ATL and BTL test execution at the root level -->
-    <profiles>
-        <profile>
-            <id>atl-tests</id>
-            <properties>
-                <cucumber.filter.tags>${atl.test.tags}</cucumber.filter.tags>
-            </properties>
-        </profile>
-        <profile>
-            <id>btl-tests</id>
-            <properties>
-                <cucumber.filter.tags>${btl.test.tags}</cucumber.filter.tags>
-            </properties>
-        </profile>
-        <profile>
-            <id>all-tests</id>
-            <properties>
-                <cucumber.filter.tags>${all.test.tags}</cucumber.filter.tags>
-            </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>skip-quality-checks</id>
-            <properties>
-                <skip.quality.checks>true</skip.quality.checks>
-            </properties>
-        </profile>
-    </profiles>
+  <groupId>org.samstraumr</groupId>
+  <artifactId>samstraumr</artifactId>
+  <version>0.3</version>
+  <packaging>pom</packaging>
+  <name>Samstraumr</name>
+
+  <description>Root POM that references the actual Samstraumr project structure.
+        This allows mvn commands to be run from the project root directory.</description>
+
+  <modules>
+    <module>Samstraumr</module>
+  </modules>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <all.test.tags>@ATL or @BTL</all.test.tags>
+    <atl.test.tags>@ATL</atl.test.tags>
+    <btl.test.tags>@BTL</btl.test.tags>
+    <skip.quality.checks>false</skip.quality.checks>
+
+    <!-- Quality check plugin versions -->
+    <spotless.plugin.version>2.40.0</spotless.plugin.version>
+    <pmd.plugin.version>3.21.0</pmd.plugin.version>
+    <checkstyle.plugin.version>3.3.1</checkstyle.plugin.version>
+    <spotbugs.plugin.version>4.8.2.0</spotbugs.plugin.version>
+    <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
+    <pmd.version>7.0.0</pmd.version>
+    <checkstyle.version>10.14.0</checkstyle.version>
+  </properties>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- Spotless plugin for code formatting -->
+        <plugin>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <version>${spotless.plugin.version}</version>
+          <configuration>
+            <java>
+              <includes>
+                <include>**/*.java</include>
+              </includes>
+              <importOrder>
+                <order>java,javax,org,com,</order>
+              </importOrder>
+              <removeUnusedImports/>
+              <googleJavaFormat>
+                <version>1.17.0</version>
+                <style>GOOGLE</style>
+              </googleJavaFormat>
+              <trimTrailingWhitespace/>
+              <endWithNewline/>
+            </java>
+            <pom>
+              <includes>
+                <include>**/pom.xml</include>
+              </includes>
+              <sortPom>
+                <expandEmptyElements>false</expandEmptyElements>
+              </sortPom>
+            </pom>
+            <markdown>
+              <includes>
+                <include>**/*.md</include>
+              </includes>
+              <endWithNewline/>
+              <trimTrailingWhitespace/>
+            </markdown>
+          </configuration>
+          <executions>
+            <execution>
+              <id>spotless-check</id>
+              <goals>
+                <goal>check</goal>
+              </goals>
+              <phase>validate</phase>
+              <configuration>
+                <skip>${skip.quality.checks}</skip>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+  <!-- Profile definitions for ATL and BTL test execution at the root level -->
+  <profiles>
+    <profile>
+      <id>atl-tests</id>
+      <properties>
+        <cucumber.filter.tags>${atl.test.tags}</cucumber.filter.tags>
+      </properties>
+    </profile>
+    <profile>
+      <id>btl-tests</id>
+      <properties>
+        <cucumber.filter.tags>${btl.test.tags}</cucumber.filter.tags>
+      </properties>
+    </profile>
+    <profile>
+      <id>all-tests</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <cucumber.filter.tags>${all.test.tags}</cucumber.filter.tags>
+      </properties>
+    </profile>
+    <profile>
+      <id>skip-quality-checks</id>
+      <properties>
+        <skip.quality.checks>true</skip.quality.checks>
+      </properties>
+    </profile>
+  </profiles>
 </project>

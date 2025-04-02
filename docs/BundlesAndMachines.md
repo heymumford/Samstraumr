@@ -60,10 +60,10 @@ public class AuthenticationBundle implements Bundle {
     private final Tube credentialValidator;
     private final Tube tokenGenerator;
     private final Tube accessManager;
-    
+
     // Bundle state management
     private BundleState state;
-    
+
     // Methods for configuration, initialization, etc.
 }
 ```
@@ -113,13 +113,13 @@ Build machines by integrating bundles that:
 // Example machine composition (simplified)
 public class CustomerManagementMachine implements Machine {
     private final Bundle registrationBundle;
-    private final Bundle profileBundle;  
+    private final Bundle profileBundle;
     private final Bundle analyticsBundle;
     private final Bundle communicationBundle;
-    
+
     // Machine state management
     private MachineState state;
-    
+
     // Cross-bundle orchestration methods
 }
 ```
@@ -179,7 +179,7 @@ State changes ripple through the hierarchy in meaningful ways:
 public void evaluateBundleState() {
     int flowingCount = 0;
     int errorCount = 0;
-    
+
     for (Tube tube : tubes) {
         if (tube.getDesignState() == TubeState.FLOWING) {
             flowingCount++;
@@ -187,7 +187,7 @@ public void evaluateBundleState() {
             errorCount++;
         }
     }
-    
+
     if (errorCount > criticalThreshold) {
         setDesignState(BundleState.CRITICAL);
         notifyMachine();

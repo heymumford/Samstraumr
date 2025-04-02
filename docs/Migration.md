@@ -44,35 +44,35 @@ Before beginning your migration journey, take time to understand your existing s
 public class DependencyMapper {
     private final Set<String> analyzedClasses = new HashSet<>();
     private final Map<String, Set<String>> dependencyGraph = new HashMap<>();
-    
+
     public void analyzeCodebase(String rootPackage) {
         // Find all classes in the package and subpackages
         Set<Class<?>> allClasses = findClasses(rootPackage);
-        
+
         // Analyze each class for dependencies
         for (Class<?> clazz : allClasses) {
             analyzeClass(clazz);
         }
-        
+
         // Generate visualization or report
         generateDependencyReport();
     }
-    
+
     private void analyzeClass(Class<?> clazz) {
         String className = clazz.getName();
-        
+
         if (analyzedClasses.contains(className)) {
             return;
         }
-        
+
         analyzedClasses.add(className);
         Set<String> dependencies = new HashSet<>();
-        
+
         // Analyze fields
         for (Field field : clazz.getDeclaredFields()) {
             dependencies.add(field.getType().getName());
         }
-        
+
         // Analyze method parameters and return types
         for (Method method : clazz.getDeclaredMethods()) {
             dependencies.add(method.getReturnType().getName());
@@ -80,26 +80,26 @@ public class DependencyMapper {
                 dependencies.add(paramType.getName());
             }
         }
-        
+
         // Store dependencies
         dependencyGraph.put(className, dependencies);
     }
-    
+
     // Identify potential tubes based on dependency patterns
     public List<String> identifyPotentialTubes() {
         List<String> candidates = new ArrayList<>();
-        
+
         for (Map.Entry<String, Set<String>> entry : dependencyGraph.entrySet()) {
             String className = entry.getKey();
             Set<String> dependencies = entry.getValue();
-            
+
             // Classes with few dependencies and clear input/output patterns
             // make good tube candidates
             if (isTubeCandidate(className, dependencies)) {
                 candidates.add(className);
             }
         }
-        
+
         return candidates;
     }
 }
@@ -143,7 +143,7 @@ public class LegacyOrderProcessingFacade implements OrderProcessor {
     private final LegacyOrderService legacyService; // Original implementation
     private final OrderProcessingTube newTube;      // Samstraumr implementation
     private final FeatureToggleService toggleService;
-    
+
     @Override
     public OrderResult processOrder(Order order) {
         // Use feature toggle to decide which implementation to use
@@ -153,7 +153,7 @@ public class LegacyOrderProcessingFacade implements OrderProcessor {
                 return (OrderResult) newTube.process(order);
             } catch (Exception e) {
                 // Fall back to legacy implementation if an error occurs
-                logger.warn("Error in new implementation, falling back to legacy: {}", 
+                logger.warn("Error in new implementation, falling back to legacy: {}",
                           e.getMessage());
                 return legacyService.processOrder(order);
             }
@@ -162,7 +162,7 @@ public class LegacyOrderProcessingFacade implements OrderProcessor {
             return legacyService.processOrder(order);
         }
     }
-    
+
     // Additional methods to synchronize state between implementations
     private void synchronizeState() {
         // Copy relevant state between old and new implementations
@@ -214,18 +214,18 @@ Selecting the right components for initial migration is crucial for building mom
 public class PaymentProcessorService {
     private final PaymentGateway gateway;
     private final TransactionRepository repository;
-    
+
     public TransactionResult processPayment(PaymentRequest request) {
         // Validate request
         validateRequest(request);
-        
+
         // Process payment
         PaymentResponse response = gateway.submitPayment(
             request.getAmount(),
             request.getCardDetails(),
             request.getCustomerId()
         );
-        
+
         // Store transaction
         Transaction transaction = new Transaction(
             UUID.randomUUID().toString(),
@@ -235,9 +235,9 @@ public class PaymentProcessorService {
             response.getTransactionId(),
             response.getErrorCode()
         );
-        
+
         repository.save(transaction);
-        
+
         // Return result
         return new TransactionResult(
             response.isSuccessful(),
@@ -253,24 +253,24 @@ public class PaymentProcessorTube implements Tube {
     private final BirthCertificate identity;
     private TubeState designState = TubeState.FLOWING;
     private DynamicState dynamicState;
-    
+
     // Core dependencies
     private final PaymentGateway gateway;
     private final TransactionRepository repository;
-    
+
     // Performance metrics
     private final AtomicLong totalProcessed = new AtomicLong();
     private final AtomicLong successCount = new AtomicLong();
     private final AtomicLong failureCount = new AtomicLong();
     private final AtomicLong avgProcessingTime = new AtomicLong();
-    
+
     public PaymentProcessorTube() {
         this.identity = new BirthCertificate.Builder()
             .withID("PaymentProcessor")
             .withPurpose("Process payment transactions")
             .withCreationTime(Instant.now())
             .build();
-            
+
         this.monitor = new PaymentProcessorMonitor(this);
         this.dynamicState = new DynamicState.Builder()
             .withTimestamp(Instant.now())
@@ -278,7 +278,7 @@ public class PaymentProcessorTube implements Tube {
             .withMetric("successRate", 100.0)
             .build();
     }
-    
+
     @Override
     public Object process(Object input) {
         if (designState != TubeState.FLOWING) {
@@ -288,7 +288,7 @@ public class PaymentProcessorTube implements Tube {
                 "Payment processor is currently " + designState
             );
         }
-        
+
         if (!(input instanceof PaymentRequest)) {
             return new TransactionResult(
                 false,
@@ -296,9 +296,9 @@ public class PaymentProcessorTube implements Tube {
                 "Invalid input type: " + input.getClass().getSimpleName()
             );
         }
-        
+
         PaymentRequest request = (PaymentRequest) input;
-        
+
         // Update dynamic state to reflect processing
         updateDynamicState(new DynamicState.Builder()
             .withTimestamp(Instant.now())
@@ -306,20 +306,20 @@ public class PaymentProcessorTube implements Tube {
             .withProperty("customerID", request.getCustomerId())
             .withMetric("amount", request.getAmount().doubleValue())
             .build());
-        
+
         long startTime = System.nanoTime();
-        
+
         try {
             // Validate request
             validateRequest(request);
-            
+
             // Process payment
             PaymentResponse response = gateway.submitPayment(
                 request.getAmount(),
                 request.getCardDetails(),
                 request.getCustomerId()
             );
-            
+
             // Store transaction
             Transaction transaction = new Transaction(
                 UUID.randomUUID().toString(),
@@ -329,9 +329,9 @@ public class PaymentProcessorTube implements Tube {
                 response.getTransactionId(),
                 response.getErrorCode()
             );
-            
+
             repository.save(transaction);
-            
+
             // Update metrics
             totalProcessed.incrementAndGet();
             if (response.isSuccessful()) {
@@ -339,10 +339,10 @@ public class PaymentProcessorTube implements Tube {
             } else {
                 failureCount.incrementAndGet();
             }
-            
+
             long processingTime = System.nanoTime() - startTime;
             updateAverageProcessingTime(processingTime);
-            
+
             // Update final state
             updateDynamicState(new DynamicState.Builder()
                 .withTimestamp(Instant.now())
@@ -354,10 +354,10 @@ public class PaymentProcessorTube implements Tube {
                 .withMetric("successRate", calculateSuccessRate())
                 .withMetric("avgProcessingTimeMs", avgProcessingTime.get() / 1_000_000.0)
                 .build());
-            
+
             // Check gateway health after processing
             checkGatewayHealth();
-            
+
             // Return result
             return new TransactionResult(
                 response.isSuccessful(),
@@ -366,7 +366,7 @@ public class PaymentProcessorTube implements Tube {
             );
         } catch (Exception e) {
             failureCount.incrementAndGet();
-            
+
             // Update error state
             updateDynamicState(new DynamicState.Builder()
                 .withTimestamp(Instant.now())
@@ -377,12 +377,12 @@ public class PaymentProcessorTube implements Tube {
                 .withMetric("successRate", calculateSuccessRate())
                 .withMetric("errorCount", failureCount.get())
                 .build());
-                
+
             // Check if we need to change design state
             if (calculateSuccessRate() < criticalSuccessRateThreshold) {
                 setDesignState(TubeState.ERROR);
             }
-            
+
             return new TransactionResult(
                 false,
                 null,
@@ -390,12 +390,12 @@ public class PaymentProcessorTube implements Tube {
             );
         }
     }
-    
+
     private void checkGatewayHealth() {
         if (!gateway.isHealthy() && designState == TubeState.FLOWING) {
             logger.warn("Payment gateway reporting unhealthy status");
             setDesignState(TubeState.ADAPTING);
-            
+
             // Attempt recovery
             if (attemptGatewayRecovery()) {
                 setDesignState(TubeState.FLOWING);
@@ -404,7 +404,7 @@ public class PaymentProcessorTube implements Tube {
             }
         }
     }
-    
+
     // Other tube interface methods and helpers
 }
 ```
@@ -420,15 +420,15 @@ Create adapters that translate between your existing interfaces and Samstraumr t
 ```java
 public class LegacyServiceAdapter implements LegacyService {
     private final Tube tube;
-    
+
     @Override
     public LegacyResponse performOperation(LegacyRequest request) {
         // Convert legacy request to tube input
         TubeInput input = convertRequest(request);
-        
+
         // Process through tube
         Object output = tube.process(input);
-        
+
         // Convert tube output to legacy response
         return convertOutput(output);
     }
@@ -444,23 +444,23 @@ public class SidecarRouter {
     private final LegacyService legacyService;
     private final Tube newTube;
     private final MetricsCollector metrics;
-    
+
     public Response processRequest(Request request) {
         // Clone the request for comparison purposes
         Request requestCopy = request.clone();
-        
+
         // Process through legacy service
         Response legacyResponse = legacyService.process(request);
-        
+
         // Process through new tube (shadow traffic)
         TubeInput tubeInput = convertRequest(requestCopy);
         Object tubeOutput = newTube.process(tubeInput);
         Response tubeResponse = convertOutput(tubeOutput);
-        
+
         // Compare responses
         boolean resultsMatch = compareResponses(legacyResponse, tubeResponse);
         metrics.recordComparison(request, legacyResponse, tubeResponse, resultsMatch);
-        
+
         // Always return legacy response during shadow period
         return legacyResponse;
     }
@@ -476,18 +476,18 @@ public class EventSourcingBridge {
     private final EventStore eventStore;
     private final LegacySystem legacySystem;
     private final Tube newTube;
-    
+
     public void processEvent(DomainEvent event) {
         // Store the event
         eventStore.append(event);
-        
+
         // Process in legacy system
         legacySystem.handleEvent(event);
-        
+
         // Process in new tube
         newTube.process(event);
     }
-    
+
     public void replayEvents() {
         // Replay events through new system to synchronize state
         for (DomainEvent event : eventStore.getAllEvents()) {
@@ -506,7 +506,7 @@ public class FeatureFlagRouter {
     private final LegacyService legacyService;
     private final Tube newTube;
     private final FeatureFlagService featureFlags;
-    
+
     public Response handleRequest(Request request, Context context) {
         // Check feature flag
         if (featureFlags.isEnabled("USE_SAMSTRAUMR_IMPLEMENTATION", context)) {
@@ -550,21 +550,21 @@ public class CoreComponentAnalyzer {
     public Map<String, Integer> rankComponentsByDependencies(
             Map<String, Set<String>> dependencyGraph) {
         Map<String, Integer> dependencyCount = new HashMap<>();
-        
+
         // Count incoming dependencies for each component
         for (String component : dependencyGraph.keySet()) {
             dependencyCount.put(component, 0);
         }
-        
+
         for (Map.Entry<String, Set<String>> entry : dependencyGraph.entrySet()) {
             for (String dependency : entry.getValue()) {
                 dependencyCount.put(
-                    dependency, 
+                    dependency,
                     dependencyCount.getOrDefault(dependency, 0) + 1
                 );
             }
         }
-        
+
         // Sort by dependency count (highest first)
         return dependencyCount.entrySet().stream()
             .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
@@ -587,14 +587,14 @@ public class ParallelImplementationManager {
     private final Map<String, Object> legacyImplementations = new HashMap<>();
     private final Map<String, Tube> tubeImplementations = new HashMap<>();
     private final FeatureFlagService featureFlags;
-    
-    public void registerImplementations(String componentId, 
+
+    public void registerImplementations(String componentId,
                                       Object legacyImpl,
                                       Tube tubeImpl) {
         legacyImplementations.put(componentId, legacyImpl);
         tubeImplementations.put(componentId, tubeImpl);
     }
-    
+
     public Object getImplementation(String componentId, Context context) {
         if (featureFlags.isEnabled("USE_TUBE_" + componentId, context)) {
             return tubeImplementations.get(componentId);
@@ -602,11 +602,11 @@ public class ParallelImplementationManager {
             return legacyImplementations.get(componentId);
         }
     }
-    
+
     public void migrateAllTraffic(String componentId) {
         featureFlags.enableGlobally("USE_TUBE_" + componentId);
     }
-    
+
     public void rollbackMigration(String componentId) {
         featureFlags.disableGlobally("USE_TUBE_" + componentId);
     }
@@ -622,33 +622,33 @@ Organize migration around business domains to create cohesive bundles:
 public class DomainMigrationPlanner {
     private final Map<String, Set<String>> domainToComponents = new HashMap<>();
     private final Map<String, Set<String>> componentToDependencies = new HashMap<>();
-    
+
     public List<MigrationPhase> createMigrationPlan() {
         List<MigrationPhase> phases = new ArrayList<>();
         Set<String> migratedComponents = new HashSet<>();
-        
+
         // Process domains in order of independence (fewer cross-domain dependencies)
         List<String> orderedDomains = rankDomainsByIndependence();
-        
+
         for (String domain : orderedDomains) {
             Set<String> domainComponents = domainToComponents.get(domain);
-            
+
             // Create a phase for this domain
             MigrationPhase phase = new MigrationPhase(domain);
-            
+
             // Find components that can be migrated (all dependencies already migrated)
             for (String component : domainComponents) {
                 Set<String> dependencies = componentToDependencies.get(component);
-                
+
                 if (migratedComponents.containsAll(dependencies)) {
                     phase.addComponent(component);
                     migratedComponents.add(component);
                 }
             }
-            
+
             phases.add(phase);
         }
-        
+
         return phases;
     }
 }
@@ -667,19 +667,19 @@ Ensure new implementations behave the same as legacy ones:
 public void shouldProduceSameResultAsLegacyImplementation() {
     // Given
     PaymentRequest request = createSamplePaymentRequest();
-    
+
     // When - process with legacy implementation
     LegacyPaymentProcessor legacyProcessor = new LegacyPaymentProcessor();
     TransactionResult legacyResult = legacyProcessor.processPayment(request);
-    
+
     // When - process with new tube implementation
     PaymentProcessorTube tube = new PaymentProcessorTube();
     TransactionResult tubeResult = (TransactionResult) tube.process(request);
-    
+
     // Then - results should be equivalent
     assertThat(tubeResult.isSuccessful()).isEqualTo(legacyResult.isSuccessful());
     assertThat(tubeResult.getErrorMessage()).isEqualTo(legacyResult.getErrorMessage());
-    
+
     // And - tube should track metrics
     DynamicState state = tube.getDynamicState();
     assertThat(state.getMetric("totalProcessed").intValue()).isEqualTo(1);
@@ -696,24 +696,24 @@ public void shouldTransitionToErrorStateWhenGatewayFails() {
     // Given
     PaymentProcessorTube tube = new PaymentProcessorTube();
     PaymentRequest request = createSamplePaymentRequest();
-    
+
     // When - simulate gateway failure
     PaymentGateway mockGateway = mock(PaymentGateway.class);
     when(mockGateway.submitPayment(any(), any(), any()))
         .thenThrow(new GatewayException("Service unavailable"));
     tube.setPaymentGateway(mockGateway);
-    
+
     // Then - initial state should be FLOWING
     assertThat(tube.getDesignState()).isEqualTo(TubeState.FLOWING);
-    
+
     // When - process multiple requests to exceed threshold
     for (int i = 0; i < 10; i++) {
         tube.process(request);
     }
-    
+
     // Then - state should transition to ERROR
     assertThat(tube.getDesignState()).isEqualTo(TubeState.ERROR);
-    
+
     // And - dynamic state should reflect the issue
     DynamicState state = tube.getDynamicState();
     assertThat(state.getProperty("error")).isNotNull();
@@ -732,13 +732,13 @@ public void shouldInteractCorrectlyWithLegacyComponents() {
     UserServiceTube userTube = new UserServiceTube();
     LegacyNotificationService legacyNotification = new LegacyNotificationService();
     NotificationAdapter adapter = new NotificationAdapter(legacyNotification);
-    
+
     userTube.setNotificationService(adapter);
-    
+
     // When - perform operation that triggers notification
     User user = new User("user123", "jane@example.com");
     userTube.process(new UpdateProfileRequest(user, "New Name"));
-    
+
     // Then - legacy notification service should receive the notification
     verify(legacyNotification).sendNotification(
         eq("jane@example.com"),
@@ -756,25 +756,25 @@ Verify that tube implementations adapt properly to adverse conditions:
 public void shouldAdaptToResourceConstraints() {
     // Given
     DataProcessorTube tube = new DataProcessorTube();
-    
+
     // When - simulate memory constraints
     ResourceSimulator.simulateLowMemory();
-    
+
     // Then - tube should adjust batch size
     tube.process(createLargeBatchRequest());
-    
+
     // Verify batch size was reduced
     assertThat(tube.getCurrentBatchSize())
         .isLessThan(tube.getDefaultBatchSize());
-        
+
     // When - memory returns to normal
     ResourceSimulator.simulateNormalMemory();
-    
+
     // Then - tube should gradually increase batch size again
     for (int i = 0; i < 5; i++) {
         tube.process(createLargeBatchRequest());
     }
-    
+
     // Verify batch size increased
     assertThat(tube.getCurrentBatchSize())
         .isGreaterThan(tube.getMinimumBatchSize());
@@ -858,31 +858,31 @@ Start with small, low-risk migrations that demonstrate clear benefits. Use metri
 public class StateSynchronizer {
     private final Object legacyComponent;
     private final Tube newTube;
-    
+
     public void synchronizeState() {
         // Extract state from legacy component
         LegacyState legacyState = extractLegacyState();
-        
+
         // Convert to tube state format
         DynamicState tubeState = convertState(legacyState);
-        
+
         // Update tube state
         newTube.setDynamicState(tubeState);
-        
+
         logger.info("State synchronized from legacy component to tube");
     }
-    
+
     public void bidirectionalSync() {
         // Determine authoritative values for each state element
         Map<String, Object> authoritativeState = determineAuthoritativeState(
             extractLegacyState(),
             newTube.getDynamicState()
         );
-        
+
         // Update both components
         updateLegacyState(authoritativeState);
         updateTubeState(authoritativeState);
-        
+
         logger.info("Bidirectional state synchronization complete");
     }
 }
@@ -897,29 +897,29 @@ public class MigrationController {
     private final FeatureFlagService featureFlags;
     private final MetricsService metrics;
     private final AlertService alerts;
-    
+
     public void beginMigration(String componentId, String newTubeId) {
         // Start with a small percentage of traffic
         featureFlags.setPercentage("USE_TUBE_" + componentId, 5);
-        
+
         // Monitor for issues
         metrics.createDashboard("migration_" + componentId);
         alerts.createAlert("migration_error_" + componentId)
             .withCondition("error_rate > 1%")
             .withAction(this::rollbackMigration);
-        
+
         logger.info("Migration started for component {}", componentId);
     }
-    
+
     public void incrementTraffic(String componentId) {
         int currentPercentage = featureFlags.getPercentage("USE_TUBE_" + componentId);
         int newPercentage = Math.min(currentPercentage * 2, 100);
-        
+
         featureFlags.setPercentage("USE_TUBE_" + componentId, newPercentage);
-        logger.info("Increased traffic to {}% for component {}", 
+        logger.info("Increased traffic to {}% for component {}",
                   newPercentage, componentId);
     }
-    
+
     public void rollbackMigration(String componentId) {
         featureFlags.setPercentage("USE_TUBE_" + componentId, 0);
         alerts.notifyTeam("Migration rollback for " + componentId);
@@ -935,11 +935,11 @@ public class MigrationController {
 ```java
 public class AspectAdapter {
     private final List<CrossCuttingConcern> concerns = new ArrayList<>();
-    
+
     public void registerConcern(CrossCuttingConcern concern) {
         concerns.add(concern);
     }
-    
+
     public Object wrapTube(Tube tube) {
         // Create a proxy that applies all cross-cutting concerns
         return Proxy.newProxyInstance(
@@ -950,12 +950,12 @@ public class AspectAdapter {
                 for (CrossCuttingConcern concern : concerns) {
                     concern.before(tube, method, args);
                 }
-                
+
                 // Invoke the actual method
                 Object result;
                 try {
                     result = method.invoke(tube, args);
-                    
+
                     // Apply "after" aspects
                     for (CrossCuttingConcern concern : concerns) {
                         concern.afterSuccess(tube, method, args, result);
@@ -967,7 +967,7 @@ public class AspectAdapter {
                     }
                     throw e;
                 }
-                
+
                 return result;
             }
         );
@@ -977,16 +977,16 @@ public class AspectAdapter {
 // Example usage for common cross-cutting concerns
 public void setupCrossCuttingConcerns() {
     AspectAdapter adapter = new AspectAdapter();
-    
+
     // Add authentication aspect
     adapter.registerConcern(new AuthenticationConcern(securityService));
-    
+
     // Add transaction management
     adapter.registerConcern(new TransactionConcern(transactionManager));
-    
+
     // Add logging
     adapter.registerConcern(new LoggingConcern());
-    
+
     // Wrap tubes with aspects
     Tube wrappedTube = (Tube) adapter.wrapTube(new PaymentProcessorTube());
 }
@@ -1003,28 +1003,28 @@ public class DualPipelineVerifier {
     private final ComparisonStrategy strategy;
     private final TestDataGenerator generator;
     private final TestResultRepository repository;
-    
+
     public void verifyWithRandomData(int testCount) {
         for (int i = 0; i < testCount; i++) {
             // Generate random test data
             Object testData = generator.generateRandomData();
-            
+
             // Process through both pipelines
             Object legacyResult = processWithLegacy(testData);
             Object tubeResult = processWithTube(testData);
-            
+
             // Compare results
             ComparisonResult comparison = strategy.compare(legacyResult, tubeResult);
-            
+
             // Store results
             repository.saveComparison(testData, legacyResult, tubeResult, comparison);
-            
+
             // Alert on significant differences
             if (comparison.getDifference() > significanceTreshold) {
                 alertTeam(comparison);
             }
         }
-        
+
         // Generate summary report
         ComparisonSummary summary = generateSummary();
         logger.info("Verification complete: {}", summary);

@@ -1,143 +1,86 @@
 # Samstraumr Quality Checks
 
-This document outlines the quality checks and test organization for the Samstraumr project.
+This document explains how to use the quality checks in the Samstraumr project.
 
-## Test Organization (MECE)
+## Available Quality Checks
 
-Samstraumr tests follow a Mutually Exclusive, Collectively Exhaustive (MECE) organization approach:
+The following quality checks are configured in the project:
 
-### Hierarchical Structure
-Tests are organized according to component complexity levels:
+1. **Spotless** - Code formatting using Google Java Style
+2. **PMD** - Static code analysis
+3. **Checkstyle** - Style checking based on Google's style
+4. **SpotBugs** - Bug detection
+5. **JaCoCo** - Code coverage
 
-1. **Atomic Components** (`@L0_Tube`) - Unit tests for individual Tubes
-2. **Component Bundles** (`@L1_Bundle`) - Tests for connected Tubes forming Bundles
-3. **Machine Compositions** (`@L2_Machine`) - Tests for interconnected Bundles forming Machines
-4. **Complete Systems** (`@L3_System`) - Tests for entire system operation
+## Running Quality Checks
 
-### Critical Path Categorization
-Tests are categorized by importance to enable prioritized test execution:
+### All Quality Checks
 
-1. **Above The Line** (`@ATL`) - Critical functionality tests that must pass for a valid build
-2. **Below The Line** (`@BTL`) - Non-critical robustness tests for edge cases and quality
-
-## Running Tests
-
-### Test Selection
-Run tests based on their categorization:
+To run all quality checks:
 
 ```bash
-# Run all tests
-mvn test
-
-# Run only ATL tests (critical functionality)
-mvn test -P atl-tests
-
-# Run only BTL tests (robustness)
-mvn test -P btl-tests
-
-# Run specific component level tests
-mvn test -Dcucumber.filter.tags="@L0_Tube"
-mvn test -Dcucumber.filter.tags="@L1_Bundle"
-mvn test -Dcucumber.filter.tags="@L2_Machine"
-mvn test -Dcucumber.filter.tags="@L3_System"
-
-# Run tests with combined tags
-mvn test -Dcucumber.filter.tags="@ATL and @L0_Tube"
-mvn test -Dcucumber.filter.tags="@BTL and @Performance"
+mvn validate -P quality-checks
 ```
 
-## Quality Checks
+### Skip Quality Checks
 
-Samstraumr implements a comprehensive quality check pipeline for ensuring code quality:
-
-### 1. Code Formatting (Spotless)
-- Enforces consistent code formatting
-- Ensures proper import organization
-- Validates whitespace and trailing newlines
+To skip quality checks during build:
 
 ```bash
-# Check formatting
+mvn clean install -P skip-quality-checks
+```
+
+### Individual Checks
+
+To run individual quality checks:
+
+```bash
+# Format code with Spotless
+mvn spotless:apply
+
+# Check code formatting
 mvn spotless:check
 
-# Apply automatic formatting
+# Run PMD analysis
+mvn pmd:check
+
+# Run Checkstyle
+mvn checkstyle:check
+
+# Run SpotBugs
+mvn spotbugs:check
+
+# Generate JaCoCo coverage report
+mvn jacoco:report
+```
+
+## Fixing Common Issues
+
+### Spotless Issues
+
+If you have formatting issues, run:
+
+```bash
 mvn spotless:apply
 ```
 
-### 2. Static Code Analysis (PMD)
-- Identifies potential bugs
-- Enforces best practices
-- Detects error-prone code patterns
+### Encoding Issues
+
+For encoding issues in files, ensure all files are saved with UTF-8 encoding.
+
+### SpotBugs Issues
+
+To see detailed information about SpotBugs issues:
 
 ```bash
-# Run PMD checks
-mvn pmd:check
+mvn spotbugs:gui
 ```
 
-### 3. Coding Standards (Checkstyle)
-- Enforces Google Java Style Guide
-- Ensures consistent naming conventions
-- Validates documentation and Javadoc
+## Configuration Files
 
-```bash
-# Run Checkstyle checks
-mvn checkstyle:check
-```
-
-### 4. Bug Detection (SpotBugs)
-- Static analysis to find potential bugs
-- Detects null pointer dereferences
-- Identifies resource leaks and concurrency issues
-
-```bash
-# Run SpotBugs checks
-mvn spotbugs:check
-```
-
-### 5. Code Coverage (JaCoCo)
-- Measures test coverage
-- Enforces minimum coverage thresholds
-- Generates detailed coverage reports
-
-```bash
-# Generate coverage report
-mvn jacoco:report
-
-# Verify coverage meets thresholds
-mvn jacoco:check
-```
-
-## Running All Quality Checks
-
-Use the provided script to run all quality checks in sequence:
-
-```bash
-./build-checks.sh
-```
-
-This script:
-1. Verifies code formatting
-2. Runs static code analysis
-3. Checks coding standards
-4. Runs bug detection
-5. Executes ATL tests (critical)
-6. Executes BTL tests (robustness)
-7. Verifies code coverage
-
-## Report Locations
-
-After running the quality checks, reports are available in:
-
-- Cucumber Test Report: `target/cucumber-reports/cucumber.html`
-- JaCoCo Coverage Report: `target/site/jacoco/index.html`
-- Checkstyle Report: `target/checkstyle-result.xml`
-- PMD Analysis: `target/pmd.xml`
-- SpotBugs Results: `target/spotbugsXml.xml`
+- Checkstyle: `Samstraumr/checkstyle.xml`
+- PMD: `Samstraumr/pmd-ruleset.xml`
 
 ## CI/CD Integration
 
-These quality checks are designed to be integrated into CI/CD pipelines:
-
-1. ATL tests should block PR merges if they fail
-2. BTL tests may be run as non-blocking checks
-3. Quality checks should be run before code review
-4. Coverage reports should be published for review
+Quality checks are integrated into the CI/CD pipeline to ensure code quality. Pull requests that fail quality checks will not be merged until the issues are fixed.

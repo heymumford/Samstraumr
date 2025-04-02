@@ -1,6 +1,6 @@
 # How to Amplify the Boredom and Silent Torture of Unit Testing
 
-Welcome, friend! You’re about to embark on a journey through the fascinating world of **Tube-Based Development (TBD)**—where **Tubes**, **Composites**, and **Machines** come to life through the power of modular, self-aware systems. 
+Welcome, friend! You’re about to embark on a journey through the fascinating world of **Tube-Based Development (TBD)**—where **Tubes**, **Composites**, and **Machines** come to life through the power of modular, self-aware systems.
 
 This **Unit Test Strategy** will serve as your trusty guide for navigating the rigorous (but totally fun) terrain of **Tube.java Atomic Boundary Tests**, all the way up to the grand symphony of **Machine Construct Validation**. Buckle up, and let’s do this!
 
@@ -29,7 +29,7 @@ At Samstraumr, we live by the philosophy that **simplicity**, **adaptability**, 
 1. **ATL** (*Above The Line* testing, pronounced "Attle"): The critical, must-pass tests that ensure our Tubes don’t break. If these fail, it’s like Voltron losing a lion—total disaster. 🦁🚫
    - **Attle** = Absolutely Top-Level Essentials 🏆
 
-2. **BTL** (*Below The Line* testing, pronounced "Bottle"): The more detailed, edge-case-y tests that take the Tubes from "good enough" to **bulletproof**.  
+2. **BTL** (*Below The Line* testing, pronounced "Bottle"): The more detailed, edge-case-y tests that take the Tubes from "good enough" to **bulletproof**.
    - **Bottle** = Beyond Top-Level Essentials 🍾
 
 Both ATL and BTL tests help us ensure that **Atomic Boundary Tests (ABT)** and **Inter-Tube Feature Tests (ITFT)** work harmoniously, preventing our Tubes from becoming… well, **roadkill** 🦔🚗.
@@ -57,19 +57,19 @@ Remember, **every Machine is made of Composites, and every Composite has at leas
 - **What is ATL?**
   - **Critical, priority-zero tests** that must pass for the Tube to function. We test only the **core features** that guarantee the Tube’s existence is **meaningful and secure**.
   - Think of ATL tests as the **spinal cord** of the system—break it, and nothing works.
-  
+
 - **What do we test?**
   - **Unique UUID**: Does each Tube get its very own identity? (Spoiler: It better.)
   - **State Persistence**: Does the Tube retain its identity and state over time?
   - **Basic Input/Output**: Can it handle fundamental tasks like allocating memory and passing data?
-  
+
 - **Why is it critical?**
   - **No ATL, no Tube.** It’s that simple. These are **must-have tests** that ensure Tubes can function in the first place.
 
 ### **BTL: Below The Line Testing (Bottle) 🍾**
 - **What is BTL?**
   - Detailed tests that **explore edge cases**, ensure **robustness**, and cover everything ATL doesn’t. These are the extra layers of polish that ensure your Tube is not just functional, but **bulletproof**.
-  
+
 - **What do we test?**
   - **Edge Cases**: How does the Tube handle invalid inputs? Does it gracefully manage memory under stress?
   - **Performance Under Load**: Can the Tube handle extreme conditions without breaking a sweat?

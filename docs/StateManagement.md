@@ -279,28 +279,28 @@ public class DynamicState {
     private final Instant timestamp;
     private final Map<String, Object> properties;
     private final Map<String, Number> metrics;
-    
+
     // Builder pattern for construction
     public static class Builder {
         private final Map<String, Object> properties = new HashMap<>();
         private final Map<String, Number> metrics = new HashMap<>();
         private Instant timestamp = Instant.now();
-        
+
         public Builder withProperty(String key, Object value) {
             properties.put(key, value);
             return this;
         }
-        
+
         public Builder withMetric(String key, Number value) {
             metrics.put(key, value);
             return this;
         }
-        
+
         public Builder withTimestamp(Instant timestamp) {
             this.timestamp = timestamp;
             return this;
         }
-        
+
         public DynamicState build() {
             return new DynamicState(timestamp, properties, metrics);
         }
@@ -1088,16 +1088,16 @@ Using state information to make routing decisions within a flow:
 ```java
 public class StateAwareRouterTube implements Tube {
     private final Map<String, Tube> routes = new HashMap<>();
-    
+
     private TubeProcessor createProcessor() {
         return input -> {
             Request request = (Request) input;
-            
+
             // Select route based on state of destination tubes
             List<Tube> eligibleTubes = routes.values().stream()
                 .filter(tube -> tube.getDesignState() == TubeState.FLOWING)
                 .collect(Collectors.toList());
-                
+
             if (eligibleTubes.isEmpty()) {
                 // No available routes
                 return new RoutingResult(
@@ -1106,10 +1106,10 @@ public class StateAwareRouterTube implements Tube {
                     "No flowing tubes available for routing"
                 );
             }
-            
+
             // Select tube based on load or other metrics
             Tube selectedTube = selectBestTube(eligibleTubes);
-            
+
             // Route the request
             return new RoutingResult(
                 true,
@@ -1118,7 +1118,7 @@ public class StateAwareRouterTube implements Tube {
             );
         };
     }
-    
+
     private Tube selectBestTube(List<Tube> eligibleTubes) {
         // Select based on dynamic state metrics
         return eligibleTubes.stream()
@@ -1126,7 +1126,7 @@ public class StateAwareRouterTube implements Tube {
                 tube -> getQueueDepth(tube.getDynamicState())))
             .orElse(eligibleTubes.get(0));
     }
-    
+
     private double getQueueDepth(DynamicState state) {
         Number depth = state.getMetric("queueDepth");
         return depth != null ? depth.doubleValue() : 0.0;
