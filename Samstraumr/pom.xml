@@ -3,18 +3,23 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.samstraumr</groupId>
-    <artifactId>samstraumr-framework</artifactId>
-    <version>0.3</version>
+    <parent>
+        <groupId>org.samstraumr</groupId>
+        <artifactId>samstraumr</artifactId>
+        <version>0.3</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    
+    <artifactId>samstraumr-modules</artifactId>
     <packaging>pom</packaging>
-    <name>Samstraumr Framework</name>
+    <name>Samstraumr Modules</name>
 
     <modules>
         <module>samstraumr-core</module>
     </modules>
 
     <properties>
-        <!-- Project Settings -->
+        <\!-- Project Settings -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
@@ -23,7 +28,7 @@
         <sonar.organization>heymumford</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
-        <!-- Dependency Versions -->
+        <\!-- Dependency Versions -->
         <slf4j.version>2.0.16</slf4j.version>
         <log4j.version>2.24.0</log4j.version>
         <oshi-core.version>6.6.5</oshi-core.version>
@@ -39,7 +44,7 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Logging Dependencies -->
+            <\!-- Logging Dependencies -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
@@ -56,14 +61,14 @@
                 <version>${log4j.version}</version>
             </dependency>
 
-            <!-- OSHI for system information -->
+            <\!-- OSHI for system information -->
             <dependency>
                 <groupId>com.github.oshi</groupId>
                 <artifactId>oshi-core</artifactId>
                 <version>${oshi-core.version}</version>
             </dependency>
 
-            <!-- Jackson for JSON serialization -->
+            <\!-- Jackson for JSON serialization -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
@@ -75,7 +80,7 @@
                 <version>${jackson-core.version}</version>
             </dependency>
 
-            <!-- Testing Dependencies (JUnit, Mockito, Cucumber) -->
+            <\!-- Testing Dependencies (JUnit, Mockito, Cucumber) -->
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>
