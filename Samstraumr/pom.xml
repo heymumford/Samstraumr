@@ -63,6 +63,15 @@
                         <systemPropertyVariables>
                             <cucumber.filter.tags>${cucumber.filter.tags}</cucumber.filter.tags>
                         </systemPropertyVariables>
+                        <!-- Optimize for performance -->
+                        <forkCount>2C</forkCount>
+                        <reuseForks>true</reuseForks>
+                        <parallel>classes</parallel>
+                        <threadCount>12</threadCount>
+                        <perCoreThreadCount>true</perCoreThreadCount>
+                        <useUnlimitedThreads>false</useUnlimitedThreads>
+                        <argLine>-Xmx1024m</argLine>
+                        <trimStackTrace>false</trimStackTrace>
                     </configuration>
                 </plugin>
                 
