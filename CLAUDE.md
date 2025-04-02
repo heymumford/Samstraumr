@@ -6,6 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Build project: `mvn clean install`
 - Build without tests: `mvn clean install -DskipTests`
 - Run all tests: `mvn test`
+- Run with performance optimizations:
+  - Linux/WSL: `./build-performance.sh`
+  - Windows: `build-performance.bat`
+  - Custom command with optimizations: `./build-performance.sh clean test -P atl-tests`
+  - With specific thread count: `mvn test -T 12` (uses 12 threads)
 
 ## Test Commands
 ### Test Categorization
