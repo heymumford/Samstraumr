@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-framework</artifactId>
-    <version>0.2</version>
+    <version>0.3</version>
   </parent>
 
   <artifactId>samstraumr-core</artifactId>
