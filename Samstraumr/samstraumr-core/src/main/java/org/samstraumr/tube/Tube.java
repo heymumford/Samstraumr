@@ -21,8 +21,8 @@ public class Tube {
 
     private final String uniqueId;
     private final String reason;
-    private static List<String> lineage;
-    private static List<String> mimirLog;
+    private final List<String> lineage;
+    private final List<String> mimirLog;
     private final Environment environment;
     private volatile Timer terminationTimer;
 
@@ -37,7 +37,8 @@ public class Tube {
             
             this.reason = reason;
             this.environment = environment;
-            initializeLists(reason);
+            this.lineage = Collections.synchronizedList(new ArrayList<>(Collections.singletonList(reason)));
+            this.mimirLog = Collections.synchronizedList(new LinkedList<>());
             this.uniqueId = generateSHA256UniqueId(reason + environment.getParameters());
             initializeTube();
         } catch (Exception e) {
@@ -47,11 +48,6 @@ public class Tube {
             }
             throw new TubeInitializationException("Failed to initialize Tube", e);
         }
-    }
-
-    private void initializeLists(String reason) {
-        this.lineage = Collections.synchronizedList(new ArrayList<>(Collections.singletonList(reason)));
-        this.mimirLog = Collections.synchronizedList(new LinkedList<>());
     }
 
     private void initializeTube() {
