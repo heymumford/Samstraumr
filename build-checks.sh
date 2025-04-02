@@ -42,7 +42,20 @@ java -version
 print_header "Maven Version"
 mvn --version | head -n 1
 
-# Step 1: Code formatting check
+# Step 1: File encoding and line ending check
+print_header "Checking File Encoding and Line Endings"
+if [ -f "./check-encoding.sh" ]; then
+  ./check-encoding.sh || {
+    print_error "File encoding or line ending check failed"
+    print_warning "Run './check-encoding.sh --fix' to fix encoding issues"
+    exit 1
+  }
+  print_success "File encoding and line ending check passed"
+else
+  print_warning "check-encoding.sh not found - skipping encoding check"
+fi
+
+# Step 2: Code formatting check
 print_header "Running Code Formatting Check (Spotless)"
 mvn spotless:check || {
   print_error "Code formatting check failed"
@@ -51,7 +64,7 @@ mvn spotless:check || {
 }
 print_success "Code formatting check passed"
 
-# Step 2: Static code analysis (PMD)
+# Step 3: Static code analysis (PMD)
 print_header "Running Static Code Analysis (PMD)"
 mvn pmd:check || {
   print_error "PMD code analysis failed"
@@ -60,7 +73,7 @@ mvn pmd:check || {
 }
 print_success "PMD code analysis passed"
 
-# Step 3: Coding standards check (Checkstyle)
+# Step 4: Coding standards check (Checkstyle)
 print_header "Running Coding Standards Check (Checkstyle)"
 mvn checkstyle:check || {
   print_error "Checkstyle check failed"
@@ -69,7 +82,7 @@ mvn checkstyle:check || {
 }
 print_success "Checkstyle check passed"
 
-# Step 4: Bug detection (SpotBugs)
+# Step 5: Bug detection (SpotBugs)
 print_header "Running Bug Detection (SpotBugs)"
 mvn spotbugs:check || {
   print_error "SpotBugs bug detection failed"
@@ -78,7 +91,7 @@ mvn spotbugs:check || {
 }
 print_success "SpotBugs bug detection passed"
 
-# Step 5: Compile
+# Step 6: Compile
 print_header "Compiling Code"
 mvn clean compile || {
   print_error "Compilation failed"
@@ -86,7 +99,7 @@ mvn clean compile || {
 }
 print_success "Compilation passed"
 
-# Step 6: Run ATL tests first (must pass)
+# Step 7: Run ATL tests first (must pass)
 print_header "Running Above-The-Line (ATL) Critical Tests"
 mvn test -P atl-tests || {
   print_error "ATL tests failed - critical issues found!"
@@ -95,7 +108,7 @@ mvn test -P atl-tests || {
 }
 print_success "ATL tests passed"
 
-# Step 7: Run BTL tests (additional quality checks)
+# Step 8: Run BTL tests (additional quality checks)
 print_header "Running Below-The-Line (BTL) Robustness Tests"
 mvn test -P btl-tests || {
   print_warning "BTL tests failed - robustness issues found"
@@ -104,7 +117,7 @@ mvn test -P btl-tests || {
 }
 print_success "BTL tests completed"
 
-# Step 8: Code coverage check
+# Step 9: Code coverage check
 print_header "Running Code Coverage Analysis (JaCoCo)"
 mvn jacoco:report jacoco:check || {
   print_warning "Code coverage below threshold"
@@ -124,6 +137,10 @@ echo " - JaCoCo Coverage: target/site/jacoco/index.html"
 echo " - CheckStyle: target/checkstyle-result.xml"
 echo " - PMD: target/pmd.xml"
 echo " - SpotBugs: target/spotbugsXml.xml"
+echo ""
+echo "Encoding and line ending checks:"
+echo " - Run './check-encoding.sh --verbose' for detailed encoding information"
+echo " - Run './check-encoding.sh --fix' to automatically fix issues"
 
 # Make script executable
 chmod +x "$0"

@@ -55,6 +55,8 @@
               </googleJavaFormat>
               <trimTrailingWhitespace/>
               <endWithNewline/>
+              <encoding>UTF-8</encoding>
+              <lineEndings>LF</lineEndings>
             </java>
             <pom>
               <includes>
@@ -63,6 +65,8 @@
               <sortPom>
                 <expandEmptyElements>false</expandEmptyElements>
               </sortPom>
+              <encoding>UTF-8</encoding>
+              <lineEndings>LF</lineEndings>
             </pom>
             <markdown>
               <includes>
@@ -70,6 +74,8 @@
               </includes>
               <endWithNewline/>
               <trimTrailingWhitespace/>
+              <encoding>UTF-8</encoding>
+              <lineEndings>LF</lineEndings>
             </markdown>
           </configuration>
           <executions>
@@ -92,6 +98,34 @@
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
+      </plugin>
+      <!-- Ensure consistent encoding in resource files -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.1</version>
+        <configuration>
+          <encoding>UTF-8</encoding>
+          <resources>
+            <resource>
+              <directory>src/main/resources</directory>
+              <filtering>true</filtering>
+            </resource>
+            <resource>
+              <directory>src/test/resources</directory>
+              <filtering>true</filtering>
+            </resource>
+          </resources>
+          <nonFilteredFileExtensions>
+            <nonFilteredFileExtension>png</nonFilteredFileExtension>
+            <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
+            <nonFilteredFileExtension>jpeg</nonFilteredFileExtension>
+            <nonFilteredFileExtension>gif</nonFilteredFileExtension>
+            <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+            <nonFilteredFileExtension>zip</nonFilteredFileExtension>
+            <nonFilteredFileExtension>jar</nonFilteredFileExtension>
+          </nonFilteredFileExtensions>
+        </configuration>
       </plugin>
     </plugins>
   </build>

@@ -126,6 +126,13 @@ Samstraumr thrives within a garden of diverse practitioners tending their own im
 - [Testing Strategy](./docs/proposals/SamstraumrTestingStrategy.md)
 - [LLM Context Composite Tube Proposal](./docs/proposals/LLMContextCompositeTubeProposal.md)
 
+## Development Standards
+
+- **Text Encoding:** All text files use UTF-8 encoding
+- **Line Endings:** Unix-style (LF) line endings for all text files except Windows batch files
+- **File Formats:** `.editorconfig` and `.gitattributes` ensure consistent formatting
+- **Quality Checks:** Run `./check-encoding.sh` to verify file encoding and line endings
+
 ## Connect
 
 - **Author:** [Eric C. Mumford](mailto:heymumford@samstraumr.org)
