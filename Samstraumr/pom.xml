@@ -25,7 +25,7 @@
     <checkstyle.plugin.version>3.3.1</checkstyle.plugin.version>
     <spotbugs.plugin.version>4.8.2.0</spotbugs.plugin.version>
     <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
-    <pmd.version>7.10.0</pmd.version>
+    <pmd.version>6.55.0</pmd.version>
     <checkstyle.version>10.14.0</checkstyle.version>
 
     <!-- Test configuration properties -->
@@ -92,6 +92,8 @@
               </googleJavaFormat>
               <trimTrailingWhitespace/>
               <endWithNewline/>
+              <encoding>UTF-8</encoding>
+              <lineEndings>UNIX</lineEndings>
             </java>
             <pom>
               <includes>
@@ -101,6 +103,8 @@
               <sortPom>
                 <expandEmptyElements>false</expandEmptyElements>
               </sortPom>
+              <encoding>UTF-8</encoding>
+              <lineEndings>UNIX</lineEndings>
             </pom>
             <markdown>
               <includes>
@@ -108,6 +112,8 @@
               </includes>
               <endWithNewline/>
               <trimTrailingWhitespace/>
+              <encoding>UTF-8</encoding>
+              <lineEndings>UNIX</lineEndings>
             </markdown>
             <yaml>
               <includes>
@@ -116,6 +122,8 @@
               </includes>
               <endWithNewline/>
               <trimTrailingWhitespace/>
+              <encoding>UTF-8</encoding>
+              <lineEndings>UNIX</lineEndings>
             </yaml>
           </configuration>
           <executions>
