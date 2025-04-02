@@ -6,8 +6,19 @@ import static org.junit.jupiter.api.Assertions.*;
 import io.cucumber.java.en.*;
 import org.samstraumr.tube.Tube;
 import org.samstraumr.tube.Environment;
-import java.util.List; // Import added
+import java.util.List;
 
+/**
+ * Step definitions for L0_Tube initialization tests.
+ * These steps validate the proper initialization, identity management,
+ * and self-awareness capabilities of atomic Tubes.
+ * 
+ * Related tags:
+ * - @L0_Tube - Level 0 atomic tube component tests
+ * - @Init - Initialization phase tests
+ * - @Identity - Identity management tests
+ * - @Awareness - Self-monitoring and environment awareness tests
+ */
 public class TubeInitializationSteps {
     private static final Logger logger = LoggerFactory.getLogger(TubeInitializationSteps.class);
     private Tube testTube;
