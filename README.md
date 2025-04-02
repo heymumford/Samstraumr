@@ -1,121 +1,137 @@
-# Samstraumr
+# Samstraumr Framework
 
-**A Living Blueprint for Self-Aware, Adaptable Software**
+> *Software that breathes, flows, and grows like a living stream*
 
-Concept and Authorship by [Eric C. Mumford](mailto:heymumford@samstraumr.org), *Lifelong Engineer and Tinkerer*  
-[GitHub](https://github.com/heymumford) | [LinkedIn](https://www.linkedin.com/in/eric-mumford/)
+```
+Last updated: April 2, 2025
+Maintainer: Eric C. Mumford (@Vorthruna)
+Version: 1.2.0
+License: Mozilla Public License 2.0
+```
 
----
+## Table of Contents
+
+- [Overview](#overview)
+- [Core Concepts](#core-concepts)
+    - [Tubes as Building Blocks](#tubes-as-building-blocks)
+    - [Identity Notation](#identity-notation)
+    - [State Management](#state-management)
+- [Benefits](#benefits)
+- [Getting Started](#getting-started)
+- [Advanced Topics](#advanced-topics)
+- [Community](#community)
+- [Resources](#resources)
+- [Connect](#connect)
 
 ## Overview
 
-Samstraumr is a **design framework** built around **Tube-Based Development (TBD)**—a method of structuring code as interconnected **tubes** (logical modules) that process inputs and outputs in a manner reminiscent of natural flows. This concept is deeply inspired by **natural systems** and aims to foster software that:
+Imagine software that adapts to change as gracefully as a river adjusts its course around new stones. This is the vision behind Samstraumr (from Old Norse, meaning "unified flow").
 
-- Adapts organically to changing requirements
-- Promotes modularity and maintainability
-- Emphasizes collaboration and clear communication
+Samstraumr is a design framework that reimagines how we build software by drawing inspiration from nature's elegant solutions. Just as rivers find the most efficient path downhill, Samstraumr helps developers create systems that naturally find balance and harmony through **Tube-Based Development (TBD)**.
 
-The term **"Samstraumr"** blends “Sam” (together, unified) with “Straumr” (Old Norse for “stream” or “flow”), echoing the framework’s mission to **unify** system components in a coherent, flowing manner.
+At its heart, Samstraumr envisions software components as interconnected "tubes" – mindful pathways that guide data and functionality through your system with purpose and awareness.
+
+[→ Explore our systems theory foundation](./docs/SystemsTheoryFoundation.md)
+
+## Core Concepts
+
+### Tubes as Building Blocks
+
+In nature, specialized structures channel resources where they're needed – from rivers carving landscapes to veins delivering nutrients through your body. Samstraumr's **tubes** bring this wisdom to code.
+
+A tube is a self-aware component with clear responsibilities, mindful of what flows in and what flows out. Like organs in a body, tubes perform specific functions while contributing to a greater purpose:
+
+- **Atomic tubes** – Individual specialists, like a heart cell with one clear job
+- **Bundles** – Collaborative teams, like a complete heart with coordinated chambers
+- **Machines** – Orchestrated systems, like a full circulatory system working in concert
+
+This nested approach mirrors nature's elegant organization – from cells to organisms to ecosystems – allowing complex symphonies to emerge from simple melodies.
+
+[→ Discover detailed core concepts](./docs/CoreConcepts.md)  
+[→ Learn about tube design patterns](./docs/TubePatterns.md)  
+[→ Understand bundles and machines](./docs/BundlesAndMachines.md)
+
+### Identity Notation
+
+Even in complex ecosystems, every creature has its place and name. Samstraumr brings this clarity to software with a naming system as elegant as it is practical:
+
+- `T<ID>` – A single tube, like referring to "the oak tree" (`T7`)
+- `B<ID>.T<ID>` – A tube within its bundle, like "the oak in the north grove" (`B3.T2`)
+- `M<ID>.B<ID>.T<ID>` – A fully qualified address, like "the oak in the north grove of Sherwood Forest" (`M0.B1.T4`)
+
+This whispered language allows developers to reference any part of even the most intricate systems with brevity and precision – a gift to future caretakers of your code.
+
+### State Management
+
+Just as a river might be flowing, frozen, or flooding – each with different implications – Samstraumr components understand themselves through two complementary lenses:
+
+1. **Design State** – Fundamental conditions that change rarely but significantly:
+    - `FLOWING` – Healthy operation, like a river in its banks
+    - `BLOCKED` – Temporarily unable to process, like a river meeting a new dam
+    - `ADAPTING` – Reconfiguring to new conditions, like a river finding a path around obstacles
+    - `ERROR` – Experiencing distress, like a river during toxic contamination
+
+2. **Dynamic State** – Moment-to-moment awareness that shifts fluidly with changing conditions, like the ripples, eddies, and currents that animate a flowing stream
+
+This dual awareness allows components to maintain their essence while dancing with the ever-changing now.
+
+[→ Explore state harmony in depth](./docs/StateManagement.md)
+
+## Benefits
+
+When you embrace Samstraumr's flowing wisdom:
+
+- **Unexpected intelligence emerges** – Components become more than the sum of their parts
+- **Systems bend without breaking** – Resilience becomes woven into your software's fabric
+- **Growth feels organic, not painful** – Evolution without revolution
+- **Technical debt becomes rare** – Clean boundaries prevent tangled roots
+- **Teams work in harmony** – Clear responsibilities foster collaboration without conflict
+- **Solutions scale naturally** – From garden pond to mighty ocean
+
+## Getting Started
+
+Begin your journey with Samstraumr through these gentle steps:
+
+1. **Start with a single stream** – Create one thoughtful tube with clear purpose
+2. **Map the natural flows** – Identify how information wants to move through your system
+3. **Listen and respond** – Enable your tubes to hear and adapt to what's happening around them
+4. **Let complexity emerge gradually** – Nurture growth through thoughtful composition
+
+[→ Follow our step-by-step guide](./docs/GettingStarted.md)
+
+## Advanced Topics
+
+For those ready to dive deeper:
+
+- **Migrating existing systems** – Bringing Samstraumr wisdom to established codebases
+- **Testing approaches** – Verification through conversation
+- **Design patterns** – Recurring solutions to common challenges
+
+[→ Discover migration strategies](./docs/Migration.md)  
+[→ Explore testing approaches](./docs/Testing.md)
+
+## Community
+
+Samstraumr thrives within a garden of diverse practitioners tending their own implementations while sharing discoveries. Join our growing community:
+
+- **Share your creations** through pull requests
+- **Plant new ideas** via thoughtful issues
+- **Join conversations** about patterns observed in the wild
+- **Tend the documentation** to help future explorers
+
+## Resources
+
+- [Glossary of Terms](./docs/Glossary.md)
+- [Frequently Asked Questions](./docs/FAQ.md)
+- [Testing Strategy](./docs/proposals/SamstraumrTestingStrategy.md)
+- [LLM Context Composite Tube Proposal](./docs/proposals/LLMContextCompositeTubeProposal.md)
+
+## Connect
+
+- **Author:** [Eric C. Mumford](mailto:heymumford@samstraumr.org)
+- **GitHub:** [github.com/heymumford](https://github.com/heymumford)
+- **LinkedIn:** [linkedin.com/in/eric-mumford](https://www.linkedin.com/in/eric-mumford/)
 
 ---
 
-## Background and Philosophy
-
-After decades dealing with large, **legacy codebases** and the friction of daily maintenance, it became clear that **monolithic** or poorly modularized architectures hinder adaptability. Samstraumr emerges from the conviction that **design elegance and system resilience** need not be sacrificed in pursuit of rapid development.
-
-1. **Evolution from OOP and FP**
-   - Like how airplanes paved the way for helicopters and drones—each an application of flight principles—Samstraumr builds on Object-Oriented and Functional Programming to emphasize **adaptable** and **flow-centric** architectures.
-
-2. **Guiding Principles**
-   - **Simplicity and Clarity**: Systems should be instantly understandable.
-   - **Modularity and Reusability**: Build independent tubes to avoid reinventing the wheel.
-   - **Self-Awareness and Adaptability**: Allow components to observe, learn, and evolve during operation.
-   - **Collaboration and Transparency**: Facilitate open interactions, enabling tubes to connect and transform flows seamlessly.
-   - **Natural Flow**: Embrace the organic way water (or air) moves—flexible, unobstructed, and efficient.
-
----
-
-## Architectural Decisions
-
-### 1. Tubes at Every Level
-
-A **tube** is a self-contained unit with a specific responsibility. Tubes can:
-
-- **Stand alone** (atomic tube)
-- **Form Bundles** (collections of tubes)
-- **Compose Machines** (bundles of bundles, potentially nested)
-
-This hierarchy ensures scalability from small modules to complex, layered systems.
-
-### 2. Identity Notation
-
-To keep logs and references **concise** yet **unambiguous**, Samstraumr adopts a short notation:
-
-- **`T<ID>`** for an atomic tube (e.g., `T7`)
-- **`B<ID>.T<ID>`** for a tube inside a bundle (e.g., `B1.T2`)
-- **`M<ID>.B<ID>.T<ID>`** for a tube within a bundle inside a machine (e.g., `M0.B1.T2`)
-
-Nesting is possible for deeper hierarchies (e.g., `M2.M1.B3.T9`), reflecting how tubes aggregate into bundles and machines.
-
-### 3. State Management
-
-Samstraumr relies on **two layers of state**:
-
-1. **Design State**
-   - A stable, **enum-based** state representing the big-picture mode of a tube, bundle, or machine
-   - Example (for tubes): `FLOWING`, `BLOCKED`, `ADAPTING`, `ERROR`
-
-2. **Dynamic State**
-   - A **flexible** class or data structure capturing ephemeral or context-specific sub-states
-   - Frequently updated in real time (e.g., “learning,” “monitoring,” “queueing_request”)
-
-At each hierarchical level (tube, bundle, machine), the **Design State** rarely changes under normal operation, while the **Dynamic State** can shift rapidly based on environment or interaction.
-
----
-
-## Tube-Based Development in Practice
-
-1. **Modularity for Rapid Development**
-   - Each tube is isolated and can be tested or replaced without affecting the entire system.
-   - Encourages **parallel development**, as multiple teams can work on different tubes simultaneously.
-
-2. **Adaptive Behaviors and Self-Correction**
-   - Tubes can observe their own metrics (through dynamic states) and **auto-correct** or **scale** as needed.
-   - Systems remain resilient under evolving conditions.
-
-3. **Resilience and Fault Tolerance**
-   - At higher levels, bundles or machines detect errors in underlying tubes and can switch to alternate paths.
-   - **Redundancy**: Critical tubes can run in parallel to ensure continuity.
-
-4. **Streamlined Maintenance**
-   - **Focus** on a single tube or bundle at a time.
-   - Simplifies both **debugging** (logs reference short identities like `M0.B2.T5`) and **rollouts** (replace or upgrade tubes independently).
-
----
-
-## Why Choose Samstraumr?
-
-1. **Faster Onboarding**: New contributors can quickly grasp the flow of data through clearly defined tubes and connections.
-2. **Lower Technical Debt**: Isolated modules mean less risk of entangled code and “spaghetti” dependencies.
-3. **Scalability**: Start small (simple tubes) and grow into nested bundles and machines without architectural rewrites.
-4. **Natural Inspiration**: Mimics how **living systems** streamline energy and information through specialized pathways.
-
----
-
-## Next Steps
-
-- **Review the [Proposals Documentation](./Samstraumr/docs/proposals)** for in-depth concepts on composite tubes.
-- Explore our **Testing Strategy** in [SamstraumrTestingStrategy.md](./Samstraumr/docs/proposals/SamstraumrTestingStrategy.md).
-- Connect with [Eric Mumford](mailto:heymumford@samstraumr.org) for further discussion or collaboration.
-
----
-
-## Conclusion
-
-Samstraumr’s **Tube-Based Development** offers a holistic framework for building and organizing software:
-
-- **Inspired by** natural flows and adaptive biology
-- **Driven by** a clear separation of concerns via atomic, bundle, and machine layers
-- **Enabled by** concise identity notation and a two-tier state management system
-
-Embracing these concepts fosters **maintainable, robust, and naturally adaptable** code—allowing teams to innovate swiftly, sustainably, and with confidence.
+*Samstraumr: Where code flows like water, finding harmony in change*
