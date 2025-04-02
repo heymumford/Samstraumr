@@ -29,13 +29,22 @@ public class Tube {
     public Tube(String reason, Environment environment) {
         logger.info("Initializing new Tube with reason: {}", reason);
         try {
+            if (environment == null) {
+                logger.error("Environment cannot be null");
+                throw new TubeInitializationException("Environment cannot be null", 
+                    new NullPointerException("Environment cannot be null"));
+            }
+            
             this.reason = reason;
             this.environment = environment;
             initializeLists(reason);
             this.uniqueId = generateSHA256UniqueId(reason + environment.getParameters());
             initializeTube();
         } catch (Exception e) {
-            logger.error("Failed to initialize Tube", e);
+            logger.error("Failed to initialize Tube: {} - initialization failed", reason);
+            if (e instanceof TubeInitializationException) {
+                throw e;
+            }
             throw new TubeInitializationException("Failed to initialize Tube", e);
         }
     }
@@ -48,6 +57,7 @@ public class Tube {
     private void initializeTube() {
         logToMimir("Tube initialized with ID: " + this.uniqueId);
         logger.debug("Tube initialized with ID: {}", this.uniqueId);
+        logToMimir("Initialization reason: " + this.reason);
         setTerminationDelay(DEFAULT_TERMINATION_DELAY);
         logToMimir("Environment: " + environment.getParameters());
     }

@@ -59,7 +59,7 @@ Feature: Tube Initialization and Logging
     # to prevent cascading failures, making this a priority test.
     Given the operating environment is invalid
     When a new Tube is instantiated with reason "Invalid Environment Test"
-    Then the Tube initialization should fail with a "EnvironmentInitializationException"
+    Then the Tube initialization should fail with a "TubeInitializationException"
     And the Tube should log "Invalid Environment Test - initialization failed"
     And the Tube log should capture the specific error message
 
