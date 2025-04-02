@@ -37,6 +37,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - Coding standards: `mvn checkstyle:check`
   - Bug detection: `mvn spotbugs:check`
   - Code coverage: `mvn jacoco:report`
+- File encoding and line ending checks:
+  - Check encoding and line endings: `./check-encoding.sh`
+  - Check with detailed output: `./check-encoding.sh --verbose`
+  - Automatically fix issues: `./check-encoding.sh --fix`
 
 ## Code Style Guidelines
 - **Imports**: Specific imports (no wildcards). Standard Java first, then third-party, then project imports.
@@ -46,6 +50,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Testing**: Cucumber for BDD testing; feature files with descriptive scenarios.
 - **Documentation**: Javadoc for public APIs; comments for complex operations.
 - **Structure**: Final fields for immutability; private methods for implementation details.
+- **Encoding**: UTF-8 for all text files; LF (Unix-style) line endings for all text files except .bat and .cmd files.
+- **File Format**: EditorConfig ensures consistent formatting across different IDEs.
 
 ## Project Organization
 - Multi-module Maven project (Java 21)
