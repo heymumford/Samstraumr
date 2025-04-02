@@ -13,6 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Run BTL (robustness) tests: `mvn test -P btl-tests`
 - Run tests with specific tag: `mvn test -Dcucumber.filter.tags="@TagName"`
 - Run tests with tag combinations: `mvn test -Dcucumber.filter.tags="@L0_Tube and @Identity"`
+- Run tests with quality checks skipped: `mvn test -P atl-tests -P skip-quality-checks -Dspotless.check.skip=true -Dpmd.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true -Djacoco.skip=true -Dmaven.test.skip=false`
 
 ### Test Tag Hierarchy
 - Layer-based hierarchy: `@L0_Tube`, `@L1_Bundle`, `@L2_Machine`, `@L3_System`
