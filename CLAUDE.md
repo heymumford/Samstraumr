@@ -4,6 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build Commands
 - Build project: `mvn clean install`
+- Build without tests: `mvn clean install -DskipTests`
 - Run all tests: `mvn test`
 - Run tagged tests: `mvn test -Dcucumber.filter.tags="@ATL"`
 - Run specific test categories: `mvn test -Dcucumber.filter.tags="@UUID"` or `mvn test -Dcucumber.filter.tags="@Logging"`
