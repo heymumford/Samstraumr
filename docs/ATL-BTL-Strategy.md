@@ -1,5 +1,12 @@
 # ATL/BTL Testing Strategy
 
+```
+Version: 0.6.1
+Last updated: April 03, 2025
+Author: Eric C. Mumford (@heymumford)
+Contributors: Samstraumr Core Team
+```
+
 This document outlines the Above the Line (ATL) and Below the Line (BTL) testing strategy implemented in Samstraumr, providing guidelines for categorizing tests and ensuring efficient test execution.
 
 ## Table of Contents
@@ -162,3 +169,5 @@ The ATL/BTL strategy is designed to optimize continuous integration:
 ---
 
 By following this ATL/BTL testing strategy, Samstraumr achieves a balance between fast feedback for critical functionality and comprehensive coverage for the entire system.
+
+[← Testing Overview](./Testing.md) | [Core Concepts →](./CoreConcepts.md)

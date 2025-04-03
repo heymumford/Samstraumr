@@ -2,7 +2,7 @@
 
 ```
 Version: 0.6.1
-Last updated: April 2, 2025
+Last updated: April 03, 2025
 Author: Eric C. Mumford (@heymumford)
 ```
 
@@ -33,14 +33,14 @@ Maven dependency:
 <dependency>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-core</artifactId>
-    <version>0.5.7</version>
+    <version>0.6.1</version>
 </dependency>
 ```
 
 Gradle dependency:
 
 ```groovy
-implementation 'org.samstraumr:samstraumr-core:0.5.7'
+implementation 'org.samstraumr:samstraumr-core:0.6.1'
 ```
 
 ### Project Structure

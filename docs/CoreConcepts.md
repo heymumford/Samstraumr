@@ -1,7 +1,8 @@
 # Core Concepts: The Essence of Samstraumr
 
 ```
-Last updated: April 2, 2025
+Version: 0.6.1
+Last updated: April 03, 2025
 Author: Eric C. Mumford (@heymumford)
 Contributors: Samstraumr Core Team
 ```

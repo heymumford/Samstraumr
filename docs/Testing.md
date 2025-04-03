@@ -1,8 +1,8 @@
 # Testing in Samstraumr
 
 ```
-Version: 0.5.7
-Last updated: April 2, 2025
+Version: 0.6.1
+Last updated: April 03, 2025
 Author: Eric C. Mumford (@heymumford)
 Contributors: Samstraumr Core Team
 ```
@@ -36,7 +36,7 @@ Samstraumr's testing philosophy draws from systems theory, recognizing that part
 
 1. **Hierarchical Testing**: Tests are organized in layers, mirroring the natural composition of Samstraumr systems (tubes, bundles, machines, systems).
 
-2. **Critical Path Categorization**: Tests are prioritized into Above-the-Line (ATL) tests that must pass for basic functionality, and Below-the-Line (BTL) tests for robustness and edge cases.
+2. **Critical Path Categorization**: Tests are prioritized into Above-the-Line (ATL) tests that must pass for basic functionality, and Below-the-Line (BTL) tests for robustness and edge cases. For a complete explanation of this strategy, see the [ATL/BTL Strategy](./ATL-BTL-Strategy.md) documentation.
 
 3. **Capability-Based Organization**: Tests are categorized by the core capabilities they validate (identity, flow, state, awareness).
 
@@ -217,10 +217,14 @@ To organize our tests in a way that reflects Samstraumr's core principles, we've
 
 ### Critical Path Categorization
 
-| Tag | Description | Example |
-|-----|-------------|---------|
-| `@ATL` | Above-the-line critical tests (must pass) | Core functionality tests that must pass |
-| `@BTL` | Below-the-line robustness tests | Edge cases and additional quality tests |
+The ATL/BTL categorization is a key part of Samstraumr's testing strategy, dividing tests by criticality:
+
+| Tag | Full Name | Description | Example |
+|-----|-----------|-------------|---------|
+| `@ATL` | Above The Line | Critical tests that MUST pass with every build | Core functionality tests that must pass |
+| `@BTL` | Below The Line | Important but non-blocking tests that can run separately | Edge cases and additional quality tests |
+
+This strategy enables faster feedback cycles while maintaining comprehensive coverage. See the complete [ATL/BTL Strategy](./ATL-BTL-Strategy.md) documentation for implementation details.
 
 ### Core Capabilities
 
@@ -554,7 +558,12 @@ The recommended way to run Samstraumr tests is using the test runner script:
 # Run all tests
 ./util/test/run-tests.sh all
 
-# Run specific test types
+# Run tests by criticality
+./util/test/run-tests.sh atl          # Run Above The Line tests (critical, must pass)
+./util/test/run-tests.sh btl          # Run Below The Line tests (robustness, non-blocking)
+./util/test/run-tests.sh critical     # Alias for atl (for backward compatibility)
+
+# Run tests by type
 ./util/test/run-tests.sh tube         # Run Tube Tests (unit)
 ./util/test/run-tests.sh flow         # Run Flow Tests (integration)
 ./util/test/run-tests.sh bundle       # Run Bundle Tests (component)
@@ -562,7 +571,6 @@ The recommended way to run Samstraumr tests is using the test runner script:
 ./util/test/run-tests.sh adaptation   # Run Adaptation Tests (property)
 ./util/test/run-tests.sh machine      # Run Machine Tests (e2e)
 ./util/test/run-tests.sh acceptance   # Run BDD Acceptance Tests (business)
-./util/test/run-tests.sh critical     # Run critical tests only (fast for CI)
 ```
 
 ### Script Options
@@ -602,8 +610,11 @@ For more granular control, you can also run tests directly with Maven:
 # Run all tests
 mvn test
 
-# Run all critical tests
-mvn test -P atl-tests
+# Run tests by criticality
+mvn test -P atl-tests          # Run Above The Line tests (critical)
+mvn test -P btl-tests          # Run Below The Line tests (robustness)
+mvn test -Dgroups=ATL          # Alternative way to run ATL tests
+mvn test -Dgroups=BTL          # Alternative way to run BTL tests
 
 # Run tests with specific test type
 mvn test -Dtest=*TubeTest       # Run all Tube Tests
