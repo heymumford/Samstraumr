@@ -88,5 +88,58 @@
       <version>${cucumber.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-suite-api</artifactId>
+      <version>1.10.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-suite</artifactId>
+      <version>1.10.2</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+  
+  <profiles>
+    <!-- ATL Tests Profile -->
+    <profile>
+      <id>atl-tests</id>
+      <properties>
+        <cucumber.filter.tags>@ATL</cucumber.filter.tags>
+      </properties>
+    </profile>
+    
+    <!-- BTL Tests Profile -->
+    <profile>
+      <id>btl-tests</id>
+      <properties>
+        <cucumber.filter.tags>@BTL</cucumber.filter.tags>
+      </properties>
+    </profile>
+    
+    <!-- Fast Profile for development iterations -->
+    <profile>
+      <id>fast</id>
+      <properties>
+        <maven.test.skip>true</maven.test.skip>
+        <spotless.check.skip>true</spotless.check.skip>
+        <checkstyle.skip>true</checkstyle.skip>
+        <spotbugs.skip>true</spotbugs.skip>
+        <jacoco.skip>true</jacoco.skip>
+      </properties>
+    </profile>
+    
+    <!-- Skip Quality Checks Profile -->
+    <profile>
+      <id>skip-quality-checks</id>
+      <properties>
+        <spotless.check.skip>true</spotless.check.skip>
+        <checkstyle.skip>true</checkstyle.skip>
+        <spotbugs.skip>true</spotbugs.skip>
+        <jacoco.skip>true</jacoco.skip>
+      </properties>
+    </profile>
+  </profiles>
 </project>
