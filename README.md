@@ -104,7 +104,7 @@ Begin your journey with Samstraumr through these gentle steps:
 For those ready to dive deeper:
 
 - **Migrating existing systems** – Bringing Samstraumr wisdom to established codebases
-- **Testing approaches** – Verification through conversation
+- **Testing approaches** – Hierarchical testing with BDD for living documentation
 - **Design patterns** – Recurring solutions to common challenges
 
 [→ Discover migration strategies](./docs/Migration.md)
