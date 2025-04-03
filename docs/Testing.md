@@ -211,15 +211,17 @@ The Observer pattern allows tubes to monitor events without modifying data flow.
 - Verify that observer tubes receive all signals they're configured to observe
 - Ensure observation has minimal overhead on system performance
 - Test that observers don't modify the original data being observed
+- Verify proper handling of observation interruptions and recovery
 
 **Example:**
 ```gherkin
 @ATL @L1_Bundle @Observer
 Scenario: Observer tube monitors data flow without interference
-  Given a monitor tube is initialized to observe multiple signals
-  When 100 data packets flow through the observed tube
-  Then the observer tube should log all 100 packets
-  And the observer's overhead should be less than 25% of total processing time
+  Given a monitor tube is initialized to observe multiple signals generated at high frequency
+  When the monitor tube observes them
+  Then the signals should be logged accurately with 100 entries
+  And no modifications should be made to the observed signals
+  And the observer's overhead should be less than 10% of total processing time
 ```
 
 ### Transformer Pattern Testing

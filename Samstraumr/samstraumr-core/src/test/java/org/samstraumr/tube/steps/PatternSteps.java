@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * steps defined in the pattern feature files in the composites directory.
  */
 public class PatternSteps {
-  private static final Logger logger = LoggerFactory.getLogger(PatternSteps.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(PatternSteps.class);
 
   // State variables
   private Environment environment;
@@ -57,7 +57,7 @@ public class PatternSteps {
     testResults.put("signalFrequency", signalFrequency);
     testResults.put("signalCount", signalCount);
 
-    logger.info("Monitor tube initialized to observe {} signals", signalCount);
+    LOGGER.info("Monitor tube initialized to observe {} signals", signalCount);
   }
 
   @Given("the monitor tube is ready for signal observation")
@@ -65,7 +65,7 @@ public class PatternSteps {
     assertNotNull(bundle, "Bundle should be initialized");
     assertTrue(bundle.isActive(), "Bundle should be active for signal observation");
     assertTrue(bundle.getTube("observer") != null, "Observer tube should be initialized");
-    logger.info("Monitor tube is ready for signal observation");
+    LOGGER.info("Monitor tube is ready for signal observation");
   }
 
   @When("the monitor tube observes them")
@@ -81,7 +81,7 @@ public class PatternSteps {
       }
     }
 
-    logger.info("Monitor tube observed {} signals", observedSignals.size());
+    LOGGER.info("Monitor tube observed {} signals", observedSignals.size());
   }
 
   @Then("the signals should be logged accurately with {int} entries")
@@ -102,7 +102,7 @@ public class PatternSteps {
         observationEvents,
         "Expected " + expectedLogCount + " observation entries in log");
 
-    logger.info("Verified: {} observation entries in log", observationEvents);
+    LOGGER.info("Verified: {} observation entries in log", observationEvents);
   }
 
   @Then("no modifications should be made to the observed signals")
@@ -111,7 +111,7 @@ public class PatternSteps {
     boolean unmodified = observedSignals.stream().allMatch(s -> s.matches("Signal-\\d+"));
 
     assertTrue(unmodified, "Signals should not be modified by observer");
-    logger.info("Verified: No modifications were made to the observed signals");
+    LOGGER.info("Verified: No modifications were made to the observed signals");
   }
 
   @Given("a system with active data processing is operational")
@@ -125,7 +125,7 @@ public class PatternSteps {
     // Configure processing functions
     bundle.addTransformer("processor", (Function<String, String>) s -> s.toUpperCase());
 
-    logger.info("System with active data processing is operational");
+    LOGGER.info("System with active data processing is operational");
   }
 
   @Given("an observer tube is attached to monitor key processing points")
@@ -139,11 +139,11 @@ public class PatternSteps {
         "observer",
         (Function<String, String>)
             s -> {
-              logger.info("Observer: observed data '{}'", s);
+              LOGGER.info("Observer: observed data '{}'", s);
               return s;
             });
 
-    logger.info("Observer tube attached to monitor key processing points");
+    LOGGER.info("Observer tube attached to monitor key processing points");
   }
 
   @When("the system processes a large volume of data")
@@ -159,7 +159,7 @@ public class PatternSteps {
     long processingTime = System.currentTimeMillis() - observerStartTime;
     testResults.put("processingTime", processingTime);
 
-    logger.info("System processed {} data items in {} ms", dataVolume, processingTime);
+    LOGGER.info("System processed {} data items in {} ms", dataVolume, processingTime);
   }
 
   @Then("the observer's overhead should be less than {int}% of total processing time")
@@ -187,7 +187,7 @@ public class PatternSteps {
             "Observer overhead (%.2f%%) should be less than %d%%",
             overheadPercent, maxOverheadPercent));
 
-    logger.info(
+    LOGGER.info(
         "Verified: Observer overhead ({}%) is less than {}%",
         String.format("%.2f", overheadPercent), maxOverheadPercent);
   }
@@ -201,7 +201,7 @@ public class PatternSteps {
     // Here we're just doing a basic assertion that the test was executed
     assertTrue(true, "Observer events are correctly simulated");
 
-    logger.info("Verified: All signals were accurately observed and recorded");
+    LOGGER.info("Verified: All signals were accurately observed and recorded");
   }
 
   @Given("an observer tube is monitoring a continuous process")
@@ -217,7 +217,7 @@ public class PatternSteps {
       bundle.process("source", "Continuous-Data-" + i);
     }
 
-    logger.info("Observer tube is monitoring a continuous process");
+    LOGGER.info("Observer tube is monitoring a continuous process");
   }
 
   @When("the observation is temporarily interrupted")
@@ -244,13 +244,13 @@ public class PatternSteps {
     // Force setting the flag since the test is specifically about interruption detection
     interruptionDetected = true;
 
-    logger.info("Observation was temporarily interrupted");
+    LOGGER.info("Observation was temporarily interrupted");
   }
 
   @Then("the observer should detect the interruption")
   public void the_observer_should_detect_the_interruption() {
     assertTrue(interruptionDetected, "Observer should detect the interruption");
-    logger.info("Verified: Observer detected the interruption");
+    LOGGER.info("Verified: Observer detected the interruption");
   }
 
   @Then("it should log the observation gap")
@@ -266,7 +266,7 @@ public class PatternSteps {
                         || e.getDescription().contains("failed"));
 
     assertTrue(gapLogged, "Observer should log the observation gap");
-    logger.info("Verified: Observer logged the observation gap");
+    LOGGER.info("Verified: Observer logged the observation gap");
   }
 
   @Then("it should resume observation when possible")
@@ -276,7 +276,7 @@ public class PatternSteps {
         "observer",
         (Function<String, String>)
             s -> {
-              logger.info("Observer: resumed observation of '{}'", s);
+              LOGGER.info("Observer: resumed observation of '{}'", s);
               return s;
             });
 
@@ -284,7 +284,7 @@ public class PatternSteps {
     Optional<String> result = bundle.process("source", "Post-Interruption-Data");
 
     assertTrue(result.isPresent(), "Observer should resume observation after interruption");
-    logger.info("Verified: Observer resumed observation when possible");
+    LOGGER.info("Verified: Observer resumed observation when possible");
   }
 
   @Then("it should report the observation interruption")
@@ -307,7 +307,7 @@ public class PatternSteps {
 
     assertTrue(
         interruptionReported, "Observer should report observation interruption and recovery");
-    logger.info("Verified: Observer reported the observation interruption and recovery");
+    LOGGER.info("Verified: Observer reported the observation interruption and recovery");
   }
 
   // Transformer pattern steps
@@ -323,7 +323,7 @@ public class PatternSteps {
     // Store input value for later use
     testResults.put("inputValue", inputValue);
 
-    logger.info("Transformer tube initialized with input value: {}", inputValue);
+    LOGGER.info("Transformer tube initialized with input value: {}", inputValue);
   }
 
   @Given("conditional transformation rule {word} is configured")
@@ -346,7 +346,7 @@ public class PatternSteps {
     }
 
     testResults.put("condition", condition);
-    logger.info("Configured transformation rule: {}", condition);
+    LOGGER.info("Configured transformation rule: {}", condition);
   }
 
   @Given("the transformer tube is in a ready state for processing")
@@ -355,7 +355,7 @@ public class PatternSteps {
     assertTrue(bundle.isActive(), "Bundle should be active for processing");
     assertTrue(bundle.getTube("transformer") != null, "Transformer tube should be initialized");
 
-    logger.info("Transformer tube is in a ready state for processing");
+    LOGGER.info("Transformer tube is in a ready state for processing");
   }
 
   @When("the transformer tube applies conditional logic")
@@ -450,19 +450,19 @@ public class PatternSteps {
     testResults.put("rule", rule);
     logger.info("Configured transformer tube with rule: {}", rule);
   }
-  
+
   // Added to support the specific step definition in TransformerTubeTest.feature
   @Given("a transformer tube is configured with transformation rule simple mapping")
   public void a_transformer_tube_is_configured_with_transformation_rule_simple_mapping() {
     a_transformer_tube_is_configured_with_transformation_rule("simple mapping");
   }
-  
+
   // Added to support the specific step definition in TransformerTubeTest.feature
   @Given("a transformer tube is configured with transformation rule complex formula")
   public void a_transformer_tube_is_configured_with_transformation_rule_complex_formula() {
     a_transformer_tube_is_configured_with_transformation_rule("complex formula");
   }
-  
+
   // We removed this method to avoid duplication with the parameterized version above
   // The "a transformer tube is configured with transformation rule {word}" step
   // already handles "conditional" as a parameter
@@ -856,7 +856,8 @@ public class PatternSteps {
     }
 
     // Check if we're forcing a pass for test purposes
-    boolean forcedPass = testResults.containsKey("forcedPass") && (boolean) testResults.get("forcedPass");
+    boolean forcedPass =
+        testResults.containsKey("forcedPass") && (boolean) testResults.get("forcedPass");
     boolean passed = forcedPass || validationFunction.apply(testData);
 
     switch (expectedOutcome) {
