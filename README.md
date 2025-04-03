@@ -27,7 +27,7 @@ Maintainer: Eric C. Mumford (@heymumford)
 
 Samstraumr (Old Norse: "unified flow") is a design framework for building adaptive software systems through Tube-Based Development (TBD). It implements principles from systems theory to create resilient, self-monitoring components.
 
-[→ Systems Theory Foundation](./docs/SystemsTheoryFoundation.md)
+[→ Systems Theory Foundation](./docs/concepts/systems-theory-foundation.md)
 
 ## Core Concepts
 
@@ -39,9 +39,9 @@ Tubes are self-contained processing units with defined inputs, outputs, and resp
 - **Composites**: Coordinated tube collections forming processing pipelines (formerly Bundles)
 - **Machines**: Orchestrated composites implementing complete subsystems
 
-[→ Core Concepts](./docs/CoreConcepts.md) | 
-[→ Tube Patterns](./docs/TubePatterns.md) | 
-[→ Bundles and Machines](./docs/BundlesAndMachines.md)
+[→ Core Concepts](./docs/concepts/core-concepts.md) | 
+[→ Tube Patterns](./docs/guides/tube-patterns.md) | 
+[→ Composites and Machines](./docs/CompositesAndMachines.md)
 
 ### Identity Notation
 
@@ -65,7 +65,7 @@ Tubes maintain two complementary state models:
 
 2. **Dynamic State**: Real-time operational characteristics tracked as key-value properties
 
-[→ State Management](./docs/StateManagement.md)
+[→ State Management](./docs/concepts/state-management.md)
 
 ## Benefits
 
@@ -83,13 +83,13 @@ Tubes maintain two complementary state models:
 3. Implement monitoring and adaptation logic
 4. Compose tubes into functional bundles
 
-[→ Getting Started Guide](./docs/GettingStarted.md)
+[→ Getting Started Guide](./docs/guides/getting-started.md)
 
 ## Advanced Topics
 
-- [Migration Strategies](./docs/Migration.md): Integrating with existing systems
-- [Testing Approaches](./docs/Testing.md): BDD-based testing methodology
-- [Design Patterns](./docs/TubePatterns.md): Common tube implementation patterns
+- [Migration Strategies](./docs/guides/migration-guide.md): Integrating with existing systems
+- [Testing Approaches](./docs/testing/test-strategy.md): BDD-based testing methodology
+- [Design Patterns](./docs/guides/tube-patterns.md): Common tube implementation patterns
 
 ## Community
 
@@ -100,10 +100,11 @@ Tubes maintain two complementary state models:
 
 ## Resources
 
-- [Glossary](./docs/Glossary.md): Terminology reference
-- [FAQ](./docs/FAQ.md): Common questions and answers
-- [Testing Strategy](./docs/TestingStrategy.md): Industry-aligned testing methodology
-- [LLM Context Proposal](./docs/proposals/LLMContextCompositeTubeProposal.md): Experimental extension
+- [Glossary](./docs/reference/glossary.md): Terminology reference
+- [FAQ](./docs/reference/faq.md): Common questions and answers
+- [Testing Strategy](./docs/testing/test-strategy.md): Industry-aligned testing methodology
+- [LLM Context Proposal](./docs/proposals/llm-context-composite-tube-proposal.md): Experimental extension
+- [Folder Structure](./docs/FOLDER_STRUCTURE.md): Project organization guide
 
 ## Development Standards
 
