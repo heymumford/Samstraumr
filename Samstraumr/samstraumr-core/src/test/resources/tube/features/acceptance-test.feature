@@ -1,4 +1,4 @@
-@AcceptanceTest @Flow
+@AcceptanceTest @ATL @Flow
 Feature: Data Processing System Acceptance
   As a business user
   I want a robust data processing system

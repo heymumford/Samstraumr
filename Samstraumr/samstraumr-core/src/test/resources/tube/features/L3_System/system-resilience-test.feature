@@ -6,11 +6,11 @@
 # continue operating under adverse conditions.
 # ---------------------------------------------------------------------------------------
 
-@L3_System @Resilience @Implemented @FixedTests
+@L3_System @Resilience
 Feature: System Resilience and Recovery
   # This feature validates that complete systems can handle and recover from failures
 
-  @L3_System @Runtime @Resilience @CircuitBreaker
+  @ATL @L3_System @Runtime @Resilience @CircuitBreaker
   Scenario: System recovers from component failures
     # Purpose: Test that systems can detect and recover from internal component failures
     Given a complete system with redundant components is running
@@ -20,7 +20,7 @@ Feature: System Resilience and Recovery
     And redundant components should take over
     And the system should continue operating with minimal disruption
 
-  @L3_System @Runtime @Resilience @Performance
+  @ATL @L3_System @Runtime @Resilience @Performance
   Scenario: System handles resource exhaustion gracefully
     # Purpose: Ensure that systems can handle resource constraints
     Given a system is operating under normal conditions

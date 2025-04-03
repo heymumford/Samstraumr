@@ -166,7 +166,7 @@ application.properties
 
 ## Acronyms and Abbreviations
 
-For acronyms and abbreviations, only the first letter should be uppercase in camelCase and PascalCase contexts:
+For most acronyms and abbreviations, only the first letter should be uppercase in camelCase and PascalCase contexts:
 
 ```java
 // Good
@@ -183,6 +183,22 @@ However, acronyms in constants should be all uppercase:
 ```java
 private static final String XML_SCHEMA = "schema.xsd";
 ```
+
+### Exceptions for Specific Acronyms
+
+Certain acronyms are recognized as having special importance and may be fully capitalized even in class names, method names, and variables:
+
+```java
+// Exceptions for specific acronyms
+public class FAQService { ... }  // Frequently Asked Questions
+public class TBDValidator { ... } // Tube Based Development
+private String TBDFormat;
+```
+
+This exception applies only to the following acronyms:
+- FAQ (Frequently Asked Questions)
+- TBD (Tube Based Development)
+- Other domain-specific acronyms documented in the project glossary
 
 ## Type Parameters
 

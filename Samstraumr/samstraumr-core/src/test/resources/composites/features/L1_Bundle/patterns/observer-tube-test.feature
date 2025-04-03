@@ -1,15 +1,15 @@
 # ---------------------------------------------------------------------------------------
-# observer-tube-test.feature - Tests for Observer Tube Pattern
+# ObserverTubeTest.feature - Tests for Observer Tube Pattern
 #
 # This feature file contains tests for tubes that implement the Observer pattern,
 # which monitors signals or operations without altering them.
 # ---------------------------------------------------------------------------------------
 
-@L1_Bundle @Awareness @Observer @Implemented @FixedTests
+@ATL @L1_Bundle @Awareness @Observer
 Feature: Observer Tube - Signal Monitoring
   # This feature verifies that Observer tubes correctly monitor signals without modifying them
 
-  @L1_Bundle @Runtime @Awareness @Observer
+  @ATL @L1_Bundle @Runtime @Awareness @Observer
   Scenario Outline: Observer tube monitors signals without altering them
     # Purpose: Verify that observer tubes can monitor signals without modifying them
     Given a monitor tube is initialized to observe multiple signals generated at <signalFrequency> frequency

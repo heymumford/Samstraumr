@@ -5,11 +5,11 @@
 # that tubes can be properly connected together to form functional bundles that process data.
 # ---------------------------------------------------------------------------------------
 
-@L1_Bundle @Flow @Implemented @FixedTests
+@L1_Bundle @Flow
 Feature: Bundle Connection and Flow
   # This feature validates that tubes can be connected into bundles and data flows correctly through the connections
 
-  @L1_Bundle @Init @Flow @Transformer
+  @ATL @L1_Bundle @Init @Flow @Transformer
   Scenario: Basic tubes connect into a data transformation bundle
     # Purpose: Confirm that tubes can be connected to form a simple transformation pipeline
     Given tubes are instantiated for a simple transformation bundle
@@ -17,7 +17,7 @@ Feature: Bundle Connection and Flow
     Then data should flow from the source tube through the transformer tube to the sink tube
     And the transformation should be applied correctly to the data
 
-  @L1_Bundle @Runtime @Flow @Validator
+  @ATL @L1_Bundle @Runtime @Flow @Validator
   Scenario: Bundles validate data between tube connections
     # Purpose: Ensure that data validation occurs at connection boundaries
     Given a bundle is created with validator tubes between components

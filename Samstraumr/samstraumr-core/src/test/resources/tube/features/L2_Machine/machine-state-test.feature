@@ -6,11 +6,11 @@
 # changes to their component bundles and tubes.
 # ---------------------------------------------------------------------------------------
 
-@L2_Machine @State @Implemented @FixedTests
+@L2_Machine @State
 Feature: Machine State Management
   # This feature validates that machines properly manage state across bundles and tubes
 
-  @L2_Machine @Init @State
+  @ATL @L2_Machine @Init @State
   Scenario: Machine initializes with proper state hierarchy
     # Purpose: Confirm that a machine properly initializes its internal state
     Given a machine with multiple bundles is instantiated
@@ -19,7 +19,7 @@ Feature: Machine State Management
     And the machine should have a unified state view
     And the state hierarchy should be correctly established
 
-  @L2_Machine @Runtime @State @Awareness
+  @ATL @L2_Machine @Runtime @State @Awareness
   Scenario: Machine propagates state changes to components
     # Purpose: Ensure that state changes propagate correctly through the machine
     Given a machine is running with normal state

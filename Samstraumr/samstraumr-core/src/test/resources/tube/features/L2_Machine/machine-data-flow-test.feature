@@ -1,4 +1,4 @@
-@L2_Machine @MachineTest @Flow @Runtime
+@L2_Machine @MachineTest @ATL @Flow @Runtime
 Feature: Machine Data Flow
   As a system integrator
   I want to verify data flows correctly through connected bundles forming a machine

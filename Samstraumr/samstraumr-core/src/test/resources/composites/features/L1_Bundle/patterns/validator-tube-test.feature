@@ -1,15 +1,15 @@
 # ---------------------------------------------------------------------------------------
-# validator-tube-test.feature - Tests for Validator Tube Pattern
+# ValidatorTubeTest.feature - Tests for Validator Tube Pattern
 #
 # This feature file contains tests for tubes that implement the Validator pattern,
 # which validates input data according to predefined rules.
 # ---------------------------------------------------------------------------------------
 
-@L1_Bundle @Flow @Validator @Implemented @FixedTests
+@ATL @L1_Bundle @Flow @Validator
 Feature: Validator Tube - Input Validation and Routing
   # This feature verifies that Validator tubes correctly validate input data against rules
 
-  @L1_Bundle @Init @Flow @Validator
+  @ATL @L1_Bundle @Init @Flow @Validator
   Scenario Outline: Validator tube validates inputs and routes them based on predefined rules
     # Purpose: Verify that validator tubes correctly validate data against predefined rules
     Given a connector tube is initialized and raw input data <inputData> is provided to the system
