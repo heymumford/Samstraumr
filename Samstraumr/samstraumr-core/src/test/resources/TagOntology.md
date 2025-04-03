@@ -4,37 +4,37 @@ This document defines the tag ontology for organizing and categorizing Samstraum
 
 ## Test Type Tags
 
-Tags that identify the primary test type and corresponding testing tool:
+Tags that identify the primary test type and corresponding testing tool, aligned with Tube-Based Development (TBD) terminology:
 
-| Tag | Description | Test Type | Technology |
-|-----|-------------|-----------|------------|
-| `@TubeTest` | Individual tube unit tests | Tube Tests | JUnit 5 |
-| `@FlowTest` | Single tube data flow tests | Flow Tests | JUnit 5 |
-| `@BundleTest` | Connected tubes component tests | Bundle Tests | JUnit 5 |
-| `@StreamTest` | External integration tests | Stream Tests | JUnit 5 + TestContainers |
-| `@AdaptationTest` | Property-based adaptation tests | Adaptation Tests | JUnit 5 (custom) |
-| `@L2_Machine` | End-to-end machine tests | Machine Tests | Cucumber |
-| `@Acceptance` | Business requirement validation | BDD Acceptance Tests | Cucumber |
+| Tag | TBD Term | TBD Acronym | Description | Test Type | Technology |
+|-----|----------|-------------|-------------|-----------|------------|
+| `@TubeTest` | Atomic Boundary Testing | ABT | Individual tube unit tests | Tube Tests | JUnit 5 |
+| `@FlowTest` | Inter-Tube Feature Testing | ITFT | Single tube data flow tests | Flow Tests | JUnit 5 |
+| `@BundleTest` | Composite Tube Interaction Testing | CTIT | Connected tubes component tests | Bundle Tests | JUnit 5 |
+| `@StreamTest` | Composite Tube Interaction Testing (External) | CTIT | External integration tests | Stream Tests | JUnit 5 + TestContainers |
+| `@AdaptationTest` | Inter-Tube Feature Testing (Advanced) | ITFT | Property-based adaptation tests | Adaptation Tests | JUnit 5 (custom) |
+| `@L2_Machine` | Machine Construct Validation Testing | MCVT | End-to-end machine tests | Machine Tests | Cucumber |
+| `@Acceptance` | Machine Construct Validation Testing (User-focused) | MCVT | Business requirement validation | BDD Acceptance Tests | Cucumber |
 
 ## Hierarchical Structure
 
-Tests are organized in a hierarchical manner, mirroring the compositional structure of Samstraumr systems:
+Tests are organized in a hierarchical manner, mirroring the compositional structure of Samstraumr systems, aligned with TBD levels:
 
-| Tag | Description | Example |
-|-----|-------------|---------|
-| `@L0_Tube` | Atomic tube component tests | Testing a single tube in isolation |
-| `@L1_Bundle` | Bundle-level integration tests | Testing connected tubes forming a bundle |
-| `@L2_Machine` | Complex machine composition tests | Testing interconnected bundles forming a machine |
-| `@L3_System` | Full system tests | Testing complete systems with multiple machines |
+| Tag | TBD Level | TBD Primary Test Type | Description | Example |
+|-----|-----------|----------------------|-------------|---------|
+| `@L0_Tube` | Atomic Level | ABT | Atomic tube component tests | Testing a single tube in isolation |
+| `@L1_Bundle` | Composite Level | CTIT | Bundle-level integration tests | Testing connected tubes forming a bundle |
+| `@L2_Machine` | Machine Level | MCVT | Complex machine composition tests | Testing interconnected bundles forming a machine |
+| `@L3_System` | Acceptance Level | MCVT (User-focused) | Full system tests | Testing complete systems with multiple machines |
 
 ## Critical Path Categorization
 
-Tests are divided into critical and robustness categories to prioritize execution:
+Tests are divided into critical and robustness categories to prioritize execution, following TBD terminology:
 
-| Tag | Description | Example |
-|-----|-------------|---------|
-| `@ATL` | Above-the-line critical tests (must pass) | Core functionality tests that must pass |
-| `@BTL` | Below-the-line robustness tests | Edge cases and additional quality tests |
+| Tag | TBD Term | TBD Pronunciation | Description | Example |
+|-----|----------|------------------|-------------|---------|
+| `@ATL` | Above The Line | "Attle" | Critical, must-pass tests that ensure Tubes don't break | Core functionality tests that must pass |
+| `@BTL` | Below The Line | "Bottle" | Detailed, edge-case tests that make Tubes bulletproof | Edge cases and additional quality tests |
 
 ## Core Capabilities
 
@@ -82,12 +82,6 @@ Tests focused on non-functional quality attributes:
 
 Tags can be combined to create more specific test subsets. Examples:
 
-```
-@L0_Tube @Identity           # All identity tests for atomic tubes
-@ATL @Init                   # All critical initialization tests
-@L2_Machine @State @Runtime  # Runtime state tests for machines
-@BTL @Resilience             # All robustness resilience tests
-```
 
 ## Best Practices
 

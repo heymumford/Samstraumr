@@ -1,8 +1,3 @@
-/*
-Filename: MachineTest.java
-Purpose: Defines the MachineTest annotation for the Samstraumr testing strategy.
-*/
-
 package org.samstraumr.tube.test.annotations;
 
 import java.lang.annotation.ElementType;

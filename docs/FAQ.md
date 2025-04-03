@@ -1,11 +1,5 @@
 # Frequently Asked Questions
 
-```
-Version: 0.6.1
-Last updated: April 03, 2025
-Author: Eric C. Mumford (@heymumford)
-Contributors: Samstraumr Core Team
-```
 
 This document contains frequently asked questions about the Samstraumr project.
 

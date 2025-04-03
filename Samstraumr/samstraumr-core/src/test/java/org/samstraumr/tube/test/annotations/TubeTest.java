@@ -1,17 +1,3 @@
-/*
-Filename: TubeTest.java
-Purpose: Annotation for marking tests that focus on individual tubes (unit tests)
-Goals:
-  - Provide a way to categorize tests by test type
-  - Enable filtering of tests by type
-  - Support the unified testing strategy
-Dependencies:
-  - JUnit 5 for test framework
-  - Maven for test execution
-Assumptions:
-  - Tests marked with @TubeTest focus on testing individual tubes in isolation
-*/
-
 package org.samstraumr.tube.test.annotations;
 
 import java.lang.annotation.ElementType;

@@ -1,19 +1,3 @@
-/*
-Filename: RunBTLCucumberTest.java
-Purpose: Cucumber test runner for executing Below The Line (BTL) BDD tests
-Goals:
-  - Run only BTL tests that are important but non-blocking
-  - Support filtering by the @BTL tag
-  - Generate standardized reports for BTL tests
-Dependencies:
-  - io.cucumber: For Cucumber BDD testing infrastructure
-  - org.junit.platform.suite.api: For test suite configuration
-  - org.samstraumr.tube.steps: For step definitions implementing test scenarios
-Assumptions:
-  - Feature files have proper @BTL tags on non-critical scenarios
-  - BTL tests may be slower, more complex, and focus on edge cases
-*/
-
 package org.samstraumr.tube;
 
 import static io.cucumber.junit.platform.engine.Constants.FILTER_TAGS_PROPERTY_NAME;

@@ -1,19 +1,5 @@
-/*
-Filename: TubeStatus.java
-Purpose: Defines the possible states of a Tube throughout its lifecycle to enable state-based operations and monitoring.
-Goals:
-  - Ensure that tube state transitions are clearly defined for the entire lifecycle
-  - Ensure that error and recovery states are properly represented
-  - Ensure that all operational phases have corresponding status indicators
-Dependencies:
-  - org.samstraumr.tube: Core package containing tube implementations that use these states
-Assumptions:
-  - Tubes can only be in one state at a time
-  - State transitions follow a predictable, controlled pattern
-  - UNDETERMINED state is used only for exceptional situations
-*/
-
 package org.samstraumr.tube;
+
 public enum TubeStatus {
 
   /**

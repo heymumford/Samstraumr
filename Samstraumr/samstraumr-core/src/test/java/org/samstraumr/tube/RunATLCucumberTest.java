@@ -1,19 +1,3 @@
-/*
-Filename: RunATLCucumberTest.java
-Purpose: Cucumber test runner for executing Above The Line (ATL) BDD tests
-Goals:
-  - Run only critical ATL tests that must pass with every build
-  - Support filtering by the @ATL tag
-  - Generate standardized reports for ATL tests
-Dependencies:
-  - io.cucumber: For Cucumber BDD testing infrastructure
-  - org.junit.platform.suite.api: For test suite configuration
-  - org.samstraumr.tube.steps: For step definitions implementing test scenarios
-Assumptions:
-  - Feature files have proper @ATL tags on critical scenarios
-  - ATL tests are fast, reliable, and focus on core functionality
-*/
-
 package org.samstraumr.tube;
 
 import static io.cucumber.junit.platform.engine.Constants.FILTER_TAGS_PROPERTY_NAME;

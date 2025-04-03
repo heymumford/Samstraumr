@@ -1,11 +1,5 @@
 # ATL/BTL Testing Strategy
 
-```
-Version: 0.6.1
-Last updated: April 03, 2025
-Author: Eric C. Mumford (@heymumford)
-Contributors: Samstraumr Core Team
-```
 
 This document outlines the Above the Line (ATL) and Below the Line (BTL) testing strategy implemented in Samstraumr, providing guidelines for categorizing tests and ensuring efficient test execution.
 
@@ -102,23 +96,6 @@ Samstraumr implements the ATL/BTL strategy across both JUnit and Cucumber tests:
 
 # Run Above The Line tests with quality checks skipped
 ./util/test/run-tests.sh --skip-quality atl
-```
-
-### Using Maven Directly
-
-```bash
-# Run Above The Line tests
-mvn test -P atl-tests
-
-# Run Below The Line tests
-mvn test -P btl-tests
-
-# Run JUnit Above The Line tests
-mvn test -Dgroups=ATL
-
-# Run Cucumber Above The Line tests
-mvn test -Dcucumber.filter.tags="@ATL"
-```
 
 ## Test Categorization Guidelines
 

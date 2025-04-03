@@ -1,8 +1,3 @@
-/*
-Filename: FlowTest.java
-Purpose: Defines the FlowTest annotation for the Samstraumr testing strategy.
-*/
-
 package org.samstraumr.tube.test.annotations;
 
 import java.lang.annotation.ElementType;

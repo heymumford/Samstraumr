@@ -6,10 +6,29 @@ This directory contains scripts for quality checks and fixes in the Samstraumr p
 
 ### `build-checks.sh`
 
-Runs all quality checks configured in the project.
+Runs all quality checks configured in the project. This script has been enhanced to support running quality tools incrementally.
 
 ```bash
+# Run all quality checks
 ./build-checks.sh
+
+# Skip specific checks
+./build-checks.sh --skip-spotless --skip-spotbugs
+
+# Run only specific checks
+./build-checks.sh --only=spotless,checkstyle
+
+# Show help
+./build-checks.sh --help
+```
+
+### `enable-quality-tools.sh`
+
+An interactive script that helps you enable quality tools one by one, allowing you to fix issues incrementally.
+
+```bash
+# Start the interactive quality tool enablement wizard
+./enable-quality-tools.sh
 ```
 
 ### `check-encoding.sh`

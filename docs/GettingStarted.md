@@ -1,10 +1,5 @@
 # Getting Started with Samstraumr
 
-```
-Version: 0.6.1
-Last updated: April 03, 2025
-Author: Eric C. Mumford (@heymumford)
-```
 
 ## Table of Contents
 - [Setting Up Your Environment](#setting-up-your-environment)
@@ -35,27 +30,11 @@ Maven dependency:
     <artifactId>samstraumr-core</artifactId>
     <version>0.6.1</version>
 </dependency>
-```
-
-Gradle dependency:
-
-```groovy
-implementation 'org.samstraumr:samstraumr-core:0.6.1'
-```
 
 ### Project Structure
 
 Recommended project organization:
 
-```
-src/main/java/org/yourdomain/
-├── tubes/        # Individual tube implementations
-├── bundles/      # Bundle compositions
-├── machines/     # Machine orchestration
-├── config/       # Configuration classes
-├── models/       # Domain models
-└── app/          # Application entry points
-```
 
 ## Creating Your First Tube
 
@@ -171,40 +150,6 @@ public class EmailValidatorTube implements Tube {
         public String getValue() { return value; }
     }
 }
-```
-
-### 2. Test the Tube
-
-```java
-package org.yourdomain.tubes.test;
-
-import org.junit.jupiter.api.Test;
-import org.yourdomain.tubes.EmailValidatorTube;
-import org.yourdomain.tubes.EmailValidatorTube.ValidationResult;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-class EmailValidatorTubeTest {
-    @Test
-    void shouldValidateCorrectEmailFormat() {
-        EmailValidatorTube tube = new EmailValidatorTube();
-        ValidationResult result = (ValidationResult) tube.process("user@example.com");
-        
-        assertTrue(result.isValid());
-        assertEquals("user@example.com", result.getValue());
-    }
-
-    @Test
-    void shouldRejectInvalidEmailFormat() {
-        EmailValidatorTube tube = new EmailValidatorTube();
-        ValidationResult result = (ValidationResult) tube.process("invalid-email");
-        
-        assertFalse(result.isValid());
-        assertNull(result.getValue());
-        assertTrue(result.getMessage().contains("Invalid email format"));
-    }
-}
-```
 
 ## Understanding the Flow
 
@@ -253,43 +198,6 @@ private TubeProcessor createProcessor() {
         }
     };
 }
-```
-
-## Connecting Tubes Together
-
-### Creating a Complementary Tube
-
-Formatter tube for display formatting:
-
-```java
-public class EmailFormatterTube implements Tube {
-    // Standard tube initialization code omitted
-
-    private TubeProcessor createProcessor() {
-        return input -> {
-            if (!(input instanceof ValidationResult)) {
-                logger.warn("Expected ValidationResult but received: {}", input.getClass().getName());
-                return FormatResult.error("Invalid input type");
-            }
-
-            ValidationResult validationResult = (ValidationResult) input;
-            if (!validationResult.isValid()) {
-                return FormatResult.error(validationResult.getMessage());
-            }
-
-            String email = validationResult.getValue();
-            String username = email.substring(0, email.indexOf('@'));
-            String domain = email.substring(email.indexOf('@') + 1);
-
-            return new FormatResult(
-                username,
-                domain,
-                username.substring(0, 1).toUpperCase() + "." + domain
-            );
-        };
-    }
-}
-```
 
 ### Connecting the Flow
 
@@ -311,37 +219,6 @@ public class EmailProcessingFlow {
         return (FormatResult) formatter.process(validationResult);
     }
 }
-```
-
-## Monitoring and Adaptation
-
-### Self-Monitoring
-
-Health monitoring implementation:
-
-```java
-private TubeMonitor createMonitor() {
-    return () -> {
-        long totalProcessed = metrics.getCount("valid_email") +
-                             metrics.getCount("invalid_email") +
-                             metrics.getCount("null_input");
-
-        double errorRate = totalProcessed > 0 ?
-            (double)(metrics.getCount("invalid_email") + 
-                    metrics.getCount("null_input")) / totalProcessed :
-            0.0;
-
-        String status = errorRate < 0.5 ? "HEALTHY" : "DEGRADED";
-
-        return new HealthAssessment.Builder()
-            .withTimestamp(Instant.now())
-            .withStatus(status)
-            .withMetric("total_processed", totalProcessed)
-            .withMetric("error_rate", errorRate)
-            .build();
-    };
-}
-```
 
 ### Adaptive Behavior
 
@@ -371,63 +248,6 @@ public void checkHealth() {
         logger.info("Health restored");
     }
 }
-```
-
-## Building Your First Bundle
-
-### Bundle Implementation
-
-```java
-public class EmailProcessingBundle implements Bundle {
-    private final EmailValidatorTube validator;
-    private final EmailFormatterTube formatter;
-    private final EmailStorageTube storage;
-
-    private BundleState designState;
-    private DynamicState dynamicState;
-
-    public EmailProcessingBundle() {
-        // Initialize tubes
-        this.validator = new EmailValidatorTube();
-        this.formatter = new EmailFormatterTube();
-        this.storage = new EmailStorageTube();
-
-        // Set initial state
-        this.designState = BundleState.FLOWING;
-        this.dynamicState = new DynamicState.Builder()
-            .withTimestamp(Instant.now())
-            .build();
-    }
-
-    public FormatResult processAndStoreEmail(String email) {
-        if (designState != BundleState.FLOWING) {
-            throw new IllegalStateException("Bundle not flowing: " + designState);
-        }
-
-        // Process through tube chain
-        ValidationResult validationResult = 
-            (ValidationResult) validator.process(email);
-
-        if (!validationResult.isValid()) {
-            return FormatResult.error(validationResult.getMessage());
-        }
-
-        FormatResult formatResult = 
-            (FormatResult) formatter.process(validationResult);
-        storage.process(formatResult);
-
-        return formatResult;
-    }
-
-    public void monitorHealth() {
-        boolean allHealthy = Stream.of(validator, formatter, storage)
-            .map(tube -> tube.getMonitor().assessHealth())
-            .allMatch(health -> "HEALTHY".equals(health.getStatus()));
-
-        designState = allHealthy ? BundleState.FLOWING : BundleState.DEGRADED;
-    }
-}
-```
 
 ## Common Patterns
 
@@ -456,42 +276,6 @@ public class EmailAuditTube implements Tube {
         };
     }
 }
-```
-
-### Circuit Breaker
-
-Failure protection pattern:
-
-```java
-public class CircuitBreakerTube implements Tube {
-    private int consecutiveFailures = 0;
-    private static final int THRESHOLD = 5;
-
-    private TubeProcessor createProcessor() {
-        return input -> {
-            if (designState == TubeState.BLOCKED) {
-                return ErrorResult.circuitOpen("Circuit open");
-            }
-
-            try {
-                Object result = doActualProcessing(input);
-                consecutiveFailures = 0; // Reset on success
-                return result;
-            } catch (Exception e) {
-                consecutiveFailures++;
-
-                if (consecutiveFailures >= THRESHOLD) {
-                    designState = TubeState.BLOCKED;
-                    logger.error("Circuit opened after {} failures", THRESHOLD);
-                    scheduleReset(); // Attempt reset after timeout
-                }
-
-                return ErrorResult.processingFailure(e.getMessage());
-            }
-        };
-    }
-}
-```
 
 ## Troubleshooting
 

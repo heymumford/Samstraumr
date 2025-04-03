@@ -101,32 +101,6 @@ Feature: Unique Identity for Tubes
     Given a new Tube is instantiated
     Then it should have a unique UUID
     And that UUID should never change over time
-```
-
----
-
-## 🤝 **Inter-Tube Feature Tests (ITFT)**
-
-Now we move beyond **single-Tube testing**. Here, we’re testing how **features inside a Tube** interact with one another. It’s like making sure **a lion’s tail** talks to its brain before swinging into battle.
-
-### **What We Test in ITFT**:
-- **Feature Interactions**: Does Tube memory allocation work with CPU management?
-- **Internal Collaboration**: Do features work together smoothly, or do they trip over each other?
-
-### **Example BTL Test for ITFT**:
-```gherkin
-Feature: Feature Collaboration within a Tube
-  As a developer
-  I want to ensure that Tube features work together
-  So that internal collaboration leads to seamless outcomes
-
-  @BTL @Features
-  Scenario: Tube memory allocation and CPU management work together
-    Given a Tube is handling a task requiring memory and CPU
-    When the Tube allocates memory
-    Then the CPU usage should increase proportionally
-    And the system should remain stable
-```
 
 ---
 
@@ -151,35 +125,3 @@ Feature: Composite Tube External Interaction
     Then it should receive a valid response
     And the base Tube should only log internal operations
     And the base Tube should not communicate directly with the external system
-```
-
----
-
-### **Key Points in CTIT**:
-- **Base Tubes Do NOT Talk to the Outside World**: Base Tubes remain isolated, focused solely on their machine environment and inter-Tube interactions.
-- **Composite Tubes Handle External Tasks**: Composite Tubes are designed to extend beyond the boundaries of a base Tube by handling external requests and responses, ensuring modular and adaptable interaction with outside systems.
-
----
-
-## 🤖 **Machine Construct Validation Tests (MCVT)**
-
-At the highest level, we test **how Machines—composed of many Tubes and Composites—interact with the real world.** Here, we ensure **end-to-end system reliability**, testing **performance, resilience, and adaptability** in live environments.
-
----
-
-## 🎉 **Fun Acronyms to Remember**
-
-- **ATL** = **Attle** (Absolutely Top-Level Essentials) 🏆
-- **BTL** = **Bottle** (Beyond Top-Level Essentials) 🍾
-- **ABT** = **Atomic Boundary Tests** (Atomic-level tests) 🚀
-- **ITFT** = **Inter-Tube Feature Testing** (Feature interactions) 🤝
-- **CTIT** = **Composite Tube Interaction Tests** (Composite integrity) 🧩
-- **MCVT** = **Machine Construct Validation Tests** (World domination) 🤖
-
----
-
-## 🌟 **Final Thoughts**
-
-Samstraumr is all about building systems that grow, adapt, and scale—just like Voltron, but with more tubes and less drama. Through precise, playful testing, we ensure that each Tube, Composite, and Machine works like a charm. This is where the magic of Tube-Based Design shines: by creating self-aware, modular components that can evolve smoothly, even when the external world gets messy. Whether you're testing an atomic Tube that's happily working in isolation or a Composite Tube interacting with an API, the principles of Samstraumr keep things running efficiently.
-
-By focusing on clarity, resilience, and scalability, and by having a bit of fun along the way, we're not just building systems—we're creating an entire ecosystem of flexible, evolving technology that can handle anything the real world throws at it. After all, what's more fun than making sure your Tubes know their purpose, work together like a well-oiled machine, and keep the peace?

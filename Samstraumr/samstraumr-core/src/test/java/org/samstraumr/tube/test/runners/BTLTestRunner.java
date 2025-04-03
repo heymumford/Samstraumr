@@ -1,18 +1,3 @@
-/*
-Filename: BTLTestRunner.java
-Purpose: JUnit test runner for executing Below The Line (BTL) tests
-Goals:
-  - Provide a way to run only BTL tests
-  - Filter tests based on @BelowTheLine annotation or BTL tag
-  - Support the ATL/BTL test categorization strategy
-Dependencies:
-  - JUnit 5 for test framework
-  - Maven for test execution
-Assumptions:
-  - Tests marked with @BelowTheLine will be included in this runner
-  - This runner will be used in separate processes (nightly builds, separate CI jobs)
-*/
-
 package org.samstraumr.tube.test.runners;
 
 import org.junit.platform.suite.api.IncludeTags;

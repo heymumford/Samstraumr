@@ -1,11 +1,5 @@
 # Glossary
 
-```
-Version: 0.6.1
-Last updated: April 03, 2025
-Author: Eric C. Mumford (@heymumford)
-Contributors: Samstraumr Core Team
-```
 
 This document contains definitions of terms used throughout the Samstraumr project.
 

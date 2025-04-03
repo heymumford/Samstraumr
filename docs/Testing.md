@@ -1,11 +1,5 @@
 # Testing in Samstraumr
 
-```
-Version: 0.6.1
-Last updated: April 03, 2025
-Author: Eric C. Mumford (@heymumford)
-Contributors: Samstraumr Core Team
-```
 
 ## Table of Contents
 - [Introduction](#introduction)
@@ -76,32 +70,6 @@ class TubeInitializationTest {
         // Test with different sizes
     }
 }
-```
-
-### TestContainers
-For system testing with external dependencies like databases and services:
-
-- **Containerized Dependencies**: Automatically spin up Docker containers for external services
-- **Database Testing**: Support for PostgreSQL, MySQL, MongoDB, and other databases
-- **Messaging Systems**: Kafka, RabbitMQ, and other messaging systems
-- **Custom Services**: Support for custom Docker images
-
-```java
-@Testcontainers
-public class DatabaseStreamTest {
-    @Container
-    private static final PostgreSQLContainer<?> postgres = 
-        new PostgreSQLContainer<>("postgres:14")
-            .withDatabaseName("test")
-            .withUsername("test")
-            .withPassword("test");
-            
-    @Test
-    void shouldConnectToDatabase() {
-        // Test database operations
-    }
-}
-```
 
 ### Cucumber
 For BDD testing at machine and acceptance levels:
@@ -119,30 +87,6 @@ Feature: Customer Registration
     When they register with email "john@example.com"
     Then they should receive a welcome email
     And their account should be created in the system
-```
-
-### Mockito
-For mocking dependencies in unit and integration tests:
-
-- **Mock Objects**: Create test doubles for external dependencies
-- **Behavior Verification**: Verify interactions with dependencies
-- **Argument Matching**: Flexible argument matching for verification
-- **Spy Objects**: Partial mocking of real objects
-
-```java
-@Test
-void shouldSendNotificationOnError() {
-    // Given
-    NotificationService notificationService = mock(NotificationService.class);
-    MonitorTube tube = new MonitorTube(notificationService);
-    
-    // When
-    tube.handleError("test error");
-    
-    // Then
-    verify(notificationService).sendAlert(eq("test error"), any(ErrorLevel.class));
-}
-```
 
 ### Custom Testing Tools
 
@@ -162,33 +106,6 @@ Samstraumr includes a custom test runner script for simplified test execution:
 
 # Run all tests with verbose output
 ./util/test/run-tests.sh --verbose all
-```
-
-#### Adaptation Testing Framework
-Custom framework for testing adaptive behavior:
-
-- **Resource Constraints**: Simulate memory, CPU, I/O limitations
-- **Failure Injection**: Introduce controlled failures to test adaptation
-- **State Transition Analysis**: Verify correct state changes during adaptation
-- **Recovery Verification**: Ensure proper recovery from constrained conditions
-
-```java
-@Test
-void shouldAdaptToResourceConstraints() {
-    AdaptationTestHarness harness = new AdaptationTestHarness();
-    harness.withConstraint(ResourceType.MEMORY, 0.2)
-           .withConstraint(ResourceType.CPU, 0.3)
-           .execute(tube -> {
-               // Perform operations that trigger adaptation
-               return tube.process("test data");
-           })
-           .verify(result -> {
-               // Verify correct adaptation behavior
-               assertTrue(result.isSuccessful());
-               assertEquals(TubeState.ADAPTING, result.getTubeState());
-           });
-}
-```
 
 ## Tag Ontology
 
@@ -285,31 +202,6 @@ void shouldInitializeWithUniqueIdentifier() {
     assertNotNull(tube.getUniqueId());
     assertTrue(tube.getUniqueId().length() > 0);
 }
-```
-
-### Flow Tests
-- **Focus**: Data flows through a single tube (Integration tests)
-- **Technology**: JUnit 5
-- **Naming Convention**: `*FlowTest.java`
-- **Purpose**: Verify data transformations and internal component interactions
-- **Examples**: Data processing within a tube, error handling, state changes during processing
-- **Command**: `./util/test/run-tests.sh flow`
-
-```java
-@Test
-void shouldTransformDataCorrectly() {
-    // Given
-    TransformerTube tube = new TransformerTube();
-    String inputData = "test data";
-    
-    // When
-    String result = tube.process(inputData);
-    
-    // Then
-    assertEquals("TEST DATA", result);
-    assertTrue(tube.getProcessingLog().contains("transformation applied"));
-}
-```
 
 ### Bundle Tests
 - **Focus**: Multiple connected tubes (Component tests)
@@ -333,36 +225,6 @@ void shouldProcessDataThroughEntireBundle() {
     assertTrue(result.isPresent());
     assertEquals("PROCESSED: RAW INPUT", result.get());
 }
-```
-
-### Stream Tests
-- **Focus**: External system interactions (System tests)
-- **Technology**: JUnit 5 with TestContainers
-- **Naming Convention**: `*StreamTest.java`
-- **Purpose**: Verify integration with external dependencies
-- **Examples**: Database interactions, API communication, messaging systems
-- **Command**: `./util/test/run-tests.sh stream`
-
-```java
-@Test
-void shouldPersistDataToDatabase() {
-    // Given
-    try (PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14")) {
-        postgres.start();
-        DatabaseTube tube = new DatabaseTube(postgres.getJdbcUrl(), 
-                                            postgres.getUsername(), 
-                                            postgres.getPassword());
-        
-        // When
-        tube.store("test_key", "test_value");
-        
-        // Then
-        Optional<String> result = tube.retrieve("test_key");
-        assertTrue(result.isPresent());
-        assertEquals("test_value", result.get());
-    }
-}
-```
 
 ### Adaptation Tests
 - **Focus**: System behavior under changing conditions (Property tests)
@@ -388,27 +250,6 @@ void shouldAdaptToReducedMemory() {
     assertTrue(result.isSuccessful());
     assertTrue(tube.getMemoryUsage() < memoryConstraint.getThreshold());
 }
-```
-
-### Machine Tests
-- **Focus**: End-to-end functionality (E2E tests)
-- **Technology**: Cucumber BDD
-- **Naming Convention**: `*.feature` files with `@L2_Machine` tag
-- **Purpose**: Verify complete machine functionality across multiple bundles
-- **Examples**: Business workflows, user interactions, system integrations
-- **Command**: `./util/test/run-tests.sh machine`
-
-```gherkin
-@L2_Machine @ATL
-Feature: Data Processing Machine
-  
-  Scenario: Process data through complete pipeline
-    Given a data processing machine is initialized
-    When raw data "customer:John Doe,order:123" is submitted
-    Then the customer information should be extracted
-    And the order should be processed
-    And a confirmation should be generated
-```
 
 ### BDD Acceptance Tests
 - **Focus**: Business requirements validation (Acceptance tests)
@@ -428,39 +269,6 @@ Feature: Order Processing
     Then the order should be accepted
     And an order confirmation should be sent
     And inventory should be updated
-```
-
-## BDD with Cucumber
-
-Samstraumr uses Behavior-Driven Development (BDD) with Cucumber for several key advantages:
-
-### Why BDD?
-
-1. **Natural Language Specifications**: Features and scenarios written in Gherkin provide clear, readable specifications that anyone can understand.
-
-2. **Living Documentation**: Tests serve as executable specifications that evolve alongside the code, ensuring documentation stays current.
-
-3. **Collaboration**: BDD bridges the gap between technical and non-technical stakeholders, fostering shared understanding.
-
-4. **Adaptive Testing**: BDD scenarios can adapt to the changing nature of Samstraumr systems, just as the systems themselves adapt to their environment.
-
-### Structure of a Cucumber Test
-
-```gherkin
-@ATL @L0_Tube @Init @Identity
-Feature: Tube Initialization
-  As a developer
-  I want tubes to initialize with unique identities
-  So that each tube can be uniquely identified in the system
-
-  Background:
-    Given the operating environment is ready
-
-  Scenario: Tube initializes with a unique UUID
-    When a new Tube is instantiated with reason "Test Initialization"
-    Then the Tube should initialize with a unique UUID
-    And the Tube should log its environment details
-```
 
 This approach combines human-readable specifications with executable tests, ensuring that your documentation always reflects the actual system behavior.
 
@@ -487,26 +295,6 @@ Scenario: Observer tube monitors data flow without interference
   Then the signals should be logged accurately with 100 entries
   And no modifications should be made to the observed signals
   And the observer's overhead should be less than 10% of total processing time
-```
-
-### Transformer Pattern Testing
-
-The Transformer pattern processes and modifies data flowing through tubes.
-
-**Testing Strategy:**
-- Verify transformations produce expected outputs for various inputs
-- Test handling of invalid inputs
-- Measure transformation performance under load
-
-**Example:**
-```gherkin
-@ATL @L1_Bundle @Transformer
-Scenario: Transformer tube correctly modifies data
-  Given a transformer tube is configured with a specific transformation function
-  When data "Hello" is sent through the transformer
-  Then the output should be "HELLO" after transformation
-  And the transformation should be logged
-```
 
 ### Validator Pattern Testing
 
@@ -525,26 +313,6 @@ Scenario: Validator tube correctly identifies invalid data
   When non-numeric data "abc" is sent for validation
   Then the data should be rejected
   And an appropriate error should be logged for the invalid input
-```
-
-### Circuit Breaker Pattern Testing
-
-The Circuit Breaker pattern isolates failures to prevent cascading system issues.
-
-**Testing Strategy:**
-- Verify that failures are detected and isolated
-- Test recovery and reset mechanisms
-- Ensure proper state transitions (closed → open → half-open → closed)
-
-**Example:**
-```gherkin
-@ATL @L2_Machine @CircuitBreaker
-Scenario: Circuit breaker isolates failing component
-  Given a machine with circuit breaker protection is running
-  When a component begins failing repeatedly
-  Then the circuit breaker should transition to OPEN state
-  And the system should redirect flow around the failing component
-```
 
 ## Running Tests
 
@@ -571,58 +339,11 @@ The recommended way to run Samstraumr tests is using the test runner script:
 ./util/test/run-tests.sh adaptation   # Run Adaptation Tests (property)
 ./util/test/run-tests.sh machine      # Run Machine Tests (e2e)
 ./util/test/run-tests.sh acceptance   # Run BDD Acceptance Tests (business)
-```
-
-### Script Options
-
-The test runner supports various options:
-
-```bash
-# Run tests in parallel
-./util/test/run-tests.sh --parallel flow
-
-# Set custom thread count
-./util/test/run-tests.sh --threads 4 bundle
-
-# Skip quality checks for faster execution
-./util/test/run-tests.sh --skip-quality stream
-
-# Enable verbose output
-./util/test/run-tests.sh --verbose adaptation
-
-# Combine options
-./util/test/run-tests.sh --parallel --threads 8 --skip-quality machine
-```
 
 For help with all available options:
 
 ```bash
 ./util/test/run-tests.sh --help
-```
-
-### Maven Direct Execution
-
-For more granular control, you can also run tests directly with Maven:
-
-#### Basic Test Execution
-
-```bash
-# Run all tests
-mvn test
-
-# Run tests by criticality
-mvn test -P atl-tests          # Run Above The Line tests (critical)
-mvn test -P btl-tests          # Run Below The Line tests (robustness)
-mvn test -Dgroups=ATL          # Alternative way to run ATL tests
-mvn test -Dgroups=BTL          # Alternative way to run BTL tests
-
-# Run tests with specific test type
-mvn test -Dtest=*TubeTest       # Run all Tube Tests
-mvn test -Dtest=*FlowTest       # Run all Flow Tests
-mvn test -Dtest=*BundleTest     # Run all Bundle Tests
-mvn test -Dtest=*StreamTest     # Run all Stream Tests
-mvn test -Dtest=*AdaptationTest # Run all Adaptation Tests
-```
 
 #### Tagged Testing (Cucumber)
 
@@ -634,20 +355,6 @@ mvn test -Dcucumber.filter.tags="@Acceptance"    # Run Acceptance Tests
 # Combine tags for specific subsets
 mvn test -Dcucumber.filter.tags="@L0_Tube and @Identity"
 mvn test -Dcucumber.filter.tags="@ATL and @Resilience"
-```
-
-#### Performance Optimization
-
-```bash
-# Run with custom thread count for parallelization
-mvn test -T 12 -P atl-tests
-
-# Skip quality checks during test runs
-mvn test -P skip-quality-checks
-
-# Use build performance script
-./util/build/build-performance.sh test -P atl-tests
-```
 
 ### Test Reports
 
@@ -669,32 +376,6 @@ mvn test -Dcucumber.plugin="html:target/custom-reports/cucumber.html"
 
 # Generate JSON report for external tools
 mvn test -Dcucumber.plugin="json:target/custom-reports/cucumber.json"
-```
-
-## Writing New Tests
-
-When adding new components to Samstraumr, follow these steps to create appropriate tests:
-
-### 1. Identify the Component Level
-
-Determine where your component fits in the hierarchy:
-- Individual tube? Start with `@L0_Tube` tests
-- Bundle of tubes? Add `@L1_Bundle` tests
-- Machine? Include `@L2_Machine` tests
-- Complete system? Create `@L3_System` tests
-
-### 2. Start with ATL Tests
-
-Begin by writing critical Above-the-Line tests that verify essential functionality:
-
-```gherkin
-@ATL @L0_Tube @Init @Identity
-Scenario: New tube component initializes correctly
-  Given the operating environment is ready
-  When the new tube component is instantiated
-  Then it should have a unique identifier
-  And it should initialize in FLOWING state
-```
 
 ### 3. Add BTL Tests for Robustness
 
@@ -707,24 +388,6 @@ Scenario: New tube component handles invalid initialization parameters
   When the new tube component is instantiated with invalid parameters
   Then it should fail gracefully
   And log appropriate error messages
-```
-
-### 4. Implement Step Definitions
-
-Create corresponding step definitions in Java:
-
-```java
-@Given("the new tube component is instantiated")
-public void the_new_tube_component_is_instantiated() {
-    testTube = new NewTubeComponent();
-    assertNotNull(testTube);
-}
-
-@Then("it should have a unique identifier")
-public void it_should_have_a_unique_identifier() {
-    assertNotNull(testTube.getUniqueId());
-}
-```
 
 ### 5. Run Tests Incrementally
 
@@ -748,13 +411,6 @@ Every test should have at minimum:
 ### 2. Structure Test Directories Hierarchically
 
 Organize feature files in directories that reflect the testing hierarchy:
-```
-src/test/resources/tube/features/
-   L0_Tube/
-   L1_Bundle/
-   L2_Machine/
-   L3_System/
-```
 
 ### 3. Write Self-Documenting Scenarios
 
@@ -784,20 +440,6 @@ Scenario: Tube adapts to resource constraints
   Then the tube should transition to ADAPTING state
   And reduce its resource consumption
   And continue processing with adjusted parameters
-```
-
-### Testing State Transitions
-
-Verify that state changes occur correctly and propagate appropriately:
-
-```gherkin
-@ATL @L2_Machine @State
-Scenario: State changes propagate through the machine
-  Given a machine with interconnected bundles is running
-  When a tube in bundle B1 transitions to ERROR state
-  Then bundle B1 should transition to DEGRADED state
-  And the machine should report partial functionality
-```
 
 ### Performance Testing
 
@@ -810,35 +452,6 @@ Scenario: Bundle processes large data volumes efficiently
   When 1 million records are processed through the bundle
   Then the processing should complete within 30 seconds
   And memory usage should not exceed 500MB
-```
-
-### Testing Cycles and Frequency
-
-Samstraumr's testing approach follows natural cycles that align with development phases:
-
-1. **Development Cycle**: During active development, focus on ATL tests for the specific components being modified.
-
-2. **Integration Cycle**: Before merging changes, run all ATL tests across all levels to ensure no regressions.
-
-3. **Release Cycle**: Before releases, run comprehensive ATL and BTL tests to ensure complete system integrity.
-
-4. **Maintenance Cycle**: Periodically run performance and resilience tests to identify degradation over time.
-
-## Quality Gates
-
-Samstraumr enforces quality through automated checks integrated into the build process. These quality gates ensure code meets standards before being merged into the main branch.
-
-### Spotless (Code Formatting)
-
-Ensures consistent code style using Google Java Style guidelines.
-
-```bash
-# Check code formatting
-mvn spotless:check
-
-# Apply formatting fixes
-mvn spotless:apply
-```
 
 ### PMD (Static Code Analysis)
 
@@ -847,22 +460,6 @@ Identifies potential bugs, suboptimal code, and overly complex expressions.
 ```bash
 # Run PMD analysis
 mvn pmd:check
-```
-
-Key rules enforced:
-- No unused variables or imports
-- No empty catch blocks
-- No overly complex methods
-- Proper exception handling
-
-### Checkstyle (Style Standards)
-
-Enforces coding standards beyond formatting, including naming conventions and structural rules.
-
-```bash
-# Run Checkstyle
-mvn checkstyle:check
-```
 
 Key standards enforced:
 - Naming conventions (camelCase, PascalCase, etc.)
@@ -880,22 +477,6 @@ mvn spotbugs:check
 
 # View detailed reports
 mvn spotbugs:gui
-```
-
-Key checks performed:
-- Null pointer dereferences
-- Resource leaks
-- Thread synchronization issues
-- Security vulnerabilities
-
-### JaCoCo (Code Coverage)
-
-Tracks test coverage to ensure adequate testing of all code.
-
-```bash
-# Generate coverage report
-mvn jacoco:report
-```
 
 Coverage thresholds:
 - Instruction coverage: 80%
@@ -931,23 +512,3 @@ You can simulate the CI pipeline locally to catch issues before pushing:
 ```bash
 # Full CI simulation
 ./build-checks.sh && ./build-performance.sh test -P atl-tests
-```
-
-### SonarQube Integration
-
-Samstraumr integrates with SonarQube for advanced code quality and security analysis.
-
-Key metrics monitored:
-- **Reliability**: Bug detection and prevention
-- **Security**: Vulnerability detection
-- **Maintainability**: Code smells and technical debt
-- **Coverage**: Test coverage verification
-- **Duplications**: Code duplication detection
-
-When used with the GitHub workflow, SonarQube results are displayed directly in pull requests, making code review more effective and ensuring only high-quality code gets merged.
-
----
-
-By embracing this comprehensive testing approach, your Samstraumr systems will grow with confidence, adapting to new requirements while maintaining the integrity and resilience that make them truly living software.
-
-[Return to Getting Started](./GettingStarted.md) | [Explore Core Concepts](./CoreConcepts.md)

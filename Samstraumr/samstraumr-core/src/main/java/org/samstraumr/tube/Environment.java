@@ -1,33 +1,18 @@
-/*
-Filename: Environment.java
-Purpose: Captures and manages system environment information for Tube instances to operate with awareness of their execution context.
-Goals:
-  - Ensure that system hardware and software details are reliably collected for tube operation
-  - Ensure that environment details can be serialized consistently for identification
-  - Ensure that failure modes gracefully handle unavailable system information
-Dependencies:
-  - com.fasterxml.jackson: For JSON processing of environment data
-  - oshi: For hardware and operating system information collection
-  - org.slf4j: For logging operational status
-  - java.security: For environment fingerprinting
-Assumptions:
-  - System permissions allow access to hardware and network information
-  - Requires non-headless environment with physical or virtual hardware accessible via OSHI
-  - Jackson JSON processing is available for environment serialization
-*/
-
 package org.samstraumr.tube;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+
 import oshi.SystemInfo;
 import oshi.hardware.*;
 import oshi.software.os.OperatingSystem;

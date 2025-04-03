@@ -1,17 +1,3 @@
-/*
-Filename: BundleTest.java
-Purpose: Annotation for marking tests that focus on connected tubes (component tests)
-Goals:
-  - Provide a way to categorize tests by test type
-  - Enable filtering of tests by type
-  - Support the unified testing strategy
-Dependencies:
-  - JUnit 5 for test framework
-  - Maven for test execution
-Assumptions:
-  - Tests marked with @BundleTest focus on testing connected tubes as components
-*/
-
 package org.samstraumr.tube.test.annotations;
 
 import java.lang.annotation.ElementType;

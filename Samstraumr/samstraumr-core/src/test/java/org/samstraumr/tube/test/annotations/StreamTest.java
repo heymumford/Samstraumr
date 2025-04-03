@@ -1,8 +1,3 @@
-/*
-Filename: StreamTest.java
-Purpose: Defines the StreamTest annotation for the Samstraumr testing strategy.
-*/
-
 package org.samstraumr.tube.test.annotations;
 
 import java.lang.annotation.ElementType;

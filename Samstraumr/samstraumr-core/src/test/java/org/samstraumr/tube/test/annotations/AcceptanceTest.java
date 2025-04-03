@@ -1,8 +1,3 @@
-/*
-Filename: AcceptanceTest.java
-Purpose: Defines the AcceptanceTest annotation for the Samstraumr testing strategy.
-*/
-
 package org.samstraumr.tube.test.annotations;
 
 import java.lang.annotation.ElementType;

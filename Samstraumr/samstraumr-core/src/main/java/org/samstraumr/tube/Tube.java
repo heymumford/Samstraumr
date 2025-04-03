@@ -1,20 +1,3 @@
-/*
-Filename: Tube.java
-Purpose: Core operational unit of the Samstraumr architecture representing a self-monitoring, self-documenting processing unit.
-Goals:
-  - Ensure that each tube maintains a unique, identifiable state with proper initialization and termination handling
-  - Ensure that processing state can be tracked through lineage and logs for observability
-  - Ensure that tubes can be initialized safely with appropriate error handling
-Dependencies:
-  - org.slf4j: For logging operations and state changes
-  - java.security: For generating unique identifiers using SHA-256
-  - java.util: For collections and timer management
-Assumptions:
-  - Environment parameter is reliably initialized before tube creation
-  - SHA-256 algorithm is available in the JVM environment
-  - Termination timing is thread-safe and doesn't interfere with ongoing operations
-*/
-
 package org.samstraumr.tube;
 
 import java.security.MessageDigest;
@@ -26,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -196,10 +180,10 @@ public class Tube {
     mimirLog.add(timestampedEntry);
     LOGGER.trace("Mimir Log: {}", timestampedEntry);
   }
-  
+
   /**
    * Adds a reason to the tube's lineage.
-   * 
+   *
    * @param reason the reason to add to lineage
    */
   public void addToLineage(String reason) {

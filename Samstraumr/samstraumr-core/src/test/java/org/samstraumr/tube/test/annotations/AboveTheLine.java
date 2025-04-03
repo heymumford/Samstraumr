@@ -1,18 +1,3 @@
-/*
-Filename: AboveTheLine.java
-Purpose: Annotation for marking tests that are critical to the codebase and must pass with every build
-Goals:
-  - Provide a way to categorize tests as critical (must pass)
-  - Enable filtering of tests by criticalness
-  - Support the ATL/BTL test categorization strategy
-Dependencies:
-  - JUnit 5 for test framework
-  - Maven for test execution
-Assumptions:
-  - Tests marked with @AboveTheLine will be run in the main build pipeline
-  - Tests without @AboveTheLine or with @BelowTheLine will be run separately
-*/
-
 package org.samstraumr.tube.test.annotations;
 
 import java.lang.annotation.ElementType;

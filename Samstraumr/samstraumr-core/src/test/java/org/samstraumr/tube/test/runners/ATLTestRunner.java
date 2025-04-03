@@ -1,18 +1,3 @@
-/*
-Filename: ATLTestRunner.java
-Purpose: JUnit test runner for executing Above The Line (ATL) tests
-Goals:
-  - Provide a way to run only ATL tests
-  - Filter tests based on @AboveTheLine annotation or ATL tag
-  - Support the ATL/BTL test categorization strategy
-Dependencies:
-  - JUnit 5 for test framework
-  - Maven for test execution
-Assumptions:
-  - Tests marked with @AboveTheLine will be included in this runner
-  - This runner will be used in the main build pipeline
-*/
-
 package org.samstraumr.tube.test.runners;
 
 import org.junit.platform.suite.api.IncludeTags;

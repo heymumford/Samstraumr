@@ -1,18 +1,3 @@
-/*
-Filename: BelowTheLine.java
-Purpose: Annotation for marking tests that are important but non-blocking and can run separately
-Goals:
-  - Provide a way to categorize tests as non-critical (should pass but don't block)
-  - Enable filtering of tests by criticalness
-  - Support the ATL/BTL test categorization strategy
-Dependencies:
-  - JUnit 5 for test framework
-  - Maven for test execution
-Assumptions:
-  - Tests marked with @BelowTheLine will be run in separate processes
-  - BTL tests won't block the main build pipeline if they fail
-*/
-
 package org.samstraumr.tube.test.annotations;
 
 import java.lang.annotation.ElementType;

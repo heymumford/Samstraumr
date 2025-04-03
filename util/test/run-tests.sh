@@ -47,7 +47,9 @@ show_usage() {
     echo "  machine   - Run Machine Tests (e2e/Cucumber)"
     echo "  acceptance - Run BDD Acceptance Tests (business/Cucumber)"
     echo "  all       - Run all tests (default)"
-    echo "  critical  - Run only critical tests (fast for CI)"
+    echo "  atl       - Run Above The Line tests (critical, must-pass tests)"
+    echo "  btl       - Run Below The Line tests (important but non-blocking tests)"
+    echo "  critical  - Run only critical tests (alias for atl, fast for CI)"
     echo ""
     echo "OPTIONS:"
     echo "  -p, --parallel     Run tests in parallel"
@@ -61,6 +63,8 @@ show_usage() {
     echo "  ./util/test/run-tests.sh -p bundle      # Run bundle tests in parallel"
     echo "  ./util/test/run-tests.sh -s acceptance  # Run acceptance tests without quality checks"
     echo "  ./util/test/run-tests.sh -p -t 4 all    # Run all tests in parallel with 4 threads"
+    echo "  ./util/test/run-tests.sh atl            # Run Above The Line (critical) tests"
+    echo "  ./util/test/run-tests.sh btl            # Run Below The Line (robustness) tests"
     echo ""
 }
 
@@ -87,7 +91,7 @@ while [[ $# -gt 0 ]]; do
             show_usage
             exit 0
             ;;
-        tube|flow|bundle|stream|adaptation|machine|acceptance|all|critical)
+        tube|flow|bundle|stream|adaptation|machine|acceptance|all|critical|atl|btl)
             TEST_TYPE="$1"
             shift
             ;;
@@ -147,9 +151,13 @@ case $TEST_TYPE in
         echo "🧪 Running BDD Acceptance Tests (business/Cucumber)"
         mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dcucumber.filter.tags="@Acceptance"
         ;;
-    critical)
-        echo "🧪 Running Critical Tests (fast cycle for CI)"
+    atl|critical)
+        echo "🧪 Running Above The Line (ATL) Tests - Critical Path"
         mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -P atl-tests
+        ;;
+    btl)
+        echo "🧪 Running Below The Line (BTL) Tests - Robustness Path"
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -P btl-tests
         ;;
     all)
         echo "🧪 Running All Tests"

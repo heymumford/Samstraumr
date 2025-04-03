@@ -1,8 +1,3 @@
-/*
-Filename: AdaptationTest.java
-Purpose: Defines the AdaptationTest annotation for the Samstraumr testing strategy.
-*/
-
 package org.samstraumr.tube.test.annotations;
 
 import java.lang.annotation.ElementType;

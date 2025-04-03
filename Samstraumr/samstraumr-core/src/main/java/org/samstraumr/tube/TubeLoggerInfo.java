@@ -1,19 +1,3 @@
-/*
-Filename: TubeLoggerInfo.java
-Purpose: Handles the structured data assembly for tube logging with identifiers and visual representation.
-Goals:
-  - Ensure that logging data includes consistent identifiers across tube ecosystem
-  - Ensure that log entries maintain order with sequence numbering
-  - Ensure that tubes have visual differentiation through color hashing
-Dependencies:
-  - java.awt.Color: For visual hash generation
-  - java.util.concurrent.atomic: For thread-safe sequence numbering
-Assumptions:
-  - Tube IDs are unique within a machine context
-  - Color visualization is used in logging interfaces
-  - Log sequence numbers are monotonically increasing within a tube instance
-*/
-
 package org.samstraumr.tube;
 
 import java.awt.Color;
