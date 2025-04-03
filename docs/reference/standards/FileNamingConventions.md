@@ -40,6 +40,18 @@ This document outlines the standard naming conventions for files within the Sams
    - Use **lowercase** for package names (e.g., `org.samstraumr.tube`)
    - Use periods to separate hierarchical packages
 
+### Cucumber Feature Files
+
+1. **Feature Files**
+   - Use **kebab-case** with descriptive names ending in `-test.feature` (e.g., `tube-initialization-test.feature`)
+   - For example files, use the pattern: `<prefix>-<descriptive-name>-example.feature`
+   - Separate words with hyphens for readability
+
+2. **Special TBD Files**
+   - Files related to Tube Based Development (TBD) should keep TBD acronym capitalized
+   - Format: `TBD-<descriptive-name-in-kebab-case>.feature` (e.g., `TBD-atomic-boundary-test-example.feature`)
+   - This ensures TBD stands out in the filesystem while maintaining consistency
+
 ### Scripts
 
 1. **Shell Scripts**
@@ -76,14 +88,17 @@ This document outlines the standard naming conventions for files within the Sams
 
 ## Implementation
 
-To ensure all files follow these conventions, we have created a standardization script:
+To ensure all files follow these conventions, we have created standardization scripts:
 
 ```bash
-# Run the standardization script
+# Run the Markdown standardization script
 ./docs/standardize-md-filenames.sh
+
+# Run the Cucumber feature file standardization script
+./docs/scripts/standardize-feature-filenames.sh
 ```
 
-This script will detect and rename files that don't follow the conventions, ensuring consistency across the project.
+These scripts will detect and rename files that don't follow the conventions, ensuring consistency across the project.
 
 ### Maintenance
 
@@ -94,12 +109,16 @@ When adding new files to the project, follow these guidelines:
    - Only use UPPER_CASE for README.md files
 
 2. For checking conformance:
-   - Run the standardization script periodically:
+   - Run the standardization scripts periodically:
      ```bash
+     # For Markdown files
      ./docs/standardize-md-filenames.sh
+     
+     # For Cucumber feature files
+     ./docs/scripts/standardize-feature-filenames.sh
      ```
-   - The script will identify and fix any non-conforming files
-   - Consider running this check as part of a pre-commit hook or CI process
+   - The scripts will identify and fix any non-conforming files
+   - Consider running these checks as part of a pre-commit hook or CI process
 
 3. If adding new file types not covered by these conventions:
    - Update this document with the appropriate conventions
