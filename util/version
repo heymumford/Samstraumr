@@ -173,9 +173,8 @@ update_version() {
   # Update badges in README.md if we have the badge script
   if [ -f "./util/badges/generate-badges.sh" ]; then
     chmod +x ./util/badges/generate-badges.sh
-    VERSION_BADGE=$(./util/badges/generate-badges.sh version)
-    # Update the version badge using more specific pattern matching
-    sed -i "s|\\[\\!\\[Version\\].*version-[0-9.]\\+-blue\\]|$VERSION_BADGE|" README.md
+    # Just directly replace the version in the badge URL
+    sed -i "s|version-[0-9.]\+-blue|version-$new_version-blue|g" README.md
     print_success "Updated version badge in README.md"
   fi
   print_success "Updated README.md"
