@@ -9,6 +9,13 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 RESET='\033[0m'
 
+# Get script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." &> /dev/null && pwd 2> /dev/null || echo "$SCRIPT_DIR")"
+
+# Change to project root directory
+cd "$PROJECT_ROOT"
+
 echo -e "${YELLOW}Checking file encodings...${RESET}"
 
 # Array of extensions to check
@@ -34,6 +41,7 @@ check_file() {
     
     # Skip binary files
     if file "$file" | grep -q "binary"; then
+        echo -e "${YELLOW}Skipping binary file: $file${RESET}"
         return
     fi
     
@@ -73,9 +81,9 @@ for ext in "${EXTENSIONS[@]}"; do
         echo -e "${YELLOW}Checking *.${ext} files...${RESET}"
     fi
     
-    find . -name "*.${ext}" -not -path "*/target/*" -not -path "*/node_modules/*" -type f | while read -r file; do
+    while IFS= read -r file; do
         check_file "$file"
-    done
+    done < <(find . -name "*.${ext}" -not -path "*/target/*" -not -path "*/node_modules/*" -type f)
 done
 
 # Fix encoding and line ending issues if requested
