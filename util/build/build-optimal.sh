@@ -1,5 +1,19 @@
 #!/bin/bash
-# Optimized build script for Samstraumr
+# Filename: build-optimal.sh
+# Purpose: Provides optimized Maven build configuration for Samstraumr with flexible build modes.
+# Goals:
+#   - Ensure that builds are executed with optimized memory and thread settings
+#   - Ensure that different build modes (fast, compile, test) are easily accessible
+#   - Ensure that project structure and Java version compatibility are properly handled
+# Dependencies:
+#   - Maven build system with appropriate profiles
+#   - java17-compat.sh for version compatibility
+#   - Project structure with standard Maven layout
+# Assumptions:
+#   - Script may be called from different locations relative to project root
+#   - Maven is installed and properly configured in the environment
+#   - The fast profile is defined in the project POM files
+#
 # Usage: ./build-optimal.sh [clean] [fast|compile|test] [additional maven flags]
 
 set -e

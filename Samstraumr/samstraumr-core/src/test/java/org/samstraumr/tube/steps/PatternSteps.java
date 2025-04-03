@@ -15,6 +15,26 @@ import org.samstraumr.tube.bundle.BundleFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/*
+Filename: PatternSteps.java
+Purpose: Implements BDD step definitions for testing Tube design patterns (Observer, Transformer, Validator) in the Samstraumr architecture.
+Goals:
+  - Provide comprehensive test implementations for verifying pattern-specific behavior of Tube components
+  - Validate that Observer tubes can effectively monitor signals without modification
+  - Ensure Transformer tubes correctly apply transformations with appropriate error handling
+  - Verify Validator tubes properly enforce validation rules and handle invalid data appropriately
+Dependencies:
+  - JUnit 5 assertions for verification
+  - Cucumber Java annotations for BDD test implementation
+  - Environment.java for system context
+  - Bundle.java for connected tube operations
+  - BundleFactory.java for creating test bundles with pattern-specific configurations
+Assumptions:
+  - Each test scenario operates with a clean environment and bundle state
+  - Bundle implementations properly track events for verification
+  - Simulated timing and performance tests are representative of actual system behavior
+*/
+
 /**
  * Step definitions for testing tube patterns: Observer, Transformer, and Validator. Implements the
  * steps defined in the pattern feature files in the composites directory.

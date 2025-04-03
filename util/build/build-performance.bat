@@ -1,7 +1,18 @@
 @echo off
-:: Script to optimize build performance on Windows
-:: Uses optimal settings for CI/CD and local development
-:: Automatically detects system resources
+:: Filename: build-performance.bat
+:: Purpose: Windows-specific script that optimizes Maven build performance based on system resources.
+:: Goals:
+::   - Ensure that build performance is optimized for Windows environments
+::   - Ensure that system resources (CPU cores, memory) are detected and utilized optimally
+::   - Ensure that test runs are configured for parallel execution where possible
+:: Dependencies:
+::   - Windows Management Instrumentation Command-line (WMIC)
+::   - Maven build system with appropriate profiles
+::   - Windows command shell environment
+:: Assumptions:
+::   - Windows environment with WMIC available
+::   - Maven is installed and accessible on the system PATH
+::   - System has adequate resources for running the build
 
 echo ====== Samstraumr Performance Build ======
 echo.

@@ -1,3 +1,20 @@
+/*
+Filename: Bundle.java
+Purpose: Implements a connected collection of Tubes that form data processing pipelines with error handling capabilities.
+Goals:
+  - Ensure that tubes can be connected in flexible processing pipelines
+  - Ensure that data transformations, validations, and circuit breaking are properly managed
+  - Ensure that error handling is comprehensive and isolated to specific processing paths
+Dependencies:
+  - org.samstraumr.tube: For Tube and Environment components
+  - org.slf4j: For logging bundle operations and errors
+  - java.util.concurrent: For thread-safe operations in multi-threaded environments
+Assumptions:
+  - Tubes are properly initialized before being added to a bundle
+  - Data types are compatible between connected tubes
+  - Circuit breaker reset timeouts are appropriate for the application's needs
+*/
+
 package org.samstraumr.tube.bundle;
 
 import java.util.*;
@@ -8,11 +25,6 @@ import org.samstraumr.tube.Environment;
 import org.samstraumr.tube.Tube;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-/**
- * A Bundle represents a collection of connected Tubes that form a processing pipeline. Bundles
- * allow data to flow between tubes in a directed manner.
- */
 public class Bundle {
   private static final Logger LOGGER = LoggerFactory.getLogger(Bundle.class);
 

@@ -1,59 +1,18 @@
-# ---------------------------------------------------------------------------------------
-# TubeInitializationTest.feature - Initialization and Logging Tests for Atomic Tubes
-#
-# This feature file contains critical Above the Line (ATL) tests for the initialization
-# and logging of atomic base tubes in Samstraumr. These tests validate the integrity,
-# uniqueness, and self-contained nature of a tube's identity and operations. All ATL tests
-# must pass before proceeding to any further testing stages.
-#
-# Running Tests from the Command Line:
-#
-# To run all tests in this feature file:
-#   mvn test -Dcucumber.filter.tags="@ATL"
-#
-# To run tests by hierarchy level:
-#   mvn test -Dcucumber.filter.tags="@L0_Tube"
-#
-# To run by capability:
-#   mvn test -Dcucumber.filter.tags="@Identity" 
-#   mvn test -Dcucumber.filter.tags="@Flow"
-#   mvn test -Dcucumber.filter.tags="@State"
-#   mvn test -Dcucumber.filter.tags="@Awareness"
-#
-# To run by lifecycle phase:
-#   mvn test -Dcucumber.filter.tags="@Init"
-#   mvn test -Dcucumber.filter.tags="@Runtime"
-#   mvn test -Dcucumber.filter.tags="@Termination"
-#
-# To run by pattern:
-#   mvn test -Dcucumber.filter.tags="@Transformer"
-#   mvn test -Dcucumber.filter.tags="@Observer"
-#   mvn test -Dcucumber.filter.tags="@Validator"
-#
-# Available Tags (New Ontology):
-#   @ATL/@BTL     - Critical/Robustness tests
-#   @L0_Tube      - Atomic tube component tests
-#   @Identity     - UUID, naming, identification tests
-#   @Flow         - Data movement and transformation
-#   @State        - State management and transitions
-#   @Awareness    - Self-monitoring and environment awareness
-#   @Init         - Initialization/construction tests
-#   @Runtime      - Normal operation tests
-#   @Termination  - Shutdown/cleanup tests
-#   @Observer     - Monitoring pattern tests
-#   @Transformer  - Data transformation tests
-#   @Validator    - Input validation tests
-#   @CircuitBreaker - Fault tolerance tests
-#   @Performance  - Speed and resource usage
-#   @Resilience   - Recovery and fault handling
-#   @Scale        - Load and scaling tests
-#
-# Best Practices for Running Tests:
-#   - Always start with @ATL tests before proceeding to @BTL tests
-#   - Use specific tags to focus on particular areas when troubleshooting
-#   - Tests are organized hierarchically from L0 (atomic components) to L3 (systems)
-#   - Tags can be combined for more specific test subsets
-# ---------------------------------------------------------------------------------------
+/*
+Filename: TubeInitializationTest.feature
+Purpose: Validates initialization, uniqueness, and logging capabilities of atomic Tube instances.
+Goals:
+  - Ensure that tubes initialize with unique identifiers
+  - Ensure that environment details are properly captured and logged
+  - Ensure that tubes maintain isolation and proper error handling
+Dependencies:
+  - BDD step definitions in org.samstraumr.tube.steps package
+  - Tube and Environment implementations in org.samstraumr.tube
+Assumptions:
+  - Test environment provides stable resource conditions
+  - Cucumber test runner is properly configured
+  - Test tags (@ATL, @L0_Tube, etc.) are consistent with the test ontology
+*/
 
 @ATL @L0_Tube
 Feature: Tube Initialization and Logging

@@ -1,3 +1,20 @@
+/*
+Filename: BundleFactory.java
+Purpose: Factory for creating and managing standardized Bundle configurations based on common patterns.
+Goals:
+  - Ensure that bundle creation follows established patterns
+  - Ensure that bundles are properly registered for lifecycle management
+  - Ensure that common tube configurations are available through simplified APIs
+Dependencies:
+  - org.samstraumr.tube: For Environment component and configuration
+  - org.samstraumr.tube.bundle: For Bundle implementation and management
+  - java.util.concurrent: For thread-safe registry operations
+Assumptions:
+  - Bundle IDs should be unique within the application
+  - Pattern-based bundles follow standardized naming conventions
+  - Environment configuration is consistent across related bundles
+*/
+
 package org.samstraumr.tube.bundle;
 
 import java.util.Collections;
@@ -8,11 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.samstraumr.tube.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-/**
- * Factory class for creating and managing Bundles. Provides utilities for creating common bundle
- * patterns.
- */
 public class BundleFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(BundleFactory.class);
   private static final Map<String, Bundle> BUNDLE_REGISTRY = new ConcurrentHashMap<>();
