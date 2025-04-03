@@ -1,21 +1,9 @@
 #!/bin/bash
-# Script to remove legacy headers from Java files
+# Legacy wrapper - redirects to the new location
 
-# Find all Java files
-java_files=$(find /home/emumford/NativeLinuxProjects/Samstraumr -type f -name "*.java")
+echo -e "\033[1;33mWARNING: update-java-headers.sh has been moved to util/maintenance/headers/\033[0m"
+echo -e "Please use \033[1;32m./util/maintenance/headers/update-java-headers.sh\033[0m instead."
+echo ""
 
-for file in $java_files; do
-  # Check if file has a comment header block
-  if grep -q "^\/\*" "$file"; then
-    # Get the package line number
-    package_line=$(grep -n "^package" "$file" | head -1 | cut -d: -f1)
-    
-    if [ ! -z "$package_line" ]; then
-      # Delete everything before the package line
-      sed -i "1,$(($package_line-1))d" "$file"
-      echo "Updated $file"
-    fi
-  fi
-done
-
-echo "Completed updating Java files"
+# Forward to new script
+./util/maintenance/headers/update-java-headers.sh "$@"

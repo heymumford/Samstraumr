@@ -24,6 +24,7 @@ public class Tube {
   private final List<String> mimirLog;
   private final Environment environment;
   private volatile Timer terminationTimer;
+  private String environmentState = "normal";
 
   private Tube(String reason, Environment environment, String uniqueId) {
     this.reason = reason;
@@ -171,11 +172,17 @@ public class Tube {
   }
 
   /**
-   * Logs an entry to the Mimir log.
+   * Logs an entry to the Mimir log with timestamp.
+   * This internal log allows the tube to maintain state information and debug data.
    *
    * @param logEntry the entry to log
    */
   public void logToMimir(String logEntry) {
+    if (logEntry == null || logEntry.isEmpty()) {
+      LOGGER.warn("Attempted to log empty or null entry to Mimir log");
+      return;
+    }
+    
     String timestampedEntry = Instant.now().toString() + ": " + logEntry;
     mimirLog.add(timestampedEntry);
     LOGGER.trace("Mimir Log: {}", timestampedEntry);
@@ -191,6 +198,31 @@ public class Tube {
     if (reason != null && !reason.trim().isEmpty()) {
       lineage.add(reason);
       logToMimir("Added to lineage: " + reason);
+    }
+  }
+  
+  /**
+   * Updates the tube's awareness of environmental state changes.
+   *
+   * @param newState the new state of the environment
+   */
+  public void updateEnvironmentState(String newState) {
+    LOGGER.debug("Environment state changing from {} to {}", environmentState, newState);
+    this.environmentState = newState;
+    
+    // Log appropriate messages based on state
+    if ("low memory".equals(newState)) {
+      logToMimir("Memory critically low");
+      LOGGER.warn("Tube {} environment experiencing low memory", uniqueId);
+    } else if ("high cpu".equals(newState)) {
+      logToMimir("CPU usage critically high");
+      LOGGER.warn("Tube {} environment experiencing high CPU usage", uniqueId);
+    } else if ("normal".equals(newState)) {
+      logToMimir("Environment operating normally");
+      LOGGER.info("Tube {} environment returned to normal state", uniqueId);
+    } else {
+      logToMimir("Environment state changed to: " + newState);
+      LOGGER.info("Tube {} environment state changed to: {}", uniqueId, newState);
     }
   }
 

@@ -168,31 +168,17 @@ update_version() {
   done
   print_success "Updated POM files"
   
-  # Update README.md version
-  sed -i "s/Version: .*/Version: $new_version/g" README.md
-  # Update badges in README.md if we have the badge script
-  if [ -f "./util/badges/generate-badges.sh" ]; then
-    chmod +x ./util/badges/generate-badges.sh
-    # Just directly replace the version in the badge URL
+  # Update README.md version - the single source of truth for version info
+  if [ -f "README.md" ]; then
+    # Update version string
+    sed -i "s/Version: .*/Version: $new_version/g" README.md
+    # Update version badge URL
     sed -i "s|version-[0-9.]\+-blue|version-$new_version-blue|g" README.md
-    print_success "Updated version badge in README.md"
+    print_success "Updated version and badge in README.md"
   fi
-  print_success "Updated README.md"
   
-  # Update version in other documentation files
-  local doc_files=(
-    "docs/GettingStarted.md"
-    "CLAUDE.md"
-  )
-  
-  for doc_file in "${doc_files[@]}"; do
-    if [ -f "$doc_file" ]; then
-      if grep -q "Version:" "$doc_file"; then
-        sed -i "s/Version: .*/Version: $new_version/g" "$doc_file"
-        print_success "Updated $doc_file"
-      fi
-    fi
-  done
+  # We should only have version mentioned in one place - the root README.md
+  # Do not update versions in any other documentation files
   
   print_header "Version Update Complete"
   echo "Build the project to apply version changes to all resources"

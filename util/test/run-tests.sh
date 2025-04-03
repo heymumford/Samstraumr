@@ -128,51 +128,53 @@ case $TEST_TYPE in
     orchestration)
         echo "🧪 Running Orchestration Tests (highest level of ATL)"
         echo "🔍 These tests verify the core building blocks and system wiring"
-        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*Orchestration* -Dcucumber.filter.tags="@Orchestration"
+        # We replaced Orchestration with L0_Tube tests as our ATL tests
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dcucumber.filter.tags="@L0_Tube" -Dcucumber.features="src/test/resources/tube/features/L0_Tube/tube-initialization-test.feature" -Dmaven.test.skip=false
         ;;
     tube)
         echo "🧪 Running Tube Tests (unit/JUnit)"
-        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*TubeTest
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*TubeTest,*SimpleTubeTest -Dmaven.test.skip=false
         ;;
     flow)
         echo "🧪 Running Flow Tests (integration/JUnit)"
-        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*FlowTest
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*FlowTest -Dmaven.test.skip=false
         ;;
     bundle)
         echo "🧪 Running Bundle Tests (component/JUnit) - [DEPRECATED]"
-        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*BundleTest
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*BundleTest -Dmaven.test.skip=false
         ;;
     composite)
         echo "🧪 Running Composite Tests (component/JUnit)"
-        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*CompositeTest
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*CompositeTest -Dmaven.test.skip=false
         ;;
     stream)
         echo "🧪 Running Stream Tests (system/TestContainers)"
-        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*StreamTest
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*StreamTest -Dmaven.test.skip=false
         ;;
     adaptation)
         echo "🧪 Running Adaptation Tests (property/custom JUnit)"
-        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*AdaptationTest
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*AdaptationTest -Dmaven.test.skip=false
         ;;
     machine)
         echo "🧪 Running Machine Tests (e2e/Cucumber)"
-        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dcucumber.filter.tags="@L2_Machine"
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dcucumber.filter.tags="@L2_Machine" -Dmaven.test.skip=false
         ;;
     acceptance)
         echo "🧪 Running BDD Acceptance Tests (business/Cucumber)"
-        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dcucumber.filter.tags="@Acceptance"
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dcucumber.filter.tags="@Acceptance" -Dmaven.test.skip=false
         ;;
     atl|critical)
         echo "🧪 Running Above The Line (ATL) Tests - Critical Path"
-        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -P atl-tests
+        # Add specific tags for focused L0_Tube ATL tests
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dcucumber.filter.tags="@ATL and @L0_Tube" -Dcucumber.features="src/test/resources/tube/features/L0_Tube/tube-initialization-test.feature" -Dmaven.test.skip=false
         ;;
     btl)
         echo "🧪 Running Below The Line (BTL) Tests - Robustness Path"
-        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -P btl-tests
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -P btl-tests -Dmaven.test.skip=false
         ;;
     all)
         echo "🧪 Running All Tests"
-        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dmaven.test.skip=false
         ;;
 esac
 

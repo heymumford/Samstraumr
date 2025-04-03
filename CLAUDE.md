@@ -101,11 +101,41 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - Check with detailed output: `./util/quality/check-encoding.sh --verbose`
   - Automatically fix issues: `./util/quality/check-encoding.sh --fix`
 
+## CI/CD Pipeline Commands
+- Local GitHub Actions workflow verification with Act:
+  - Install Act: `sudo curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash`
+  - List available jobs: `act -l`
+  - Dry run a job: `act -j initialization --dryrun`
+  - Run a specific job: `sudo act -j get-version`
+  - Run with specific event: `sudo act workflow_dispatch -j get-version -W .github/workflows/samstraumr-pipeline.yml`
+  - Complete documentation: See `docs/contribution/ci-cd-guide.md`
+- Badge management:
+  - Generate all badges: `./util/badges/generate-badges.sh all`
+  - Generate specific badge: `./util/badges/generate-badges.sh build`
+- Build Reports:
+  - Quick build report (recommended): `./util/build/generate-build-report.sh --skip-tests --skip-quality`
+  - Full build report: `./util/build/generate-build-report.sh`
+  - Skip tests during report generation: `./util/build/generate-build-report.sh --skip-tests`
+  - Skip quality checks during report generation: `./util/build/generate-build-report.sh --skip-quality`
+  - Specify custom output directory: `./util/build/generate-build-report.sh --output /path/to/output`
+  - View report: `xdg-open target/samstraumr-report/index.html` (Linux/WSL)
+  - Build report documentation: See `docs/contribution/build-report-guide.md`
+
 ## Code Style Guidelines
 - **Imports**: Specific imports (no wildcards). Standard Java first, then third-party, then project imports.
-- **Naming**: PascalCase for classes, camelCase for methods/variables, ALL_CAPS for constants.
+- **Naming**: 
+  - Classes, interfaces, enums, annotations: PascalCase
+  - Methods, variables, parameters: camelCase
+  - Constants (static final fields): UPPER_SNAKE_CASE
+  - Cucumber step methods: snake_case
+  - See docs/JAVA_NAMING_STANDARDS.md for complete details
 - **Error Handling**: Custom exceptions with contextual messages; consistent logging before throwing exceptions.
-- **Logging**: Use SLF4J with Log4j2 implementation; consistent log levels; parameterized logging.
+- **Logging**: 
+  - Use SLF4J with Log4j2 implementation
+  - Follow log level guidelines in docs/LOGGING_STANDARDS.md
+  - Always use parameterized logging (LOGGER.info("Value: {}", value))
+  - Include exceptions in error logs (LOGGER.error("Message", exception))
+  - Never use System.out.println or System.err.println
 - **Testing**: Cucumber for BDD testing; feature files with descriptive scenarios.
 - **Documentation**: Javadoc for public APIs; comments for complex operations.
 - **Structure**: Final fields for immutability; private methods for implementation details.
@@ -134,7 +164,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - JaCoCo: Code coverage
 - Version management
   - Central version.properties file in Samstraumr/ directory
-  - Update version with: `./util/maintenance/update-version.sh <new-version>`
+  - Update version with: `./util/version bump patch` (preferred) or `./util/version set <new-version>`
+  - Always use patch version bumping for bugfixes and small improvements
   - Resources filtered to include version information
 
 ## Quality Reports

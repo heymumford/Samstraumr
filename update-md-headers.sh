@@ -1,28 +1,9 @@
 #!/bin/bash
-# Script to remove legacy headers from Markdown files
+# Legacy wrapper - redirects to the new location
 
-# Find all Markdown files
-md_files=$(find /home/emumford/NativeLinuxProjects/Samstraumr -type f -name "*.md" | grep -v "target/")
+echo -e "\033[1;33mWARNING: update-md-headers.sh has been moved to util/maintenance/headers/\033[0m"
+echo -e "Please use \033[1;32m./util/maintenance/headers/update-md-headers.sh\033[0m instead."
+echo ""
 
-for file in $md_files; do
-  # Skip non-documentation files
-  if [[ "$file" == *"README.md" ]]; then
-    # Special handling for README.md which needs version but not other metadata
-    sed -i '/^```$/,/^```$/s/^Last updated:.*$//' "$file"
-    sed -i '/^```$/,/^```$/s/^Author:.*$//' "$file"
-    sed -i '/^```$/,/^```$/s/^Contributors:.*$//' "$file"
-    # Remove empty lines in the version block
-    sed -i '/^```$/,/^```$/s/^[[:space:]]*$//g' "$file"
-    # Clean up multiple newlines
-    sed -i ':a;N;$!ba;s/\n\n\n\n/\n\n/g' "$file"
-  else
-    # For other markdown files, remove the entire version block
-    sed -i '/^```$/,/^```$/d' "$file"
-    # Clean up multiple newlines after removal
-    sed -i ':a;N;$!ba;s/\n\n\n\n/\n\n/g' "$file"
-  fi
-  
-  echo "Updated $file"
-done
-
-echo "Completed updating Markdown files"
+# Forward to new script
+./util/maintenance/headers/update-md-headers.sh "$@"

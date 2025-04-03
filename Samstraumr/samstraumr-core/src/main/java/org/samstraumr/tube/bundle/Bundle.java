@@ -1,5 +1,7 @@
 package org.samstraumr.tube.bundle;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -142,8 +144,44 @@ public class Bundle {
    * @deprecated Use {@link org.samstraumr.tube.composite.Composite#getEventLog()} instead.
    */
   @Deprecated
-  public List<?> getEventLog() {
-    return delegate.getEventLog();
+  public List<BundleEvent> getEventLog() {
+    List<org.samstraumr.tube.composite.Composite.CompositeEvent> compositeEvents = delegate.getEventLog();
+    List<BundleEvent> bundleEvents = new ArrayList<>();
+    
+    for (org.samstraumr.tube.composite.Composite.CompositeEvent event : compositeEvents) {
+      bundleEvents.add(new BundleEvent(event.getDescription(), event.getTimestamp()));
+    }
+    
+    return Collections.unmodifiableList(bundleEvents);
+  }
+  
+  /**
+   * BundleEvent proxy class for backward compatibility.
+   *
+   * @deprecated Use {@link org.samstraumr.tube.composite.Composite.CompositeEvent} instead.
+   */
+  @Deprecated
+  public static class BundleEvent {
+    private final String description;
+    private final long timestamp;
+    
+    public BundleEvent(String description, long timestamp) {
+      this.description = description;
+      this.timestamp = timestamp;
+    }
+    
+    public String getDescription() {
+      return description;
+    }
+    
+    public long getTimestamp() {
+      return timestamp;
+    }
+    
+    @Override
+    public String toString() {
+      return timestamp + ": " + description;
+    }
   }
 
   /**
@@ -228,8 +266,43 @@ public class Bundle {
    * @deprecated Use {@link org.samstraumr.tube.composite.Composite#getCircuitBreakers()} instead.
    */
   @Deprecated
-  public Map<String, ?> getCircuitBreakers() {
+  public Map<String, org.samstraumr.tube.composite.Composite.CircuitBreaker> getCircuitBreakers() {
     return delegate.getCircuitBreakers();
+  }
+  
+  /**
+   * CircuitBreaker proxy class for backward compatibility.
+   *
+   * @deprecated Use {@link org.samstraumr.tube.composite.Composite.CircuitBreaker} instead.
+   */
+  @Deprecated
+  public static class CircuitBreaker {
+    private final org.samstraumr.tube.composite.Composite.CircuitBreaker delegate;
+    
+    public CircuitBreaker(String tubeName, int failureThreshold, long resetTimeoutMs) {
+      this.delegate = new org.samstraumr.tube.composite.Composite.CircuitBreaker(
+          tubeName, failureThreshold, resetTimeoutMs);
+    }
+    
+    public void recordFailure() {
+      delegate.recordFailure();
+    }
+    
+    public void reset() {
+      delegate.reset();
+    }
+    
+    public boolean isOpen() {
+      return delegate.isOpen();
+    }
+    
+    public String getTubeName() {
+      return delegate.getTubeName();
+    }
+    
+    public int getFailureCount() {
+      return delegate.getFailureCount();
+    }
   }
 
   /**
