@@ -1,20 +1,18 @@
-/*
-Filename: tube-initialization-test.feature
-Purpose: Validates initialization, uniqueness, and logging capabilities of atomic Tube instances.
-Goals:
-  - Ensure that tubes initialize with unique identifiers
-  - Ensure that environment details are properly captured and logged
-  - Ensure that tubes maintain isolation and proper error handling
-Dependencies:
-  - BDD step definitions in org.samstraumr.tube.steps package
-  - Tube and Environment implementations in org.samstraumr.tube
-Assumptions:
-  - Test environment provides stable resource conditions
-  - Cucumber test runner is properly configured
-  - Test tags (@ATL, @L0_Tube, etc.) are consistent with the test ontology
-*/
+# Filename: tube-initialization-test.feature
+# Purpose: Validates initialization, uniqueness, and logging capabilities of atomic Tube instances.
+# Goals:
+#   - Ensure that tubes initialize with unique identifiers
+#   - Ensure that environment details are properly captured and logged
+#   - Ensure that tubes maintain isolation and proper error handling
+# Dependencies:
+#   - BDD step definitions in org.samstraumr.tube.steps package
+#   - Tube and Environment implementations in org.samstraumr.tube
+# Assumptions:
+#   - Test environment provides stable resource conditions
+#   - Cucumber test runner is properly configured
+#   - Test tags (@ATL, @L0_Tube, etc.) are consistent with the test ontology
 
-@ATL @L0_Tube
+@ATL @L0_Tube @Implemented @FixedTests
 Feature: Tube Initialization and Logging
   # This feature verifies that the atomic base tube (Tube.java) initializes correctly, ensuring that it operates
   # within its assigned environment, generates a unique identity (UUID), logs relevant details, and remains self-contained.

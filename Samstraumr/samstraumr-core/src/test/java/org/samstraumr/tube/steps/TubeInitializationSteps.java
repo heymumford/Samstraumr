@@ -1,4 +1,6 @@
 
+package org.samstraumr.tube.steps;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
@@ -18,8 +20,9 @@ import org.slf4j.LoggerFactory;
 import io.cucumber.java.en.*;
 
 /**
- * Step definitions for L0_Tube initialization tests. These steps validate the proper
- * initialization, identity management, and self-awareness capabilities of atomic Tubes.
+ * Step definitions for L0_Tube initialization tests from tube-initialization-test.feature.
+ * These steps validate the proper initialization, identity management, and self-awareness 
+ * capabilities of atomic Tubes.
  *
  * <p>Related tags: - @L0_Tube - Level 0 atomic tube component tests - @Init - Initialization phase
  * tests - @Identity - Identity management tests - @Awareness - Self-monitoring and environment
@@ -273,32 +276,38 @@ public class TubeInitializationSteps {
     // For this test implementation, we'll just simulate the condition change
     logger.info("Environment changed to: {}", newState);
 
-    // For this test implementation, we'll assume the tube will detect this
-    // In a real implementation, we would need to trigger environment changes
-
-    // Force the tube to check its environment (simulated)
+    // Update the environment state in the tube
     if (testTube != null) {
-      // Simulate logging the environment change
-      // This would usually be done by the Tube internally
-      testTube.queryMimirLog(); // Just to ensure tube is active
+      testTube.updateEnvironmentState(newState);
+      logger.info("Notified tube of environment state change to: {}", newState);
+    } else {
+      logger.error("Cannot update environment state - tube is null");
+      fail("Test tube is null, cannot update environment state");
     }
   }
 
   @Then("the Tube should log {string} in the Tube log")
   public void the_tube_should_log_in_the_tube_log(String expectedLogMessage) {
-    // For now, since our implementation doesn't actively monitor environment changes,
-    // we'll implement a simplified check
-
     assertNotNull(testTube, "Tube should be initialized");
 
-    // In a full implementation, the tube would detect the change and log it
-    // For now, we'll do a basic test that verifies the tube can be queried
+    // Get the log entries
     List<String> mimirLog = testTube.queryMimirLog();
     assertNotNull(mimirLog, "The log should not be null");
-
-    // Since we don't have the actual implementation of environment monitoring,
-    // we'll just verify the tube is logging correctly in general
     assertFalse(mimirLog.isEmpty(), "Log should not be empty");
+
+    // Check if any log entry contains the expected message
+    boolean foundExpectedLog = false;
+    for (String logEntry : mimirLog) {
+      if (logEntry.contains(expectedLogMessage)) {
+        foundExpectedLog = true;
+        break;
+      }
+    }
+
+    assertTrue(foundExpectedLog, 
+        "Expected log message '" + expectedLogMessage + "' not found in log: " + String.join("\n", mimirLog));
+    
+    logger.info("Successfully verified log message: {}", expectedLogMessage);
   }
 
   @Then("the Tube should remain operational while logging resource adjustments")

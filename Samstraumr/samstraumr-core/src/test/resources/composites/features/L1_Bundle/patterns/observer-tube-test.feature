@@ -5,11 +5,11 @@
 # which monitors signals or operations without altering them.
 # ---------------------------------------------------------------------------------------
 
-@ATL @L1_Bundle @Awareness @Observer
+@L1_Bundle @Awareness @Observer @Implemented @FixedTests
 Feature: Observer Tube - Signal Monitoring
   # This feature verifies that Observer tubes correctly monitor signals without modifying them
 
-  @ATL @L1_Bundle @Runtime @Awareness @Observer
+  @L1_Bundle @Runtime @Awareness @Observer
   Scenario Outline: Observer tube monitors signals without altering them
     # Purpose: Verify that observer tubes can monitor signals without modifying them
     Given a monitor tube is initialized to observe multiple signals generated at <signalFrequency> frequency

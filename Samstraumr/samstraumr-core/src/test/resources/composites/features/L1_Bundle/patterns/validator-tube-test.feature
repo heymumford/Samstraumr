@@ -5,11 +5,11 @@
 # which validates input data according to predefined rules.
 # ---------------------------------------------------------------------------------------
 
-@ATL @L1_Bundle @Flow @Validator
+@L1_Bundle @Flow @Validator @Implemented @FixedTests
 Feature: Validator Tube - Input Validation and Routing
   # This feature verifies that Validator tubes correctly validate input data against rules
 
-  @ATL @L1_Bundle @Init @Flow @Validator
+  @L1_Bundle @Init @Flow @Validator
   Scenario Outline: Validator tube validates inputs and routes them based on predefined rules
     # Purpose: Verify that validator tubes correctly validate data against predefined rules
     Given a connector tube is initialized and raw input data <inputData> is provided to the system

@@ -34,7 +34,8 @@ public class BundleFactory {
   public static Bundle createBundle(Environment environment) {
     LOGGER.warn("BundleFactory is deprecated. Use CompositeFactory instead.");
     Composite composite = CompositeFactory.createComposite(environment);
-    return new Bundle(composite.getCompositeId(), environment);
+    Bundle bundle = new Bundle(composite.getCompositeId(), environment);
+    return bundle;
   }
 
   /**
@@ -49,7 +50,8 @@ public class BundleFactory {
   public static Bundle createBundle(String bundleId, Environment environment) {
     LOGGER.warn("BundleFactory is deprecated. Use CompositeFactory instead.");
     Composite composite = CompositeFactory.createComposite(bundleId, environment);
-    return new Bundle(bundleId, environment);
+    Bundle bundle = new Bundle(bundleId, environment);
+    return bundle;
   }
 
   /**
@@ -62,8 +64,20 @@ public class BundleFactory {
   @Deprecated
   public static Bundle createTransformationBundle(Environment environment) {
     LOGGER.warn("BundleFactory is deprecated. Use CompositeFactory instead.");
-    Composite composite = CompositeFactory.createTransformationComposite(environment);
-    return new Bundle(composite.getCompositeId(), environment);
+    
+    // Create a new Bundle directly with the transformation structure
+    Bundle bundle = new Bundle("transformation-" + System.currentTimeMillis(), environment);
+    
+    // Add tubes
+    bundle.createTube("source", "Source Tube")
+          .createTube("transformer", "Transformer Tube")
+          .createTube("sink", "Sink Tube");
+    
+    // Connect tubes
+    bundle.connect("source", "transformer").connect("transformer", "sink");
+    
+    LOGGER.info("Created transformation bundle: {}", bundle.getBundleId());
+    return bundle;
   }
 
   /**
@@ -76,8 +90,23 @@ public class BundleFactory {
   @Deprecated
   public static Bundle createValidationBundle(Environment environment) {
     LOGGER.warn("BundleFactory is deprecated. Use CompositeFactory instead.");
-    Composite composite = CompositeFactory.createValidationComposite(environment);
-    return new Bundle(composite.getCompositeId(), environment);
+    
+    // Create a new Bundle directly with the validation structure
+    Bundle bundle = new Bundle("validation-" + System.currentTimeMillis(), environment);
+    
+    // Add tubes
+    bundle.createTube("processor", "Processor Tube")
+          .createTube("validator", "Validator Tube")
+          .createTube("output", "Output Tube");
+    
+    // Connect tubes
+    bundle.connect("processor", "validator").connect("validator", "output");
+    
+    // Enable circuit breaker on validator
+    bundle.enableCircuitBreaker("validator", 3, 5000);
+    
+    LOGGER.info("Created validation bundle: {}", bundle.getBundleId());
+    return bundle;
   }
 
   /**
@@ -90,8 +119,31 @@ public class BundleFactory {
   @Deprecated
   public static Bundle createProcessingBundle(Environment environment) {
     LOGGER.warn("BundleFactory is deprecated. Use CompositeFactory instead.");
-    Composite composite = CompositeFactory.createProcessingComposite(environment);
-    return new Bundle(composite.getCompositeId(), environment);
+    
+    // Create a new Bundle directly with the processing structure
+    Bundle bundle = new Bundle("processing-" + System.currentTimeMillis(), environment);
+    
+    // Add tubes
+    bundle.createTube("input", "Input Tube")
+          .createTube("parser", "Parser Tube")
+          .createTube("validator", "Validator Tube")
+          .createTube("processor", "Processor Tube")
+          .createTube("formatter", "Formatter Tube")
+          .createTube("output", "Output Tube");
+    
+    // Connect tubes in sequence
+    bundle.connect("input", "parser")
+          .connect("parser", "validator")
+          .connect("validator", "processor")
+          .connect("processor", "formatter")
+          .connect("formatter", "output");
+    
+    // Enable circuit breakers
+    bundle.enableCircuitBreaker("parser", 2, 10000)
+          .enableCircuitBreaker("processor", 3, 15000);
+    
+    LOGGER.info("Created standard processing bundle: {}", bundle.getBundleId());
+    return bundle;
   }
 
   /**
@@ -104,8 +156,28 @@ public class BundleFactory {
   @Deprecated
   public static Bundle createObserverBundle(Environment environment) {
     LOGGER.warn("BundleFactory is deprecated. Use CompositeFactory instead.");
-    Composite composite = CompositeFactory.createObserverComposite(environment);
-    return new Bundle(composite.getCompositeId(), environment);
+    
+    // Create a new Bundle directly with the observer structure
+    Bundle bundle = new Bundle("observer-" + System.currentTimeMillis(), environment);
+    
+    // Add tubes
+    bundle.createTube("source", "Source Tube")
+          .createTube("observer", "Observer Tube")
+          .createTube("output", "Output Tube");
+    
+    // Connect tubes - observer is connected to source to monitor signals
+    bundle.connect("source", "observer").connect("observer", "output");
+    
+    // Configure observer tube to just pass through data (monitoring only)
+    bundle.addTransformer("observer", data -> {
+        // Observer pattern just logs the data without modifying it
+        LOGGER.info("Observer tube observed: {}", data);
+        bundle.logEvent("Observer observed data: " + data);
+        return data;
+    });
+    
+    LOGGER.info("Created observer bundle: {}", bundle.getBundleId());
+    return bundle;
   }
 
   /**

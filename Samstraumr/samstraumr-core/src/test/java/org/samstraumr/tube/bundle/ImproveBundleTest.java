@@ -17,7 +17,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.samstraumr.tube.Environment;
-import org.samstraumr.tube.annotations.BundleTest;
+import org.samstraumr.tube.composite.Composite;
+import org.samstraumr.tube.test.annotations.BundleTest;
 
 /**
  * Bundle Tests focus on connected tubes forming bundles. These tests verify component interactions
@@ -35,9 +36,9 @@ public class ImproveBundleTest {
 
   @BeforeEach
   void setUp() {
-    // Configure mock environment
-    when(mockEnvironment.getParameters()).thenReturn("{\"hostname\":\"bundle-test-host\"}");
-    when(mockEnvironment.getEnvironmentHash()).thenReturn("bundle-test-hash");
+    // Configure mock environment using lenient() to avoid unused stubbing issues
+    lenient().when(mockEnvironment.getParameters()).thenReturn("{\"hostname\":\"bundle-test-host\"}");
+    lenient().when(mockEnvironment.getEnvironmentHash()).thenReturn("bundle-test-hash");
 
     // Create bundle for testing
     bundle = new Bundle(BUNDLE_ID, mockEnvironment);
@@ -204,9 +205,12 @@ public class ImproveBundleTest {
     bundle.process("processor", "fail1");
     bundle.process("processor", "fail2");
 
-    // Then - Circuit should be open
-    Map<String, Bundle.CircuitBreaker> breakers = bundle.getCircuitBreakers();
-    assertTrue(breakers.get("processor").isOpen());
+    // Then - Get the delegate composite circuit breakers
+    Map<String, Composite.CircuitBreaker> circuitBreakers = bundle.getCircuitBreakers();
+    
+    // Verify the circuit breaker is open
+    Composite.CircuitBreaker processorBreaker = circuitBreakers.get("processor");
+    assertTrue(processorBreaker.isOpen());
 
     // When - Try processing valid data with open circuit
     Optional<String> rejectedResult = bundle.process("processor", "should be rejected");
@@ -215,11 +219,10 @@ public class ImproveBundleTest {
     assertFalse(rejectedResult.isPresent());
 
     // When - Wait for circuit breaker to reset (mock reset by directly resetting)
-    Bundle.CircuitBreaker breaker = breakers.get("processor");
-    breaker.reset();
+    processorBreaker.reset();
 
     // Then - Circuit should be closed
-    assertFalse(breaker.isOpen());
+    assertFalse(processorBreaker.isOpen());
 
     // When - Process again after reset
     Optional<String> afterResetResult = bundle.process("processor", "after reset");

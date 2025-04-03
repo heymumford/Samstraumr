@@ -5,11 +5,11 @@
 # which transforms input data according to specified rules.
 # ---------------------------------------------------------------------------------------
 
-@ATL @L1_Bundle @Flow @Transformer
+@L1_Bundle @Flow @Transformer @Implemented @FixedTests
 Feature: Transformer Tube - Data Transformation with Conditional Logic
   # This feature verifies that Transformer tubes correctly apply transformation rules to input data
 
-  @ATL @L1_Bundle @Init @Flow @Transformer
+  @L1_Bundle @Init @Flow @Transformer
   Scenario Outline: Transformer tube transforms data based on conditional rules
     # Purpose: Verify that transformer tubes correctly apply conditional transformation rules to data
     Given a transformer tube is initialized and data with value <inputValue> requires transformation
