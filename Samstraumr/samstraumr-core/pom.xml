@@ -22,7 +22,7 @@
     <oshi.version>6.4.7</oshi.version>
     <testcontainers.version>1.19.3</testcontainers.version>
     <mockito.version>5.8.0</mockito.version>
-    <junit.platform.version>1.10.2</junit.platform.version>
+    <junit.platform.version>1.12.1</junit.platform.version>
   </properties>
   
   <dependencies>
