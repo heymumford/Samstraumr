@@ -66,8 +66,8 @@ sed -i "s/<samstraumr.version>$CURRENT_VERSION<\/samstraumr.version>/<samstraumr
 
 print_success "Updated POM files"
 
-# Update README.md version
-sed -i "s/Version: [0-9.]\+/Version: $NEW_VERSION/g" README.md
+# Update README.md version - match any version format, including non-numeric
+sed -i "s/Version: .*/Version: $NEW_VERSION/g" README.md
 print_success "Updated README.md"
 
 print_header "Version Update Complete"
