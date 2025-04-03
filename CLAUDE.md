@@ -112,6 +112,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Badge management:
   - Generate all badges: `./util/badges/generate-badges.sh all`
   - Generate specific badge: `./util/badges/generate-badges.sh build`
+- Build Reports:
+  - Generate comprehensive build report: `./util/build/generate-build-report.sh`
+  - Skip tests during report generation: `./util/build/generate-build-report.sh --skip-tests`
+  - Skip quality checks during report generation: `./util/build/generate-build-report.sh --skip-quality`
+  - Specify custom output directory: `./util/build/generate-build-report.sh --output /path/to/output`
+  - Build report documentation: See `docs/contribution/build-report-guide.md`
 
 ## Code Style Guidelines
 - **Imports**: Specific imports (no wildcards). Standard Java first, then third-party, then project imports.

@@ -38,6 +38,9 @@
     <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
     <checkstyle.version>10.14.0</checkstyle.version>
     <spotless.google.format.version>1.17.0</spotless.google.format.version>
+    <maven.site.plugin.version>3.12.1</maven.site.plugin.version>
+    <maven.project.info.reports.plugin.version>3.4.5</maven.project.info.reports.plugin.version>
+    <cucumber.reporting.version>5.7.5</cucumber.reporting.version>
   </properties>
   
   <build>
@@ -225,6 +228,92 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    
+    <!-- Build Report Profile -->
+    <profile>
+      <id>build-report</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-site-plugin</artifactId>
+            <version>${maven.site.plugin.version}</version>
+            <configuration>
+              <locales>en</locales>
+              <generateReports>true</generateReports>
+              <generateSitemap>true</generateSitemap>
+              <relativizeDecorationLinks>false</relativizeDecorationLinks>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+      <reporting>
+        <outputDirectory>${project.build.directory}/samstraumr-report</outputDirectory>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-project-info-reports-plugin</artifactId>
+            <version>${maven.project.info.reports.plugin.version}</version>
+            <configuration>
+              <dependencyDetailsEnabled>true</dependencyDetailsEnabled>
+              <dependencyLocationsEnabled>true</dependencyLocationsEnabled>
+            </configuration>
+            <reportSets>
+              <reportSet>
+                <reports>
+                  <report>index</report>
+                  <report>summary</report>
+                  <report>team</report>
+                  <report>dependencies</report>
+                  <report>plugins</report>
+                </reports>
+              </reportSet>
+            </reportSets>
+          </plugin>
+          
+          <!-- Code Quality Reports -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <version>${checkstyle.plugin.version}</version>
+            <configuration>
+              <configLocation>Samstraumr/checkstyle.xml</configLocation>
+              <includeTestSourceDirectory>true</includeTestSourceDirectory>
+            </configuration>
+          </plugin>
+          
+          <plugin>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
+            <version>${spotbugs.plugin.version}</version>
+          </plugin>
+          
+          <!-- Test Coverage Reports -->
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco.plugin.version}</version>
+            <reportSets>
+              <reportSet>
+                <reports>
+                  <report>report</report>
+                </reports>
+              </reportSet>
+            </reportSets>
+          </plugin>
+          
+          <!-- Test Results Reports -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-report-plugin</artifactId>
+            <version>${maven.surefire.plugin.version}</version>
+            <configuration>
+              <linkXRef>true</linkXRef>
+            </configuration>
+          </plugin>
+        </plugins>
+      </reporting>
     </profile>
   </profiles>
 </project>

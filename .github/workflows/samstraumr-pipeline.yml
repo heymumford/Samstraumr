@@ -372,11 +372,55 @@ jobs:
             **/target/cucumber-reports/
           retention-days: 7
           
+  # Generate Build Report
+  build-report:
+    name: Generate Build Report
+    if: success() || failure()
+    needs: [get-version, orchestration-tests, btl-tests, quality-analysis]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for report generation
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Generate Build Report
+        run: |
+          chmod +x ./util/build/generate-build-report.sh
+          ./util/build/generate-build-report.sh --skip-tests --skip-quality
+
+      - name: Upload Build Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: samstraumr-build-report
+          path: target/samstraumr-report
+          retention-days: 14
+
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: target/samstraumr-report
+          branch: gh-pages
+          clean: true
+
   # Update workflow summary with version information
   workflow-summary:
     name: Workflow Summary
     if: always()
-    needs: [get-version, orchestration-tests, btl-tests, quality-analysis]
+    needs: [get-version, orchestration-tests, btl-tests, quality-analysis, build-report]
     runs-on: ubuntu-latest
     steps:
       - name: Add Version to Workflow Summary
@@ -384,3 +428,4 @@ jobs:
           echo "# Samstraumr v${{ needs.get-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Build completed for Samstraumr version ${{ needs.get-version.outputs.version }}." >> $GITHUB_STEP_SUMMARY
+          echo "Build Report available at: https://heymumford.github.io/Samstraumr/" >> $GITHUB_STEP_SUMMARY
