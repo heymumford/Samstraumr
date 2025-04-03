@@ -31,4 +31,5 @@ replay_pid*
 # Maven
 target/
 **/target/
+.mvn/
 
