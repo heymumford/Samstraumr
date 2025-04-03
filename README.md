@@ -5,7 +5,7 @@ Version: 0.6.0
 License: Mozilla Public License 2.0
 Maintainer: Eric C. Mumford (@heymumford)
 ```
-2
+
 ## Table of Contents
 
 - [Overview](#overview)
