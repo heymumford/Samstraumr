@@ -7,7 +7,8 @@ This directory contains utility scripts for the Samstraumr project. We have reor
 ### Root Level Scripts (Flattened Structure)
 
 #### Version Management
-- `version.sh` - Unified version management utility
+- `version` - Unified and consolidated version management utility (preferred)
+- `version.sh` - Legacy wrapper (deprecated)
 
 #### Build Scripts
 - `build-optimal.sh` - Optimized build script with thread and memory settings
@@ -23,7 +24,7 @@ This directory contains utility scripts for the Samstraumr project. We have reor
 #### Setup and Environment Scripts
 - `setup-java-env.sh` - Sets up Java environment variables
 - `setup-java17-compat.sh` - Java 17 compatibility script
-- `update-version-test.sh` - Updates version, runs tests, and creates git tag
+- `update-version-test.sh` - Updates version, runs tests, and creates git tag (deprecated)
 
 ### Utility Scripts
 
@@ -56,14 +57,15 @@ Scripts are now available directly from the util/ directory with consistent nami
 
 ```bash
 # From project root
-./util/version.sh bump patch                # Use the version utility 
+./util/version get                          # Show current version
+./util/version bump patch                   # Bump patch version
+./util/version test patch                   # Bump version, run tests, and tag
 ./util/test-run.sh tube                     # Run specific tests
 ./util/test-run-atl.sh                      # Run Above The Line tests
 ./util/test-run-all.sh --both unit          # Run unit and tube tests
 ./util/build-optimal.sh                     # Use optimized build
 ./util/build-performance.sh                 # Run performance-optimized build
 ./util/build-report.sh                      # Generate a build report
-./util/update-version-test.sh patch         # Update version, test, and tag
 
 # Helper scripts in scripts/ directory
 ./util/scripts/check-build-quality.sh       # Run all quality checks
@@ -86,42 +88,50 @@ util\build-performance.bat
 
 ## Version Management
 
-The version utility provides a unified interface for managing project versions:
+We have consolidated all version management into a single, unified script.
+See [VERSION_SCRIPTS.md](VERSION_SCRIPTS.md) for complete documentation.
 
 ```bash
 # Display current version information
-./util/version.sh get
+./util/version get
 
 # Bump the patch version (0.5.8 → 0.5.9)
-./util/version.sh bump patch
+./util/version bump patch
 
 # Bump the minor version (0.5.8 → 0.6.0)
-./util/version.sh bump minor
+./util/version bump minor
 
 # Bump the major version (0.5.8 → 1.0.0)
-./util/version.sh bump major
+./util/version bump major
 
 # Set a specific version
-./util/version.sh set 0.7.0
+./util/version set 0.7.0
+
+# Verify version and tag alignment
+./util/version verify
+
+# Fix missing tag for current version
+./util/version fix-tag
+
+# Bump version, run tests, commit and tag
+./util/version test patch
+
+# Run tests with options
+./util/version test minor --skip-tests --push
 
 # View version history
-./util/version.sh history
-
-# Update version without committing changes
-./util/version.sh bump patch --no-commit
-
-# Create git tag for the current version
-./util/version.sh tag
+./util/version history
 ```
 
 The utility will automatically:
 - Update all version numbers in properties files and POM files
 - Update version references in documentation
 - Update the "last updated" date
-- Create a Git commit with appropriate message (unless `--no-commit` is specified)
-- Optionally create a git tag for the version
+- Create a Git commit with appropriate message
+- Create a git tag matching the version number
+- Ensure version and git tag stay synchronized
 
-For more help, run `./util/version.sh --help`
+For more help, run `./util/version --help`
 
 ## Script Organization Guidelines
 

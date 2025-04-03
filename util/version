@@ -1,21 +1,36 @@
 #!/bin/bash
-# Samstraumr Version Manager
+# Samstraumr Version Manager (Consolidated)
 # A unified interface for managing project versions
+#
+# This script consolidates functionality from:
+# - util/version (main version management)
+# - util/version.sh (legacy wrapper)
+# - util/update-version-test.sh (version bump with testing)
+# - bin/update-version.sh (redirect script)
 #
 # Usage:
 #   ./util/version <command> [options]
 #
 # Commands:
 #   get                Show current version information
+#   export|echo        Output only the current version (for scripts and CI)
 #   bump major         Bump the major version (X.y.z → X+1.0.0)
 #   bump minor         Bump the minor version (x.Y.z → x.Y+1.0)
 #   bump patch         Bump the patch version (x.y.Z → x.y.Z+1)
 #   set x.y.z          Set a specific version number
+#   verify             Verify that version and tag are in sync
+#   fix-tag            Create a git tag matching the current version
+#   test               Bump version, run tests, then commit and tag
 #   history            Show version history
 #
 # Options:
 #   --no-commit        Don't automatically commit the version change
+#   --skip-tests       Skip running tests (for test command only)
+#   --skip-quality     Skip quality checks (for test command only)
+#   --push             Push changes to remote (for test command only)
 #   --help             Show this help message
+#
+# Note: Other version scripts are now deprecated and will be removed in future releases.
 
 set -e
 
@@ -65,10 +80,14 @@ show_usage() {
   echo "  set x.y.z          Set a specific version number"
   echo "  verify             Verify that version and tag are in sync"
   echo "  fix-tag            Create a git tag matching the current version"
+  echo "  test               Bump version, run tests, then commit and tag"
   echo "  history            Show version history"
   echo ""
   echo "Options:"
   echo "  --no-commit        Don't automatically commit the version change"
+  echo "  --skip-tests       Skip running tests (for test command only)"
+  echo "  --skip-quality     Skip quality checks (for test command only)"
+  echo "  --push             Push changes to remote (for test command only)"
   echo "  --help             Show this help message"
 }
 
@@ -393,6 +412,69 @@ Generated with Claude Code"
   fi
 }
 
+# Function to perform version bump with testing
+test_version_bump() {
+  local bump_type=$1
+  local skip_tests=$2
+  local skip_quality=$3
+  local push_changes=$4
+  
+  print_header "Version Bump with Testing"
+  
+  # Step 1: Calculate new version
+  local current_version=$(get_current_version)
+  local new_version=$(calculate_new_version "$bump_type")
+  
+  echo -e "Current version: ${YELLOW}$current_version${NC}"
+  echo -e "New version:     ${GREEN}$new_version${NC}"
+  
+  # Step 2: Bump the version without committing
+  update_version "$new_version"
+  
+  # Step 3: Run code formatting if not skipped
+  if [ "$skip_quality" = false ]; then
+    print_header "Running Code Formatting"
+    if command -v mvn &> /dev/null; then
+      mvn spotless:apply
+      print_success "Code formatting applied"
+    else
+      print_warning "Maven not available - skipping formatting"
+    fi
+  fi
+  
+  # Step 4: Run tests if not skipped
+  if [ "$skip_tests" = false ]; then
+    print_header "Running ATL Tests"
+    if [ -f "$PROJECT_ROOT/util/test-run-atl.sh" ]; then
+      "$PROJECT_ROOT/util/test-run-atl.sh"
+      print_success "All tests passed"
+    else
+      print_warning "Test script not found - skipping tests"
+    fi
+  fi
+  
+  # Step 5: Commit and tag
+  commit_version_changes "$new_version" "$bump_type"
+  
+  # Step 6: Push changes if requested
+  if [ "$push_changes" = true ]; then
+    print_header "Pushing Changes to Remote"
+    echo "Pushing commits and tags to remote repository..."
+    
+    # Push commits
+    git push
+    
+    # Push tag
+    git push origin "v$new_version"
+    
+    print_success "All changes and tags have been pushed to remote"
+  else
+    echo ""
+    echo "To push the changes and tag to the remote repository, run:"
+    echo -e "  ${YELLOW}git push && git push origin v$new_version${NC}"
+  fi
+}
+
 # Main command processing
 if [ $# -eq 0 ]; then
   show_usage
@@ -405,6 +487,9 @@ shift
 # Default options
 AUTO_COMMIT=true
 BUMP_TYPE=""
+SKIP_TESTS=false
+SKIP_QUALITY=false
+PUSH_CHANGES=false
 
 # First argument for "bump" command is the type, don't treat it as an option
 if [ "$COMMAND" = "bump" ] && [ $# -gt 0 ]; then
@@ -418,11 +503,33 @@ if [ "$COMMAND" = "set" ] && [ $# -gt 0 ]; then
   shift
 fi
 
+# First argument for "test" command is the bump type, don't treat it as an option
+if [ "$COMMAND" = "test" ] && [ $# -gt 0 ]; then
+  if [[ "$1" =~ ^(major|minor|patch)$ ]]; then
+    BUMP_TYPE=$1
+    shift
+  else
+    BUMP_TYPE="patch"  # Default to patch if not specified
+  fi
+fi
+
 # Process options
 while [ $# -gt 0 ]; do
   case "$1" in
     --no-commit)
       AUTO_COMMIT=false
+      shift
+      ;;
+    --skip-tests)
+      SKIP_TESTS=true
+      shift
+      ;;
+    --skip-quality)
+      SKIP_QUALITY=true
+      shift
+      ;;
+    --push)
+      PUSH_CHANGES=true
       shift
       ;;
     --help)
@@ -453,6 +560,19 @@ case "$COMMAND" in
   
   fix-tag)
     fix_version_tag_misalignment
+    ;;
+
+  test)
+    if [ -z "$BUMP_TYPE" ]; then
+      BUMP_TYPE="patch"  # Default to patch if not specified
+    fi
+    
+    if [[ ! "$BUMP_TYPE" =~ ^(major|minor|patch)$ ]]; then
+      print_error "Invalid bump type: $BUMP_TYPE. Must be major, minor, or patch."
+      exit 1
+    fi
+    
+    test_version_bump "$BUMP_TYPE" "$SKIP_TESTS" "$SKIP_QUALITY" "$PUSH_CHANGES"
     ;;
   
   bump)
