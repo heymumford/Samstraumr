@@ -13,33 +13,40 @@
   </modules>
 
   <properties>
-    <!-- Load version properties from central file -->
+    <!-- Version configuration - Import from file -->
     <version.file.path>${project.basedir}/version.properties</version.file.path>
-
+    
+    <!-- Project version - used until properties are loaded -->
+    <samstraumr.version>0.4</samstraumr.version>
+    
     <!-- Core properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
+    
+    <!-- Test configuration -->
+    <atl.test.tags>@ATL</atl.test.tags>
+    <btl.test.tags>@BTL</btl.test.tags>
+    <all.test.tags>@ATL or @BTL</all.test.tags>
+    <skip.quality.checks>false</skip.quality.checks>
+    
+    <!-- Maven plugin versions -->
     <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
     <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
-
-    <!-- Added plugin versions for quality checks -->
+    <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
+    <properties.plugin.version>1.2.0</properties.plugin.version>
+    
+    <!-- Quality check plugin versions -->
     <spotless.plugin.version>2.40.0</spotless.plugin.version>
     <pmd.plugin.version>3.20.0</pmd.plugin.version>
     <checkstyle.plugin.version>3.3.1</checkstyle.plugin.version>
     <spotbugs.plugin.version>4.8.2.0</spotbugs.plugin.version>
     <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
+    
+    <!-- Quality tool versions -->
     <pmd.version>6.55.0</pmd.version>
     <checkstyle.version>10.14.0</checkstyle.version>
-
-    <!-- Maven resources plugin for filtering -->
-    <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
-
-    <!-- Test configuration properties -->
-    <atl.test.tags>@ATL</atl.test.tags>
-    <btl.test.tags>@BTL</btl.test.tags>
-    <all.test.tags>@ATL or @BTL</all.test.tags>
-    <skip.quality.checks>false</skip.quality.checks>
+    <spotless.google.format.version>1.17.0</spotless.google.format.version>
   </properties>
 
   <build>
@@ -49,7 +56,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>properties-maven-plugin</artifactId>
-          <version>1.2.0</version>
+          <version>${properties.plugin.version}</version>
           <executions>
             <execution>
               <goals>
@@ -113,7 +120,7 @@
               </importOrder>
               <removeUnusedImports/>
               <googleJavaFormat>
-                <version>1.17.0</version>
+                <version>${spotless.google.format.version}</version>
                 <style>GOOGLE</style>
               </googleJavaFormat>
               <trimTrailingWhitespace/>
@@ -170,7 +177,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pmd-plugin</artifactId>
-          <version>3.20.0</version>
+          <version>${pmd.plugin.version}</version>
           <configuration>
             <failOnViolation>true</failOnViolation>
             <printFailingErrors>true</printFailingErrors>
@@ -178,7 +185,7 @@
             <analysisCache>true</analysisCache>
             <includeTests>true</includeTests>
             <sourceEncoding>UTF-8</sourceEncoding>
-            <targetJdk>17</targetJdk>
+            <targetJdk>${maven.compiler.target}</targetJdk>
             <rulesets>
               <ruleset>/category/java/bestpractices.xml/UnusedPrivateMethod</ruleset>
               <ruleset>/category/java/errorprone.xml/EmptyCatchBlock</ruleset>
@@ -188,12 +195,12 @@
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-core</artifactId>
-              <version>6.55.0</version>
+              <version>${pmd.version}</version>
             </dependency>
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-java</artifactId>
-              <version>6.55.0</version>
+              <version>${pmd.version}</version>
             </dependency>
           </dependencies>
           <executions>

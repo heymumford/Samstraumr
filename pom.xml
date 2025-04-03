@@ -18,25 +18,38 @@
   <properties>
     <!-- Version configuration - Import from the modules directory -->
     <version.file.path>${project.basedir}/Samstraumr/version.properties</version.file.path>
+    
+    <!-- Project version - used until properties are loaded -->
+    <samstraumr.version>0.4</samstraumr.version>
 
     <!-- Core properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+    
+    <!-- Test configuration -->
     <all.test.tags>@ATL or @BTL</all.test.tags>
     <atl.test.tags>@ATL</atl.test.tags>
     <btl.test.tags>@BTL</btl.test.tags>
     <skip.quality.checks>false</skip.quality.checks>
 
+    <!-- Maven plugin versions -->
+    <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
+    <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
+    <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
+    <properties.plugin.version>1.2.0</properties.plugin.version>
+    
     <!-- Quality check plugin versions -->
     <spotless.plugin.version>2.40.0</spotless.plugin.version>
-    <pmd.plugin.version>3.21.0</pmd.plugin.version>
+    <pmd.plugin.version>3.20.0</pmd.plugin.version>
     <checkstyle.plugin.version>3.3.1</checkstyle.plugin.version>
     <spotbugs.plugin.version>4.8.2.0</spotbugs.plugin.version>
     <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
+    
+    <!-- Quality tool versions -->
     <pmd.version>6.55.0</pmd.version>
     <checkstyle.version>10.14.0</checkstyle.version>
-
-    <!-- Maven resources plugin for filtering -->
-    <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
+    <spotless.google.format.version>1.17.0</spotless.google.format.version>
   </properties>
 
   <build>
@@ -57,7 +70,7 @@
               </importOrder>
               <removeUnusedImports/>
               <googleJavaFormat>
-                <version>1.17.0</version>
+                <version>${spotless.google.format.version}</version>
                 <style>GOOGLE</style>
               </googleJavaFormat>
               <trimTrailingWhitespace/>
@@ -106,7 +119,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>properties-maven-plugin</artifactId>
-        <version>1.2.0</version>
+        <version>${properties.plugin.version}</version>
         <executions>
           <execution>
             <goals>
@@ -130,7 +143,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>3.3.1</version>
+        <version>${maven.resources.plugin.version}</version>
         <configuration>
           <encoding>UTF-8</encoding>
           <resources>
