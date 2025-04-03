@@ -17,10 +17,16 @@ echo -e "${YELLOW}Running Above The Line (ATL) tests...${NC}"
 echo ""
 
 # Set Maven options for faster builds and integrate JAVA_TOOL_OPTIONS
-source "$(dirname "$0")/../build/java-env-setup.sh"
+source "$(dirname "$0")/setup-java-env.sh"
 
 # Add additional Maven options for faster builds
 export MAVEN_OPTS="$MAVEN_OPTS -XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+
+# Apply Spotless formatting first to ensure code format is correct
+echo -e "${YELLOW}Running code formatting with Spotless...${NC}"
+mvn spotless:apply -q || {
+    echo -e "${RED}Warning: Spotless formatting failed, proceeding with build anyway${NC}"
+}
 
 # Clean and install without running tests first
 echo -e "${YELLOW}Building project without tests...${NC}"
