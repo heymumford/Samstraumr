@@ -25,8 +25,8 @@ public class TubeLogger {
   }
 
   /**
-   * Logs a message with the specified level, context, and tags.
-   * This method provides structured logging capabilities with additional context.
+   * Logs a message with the specified level, context, and tags. This method provides structured
+   * logging capabilities with additional context.
    *
    * @param level the log level ("debug", "info", "warn", "error")
    * @param message the message to log

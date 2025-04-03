@@ -172,8 +172,8 @@ public class Tube {
   }
 
   /**
-   * Logs an entry to the Mimir log with timestamp.
-   * This internal log allows the tube to maintain state information and debug data.
+   * Logs an entry to the Mimir log with timestamp. This internal log allows the tube to maintain
+   * state information and debug data.
    *
    * @param logEntry the entry to log
    */
@@ -182,7 +182,7 @@ public class Tube {
       LOGGER.warn("Attempted to log empty or null entry to Mimir log");
       return;
     }
-    
+
     String timestampedEntry = Instant.now().toString() + ": " + logEntry;
     mimirLog.add(timestampedEntry);
     LOGGER.trace("Mimir Log: {}", timestampedEntry);
@@ -200,7 +200,7 @@ public class Tube {
       logToMimir("Added to lineage: " + reason);
     }
   }
-  
+
   /**
    * Updates the tube's awareness of environmental state changes.
    *
@@ -209,7 +209,7 @@ public class Tube {
   public void updateEnvironmentState(String newState) {
     LOGGER.debug("Environment state changing from {} to {}", environmentState, newState);
     this.environmentState = newState;
-    
+
     // Log appropriate messages based on state
     if ("low memory".equals(newState)) {
       logToMimir("Memory critically low");
