@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  * allow data to flow between tubes in a directed manner.
  */
 public class Bundle {
-  private static final Logger logger = LoggerFactory.getLogger(Bundle.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Bundle.class);
 
   private final String bundleId;
   private final Map<String, Tube> tubes;
@@ -44,7 +44,7 @@ public class Bundle {
     this.active = new AtomicBoolean(true);
 
     logEvent("Bundle initialized: " + bundleId);
-    logger.info("Bundle {} initialized", bundleId);
+    LOGGER.info("Bundle {} initialized", bundleId);
   }
 
   /**
@@ -56,7 +56,7 @@ public class Bundle {
    */
   public Bundle addTube(String name, Tube tube) {
     if (tubes.containsKey(name)) {
-      logger.warn("Replacing existing tube with name: {}", name);
+      LOGGER.warn("Replacing existing tube with name: {}", name);
     }
 
     tubes.put(name, tube);
@@ -91,7 +91,7 @@ public class Bundle {
     connections.computeIfAbsent(sourceName, k -> new ArrayList<>()).add(targetName);
 
     logEvent(String.format("Connected tubes: %s -> %s", sourceName, targetName));
-    logger.debug("Connected tubes in bundle {}: {} -> {}", bundleId, sourceName, targetName);
+    LOGGER.debug("Connected tubes in bundle {}: {} -> {}", bundleId, sourceName, targetName);
     return this;
   }
 
@@ -152,7 +152,7 @@ public class Bundle {
     validateTubeExists(entryPoint);
 
     if (!active.get()) {
-      logger.warn("Cannot process data: Bundle {} is not active", bundleId);
+      LOGGER.warn("Cannot process data: Bundle {} is not active", bundleId);
       return Optional.empty();
     }
 
@@ -162,7 +162,7 @@ public class Bundle {
     try {
       return processInternal(entryPoint, bundleData);
     } catch (Exception e) {
-      logger.error("Error processing data through bundle {}: {}", bundleId, e.getMessage(), e);
+      LOGGER.error("Error processing data through bundle {}: {}", bundleId, e.getMessage(), e);
       logEvent("Processing error: " + e.getMessage());
       return Optional.empty();
     }
@@ -228,7 +228,7 @@ public class Bundle {
       }
 
       logEvent("Error in tube " + tubeName + ": " + e.getMessage());
-      logger.error("Error in tube {}: {}", tubeName, e.getMessage(), e);
+      LOGGER.error("Error in tube {}: {}", tubeName, e.getMessage(), e);
       return Optional.empty();
     }
   }
@@ -255,7 +255,7 @@ public class Bundle {
   public void deactivate() {
     if (active.compareAndSet(true, false)) {
       logEvent("Bundle deactivated: " + bundleId);
-      logger.info("Bundle {} deactivated", bundleId);
+      LOGGER.info("Bundle {} deactivated", bundleId);
     }
   }
 
@@ -263,7 +263,7 @@ public class Bundle {
   public void activate() {
     if (active.compareAndSet(false, true)) {
       logEvent("Bundle activated: " + bundleId);
-      logger.info("Bundle {} activated", bundleId);
+      LOGGER.info("Bundle {} activated", bundleId);
     }
   }
 
@@ -322,7 +322,7 @@ public class Bundle {
   public void logEvent(String description) {
     BundleEvent event = new BundleEvent(description);
     eventLog.add(event);
-    logger.debug("Bundle event: {}", description);
+    LOGGER.debug("Bundle event: {}", description);
   }
 
   /** Wrapper class for data flowing through the bundle. */
@@ -401,21 +401,21 @@ public class Bundle {
 
       if (failureCount >= failureThreshold) {
         open.set(true);
-        logger.warn("Circuit breaker opened for tube {}: Failure threshold reached", tubeName);
+        LOGGER.warn("Circuit breaker opened for tube {}: Failure threshold reached", tubeName);
       }
     }
 
     public synchronized void reset() {
       failureCount = 0;
       open.set(false);
-      logger.info("Circuit breaker reset for tube {}", tubeName);
+      LOGGER.info("Circuit breaker reset for tube {}", tubeName);
     }
 
     public synchronized boolean isOpen() {
       if (open.get()) {
         // Check if reset timeout has elapsed
         if (System.currentTimeMillis() - lastFailureTime > resetTimeoutMs) {
-          logger.info("Circuit breaker for tube {} entering half-open state", tubeName);
+          LOGGER.info("Circuit breaker for tube {} entering half-open state", tubeName);
           open.set(false); // Move to half-open state
           return false;
         }

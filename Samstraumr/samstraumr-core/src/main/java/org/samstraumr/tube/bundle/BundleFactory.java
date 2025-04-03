@@ -14,8 +14,8 @@ import org.slf4j.LoggerFactory;
  * patterns.
  */
 public class BundleFactory {
-  private static final Logger logger = LoggerFactory.getLogger(BundleFactory.class);
-  private static final Map<String, Bundle> bundleRegistry = new ConcurrentHashMap<>();
+  private static final Logger LOGGER = LoggerFactory.getLogger(BundleFactory.class);
+  private static final Map<String, Bundle> BUNDLE_REGISTRY = new ConcurrentHashMap<>();
 
   private BundleFactory() {
     // Private constructor to prevent instantiation
@@ -41,8 +41,8 @@ public class BundleFactory {
    */
   public static Bundle createBundle(String bundleId, Environment environment) {
     Bundle bundle = new Bundle(bundleId, environment);
-    bundleRegistry.put(bundleId, bundle);
-    logger.info("Created and registered bundle: {}", bundleId);
+    BUNDLE_REGISTRY.put(bundleId, bundle);
+    LOGGER.info("Created and registered bundle: {}", bundleId);
     return bundle;
   }
 
@@ -64,7 +64,7 @@ public class BundleFactory {
     // Connect tubes
     bundle.connect("source", "transformer").connect("transformer", "sink");
 
-    logger.info("Created transformation bundle: {}", bundle.getBundleId());
+    LOGGER.info("Created transformation bundle: {}", bundle.getBundleId());
     return bundle;
   }
 
@@ -89,7 +89,7 @@ public class BundleFactory {
     // Enable circuit breaker on validator
     bundle.enableCircuitBreaker("validator", 3, 5000);
 
-    logger.info("Created validation bundle: {}", bundle.getBundleId());
+    LOGGER.info("Created validation bundle: {}", bundle.getBundleId());
     return bundle;
   }
 
@@ -122,7 +122,7 @@ public class BundleFactory {
     // Enable circuit breakers
     bundle.enableCircuitBreaker("parser", 2, 10000).enableCircuitBreaker("processor", 3, 15000);
 
-    logger.info("Created standard processing bundle: {}", bundle.getBundleId());
+    LOGGER.info("Created standard processing bundle: {}", bundle.getBundleId());
     return bundle;
   }
 
@@ -149,13 +149,13 @@ public class BundleFactory {
         "observer",
         data -> {
           // Observer pattern just logs the data without modifying it
-          logger.info("Observer tube observed: {}", data);
+          LOGGER.info("Observer tube observed: {}", data);
           // Add to the bundle event log for test verification
           bundle.logEvent("Observer observed data: " + data);
           return data;
         });
 
-    logger.info("Created observer bundle: {}", bundle.getBundleId());
+    LOGGER.info("Created observer bundle: {}", bundle.getBundleId());
     return bundle;
   }
 
@@ -166,7 +166,7 @@ public class BundleFactory {
    * @return Optional containing the bundle if found, empty otherwise
    */
   public static Optional<Bundle> getBundle(String bundleId) {
-    return Optional.ofNullable(bundleRegistry.get(bundleId));
+    return Optional.ofNullable(BUNDLE_REGISTRY.get(bundleId));
   }
 
   /**
@@ -175,7 +175,7 @@ public class BundleFactory {
    * @return An unmodifiable map of bundle IDs to bundles
    */
   public static Map<String, Bundle> getAllBundles() {
-    return Collections.unmodifiableMap(bundleRegistry);
+    return Collections.unmodifiableMap(BUNDLE_REGISTRY);
   }
 
   /**
@@ -185,10 +185,10 @@ public class BundleFactory {
    * @return true if the bundle was removed, false if it wasn't found
    */
   public static boolean removeBundle(String bundleId) {
-    Bundle bundle = bundleRegistry.remove(bundleId);
+    Bundle bundle = BUNDLE_REGISTRY.remove(bundleId);
     if (bundle != null) {
       bundle.deactivate();
-      logger.info("Removed bundle from registry: {}", bundleId);
+      LOGGER.info("Removed bundle from registry: {}", bundleId);
       return true;
     }
     return false;

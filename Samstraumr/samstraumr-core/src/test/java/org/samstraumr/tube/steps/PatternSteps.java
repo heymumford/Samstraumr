@@ -370,7 +370,7 @@ public class PatternSteps {
       testResults.put("transformedValue", result.get());
     }
 
-    logger.info("Applied conditional transformation logic to value: {}", inputValue);
+    LOGGER.info("Applied conditional transformation logic to value: {}", inputValue);
   }
 
   @Then("the data should be transformed according to the specified condition")
@@ -398,7 +398,7 @@ public class PatternSteps {
           inputValue, transformedValue, "Transformation should apply 'equal' rule correctly");
     }
 
-    logger.info("Verified: Data was transformed according to the '{}' condition", condition);
+    LOGGER.info("Verified: Data was transformed according to the '{}' condition", condition);
   }
 
   @Then("the transformation should produce an output of {int}")
@@ -406,7 +406,7 @@ public class PatternSteps {
     Integer transformedValue = (Integer) testResults.get("transformedValue");
     assertEquals(expectedOutput, transformedValue, "Transformation should produce expected output");
 
-    logger.info("Verified: Transformation produced expected output: {}", expectedOutput);
+    LOGGER.info("Verified: Transformation produced expected output: {}", expectedOutput);
   }
 
   @Given("a transformer tube is configured with transformation rule {word}")
@@ -448,7 +448,7 @@ public class PatternSteps {
     }
 
     testResults.put("rule", rule);
-    logger.info("Configured transformer tube with rule: {}", rule);
+    LOGGER.info("Configured transformer tube with rule: {}", rule);
   }
 
   // Added to support the specific step definition in TransformerTubeTest.feature
@@ -488,7 +488,7 @@ public class PatternSteps {
     long processingTime = endTime - startTime;
 
     testResults.put("processingTime", processingTime);
-    logger.info("Processed {} data items in {} ms", dataVolume, processingTime);
+    LOGGER.info("Processed {} data items in {} ms", dataVolume, processingTime);
   }
 
   @Then("all transformations should complete within {int} milliseconds")
@@ -501,7 +501,7 @@ public class PatternSteps {
             "Processing time (%d ms) should be within time limit (%d ms)",
             processingTime, timeLimit));
 
-    logger.info("Verified: All transformations completed within time limit ({} ms)", timeLimit);
+    LOGGER.info("Verified: All transformations completed within time limit ({} ms)", timeLimit);
   }
 
   @Then("all output data should correctly reflect the applied transformation")
@@ -548,7 +548,7 @@ public class PatternSteps {
 
     assertTrue(
         allTransformed, "All output data should correctly reflect the applied transformation");
-    logger.info("Verified: All output data correctly reflects the '{}' transformation", rule);
+    LOGGER.info("Verified: All output data correctly reflects the '{}' transformation", rule);
   }
 
   @Given("a transformer tube is configured for string transformation")
@@ -562,7 +562,7 @@ public class PatternSteps {
     // Configure string transformation
     bundle.addTransformer("transformer", (Function<String, String>) s -> s.toUpperCase());
 
-    logger.info("Transformer tube configured for string transformation");
+    LOGGER.info("Transformer tube configured for string transformation");
   }
 
   @When("invalid data of incorrect type is provided")
@@ -580,7 +580,7 @@ public class PatternSteps {
       testResults.put("exception", new NullPointerException("Simulated null pointer for test"));
     }
 
-    logger.info("Invalid data (null) provided to transformer");
+    LOGGER.info("Invalid data (null) provided to transformer");
   }
 
   @Then("the transformer should detect the invalid input")
@@ -588,7 +588,7 @@ public class PatternSteps {
     // Check if an exception was caught
     assertTrue(testResults.containsKey("exception"), "Transformer should detect invalid input");
 
-    logger.info("Verified: Transformer detected the invalid input");
+    LOGGER.info("Verified: Transformer detected the invalid input");
   }
 
   @Then("an appropriate error should be logged for the invalid input")
@@ -618,7 +618,7 @@ public class PatternSteps {
                         || e.getDescription().contains("exception"));
 
     assertTrue(errorLogged, "Transformer should log an appropriate error");
-    logger.info("Verified: Appropriate error was logged for invalid input");
+    LOGGER.info("Verified: Appropriate error was logged for invalid input");
   }
 
   @Then("the transformer should continue operating without failure")
@@ -629,7 +629,7 @@ public class PatternSteps {
     assertTrue(result.isPresent(), "Transformer should continue operating after invalid input");
     assertEquals("VALID", result.get(), "Transformer should correctly transform valid input");
 
-    logger.info("Verified: Transformer continued operating without failure");
+    LOGGER.info("Verified: Transformer continued operating without failure");
   }
 
   // Validator pattern steps
@@ -646,7 +646,7 @@ public class PatternSteps {
         "validator",
         (Function<String, Boolean>) s -> s != null && s.length() >= 5 && s.equals(s.toUpperCase()));
 
-    logger.info("Validator tube configured with strict validation rules");
+    LOGGER.info("Validator tube configured with strict validation rules");
   }
 
   @When("critical data validation fails")
@@ -655,7 +655,7 @@ public class PatternSteps {
     Optional<String> result = bundle.process("processor", "invalid"); // too short
 
     testResults.put("validationResult", result);
-    logger.info("Critical data validation failed for 'invalid'");
+    LOGGER.info("Critical data validation failed for 'invalid'");
   }
 
   @Then("the validator should block the data from propagating further")
@@ -663,7 +663,7 @@ public class PatternSteps {
     Optional<String> result = (Optional<String>) testResults.get("validationResult");
 
     assertFalse(result.isPresent(), "Validator should block invalid data");
-    logger.info("Verified: Validator blocked the data from propagating further");
+    LOGGER.info("Verified: Validator blocked the data from propagating further");
   }
 
   @Then("a detailed validation error should be logged")
@@ -692,7 +692,7 @@ public class PatternSteps {
     }
 
     assertTrue(validationErrorLogged, "Validator should log detailed validation error");
-    logger.info("Verified: Detailed validation error was logged");
+    LOGGER.info("Verified: Detailed validation error was logged");
   }
 
   @Then("upstream systems should be notified of the validation failure")
@@ -712,7 +712,7 @@ public class PatternSteps {
                         || e.getDescription().contains("notified"));
 
     assertTrue(notificationLogged, "Upstream systems should be notified of validation failure");
-    logger.info("Verified: Upstream systems were notified of the validation failure");
+    LOGGER.info("Verified: Upstream systems were notified of the validation failure");
   }
 
   @Given("a validator tube is configured with multi-level validation")
@@ -738,13 +738,13 @@ public class PatternSteps {
     validationRules.put("relaxed", s -> s != null);
 
     testResults.put("validationRules", validationRules);
-    logger.info("Validator tube configured with multi-level validation");
+    LOGGER.info("Validator tube configured with multi-level validation");
   }
 
   @Given("the current system context is {word}")
   public void the_current_system_context_is(String context) {
     testResults.put("context", context);
-    logger.info("System context set to: {}", context);
+    LOGGER.info("System context set to: {}", context);
   }
 
   @When("data with quality level {word} is processed")
@@ -810,7 +810,7 @@ public class PatternSteps {
           "Validation failed for data '" + testData + "' using " + validationLevel + " validation");
     }
 
-    logger.info(
+    LOGGER.info(
         "Processed data '{}' with quality level '{}' using '{}' validation",
         testData,
         qualityLevel,
@@ -825,7 +825,7 @@ public class PatternSteps {
         actualValidationLevel,
         "Validator should apply the expected validation level");
 
-    logger.info("Verified: Validator applied '{}' validation rules", expectedValidationLevel);
+    LOGGER.info("Verified: Validator applied '{}' validation rules", expectedValidationLevel);
   }
 
   @Then("the validation outcome should be {word}")
@@ -897,7 +897,7 @@ public class PatternSteps {
       bundle.logEvent("Validation outcome: " + expectedOutcome + " for data '" + testData + "'");
     }
 
-    logger.info("Verified: Validation outcome was '{}'", expectedOutcome);
+    LOGGER.info("Verified: Validation outcome was '{}'", expectedOutcome);
   }
 
   @Then("the validation outcome should be pass with flag")
@@ -935,7 +935,7 @@ public class PatternSteps {
     testResults.put("inputDataType", inputDataType);
     testResults.put("testData", testData);
 
-    logger.info("Connector tube initialized with {} data: {}", inputDataType, testData);
+    LOGGER.info("Connector tube initialized with {} data: {}", inputDataType, testData);
   }
 
   @Given("predefined validation rule {word} is configured")
@@ -972,7 +972,7 @@ public class PatternSteps {
     testResults.put("ruleName", ruleName);
     testResults.put("expectedOutcome", expectedOutcome);
 
-    logger.info("Configured validation rule: {}", ruleName);
+    LOGGER.info("Configured validation rule: {}", ruleName);
   }
 
   @Given("the connector tube is fully functional and ready for validation")
@@ -981,7 +981,7 @@ public class PatternSteps {
     assertTrue(bundle.isActive(), "Bundle should be active for validation");
     assertTrue(bundle.getTube("validator") != null, "Validator tube should be initialized");
 
-    logger.info("Connector tube is fully functional and ready for validation");
+    LOGGER.info("Connector tube is fully functional and ready for validation");
   }
 
   @When("the connector tube processes the input data")
@@ -1004,7 +1004,7 @@ public class PatternSteps {
       bundle.logEvent("Validation passed: Data routed correctly");
     }
 
-    logger.info(
+    LOGGER.info(
         "Connector tube processed the input data with outcome: {}",
         result.isPresent() ? "passed validation" : "rejected");
   }
@@ -1028,7 +1028,7 @@ public class PatternSteps {
       assertFalse(processingResult.isPresent(), "Data that fails validation should be rejected");
     }
 
-    logger.info("Verified: Input data was validated according to rule {}", ruleName);
+    LOGGER.info("Verified: Input data was validated according to rule {}", ruleName);
   }
 
   @Then("valid data should be routed to the appropriate processing tube if applicable")
@@ -1053,7 +1053,7 @@ public class PatternSteps {
       }
     }
 
-    logger.info("Verified: Valid data was routed appropriately");
+    LOGGER.info("Verified: Valid data was routed appropriately");
   }
 
   @Then("invalid data should be flagged with an appropriate error message if applicable")
@@ -1082,6 +1082,6 @@ public class PatternSteps {
       }
     }
 
-    logger.info("Verified: Invalid data was properly flagged with error message");
+    LOGGER.info("Verified: Invalid data was properly flagged with error message");
   }
 }

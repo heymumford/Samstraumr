@@ -16,7 +16,7 @@ import oshi.software.os.OperatingSystem;
 import oshi.util.FormatUtil;
 
 public class Environment {
-  private static final Logger logger = LoggerFactory.getLogger(Environment.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Environment.class);
   private static final String UNKNOWN = "unknown";
 
   private final SystemInfo systemInfo;
@@ -35,9 +35,9 @@ public class Environment {
       hal = si.getHardware();
       operatingSystem = si.getOperatingSystem();
       mapper = JsonMapper.builder().enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY).build();
-      logger.info("Environment initialized successfully");
+      LOGGER.info("Environment initialized successfully");
     } catch (Exception e) {
-      logger.error("Failed to initialize Environment", e);
+      LOGGER.error("Failed to initialize Environment", e);
     }
 
     this.systemInfo = si;
@@ -68,7 +68,7 @@ public class Environment {
     try {
       return objectMapper.writeValueAsString(info);
     } catch (JsonProcessingException e) {
-      logger.error("Failed to serialize environment parameters to JSON", e);
+      LOGGER.error("Failed to serialize environment parameters to JSON", e);
       return "{\"error\": \"Failed to serialize environment parameters to JSON\"}";
     }
   }
@@ -77,13 +77,15 @@ public class Environment {
     try {
       return InetAddress.getLocalHost().getHostName();
     } catch (UnknownHostException e) {
-      logger.warn("Failed to get hostname", e);
+      LOGGER.warn("Failed to get hostname", e);
       return UNKNOWN;
     }
   }
 
   private String getMacAddress() {
-    if (hardware == null) return UNKNOWN;
+    if (hardware == null) {
+      return UNKNOWN;
+    }
     try {
       List<NetworkIF> networkIFs = hardware.getNetworkIFs();
       for (NetworkIF net : networkIFs) {
@@ -94,31 +96,39 @@ public class Environment {
         }
       }
     } catch (Exception e) {
-      logger.warn("Failed to get MAC address", e);
+      LOGGER.warn("Failed to get MAC address", e);
     }
     return UNKNOWN;
   }
 
   private String getCpuModel() {
-    if (hardware == null) return UNKNOWN;
+    if (hardware == null) {
+      return UNKNOWN;
+    }
     CentralProcessor processor = hardware.getProcessor();
     return processor != null ? processor.getProcessorIdentifier().getName() : UNKNOWN;
   }
 
   private int getCpuCores() {
-    if (hardware == null) return 0;
+    if (hardware == null) {
+      return 0;
+    }
     CentralProcessor processor = hardware.getProcessor();
     return processor != null ? processor.getPhysicalProcessorCount() : 0;
   }
 
   private int getCpuThreads() {
-    if (hardware == null) return 0;
+    if (hardware == null) {
+      return 0;
+    }
     CentralProcessor processor = hardware.getProcessor();
     return processor != null ? processor.getLogicalProcessorCount() : 0;
   }
 
   private String getTotalMemory() {
-    if (hardware == null) return UNKNOWN;
+    if (hardware == null) {
+      return UNKNOWN;
+    }
     GlobalMemory memory = hardware.getMemory();
     return memory != null ? FormatUtil.formatBytes(memory.getTotal()) : UNKNOWN;
   }
@@ -132,7 +142,9 @@ public class Environment {
   }
 
   private String getPrimaryIPAddress() {
-    if (hardware == null) return UNKNOWN;
+    if (hardware == null) {
+      return UNKNOWN;
+    }
     try {
       List<NetworkIF> networkIFs = hardware.getNetworkIFs();
       for (NetworkIF net : networkIFs) {
@@ -141,13 +153,15 @@ public class Environment {
         }
       }
     } catch (Exception e) {
-      logger.warn("Failed to get primary IP address", e);
+      LOGGER.warn("Failed to get primary IP address", e);
     }
     return UNKNOWN;
   }
 
   private String getVirtualizationStatus() {
-    if (hardware == null) return UNKNOWN;
+    if (hardware == null) {
+      return UNKNOWN;
+    }
     try {
       String manufacturer = hardware.getComputerSystem().getManufacturer().toLowerCase();
       if (manufacturer.contains("vmware")
@@ -158,13 +172,15 @@ public class Environment {
         return "Virtual";
       }
     } catch (Exception e) {
-      logger.warn("Failed to get virtualization status", e);
+      LOGGER.warn("Failed to get virtualization status", e);
     }
     return "Physical";
   }
 
   private String getDiskInfo() {
-    if (hardware == null) return UNKNOWN;
+    if (hardware == null) {
+      return UNKNOWN;
+    }
     try {
       List<HWDiskStore> diskStores = hardware.getDiskStores();
       if (!diskStores.isEmpty()) {
@@ -174,7 +190,7 @@ public class Environment {
         return type + ":" + size;
       }
     } catch (Exception e) {
-      logger.warn("Failed to get disk info", e);
+      LOGGER.warn("Failed to get disk info", e);
     }
     return UNKNOWN;
   }
@@ -185,10 +201,10 @@ public class Environment {
       byte[] hash = digest.digest(getParameters().getBytes("UTF-8"));
       return bytesToHex(hash);
     } catch (NoSuchAlgorithmException e) {
-      logger.error("SHA-256 algorithm not found", e);
+      LOGGER.error("SHA-256 algorithm not found", e);
       throw new RuntimeException("SHA-256 algorithm not found", e);
     } catch (java.io.UnsupportedEncodingException e) {
-      logger.error("UTF-8 encoding not supported", e);
+      LOGGER.error("UTF-8 encoding not supported", e);
       throw new RuntimeException("UTF-8 encoding not supported", e);
     }
   }
@@ -197,7 +213,9 @@ public class Environment {
     StringBuilder hexString = new StringBuilder(2 * hash.length);
     for (byte b : hash) {
       String hex = Integer.toHexString(0xff & b);
-      if (hex.length() == 1) hexString.append('0');
+      if (hex.length() == 1) {
+        hexString.append('0');
+      }
       hexString.append(hex);
     }
     return hexString.toString();

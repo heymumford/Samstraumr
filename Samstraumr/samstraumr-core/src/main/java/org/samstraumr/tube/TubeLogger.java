@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TubeLogger {
-  private static final Logger logger = LoggerFactory.getLogger(TubeLogger.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(TubeLogger.class);
   private final TubeLoggerInfo loggerInfo;
 
   public TubeLogger(String tubeId, String compositeId, String machineId) {
@@ -22,19 +22,19 @@ public class TubeLogger {
 
     switch (level.toLowerCase()) {
       case "debug":
-        logger.debug("{}", logEntry);
+        LOGGER.debug("{}", logEntry);
         break;
       case "info":
-        logger.info("{}", logEntry);
+        LOGGER.info("{}", logEntry);
         break;
       case "warn":
-        logger.warn("{}", logEntry);
+        LOGGER.warn("{}", logEntry);
         break;
       case "error":
-        logger.error("{}", logEntry);
+        LOGGER.error("{}", logEntry);
         break;
       default:
-        logger.info("{}", logEntry);
+        LOGGER.info("{}", logEntry);
     }
   }
 }

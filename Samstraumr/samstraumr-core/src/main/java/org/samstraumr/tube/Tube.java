@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Tube {
-  private static final Logger logger = LoggerFactory.getLogger(Tube.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Tube.class);
   private static final int DEFAULT_TERMINATION_DELAY = 60; // seconds
   private static final String DIGEST_ALGORITHM = "SHA-256";
 
@@ -33,7 +33,7 @@ public class Tube {
 
     // Initialize in the constructor without throwing exceptions
     logToMimir("Tube initialized with ID: " + this.uniqueId);
-    logger.debug("Tube initialized with ID: {}", this.uniqueId);
+    LOGGER.debug("Tube initialized with ID: {}", this.uniqueId);
     logToMimir("Initialization reason: " + this.reason);
 
     // Initialize timer directly instead of using setTerminationDelay which might throw exceptions
@@ -45,7 +45,7 @@ public class Tube {
       logToMimir("Termination delay set to " + DEFAULT_TERMINATION_DELAY + " seconds.");
     } catch (Exception e) {
       // Just log the error without throwing
-      logger.error("Failed to set termination delay: {}", e.getMessage());
+      LOGGER.error("Failed to set termination delay: {}", e.getMessage());
       logToMimir("Warning: Failed to set termination delay");
     }
 
@@ -61,7 +61,7 @@ public class Tube {
    * @throws TubeInitializationException if initialization fails
    */
   public static Tube create(String reason, Environment environment) {
-    logger.info("Creating new Tube with reason: {}", reason);
+    LOGGER.info("Creating new Tube with reason: {}", reason);
 
     // Validate parameters
     validateParameters(reason, environment);
@@ -73,7 +73,7 @@ public class Tube {
       // Create and return new tube
       return new Tube(reason, environment, uniqueId);
     } catch (Exception e) {
-      logger.error("Failed to initialize Tube: {} - initialization failed", reason);
+      LOGGER.error("Failed to initialize Tube: {} - initialization failed", reason);
       throw new TubeInitializationException("Failed to initialize Tube", e);
     }
   }
@@ -87,13 +87,13 @@ public class Tube {
    */
   private static void validateParameters(String reason, Environment environment) {
     if (environment == null) {
-      logger.error("Environment cannot be null");
+      LOGGER.error("Environment cannot be null");
       throw new TubeInitializationException(
           "Environment cannot be null", new NullPointerException("Environment cannot be null"));
     }
 
     if (reason == null || reason.trim().isEmpty()) {
-      logger.error("Reason cannot be null or empty");
+      LOGGER.error("Reason cannot be null or empty");
       throw new TubeInitializationException(
           "Reason cannot be null or empty",
           new IllegalArgumentException("Reason cannot be null or empty"));
@@ -115,10 +115,10 @@ public class Tube {
       byte[] hash = digest.digest((parameters + Instant.now().toString()).getBytes("UTF-8"));
       return bytesToHex(hash);
     } catch (NoSuchAlgorithmException e) {
-      logger.error("Failed to generate unique ID: SHA-256 algorithm not found", e);
+      LOGGER.error("Failed to generate unique ID: SHA-256 algorithm not found", e);
       throw new TubeInitializationException("Failed to generate unique ID", e);
     } catch (java.io.UnsupportedEncodingException e) {
-      logger.error("UTF-8 encoding not supported", e);
+      LOGGER.error("UTF-8 encoding not supported", e);
       throw new TubeInitializationException("UTF-8 encoding not supported", e);
     }
   }
@@ -127,7 +127,9 @@ public class Tube {
     StringBuilder hexString = new StringBuilder(2 * hash.length);
     for (byte b : hash) {
       String hex = Integer.toHexString(0xff & b);
-      if (hex.length() == 1) hexString.append('0');
+      if (hex.length() == 1) {
+        hexString.append('0');
+      }
       hexString.append(hex);
     }
     return hexString.toString();
@@ -146,12 +148,12 @@ public class Tube {
   }
 
   public List<String> queryMimirLog() {
-    logger.debug("Querying Mimir log. Current size: {}", mimirLog.size());
+    LOGGER.debug("Querying Mimir log. Current size: {}", mimirLog.size());
     return Collections.unmodifiableList(mimirLog);
   }
 
   public synchronized void setTerminationDelay(int seconds) {
-    logger.info("Setting termination delay to {} seconds", seconds);
+    LOGGER.info("Setting termination delay to {} seconds", seconds);
     try {
       synchronized (this) {
         if (terminationTimer != null) {
@@ -162,7 +164,7 @@ public class Tube {
       }
       logToMimir("Custom termination delay set to " + seconds + " seconds.");
     } catch (IllegalArgumentException e) {
-      logger.error("Invalid termination delay: {}", seconds, e);
+      LOGGER.error("Invalid termination delay: {}", seconds, e);
       throw new IllegalArgumentException("Invalid termination delay", e);
     }
   }
@@ -170,18 +172,18 @@ public class Tube {
   private void logToMimir(String logEntry) {
     String timestampedEntry = Instant.now().toString() + ": " + logEntry;
     mimirLog.add(timestampedEntry);
-    logger.trace("Mimir Log: {}", timestampedEntry);
+    LOGGER.trace("Mimir Log: {}", timestampedEntry);
   }
 
   private class TerminationTask extends TimerTask {
     @Override
     public void run() {
       synchronized (Tube.this) {
-        logger.info("Executing termination task for Tube: {}", uniqueId);
+        LOGGER.info("Executing termination task for Tube: {}", uniqueId);
         logToMimir("Tube self-terminating.");
         terminationTimer.cancel();
         clearLogsAndLineage();
-        logger.debug("Tube {} terminated. Mimir log and lineage cleared.", uniqueId);
+        LOGGER.debug("Tube {} terminated. Mimir log and lineage cleared.", uniqueId);
       }
     }
 
