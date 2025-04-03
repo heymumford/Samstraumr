@@ -1,0 +1,15 @@
+# Default owners for everything
+* @heymumford
+
+# Core component owners
+/Samstraumr/samstraumr-core/src/main/java/org/samstraumr/tube/ @heymumford
+/Samstraumr/samstraumr-core/src/main/java/org/samstraumr/tube/bundle/ @heymumford
+
+# Test ownership
+/Samstraumr/samstraumr-core/src/test/ @heymumford
+
+# Documentation ownership
+/docs/ @heymumford
+
+# CI/CD configuration
+/.github/ @heymumford
