@@ -5,6 +5,7 @@
 # - README.md files remain in UPPER_CASE
 # - CLAUDE.md remains in UPPER_CASE 
 # - Other documentation files use PascalCase
+# - Acronyms like FAQ, TBD remain in UPPERCASE
 
 # Set colors for output
 RED='\033[0;31m'
@@ -35,6 +36,7 @@ print_header "Standardizing Markdown Filenames"
 echo "Following naming conventions:"
 echo "- README.md files remain in UPPER_CASE"
 echo "- CLAUDE.md remains in UPPER_CASE"
+echo "- Acronyms (like FAQ.md, TBD.md) remain in UPPERCASE"
 echo "- Other documentation files use PascalCase"
 echo ""
 
@@ -107,7 +109,7 @@ if [ -f "docs/contribution/quality-checks.md" ]; then
   mv -v docs/contribution/quality-checks.md docs/contribution/QualityChecks.md
 fi
 if [ -f "docs/contribution/ci-cd-guide.md" ]; then
-  mv -v docs/contribution/ci-cd-guide.md docs/contribution/CiCdGuide.md
+  mv -v docs/contribution/ci-cd-guide.md docs/contribution/CICDGuide.md
 fi
 if [ -f "docs/contribution/contributing.md" ]; then
   mv -v docs/contribution/contributing.md docs/contribution/Contributing.md
@@ -152,7 +154,7 @@ if [ -f "docs/reference/glossary.md" ]; then
   mv -v "docs/reference/glossary.md" "docs/reference/Glossary.md"
 fi
 if [ -f "docs/reference/faq.md" ]; then
-  mv -v "docs/reference/faq.md" "docs/reference/Faq.md"
+  mv -v "docs/reference/faq.md" "docs/reference/FAQ.md"
 fi
 
 # Rename files in the reference standards directory
@@ -257,12 +259,14 @@ print_header "Checking for any remaining files that don't follow conventions"
 # This improved pattern detects files that:
 # 1. Have lowercase first letter (not PascalCase) for the filename (not path)
 # 2. Have underscores or hyphens in the filename (not path)
-# 3. Are not README.md or CLAUDE.md
+# 3. Are not README.md, CLAUDE.md, or recognized acronyms like FAQ.md, TBD.md, etc.
+# 4. Special cases for version-template.md
 remaining_files=$(find . -name "*.md" | grep -v "/README\.md$" | grep -v "/CLAUDE\.md$" | 
   grep -v "/PULL_REQUEST_TEMPLATE\.md$" | 
   awk -F/ '{print $NF}' | 
   grep -E '^[a-z]|[-_]' | 
-  grep -v '^version-template\.md$')
+  grep -v '^version-template\.md$' |
+  grep -v '^[A-Z][A-Z0-9]*\.md$')
 
 if [ -n "$remaining_files" ]; then
   # Now search for the actual paths for reporting
@@ -278,4 +282,5 @@ print_header "Standardization Complete"
 echo "All Markdown files have been standardized according to the naming conventions:"
 echo "- README.md files remain in UPPER_CASE"
 echo "- CLAUDE.md remains in UPPER_CASE"
+echo "- Acronyms (like FAQ.md, TBD.md) remain in UPPERCASE"
 echo "- Other documentation files use PascalCase"

@@ -17,14 +17,15 @@ This document outlines the standard naming conventions for files within the Sams
 3. **Documentation Files**
    - Use **PascalCase** for all other documentation files (e.g., `GettingStarted.md`, `CoreConcepts.md`)
    - Multi-word names in PascalCase, no separators (e.g., `LoggingStandards.md`, not `Logging-Standards.md`)
+   - For acronyms, keep the acronym in all caps (e.g., `FAQ.md`, `TBD.md`, `APIReference.md`, `CICDGuide.md`)
 
 ### Directory-Specific Patterns
 
 - **docs/concepts/**: `CoreConcepts.md`, `StateManagement.md`
 - **docs/guides/**: `GettingStarted.md`, `MigrationGuide.md`
-- **docs/reference/**: `Glossary.md`, `Faq.md`
+- **docs/reference/**: `Glossary.md`, `FAQ.md`
 - **docs/testing/**: `TestStrategy.md`, `BddWithCucumber.md`
-- **docs/contribution/**: `Contributing.md`, `CodeStandards.md`
+- **docs/contribution/**: `Contributing.md`, `CodeStandards.md`, `CICDGuide.md`
 
 ## Source Code
 
