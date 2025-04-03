@@ -14,27 +14,36 @@ The following quality checks are configured in the project:
 
 ## Running Quality Checks
 
-### All Quality Checks
+### Using the Quality Check Script
 
-To run all quality checks:
+The recommended way to run quality checks is using the provided script:
 
 ```bash
+# Run all quality checks
+./util/quality/build-checks.sh
+
+# Skip specific checks
+./util/quality/build-checks.sh --skip-spotless --skip-spotbugs
+
+# Run only specific checks
+./util/quality/build-checks.sh --only=spotless,checkstyle
+
+# Show help
+./util/quality/build-checks.sh --help
+
+This wizard allows you to incrementally add quality checks, fixing issues as you go.
+
+### Maven Commands
+
+You can also run checks directly with Maven:
+
+```bash
+# Run all quality checks
 mvn validate -P quality-checks
-```
 
-### Skip Quality Checks
-
-To skip quality checks during build:
-
-```bash
+# Skip quality checks during build
 mvn clean install -P skip-quality-checks
-```
 
-### Individual Checks
-
-To run individual quality checks:
-
-```bash
 # Format code with Spotless
 mvn spotless:apply
 
@@ -51,17 +60,6 @@ mvn spotbugs:check
 
 # Generate JaCoCo coverage report
 mvn jacoco:report
-```
-
-## Fixing Common Issues
-
-### Spotless Issues
-
-If you have formatting issues, run:
-
-```bash
-mvn spotless:apply
-```
 
 ### Encoding Issues
 
@@ -73,22 +71,3 @@ To see detailed information about SpotBugs issues:
 
 ```bash
 mvn spotbugs:gui
-```
-
-## Configuration Files
-
-- Checkstyle: `Samstraumr/checkstyle.xml`
-- SonarQube: Configuration resides on the SonarQube server
-
-## CI/CD Integration
-
-Quality checks are integrated into the CI/CD pipeline to ensure code quality. Pull requests that fail quality checks will not be merged until the issues are fixed.
-
-## SonarQube Integration
-
-SonarQube provides comprehensive static code analysis for the project. It runs as part of the CI/CD pipeline and also can be accessed through:
-
-- SonarQube Dashboard (refer to your team's SonarQube instance URL)
-- SonarLint IDE plugin for local analysis
-
-For more information on SonarQube and why we migrated from PMD, see `docs/quality-changes.md`.

@@ -1,10 +1,5 @@
 # Core Concepts: The Essence of Samstraumr
 
-```
-Last updated: April 2, 2025
-Author: Eric C. Mumford (@heymumford)
-Contributors: Samstraumr Core Team
-```
 
 ## Table of Contents
 - [Introduction: A New Way of Seeing Software](#introduction-a-new-way-of-seeing-software)
@@ -50,103 +45,6 @@ public class DataValidatorTube implements Tube {
 
     // Tube implementation methods
 }
-```
-
-### Tube Responsibilities
-
-Unlike traditional components that often mix concerns, a tube has clear responsibilities:
-
-- **Do One Thing Well**: Each tube addresses a specific, focused concern
-- **Know Thyself**: Maintain awareness of internal state and health
-- **Respect Boundaries**: Interact with other tubes through defined interfaces
-- **Adapt When Needed**: Respond to changing conditions and requirements
-- **Communicate Clearly**: Provide meaningful information about state and capabilities
-
-### The Tube Lifecycle
-
-Tubes move through a natural lifecycle:
-
-1. **Creation**: Birth with a clear identity and purpose
-2. **Initialization**: Establishment of initial state and resources
-3. **Operation**: Processing of inputs to create outputs
-4. **Adaptation**: Adjustment to changing conditions
-5. **Dormancy**: Periods of inactivity while maintaining readiness
-6. **Termination**: Graceful shutdown and resource release
-
-## Flow: The Movement of Information and Control
-
-In nature, rivers don't just transport water—they shape landscapes, sustain ecosystems, and adapt their course over time. Similarly, in Samstraumr, **flow** refers to the mindful movement of information, control, and influence throughout your system.
-
-### Types of Flow
-
-Samstraumr recognizes several distinct types of flow:
-
-1. **Data Flow**: The movement of information between tubes
-2. **Control Flow**: The passing of execution and decision-making authority
-3. **State Flow**: The propagation of state changes through the system
-4. **Resource Flow**: The allocation and release of system resources
-5. **Awareness Flow**: The sharing of monitoring information and health status
-
-### Flow Characteristics
-
-Healthy flow in a Samstraumr system exhibits these qualities:
-
-- **Directionality**: Clear pathways with defined sources and destinations
-- **Regulation**: Appropriate control of volume and timing (backpressure)
-- **Visibility**: Observability of what is flowing and how
-- **Adaptability**: Ability to adjust to changing conditions
-- **Resilience**: Capacity to overcome obstacles and recover from disruptions
-
-### Flow Patterns
-
-Certain patterns emerge in well-designed flows:
-
-- **Confluence**: Multiple flows joining together
-- **Divergence**: A single flow splitting into multiple paths
-- **Cycling**: Flows that return to their source after transformation
-- **Buffering**: Temporary storage to manage flow variations
-- **Filtering**: Selective passage based on content or condition
-
-## Identity: Clear Names in a Complex World
-
-As systems grow, clarity of reference becomes essential. Samstraumr employs a concise identity system that provides unambiguous references to any component at any level of the hierarchy.
-
-### The Identity Structure
-
-The identity system uses a straightforward dot notation:
-
-- **T\<ID\>**: Simple tube (e.g., `T7`)
-- **B\<ID\>.T\<ID\>**: Tube within a bundle (e.g., `B3.T2`)
-- **M\<ID\>.B\<ID\>.T\<ID\>**: Tube within a bundle inside a machine (e.g., `M0.B1.T4`)
-
-For deeper hierarchies, the pattern continues logically (e.g., `M2.M1.B3.T9`).
-
-### Identity Properties
-
-Within Samstraumr, identities have several important properties:
-
-- **Uniqueness**: No two elements share the same full identity
-- **Permanence**: An element's identity remains stable throughout its lifetime
-- **Clarity**: Identities are designed for human readability and machine processing
-- **Hierarchy**: The notation inherently communicates structural relationships
-- **Conciseness**: Brief enough for logs, debugging, and conversation
-
-### Birth Certificates
-
-Each tube receives a formal birth certificate at creation:
-
-```java
-// Example birth certificate (simplified)
-public class BirthCertificate {
-    private final String fullIdentity;
-    private final Instant creationTime;
-    private final String purpose;
-    private final String version;
-    private final String creator;
-
-    // Methods for identity verification and information
-}
-```
 
 This birth certificate serves as both documentation and a formal verification mechanism, allowing tubes to authenticate themselves and others within the system.
 
@@ -230,28 +128,3 @@ public void assessHealth() {
         .withTimestamp(Instant.now())
         .build());
 }
-```
-
-## Core Principles in Practice
-
-These concepts converge into a set of guiding principles for Samstraumr development:
-
-1. **Mindful Isolation**: Components should be self-contained yet aware of their context
-2. **Natural Flows**: Data and control should move through the system like water—following the path of least resistance
-3. **Adaptive Resilience**: Systems should bend rather than break when facing unexpected conditions
-4. **Clear Boundaries**: Interfaces between components should be explicit and well-defined
-5. **Self-Knowledge**: Components should understand and communicate their own capabilities and limitations
-6. **Emergent Intelligence**: Complex behaviors should arise naturally from the interaction of simpler components
-7. **Evolutionary Design**: Systems should be able to evolve over time without complete reconstruction
-
-## The Journey Ahead
-
-The concepts introduced here form the foundation of Samstraumr, but they merely scratch the surface of what's possible with Tube-Based Development. As you continue exploring, you'll discover how these principles manifest in more complex structures like bundles and machines, how testing reveals the true nature of your tubes, and how existing systems can be gradually transformed into flowing, adaptive ecosystems.
-
-The journey from traditional development to Samstraumr is not just about learning new patterns—it's about embracing a new way of seeing software as a living, breathing entity that grows and evolves alongside your understanding.
-
----
-
-*"The river knows the way to the sea, and like the river, your software can find its own path forward if you create the right conditions for flow."*
-
-[← Return to README](../README.md) | [Explore State Management →](./StateManagement.md)

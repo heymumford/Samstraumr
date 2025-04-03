@@ -4,6 +4,11 @@ This directory contains utility scripts for the Samstraumr project, organized in
 
 ## Directory Structure
 
+- Root Level
+  - `version` - **NEW**: Unified version management utility
+  - `test/` - Testing utilities
+    - `run-tests.sh` - Comprehensive test runner for all test types
+
 - `build/` - Scripts for building the project with different configurations
   - `build-optimal.sh` - Optimized build script with thread and memory settings
   - `build-performance.sh` - Performance-focused build script
@@ -17,7 +22,7 @@ This directory contains utility scripts for the Samstraumr project, organized in
   - `skip-quality-build.sh` - Runs build with quality checks skipped
 
 - `maintenance/` - Scripts for project maintenance
-  - `update-version.sh` - Updates version numbers throughout the codebase
+  - `update-version.sh` - *(Deprecated)* Use the new `version` utility instead
   - `cleanup-maven.sh` - Cleans Maven repository cache
 
 ## Usage
@@ -26,10 +31,13 @@ Scripts must be run from their locations in the util/ directory. For example:
 
 ```bash
 # From project root
-./util/build/build-optimal.sh
+./util/version bump patch      # Use the new version utility
+./util/test/run-tests.sh tube  # Run specific tests
+./util/build/build-optimal.sh  # Use optimized build
 
 # If you frequently run these scripts, consider adding the directories to your PATH
-export PATH=$PATH:$(pwd)/util/build:$(pwd)/util/quality:$(pwd)/util/maintenance
+export PATH=$PATH:$(pwd)/util:$(pwd)/util/build:$(pwd)/util/quality:$(pwd)/util/maintenance
+version bump patch
 build-optimal.sh
 ```
 
@@ -44,6 +52,41 @@ util\build\build-performance.bat
 Scripts are no longer available in the project root. All scripts must be run from their 
 specific locations in the util directory structure. Running `./build-optimal.sh` 
 from the project root will fail.
+
+## Version Management
+
+The new `version` utility provides a unified interface for managing project versions:
+
+```bash
+# Display current version information
+./util/version get
+
+# Bump the patch version (0.5.8 → 0.5.9)
+./util/version bump patch
+
+# Bump the minor version (0.5.8 → 0.6.0)
+./util/version bump minor
+
+# Bump the major version (0.5.8 → 1.0.0)
+./util/version bump major
+
+# Set a specific version
+./util/version set 0.7.0
+
+# View version history
+./util/version history
+
+# Update version without committing changes
+./util/version bump patch --no-commit
+```
+
+The utility will automatically:
+- Update all version numbers in properties files and POM files
+- Update version references in documentation
+- Update the "last updated" date
+- Create a Git commit with appropriate message (unless `--no-commit` is specified)
+
+For more help, run `./util/version --help`
 
 ## Adding New Scripts
 

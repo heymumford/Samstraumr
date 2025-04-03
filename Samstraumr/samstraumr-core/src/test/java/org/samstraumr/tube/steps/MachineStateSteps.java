@@ -1,16 +1,17 @@
-package org.samstraumr.tube.steps;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import io.cucumber.java.en.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.samstraumr.tube.Environment;
 import org.samstraumr.tube.Tube;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.cucumber.java.en.*;
 
 /**
  * Step definitions for testing machine state management. Implements the steps defined in

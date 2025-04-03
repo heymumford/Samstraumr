@@ -1,10 +1,5 @@
 # The Living Waters: Systems Theory Foundation for Samstraumr
 
-```
-Last updated: April 2, 2025
-Author: Eric C. Mumford (@heymumford)
-Contributors: Samstraumr Core Team
-```
 
 ## Table of Contents
 - [Introduction: Where Code Meets Nature](#introduction-where-code-meets-nature)

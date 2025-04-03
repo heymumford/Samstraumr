@@ -1,4 +1,3 @@
-package org.samstraumr.tube.bundle;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -6,10 +5,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+
 import org.junit.jupiter.api.Test;
 import org.samstraumr.tube.Environment;
+import org.samstraumr.tube.test.annotations.BelowTheLine;
+import org.samstraumr.tube.test.annotations.BundleTest;
 
-/** Unit tests for the Bundle class and BundleFactory. */
+/**
+ * Unit tests for the Bundle class and BundleFactory.
+ *
+ * <p>These are Below The Line (BTL) tests that provide comprehensive coverage of bundle
+ * functionality but are not critical for every build.
+ */
+@BundleTest
+@BelowTheLine
 public class BundleTest {
 
   @Test

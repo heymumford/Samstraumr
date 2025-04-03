@@ -1,10 +1,5 @@
 # Migration: Transforming Existing Systems into Flowing Streams
 
-```
-Last updated: April 2, 2025
-Author: Eric C. Mumford (@heymumford)
-Contributors: Samstraumr Core Team
-```
 
 ## Table of Contents
 - [Introduction: The Journey of Transformation](#introduction-the-journey-of-transformation)
@@ -103,72 +98,6 @@ public class DependencyMapper {
         return candidates;
     }
 }
-```
-
-### Organizational Assessment
-
-1. **Team Structure**: Understand how teams are organized and how this maps to the codebase
-
-2. **Knowledge Distribution**: Identify who holds key knowledge about different parts of the system
-
-3. **Cultural Readiness**: Assess the team's openness to new patterns and incremental change
-
-4. **Skills Assessment**: Evaluate the team's familiarity with concepts similar to Samstraumr
-
-### System Boundaries Assessment
-
-1. **External Interfaces**: Identify all interfaces with external systems
-
-2. **API Contracts**: Catalog existing API contracts that must be maintained
-
-3. **Service Boundaries**: Map the natural service and module boundaries
-
-4. **Data Ownership**: Understand which components own and modify different data elements
-
-## The Strangler Fig Pattern
-
-The Strangler Fig pattern—named after a plant that gradually grows around a host tree until it becomes self-supporting—provides an effective approach for incremental migration:
-
-1. **Identify Boundaries**: Find natural seams in your application where functionality can be isolated
-
-2. **Build Facades**: Create interface layers between the old system and new Samstraumr components
-
-3. **Gradually Replace**: Replace functionality piece by piece, keeping the system operational throughout
-
-4. **Decommission**: Remove old code once the new implementation has fully taken over
-
-```java
-// Example of a facade connecting legacy code to a new Samstraumr tube
-public class LegacyOrderProcessingFacade implements OrderProcessor {
-    private final LegacyOrderService legacyService; // Original implementation
-    private final OrderProcessingTube newTube;      // Samstraumr implementation
-    private final FeatureToggleService toggleService;
-
-    @Override
-    public OrderResult processOrder(Order order) {
-        // Use feature toggle to decide which implementation to use
-        if (toggleService.isEnabled("USE_NEW_ORDER_PROCESSOR", order.getCustomerId())) {
-            try {
-                // Route to new implementation
-                return (OrderResult) newTube.process(order);
-            } catch (Exception e) {
-                // Fall back to legacy implementation if an error occurs
-                logger.warn("Error in new implementation, falling back to legacy: {}",
-                          e.getMessage());
-                return legacyService.processOrder(order);
-            }
-        } else {
-            // Use legacy implementation
-            return legacyService.processOrder(order);
-        }
-    }
-
-    // Additional methods to synchronize state between implementations
-    private void synchronizeState() {
-        // Copy relevant state between old and new implementations
-    }
-}
-```
 
 ### Key Benefits of the Strangler Fig Approach
 
@@ -407,33 +336,6 @@ public class PaymentProcessorTube implements Tube {
 
     // Other tube interface methods and helpers
 }
-```
-
-## Integration Strategies
-
-Integrating Samstraumr components with existing systems requires thoughtful approaches:
-
-### Adapter Pattern
-
-Create adapters that translate between your existing interfaces and Samstraumr tubes:
-
-```java
-public class LegacyServiceAdapter implements LegacyService {
-    private final Tube tube;
-
-    @Override
-    public LegacyResponse performOperation(LegacyRequest request) {
-        // Convert legacy request to tube input
-        TubeInput input = convertRequest(request);
-
-        // Process through tube
-        Object output = tube.process(input);
-
-        // Convert tube output to legacy response
-        return convertOutput(output);
-    }
-}
-```
 
 ### Sidecar Pattern
 
@@ -465,37 +367,6 @@ public class SidecarRouter {
         return legacyResponse;
     }
 }
-```
-
-### Event Sourcing Bridge
-
-Use event sourcing to maintain both systems during migration:
-
-```java
-public class EventSourcingBridge {
-    private final EventStore eventStore;
-    private final LegacySystem legacySystem;
-    private final Tube newTube;
-
-    public void processEvent(DomainEvent event) {
-        // Store the event
-        eventStore.append(event);
-
-        // Process in legacy system
-        legacySystem.handleEvent(event);
-
-        // Process in new tube
-        newTube.process(event);
-    }
-
-    public void replayEvents() {
-        // Replay events through new system to synchronize state
-        for (DomainEvent event : eventStore.getAllEvents()) {
-            newTube.process(event);
-        }
-    }
-}
-```
 
 ### Feature Flag Integration
 
@@ -518,17 +389,6 @@ public class FeatureFlagRouter {
         }
     }
 }
-```
-
-## Migration Patterns
-
-Several patterns have emerged for effective migration to Samstraumr:
-
-### Leaf First
-
-Start with leaf nodes in your dependency tree—components that have few or no dependencies on other components:
-
-```
 Legacy System:
     ├── Core Service ← depends on ← User Service ← depends on ← Notification Service
     └── Core Service ← depends on ← Payment Service
@@ -538,45 +398,6 @@ Migration Order:
     2. Payment Service (leaf node)
     3. User Service (depends only on migrated component)
     4. Core Service (depends on migrated components)
-```
-
-### Core Last
-
-Reserve the most central, heavily-relied upon components for later in the migration:
-
-```java
-// Example of identifying core components
-public class CoreComponentAnalyzer {
-    public Map<String, Integer> rankComponentsByDependencies(
-            Map<String, Set<String>> dependencyGraph) {
-        Map<String, Integer> dependencyCount = new HashMap<>();
-
-        // Count incoming dependencies for each component
-        for (String component : dependencyGraph.keySet()) {
-            dependencyCount.put(component, 0);
-        }
-
-        for (Map.Entry<String, Set<String>> entry : dependencyGraph.entrySet()) {
-            for (String dependency : entry.getValue()) {
-                dependencyCount.put(
-                    dependency,
-                    dependencyCount.getOrDefault(dependency, 0) + 1
-                );
-            }
-        }
-
-        // Sort by dependency count (highest first)
-        return dependencyCount.entrySet().stream()
-            .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-            .collect(Collectors.toMap(
-                Map.Entry::getKey,
-                Map.Entry::getValue,
-                (e1, e2) -> e1,
-                LinkedHashMap::new
-            ));
-    }
-}
-```
 
 ### Parallel Implementation
 
@@ -611,48 +432,6 @@ public class ParallelImplementationManager {
         featureFlags.disableGlobally("USE_TUBE_" + componentId);
     }
 }
-```
-
-### Domain-Driven Slicing
-
-Organize migration around business domains to create cohesive bundles:
-
-```java
-// Example of domain-driven migration planning
-public class DomainMigrationPlanner {
-    private final Map<String, Set<String>> domainToComponents = new HashMap<>();
-    private final Map<String, Set<String>> componentToDependencies = new HashMap<>();
-
-    public List<MigrationPhase> createMigrationPlan() {
-        List<MigrationPhase> phases = new ArrayList<>();
-        Set<String> migratedComponents = new HashSet<>();
-
-        // Process domains in order of independence (fewer cross-domain dependencies)
-        List<String> orderedDomains = rankDomainsByIndependence();
-
-        for (String domain : orderedDomains) {
-            Set<String> domainComponents = domainToComponents.get(domain);
-
-            // Create a phase for this domain
-            MigrationPhase phase = new MigrationPhase(domain);
-
-            // Find components that can be migrated (all dependencies already migrated)
-            for (String component : domainComponents) {
-                Set<String> dependencies = componentToDependencies.get(component);
-
-                if (migratedComponents.containsAll(dependencies)) {
-                    phase.addComponent(component);
-                    migratedComponents.add(component);
-                }
-            }
-
-            phases.add(phase);
-        }
-
-        return phases;
-    }
-}
-```
 
 ## Testing During Migration
 
@@ -684,42 +463,6 @@ public void shouldProduceSameResultAsLegacyImplementation() {
     DynamicState state = tube.getDynamicState();
     assertThat(state.getMetric("totalProcessed").intValue()).isEqualTo(1);
 }
-```
-
-### State Transition Testing
-
-Verify that tubes correctly manage their state:
-
-```java
-@Test
-public void shouldTransitionToErrorStateWhenGatewayFails() {
-    // Given
-    PaymentProcessorTube tube = new PaymentProcessorTube();
-    PaymentRequest request = createSamplePaymentRequest();
-
-    // When - simulate gateway failure
-    PaymentGateway mockGateway = mock(PaymentGateway.class);
-    when(mockGateway.submitPayment(any(), any(), any()))
-        .thenThrow(new GatewayException("Service unavailable"));
-    tube.setPaymentGateway(mockGateway);
-
-    // Then - initial state should be FLOWING
-    assertThat(tube.getDesignState()).isEqualTo(TubeState.FLOWING);
-
-    // When - process multiple requests to exceed threshold
-    for (int i = 0; i < 10; i++) {
-        tube.process(request);
-    }
-
-    // Then - state should transition to ERROR
-    assertThat(tube.getDesignState()).isEqualTo(TubeState.ERROR);
-
-    // And - dynamic state should reflect the issue
-    DynamicState state = tube.getDynamicState();
-    assertThat(state.getProperty("error")).isNotNull();
-    assertThat(state.getMetric("successRate").doubleValue()).isEqualTo(0.0);
-}
-```
 
 ### Integration Testing with Mixed Components
 
@@ -745,41 +488,6 @@ public void shouldInteractCorrectlyWithLegacyComponents() {
         contains("profile updated")
     );
 }
-```
-
-### Chaos Testing for Adaptability
-
-Verify that tube implementations adapt properly to adverse conditions:
-
-```java
-@Test
-public void shouldAdaptToResourceConstraints() {
-    // Given
-    DataProcessorTube tube = new DataProcessorTube();
-
-    // When - simulate memory constraints
-    ResourceSimulator.simulateLowMemory();
-
-    // Then - tube should adjust batch size
-    tube.process(createLargeBatchRequest());
-
-    // Verify batch size was reduced
-    assertThat(tube.getCurrentBatchSize())
-        .isLessThan(tube.getDefaultBatchSize());
-
-    // When - memory returns to normal
-    ResourceSimulator.simulateNormalMemory();
-
-    // Then - tube should gradually increase batch size again
-    for (int i = 0; i < 5; i++) {
-        tube.process(createLargeBatchRequest());
-    }
-
-    // Verify batch size increased
-    assertThat(tube.getCurrentBatchSize())
-        .isGreaterThan(tube.getMinimumBatchSize());
-}
-```
 
 ## Organizational Considerations
 
@@ -789,22 +497,6 @@ Technical migration is only part of the journey—organizational aspects are equ
 
 Consider how team structures might evolve as your system architecture changes:
 
-```
-Before Migration:
-    - Frontend Team
-    - Backend Team
-    - Database Team
-
-During Migration:
-    - Frontend Team
-    - Core Services Team
-    - Samstraumr Migration Team
-
-After Migration:
-    - User Experience Flow Team (frontend + user-related tubes)
-    - Business Logic Flow Team (transaction-related tubes and bundles)
-    - Data Flow Team (storage and analytics tubes and bundles)
-```
 
 ### Knowledge Transfer
 
@@ -886,47 +578,6 @@ public class StateSynchronizer {
         logger.info("Bidirectional state synchronization complete");
     }
 }
-```
-
-### Challenge: Maintaining System Stability
-
-**Solution: Conservative Rollout Strategy**
-
-```java
-public class MigrationController {
-    private final FeatureFlagService featureFlags;
-    private final MetricsService metrics;
-    private final AlertService alerts;
-
-    public void beginMigration(String componentId, String newTubeId) {
-        // Start with a small percentage of traffic
-        featureFlags.setPercentage("USE_TUBE_" + componentId, 5);
-
-        // Monitor for issues
-        metrics.createDashboard("migration_" + componentId);
-        alerts.createAlert("migration_error_" + componentId)
-            .withCondition("error_rate > 1%")
-            .withAction(this::rollbackMigration);
-
-        logger.info("Migration started for component {}", componentId);
-    }
-
-    public void incrementTraffic(String componentId) {
-        int currentPercentage = featureFlags.getPercentage("USE_TUBE_" + componentId);
-        int newPercentage = Math.min(currentPercentage * 2, 100);
-
-        featureFlags.setPercentage("USE_TUBE_" + componentId, newPercentage);
-        logger.info("Increased traffic to {}% for component {}",
-                  newPercentage, componentId);
-    }
-
-    public void rollbackMigration(String componentId) {
-        featureFlags.setPercentage("USE_TUBE_" + componentId, 0);
-        alerts.notifyTeam("Migration rollback for " + componentId);
-        logger.warn("Migration rolled back for component {}", componentId);
-    }
-}
-```
 
 ### Challenge: Cross-Cutting Concerns
 
@@ -990,47 +641,6 @@ public void setupCrossCuttingConcerns() {
     // Wrap tubes with aspects
     Tube wrappedTube = (Tube) adapter.wrapTube(new PaymentProcessorTube());
 }
-```
-
-### Challenge: Legacy Integration Testing
-
-**Solution: Dual Pipeline Verification**
-
-```java
-public class DualPipelineVerifier {
-    private final Object legacyComponent;
-    private final Tube newTube;
-    private final ComparisonStrategy strategy;
-    private final TestDataGenerator generator;
-    private final TestResultRepository repository;
-
-    public void verifyWithRandomData(int testCount) {
-        for (int i = 0; i < testCount; i++) {
-            // Generate random test data
-            Object testData = generator.generateRandomData();
-
-            // Process through both pipelines
-            Object legacyResult = processWithLegacy(testData);
-            Object tubeResult = processWithTube(testData);
-
-            // Compare results
-            ComparisonResult comparison = strategy.compare(legacyResult, tubeResult);
-
-            // Store results
-            repository.saveComparison(testData, legacyResult, tubeResult, comparison);
-
-            // Alert on significant differences
-            if (comparison.getDifference() > significanceTreshold) {
-                alertTeam(comparison);
-            }
-        }
-
-        // Generate summary report
-        ComparisonSummary summary = generateSummary();
-        logger.info("Verification complete: {}", summary);
-    }
-}
-```
 
 ## Migration Roadmap Template
 
@@ -1105,20 +715,6 @@ A structured roadmap helps maintain momentum and clarity throughout the migratio
 
 ### Sample Timeline Visualization
 
-```
-Month:   |1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|
-Phase 1: |===========|
-          Assessment  First       Pilot
-          & Setup     Migration   Deployment
-
-Phase 2:             |=======================|
-                      Additional  Bundle     Expanded
-                      Tubes       Formation  Deployment
-
-Phase 3:                                     |===============================|
-                                              Machine    Core      Legacy
-                                              Formation  Migration Decommission
-```
 
 ---
 

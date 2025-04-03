@@ -1,0 +1,386 @@
+name: Samstraumr Pipeline
+
+run-name: Samstraumr Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  # Get version number for the workflow name
+  get-version:
+    name: Get Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Get version
+        id: get_version
+        run: |
+          # Check for version.properties file
+          if [ -f "Samstraumr/version.properties" ]; then
+            # Make the version script executable
+            chmod +x ./util/version
+            # Extract the version
+            VERSION=$(./util/version export) || VERSION="0.0.0"
+          else
+            # Try to extract directly from properties file if available
+            if [ -f "Samstraumr/version.properties" ]; then
+              VERSION=$(grep "samstraumr.version=" "Samstraumr/version.properties" | cut -d= -f2)
+            else
+              # Fallback version if we can't determine it
+              VERSION="0.0.0"
+            fi
+          fi
+          
+          # Set the output variable
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          # Send a notice to GitHub Actions UI
+          echo "::notice::Samstraumr Pipeline v$VERSION"
+          
+          # Add to step summary
+          echo "# Samstraumr v$VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Build started for Samstraumr version $VERSION" >> $GITHUB_STEP_SUMMARY
+
+  # Core initialization and build verification
+  initialization:
+    name: Initialization and Verification
+    needs: get-version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for SonarQube analysis
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Environment awareness
+        run: |
+          echo "Environment Information:"
+          echo "CPU cores: $(nproc)"
+          echo "Memory: $(free -h)"
+          java -version
+          echo "Working directory: $(pwd)"
+          ls -la
+
+      - name: Set Job Summary and Info
+        run: |
+          echo "# 🚀 Building Samstraumr v${{ needs.get-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: ${{ needs.get-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Verify compilation
+        run: mvn -B clean compile
+
+  # Orchestration tests - the highest level of ATL tests
+  orchestration-tests:
+    name: Orchestration Tests
+    needs: [get-version, initialization]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run Orchestration tests
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          ./util/test/run-tests.sh orchestration --skip-quality
+
+      - name: Upload Orchestration test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orchestration-test-reports
+          path: |
+            **/target/surefire-reports/
+            **/target/cucumber-reports/
+          retention-days: 7
+
+  # Unit and component tests
+  unit-tests:
+    name: Unit and Component Tests
+    needs: orchestration-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run Tube Tests
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          ./util/test/run-tests.sh tube --skip-quality
+
+      - name: Run Flow Tests
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          ./util/test/run-tests.sh flow --skip-quality
+
+      - name: Run Composite Tests
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          mvn test -Dtest=*CompositeTest -P skip-quality-checks
+
+      - name: Upload Unit Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-component-test-reports
+          path: |
+            **/target/surefire-reports/
+          retention-days: 7
+
+  # Integration tests
+  integration-tests:
+    name: Integration Tests
+    needs: orchestration-tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: streamtest
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run Stream Tests
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          ./util/test/run-tests.sh stream --skip-quality
+
+      - name: Run Adaptation Tests
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          ./util/test/run-tests.sh adaptation --skip-quality
+
+      - name: Upload Integration Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-reports
+          path: |
+            **/target/surefire-reports/
+          retention-days: 7
+
+  # End-to-end and acceptance tests
+  e2e-tests:
+    name: E2E and Acceptance Tests
+    needs: orchestration-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run Machine Tests
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          ./util/test/run-tests.sh machine --skip-quality
+
+      - name: Run Acceptance Tests
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          ./util/test/run-tests.sh acceptance --skip-quality
+
+      - name: Upload BDD Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bdd-test-reports
+          path: |
+            **/target/cucumber-reports/
+          retention-days: 7
+
+  # Quality analysis
+  quality-analysis:
+    name: Quality Analysis
+    needs: [unit-tests, integration-tests, e2e-tests]
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for SonarQube analysis
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Run Spotless check
+        run: |
+          chmod +x ./util/quality/build-checks.sh || true
+          if [ -x ./util/quality/build-checks.sh ]; then
+            ./util/quality/build-checks.sh --only=spotless || true
+          else
+            mvn -B spotless:check || true
+          fi
+
+      - name: Run Checkstyle
+        run: |
+          if [ -x ./util/quality/build-checks.sh ]; then
+            ./util/quality/build-checks.sh --only=checkstyle || true
+          else
+            mvn -B checkstyle:check || true
+          fi
+
+      - name: Run SpotBugs
+        run: |
+          if [ -x ./util/quality/build-checks.sh ]; then
+            ./util/quality/build-checks.sh --only=spotbugs || true
+          else
+            mvn -B spotbugs:check || true
+          fi
+
+      - name: Generate JaCoCo report
+        run: |
+          if [ -x ./util/quality/build-checks.sh ]; then
+            ./util/quality/build-checks.sh --only=jacoco || true
+          else
+            mvn -B jacoco:report || true
+          fi
+
+      - name: Download all test results
+        uses: actions/download-artifact@v4
+        with:
+          path: test-reports
+
+      - name: SonarQube analysis
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        if: env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != ''
+        run: |
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=heymumford_Samstraumr \
+            -Dsonar.projectName="Samstraumr" \
+            -Dsonar.qualitygate.wait=true \
+            -Dsonar.coverage.jacoco.xmlReportPaths=**/jacoco.xml,**/target/site/jacoco/jacoco.xml,test-reports/**/jacoco.xml \
+            -Dsonar.java.spotbugs.reportPaths=**/spotbugsXml.xml,**/target/spotbugsXml.xml,test-reports/**/spotbugsXml.xml \
+            -Dsonar.java.checkstyle.reportPaths=**/checkstyle-result.xml,**/target/checkstyle-result.xml,test-reports/**/checkstyle-result.xml
+
+      - name: Upload Quality Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports
+          path: |
+            **/target/site/jacoco/
+            **/target/checkstyle-result.xml
+            **/target/spotbugsXml.xml
+          retention-days: 7
+
+  # BTL tests - run if time permits and all other tests pass
+  btl-tests:
+    name: Below-The-Line Tests
+    needs: [unit-tests, integration-tests, e2e-tests]
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run BTL tests
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          ./util/test/run-tests.sh btl --skip-quality
+
+      - name: Upload BTL test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: btl-test-reports
+          path: |
+            **/target/surefire-reports/
+            **/target/cucumber-reports/
+          retention-days: 7
+          
+  # Update workflow summary with version information
+  workflow-summary:
+    name: Workflow Summary
+    if: always()
+    needs: [get-version, orchestration-tests, btl-tests, quality-analysis]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add Version to Workflow Summary
+        run: |
+          echo "# Samstraumr v${{ needs.get-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Build completed for Samstraumr version ${{ needs.get-version.outputs.version }}." >> $GITHUB_STEP_SUMMARY

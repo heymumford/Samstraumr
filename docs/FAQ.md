@@ -1,5 +1,6 @@
 # Frequently Asked Questions
 
+
 This document contains frequently asked questions about the Samstraumr project.
 
 ## General Questions
@@ -22,3 +23,11 @@ Run `./util/build/build-optimal.sh` in the project root directory.
 ### How do I run the tests?
 
 Run `mvn test` or use the specific test commands documented in CLAUDE.md.
+
+### How do I categorize tests as ATL or BTL?
+
+Follow the guidelines in the [ATL/BTL Strategy](./ATL-BTL-Strategy.md) documentation.
+
+---
+
+[← Core Concepts](./CoreConcepts.md) | [Glossary →](./Glossary.md)

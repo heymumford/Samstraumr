@@ -39,15 +39,19 @@ show_usage() {
     echo "Usage: ./util/test/run-tests.sh [OPTIONS] [TEST_TYPE]"
     echo ""
     echo "TEST TYPES:"
-    echo "  tube      - Run Tube Tests (unit/JUnit)"
-    echo "  flow      - Run Flow Tests (integration/JUnit)"
-    echo "  bundle    - Run Bundle Tests (component/JUnit)"
-    echo "  stream    - Run Stream Tests (system/TestContainers)"
-    echo "  adaptation - Run Adaptation Tests (property/custom JUnit)"
-    echo "  machine   - Run Machine Tests (e2e/Cucumber)"
-    echo "  acceptance - Run BDD Acceptance Tests (business/Cucumber)"
-    echo "  all       - Run all tests (default)"
-    echo "  critical  - Run only critical tests (fast for CI)"
+    echo "  orchestration - Run Orchestration Tests (highest level of ATL)"
+    echo "  tube          - Run Tube Tests (unit/JUnit)"
+    echo "  flow          - Run Flow Tests (integration/JUnit)"
+    echo "  bundle        - Run Bundle Tests (component/JUnit) - [DEPRECATED]"
+    echo "  composite     - Run Composite Tests (component/JUnit)"
+    echo "  stream        - Run Stream Tests (system/TestContainers)"
+    echo "  adaptation    - Run Adaptation Tests (property/custom JUnit)"
+    echo "  machine       - Run Machine Tests (e2e/Cucumber)"
+    echo "  acceptance    - Run BDD Acceptance Tests (business/Cucumber)"
+    echo "  all           - Run all tests (default)"
+    echo "  atl           - Run Above The Line tests (critical, must-pass tests)"
+    echo "  btl           - Run Below The Line tests (important but non-blocking tests)"
+    echo "  critical      - Run only critical tests (alias for atl, fast for CI)"
     echo ""
     echo "OPTIONS:"
     echo "  -p, --parallel     Run tests in parallel"
@@ -61,6 +65,8 @@ show_usage() {
     echo "  ./util/test/run-tests.sh -p bundle      # Run bundle tests in parallel"
     echo "  ./util/test/run-tests.sh -s acceptance  # Run acceptance tests without quality checks"
     echo "  ./util/test/run-tests.sh -p -t 4 all    # Run all tests in parallel with 4 threads"
+    echo "  ./util/test/run-tests.sh atl            # Run Above The Line (critical) tests"
+    echo "  ./util/test/run-tests.sh btl            # Run Below The Line (robustness) tests"
     echo ""
 }
 
@@ -87,7 +93,7 @@ while [[ $# -gt 0 ]]; do
             show_usage
             exit 0
             ;;
-        tube|flow|bundle|stream|adaptation|machine|acceptance|all|critical)
+        orchestration|tube|flow|bundle|composite|stream|adaptation|machine|acceptance|all|critical|atl|btl)
             TEST_TYPE="$1"
             shift
             ;;
@@ -114,11 +120,16 @@ fi
 # Set verbosity flags
 VERBOSE_FLAG=""
 if [ "$VERBOSE" = true ]; then
-    VERBOSE_FLAG="--debug"
+    VERBOSE_FLAG="-X"
 fi
 
 # Configure test specific settings
 case $TEST_TYPE in
+    orchestration)
+        echo "🧪 Running Orchestration Tests (highest level of ATL)"
+        echo "🔍 These tests verify the core building blocks and system wiring"
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*Orchestration* -Dcucumber.filter.tags="@Orchestration"
+        ;;
     tube)
         echo "🧪 Running Tube Tests (unit/JUnit)"
         mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*TubeTest
@@ -128,8 +139,12 @@ case $TEST_TYPE in
         mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*FlowTest
         ;;
     bundle)
-        echo "🧪 Running Bundle Tests (component/JUnit)"
+        echo "🧪 Running Bundle Tests (component/JUnit) - [DEPRECATED]"
         mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*BundleTest
+        ;;
+    composite)
+        echo "🧪 Running Composite Tests (component/JUnit)"
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*CompositeTest
         ;;
     stream)
         echo "🧪 Running Stream Tests (system/TestContainers)"
@@ -147,9 +162,13 @@ case $TEST_TYPE in
         echo "🧪 Running BDD Acceptance Tests (business/Cucumber)"
         mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dcucumber.filter.tags="@Acceptance"
         ;;
-    critical)
-        echo "🧪 Running Critical Tests (fast cycle for CI)"
+    atl|critical)
+        echo "🧪 Running Above The Line (ATL) Tests - Critical Path"
         mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -P atl-tests
+        ;;
+    btl)
+        echo "🧪 Running Below The Line (BTL) Tests - Robustness Path"
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -P btl-tests
         ;;
     all)
         echo "🧪 Running All Tests"
