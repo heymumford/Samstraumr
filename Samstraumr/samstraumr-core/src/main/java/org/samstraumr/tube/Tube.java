@@ -171,11 +171,17 @@ public class Tube {
   }
 
   /**
-   * Logs an entry to the Mimir log.
+   * Logs an entry to the Mimir log with timestamp.
+   * This internal log allows the tube to maintain state information and debug data.
    *
    * @param logEntry the entry to log
    */
   public void logToMimir(String logEntry) {
+    if (logEntry == null || logEntry.isEmpty()) {
+      LOGGER.warn("Attempted to log empty or null entry to Mimir log");
+      return;
+    }
+    
     String timestampedEntry = Instant.now().toString() + ": " + logEntry;
     mimirLog.add(timestampedEntry);
     LOGGER.trace("Mimir Log: {}", timestampedEntry);

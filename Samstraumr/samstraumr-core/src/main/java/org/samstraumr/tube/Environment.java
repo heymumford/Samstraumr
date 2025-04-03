@@ -34,13 +34,15 @@ public class Environment {
     JsonMapper mapper = null;
 
     try {
+      LOGGER.debug("Initializing SystemInfo for environment");
       si = new SystemInfo();
       hal = si.getHardware();
       operatingSystem = si.getOperatingSystem();
       mapper = JsonMapper.builder().enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY).build();
-      LOGGER.info("Environment initialized successfully");
+      LOGGER.info("Environment initialized successfully with OS: {}", 
+          operatingSystem != null ? operatingSystem.getFamily() : "unknown");
     } catch (Exception e) {
-      LOGGER.error("Failed to initialize Environment", e);
+      LOGGER.error("Failed to initialize Environment: {}", e.getMessage(), e);
     }
 
     this.systemInfo = si;
@@ -85,21 +87,31 @@ public class Environment {
     }
   }
 
+  /**
+   * Retrieves the MAC address of the first non-loopback network interface.
+   * 
+   * @return MAC address as a string, or "unknown" if it cannot be determined
+   */
   private String getMacAddress() {
     if (hardware == null) {
+      LOGGER.debug("Hardware abstraction layer is null, cannot retrieve MAC address");
       return UNKNOWN;
     }
     try {
       List<NetworkIF> networkIFs = hardware.getNetworkIFs();
+      LOGGER.debug("Found {} network interfaces", networkIFs.size());
+      
       for (NetworkIF net : networkIFs) {
         if (!net.queryNetworkInterface().isLoopback()
             && net.getMacaddr() != null
             && !net.getMacaddr().isEmpty()) {
+          LOGGER.debug("Using network interface: {}", net.getName());
           return net.getMacaddr();
         }
       }
+      LOGGER.debug("No suitable network interface found with a valid MAC address");
     } catch (Exception e) {
-      LOGGER.warn("Failed to get MAC address", e);
+      LOGGER.warn("Failed to get MAC address: {}", e.getMessage(), e);
     }
     return UNKNOWN;
   }
