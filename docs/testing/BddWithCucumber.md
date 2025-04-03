@@ -1,5 +1,10 @@
 # Behavior-Driven Development with Cucumber
 
+> **⚠️ DEPRECATED**: This document has been merged into a comprehensive BDD documentation document.
+> 
+> Please refer to the consolidated document for the most up-to-date information:
+> [BDD Documentation](BddDocumentation.md)
+
 This document explains Samstraumr's approach to Behavior-Driven Development (BDD) using Cucumber.
 
 ## Introduction to BDD

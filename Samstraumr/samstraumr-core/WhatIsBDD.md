@@ -1,5 +1,10 @@
 # What is Behavior Driven Development (BDD)
 
+> **⚠️ DEPRECATED**: This document has been merged into a comprehensive BDD documentation document.
+> 
+> Please refer to the consolidated document for the most up-to-date information:
+> [BDD Documentation](/docs/testing/BddDocumentation.md)
+
 Synthesized by Eric Mumford from experience and several sources.
 
 Behavior-Driven Development streamlines the software development process by focusing on the desired behavior of the application. By involving all stakeholders in defining clear, testable requirements, BDD ensures that the final product meets business needs and provides real value to users. Whether you're a layperson or a software engineer, BDD offers a structured yet flexible approach to building effective software solutions.

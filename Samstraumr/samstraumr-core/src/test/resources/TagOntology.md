@@ -1,5 +1,10 @@
 # Samstraumr Test Tag Ontology
 
+> **⚠️ DEPRECATED**: This document has been merged into a comprehensive test tags and annotations document.
+> 
+> Please refer to the consolidated document for the most up-to-date information:
+> [Test Tags and Annotations](/docs/testing/TestTagsAndAnnotations.md)
+
 This document defines the tag ontology for organizing and categorizing Samstraumr tests. This ontology is designed to align with systems theory principles and support the complete testing strategy for Samstraumr, covering both JUnit and BDD testing approaches.
 
 ## Test Type Tags

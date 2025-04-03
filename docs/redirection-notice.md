@@ -6,8 +6,8 @@
 > 
 > Please update your bookmarks to the new location: 
 > 
-> [Logging Standards](/docs/reference/standards/LoggingStandards.md)
+> [DOCUMENT_LINK]
 >
 > Redirecting you in 3 seconds...
 >
-> <meta http-equiv="refresh" content="3;url=../docs/reference/standards/LoggingStandards.md">
+> <meta http-equiv="refresh" content="3;url=DOCUMENT_URL">

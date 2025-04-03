@@ -1,5 +1,10 @@
 # Testing Annotations
 
+> **⚠️ DEPRECATED**: This document has been merged into a comprehensive test tags and annotations document.
+> 
+> Please refer to the consolidated document for the most up-to-date information:
+> [Test Tags and Annotations](TestTagsAndAnnotations.md)
+
 This document describes the test annotations used in Samstraumr, which follow a dual terminology approach to support both domain-specific and industry-standard testing concepts.
 
 ## Dual Terminology Approach

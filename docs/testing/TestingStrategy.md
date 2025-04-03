@@ -1,8 +1,27 @@
 # Samstraumr Testing Strategy
 
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Industry-Aligned Testing Taxonomy](#industry-aligned-testing-taxonomy)
+3. [Test Pyramid Structure](#test-pyramid-structure)
+4. [Terminology Mapping](#terminology-mapping)
+5. [Above The Line vs Below The Line](#above-the-line-vs-below-the-line)
+6. [Testing Taxonomy in Detail](#testing-taxonomy-in-detail)
+7. [Test Organization](#test-organization)
+8. [Continuous Integration Strategy](#continuous-integration-strategy)
+9. [Running Tests](#running-tests)
+10. [References](#references)
+
+## Overview
+
+Samstraumr's testing strategy is designed to align with industry-standard testing concepts while maintaining its domain-specific terminology and philosophy. This document provides a comprehensive overview of our testing approach and how it maps to established testing nomenclature.
+
+The strategy is built around the concepts of Behavior-Driven Development (BDD) and Test-Driven Development (TDD), with a hierarchical structure that mirrors the compositional nature of Samstraumr systems.
+
 ## Industry-Aligned Testing Taxonomy
 
-Samstraumr's testing strategy is aligned with industry-standard testing concepts while maintaining its expressive philosophy. This document maps our testing approach to established testing nomenclature developed by practitioners like Martin Fowler, Robert C. Martin (Uncle Bob), Kent Beck, and other thought leaders.
+Samstraumr's testing strategy is aligned with industry-standard testing concepts while maintaining its expressive philosophy. Our approach builds upon the work of practitioners like Martin Fowler, Robert C. Martin (Uncle Bob), Kent Beck, and other thought leaders.
 
 ## Test Pyramid Structure
 
@@ -23,25 +42,27 @@ Our test strategy is organized according to a modified version of Mike Cohn's Te
          /----------------------\
 ```
 
-### Test Categories
+## Terminology Mapping
 
-| Industry Standard | Samstraumr Terminology | Description | Speed | Cost | ATL/BTL |
-|-------------------|------------------------|-------------|-------|------|---------|
-| **Smoke Tests** | **Orchestration Tests** | Basic build validation | Very Fast | Very Low | ATL |
-| **Unit Tests** | **Tube Tests** | Tests for individual tubes in isolation | Fast | Low | ATL |
-| **Component Tests** | **Composite Tests** | Tests for tube composites | Medium | Medium | ATL |
-| **Integration Tests** | **Flow Tests** | Tests for data flowing through tubes | Medium | Medium | Mix |
-| **API/Contract Tests** | **Machine Tests** | Tests for machine boundaries | Medium | Medium | Mix |
-| **System Tests** | **Stream Tests** | Tests for system-level behaviors | Slow | High | BTL |
-| **End-to-End Tests** | **Acceptance Tests** | Tests for complete user journeys | Very Slow | Very High | BTL |
-| **Property Tests** | **Adaptation Tests** | Tests for system adaptability | Varies | High | BTL |
+Samstraumr uses domain-specific terminology that aligns with the core concepts of our system. The following table maps our terminology to industry-standard testing terms:
 
-## Above the Line (ATL) vs Below the Line (BTL)
+| Industry Standard | Samstraumr Term | Description |
+|-------------------|-----------------|-------------|
+| Smoke Test        | Orchestration Test | Verifies the basic system assembly and connectivity |
+| Unit Test         | Tube Test       | Tests individual tubes in isolation |
+| Component Test    | Composite Test  | Tests connected tubes working together |
+| Integration Test  | Flow Test       | Tests interaction between different parts of the system |
+| API/Contract Test | Machine Test    | Tests public interfaces and contracts |
+| System Test       | Stream Test     | Tests the entire system as a whole |
+| End-to-End Test   | Acceptance Test | Tests the system from the user's perspective |
+| Property Test     | Adaptation Test | Tests system properties across a range of inputs |
+
+## Above The Line vs Below The Line
 
 Our testing strategy divides tests into critical (ATL) and non-critical (BTL) categories:
 
-- **Above The Line (ATL)**: Tests that must pass for a build to be considered valid
-- **Below The Line (BTL)**: Tests that provide additional confidence but are not blocking
+- **Above The Line (ATL)**: Critical tests that must pass for the build to be considered valid. These tests ensure the core functionality works correctly and provide fast feedback on build validity.
+- **Below The Line (BTL)**: Non-critical tests that are important for robustness but not for basic functionality. These tests provide additional confidence but are not blocking.
 
 This aligns with industry concepts of "critical path" and "build verification" versus "non-blocking validation."
 
@@ -115,19 +136,15 @@ Adaptation tests verify the system's ability to adapt to changing conditions and
 
 **Tag**: `@Property`
 
-## Testing Methodology
+## Test Organization
 
-Samstraumr employs a Behavior-Driven Development (BDD) approach using Cucumber for feature-level tests, complemented by JUnit for more granular unit and component testing. This aligns with industry practices for combining specification by example with traditional testing approaches.
+Tests are organized by their level:
 
-### BDD Feature Organization
-
-Feature files are organized hierarchically:
-
-- L0_Orchestration: Core build verification features
-- L1_Tube: Unit-level features for individual tubes
-- L1_Composite: Component-level features for composite tubes
-- L2_Machine: Integration-level features for machines
-- L3_System: System-level features for the entire application
+1. **L0 - Tube (Unit) Tests** - Tests individual tubes in isolation
+2. **L1 - Composite (Component) Tests** - Tests tubes working together
+3. **L2 - Machine (API) Tests** - Tests public interfaces
+4. **L3 - Stream (System) Tests** - Tests the entire system
+5. **L4 - Orchestration (Smoke) Tests** - Tests system assembly
 
 ## Continuous Integration Strategy
 
@@ -139,9 +156,28 @@ Our CI pipeline implements a progressive testing approach:
 4. **Quality Analysis**: Static analysis tools run alongside tests for code quality
 5. **Extended Validation**: BTL tests run lastly for additional confidence
 
+## Running Tests
+
+Tests can be run using both terminology sets with our custom runner:
+
+```bash
+# Run unit tests (Samstraumr's Tube tests)
+./run-tests.sh unit
+
+# Run both unit tests and tube tests
+./run-tests.sh --both unit
+
+# Run with specific Maven profile
+./run-tests.sh --profile btl-tests integration
+```
+
 ## References
 
 - Martin Fowler: [TestPyramid](https://martinfowler.com/articles/practical-test-pyramid.html)
 - Robert C. Martin: [The Three Rules of TDD](http://butunclebob.com/ArticleS.UncleBob.TheThreeRulesOfTdd)
 - Mike Cohn: [Succeeding with Agile](https://www.mountaingoatsoftware.com/books/succeeding-with-agile-software-development-using-scrum)
 - Kent Beck: [Test-Driven Development](https://www.amazon.com/Test-Driven-Development-Kent-Beck/dp/0321146530)
+- [Martin Fowler's Test Pyramid](https://martinfowler.com/articles/practical-test-pyramid.html)
+- [Testing Strategies in a Microservice Architecture](https://martinfowler.com/articles/microservice-testing/)
+- [Robert C. Martin's Clean Code](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)
+- [Growing Object-Oriented Software, Guided by Tests](https://www.amazon.com/Growing-Object-Oriented-Software-Guided-Tests/dp/0321503627)

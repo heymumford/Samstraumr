@@ -1,5 +1,10 @@
 # Rationale for BDD Cucumber Tests in Samstraumr: A Holistic Approach to Software Quality
 
+> **⚠️ DEPRECATED**: This document has been merged into a comprehensive BDD documentation document.
+> 
+> Please refer to the consolidated document for the most up-to-date information:
+> [BDD Documentation](/docs/testing/BddDocumentation.md)
+
 ## Situation
 
 Samstraumr, a framework for creating adaptive, self-aware software systems, hopes to inspire a paradigm shift in software development. Its tube-based design and living systems approach offer flexibility and resilience. However, with great power comes great responsibility – and the need for equally innovative testing and documentation strategies.
