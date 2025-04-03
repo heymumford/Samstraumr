@@ -2,6 +2,46 @@
 
 This document outlines how to generate and interpret comprehensive build reports for Samstraumr, following the project's philosophy of flow, awareness, and adaptive components.
 
+## Quick Start Guide
+
+Generate a build report from the Linux command line with a single command:
+
+```bash
+# From the project root directory:
+./util/build/generate-build-report.sh --skip-tests --skip-quality
+```
+
+The report will be generated at `target/samstraumr-report/index.html`. Open it in your browser:
+
+```bash
+# Linux/WSL (using xdg-open)
+xdg-open target/samstraumr-report/index.html
+
+# Or specify your browser directly
+firefox target/samstraumr-report/index.html
+# or
+google-chrome target/samstraumr-report/index.html
+```
+
+## Additional Options
+
+```bash
+# Generate full report with tests and quality checks (slower but more complete)
+./util/build/generate-build-report.sh
+
+# Skip only tests
+./util/build/generate-build-report.sh --skip-tests
+
+# Skip only quality checks
+./util/build/generate-build-report.sh --skip-quality
+
+# Specify a custom output directory
+./util/build/generate-build-report.sh --output /path/to/custom/directory
+
+# Show help
+./util/build/generate-build-report.sh --help
+```
+
 ## Philosophy
 
 In Samstraumr, we view build reports as a form of system awareness, similar to how Tubes monitor their state and environment. A proper build report should:

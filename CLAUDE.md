@@ -113,10 +113,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - Generate all badges: `./util/badges/generate-badges.sh all`
   - Generate specific badge: `./util/badges/generate-badges.sh build`
 - Build Reports:
-  - Generate comprehensive build report: `./util/build/generate-build-report.sh`
+  - Quick build report (recommended): `./util/build/generate-build-report.sh --skip-tests --skip-quality`
+  - Full build report: `./util/build/generate-build-report.sh`
   - Skip tests during report generation: `./util/build/generate-build-report.sh --skip-tests`
   - Skip quality checks during report generation: `./util/build/generate-build-report.sh --skip-quality`
   - Specify custom output directory: `./util/build/generate-build-report.sh --output /path/to/output`
+  - View report: `xdg-open target/samstraumr-report/index.html` (Linux/WSL)
   - Build report documentation: See `docs/contribution/build-report-guide.md`
 
 ## Code Style Guidelines

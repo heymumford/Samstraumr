@@ -1,9 +1,9 @@
 # Samstraumr Framework
 
-[![Version](https://img.shields.io/badge/version-1.0.10-blue)](https://github.com/heymumford/Samstraumr/releases) [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/)
+[![Version](https://img.shields.io/badge/version-1.0.11-blue)](https://github.com/heymumford/Samstraumr/releases) [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/)
 
 ```
-Version: 1.0.10
+Version: 1.0.11
 License: Mozilla Public License 2.0
 Maintainer: Eric C. Mumford (@heymumford)
 ```
@@ -113,6 +113,7 @@ Tubes maintain two complementary state models:
 - **Quality Checks**: `./util/quality/check-encoding.sh`
 - **Version Management**: `./util/version bump patch` or `./util/version set <new-version>`
 - **Build Pipeline**: Local validation with [Act](https://github.com/nektos/act) (see [CI/CD Guide](./docs/contribution/ci-cd-guide.md))
+- **Build Reports**: Generate a detailed build report with `./util/build/generate-build-report.sh --skip-tests --skip-quality` (see [Build Report Guide](./docs/contribution/build-report-guide.md))
 - **Utility Scripts**: Organized by category:
   - `util/build/`: Build automation
   - `util/quality/`: Quality assurance
