@@ -4,7 +4,7 @@
 
   <groupId>org.samstraumr</groupId>
   <artifactId>samstraumr-modules</artifactId>
-  <version>0.4</version>
+  <version>0.5</version>
   <packaging>pom</packaging>
   <name>Samstraumr Modules</name>
 
@@ -17,7 +17,7 @@
     <version.file.path>${project.basedir}/version.properties</version.file.path>
 
     <!-- Project version - used until properties are loaded -->
-    <samstraumr.version>0.4</samstraumr.version>
+    <samstraumr.version>0.5</samstraumr.version>
 
     <!-- Core properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,13 +38,13 @@
 
     <!-- Quality check plugin versions -->
     <spotless.plugin.version>2.40.0</spotless.plugin.version>
-    <pmd.plugin.version>3.21.2</pmd.plugin.version>
+    <!-- PMD plugin removed - using SonarQube for code quality -->
     <checkstyle.plugin.version>3.3.1</checkstyle.plugin.version>
     <spotbugs.plugin.version>4.8.2.0</spotbugs.plugin.version>
     <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
 
     <!-- Quality tool versions -->
-    <pmd.version>7.10.0</pmd.version>
+    <!-- PMD version removed - using SonarQube for code quality -->
     <checkstyle.version>10.14.0</checkstyle.version>
     <spotless.google.format.version>1.17.0</spotless.google.format.version>
   </properties>
@@ -175,50 +175,7 @@
           </executions>
         </plugin>
 
-        <!-- PMD plugin for code analysis -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-pmd-plugin</artifactId>
-          <version>${pmd.plugin.version}</version>
-          <configuration>
-            <failOnViolation>true</failOnViolation>
-            <printFailingErrors>true</printFailingErrors>
-            <linkXRef>false</linkXRef>
-            <analysisCache>true</analysisCache>
-            <includeTests>true</includeTests>
-            <sourceEncoding>UTF-8</sourceEncoding>
-            <targetJdk>${maven.compiler.target}</targetJdk>
-            <rulesets>
-              <ruleset>/category/java/bestpractices.xml/UnusedPrivateMethod</ruleset>
-              <ruleset>/category/java/errorprone.xml/EmptyCatchBlock</ruleset>
-              <ruleset>${project.basedir}/pmd-ruleset.xml</ruleset>
-            </rulesets>
-          </configuration>
-          <dependencies>
-            <dependency>
-              <groupId>net.sourceforge.pmd</groupId>
-              <artifactId>pmd-core</artifactId>
-              <version>${pmd.version}</version>
-            </dependency>
-            <dependency>
-              <groupId>net.sourceforge.pmd</groupId>
-              <artifactId>pmd-java</artifactId>
-              <version>${pmd.version}</version>
-            </dependency>
-          </dependencies>
-          <executions>
-            <execution>
-              <id>pmd-check</id>
-              <goals>
-                <goal>check</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <skip>${skip.quality.checks}</skip>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
+        <!-- PMD plugin removed - using SonarQube for code quality -->
 
         <!-- Checkstyle plugin for coding standards -->
         <plugin>
@@ -374,10 +331,7 @@
             <groupId>com.diffplug.spotless</groupId>
             <artifactId>spotless-maven-plugin</artifactId>
           </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-pmd-plugin</artifactId>
-          </plugin>
+          <!-- PMD plugin removed - using SonarQube for code quality -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-checkstyle-plugin</artifactId>

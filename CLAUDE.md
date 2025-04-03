@@ -19,7 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Run BTL (robustness) tests: `mvn test -P btl-tests`
 - Run tests with specific tag: `mvn test -Dcucumber.filter.tags="@TagName"`
 - Run tests with tag combinations: `mvn test -Dcucumber.filter.tags="@L0_Tube and @Identity"`
-- Run tests with quality checks skipped: `mvn test -P atl-tests -P skip-quality-checks -Dspotless.check.skip=true -Dpmd.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true -Djacoco.skip=true -Dmaven.test.skip=false`
+- Run tests with quality checks skipped: `mvn test -P atl-tests -P skip-quality-checks -Dspotless.check.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true -Djacoco.skip=true -Dmaven.test.skip=false`
 
 ### Test Tag Hierarchy
 - Layer-based hierarchy: `@L0_Tube`, `@L1_Bundle`, `@L2_Machine`, `@L3_System`
@@ -34,7 +34,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Skip quality checks: `mvn install -P skip-quality-checks`
 - Run specific checks:
   - Formatting: `mvn spotless:check` (Fix: `mvn spotless:apply`)
-  - Code analysis: `mvn pmd:check`
+  - Code analysis: SonarQube (external)
   - Coding standards: `mvn checkstyle:check`
   - Bug detection: `mvn spotbugs:check`
   - Code coverage: `mvn jacoco:report`
@@ -70,7 +70,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Feature files contain detailed test documentation with tags for selective test execution
 - Quality checks integrated into the build process
   - Spotless: Code formatting
-  - PMD: Static code analysis
+  - SonarQube: Comprehensive static code analysis (external)
   - Checkstyle: Coding standards
   - SpotBugs: Bug detection
   - JaCoCo: Code coverage
@@ -83,5 +83,5 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Cucumber Reports: `target/cucumber-reports/cucumber.html`
 - JaCoCo Coverage: `target/site/jacoco/index.html`
 - CheckStyle: `target/checkstyle-result.xml`
-- PMD: `target/pmd.xml`
+- SonarQube: Online dashboard
 - SpotBugs: `target/spotbugsXml.xml`

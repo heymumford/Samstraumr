@@ -1,61 +1,137 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <!-- Project Metadata -->
   <groupId>org.samstraumr</groupId>
   <artifactId>samstraumr</artifactId>
-  <version>0.4</version>
+  <version>0.5</version>
   <packaging>pom</packaging>
   <name>Samstraumr</name>
+  <description>
+    Root POM that references the actual Samstraumr project structure.
+    This allows Maven commands to be run from the project root directory.
+  </description>
 
-  <description>Root POM that references the actual Samstraumr project structure.
-        This allows mvn commands to be run from the project root directory.</description>
-
+  <!-- Modules -->
   <modules>
     <module>Samstraumr</module>
   </modules>
 
+  <!-- Properties Section -->
   <properties>
-    <!-- Version configuration - Import from the modules directory -->
-    <version.file.path>${project.basedir}/Samstraumr/version.properties</version.file.path>
-
-    <!-- Project version - used until properties are loaded -->
-    <samstraumr.version>0.4</samstraumr.version>
-
-    <!-- Core properties -->
+    <!-- Encoding and Java Compiler Settings -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
 
-    <!-- Test configuration -->
+    <!-- Version placeholders -->
+    <samstraumr.version>0.5</samstraumr.version>
+    <version.file.path>${project.basedir}/Samstraumr/version.properties</version.file.path>
+
+    <!-- Test Configuration -->
     <all.test.tags>@ATL or @BTL</all.test.tags>
     <atl.test.tags>@ATL</atl.test.tags>
     <btl.test.tags>@BTL</btl.test.tags>
     <skip.quality.checks>false</skip.quality.checks>
 
-    <!-- Maven plugin versions -->
+    <!-- Plugin Versions -->
     <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
     <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
     <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
     <properties.plugin.version>1.2.0</properties.plugin.version>
-
-    <!-- Quality check plugin versions -->
     <spotless.plugin.version>2.40.0</spotless.plugin.version>
-    <pmd.plugin.version>3.20.0</pmd.plugin.version>
+    <!-- PMD plugin removed - using SonarQube for code quality -->
     <checkstyle.plugin.version>3.3.1</checkstyle.plugin.version>
     <spotbugs.plugin.version>4.8.2.0</spotbugs.plugin.version>
     <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
-
-    <!-- Quality tool versions -->
-    <pmd.version>6.55.0</pmd.version>
     <checkstyle.version>10.14.0</checkstyle.version>
+    <!-- PMD version removed - using SonarQube for code quality -->
     <spotless.google.format.version>1.17.0</spotless.google.format.version>
   </properties>
 
+  <!-- Reporting Section -->
+  <reporting>
+    <plugins>
+      <!-- Checkstyle Reporting -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>checkstyle</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+
+      <!-- PMD Reporting removed - using SonarQube for code quality -->
+
+      <!-- Spotbugs Reporting -->
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+      </plugin>
+
+      <!-- JaCoCo Reporting -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <!-- Build Section -->
   <build>
     <pluginManagement>
       <plugins>
-        <!-- Spotless plugin for code formatting -->
+        <!-- Checkstyle Plugin -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>${checkstyle.plugin.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>com.puppycrawl.tools</groupId>
+              <artifactId>checkstyle</artifactId>
+              <version>${checkstyle.version}</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <configLocation>checkstyle.xml</configLocation>
+            <consoleOutput>true</consoleOutput>
+            <failsOnError>true</failsOnError>
+            <linkXRef>false</linkXRef>
+            <skip>${skip.quality.checks}</skip>
+          </configuration>
+        </plugin>
+
+        <!-- Spotbugs Plugin -->
+        <plugin>
+          <groupId>com.github.spotbugs</groupId>
+          <artifactId>spotbugs-maven-plugin</artifactId>
+          <version>${spotbugs.plugin.version}</version>
+          <configuration>
+            <effort>Max</effort>
+            <threshold>Low</threshold>
+            <xmlOutput>true</xmlOutput>
+            <skip>${skip.quality.checks}</skip>
+          </configuration>
+        </plugin>
+
+        <!-- Jacoco Plugin -->
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${jacoco.plugin.version}</version>
+          <configuration>
+            <skip>${skip.quality.checks}</skip>
+          </configuration>
+        </plugin>
+
+        <!-- Spotless Plugin -->
         <plugin>
           <groupId>com.diffplug.spotless</groupId>
           <artifactId>spotless-maven-plugin</artifactId>
@@ -65,67 +141,30 @@
               <includes>
                 <include>**/*.java</include>
               </includes>
-              <importOrder>
-                <order>java,javax,org,com,</order>
-              </importOrder>
-              <removeUnusedImports/>
               <googleJavaFormat>
                 <version>${spotless.google.format.version}</version>
                 <style>GOOGLE</style>
               </googleJavaFormat>
               <trimTrailingWhitespace/>
               <endWithNewline/>
-              <encoding>UTF-8</encoding>
-              <lineEndings>UNIX</lineEndings>
             </java>
-            <pom>
-              <includes>
-                <include>**/pom.xml</include>
-              </includes>
-              <sortPom>
-                <expandEmptyElements>false</expandEmptyElements>
-              </sortPom>
-              <encoding>UTF-8</encoding>
-              <lineEndings>UNIX</lineEndings>
-            </pom>
-            <markdown>
-              <includes>
-                <include>**/*.md</include>
-              </includes>
-              <endWithNewline/>
-              <trimTrailingWhitespace/>
-              <encoding>UTF-8</encoding>
-              <lineEndings>UNIX</lineEndings>
-            </markdown>
           </configuration>
-          <executions>
-            <execution>
-              <id>spotless-check</id>
-              <goals>
-                <goal>check</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <skip>${skip.quality.checks}</skip>
-              </configuration>
-            </execution>
-          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
 
     <plugins>
-      <!-- Load version properties -->
+      <!-- Properties Plugin -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>properties-maven-plugin</artifactId>
         <version>${properties.plugin.version}</version>
         <executions>
           <execution>
+            <phase>initialize</phase>
             <goals>
               <goal>read-project-properties</goal>
             </goals>
-            <phase>initialize</phase>
             <configuration>
               <files>
                 <file>${version.file.path}</file>
@@ -135,42 +174,19 @@
         </executions>
       </plugin>
 
-      <plugin>
-        <groupId>com.diffplug.spotless</groupId>
-        <artifactId>spotless-maven-plugin</artifactId>
-      </plugin>
-      <!-- Ensure consistent encoding in resource files -->
+      <!-- Maven Resources Plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
         <version>${maven.resources.plugin.version}</version>
         <configuration>
           <encoding>UTF-8</encoding>
-          <resources>
-            <resource>
-              <directory>src/main/resources</directory>
-              <filtering>true</filtering>
-            </resource>
-            <resource>
-              <directory>src/test/resources</directory>
-              <filtering>true</filtering>
-            </resource>
-          </resources>
-          <nonFilteredFileExtensions>
-            <nonFilteredFileExtension>png</nonFilteredFileExtension>
-            <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
-            <nonFilteredFileExtension>jpeg</nonFilteredFileExtension>
-            <nonFilteredFileExtension>gif</nonFilteredFileExtension>
-            <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
-            <nonFilteredFileExtension>zip</nonFilteredFileExtension>
-            <nonFilteredFileExtension>jar</nonFilteredFileExtension>
-          </nonFilteredFileExtensions>
         </configuration>
       </plugin>
     </plugins>
   </build>
 
-  <!-- Profile definitions for ATL and BTL test execution at the root level -->
+  <!-- Profiles Section -->
   <profiles>
     <profile>
       <id>atl-tests</id>
@@ -200,4 +216,5 @@
       </properties>
     </profile>
   </profiles>
+
 </project>

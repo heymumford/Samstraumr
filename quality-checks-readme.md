@@ -7,10 +7,10 @@ This document explains how to use the quality checks in the Samstraumr project.
 The following quality checks are configured in the project:
 
 1. **Spotless** - Code formatting using Google Java Style
-2. **PMD** - Static code analysis
-3. **Checkstyle** - Style checking based on Google's style
-4. **SpotBugs** - Bug detection
-5. **JaCoCo** - Code coverage
+2. **Checkstyle** - Style checking based on Google's style
+3. **SpotBugs** - Bug detection
+4. **JaCoCo** - Code coverage
+5. **SonarQube** - Comprehensive static code analysis (external)
 
 ## Running Quality Checks
 
@@ -41,8 +41,7 @@ mvn spotless:apply
 # Check code formatting
 mvn spotless:check
 
-# Run PMD analysis
-mvn pmd:check
+# PMD has been removed in favor of SonarQube
 
 # Run Checkstyle
 mvn checkstyle:check
@@ -79,8 +78,17 @@ mvn spotbugs:gui
 ## Configuration Files
 
 - Checkstyle: `Samstraumr/checkstyle.xml`
-- PMD: `Samstraumr/pmd-ruleset.xml`
+- SonarQube: Configuration resides on the SonarQube server
 
 ## CI/CD Integration
 
 Quality checks are integrated into the CI/CD pipeline to ensure code quality. Pull requests that fail quality checks will not be merged until the issues are fixed.
+
+## SonarQube Integration
+
+SonarQube provides comprehensive static code analysis for the project. It runs as part of the CI/CD pipeline and also can be accessed through:
+
+- SonarQube Dashboard (refer to your team's SonarQube instance URL)
+- SonarLint IDE plugin for local analysis
+
+For more information on SonarQube and why we migrated from PMD, see `docs/quality-changes.md`.
