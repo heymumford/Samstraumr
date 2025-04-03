@@ -15,20 +15,25 @@ cd "$PROJECT_ROOT"
 VERSION=$(./util/version export)
 
 # Generate badges
+VERSION_BADGE="[![Version](https://img.shields.io/badge/version-$VERSION-blue)](https://github.com/heymumford/Samstraumr/releases)"
+BUILD_BADGE="[![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml)"
+LICENSE_BADGE="[![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)"
+JAVA_BADGE="[![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/)"
+
 generate_version_badge() {
-    echo "[![Version](https://img.shields.io/badge/version-$VERSION-blue)](https://github.com/heymumford/Samstraumr/releases)"
+    echo "$VERSION_BADGE"
 }
 
 generate_build_badge() {
-    echo "[![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml)"
+    echo "$BUILD_BADGE"
 }
 
 generate_license_badge() {
-    echo "[![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)"
+    echo "$LICENSE_BADGE"
 }
 
 generate_java_badge() {
-    echo "[![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/)"
+    echo "$JAVA_BADGE"
 }
 
 # Combined badges
