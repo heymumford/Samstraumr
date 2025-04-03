@@ -92,13 +92,13 @@ To ensure all files follow these conventions, we have created standardization sc
 
 ```bash
 # Run the Markdown standardization script
-./docs/standardize-md-filenames.sh
+./docs/scripts/standardize-md-filenames.sh
 
 # Run the Cucumber feature file standardization script
 ./docs/scripts/standardize-feature-filenames.sh
 ```
 
-These scripts will detect and rename files that don't follow the conventions, ensuring consistency across the project.
+These scripts will detect and rename files that don't follow the conventions, ensuring consistency across the project. All scripts must be run from the project root directory.
 
 ### Maintenance
 
@@ -112,7 +112,7 @@ When adding new files to the project, follow these guidelines:
    - Run the standardization scripts periodically:
      ```bash
      # For Markdown files
-     ./docs/standardize-md-filenames.sh
+     ./docs/scripts/standardize-md-filenames.sh
      
      # For Cucumber feature files
      ./docs/scripts/standardize-feature-filenames.sh
