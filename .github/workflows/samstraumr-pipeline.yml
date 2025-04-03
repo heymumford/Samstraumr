@@ -1,4 +1,4 @@
-name: Samstraumr Pipeline
+name: Samstraumr Pipeline v${{ steps.get_version.outputs.version }}
 
 on:
   push:
@@ -8,9 +8,26 @@ on:
   workflow_dispatch: # Manual trigger
 
 jobs:
+  # Get version number for the workflow name
+  get-version:
+    name: Get Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Get version
+        id: get_version
+        run: |
+          chmod +x ./util/version
+          echo "version=$(./util/version export)" >> $GITHUB_OUTPUT
+
   # Core initialization and build verification
   initialization:
     name: Initialization and Verification
+    needs: get-version
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -47,7 +64,7 @@ jobs:
   # ATL Critical tests - must pass before any other tests run
   atl-tests:
     name: Above-The-Line Tests
-    needs: initialization
+    needs: [get-version, initialization]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

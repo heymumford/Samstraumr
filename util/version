@@ -58,6 +58,7 @@ show_usage() {
   echo ""
   echo "Commands:"
   echo "  get                Show current version information"
+  echo "  export|echo        Output only the current version (for scripts and CI)"
   echo "  bump major         Bump the major version (X.y.z → X+1.0.0)"
   echo "  bump minor         Bump the minor version (x.Y.z → x.Y+1.0)"
   echo "  bump patch         Bump the patch version (x.y.Z → x.y.Z+1)"
@@ -169,6 +170,13 @@ update_version() {
   
   # Update README.md version
   sed -i "s/Version: .*/Version: $new_version/g" README.md
+  # Update badges in README.md if we have the badge script
+  if [ -f "./util/badges/generate-badges.sh" ]; then
+    chmod +x ./util/badges/generate-badges.sh
+    VERSION_BADGE=$(./util/badges/generate-badges.sh version)
+    sed -i "s|[![Version].*)]|$VERSION_BADGE|" README.md
+    print_success "Updated version badge in README.md"
+  fi
   print_success "Updated README.md"
   
   # Update version in other documentation files
@@ -206,6 +214,8 @@ commit_version_changes() {
     "Samstraumr/samstraumr-core/pom.xml"
     "docs/GettingStarted.md"
     "CLAUDE.md"
+    "util/badges/generate-badges.sh"
+    ".github/workflows/samstraumr-pipeline.yml"
   )
   
   # Only add files that exist and have changes
@@ -322,6 +332,10 @@ done
 case "$COMMAND" in
   get)
     show_version_info
+    ;;
+  
+  export|echo)
+    echo "$(get_current_version)"
     ;;
   
   bump)
