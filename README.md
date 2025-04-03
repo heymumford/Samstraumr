@@ -36,8 +36,8 @@ Samstraumr (Old Norse: "unified flow") is a design framework for building adapti
 Tubes are self-contained processing units with defined inputs, outputs, and responsibilities. The architecture follows a hierarchical organization:
 
 - **Atomic tubes**: Individual processing units with single responsibilities
-- **Bundles**: Coordinated tube collections forming processing pipelines
-- **Machines**: Orchestrated bundles implementing complete subsystems
+- **Composites**: Coordinated tube collections forming processing pipelines (formerly Bundles)
+- **Machines**: Orchestrated composites implementing complete subsystems
 
 [→ Core Concepts](./docs/CoreConcepts.md) | 
 [→ Tube Patterns](./docs/TubePatterns.md) | 
@@ -102,7 +102,7 @@ Tubes maintain two complementary state models:
 
 - [Glossary](./docs/Glossary.md): Terminology reference
 - [FAQ](./docs/FAQ.md): Common questions and answers
-- [Testing Strategy](./docs/proposals/SamstraumrTestingStrategy.md): Testing methodology
+- [Testing Strategy](./docs/TestingStrategy.md): Industry-aligned testing methodology
 - [LLM Context Proposal](./docs/proposals/LLMContextCompositeTubeProposal.md): Experimental extension
 
 ## Development Standards

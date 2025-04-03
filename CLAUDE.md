@@ -18,45 +18,74 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Test Commands
 
 ### Test Runner Script
-- Run all tests: `./util/test/run-tests.sh all`
-- Run specific test types:
-  - Tube Tests (unit/JUnit): `./util/test/run-tests.sh tube`
-  - Flow Tests (integration/JUnit): `./util/test/run-tests.sh flow`
-  - Bundle Tests (component/JUnit): `./util/test/run-tests.sh bundle`
-  - Stream Tests (system/TestContainers): `./util/test/run-tests.sh stream`
-  - Adaptation Tests (property/JUnit): `./util/test/run-tests.sh adaptation`
-  - Machine Tests (e2e/Cucumber): `./util/test/run-tests.sh machine`
-  - BDD Acceptance Tests (business/Cucumber): `./util/test/run-tests.sh acceptance`
-  - Critical Tests (fast for CI): `./util/test/run-tests.sh critical`
+- Run all tests: `./run-tests.sh all`
+- Run using either industry-standard or Samstraumr terminology:
+  - Industry Standard:
+    - `./run-tests.sh smoke` (basic system assembly and connectivity)
+    - `./run-tests.sh unit` (individual units in isolation)
+    - `./run-tests.sh component` (connected components working together)
+    - `./run-tests.sh integration` (interactions between different parts)
+    - `./run-tests.sh api` (public interfaces and contracts)
+    - `./run-tests.sh system` (entire system as a whole)
+    - `./run-tests.sh endtoend` (user perspective and requirements)
+    - `./run-tests.sh property` (system properties across inputs)
+  - Samstraumr Terminology:
+    - `./run-tests.sh orchestration` (basic system assembly and connectivity)
+    - `./run-tests.sh tube` (individual tubes in isolation)
+    - `./run-tests.sh composite` (or `bundle` for legacy) (connected tubes)
+    - `./run-tests.sh flow` (interactions between different parts)
+    - `./run-tests.sh machine` (public interfaces and contracts)
+    - `./run-tests.sh stream` (entire system as a whole)
+    - `./run-tests.sh acceptance` (user perspective and requirements)
+    - `./run-tests.sh adaptation` (system properties across inputs)
 - Options:
-  - Parallel execution: `--parallel` or `-p`
-  - Thread count: `--threads <count>` or `-t <count>`
-  - Skip quality checks: `--skip-quality` or `-s`
-  - Verbose output: `--verbose` or `-v`
+  - Include equivalent tags: `--both` or `-b` (e.g., run both unit and tube tests)
+  - Output to file: `--output <file>` or `-o <file>`
+  - Use specific Maven profile: `--profile <profile>` or `-p <profile>`
   - Help: `--help` or `-h`
 
-### Maven Direct Execution
-- Run ATL (critical) tests: `mvn test -P atl-tests`
-- Run BTL (robustness) tests: `mvn test -P btl-tests`
-- Run by test type:
-  - `mvn test -Dtest=*TubeTest` (unit)
-  - `mvn test -Dtest=*FlowTest` (integration)
-  - `mvn test -Dtest=*BundleTest` (component)
-  - `mvn test -Dtest=*StreamTest` (system)
-  - `mvn test -Dtest=*AdaptationTest` (property)
-- Run by Cucumber tags:
-  - `mvn test -Dcucumber.filter.tags="@TagName"`
-  - `mvn test -Dcucumber.filter.tags="@L0_Tube and @Identity"`
-- Run with quality checks skipped: `mvn test -P skip-quality-checks -Dspotless.check.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true -Djacoco.skip=true -Dmaven.test.skip=false`
+### Maven Test Profiles
+- Critical vs Robustness Tests:
+  - `mvn test -P atl-tests` (Above The Line - critical tests)
+  - `mvn test -P btl-tests` (Below The Line - robustness tests)
+- Industry Standard Test Profiles:
+  - `mvn test -P smoke-tests` (basic system verification)
+  - `mvn test -P unit-tests` (individual units)
+  - `mvn test -P component-tests` (connected components)
+  - `mvn test -P integration-tests` (interactions between parts)
+  - `mvn test -P api-tests` (public interfaces)
+  - `mvn test -P system-tests` (entire system)
+  - `mvn test -P endtoend-tests` (user perspective)
+  - `mvn test -P property-tests` (system properties)
+- Samstraumr Test Profiles:
+  - `mvn test -P orchestration-tests` (basic system verification)
+  - `mvn test -P tube-tests` (individual units)
+  - `mvn test -P composite-tests` (connected components)
+  - `mvn test -P flow-tests` (interactions between parts)
+  - `mvn test -P machine-tests` (public interfaces)
+  - `mvn test -P stream-tests` (entire system)
+  - `mvn test -P acceptance-tests` (user perspective)
+  - `mvn test -P adaptation-tests` (system properties)
+- Run with quality checks skipped: `mvn test -P skip-quality-checks`
 
-### Test Tag Hierarchy
-- Test type tags: `@TubeTest`, `@FlowTest`, `@BundleTest`, `@StreamTest`, `@AdaptationTest`, `@L2_Machine`, `@Acceptance`
-- Layer-based hierarchy: `@L0_Tube`, `@L1_Bundle`, `@L2_Machine`, `@L3_System`
-- Critical path: `@ATL` (critical), `@BTL` (robustness)
-- Capabilities: `@Identity`, `@Flow`, `@State`, `@Awareness`
-- Lifecycle: `@Init`, `@Runtime`, `@Termination`
-- Patterns: `@Observer`, `@Transformer`, `@Validator`, `@CircuitBreaker`
-- Non-functional: `@Performance`, `@Resilience`, `@Scale`
+### Test Annotations and Tags
+- Terminology Mapping:
+  - Industry Standard → Samstraumr:
+    - `@SmokeTest` → `@OrchestrationTest`
+    - `@UnitTest` → `@TubeTest`
+    - `@ComponentTest` → `@CompositeTest` (formerly `@BundleTest`)
+    - `@IntegrationTest` → `@FlowTest`
+    - `@ApiTest` → `@MachineTest`
+    - `@SystemTest` → `@StreamTest`
+    - `@EndToEndTest` → `@AcceptanceTest`
+    - `@PropertyTest` → `@AdaptationTest`
+- Additional Tags:
+  - Criticality: `@ATL` (critical), `@BTL` (robustness)
+  - Layer-based: `@L0_Tube`, `@L1_Bundle`, `@L2_Machine`, `@L3_System`
+  - Capabilities: `@Identity`, `@Flow`, `@State`, `@Awareness`
+  - Lifecycle: `@Init`, `@Runtime`, `@Termination`
+  - Patterns: `@Observer`, `@Transformer`, `@Validator`, `@CircuitBreaker`
+  - Non-functional: `@Performance`, `@Resilience`, `@Scale`
 
 ## Quality Check Commands
 - Run all quality checks: `./util/quality/build-checks.sh`
