@@ -317,6 +317,15 @@ public class Bundle {
   public Map<String, List<String>> getConnections() {
     return Collections.unmodifiableMap(connections);
   }
+  
+  /**
+   * Gets all circuit breakers in this bundle.
+   *
+   * @return An unmodifiable map of tube names to circuit breakers
+   */
+  public Map<String, CircuitBreaker> getCircuitBreakers() {
+    return Collections.unmodifiableMap(circuitBreakers);
+  }
 
   // Private helper methods
 

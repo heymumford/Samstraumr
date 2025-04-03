@@ -1,6 +1,7 @@
 # Testing in Samstraumr
 
 ```
+Version: 0.5.7
 Last updated: April 2, 2025
 Author: Eric C. Mumford (@heymumford)
 Contributors: Samstraumr Core Team
@@ -9,8 +10,9 @@ Contributors: Samstraumr Core Team
 ## Table of Contents
 - [Introduction](#introduction)
 - [Testing Philosophy](#testing-philosophy)
+- [Test Types](#test-types)
 - [Tag Ontology](#tag-ontology)
-- [Hierarchical Testing Structure](#hierarchical-testing-structure)
+- [Testing Tools](#testing-tools)
 - [BDD with Cucumber](#bdd-with-cucumber)
 - [Testing Patterns](#testing-patterns)
 - [Running Tests](#running-tests)
@@ -48,9 +50,161 @@ Traditional testing approaches fall short for adaptive systems like Samstraumr. 
 
 Samstraumr adopts Behavior-Driven Development (BDD) with Cucumber, creating a unified approach to testing and documentation that aligns with our philosophical underpinnings while addressing the practical challenges of quality assurance in adaptive systems.
 
+## Testing Tools
+
+Samstraumr uses a variety of testing tools and frameworks to support its comprehensive testing strategy:
+
+### JUnit 5
+The foundation of Samstraumr's testing infrastructure, providing core testing capabilities:
+
+- **Extensions**: Custom extensions for property-based testing, parameterized tests, and dynamic test generation
+- **Assertions**: Rich assertion library for test verification
+- **Test Lifecycle Management**: Advanced setup/teardown capabilities for test resources
+- **Parallel Execution**: Multi-threaded test execution for faster feedback
+
+```java
+@DisplayName("Tube initialization tests")
+class TubeInitializationTest {
+    @Test
+    void shouldCreateTubeWithValidParams() {
+        // Test implementation
+    }
+    
+    @ParameterizedTest
+    @ValueSource(strings = {"small", "medium", "large"})
+    void shouldHandleDifferentSizes(String size) {
+        // Test with different sizes
+    }
+}
+```
+
+### TestContainers
+For system testing with external dependencies like databases and services:
+
+- **Containerized Dependencies**: Automatically spin up Docker containers for external services
+- **Database Testing**: Support for PostgreSQL, MySQL, MongoDB, and other databases
+- **Messaging Systems**: Kafka, RabbitMQ, and other messaging systems
+- **Custom Services**: Support for custom Docker images
+
+```java
+@Testcontainers
+public class DatabaseStreamTest {
+    @Container
+    private static final PostgreSQLContainer<?> postgres = 
+        new PostgreSQLContainer<>("postgres:14")
+            .withDatabaseName("test")
+            .withUsername("test")
+            .withPassword("test");
+            
+    @Test
+    void shouldConnectToDatabase() {
+        // Test database operations
+    }
+}
+```
+
+### Cucumber
+For BDD testing at machine and acceptance levels:
+
+- **Gherkin Syntax**: Human-readable feature files
+- **Step Definitions**: Java implementations of test steps
+- **Reporting**: Detailed HTML reports with test results
+- **Tag Filtering**: Run specific test subsets based on tags
+
+```gherkin
+Feature: Customer Registration
+  
+  Scenario: Register a new customer
+    Given a new customer with name "John Doe"
+    When they register with email "john@example.com"
+    Then they should receive a welcome email
+    And their account should be created in the system
+```
+
+### Mockito
+For mocking dependencies in unit and integration tests:
+
+- **Mock Objects**: Create test doubles for external dependencies
+- **Behavior Verification**: Verify interactions with dependencies
+- **Argument Matching**: Flexible argument matching for verification
+- **Spy Objects**: Partial mocking of real objects
+
+```java
+@Test
+void shouldSendNotificationOnError() {
+    // Given
+    NotificationService notificationService = mock(NotificationService.class);
+    MonitorTube tube = new MonitorTube(notificationService);
+    
+    // When
+    tube.handleError("test error");
+    
+    // Then
+    verify(notificationService).sendAlert(eq("test error"), any(ErrorLevel.class));
+}
+```
+
+### Custom Testing Tools
+
+#### TestRunner Script
+Samstraumr includes a custom test runner script for simplified test execution:
+
+- **Usage**: `./util/test/run-tests.sh [OPTIONS] [TEST_TYPE]`
+- **Test Types**: tube, flow, bundle, stream, adaptation, machine, acceptance
+- **Options**: parallel execution, thread count, quality check skipping
+
+```bash
+# Run tube tests in parallel
+./util/test/run-tests.sh --parallel tube
+
+# Run acceptance tests without quality checks
+./util/test/run-tests.sh --skip-quality acceptance
+
+# Run all tests with verbose output
+./util/test/run-tests.sh --verbose all
+```
+
+#### Adaptation Testing Framework
+Custom framework for testing adaptive behavior:
+
+- **Resource Constraints**: Simulate memory, CPU, I/O limitations
+- **Failure Injection**: Introduce controlled failures to test adaptation
+- **State Transition Analysis**: Verify correct state changes during adaptation
+- **Recovery Verification**: Ensure proper recovery from constrained conditions
+
+```java
+@Test
+void shouldAdaptToResourceConstraints() {
+    AdaptationTestHarness harness = new AdaptationTestHarness();
+    harness.withConstraint(ResourceType.MEMORY, 0.2)
+           .withConstraint(ResourceType.CPU, 0.3)
+           .execute(tube -> {
+               // Perform operations that trigger adaptation
+               return tube.process("test data");
+           })
+           .verify(result -> {
+               // Verify correct adaptation behavior
+               assertTrue(result.isSuccessful());
+               assertEquals(TubeState.ADAPTING, result.getTubeState());
+           });
+}
+```
+
 ## Tag Ontology
 
-To organize our tests in a way that reflects Samstraumr's core principles, we've developed a comprehensive tag ontology:
+To organize our tests in a way that reflects Samstraumr's core principles, we've developed a comprehensive tag ontology that works in conjunction with our test types:
+
+### Test Type Tags
+
+| Tag | Description | Test Type |
+|-----|-------------|-----------|
+| `@TubeTest` | Individual tube unit tests | Tube Tests |
+| `@FlowTest` | Single tube data flow tests | Flow Tests |
+| `@BundleTest` | Connected tubes component tests | Bundle Tests |
+| `@StreamTest` | External integration tests | Stream Tests |
+| `@AdaptationTest` | Property-based adaptation tests | Adaptation Tests |
+| `@L2_Machine` | End-to-end machine tests | Machine Tests |
+| `@Acceptance` | Business requirement validation | BDD Acceptance Tests |
 
 ### Hierarchical Structure
 
@@ -102,67 +256,174 @@ To organize our tests in a way that reflects Samstraumr's core principles, we've
 | `@Resilience` | Recovery and fault handling | Testing recovery from failures |
 | `@Scale` | Load and scaling tests | Testing behavior under increased load |
 
-## Hierarchical Testing Structure
+## Test Types
 
-Our testing approach follows a natural hierarchy that mirrors the compositional structure of Samstraumr systems:
+Samstraumr's testing strategy employs a comprehensive set of test types that align with software engineering best practices while using domain-specific terminology. Each test type serves a particular purpose in verifying system functionality:
 
-### L0: Atomic Boundary Tests (ABT)
-- **Focus**: Individual tubes in isolation
-- **Examples**: UUID generation, state management, basic input/output
-- **Purpose**: Ensure each tube functions correctly as a standalone component
-- **Conceptual Foundation**: These tests verify the foundational properties of tubes as self-aware components with clear identities and boundaries.
+### Tube Tests
+- **Focus**: Individual tubes in isolation (Unit tests)
+- **Technology**: JUnit 5
+- **Naming Convention**: `*TubeTest.java`
+- **Purpose**: Verify the core functionality of a single tube component
+- **Examples**: Tube initialization, UUID generation, state transitions, lifecycle validation
+- **Command**: `./util/test/run-tests.sh tube`
 
-```gherkin
-@ATL @L0_Tube @Identity
-Scenario: Tube initializes with a unique ID and logs environment details
-  Given the operating environment is ready
-  When a new Tube is instantiated with reason "Test Initialization"
-  Then the Tube should initialize with a unique UUID
-  And the Tube should log its environment details
+```java
+@Test
+void shouldInitializeWithUniqueIdentifier() {
+    // Given
+    Environment environment = new Environment();
+    
+    // When
+    Tube tube = Tube.create("Test tube", environment);
+    
+    // Then
+    assertNotNull(tube.getUniqueId());
+    assertTrue(tube.getUniqueId().length() > 0);
+}
 ```
 
-### L1: Inter-Tube Feature Tests (ITFT)
-- **Focus**: Connected tubes forming bundles
-- **Examples**: Data transformation pipelines, validation flows
-- **Purpose**: Verify that tubes can communicate and collaborate effectively
-- **Conceptual Foundation**: These tests ensure that tubes maintain their integrity while participating in collective behavior, similar to how cells in tissues work together while maintaining their individual functions.
+### Flow Tests
+- **Focus**: Data flows through a single tube (Integration tests)
+- **Technology**: JUnit 5
+- **Naming Convention**: `*FlowTest.java`
+- **Purpose**: Verify data transformations and internal component interactions
+- **Examples**: Data processing within a tube, error handling, state changes during processing
+- **Command**: `./util/test/run-tests.sh flow`
 
-```gherkin
-@ATL @L1_Bundle @Flow @Transformer
-Scenario: Basic tubes connect into a data transformation bundle
-  Given tubes are instantiated for a simple transformation bundle
-  When the tubes are connected in a linear sequence
-  Then data should flow from the source tube through the transformer tube to the sink tube
+```java
+@Test
+void shouldTransformDataCorrectly() {
+    // Given
+    TransformerTube tube = new TransformerTube();
+    String inputData = "test data";
+    
+    // When
+    String result = tube.process(inputData);
+    
+    // Then
+    assertEquals("TEST DATA", result);
+    assertTrue(tube.getProcessingLog().contains("transformation applied"));
+}
 ```
 
-### L2: Composite Tube Interaction Tests (CTIT)
-- **Focus**: Bundles forming machines
-- **Examples**: State propagation, machine-level adaptations
-- **Purpose**: Test how bundles interact within a larger machine context
-- **Conceptual Foundation**: These tests verify emergent properties that arise when bundles interact, similar to how organ systems in a body create higher-level behaviors that aren't present in individual organs.
+### Bundle Tests
+- **Focus**: Multiple connected tubes (Component tests)
+- **Technology**: JUnit 5
+- **Naming Convention**: `*BundleTest.java`
+- **Purpose**: Verify that tubes collaborate effectively within a bundle
+- **Examples**: Data pipelines, error propagation, bundle state management
+- **Command**: `./util/test/run-tests.sh bundle`
 
-```gherkin
-@ATL @L2_Machine @State
-Scenario: Machine initializes with proper state hierarchy
-  Given a machine with multiple bundles is instantiated
-  When the machine completes initialization
-  Then each bundle should have its own state
-  And the machine should have a unified state view
+```java
+@Test
+void shouldProcessDataThroughEntireBundle() {
+    // Given
+    Bundle bundle = createTestBundle();
+    String inputData = "raw input";
+    
+    // When
+    Optional<String> result = bundle.process("entry", inputData);
+    
+    // Then
+    assertTrue(result.isPresent());
+    assertEquals("PROCESSED: RAW INPUT", result.get());
+}
 ```
 
-### L3: Machine Construct Validation Tests (MCVT)
-- **Focus**: Complete system behavior
-- **Examples**: System resilience, performance under load
-- **Purpose**: Validate end-to-end system functionality and non-functional requirements
-- **Conceptual Foundation**: These tests focus on the highest level of system organization, where multiple machines interact with each other and the external environment, demonstrating holistic emergent properties.
+### Stream Tests
+- **Focus**: External system interactions (System tests)
+- **Technology**: JUnit 5 with TestContainers
+- **Naming Convention**: `*StreamTest.java`
+- **Purpose**: Verify integration with external dependencies
+- **Examples**: Database interactions, API communication, messaging systems
+- **Command**: `./util/test/run-tests.sh stream`
+
+```java
+@Test
+void shouldPersistDataToDatabase() {
+    // Given
+    try (PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14")) {
+        postgres.start();
+        DatabaseTube tube = new DatabaseTube(postgres.getJdbcUrl(), 
+                                            postgres.getUsername(), 
+                                            postgres.getPassword());
+        
+        // When
+        tube.store("test_key", "test_value");
+        
+        // Then
+        Optional<String> result = tube.retrieve("test_key");
+        assertTrue(result.isPresent());
+        assertEquals("test_value", result.get());
+    }
+}
+```
+
+### Adaptation Tests
+- **Focus**: System behavior under changing conditions (Property tests)
+- **Technology**: Custom JUnit 5 extensions
+- **Naming Convention**: `*AdaptationTest.java`
+- **Purpose**: Verify adaptive behavior and resilience
+- **Examples**: Resource constraints handling, degraded operation modes, recovery mechanisms
+- **Command**: `./util/test/run-tests.sh adaptation`
+
+```java
+@Test
+void shouldAdaptToReducedMemory() {
+    // Given
+    AdaptiveTube tube = new AdaptiveTube();
+    ResourceConstraint memoryConstraint = ResourceConstraint.memory(0.2); // 20% memory
+    
+    // When
+    tube.applyConstraint(memoryConstraint);
+    OperationResult result = tube.performOperation();
+    
+    // Then
+    assertEquals(TubeState.ADAPTING, tube.getDesignState());
+    assertTrue(result.isSuccessful());
+    assertTrue(tube.getMemoryUsage() < memoryConstraint.getThreshold());
+}
+```
+
+### Machine Tests
+- **Focus**: End-to-end functionality (E2E tests)
+- **Technology**: Cucumber BDD
+- **Naming Convention**: `*.feature` files with `@L2_Machine` tag
+- **Purpose**: Verify complete machine functionality across multiple bundles
+- **Examples**: Business workflows, user interactions, system integrations
+- **Command**: `./util/test/run-tests.sh machine`
 
 ```gherkin
-@ATL @L3_System @Resilience
-Scenario: System recovers from component failures
-  Given a complete system with redundant components is running
-  When a critical component fails
-  Then the system should detect the failure
-  And circuit breakers should isolate the failure
+@L2_Machine @ATL
+Feature: Data Processing Machine
+  
+  Scenario: Process data through complete pipeline
+    Given a data processing machine is initialized
+    When raw data "customer:John Doe,order:123" is submitted
+    Then the customer information should be extracted
+    And the order should be processed
+    And a confirmation should be generated
+```
+
+### BDD Acceptance Tests
+- **Focus**: Business requirements validation (Acceptance tests)
+- **Technology**: Cucumber BDD
+- **Naming Convention**: `*.feature` files with `@Acceptance` tag
+- **Purpose**: Verify that the system meets business requirements
+- **Examples**: User stories, business scenarios, acceptance criteria
+- **Command**: `./util/test/run-tests.sh acceptance`
+
+```gherkin
+@Acceptance @ATL
+Feature: Order Processing
+  
+  Scenario: Customer places a valid order
+    Given a customer with a valid account
+    When they submit an order with valid payment information
+    Then the order should be accepted
+    And an order confirmation should be sent
+    And inventory should be updated
 ```
 
 ## BDD with Cucumber
@@ -283,60 +544,120 @@ Scenario: Circuit breaker isolates failing component
 
 ## Running Tests
 
-Samstraumr tests are designed to be flexible and targeted, allowing you to focus on specific aspects of the system:
+Samstraumr provides a unified test runner script that simplifies test execution while supporting the various test types:
 
-### Basic Test Execution
+### Using the Test Runner Script
+
+The recommended way to run Samstraumr tests is using the test runner script:
+
+```bash
+# Run all tests
+./util/test/run-tests.sh all
+
+# Run specific test types
+./util/test/run-tests.sh tube         # Run Tube Tests (unit)
+./util/test/run-tests.sh flow         # Run Flow Tests (integration)
+./util/test/run-tests.sh bundle       # Run Bundle Tests (component)
+./util/test/run-tests.sh stream       # Run Stream Tests (system)
+./util/test/run-tests.sh adaptation   # Run Adaptation Tests (property)
+./util/test/run-tests.sh machine      # Run Machine Tests (e2e)
+./util/test/run-tests.sh acceptance   # Run BDD Acceptance Tests (business)
+./util/test/run-tests.sh critical     # Run critical tests only (fast for CI)
+```
+
+### Script Options
+
+The test runner supports various options:
+
+```bash
+# Run tests in parallel
+./util/test/run-tests.sh --parallel flow
+
+# Set custom thread count
+./util/test/run-tests.sh --threads 4 bundle
+
+# Skip quality checks for faster execution
+./util/test/run-tests.sh --skip-quality stream
+
+# Enable verbose output
+./util/test/run-tests.sh --verbose adaptation
+
+# Combine options
+./util/test/run-tests.sh --parallel --threads 8 --skip-quality machine
+```
+
+For help with all available options:
+
+```bash
+./util/test/run-tests.sh --help
+```
+
+### Maven Direct Execution
+
+For more granular control, you can also run tests directly with Maven:
+
+#### Basic Test Execution
 
 ```bash
 # Run all tests
 mvn test
 
 # Run all critical tests
-mvn test -Dcucumber.filter.tags="@ATL"
+mvn test -P atl-tests
 
-# Run all tests for a specific level
-mvn test -Dcucumber.filter.tags="@L0_Tube"
+# Run tests with specific test type
+mvn test -Dtest=*TubeTest       # Run all Tube Tests
+mvn test -Dtest=*FlowTest       # Run all Flow Tests
+mvn test -Dtest=*BundleTest     # Run all Bundle Tests
+mvn test -Dtest=*StreamTest     # Run all Stream Tests
+mvn test -Dtest=*AdaptationTest # Run all Adaptation Tests
 ```
 
-### Targeted Testing
+#### Tagged Testing (Cucumber)
 
 ```bash
-# Run tests for a specific capability
-mvn test -Dcucumber.filter.tags="@Identity"
+# Run tests with specific tags
+mvn test -Dcucumber.filter.tags="@L2_Machine"    # Run Machine Tests
+mvn test -Dcucumber.filter.tags="@Acceptance"    # Run Acceptance Tests
 
-# Run tests for a specific lifecycle phase
-mvn test -Dcucumber.filter.tags="@Init"
-
-# Combine tags for more specific test subsets
-mvn test -Dcucumber.filter.tags="@L0_Tube and @Init"
+# Combine tags for specific subsets
+mvn test -Dcucumber.filter.tags="@L0_Tube and @Identity"
 mvn test -Dcucumber.filter.tags="@ATL and @Resilience"
 ```
 
-### Performance-Optimized Testing
-
-For faster test execution, especially in CI/CD pipelines:
+#### Performance Optimization
 
 ```bash
-# Run optimized tests with the performance script
-./build-performance.sh test -P atl-tests
-
 # Run with custom thread count for parallelization
 mvn test -T 12 -P atl-tests
 
 # Skip quality checks during test runs
 mvn test -P skip-quality-checks
+
+# Use build performance script
+./util/build/build-performance.sh test -P atl-tests
 ```
 
 ### Test Reports
 
-Cucumber generates comprehensive reports that provide insights into test results:
+Samstraumr generates comprehensive test reports:
+
+#### JUnit Reports
+
+JUnit XML reports are automatically generated in the `target/surefire-reports` directory.
+
+#### Cucumber Reports
+
+HTML reports for BDD tests can be found at `target/cucumber-reports/cucumber.html`.
+
+You can also specify custom reporting options:
 
 ```bash
-# Generate HTML report
-mvn test -Dcucumber.plugin="html:target/cucumber-reports/cucumber.html"
+# Generate custom formatted HTML report
+mvn test -Dcucumber.plugin="html:target/custom-reports/cucumber.html"
 
-# Generate JSON report
-mvn test -Dcucumber.plugin="json:target/cucumber-reports/cucumber.json"
+# Generate JSON report for external tools
+mvn test -Dcucumber.plugin="json:target/custom-reports/cucumber.json"
 ```
 
 ## Writing New Tests

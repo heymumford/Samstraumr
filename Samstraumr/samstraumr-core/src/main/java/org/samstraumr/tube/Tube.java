@@ -186,10 +186,28 @@ public class Tube {
     }
   }
 
-  private void logToMimir(String logEntry) {
+  /**
+   * Logs an entry to the Mimir log.
+   *
+   * @param logEntry the entry to log
+   */
+  public void logToMimir(String logEntry) {
     String timestampedEntry = Instant.now().toString() + ": " + logEntry;
     mimirLog.add(timestampedEntry);
     LOGGER.trace("Mimir Log: {}", timestampedEntry);
+  }
+  
+  /**
+   * Adds a reason to the tube's lineage.
+   * 
+   * @param reason the reason to add to lineage
+   */
+  public void addToLineage(String reason) {
+    LOGGER.debug("Adding to lineage: {}", reason);
+    if (reason != null && !reason.trim().isEmpty()) {
+      lineage.add(reason);
+      logToMimir("Added to lineage: " + reason);
+    }
   }
 
   private class TerminationTask extends TimerTask {

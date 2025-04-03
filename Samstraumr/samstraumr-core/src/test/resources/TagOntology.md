@@ -1,6 +1,20 @@
 # Samstraumr Test Tag Ontology
 
-This document defines the tag ontology for organizing and categorizing Samstraumr tests. This ontology is designed to align with systems theory principles and the BDD testing approach, providing a consistent framework for test organization.
+This document defines the tag ontology for organizing and categorizing Samstraumr tests. This ontology is designed to align with systems theory principles and support the complete testing strategy for Samstraumr, covering both JUnit and BDD testing approaches.
+
+## Test Type Tags
+
+Tags that identify the primary test type and corresponding testing tool:
+
+| Tag | Description | Test Type | Technology |
+|-----|-------------|-----------|------------|
+| `@TubeTest` | Individual tube unit tests | Tube Tests | JUnit 5 |
+| `@FlowTest` | Single tube data flow tests | Flow Tests | JUnit 5 |
+| `@BundleTest` | Connected tubes component tests | Bundle Tests | JUnit 5 |
+| `@StreamTest` | External integration tests | Stream Tests | JUnit 5 + TestContainers |
+| `@AdaptationTest` | Property-based adaptation tests | Adaptation Tests | JUnit 5 (custom) |
+| `@L2_Machine` | End-to-end machine tests | Machine Tests | Cucumber |
+| `@Acceptance` | Business requirement validation | BDD Acceptance Tests | Cucumber |
 
 ## Hierarchical Structure
 

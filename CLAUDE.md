@@ -16,14 +16,41 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   ⚠️ **IMPORTANT:** All scripts must be run from their locations in the util directory
 
 ## Test Commands
-### Test Categorization
+
+### Test Runner Script
+- Run all tests: `./util/test/run-tests.sh all`
+- Run specific test types:
+  - Tube Tests (unit/JUnit): `./util/test/run-tests.sh tube`
+  - Flow Tests (integration/JUnit): `./util/test/run-tests.sh flow`
+  - Bundle Tests (component/JUnit): `./util/test/run-tests.sh bundle`
+  - Stream Tests (system/TestContainers): `./util/test/run-tests.sh stream`
+  - Adaptation Tests (property/JUnit): `./util/test/run-tests.sh adaptation`
+  - Machine Tests (e2e/Cucumber): `./util/test/run-tests.sh machine`
+  - BDD Acceptance Tests (business/Cucumber): `./util/test/run-tests.sh acceptance`
+  - Critical Tests (fast for CI): `./util/test/run-tests.sh critical`
+- Options:
+  - Parallel execution: `--parallel` or `-p`
+  - Thread count: `--threads <count>` or `-t <count>`
+  - Skip quality checks: `--skip-quality` or `-s`
+  - Verbose output: `--verbose` or `-v`
+  - Help: `--help` or `-h`
+
+### Maven Direct Execution
 - Run ATL (critical) tests: `mvn test -P atl-tests`
 - Run BTL (robustness) tests: `mvn test -P btl-tests`
-- Run tests with specific tag: `mvn test -Dcucumber.filter.tags="@TagName"`
-- Run tests with tag combinations: `mvn test -Dcucumber.filter.tags="@L0_Tube and @Identity"`
-- Run tests with quality checks skipped: `mvn test -P atl-tests -P skip-quality-checks -Dspotless.check.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true -Djacoco.skip=true -Dmaven.test.skip=false`
+- Run by test type:
+  - `mvn test -Dtest=*TubeTest` (unit)
+  - `mvn test -Dtest=*FlowTest` (integration)
+  - `mvn test -Dtest=*BundleTest` (component)
+  - `mvn test -Dtest=*StreamTest` (system)
+  - `mvn test -Dtest=*AdaptationTest` (property)
+- Run by Cucumber tags:
+  - `mvn test -Dcucumber.filter.tags="@TagName"`
+  - `mvn test -Dcucumber.filter.tags="@L0_Tube and @Identity"`
+- Run with quality checks skipped: `mvn test -P skip-quality-checks -Dspotless.check.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true -Djacoco.skip=true -Dmaven.test.skip=false`
 
 ### Test Tag Hierarchy
+- Test type tags: `@TubeTest`, `@FlowTest`, `@BundleTest`, `@StreamTest`, `@AdaptationTest`, `@L2_Machine`, `@Acceptance`
 - Layer-based hierarchy: `@L0_Tube`, `@L1_Bundle`, `@L2_Machine`, `@L3_System`
 - Critical path: `@ATL` (critical), `@BTL` (robustness)
 - Capabilities: `@Identity`, `@Flow`, `@State`, `@Awareness`

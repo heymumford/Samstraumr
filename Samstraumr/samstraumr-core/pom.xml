@@ -20,9 +20,13 @@
     <log4j.version>2.22.1</log4j.version>
     <jackson.version>2.16.1</jackson.version>
     <oshi.version>6.4.7</oshi.version>
+    <testcontainers.version>1.19.3</testcontainers.version>
+    <mockito.version>5.8.0</mockito.version>
+    <junit.platform.version>1.10.2</junit.platform.version>
   </properties>
   
   <dependencies>
+    <!-- Core Dependencies -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
@@ -58,6 +62,8 @@
       <artifactId>oshi-core</artifactId>
       <version>${oshi.version}</version>
     </dependency>
+    
+    <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
@@ -70,6 +76,26 @@
       <version>${junit.jupiter.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>${junit.jupiter.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-suite-api</artifactId>
+      <version>${junit.platform.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-suite</artifactId>
+      <version>${junit.platform.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- BDD Testing with Cucumber -->
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-java</artifactId>
@@ -88,16 +114,32 @@
       <version>${cucumber.version}</version>
       <scope>test</scope>
     </dependency>
+    
+    <!-- TestContainers for Stream Tests -->
     <dependency>
-      <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-suite-api</artifactId>
-      <version>1.10.2</version>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-suite</artifactId>
-      <version>1.10.2</version>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${testcontainers.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- Mockito for Test Mocking -->
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>${mockito.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -116,6 +158,127 @@
       <id>btl-tests</id>
       <properties>
         <cucumber.filter.tags>@BTL</cucumber.filter.tags>
+      </properties>
+    </profile>
+    
+    <!-- Tube Tests Profile -->
+    <profile>
+      <id>tube-tests</id>
+      <properties>
+        <test.includes>**/*TubeTest.java</test.includes>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>${test.includes}</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- Flow Tests Profile -->
+    <profile>
+      <id>flow-tests</id>
+      <properties>
+        <test.includes>**/*FlowTest.java</test.includes>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>${test.includes}</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- Bundle Tests Profile -->
+    <profile>
+      <id>bundle-tests</id>
+      <properties>
+        <test.includes>**/*BundleTest.java</test.includes>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>${test.includes}</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- Stream Tests Profile -->
+    <profile>
+      <id>stream-tests</id>
+      <properties>
+        <test.includes>**/*StreamTest.java</test.includes>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>${test.includes}</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- Adaptation Tests Profile -->
+    <profile>
+      <id>adaptation-tests</id>
+      <properties>
+        <test.includes>**/*AdaptationTest.java</test.includes>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>${test.includes}</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- Machine Tests Profile -->
+    <profile>
+      <id>machine-tests</id>
+      <properties>
+        <cucumber.filter.tags>@L2_Machine</cucumber.filter.tags>
+      </properties>
+    </profile>
+    
+    <!-- Acceptance Tests Profile -->
+    <profile>
+      <id>acceptance-tests</id>
+      <properties>
+        <cucumber.filter.tags>@Acceptance</cucumber.filter.tags>
       </properties>
     </profile>
     
