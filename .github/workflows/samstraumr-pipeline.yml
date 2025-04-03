@@ -1,0 +1,269 @@
+name: Samstraumr Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  # Core initialization and build verification
+  initialization:
+    name: Initialization and Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for SonarQube analysis
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      
+      - name: Environment awareness
+        run: |
+          echo "Environment Information:"
+          echo "CPU cores: $(nproc)"
+          echo "Memory: $(free -h)"
+          java -version
+          echo "Working directory: $(pwd)"
+          ls -la
+      
+      - name: Initialize build environment
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          chmod +x ./build-performance.sh
+          chmod +x ./build-checks.sh
+      
+      - name: Verify compilation
+        run: mvn -B clean compile
+  
+  # ATL Critical tests - must pass before any other tests run
+  atl-tests:
+    name: Above-The-Line Tests
+    needs: initialization
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: Prepare test environment
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          chmod +x ./build-performance.sh
+      
+      - name: Run ATL critical tests
+        run: ./util/test/run-tests.sh critical
+      
+      - name: Upload ATL test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atl-test-reports
+          path: |
+            **/target/surefire-reports/
+            **/target/cucumber-reports/
+          retention-days: 7
+  
+  # Unit and component tests
+  tube-bundle-tests:
+    name: Tube and Bundle Tests
+    needs: atl-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: Prepare test environment
+        run: chmod +x ./util/test/run-tests.sh
+      
+      - name: Run Tube Tests
+        run: ./util/test/run-tests.sh tube
+      
+      - name: Run Flow Tests
+        run: ./util/test/run-tests.sh flow
+      
+      - name: Run Bundle Tests
+        run: ./util/test/run-tests.sh bundle
+      
+      - name: Upload Unit Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-component-test-reports
+          path: |
+            **/target/surefire-reports/
+          retention-days: 7
+  
+  # System and property tests
+  system-adaptation-tests:
+    name: System and Adaptation Tests
+    needs: atl-tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: streamtest
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: Prepare test environment
+        run: chmod +x ./util/test/run-tests.sh
+      
+      - name: Run Stream Tests
+        run: ./util/test/run-tests.sh stream
+      
+      - name: Run Adaptation Tests
+        run: ./util/test/run-tests.sh adaptation
+      
+      - name: Upload System Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: system-adaptation-test-reports
+          path: |
+            **/target/surefire-reports/
+          retention-days: 7
+  
+  # End-to-end and acceptance tests
+  machine-acceptance-tests:
+    name: Machine and Acceptance Tests
+    needs: atl-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: Prepare test environment
+        run: chmod +x ./util/test/run-tests.sh
+      
+      - name: Run Machine Tests
+        run: ./util/test/run-tests.sh machine
+      
+      - name: Run Acceptance Tests
+        run: ./util/test/run-tests.sh acceptance
+      
+      - name: Upload BDD Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bdd-test-reports
+          path: |
+            **/target/cucumber-reports/
+          retention-days: 7
+  
+  # Quality analysis
+  quality-analysis:
+    name: Quality Analysis
+    needs: [tube-bundle-tests, system-adaptation-tests, machine-acceptance-tests]
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for SonarQube analysis
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      
+      - name: Prepare quality environment
+        run: chmod +x ./build-checks.sh
+      
+      - name: Run quality checks
+        run: ./build-checks.sh
+      
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        with:
+          name: unit-component-test-reports
+      
+      - name: SonarQube analysis
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=heymumford_Samstraumr \
+            -Dsonar.projectName="Samstraumr" \
+            -Dsonar.qualitygate.wait=true \
+            -Dsonar.coverage.jacoco.xmlReportPaths=**/target/site/jacoco/jacoco.xml \
+            -Dsonar.java.spotbugs.reportPaths=**/target/spotbugsXml.xml \
+            -Dsonar.java.pmd.reportPaths=**/target/pmd.xml \
+            -Dsonar.java.checkstyle.reportPaths=**/target/checkstyle-result.xml
+      
+      - name: Upload Quality Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports
+          path: |
+            **/target/site/jacoco/
+            **/target/pmd.xml
+            **/target/checkstyle-result.xml
+            **/target/spotbugsXml.xml
+          retention-days: 7
