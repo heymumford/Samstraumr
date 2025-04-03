@@ -39,18 +39,19 @@ show_usage() {
     echo "Usage: ./util/test/run-tests.sh [OPTIONS] [TEST_TYPE]"
     echo ""
     echo "TEST TYPES:"
-    echo "  tube      - Run Tube Tests (unit/JUnit)"
-    echo "  flow      - Run Flow Tests (integration/JUnit)"
-    echo "  bundle    - Run Bundle Tests (component/JUnit) - [DEPRECATED]"
-    echo "  composite - Run Composite Tests (component/JUnit)"
-    echo "  stream    - Run Stream Tests (system/TestContainers)"
-    echo "  adaptation - Run Adaptation Tests (property/custom JUnit)"
-    echo "  machine   - Run Machine Tests (e2e/Cucumber)"
-    echo "  acceptance - Run BDD Acceptance Tests (business/Cucumber)"
-    echo "  all       - Run all tests (default)"
-    echo "  atl       - Run Above The Line tests (critical, must-pass tests)"
-    echo "  btl       - Run Below The Line tests (important but non-blocking tests)"
-    echo "  critical  - Run only critical tests (alias for atl, fast for CI)"
+    echo "  orchestration - Run Orchestration Tests (highest level of ATL)"
+    echo "  tube          - Run Tube Tests (unit/JUnit)"
+    echo "  flow          - Run Flow Tests (integration/JUnit)"
+    echo "  bundle        - Run Bundle Tests (component/JUnit) - [DEPRECATED]"
+    echo "  composite     - Run Composite Tests (component/JUnit)"
+    echo "  stream        - Run Stream Tests (system/TestContainers)"
+    echo "  adaptation    - Run Adaptation Tests (property/custom JUnit)"
+    echo "  machine       - Run Machine Tests (e2e/Cucumber)"
+    echo "  acceptance    - Run BDD Acceptance Tests (business/Cucumber)"
+    echo "  all           - Run all tests (default)"
+    echo "  atl           - Run Above The Line tests (critical, must-pass tests)"
+    echo "  btl           - Run Below The Line tests (important but non-blocking tests)"
+    echo "  critical      - Run only critical tests (alias for atl, fast for CI)"
     echo ""
     echo "OPTIONS:"
     echo "  -p, --parallel     Run tests in parallel"
@@ -92,7 +93,7 @@ while [[ $# -gt 0 ]]; do
             show_usage
             exit 0
             ;;
-        tube|flow|bundle|composite|stream|adaptation|machine|acceptance|all|critical|atl|btl)
+        orchestration|tube|flow|bundle|composite|stream|adaptation|machine|acceptance|all|critical|atl|btl)
             TEST_TYPE="$1"
             shift
             ;;
@@ -124,6 +125,11 @@ fi
 
 # Configure test specific settings
 case $TEST_TYPE in
+    orchestration)
+        echo "🧪 Running Orchestration Tests (highest level of ATL)"
+        echo "🔍 These tests verify the core building blocks and system wiring"
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*Orchestration* -Dcucumber.filter.tags="@Orchestration"
+        ;;
     tube)
         echo "🧪 Running Tube Tests (unit/JUnit)"
         mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*TubeTest

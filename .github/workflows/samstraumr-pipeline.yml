@@ -94,9 +94,9 @@ jobs:
       - name: Verify compilation
         run: mvn -B clean compile
 
-  # ATL Critical tests - must pass before any other tests run
-  atl-tests:
-    name: Above-The-Line Tests
+  # Orchestration tests - the highest level of ATL tests
+  orchestration-tests:
+    name: Orchestration Tests
     needs: [get-version, initialization]
     runs-on: ubuntu-latest
     steps:
@@ -110,16 +110,16 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Run ATL critical tests
+      - name: Run Orchestration tests
         run: |
           chmod +x ./util/test/run-tests.sh
-          ./util/test/run-tests.sh atl --skip-quality
+          ./util/test/run-tests.sh orchestration --skip-quality
 
-      - name: Upload ATL test results
+      - name: Upload Orchestration test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: atl-test-reports
+          name: orchestration-test-reports
           path: |
             **/target/surefire-reports/
             **/target/cucumber-reports/
@@ -128,7 +128,7 @@ jobs:
   # Unit and component tests
   unit-tests:
     name: Unit and Component Tests
-    needs: atl-tests
+    needs: orchestration-tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -168,7 +168,7 @@ jobs:
   # Integration tests
   integration-tests:
     name: Integration Tests
-    needs: atl-tests
+    needs: orchestration-tests
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -218,7 +218,7 @@ jobs:
   # End-to-end and acceptance tests
   e2e-tests:
     name: E2E and Acceptance Tests
-    needs: atl-tests
+    needs: orchestration-tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -376,7 +376,7 @@ jobs:
   workflow-summary:
     name: Workflow Summary
     if: always()
-    needs: [get-version, btl-tests, quality-analysis]
+    needs: [get-version, orchestration-tests, btl-tests, quality-analysis]
     runs-on: ubuntu-latest
     steps:
       - name: Add Version to Workflow Summary
