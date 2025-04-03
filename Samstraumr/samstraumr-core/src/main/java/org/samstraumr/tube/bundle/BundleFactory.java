@@ -127,6 +127,39 @@ public class BundleFactory {
   }
 
   /**
+   * Creates an observer bundle with source and observer tubes.
+   *
+   * @param environment The environment for the bundle
+   * @return The created observer bundle
+   */
+  public static Bundle createObserverBundle(Environment environment) {
+    Bundle bundle = createBundle("observer-" + generateBundleId(), environment);
+
+    // Add tubes
+    bundle
+        .createTube("source", "Source Tube")
+        .createTube("observer", "Observer Tube")
+        .createTube("output", "Output Tube");
+
+    // Connect tubes - observer is connected to source to monitor signals
+    bundle.connect("source", "observer").connect("observer", "output");
+
+    // Configure observer tube to just pass through data (monitoring only)
+    bundle.addTransformer(
+        "observer",
+        data -> {
+          // Observer pattern just logs the data without modifying it
+          logger.info("Observer tube observed: {}", data);
+          // Add to the bundle event log for test verification
+          bundle.logEvent("Observer observed data: " + data);
+          return data;
+        });
+
+    logger.info("Created observer bundle: {}", bundle.getBundleId());
+    return bundle;
+  }
+
+  /**
    * Gets a bundle by its ID.
    *
    * @param bundleId The ID of the bundle to retrieve

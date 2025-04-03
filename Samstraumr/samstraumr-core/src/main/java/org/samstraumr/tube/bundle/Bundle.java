@@ -314,7 +314,12 @@ public class Bundle {
     }
   }
 
-  private void logEvent(String description) {
+  /**
+   * Logs an event in the bundle's event log.
+   *
+   * @param description The description of the event
+   */
+  public void logEvent(String description) {
     BundleEvent event = new BundleEvent(description);
     eventLog.add(event);
     logger.debug("Bundle event: {}", description);

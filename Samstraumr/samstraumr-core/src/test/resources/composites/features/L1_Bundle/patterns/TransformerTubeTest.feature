@@ -45,5 +45,5 @@ Feature: Transformer Tube - Data Transformation with Conditional Logic
     Given a transformer tube is configured for string transformation
     When invalid data of incorrect type is provided
     Then the transformer should detect the invalid input
-    And an appropriate error should be logged
+    And an appropriate error should be logged for the invalid input
     And the transformer should continue operating without failure
