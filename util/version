@@ -63,6 +63,8 @@ show_usage() {
   echo "  bump minor         Bump the minor version (x.Y.z → x.Y+1.0)"
   echo "  bump patch         Bump the patch version (x.y.Z → x.y.Z+1)"
   echo "  set x.y.z          Set a specific version number"
+  echo "  verify             Verify that version and tag are in sync"
+  echo "  fix-tag            Create a git tag matching the current version"
   echo "  history            Show version history"
   echo ""
   echo "Options:"
@@ -206,10 +208,41 @@ update_version() {
   echo -e "  ${CYAN}./util/build/build-optimal.sh clean${NC}"
 }
 
-# Function to commit version changes and optionally create a tag
+# Function to check if tag exists
+tag_exists() {
+  local tag_name=$1
+  if git tag | grep -q "^$tag_name$"; then
+    return 0  # Tag exists
+  else
+    return 1  # Tag doesn't exist
+  fi
+}
+
+# Function to check if version matches git tag
+version_matches_tag() {
+  local version=$1
+  local tag_name="v$version"
+  
+  # First check if tag exists
+  if tag_exists "$tag_name"; then
+    return 0  # Tag exists and matches version
+  else
+    return 1  # Tag doesn't exist or doesn't match
+  fi
+}
+
+# Function to commit version changes and create a tag
 commit_version_changes() {
   local new_version=$1
   local bump_type=$2
+  local tag_name="v$new_version"
+  
+  # Check if tag already exists
+  if tag_exists "$tag_name"; then
+    print_error "Tag $tag_name already exists. Cannot create duplicate tag."
+    print_warning "Run 'git tag -d $tag_name' to delete the existing tag if needed."
+    return 1
+  fi
   
   print_info "Creating commit for version $new_version"
   
@@ -284,27 +317,80 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
   git commit -m "$commit_message"
   print_success "Created version commit"
   
-  # Ask user if they want to create a git tag
-  echo -n "Would you like to create a git tag for version $new_version? (y/n): "
-  read -r response
-  if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    # Create an annotated tag
-    git tag -a "v$new_version" -m "Version $new_version
+  # Automatically create a git tag to ensure version-tag consistency
+  print_info "Creating git tag for version $new_version"
+  
+  # Create an annotated tag
+  git tag -a "$tag_name" -m "Version $new_version
 
 Release version $new_version of Samstraumr.
 
 Generated with Claude Code"
-    
-    print_success "Created git tag v$new_version"
-    echo "To push the tag to remote, use:"
-    echo -e "  ${YELLOW}git push origin v$new_version${NC}"
-  fi
+  
+  print_success "Created git tag $tag_name"
+  echo "To push the tag to remote, use:"
+  echo -e "  ${YELLOW}git push && git push origin $tag_name${NC}"
+  
+  # Suggest performing a verification check
+  print_info "Version and tag are now synchronized at $new_version"
 }
 
 # Function to display version history
 show_version_history() {
   print_header "Samstraumr Version History"
   git log --oneline --grep="Bump version to\|Bump major version to\|Bump minor version to\|Bump patch version to\|Set version to" | head -15
+}
+
+# Function to verify versions and tags are in sync
+verify_version_tag_alignment() {
+  local current_version=$(get_current_version)
+  local tag_name="v$current_version"
+  
+  print_header "Version-Tag Alignment Check"
+  
+  echo -e "Current version: ${GREEN}$current_version${NC}"
+  
+  if tag_exists "$tag_name"; then
+    print_success "Tag $tag_name exists and matches current version"
+    return 0
+  else
+    print_error "Tag $tag_name does not exist"
+    echo "To create the tag, run:"
+    echo -e "  ${YELLOW}git tag -a \"$tag_name\" -m \"Version $current_version\"${NC}"
+    echo "Or run:" 
+    echo -e "  ${YELLOW}./util/version fix-tag${NC}"
+    return 1
+  fi
+}
+
+# Function to fix version-tag misalignment
+fix_version_tag_misalignment() {
+  local current_version=$(get_current_version)
+  local tag_name="v$current_version"
+  
+  print_header "Version-Tag Alignment Fix"
+  
+  echo -e "Current version: ${GREEN}$current_version${NC}"
+  
+  if tag_exists "$tag_name"; then
+    print_success "Tag $tag_name already exists and matches current version"
+    return 0
+  else
+    print_info "Creating tag $tag_name for current version $current_version"
+    
+    # Create an annotated tag
+    git tag -a "$tag_name" -m "Version $current_version
+
+Release version $current_version of Samstraumr.
+
+Generated with Claude Code"
+    
+    print_success "Created git tag $tag_name"
+    echo "To push the tag to remote, use:"
+    echo -e "  ${YELLOW}git push origin $tag_name${NC}"
+    
+    return 0
+  fi
 }
 
 # Main command processing
@@ -361,6 +447,14 @@ case "$COMMAND" in
     echo "$(get_current_version)"
     ;;
   
+  verify)
+    verify_version_tag_alignment
+    ;;
+  
+  fix-tag)
+    fix_version_tag_misalignment
+    ;;
+  
   bump)
     if [ -z "$BUMP_TYPE" ]; then
       print_error "Missing bump type (major, minor, patch)"
@@ -373,7 +467,23 @@ case "$COMMAND" in
       exit 1
     fi
     
+    # Get current version and calculate new version
+    CURRENT_VERSION=$(get_current_version)
     NEW_VERSION=$(calculate_new_version "$BUMP_TYPE")
+    
+    # Verify current version and tag are in sync before proceeding
+    local current_tag="v$CURRENT_VERSION"
+    if ! tag_exists "$current_tag"; then
+      print_warning "Current version $CURRENT_VERSION does not have a matching tag $current_tag"
+      echo -n "Do you want to continue bumping the version anyway? (y/n): "
+      read -r response
+      if [[ ! "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+        print_error "Aborting version bump. Please run './util/version verify' to check status."
+        exit 1
+      fi
+    fi
+    
+    # Proceed with version update
     update_version "$NEW_VERSION"
     
     if [ "$AUTO_COMMIT" = true ]; then
@@ -383,6 +493,7 @@ case "$COMMAND" in
       print_info "To commit changes manually, use:"
       echo -e "  ${YELLOW}git add README.md $VERSION_PROPERTIES_FILE pom.xml Samstraumr/pom.xml Samstraumr/samstraumr-core/pom.xml${NC}"
       echo -e "  ${YELLOW}git commit -m \"Bump $BUMP_TYPE version to $NEW_VERSION\"${NC}"
+      echo -e "  ${YELLOW}git tag -a \"v$NEW_VERSION\" -m \"Version $NEW_VERSION\"${NC}"
     fi
     ;;
   
@@ -398,6 +509,14 @@ case "$COMMAND" in
       exit 1
     fi
     
+    # Verify the version we're setting doesn't already have a tag
+    local new_tag="v$NEW_VERSION"
+    if tag_exists "$new_tag"; then
+      print_error "Tag $new_tag already exists. Cannot set version to $NEW_VERSION."
+      print_warning "Run 'git tag -d $new_tag' to delete the existing tag if needed."
+      exit 1
+    fi
+    
     update_version "$NEW_VERSION"
     
     if [ "$AUTO_COMMIT" = true ]; then
@@ -407,6 +526,7 @@ case "$COMMAND" in
       print_info "To commit changes manually, use:"
       echo -e "  ${YELLOW}git add README.md $VERSION_PROPERTIES_FILE pom.xml Samstraumr/pom.xml Samstraumr/samstraumr-core/pom.xml${NC}"
       echo -e "  ${YELLOW}git commit -m \"Set version to $NEW_VERSION\"${NC}"
+      echo -e "  ${YELLOW}git tag -a \"v$NEW_VERSION\" -m \"Version $NEW_VERSION\"${NC}"
     fi
     ;;
   
