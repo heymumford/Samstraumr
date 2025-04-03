@@ -1,7 +1,7 @@
 # Getting Started with Samstraumr
 
 ```
-Version: 0.5.9
+Version: 0.6.0
 Last updated: April 2, 2025
 Author: Eric C. Mumford (@heymumford)
 ```

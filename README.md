@@ -1,7 +1,7 @@
 # Samstraumr Framework
 
 ```
-Version: 0.5.9
+Version: 0.6.0
 License: Mozilla Public License 2.0
 Maintainer: Eric C. Mumford (@heymumford)
 ```
