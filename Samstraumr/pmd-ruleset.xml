@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ruleset name="Custom Ruleset"
-    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns="http://pmd.sourceforge.net/ruleset/3.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/3.0.0 https://pmd.sourceforge.io/ruleset_3_0_0.xsd">
     
     <description>
         Custom PMD ruleset for Samstraumr project
@@ -15,7 +15,7 @@
 
     <!-- Include a subset of rules from the error-prone category -->
     <rule ref="category/java/errorprone.xml/EmptyCatchBlock"/>
-    <rule ref="category/java/errorprone.xml/EmptyWhileStmt"/>
+    <!-- Removed EmptyWhileStmt as it has been deprecated and scheduled for removal in PMD 7.0.0 -->
 
     <!-- Include a subset of rules from the code style category -->
     <rule ref="category/java/codestyle.xml/ExtendsObject"/>
