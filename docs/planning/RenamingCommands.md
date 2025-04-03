@@ -1,4 +1,11 @@
-# Renaming Commands
+# Markdown File Renaming Commands
+
+This document contains the commands to standardize markdown file naming across the project.
+
+## Renaming Strategy
+- README.md files remain in UPPER_CASE
+- CLAUDE.md remains in UPPER_CASE
+- Other documentation files use PascalCase
 
 ```bash
 # Planning directory
@@ -67,4 +74,44 @@ mv -v docs/site/markdown/build-status.md docs/site/markdown/BuildStatus.md
 
 # Util directory
 mv -v util/VERSION_SCRIPTS.md util/VersionScripts.md
+
+# Additional files identified for renaming
+
+# Root directory
+mv -v "COMPATIBILITY_FIXES.md" "CompatibilityFixes.md"
+mv -v "COMPATIBILITY_REPORT.md" "CompatibilityReport.md"
+mv -v "TEST_STANDARDIZATION.md" "TestStandardization.md"
+
+# Reference directory - still need to check if these exist with lowercase names
+if [ -f "docs/reference/glossary.md" ]; then
+  mv -v "docs/reference/glossary.md" "docs/reference/Glossary.md"
+fi
+
+if [ -f "docs/reference/faq.md" ]; then
+  mv -v "docs/reference/faq.md" "docs/reference/Faq.md"
+fi
+
+# Guides directory
+if [ -f "docs/guides/prerequisites.md" ]; then
+  mv -v "docs/guides/prerequisites.md" "docs/guides/Prerequisites.md"
+fi
+
+# Contribution directory
+if [ -f "docs/contribution/contributing.md" ]; then
+  mv -v "docs/contribution/contributing.md" "docs/contribution/Contributing.md"
+fi
+
+# Site directory
+if [ -f "docs/site/markdown/index.md" ]; then
+  mv -v "docs/site/markdown/index.md" "docs/site/markdown/Index.md"
+fi
+
+# Samstraumr core resources
+if [ -f "Samstraumr/samstraumr-core/src/main/resources/version-template.md" ]; then
+  mv -v "Samstraumr/samstraumr-core/src/main/resources/version-template.md" "Samstraumr/samstraumr-core/src/main/resources/VersionTemplate.md"
+fi
+
+# Check if there are any remaining non-PascalCase files that aren't README.md or CLAUDE.md
+echo "Checking for any remaining files that don't follow conventions..."
+find . -name "*.md" | grep -v "README.md" | grep -v "CLAUDE.md" | grep -E "[^A-Z][A-Z]|[^a-z][a-z]|_|-"
 ```
