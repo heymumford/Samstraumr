@@ -1,12 +1,9 @@
 # Samstraumr Framework
 
-> *Software that breathes, flows, and grows like a living stream*
-
 ```
-Last updated: April 2, 2025
-Maintainer: Eric C. Mumford (@heymumford)
 Version: 0.5.7
 License: Mozilla Public License 2.0
+Maintainer: Eric C. Mumford (@heymumford)
 ```
 
 ## Table of Contents
@@ -21,131 +18,107 @@ License: Mozilla Public License 2.0
 - [Advanced Topics](#advanced-topics)
 - [Community](#community)
 - [Resources](#resources)
+- [Development Standards](#development-standards)
 - [Connect](#connect)
 
 ## Overview
 
-Imagine software that adapts to change as gracefully as a river adjusts its course around new stones. This is the vision behind Samstraumr (from Old Norse, meaning "unified flow").
+Samstraumr (Old Norse: "unified flow") is a design framework for building adaptive software systems through Tube-Based Development (TBD). It implements principles from systems theory to create resilient, self-monitoring components.
 
-Samstraumr is a design framework that reimagines how we build software by drawing inspiration from nature's elegant solutions. Just as rivers find the most efficient path downhill, Samstraumr helps developers create systems that naturally find balance and harmony through **Tube-Based Development (TBD)**.
-
-At its heart, Samstraumr envisions software components as interconnected "tubes" – mindful pathways that guide data and functionality through your system with purpose and awareness.
-
-[→ Explore our systems theory foundation](./docs/SystemsTheoryFoundation.md)
+[→ Systems Theory Foundation](./docs/SystemsTheoryFoundation.md)
 
 ## Core Concepts
 
 ### Tubes as Building Blocks
 
-In nature, specialized structures channel resources where they're needed – from rivers carving landscapes to veins delivering nutrients through your body. Samstraumr's **tubes** bring this wisdom to code.
+Tubes are self-contained processing units with defined inputs, outputs, and responsibilities. The architecture follows a hierarchical organization:
 
-A tube is a self-aware component with clear responsibilities, mindful of what flows in and what flows out. Like organs in a body, tubes perform specific functions while contributing to a greater purpose:
+- **Atomic tubes**: Individual processing units with single responsibilities
+- **Bundles**: Coordinated tube collections forming processing pipelines
+- **Machines**: Orchestrated bundles implementing complete subsystems
 
-- **Atomic tubes** – Individual specialists, like a heart cell with one clear job
-- **Bundles** – Collaborative teams, like a complete heart with coordinated chambers
-- **Machines** – Orchestrated systems, like a full circulatory system working in concert
-
-This nested approach mirrors nature's elegant organization – from cells to organisms to ecosystems – allowing complex symphonies to emerge from simple melodies.
-
-[→ Discover detailed core concepts](./docs/CoreConcepts.md)
-[→ Learn about tube design patterns](./docs/TubePatterns.md)
-[→ Understand bundles and machines](./docs/BundlesAndMachines.md)
+[→ Core Concepts](./docs/CoreConcepts.md) | 
+[→ Tube Patterns](./docs/TubePatterns.md) | 
+[→ Bundles and Machines](./docs/BundlesAndMachines.md)
 
 ### Identity Notation
 
-Even in complex ecosystems, every creature has its place and name. Samstraumr brings this clarity to software with a naming system as elegant as it is practical:
+The framework uses a hierarchical naming convention:
 
-- `T<ID>` – A single tube, like referring to "the oak tree" (`T7`)
-- `B<ID>.T<ID>` – A tube within its bundle, like "the oak in the north grove" (`B3.T2`)
-- `M<ID>.B<ID>.T<ID>` – A fully qualified address, like "the oak in the north grove of Sherwood Forest" (`M0.B1.T4`)
+- `T<ID>`: Single tube identifier (`T7`)
+- `B<ID>.T<ID>`: Bundle-scoped tube identifier (`B3.T2`)
+- `M<ID>.B<ID>.T<ID>`: Fully-qualified machine-scoped identifier (`M0.B1.T4`)
 
-This whispered language allows developers to reference any part of even the most intricate systems with brevity and precision – a gift to future caretakers of your code.
+This notation provides precise component addressing without ambiguity.
 
 ### State Management
 
-Just as a river might be flowing, frozen, or flooding – each with different implications – Samstraumr components understand themselves through two complementary lenses:
+Tubes maintain two complementary state models:
 
-1. **Design State** – Fundamental conditions that change rarely but significantly:
-    - `FLOWING` – Healthy operation, like a river in its banks
-    - `BLOCKED` – Temporarily unable to process, like a river meeting a new dam
-    - `ADAPTING` – Reconfiguring to new conditions, like a river finding a path around obstacles
-    - `ERROR` – Experiencing distress, like a river during toxic contamination
+1. **Design State**: Core operational state
+    - `FLOWING`: Normal operation
+    - `BLOCKED`: Processing temporarily halted
+    - `ADAPTING`: Reconfiguring for new conditions
+    - `ERROR`: Fault condition
 
-2. **Dynamic State** – Moment-to-moment awareness that shifts fluidly with changing conditions, like the ripples, eddies, and currents that animate a flowing stream
+2. **Dynamic State**: Real-time operational characteristics tracked as key-value properties
 
-This dual awareness allows components to maintain their essence while dancing with the ever-changing now.
-
-[→ Explore state harmony in depth](./docs/StateManagement.md)
+[→ State Management](./docs/StateManagement.md)
 
 ## Benefits
 
-When you embrace Samstraumr's flowing wisdom:
-
-- **Unexpected intelligence emerges** – Components become more than the sum of their parts
-- **Systems bend without breaking** – Resilience becomes woven into your software's fabric
-- **Growth feels organic, not painful** – Evolution without revolution
-- **Technical debt becomes rare** – Clean boundaries prevent tangled roots
-- **Teams work in harmony** – Clear responsibilities foster collaboration without conflict
-- **Solutions scale naturally** – From garden pond to mighty ocean
+- Emergent intelligence through component composition
+- Resilience through self-monitoring and adaptation
+- Evolutionary architecture supporting incremental growth
+- Reduced technical debt through clear boundaries
+- Collaborative development with well-defined interfaces
+- Scalable design from small applications to distributed systems
 
 ## Getting Started
 
-Begin your journey with Samstraumr through these gentle steps:
+1. Create a single tube with clear responsibilities
+2. Define input/output contracts
+3. Implement monitoring and adaptation logic
+4. Compose tubes into functional bundles
 
-1. **Start with a single stream** – Create one thoughtful tube with clear purpose
-2. **Map the natural flows** – Identify how information wants to move through your system
-3. **Listen and respond** – Enable your tubes to hear and adapt to what's happening around them
-4. **Let complexity emerge gradually** – Nurture growth through thoughtful composition
-
-[→ Follow our step-by-step guide](./docs/GettingStarted.md)
+[→ Getting Started Guide](./docs/GettingStarted.md)
 
 ## Advanced Topics
 
-For those ready to dive deeper:
-
-- **Migrating existing systems** – Bringing Samstraumr wisdom to established codebases
-- **Testing approaches** – Hierarchical testing with BDD for living documentation
-- **Design patterns** – Recurring solutions to common challenges
-
-[→ Discover migration strategies](./docs/Migration.md)
-[→ Explore testing approaches](./docs/Testing.md)
+- [Migration Strategies](./docs/Migration.md): Integrating with existing systems
+- [Testing Approaches](./docs/Testing.md): BDD-based testing methodology
+- [Design Patterns](./docs/TubePatterns.md): Common tube implementation patterns
 
 ## Community
 
-Samstraumr thrives within a garden of diverse practitioners tending their own implementations while sharing discoveries. Join our growing community:
-
-- **Share your creations** through pull requests
-- **Plant new ideas** via thoughtful issues
-- **Join conversations** about patterns observed in the wild
-- **Tend the documentation** to help future explorers
+- Contribute implementations through pull requests
+- Propose ideas via GitHub issues
+- Share usage patterns and experiences
+- Improve documentation
 
 ## Resources
 
-- [Glossary of Terms](./docs/Glossary.md)
-- [Frequently Asked Questions](./docs/FAQ.md)
-- [Testing Strategy](./docs/proposals/SamstraumrTestingStrategy.md)
-- [LLM Context Composite Tube Proposal](./docs/proposals/LLMContextCompositeTubeProposal.md)
+- [Glossary](./docs/Glossary.md): Terminology reference
+- [FAQ](./docs/FAQ.md): Common questions and answers
+- [Testing Strategy](./docs/proposals/SamstraumrTestingStrategy.md): Testing methodology
+- [LLM Context Proposal](./docs/proposals/LLMContextCompositeTubeProposal.md): Experimental extension
 
 ## Development Standards
 
-- **Text Encoding:** All text files use UTF-8 encoding
-- **Line Endings:** Unix-style (LF) line endings for all text files except Windows batch files
-- **File Formats:** `.editorconfig` and `.gitattributes` ensure consistent formatting
-- **Quality Checks:** Run `./util/quality/check-encoding.sh` to verify file encoding and line endings
-- **Version Management:** Run `./util/maintenance/update-version.sh <new-version>` to update version across the codebase
-- **Utility Scripts:** All utility scripts are now organized in the `util/` directory by category:
-  - `util/build/` - Build scripts (build-optimal.sh, build-performance.sh, etc.)
-  - `util/quality/` - Quality check scripts (build-checks.sh, check-encoding.sh, etc.)
-  - `util/maintenance/` - Maintenance scripts (update-version.sh, cleanup-maven.sh, etc.)
-  
-  ⚠️ **IMPORTANT:** All scripts must be run from their new locations in the util directory.
+- **Encoding**: UTF-8 for all text files
+- **Line Endings**: LF for all files (except CRLF for .bat/.cmd)
+- **Configuration**: Enforced via .editorconfig and .gitattributes
+- **Quality Checks**: `./util/quality/check-encoding.sh`
+- **Version Management**: `./util/maintenance/update-version.sh <new-version>`
+- **Utility Scripts**: Organized by category:
+  - `util/build/`: Build automation
+  - `util/quality/`: Quality assurance
+  - `util/maintenance/`: Maintenance operations
+
+  ⚠️ **IMPORTANT:** All scripts must be run from their util directory locations.
 
 ## Connect
 
 - **Author:** [Eric C. Mumford](mailto:heymumford@samstraumr.org)
 - **GitHub:** [github.com/heymumford](https://github.com/heymumford)
 - **LinkedIn:** [linkedin.com/in/eric-mumford](https://www.linkedin.com/in/eric-mumford/)
-
----
-
-*Samstraumr: Where code flows like water, finding harmony in change*

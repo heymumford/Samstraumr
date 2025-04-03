@@ -1,78 +1,65 @@
 # Getting Started with Samstraumr
 
 ```
+Version: 0.5.7
 Last updated: April 2, 2025
 Author: Eric C. Mumford (@heymumford)
-Contributors: Samstraumr Core Team
 ```
 
 ## Table of Contents
-- [Introduction: Your First Steps](#introduction-your-first-steps)
 - [Setting Up Your Environment](#setting-up-your-environment)
 - [Creating Your First Tube](#creating-your-first-tube)
 - [Understanding the Flow](#understanding-the-flow)
 - [Connecting Tubes Together](#connecting-tubes-together)
 - [Monitoring and Adaptation](#monitoring-and-adaptation)
 - [Building Your First Bundle](#building-your-first-bundle)
-- [Common Patterns for Beginners](#common-patterns-for-beginners)
+- [Common Patterns](#common-patterns)
 - [Troubleshooting](#troubleshooting)
 - [Next Steps](#next-steps)
 
-## Introduction: Your First Steps
-
-Welcome to Samstraumr, where software flows like water and adapts like life. This guide will take you from theory to practice, helping you build your first flowing system with the care and patience of a gardener planting seeds.
-
-Before we begin coding, take a moment to shift your perspective. Rather than thinking about building a static structure, imagine you're creating a living stream—something that will grow, respond, and evolve over time. Your role is not just to write code, but to create conditions where beneficial flows can emerge naturally.
-
 ## Setting Up Your Environment
-
-Let's prepare the soil for your first Samstraumr project.
 
 ### Prerequisites
 
 - Java 11 or higher
 - Maven 3.6 or higher
-- Your favorite IDE (IntelliJ IDEA, Eclipse, VS Code with Java extensions)
+- IDE with Java support
 
 ### Adding Samstraumr to Your Project
 
-Add the Samstraumr dependency to your Maven `pom.xml`:
+Maven dependency:
 
 ```xml
 <dependency>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-core</artifactId>
-    <version>0.4</version>
+    <version>0.5.7</version>
 </dependency>
 ```
 
-Or if you're using Gradle:
+Gradle dependency:
 
 ```groovy
-implementation 'org.samstraumr:samstraumr-core:1.2.0'
+implementation 'org.samstraumr:samstraumr-core:0.5.7'
 ```
 
 ### Project Structure
 
-While Samstraumr is flexible, a thoughtful organization helps maintain clarity:
+Recommended project organization:
 
 ```
-src/main/java/
-├── org/
-    ├── yourdomain/
-        ├── tubes/        # Individual tube implementations
-        ├── bundles/      # Bundle compositions
-        ├── machines/     # Machine orchestration
-        ├── config/       # Configuration classes
-        ├── models/       # Domain models flowing through tubes
-        └── app/          # Application entry points
+src/main/java/org/yourdomain/
+├── tubes/        # Individual tube implementations
+├── bundles/      # Bundle compositions
+├── machines/     # Machine orchestration
+├── config/       # Configuration classes
+├── models/       # Domain models
+└── app/          # Application entry points
 ```
 
 ## Creating Your First Tube
 
-Let's create a simple tube that validates input data—perhaps checking if a string is a valid email address.
-
-### 1. Implement the Tube Interface
+### 1. Implement Basic Tube
 
 ```java
 package org.yourdomain.tubes;
@@ -96,38 +83,29 @@ public class EmailValidatorTube implements Tube {
     private TubeState designState;
     private DynamicState dynamicState;
     private final TubeLogger logger;
-
-    // Tube implementation components
     private final TubeProcessor processor;
     private final TubeMonitor monitor;
     private final TubeResourceManager resources;
 
     public EmailValidatorTube() {
-        // Create a unique identity for this tube
+        // Identity and state
         this.identity = new BirthCertificate.Builder()
             .withID("T1")
-            .withPurpose("Email address validation")
+            .withPurpose("Email validation")
             .withCreationTime(Instant.now())
             .build();
 
-        // Initialize state
         this.designState = TubeState.FLOWING;
         this.dynamicState = new DynamicState.Builder()
             .withTimestamp(Instant.now())
             .build();
-
-        // Set up logging
         this.logger = new TubeLogger(identity);
-
-        // Initialize core components
+        
+        // Core components
         this.processor = createProcessor();
         this.monitor = createMonitor();
         this.resources = createResourceManager();
-
-        logger.info("Tube created and initialized");
     }
-
-    // Implementation of required Tube interface methods...
 
     // Core processing logic
     private TubeProcessor createProcessor() {
@@ -139,43 +117,36 @@ public class EmailValidatorTube implements Tube {
             String email = input.toString();
             boolean isValid = EMAIL_PATTERN.matcher(email).matches();
 
-            if (isValid) {
-                return ValidationResult.valid(email);
-            } else {
-                return ValidationResult.invalid("Invalid email format: " + email);
-            }
+            return isValid
+                ? ValidationResult.valid(email)
+                : ValidationResult.invalid("Invalid email format: " + email);
         };
     }
 
-    // Basic monitoring capability
+    // Health monitoring
     private TubeMonitor createMonitor() {
-        return () -> {
-            // Gather current stats and return health assessment
-            return new HealthAssessment.Builder()
-                .withTimestamp(Instant.now())
-                .withStatus(designState == TubeState.FLOWING ? "HEALTHY" : "UNHEALTHY")
-                .build();
-        };
+        return () -> new HealthAssessment.Builder()
+            .withTimestamp(Instant.now())
+            .withStatus(designState == TubeState.FLOWING ? "HEALTHY" : "UNHEALTHY")
+            .build();
     }
 
-    // Simple resource management
+    // Resource management
     private TubeResourceManager createResourceManager() {
         return new TubeResourceManager() {
             @Override
             public void initialize() {
-                // Minimal resources needed for this tube
                 logger.info("Resources initialized");
             }
 
             @Override
             public void release() {
-                // Clean up any resources
                 logger.info("Resources released");
             }
         };
     }
 
-    // Domain-specific result class
+    // Domain-specific result
     public static class ValidationResult {
         private final boolean valid;
         private final String message;
@@ -202,9 +173,7 @@ public class EmailValidatorTube implements Tube {
 }
 ```
 
-### 2. Test Your Tube
-
-Create a simple test to verify your tube works correctly:
+### 2. Test the Tube
 
 ```java
 package org.yourdomain.tubes.test;
@@ -218,26 +187,18 @@ import static org.junit.jupiter.api.Assertions.*;
 class EmailValidatorTubeTest {
     @Test
     void shouldValidateCorrectEmailFormat() {
-        // Arrange
         EmailValidatorTube tube = new EmailValidatorTube();
-
-        // Act
         ValidationResult result = (ValidationResult) tube.process("user@example.com");
-
-        // Assert
+        
         assertTrue(result.isValid());
         assertEquals("user@example.com", result.getValue());
     }
 
     @Test
     void shouldRejectInvalidEmailFormat() {
-        // Arrange
         EmailValidatorTube tube = new EmailValidatorTube();
-
-        // Act
         ValidationResult result = (ValidationResult) tube.process("invalid-email");
-
-        // Assert
+        
         assertFalse(result.isValid());
         assertNull(result.getValue());
         assertTrue(result.getMessage().contains("Invalid email format"));
@@ -247,25 +208,21 @@ class EmailValidatorTubeTest {
 
 ## Understanding the Flow
 
-Now that you have a functional tube, let's explore how data flows through it.
+### Processing Pathway
 
-### The Processing Pathway
+1. **Input Reception**: Data enters through `process()`
+2. **Validation**: Input is checked against rules
+3. **Result Generation**: `ValidationResult` is created
+4. **Output Delivery**: Result flows to caller
 
-1. **Input Arrives**: Data enters the tube through the `process()` method
-2. **Validation Occurs**: The processor examines the input against defined rules
-3. **Result Created**: A `ValidationResult` object is created based on the evaluation
-4. **Output Returned**: The result flows out of the tube to the caller
+### Adding Self-Awareness
 
-This simple flow demonstrates the core concept of a tube as a transformative pathway—data comes in, undergoes a change, and emerges as something new.
-
-### Enriching the Flow
-
-Let's enhance our tube to make it more aware and adaptive:
+Enhanced processor with state tracking and metrics:
 
 ```java
 private TubeProcessor createProcessor() {
     return input -> {
-        // Update dynamic state to track processing
+        // Track processing state
         dynamicState = new DynamicState.Builder()
             .withTimestamp(Instant.now())
             .withProperty("processing", true)
@@ -273,7 +230,7 @@ private TubeProcessor createProcessor() {
 
         try {
             if (input == null) {
-                updateMetrics("null_input");
+                metrics.increment("null_input");
                 return ValidationResult.invalid("Email cannot be null");
             }
 
@@ -281,14 +238,14 @@ private TubeProcessor createProcessor() {
             boolean isValid = EMAIL_PATTERN.matcher(email).matches();
 
             if (isValid) {
-                updateMetrics("valid_email");
+                metrics.increment("valid_email");
                 return ValidationResult.valid(email);
             } else {
-                updateMetrics("invalid_email");
+                metrics.increment("invalid_email");
                 return ValidationResult.invalid("Invalid email format: " + email);
             }
         } finally {
-            // Update dynamic state to reflect completion
+            // Mark processing complete
             dynamicState = new DynamicState.Builder()
                 .withTimestamp(Instant.now())
                 .withProperty("processing", false)
@@ -296,29 +253,17 @@ private TubeProcessor createProcessor() {
         }
     };
 }
-
-private void updateMetrics(String type) {
-    // In a real implementation, this would update counters or gauges
-    logger.debug("Processed {}: {}", type, Instant.now());
-}
 ```
-
-This enhancement adds:
-- State tracking during processing
-- Metrics collection for different outcomes
-- Proper cleanup after processing
 
 ## Connecting Tubes Together
 
-Individual tubes are powerful, but the true magic of Samstraumr emerges when tubes connect to form flowing systems.
-
 ### Creating a Complementary Tube
 
-Let's create another tube that formats valid email addresses for display:
+Formatter tube for display formatting:
 
 ```java
 public class EmailFormatterTube implements Tube {
-    // Similar setup code to EmailValidatorTube...
+    // Standard tube initialization code omitted
 
     private TubeProcessor createProcessor() {
         return input -> {
@@ -328,7 +273,6 @@ public class EmailFormatterTube implements Tube {
             }
 
             ValidationResult validationResult = (ValidationResult) input;
-
             if (!validationResult.isValid()) {
                 return FormatResult.error(validationResult.getMessage());
             }
@@ -344,14 +288,12 @@ public class EmailFormatterTube implements Tube {
             );
         };
     }
-
-    // FormatResult class definition...
 }
 ```
 
 ### Connecting the Flow
 
-Now let's connect our tubes to create a simple flow:
+Simple pipeline implementation:
 
 ```java
 public class EmailProcessingFlow {
@@ -364,35 +306,31 @@ public class EmailProcessingFlow {
     }
 
     public FormatResult processEmail(String email) {
-        // Flow the data through the tubes
-        ValidationResult validationResult = (ValidationResult) validator.process(email);
+        ValidationResult validationResult = 
+            (ValidationResult) validator.process(email);
         return (FormatResult) formatter.process(validationResult);
     }
 }
 ```
 
-This simple flow demonstrates how tubes can be connected to create a pipeline of transformations.
-
 ## Monitoring and Adaptation
 
-A distinguishing feature of Samstraumr is the ability of tubes to monitor their own health and adapt to changing conditions.
+### Self-Monitoring
 
-### Implementing Health Checks
-
-Let's enhance our tubes with better self-monitoring:
+Health monitoring implementation:
 
 ```java
 private TubeMonitor createMonitor() {
     return () -> {
-        long totalProcessed = getMetricCount("valid_email") +
-                             getMetricCount("invalid_email") +
-                             getMetricCount("null_input");
+        long totalProcessed = metrics.getCount("valid_email") +
+                             metrics.getCount("invalid_email") +
+                             metrics.getCount("null_input");
 
         double errorRate = totalProcessed > 0 ?
-            (double)(getMetricCount("invalid_email") + getMetricCount("null_input")) / totalProcessed :
+            (double)(metrics.getCount("invalid_email") + 
+                    metrics.getCount("null_input")) / totalProcessed :
             0.0;
 
-        // Determine health based on error rate
         String status = errorRate < 0.5 ? "HEALTHY" : "DEGRADED";
 
         return new HealthAssessment.Builder()
@@ -403,22 +341,11 @@ private TubeMonitor createMonitor() {
             .build();
     };
 }
-
-private long getMetricCount(String metric) {
-    // In a real implementation, this would retrieve actual metrics
-    // For this example, we'll just return dummy values
-    switch (metric) {
-        case "valid_email": return 75;
-        case "invalid_email": return 20;
-        case "null_input": return 5;
-        default: return 0;
-    }
-}
 ```
 
-### Adding Adaptive Behavior
+### Adaptive Behavior
 
-Now let's make our tube adapt to changing conditions:
+Self-adaptation implementation:
 
 ```java
 public void checkHealth() {
@@ -426,53 +353,46 @@ public void checkHealth() {
 
     if ("DEGRADED".equals(health.getStatus())) {
         if (designState == TubeState.FLOWING) {
-            // Begin adaptation
+            // Start adaptation
             designState = TubeState.ADAPTING;
-            logger.warn("High error rate detected ({}) - beginning adaptation",
+            logger.warn("Error rate {} exceeds threshold - adapting",
                      health.getMetric("error_rate"));
-
-            // In a real implementation, this might:
+                     
+            // Adaptation logic here
             // - Adjust validation rules
             // - Implement stricter checking
             // - Alert upstream systems
-
-            // For this example, we'll just log the adaptation
-            logger.info("Adaptation complete - monitoring for improvement");
+            
+            logger.info("Adaptation complete");
         }
     } else if (designState == TubeState.ADAPTING) {
-        // Return to normal flow if health improves
+        // Return to normal flow
         designState = TubeState.FLOWING;
-        logger.info("Health restored - resuming normal operation");
+        logger.info("Health restored");
     }
 }
 ```
 
-This adaptation logic allows the tube to respond to its own performance metrics, changing its behavior when necessary to maintain optimal operation.
-
 ## Building Your First Bundle
 
-As your system grows, organizing related tubes into bundles provides clarity and coordination.
-
-### Creating a Simple Bundle
-
-Let's bundle our email processing tubes together:
+### Bundle Implementation
 
 ```java
 public class EmailProcessingBundle implements Bundle {
     private final EmailValidatorTube validator;
     private final EmailFormatterTube formatter;
-    private final EmailStorageTube storage; // Assume we've created this tube
+    private final EmailStorageTube storage;
 
     private BundleState designState;
     private DynamicState dynamicState;
 
     public EmailProcessingBundle() {
-        // Create and initialize tubes
+        // Initialize tubes
         this.validator = new EmailValidatorTube();
         this.formatter = new EmailFormatterTube();
         this.storage = new EmailStorageTube();
 
-        // Initialize bundle state
+        // Set initial state
         this.designState = BundleState.FLOWING;
         this.dynamicState = new DynamicState.Builder()
             .withTimestamp(Instant.now())
@@ -480,98 +400,80 @@ public class EmailProcessingBundle implements Bundle {
     }
 
     public FormatResult processAndStoreEmail(String email) {
-        // Check bundle state
         if (designState != BundleState.FLOWING) {
-            throw new IllegalStateException("Bundle is not in FLOWING state: " + designState);
+            throw new IllegalStateException("Bundle not flowing: " + designState);
         }
 
-        // Flow through the tubes
-        ValidationResult validationResult = (ValidationResult) validator.process(email);
+        // Process through tube chain
+        ValidationResult validationResult = 
+            (ValidationResult) validator.process(email);
 
         if (!validationResult.isValid()) {
             return FormatResult.error(validationResult.getMessage());
         }
 
-        FormatResult formatResult = (FormatResult) formatter.process(validationResult);
+        FormatResult formatResult = 
+            (FormatResult) formatter.process(validationResult);
         storage.process(formatResult);
 
         return formatResult;
     }
 
     public void monitorHealth() {
-        // Check health of all tubes
         boolean allHealthy = Stream.of(validator, formatter, storage)
             .map(tube -> tube.getMonitor().assessHealth())
             .allMatch(health -> "HEALTHY".equals(health.getStatus()));
 
-        // Update bundle state based on tube health
         designState = allHealthy ? BundleState.FLOWING : BundleState.DEGRADED;
     }
-
-    // Additional bundle methods...
 }
 ```
 
-This bundle provides:
-- Coordinated access to the email processing flow
-- Collective health monitoring across all tubes
-- A unified interface hiding the internal tube connections
+## Common Patterns
 
-## Common Patterns for Beginners
+### Validator-Transformer-Persister
 
-As you start working with Samstraumr, these patterns will help you create clean, effective designs:
+A standard processing pipeline:
 
-### The Validator-Transformer-Persister Pattern
+1. **Validator Tube**: Validates input requirements
+2. **Transformer Tube**: Converts valid data
+3. **Persister Tube**: Stores processed data
 
-A common flow involves validation, transformation, and persistence:
+### Observer Tube
 
-1. **Validator Tube**: Ensures inputs meet requirements
-2. **Transformer Tube**: Converts valid data into new formats
-3. **Persister Tube**: Stores transformed data
-
-This pattern separates concerns while creating a natural flow of responsibility.
-
-### The Observer Tube Pattern
-
-Sometimes you need to observe data without modifying it:
+Passive monitoring without modification:
 
 ```java
 public class EmailAuditTube implements Tube {
-    // Implementation details...
-
     private TubeProcessor createProcessor() {
         return input -> {
-            // Log the email processing for audit purposes
+            // Log for audit purposes
             logger.info("Email processed: {}", input);
-
-            // Return input unchanged - this tube only observes
+            metrics.increment("emails_processed");
+            
+            // Return unchanged - observation only
             return input;
         };
     }
 }
 ```
 
-This pattern allows for monitoring, metrics, or logging without interrupting the main flow.
+### Circuit Breaker
 
-### The Circuit Breaker Pattern
-
-Protect downstream systems by breaking the circuit when errors occur:
+Failure protection pattern:
 
 ```java
 public class CircuitBreakerTube implements Tube {
     private int consecutiveFailures = 0;
     private static final int THRESHOLD = 5;
 
-    // Implementation details...
-
     private TubeProcessor createProcessor() {
         return input -> {
             if (designState == TubeState.BLOCKED) {
-                return ErrorResult.circuitOpen("Circuit is open - too many failures");
+                return ErrorResult.circuitOpen("Circuit open");
             }
 
             try {
-                // Process normally
                 Object result = doActualProcessing(input);
                 consecutiveFailures = 0; // Reset on success
                 return result;
@@ -579,62 +481,50 @@ public class CircuitBreakerTube implements Tube {
                 consecutiveFailures++;
 
                 if (consecutiveFailures >= THRESHOLD) {
-                    // Open the circuit
                     designState = TubeState.BLOCKED;
-                    logger.error("Circuit opened after {} consecutive failures", THRESHOLD);
+                    logger.error("Circuit opened after {} failures", THRESHOLD);
+                    scheduleReset(); // Attempt reset after timeout
                 }
 
                 return ErrorResult.processingFailure(e.getMessage());
             }
         };
     }
-
-    // Implementation of circuit reset logic...
 }
 ```
 
-This pattern prevents cascading failures by temporarily stopping flow when problems are detected.
-
 ## Troubleshooting
 
-Common issues you might encounter when starting with Samstraumr:
+### Communication Issues
 
-### "My tubes aren't communicating properly"
+- **Type compatibility**: Ensure output/input type matching between tubes
+- **State verification**: Confirm all tubes are in `FLOWING` state
+- **Error propagation**: Implement consistent error handling
 
-- **Check data types**: Ensure the output of one tube matches the expected input of the next
-- **Verify state**: Make sure all tubes are in the `FLOWING` state
-- **Review error handling**: Add proper exception management to see where the flow breaks
+### Adaptation Problems
 
-### "My tubes aren't adapting as expected"
+- **Metrics collection**: Implement comprehensive metrics
+- **Transition conditions**: Define clear state transition rules
+- **Logging**: Add detailed state change logging
 
-- **Implement proper monitoring**: Ensure your tubes gather meaningful metrics
-- **Add adaptation logic**: Create clear conditions for state transitions
-- **Use logging**: Add detailed logging to trace the adaptation process
+### Complexity Management
 
-### "My system feels too complex"
-
-- **Start smaller**: Begin with just 2-3 tubes before expanding
-- **Focus on flow**: Ensure data moves smoothly before adding complex adaptation
-- **Use bundles**: Group related tubes to manage complexity
+- **Start minimal**: Begin with 2-3 tubes
+- **Focus on interfaces**: Define clear contracts between tubes
+- **Use hierarchical organization**: Group related tubes into bundles
 
 ## Next Steps
 
-Now that you've created your first flowing system with Samstraumr, consider these next steps:
+1. **Expand functionality**: Add specialized tubes
+2. **Implement state management**: Add sophisticated state transitions
+3. **Organize as machines**: Group bundles into cohesive machines
+4. **Add metrics**: Implement statistical monitoring 
+5. **Test with BDD**: Create behavior specifications
 
-1. **Expand your bundle**: Add more tubes to handle additional aspects of email processing
-2. **Explore state management**: Implement more sophisticated state tracking and transitions
-3. **Create a machine**: Organize multiple bundles into a cohesive machine
-4. **Add metrics and monitoring**: Implement real metrics collection for better adaptation
-5. **Explore testing**: Use Behavior-Driven Development to verify your tubes' behavior
+### Related Resources
 
-Continue your journey with these related resources:
+- [State Management](./StateManagement.md): Dual state system
+- [Bundles and Machines](./BundlesAndMachines.md): Component organization
+- [Testing Strategy](./Testing.md): BDD verification
 
-- [State Management](./StateManagement.md) - Deeper exploration of the dual state system
-- [Bundles and Machines](./BundlesAndMachines.md) - Building larger structures
-- [Testing Strategy](./Testing.md) - Approaches for verifying tube behavior
-
----
-
-*Remember, in Samstraumr, we don't just write code—we nurture flows that grow, adapt, and evolve naturally over time.*
-
-[← Return to Core Concepts](./CoreConcepts.md) | [Explore State Management →](./StateManagement.md)
+[← Core Concepts](./CoreConcepts.md) | [State Management →](./StateManagement.md)
