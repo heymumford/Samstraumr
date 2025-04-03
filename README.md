@@ -1,9 +1,9 @@
 # Samstraumr Framework
 
-[![Version](https://img.shields.io/badge/version-1.0.5-blue)](https://github.com/heymumford/Samstraumr/releases) [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/)
+[![Version](https://img.shields.io/badge/version-1.0.6-blue)](https://github.com/heymumford/Samstraumr/releases) [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/)
 
 ```
-Version: 1.0.5
+Version: 1.0.6
 License: Mozilla Public License 2.0
 Maintainer: Eric C. Mumford (@heymumford)
 ```
@@ -111,11 +111,13 @@ Tubes maintain two complementary state models:
 - **Line Endings**: LF for all files (except CRLF for .bat/.cmd)
 - **Configuration**: Enforced via .editorconfig and .gitattributes
 - **Quality Checks**: `./util/quality/check-encoding.sh`
-- **Version Management**: `./util/maintenance/update-version.sh <new-version>`
+- **Version Management**: `./util/version bump patch` or `./util/version set <new-version>`
+- **Build Pipeline**: Local validation with [Act](https://github.com/nektos/act) (see [CI/CD Guide](./docs/contribution/ci-cd-guide.md))
 - **Utility Scripts**: Organized by category:
   - `util/build/`: Build automation
   - `util/quality/`: Quality assurance
   - `util/maintenance/`: Maintenance operations
+  - `util/badges/`: Badge generation
 
   ⚠️ **IMPORTANT:** All scripts must be run from their util directory locations.
 

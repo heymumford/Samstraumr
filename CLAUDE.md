@@ -101,6 +101,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - Check with detailed output: `./util/quality/check-encoding.sh --verbose`
   - Automatically fix issues: `./util/quality/check-encoding.sh --fix`
 
+## CI/CD Pipeline Commands
+- Local GitHub Actions workflow verification with Act:
+  - Install Act: `sudo curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash`
+  - List available jobs: `act -l`
+  - Dry run a job: `act -j initialization --dryrun`
+  - Run a specific job: `sudo act -j get-version`
+  - Run with specific event: `sudo act workflow_dispatch -j get-version -W .github/workflows/samstraumr-pipeline.yml`
+  - Complete documentation: See `docs/contribution/ci-cd-guide.md`
+- Badge management:
+  - Generate all badges: `./util/badges/generate-badges.sh all`
+  - Generate specific badge: `./util/badges/generate-badges.sh build`
+
 ## Code Style Guidelines
 - **Imports**: Specific imports (no wildcards). Standard Java first, then third-party, then project imports.
 - **Naming**: 

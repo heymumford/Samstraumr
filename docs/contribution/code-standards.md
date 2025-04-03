@@ -8,6 +8,7 @@ This document outlines the coding standards for contributing to Samstraumr.
 - **Consistency**: Follow established patterns in the codebase
 - **Testability**: Design code with testing in mind
 - **Documentation**: Document public APIs and complex logic
+- **Continuous Integration**: Always verify code passes all tests and checks before submitting
 
 ## Java Code Style
 
@@ -84,3 +85,47 @@ All code must pass the following quality checks:
 - Use descriptive commit messages in the imperative mood
 - Reference issue numbers in commit messages when applicable
 - Keep pull requests focused on a single feature or bug fix
+
+## Build Procedures
+
+### Local Development Environment
+
+1. **Standard Build**
+   - `mvn clean install` - Full build with tests
+   - `mvn clean install -DskipTests` - Build without running tests
+   - `./util/build/build-performance.sh` - Build with optimizations (Linux/WSL)
+   - `./util/build/build-optimal.sh` - Recommended optimized build (Linux/WSL)
+   - `./util/build/build-optimal.sh fast` - Fast development build, skipping tests and checks
+
+2. **Test Execution**
+   - `./run-tests.sh all` - Run all tests
+   - `./run-tests.sh <test-type>` - Run specific test type (e.g., unit, component, integration)
+   - `mvn test -P <profile>` - Run tests with specific Maven profile (e.g., atl-tests, unit-tests)
+   - See `CLAUDE.md` for complete test command reference
+
+3. **Quality Checks**
+   - `./util/quality/build-checks.sh` - Run all quality checks
+   - `./util/quality/skip-quality-build.sh` - Build without quality checks
+   - `mvn spotless:apply` - Apply code formatting
+
+### GitHub Actions Verification
+
+To verify GitHub workflows locally before pushing:
+
+1. **Install Act**
+   - Install [Act](https://github.com/nektos/act) on your system
+   - For Linux: `sudo curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash`
+   - Or place in /usr/local/bin: `sudo mv act /usr/local/bin/`
+
+2. **Configure Act**
+   - Create configuration: `echo "-P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest" > ~/.config/act/actrc`
+
+3. **Run Workflows Locally**
+   - List available workflows: `act -l`
+   - Run a specific job with dry-run: `act -j initialization --dryrun`
+   - Run a specific job: `act -j initialization`
+   - Run with specific event: `act workflow_dispatch -j get-version -W .github/workflows/samstraumr-pipeline.yml`
+
+4. **Badge Updates**
+   - GitHub Actions automatically updates the build status badge in the README
+   - You can manually check badge URLs with: `./util/badges/generate-badges.sh build`
