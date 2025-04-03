@@ -7,7 +7,7 @@ This document describes the standardized file organization for the Samstraumr pr
 The root directory should contain only essential files:
 
 - **README.md** - Project overview and quick start guide
-- **CLAUDE.md** - Instructions for Claude.ai Code Assistant
+- **CLAUDE.md** - Special configuration file for AI assistant tools
 - **LICENSE** - Project license
 - **pom.xml** - Parent Maven build file
 - **.gitignore** - Git ignore rules

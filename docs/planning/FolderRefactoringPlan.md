@@ -31,7 +31,7 @@
 
 **Keep at top level**:
 - README.md
-- CLAUDE.md (for Claude.ai)
+- CLAUDE.md (for AI tooling)
 - pom.xml (Maven parent)
 - Samstraumr/ (main code module)
 - docs/ (consolidated documentation)

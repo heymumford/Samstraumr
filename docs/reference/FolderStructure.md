@@ -34,7 +34,7 @@ Top-level files include:
 
 - **`pom.xml`**: Parent Maven POM file
 - **`README.md`**: Project introduction and overview
-- **`CLAUDE.md`**: Instructions for AI assistants
+- **`CLAUDE.md`**: Special configuration file for AI tooling
 - **`LICENSE`**: Mozilla Public License 2.0
 
 ## Core Module Structure
@@ -152,7 +152,7 @@ Samstraumr follows these file and directory naming conventions:
 
 | File | Location | Purpose |
 |------|----------|---------|
-| `CLAUDE.md` | Project root | Instructions for Claude AI |
+| `CLAUDE.md` | Project root | Special configuration file for AI tooling |
 | `docs/guides/getting-started.md` | `docs/guides/` | Initial setup guide |
 | `docs/reference/glossary.md` | `docs/reference/` | Terminology definitions |
 | `docs/contribution/code-standards.md` | `docs/contribution/` | Coding standards |

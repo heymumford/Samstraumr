@@ -22,7 +22,7 @@ Run `./util/build/build-optimal.sh` in the project root directory.
 
 ### How do I run the tests?
 
-Run `mvn test` or use the specific test commands documented in CLAUDE.md.
+Run `mvn test` or use the specific test commands documented in the project configuration.
 
 ### How do I categorize tests as ATL or BTL?
 

@@ -102,7 +102,7 @@ All code must pass the following quality checks:
    - `./run-tests.sh all` - Run all tests
    - `./run-tests.sh <test-type>` - Run specific test type (e.g., unit, component, integration)
    - `mvn test -P <profile>` - Run tests with specific Maven profile (e.g., atl-tests, unit-tests)
-   - See `CLAUDE.md` for complete test command reference
+   - See the project configuration files for complete test command reference
 
 3. **Quality Checks**
    - `./util/quality/build-checks.sh` - Run all quality checks
