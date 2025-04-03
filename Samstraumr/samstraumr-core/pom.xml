@@ -145,12 +145,192 @@
   </dependencies>
   
   <profiles>
+    <!-- Industry-Standard Test Profiles -->
+    
+    <!-- Smoke Tests Profile (Orchestration Tests) -->
+    <profile>
+      <id>smoke-tests</id>
+      <properties>
+        <cucumber.filter.tags>@Smoke or @Orchestration</cucumber.filter.tags>
+        <test.includes>**/orchestration/**/*Test.java,**/*OrchestrationTest.java,**/*SmokeTest.java</test.includes>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>${test.includes}</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- Unit Tests Profile (Tube Tests) -->
+    <profile>
+      <id>unit-tests</id>
+      <properties>
+        <cucumber.filter.tags>@Unit or @Tube</cucumber.filter.tags>
+        <test.includes>**/*UnitTest.java,**/*TubeTest.java</test.includes>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>${test.includes}</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- Component Tests Profile (Composite Tests) -->
+    <profile>
+      <id>component-tests</id>
+      <properties>
+        <cucumber.filter.tags>@Component or @Composite</cucumber.filter.tags>
+        <test.includes>**/*ComponentTest.java,**/*CompositeTest.java</test.includes>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>${test.includes}</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- Integration Tests Profile (Flow Tests) -->
+    <profile>
+      <id>integration-tests</id>
+      <properties>
+        <cucumber.filter.tags>@Integration or @Flow</cucumber.filter.tags>
+        <test.includes>**/*IntegrationTest.java,**/*FlowTest.java</test.includes>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>${test.includes}</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- API Tests Profile (Machine Tests) -->
+    <profile>
+      <id>api-tests</id>
+      <properties>
+        <cucumber.filter.tags>@Api or @Machine</cucumber.filter.tags>
+        <test.includes>**/*ApiTest.java,**/*MachineTest.java</test.includes>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>${test.includes}</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- System Tests Profile (Stream Tests) -->
+    <profile>
+      <id>system-tests</id>
+      <properties>
+        <cucumber.filter.tags>@System or @Stream</cucumber.filter.tags>
+        <test.includes>**/*SystemTest.java,**/*StreamTest.java</test.includes>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>${test.includes}</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- End-to-End Tests Profile (Acceptance Tests) -->
+    <profile>
+      <id>endtoend-tests</id>
+      <properties>
+        <cucumber.filter.tags>@EndToEnd or @Acceptance</cucumber.filter.tags>
+        <test.includes>**/*EndToEndTest.java,**/*AcceptanceTest.java</test.includes>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>${test.includes}</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- Property Tests Profile (Adaptation Tests) -->
+    <profile>
+      <id>property-tests</id>
+      <properties>
+        <cucumber.filter.tags>@Property or @Adaptation</cucumber.filter.tags>
+        <test.includes>**/*PropertyTest.java,**/*AdaptationTest.java</test.includes>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>${test.includes}</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- Samstraumr-Specific Test Profiles -->
+    
     <!-- Orchestration Tests Profile (Highest level ATL tests) -->
     <profile>
       <id>orchestration-tests</id>
       <properties>
-        <cucumber.filter.tags>@Orchestration</cucumber.filter.tags>
-        <test.includes>**/orchestration/**/*Test.java,**/*OrchestrationTest.java</test.includes>
+        <cucumber.filter.tags>@Orchestration or @Smoke</cucumber.filter.tags>
+        <test.includes>**/orchestration/**/*Test.java,**/*OrchestrationTest.java,**/*SmokeTest.java</test.includes>
       </properties>
       <build>
         <plugins>
@@ -187,7 +367,8 @@
     <profile>
       <id>tube-tests</id>
       <properties>
-        <test.includes>**/*TubeTest.java</test.includes>
+        <cucumber.filter.tags>@Tube or @Unit</cucumber.filter.tags>
+        <test.includes>**/*TubeTest.java,**/*UnitTest.java</test.includes>
       </properties>
       <build>
         <plugins>
@@ -208,7 +389,8 @@
     <profile>
       <id>flow-tests</id>
       <properties>
-        <test.includes>**/*FlowTest.java</test.includes>
+        <cucumber.filter.tags>@Flow or @Integration</cucumber.filter.tags>
+        <test.includes>**/*FlowTest.java,**/*IntegrationTest.java</test.includes>
       </properties>
       <build>
         <plugins>
@@ -225,11 +407,34 @@
       </build>
     </profile>
     
-    <!-- Bundle Tests Profile -->
+    <!-- Composite Tests Profile (formerly Bundle) -->
+    <profile>
+      <id>composite-tests</id>
+      <properties>
+        <cucumber.filter.tags>@Composite or @Component</cucumber.filter.tags>
+        <test.includes>**/*CompositeTest.java,**/*ComponentTest.java</test.includes>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>${test.includes}</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- Legacy Bundle Tests Profile (for backward compatibility) -->
     <profile>
       <id>bundle-tests</id>
       <properties>
-        <test.includes>**/*BundleTest.java</test.includes>
+        <cucumber.filter.tags>@Composite or @Component</cucumber.filter.tags>
+        <test.includes>**/*BundleTest.java,**/*CompositeTest.java,**/*ComponentTest.java</test.includes>
       </properties>
       <build>
         <plugins>
@@ -250,7 +455,8 @@
     <profile>
       <id>stream-tests</id>
       <properties>
-        <test.includes>**/*StreamTest.java</test.includes>
+        <cucumber.filter.tags>@Stream or @System</cucumber.filter.tags>
+        <test.includes>**/*StreamTest.java,**/*SystemTest.java</test.includes>
       </properties>
       <build>
         <plugins>
@@ -271,7 +477,8 @@
     <profile>
       <id>adaptation-tests</id>
       <properties>
-        <test.includes>**/*AdaptationTest.java</test.includes>
+        <cucumber.filter.tags>@Adaptation or @Property</cucumber.filter.tags>
+        <test.includes>**/*AdaptationTest.java,**/*PropertyTest.java</test.includes>
       </properties>
       <build>
         <plugins>
@@ -292,16 +499,44 @@
     <profile>
       <id>machine-tests</id>
       <properties>
-        <cucumber.filter.tags>@L2_Machine</cucumber.filter.tags>
+        <cucumber.filter.tags>@Machine or @Api</cucumber.filter.tags>
+        <test.includes>**/*MachineTest.java,**/*ApiTest.java</test.includes>
       </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>${test.includes}</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     
     <!-- Acceptance Tests Profile -->
     <profile>
       <id>acceptance-tests</id>
       <properties>
-        <cucumber.filter.tags>@Acceptance</cucumber.filter.tags>
+        <cucumber.filter.tags>@Acceptance or @EndToEnd</cucumber.filter.tags>
+        <test.includes>**/*AcceptanceTest.java,**/*EndToEndTest.java</test.includes>
       </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>${test.includes}</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     
     <!-- Fast Profile for development iterations -->
