@@ -33,6 +33,18 @@ The build status badge in the README is automatically updated when the pipeline 
 
 [Act](https://github.com/nektos/act) allows you to run GitHub Actions workflows locally to verify your changes before pushing them.
 
+For generating build reports locally without GitHub Actions:
+
+```bash
+# Generate a local build report (fastest option)
+./util/build/generate-build-report.sh --skip-tests --skip-quality
+
+# Generate full report including tests and quality checks
+./util/build/generate-build-report.sh
+```
+
+The build report will be generated in `target/samstraumr-report/index.html`.
+
 ### Installation
 
 1. **Linux/WSL**:
