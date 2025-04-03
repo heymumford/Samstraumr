@@ -38,7 +38,7 @@
 
     <!-- Quality check plugin versions -->
     <spotless.plugin.version>2.40.0</spotless.plugin.version>
-    <pmd.plugin.version>3.20.0</pmd.plugin.version>
+    <pmd.plugin.version>3.21.2</pmd.plugin.version>
     <checkstyle.plugin.version>3.3.1</checkstyle.plugin.version>
     <spotbugs.plugin.version>4.8.2.0</spotbugs.plugin.version>
     <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
@@ -81,6 +81,8 @@
             <compilerArgs>
               <arg>-Xlint:deprecation</arg>
             </compilerArgs>
+            <!-- Enable incremental compilation for faster builds -->
+            <useIncrementalCompilation>true</useIncrementalCompilation>
           </configuration>
         </plugin>
 
@@ -189,6 +191,7 @@
             <rulesets>
               <ruleset>/category/java/bestpractices.xml/UnusedPrivateMethod</ruleset>
               <ruleset>/category/java/errorprone.xml/EmptyCatchBlock</ruleset>
+              <ruleset>${project.basedir}/pmd-ruleset.xml</ruleset>
             </rulesets>
           </configuration>
           <dependencies>
@@ -395,6 +398,29 @@
       <properties>
         <skip.quality.checks>true</skip.quality.checks>
       </properties>
+    </profile>
+    <!-- Fast development profile for quick iterations -->
+    <profile>
+      <id>fast</id>
+      <properties>
+        <skip.quality.checks>true</skip.quality.checks>
+        <maven.test.skip>true</maven.test.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+        <skipTests>true</skipTests>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <optimize>false</optimize>
+              <debug>true</debug>
+              <failOnWarning>false</failOnWarning>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>

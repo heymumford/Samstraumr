@@ -7,10 +7,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Build without tests: `mvn clean install -DskipTests`
 - Run all tests: `mvn test`
 - Run with performance optimizations:
-  - Linux/WSL: `./build-performance.sh`
+  - Linux/WSL: `./build-performance.sh` or `./build-optimal.sh` (recommended)
   - Windows: `build-performance.bat`
-  - Custom command with optimizations: `./build-performance.sh clean test -P atl-tests`
-  - With specific thread count: `mvn test -T 12` (uses 12 threads)
+  - Custom command with optimizations: `./build-optimal.sh clean test -P atl-tests`
+  - With specific thread count: `mvn test -T 1C` (1 thread per CPU core)
+  - Fast development mode: `./build-optimal.sh fast` or `mvn compile -P fast -T 1C`
 
 ## Test Commands
 ### Test Categorization
@@ -52,6 +53,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Structure**: Final fields for immutability; private methods for implementation details.
 - **Encoding**: UTF-8 for all text files; LF (Unix-style) line endings for all text files except .bat and .cmd files.
 - **File Format**: EditorConfig ensures consistent formatting across different IDEs.
+
+## Maven Optimization
+- For faster builds, use `./build-optimal.sh` with appropriate flags:
+  - Development iterations: `./build-optimal.sh fast` (skips tests and checks)
+  - Clean local cache: `./cleanup-maven.sh`
+- Maven environment configuration:
+  - Settings optimized in `~/.m2/settings.xml`
+  - Memory settings: `MAVEN_OPTS="-Xmx1g -XX:+TieredCompilation -XX:TieredStopAtLevel=1"`
+  - Parallel builds: `-T 1C` flag (1 thread per core)
+  - Incremental compilation enabled for faster builds
 
 ## Project Organization
 - Multi-module Maven project (Java 17)
