@@ -22,13 +22,13 @@ This directory contains utility scripts for the Samstraumr project, organized in
 
 ## Usage
 
-Most scripts can be run directly from the project root directory. For example:
+Scripts must be run from their locations in the util/ directory. For example:
 
 ```bash
 # From project root
 ./util/build/build-optimal.sh
 
-# Or you can add the util directory to your PATH
+# If you frequently run these scripts, consider adding the directories to your PATH
 export PATH=$PATH:$(pwd)/util/build:$(pwd)/util/quality:$(pwd)/util/maintenance
 build-optimal.sh
 ```
@@ -38,6 +38,12 @@ For Windows users, you can run the .bat files directly:
 ```cmd
 util\build\build-performance.bat
 ```
+
+### ⚠️ IMPORTANT
+
+Scripts are no longer available in the project root. All scripts must be run from their 
+specific locations in the util directory structure. Running `./build-optimal.sh` 
+from the project root will fail.
 
 ## Adding New Scripts
 

@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - With specific thread count: `mvn test -T 1C` (1 thread per CPU core)
   - Fast development mode: `./util/build/build-optimal.sh fast` or `mvn compile -P fast -T 1C`
   
-  Note: Symbolic links to common scripts are provided in the project root (e.g., `./build-optimal.sh`)
+  ⚠️ **IMPORTANT:** All scripts must be run from their locations in the util directory
 
 ## Test Commands
 ### Test Categorization
@@ -33,7 +33,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Quality Check Commands
 - Run all quality checks: `./util/quality/build-checks.sh`
-- Skip quality checks: `mvn install -P skip-quality-checks`
+- Skip quality checks: `mvn install -P skip-quality-checks` or `./util/quality/skip-quality-build.sh`
 - Run specific checks:
   - Formatting: `mvn spotless:check` (Fix: `mvn spotless:apply`)
   - Code analysis: SonarQube (external)
@@ -44,8 +44,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - Check encoding and line endings: `./util/quality/check-encoding.sh`
   - Check with detailed output: `./util/quality/check-encoding.sh --verbose`
   - Automatically fix issues: `./util/quality/check-encoding.sh --fix`
-  
-  Note: The `./build-checks.sh` symbolic link is available in the project root
 
 ## Code Style Guidelines
 - **Imports**: Specific imports (no wildcards). Standard Java first, then third-party, then project imports.

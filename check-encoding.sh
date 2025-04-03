@@ -1,1 +1,0 @@
-util/quality/check-encoding.sh

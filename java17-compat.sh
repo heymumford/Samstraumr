@@ -1,1 +1,0 @@
-util/build/java17-compat.sh
