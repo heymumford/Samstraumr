@@ -10,34 +10,8 @@ on:
   workflow_dispatch: # Manual trigger
 
 jobs:
-  # Simple Maven verification job (same as dynamic-workflow.yml)
-  submit-maven:
-    name: Maven Verification
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'temurin'
-          cache: maven
-      
-      - name: Verify Maven project
-        run: mvn -B verify -DskipTests
-      
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: maven-output
-          path: |
-            **/target/*.jar
-            **/target/*.war
-          retention-days: 7
+# Jobs have been optimized based on analysis in WORKFLOW_ANALYSIS.md
+# The submit-maven job has been merged into the initialization job
 
   # Get version number for the workflow name
   get-version:
@@ -79,6 +53,7 @@ jobs:
           echo "Build started for Samstraumr version $VERSION" >> $GITHUB_STEP_SUMMARY
 
   # Core initialization and build verification
+  # Enhanced to include functionality from the removed submit-maven job
   initialization:
     name: Initialization and Verification
     needs: get-version
@@ -120,7 +95,22 @@ jobs:
           echo "- Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
 
-      - name: Verify compilation
+      # Basic verification without tests (from submit-maven job)
+      - name: Verify Maven project
+        run: mvn -B verify -DskipTests
+        
+      # Create build artifacts (from submit-maven job)
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-build-outputs
+          path: |
+            **/target/*.jar
+            **/target/*.war
+          retention-days: 7
+
+      # Full compilation as a separate step
+      - name: Verify compilation with clean
         run: mvn -B clean compile
 
   # Orchestration tests - the highest level of ATL tests
@@ -369,11 +359,19 @@ jobs:
             **/target/spotbugsXml.xml
           retention-days: 7
 
-  # BTL tests - run if time permits and all other tests pass
+  # BTL tests - only run when explicitly requested or on main branch
+  # These are optional robustness tests that increase build time
   btl-tests:
     name: Below-The-Line Tests
     needs: [unit-tests, integration-tests, e2e-tests]
-    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    # Run only in specific cases:
+    # 1. On main branch commits
+    # 2. When manually triggered via workflow_dispatch
+    # 3. When PR has the 'run-btl-tests' label
+    if: >
+      github.ref == 'refs/heads/main' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'run-btl-tests'))
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -401,12 +399,13 @@ jobs:
             **/target/cucumber-reports/
           retention-days: 7
           
-  # Generate Build Report
+  # Simplified Build Report Generation
+  # Focuses on creating useful artifacts without GitHub Pages deployment
   build-report:
     name: Generate Build Report
-    # Allow job to run independently with act, but depend on previous jobs in real workflow
-    if: github.actor != '' && (success() || failure())
-    needs: [get-version]
+    # Run on all successful builds or failures
+    if: always() && github.actor != ''
+    needs: [get-version, quality-analysis]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -414,10 +413,9 @@ jobs:
         with:
           fetch-depth: 0 # Full history for report generation
 
-      # Optional: If get-version job provides an output, use it
+      # Get version information from previous job
       - name: Set version info
         run: |
-          # Set a default version if not provided by get-version job
           VERSION="${{ needs.get-version.outputs.version || '1.0.0' }}"
           echo "Using version: $VERSION"
           if [ -f "Samstraumr/version.properties" ]; then
@@ -430,19 +428,8 @@ jobs:
             echo "Created temporary version.properties file"
           fi
 
-      # Skip downloading artifacts when running with act
-      - name: Check if running in GitHub Actions
-        id: check_env
-        run: |
-          if [ -n "$GITHUB_ACTIONS" ] && [ "$GITHUB_ACTIONS" == "true" ]; then
-            echo "is_github_actions=true" >> $GITHUB_OUTPUT
-          else
-            echo "is_github_actions=false" >> $GITHUB_OUTPUT
-          fi
-
-      # Skip downloading artifacts when running with act
+      # Download artifacts for report generation
       - name: Download all artifacts
-        if: steps.check_env.outputs.is_github_actions == 'true'
         uses: actions/download-artifact@v4
         with:
           path: artifacts
@@ -454,6 +441,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      # Generate the build report
       - name: Generate Build Report
         run: |
           # Ensure script is executable
@@ -462,35 +450,48 @@ jobs:
           # Skip tests and quality checks for faster execution
           ./util/build-report.sh --skip-tests --skip-quality
           
-          # Show where report is generated
-          echo "Report generated at: $(pwd)/target/samstraumr-report"
-          ls -la target/samstraumr-report
+          # Create summary with report information
+          echo "## Build Report Generated" >> $GITHUB_STEP_SUMMARY
+          echo "Report includes:" >> $GITHUB_STEP_SUMMARY
+          echo "- Build information" >> $GITHUB_STEP_SUMMARY
+          echo "- Test results" >> $GITHUB_STEP_SUMMARY
+          echo "- Quality metrics" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Download the report artifact for complete details." >> $GITHUB_STEP_SUMMARY
 
+      # Upload the report as an artifact
       - name: Upload Build Report
         uses: actions/upload-artifact@v4
         with:
-          name: samstraumr-build-report
+          name: samstraumr-build-report-v${{ needs.get-version.outputs.version || '1.0.0' }}
           path: target/samstraumr-report
           retention-days: 14
 
-      - name: Deploy to GitHub Pages
-        if: github.ref == 'refs/heads/main' && steps.check_env.outputs.is_github_actions == 'true'
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: target/samstraumr-report
-          branch: gh-pages
-          clean: true
-
-  # Update workflow summary with version information
+  # Update workflow summary with build results and version information
   workflow-summary:
     name: Workflow Summary
     if: always()
-    needs: [get-version, orchestration-tests, btl-tests, quality-analysis, build-report]
+    needs: [get-version, initialization, orchestration-tests, unit-tests, integration-tests, e2e-tests, quality-analysis, build-report]
     runs-on: ubuntu-latest
     steps:
       - name: Add Version to Workflow Summary
         run: |
-          echo "# Samstraumr v${{ needs.get-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "# Samstraumr v${{ needs.get-version.outputs.version }} Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Build Information" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: ${{ needs.get-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "## Job Results" >> $GITHUB_STEP_SUMMARY
+          echo "- Initialization: ${{ needs.initialization.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Orchestration Tests: ${{ needs.orchestration-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Unit Tests: ${{ needs.unit-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Integration Tests: ${{ needs.integration-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- E2E Tests: ${{ needs.e2e-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Quality Analysis: ${{ needs.quality-analysis.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
           echo "Build completed for Samstraumr version ${{ needs.get-version.outputs.version }}." >> $GITHUB_STEP_SUMMARY
-          echo "Build Report available at: https://heymumford.github.io/Samstraumr/" >> $GITHUB_STEP_SUMMARY
+          echo "Reports are available in the workflow artifacts." >> $GITHUB_STEP_SUMMARY
