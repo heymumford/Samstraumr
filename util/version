@@ -144,7 +144,7 @@ update_version() {
   echo -e "Current version: ${YELLOW}$current_version${NC}"
   echo -e "New version:     ${GREEN}$new_version${NC}"
   
-  # Update version.properties
+  # Update version.properties - This is the source of truth for version
   sed -i "s/samstraumr.version=.*/samstraumr.version=$new_version/" "$VERSION_PROPERTIES_FILE"
   print_success "Updated version.properties"
   
@@ -153,22 +153,29 @@ update_version() {
   sed -i "s/samstraumr.last.updated=.*/samstraumr.last.updated=$today/" "$VERSION_PROPERTIES_FILE"
   print_success "Updated last updated date to $today"
   
-  # Update POM files
+  # Update all POM files including parent and all modules
+  # This ensures consistent version across all modules
   local pom_files=(
     "pom.xml"
     "Samstraumr/pom.xml"
     "Samstraumr/samstraumr-core/pom.xml"
   )
   
+  echo "Updating version in POM files:"
   for pom_file in "${pom_files[@]}"; do
     if [ -f "$pom_file" ]; then
+      # Update version tags
       sed -i "s/<version>$current_version<\/version>/<version>$new_version<\/version>/g" "$pom_file"
+      # Update properties
       sed -i "s/<samstraumr.version>$current_version<\/samstraumr.version>/<samstraumr.version>$new_version<\/samstraumr.version>/g" "$pom_file"
+      # Update parent version references if applicable
+      sed -i "s/<parent>.*<version>$current_version<\/version>/<parent>\\n    <groupId>org.samstraumr<\/groupId>\\n    <artifactId>samstraumr-modules<\/artifactId>\\n    <version>$new_version<\/version>/g" "$pom_file"
+      echo "  - Updated $pom_file"
     fi
   done
-  print_success "Updated POM files"
+  print_success "Updated all POM files to version $new_version"
   
-  # Update README.md version - the single source of truth for version info
+  # Update README.md version and badge
   if [ -f "README.md" ]; then
     # Update version string
     sed -i "s/Version: .*/Version: $new_version/g" README.md
@@ -177,15 +184,29 @@ update_version() {
     print_success "Updated version and badge in README.md"
   fi
   
-  # We should only have version mentioned in one place - the root README.md
-  # Do not update versions in any other documentation files
+  # Apply code formatting after version update
+  print_header "Running Quality Checks After Version Update"
+  # Run Spotless to ensure formatting is correct after changes
+  if command -v mvn &> /dev/null; then
+    echo "Running Spotless formatting check..."
+    if mvn spotless:apply -q; then
+      print_success "Code formatting applied successfully"
+    else
+      print_warning "Spotless formatting failed - some files may need manual formatting"
+    fi
+  else
+    print_warning "Maven not available - skipping formatting check"
+  fi
   
   print_header "Version Update Complete"
-  echo "Build the project to apply version changes to all resources"
-  echo -e "Run: ${CYAN}mvn clean install${NC}"
+  echo "All files have been updated to version $new_version"
+  echo "Changes will be committed automatically unless --no-commit was specified"
+  echo ""
+  echo "To build the project with the new version, run:"
+  echo -e "  ${CYAN}./util/build/build-optimal.sh clean${NC}"
 }
 
-# Function to commit version changes
+# Function to commit version changes and optionally create a tag
 commit_version_changes() {
   local new_version=$1
   local bump_type=$2
@@ -198,7 +219,7 @@ commit_version_changes() {
     "pom.xml"
     "Samstraumr/pom.xml"
     "Samstraumr/samstraumr-core/pom.xml"
-    "docs/GettingStarted.md"
+    "docs/guides/getting-started.md"
     "CLAUDE.md"
     "util/badges/generate-badges.sh"
     ".github/workflows/samstraumr-pipeline.yml"
@@ -262,6 +283,22 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
   # Create the commit
   git commit -m "$commit_message"
   print_success "Created version commit"
+  
+  # Ask user if they want to create a git tag
+  echo -n "Would you like to create a git tag for version $new_version? (y/n): "
+  read -r response
+  if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    # Create an annotated tag
+    git tag -a "v$new_version" -m "Version $new_version
+
+Release version $new_version of Samstraumr.
+
+Generated with Claude Code"
+    
+    print_success "Created git tag v$new_version"
+    echo "To push the tag to remote, use:"
+    echo -e "  ${YELLOW}git push origin v$new_version${NC}"
+  fi
 }
 
 # Function to display version history
