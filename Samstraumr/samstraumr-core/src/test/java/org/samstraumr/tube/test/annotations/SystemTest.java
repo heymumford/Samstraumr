@@ -8,8 +8,7 @@ import java.lang.annotation.Target;
 import org.junit.jupiter.api.Tag;
 
 /**
- * Marks a test as a "System Test", indicating it focuses on testing the entire system
- * as a whole.
+ * Marks a test as a "System Test", indicating it focuses on testing the entire system as a whole.
  *
  * <p>System Tests have the following characteristics:
  *

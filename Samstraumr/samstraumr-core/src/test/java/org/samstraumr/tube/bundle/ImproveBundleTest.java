@@ -37,7 +37,9 @@ public class ImproveBundleTest {
   @BeforeEach
   void setUp() {
     // Configure mock environment using lenient() to avoid unused stubbing issues
-    lenient().when(mockEnvironment.getParameters()).thenReturn("{\"hostname\":\"bundle-test-host\"}");
+    lenient()
+        .when(mockEnvironment.getParameters())
+        .thenReturn("{\"hostname\":\"bundle-test-host\"}");
     lenient().when(mockEnvironment.getEnvironmentHash()).thenReturn("bundle-test-hash");
 
     // Create bundle for testing
@@ -207,7 +209,7 @@ public class ImproveBundleTest {
 
     // Then - Get the delegate composite circuit breakers
     Map<String, Composite.CircuitBreaker> circuitBreakers = bundle.getCircuitBreakers();
-    
+
     // Verify the circuit breaker is open
     Composite.CircuitBreaker processorBreaker = circuitBreakers.get("processor");
     assertTrue(processorBreaker.isOpen());

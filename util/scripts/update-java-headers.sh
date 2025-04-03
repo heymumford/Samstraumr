@@ -1,32 +1,9 @@
 #!/bin/bash
-# Filename: update-java-headers.sh
-# Purpose: Removes legacy headers from Java files to standardize file header format
-# Location: util/maintenance/headers/
-# Usage: ./update-java-headers.sh
-#
-# This script scans for all Java files in the project and removes any comment blocks
-# that appear before the package declaration. This helps standardize the file format
-# and removes outdated header information.
+# Legacy wrapper - redirects to the new location
 
-# Get the project root directory
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+echo -e "\033[1;33mWARNING: update-java-headers.sh has been moved to util/maintenance/headers/\033[0m"
+echo -e "Please use \033[1;32m./util/maintenance/headers/update-java-headers.sh\033[0m instead."
+echo ""
 
-# Find all Java files in the project
-java_files=$(find "$PROJECT_ROOT" -type f -name "*.java")
-
-for file in $java_files; do
-  # Check if file has a comment header block
-  if grep -q "^\/\*" "$file"; then
-    # Get the package line number
-    package_line=$(grep -n "^package" "$file" | head -1 | cut -d: -f1)
-    
-    if [ ! -z "$package_line" ]; then
-      # Delete everything before the package line
-      sed -i "1,$(($package_line-1))d" "$file"
-      echo "Updated $file"
-    fi
-  fi
-done
-
-echo "Completed updating Java files"
+# Forward to new script
+./util/maintenance/headers/update-java-headers.sh "$@"

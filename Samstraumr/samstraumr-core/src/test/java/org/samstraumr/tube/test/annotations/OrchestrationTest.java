@@ -8,8 +8,8 @@ import java.lang.annotation.Target;
 import org.junit.jupiter.api.Tag;
 
 /**
- * Marks a test as an "Orchestration Test", indicating it focuses on testing the assembly
- * and interconnectivity of the entire Samstraumr system.
+ * Marks a test as an "Orchestration Test", indicating it focuses on testing the assembly and
+ * interconnectivity of the entire Samstraumr system.
  *
  * <p>Orchestration Tests are the highest level of Above The Line (ATL) tests and have these
  * characteristics:

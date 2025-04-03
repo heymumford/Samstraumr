@@ -8,8 +8,8 @@ import java.lang.annotation.Target;
 import org.junit.jupiter.api.Tag;
 
 /**
- * Marks a test as an "Integration Test", indicating it focuses on testing the interaction
- * between different parts of the system.
+ * Marks a test as an "Integration Test", indicating it focuses on testing the interaction between
+ * different parts of the system.
  *
  * <p>Integration Tests have the following characteristics:
  *
@@ -20,8 +20,8 @@ import org.junit.jupiter.api.Tag;
  * </ul>
  *
  * <p>In traditional testing terminology, integration tests verify that components interact
- * correctly with each other. In Samstraumr, they align with Flow Tests that verify data
- * flows correctly through tube assemblies.
+ * correctly with each other. In Samstraumr, they align with Flow Tests that verify data flows
+ * correctly through tube assemblies.
  *
  * <p>Examples of integration tests include:
  *

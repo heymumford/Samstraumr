@@ -8,8 +8,8 @@ import java.lang.annotation.Target;
 import org.junit.jupiter.api.Tag;
 
 /**
- * Marks a test as an "End-to-End Test", indicating it focuses on testing the entire system
- * from the user's perspective.
+ * Marks a test as an "End-to-End Test", indicating it focuses on testing the entire system from the
+ * user's perspective.
  *
  * <p>End-to-End Tests have the following characteristics:
  *
@@ -20,8 +20,8 @@ import org.junit.jupiter.api.Tag;
  * </ul>
  *
  * <p>In traditional testing terminology, end-to-end tests verify that the system works correctly
- * from a user's perspective. In Samstraumr, they align with Acceptance Tests that verify the
- * system meets user requirements.
+ * from a user's perspective. In Samstraumr, they align with Acceptance Tests that verify the system
+ * meets user requirements.
  *
  * <p>Examples of end-to-end tests include:
  *

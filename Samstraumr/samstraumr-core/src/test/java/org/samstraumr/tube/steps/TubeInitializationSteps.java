@@ -1,4 +1,3 @@
-
 package org.samstraumr.tube.steps;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,9 +19,9 @@ import org.slf4j.LoggerFactory;
 import io.cucumber.java.en.*;
 
 /**
- * Step definitions for L0_Tube initialization tests from tube-initialization-test.feature.
- * These steps validate the proper initialization, identity management, and self-awareness 
- * capabilities of atomic Tubes.
+ * Step definitions for L0_Tube initialization tests from tube-initialization-test.feature. These
+ * steps validate the proper initialization, identity management, and self-awareness capabilities of
+ * atomic Tubes.
  *
  * <p>Related tags: - @L0_Tube - Level 0 atomic tube component tests - @Init - Initialization phase
  * tests - @Identity - Identity management tests - @Awareness - Self-monitoring and environment
@@ -304,9 +303,13 @@ public class TubeInitializationSteps {
       }
     }
 
-    assertTrue(foundExpectedLog, 
-        "Expected log message '" + expectedLogMessage + "' not found in log: " + String.join("\n", mimirLog));
-    
+    assertTrue(
+        foundExpectedLog,
+        "Expected log message '"
+            + expectedLogMessage
+            + "' not found in log: "
+            + String.join("\n", mimirLog));
+
     logger.info("Successfully verified log message: {}", expectedLogMessage);
   }
 

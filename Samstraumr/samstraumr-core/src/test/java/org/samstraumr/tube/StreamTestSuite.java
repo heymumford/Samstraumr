@@ -15,8 +15,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.samstraumr.tube.test.annotations.StreamTest;
 import org.samstraumr.tube.bundle.Bundle;
+import org.samstraumr.tube.test.annotations.StreamTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -153,7 +153,8 @@ public class StreamTestSuite {
     assertFalse(result.isPresent()); // Should fail
 
     // Verify circuit breaker opened after failure
-    Map<String, org.samstraumr.tube.composite.Composite.CircuitBreaker> breakers = bundle.getCircuitBreakers();
+    Map<String, org.samstraumr.tube.composite.Composite.CircuitBreaker> breakers =
+        bundle.getCircuitBreakers();
     assertNotNull(breakers.get("sink"));
     assertTrue(breakers.get("sink").isOpen());
   }

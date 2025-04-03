@@ -8,8 +8,8 @@ import java.lang.annotation.Target;
 import org.junit.jupiter.api.Tag;
 
 /**
- * Marks a test as a "Property Test", indicating it focuses on testing system properties
- * across a range of inputs.
+ * Marks a test as a "Property Test", indicating it focuses on testing system properties across a
+ * range of inputs.
  *
  * <p>Property Tests have the following characteristics:
  *
@@ -19,9 +19,9 @@ import org.junit.jupiter.api.Tag;
  *   <li>Invariant checking - They verify that certain properties always hold
  * </ul>
  *
- * <p>In traditional testing terminology, property tests verify that system properties hold
- * across a wide range of inputs. In Samstraumr, they align with Adaptation Tests that verify
- * the system adapts correctly to different conditions.
+ * <p>In traditional testing terminology, property tests verify that system properties hold across a
+ * wide range of inputs. In Samstraumr, they align with Adaptation Tests that verify the system
+ * adapts correctly to different conditions.
  *
  * <p>Examples of property tests include:
  *

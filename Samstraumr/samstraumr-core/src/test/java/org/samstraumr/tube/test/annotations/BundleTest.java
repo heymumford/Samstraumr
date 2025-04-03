@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Tag;
  *   <li>Error handling in tube chains
  *   <li>Bundle lifecycle tests
  * </ul>
- * 
+ *
  * @deprecated Use {@link CompositeTest} instead.
  */
 @Target({ElementType.TYPE, ElementType.METHOD})

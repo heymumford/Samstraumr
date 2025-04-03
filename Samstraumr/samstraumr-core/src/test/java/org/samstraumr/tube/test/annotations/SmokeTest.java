@@ -8,8 +8,8 @@ import java.lang.annotation.Target;
 import org.junit.jupiter.api.Tag;
 
 /**
- * Marks a test as a "Smoke Test", indicating it focuses on verifying that the basic
- * functionality of the system works correctly.
+ * Marks a test as a "Smoke Test", indicating it focuses on verifying that the basic functionality
+ * of the system works correctly.
  *
  * <p>Smoke Tests have the following characteristics:
  *
@@ -19,9 +19,9 @@ import org.junit.jupiter.api.Tag;
  *   <li>Fast - They run quickly to provide rapid feedback
  * </ul>
  *
- * <p>In traditional testing terminology, smoke tests verify that the basic functionality
- * works correctly. In Samstraumr, they align with Orchestration Tests that verify the
- * system assembles and initializes correctly.
+ * <p>In traditional testing terminology, smoke tests verify that the basic functionality works
+ * correctly. In Samstraumr, they align with Orchestration Tests that verify the system assembles
+ * and initializes correctly.
  *
  * <p>Examples of smoke tests include:
  *

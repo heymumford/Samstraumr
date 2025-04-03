@@ -8,8 +8,7 @@ import java.lang.annotation.Target;
 import org.junit.jupiter.api.Tag;
 
 /**
- * Marks a test as an "API Test", indicating it focuses on testing public interfaces
- * and contracts.
+ * Marks a test as an "API Test", indicating it focuses on testing public interfaces and contracts.
  *
  * <p>API Tests have the following characteristics:
  *
@@ -19,9 +18,9 @@ import org.junit.jupiter.api.Tag;
  *   <li>Boundary testing - They verify behavior at system boundaries
  * </ul>
  *
- * <p>In traditional testing terminology, API/contract tests verify that components
- * fulfill their contracts. In Samstraumr, they align with Machine Tests that verify
- * machines (collections of tubes) adhere to their interfaces.
+ * <p>In traditional testing terminology, API/contract tests verify that components fulfill their
+ * contracts. In Samstraumr, they align with Machine Tests that verify machines (collections of
+ * tubes) adhere to their interfaces.
  *
  * <p>Examples of API tests include:
  *

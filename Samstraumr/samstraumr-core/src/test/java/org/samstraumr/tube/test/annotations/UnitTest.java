@@ -19,8 +19,8 @@ import org.junit.jupiter.api.Tag;
  *   <li>Self-validating - They determine on their own whether they pass or fail
  * </ul>
  *
- * <p>In traditional testing terminology, unit tests verify individual methods or classes.
- * In Samstraumr, they test individual tubes in isolation with dependencies mocked or stubbed.
+ * <p>In traditional testing terminology, unit tests verify individual methods or classes. In
+ * Samstraumr, they test individual tubes in isolation with dependencies mocked or stubbed.
  *
  * <p>Examples of unit tests include:
  *

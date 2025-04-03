@@ -8,8 +8,8 @@ import java.lang.annotation.Target;
 import org.junit.jupiter.api.Tag;
 
 /**
- * Marks a test as a "Component Test", indicating it focuses on testing connected
- * components working together.
+ * Marks a test as a "Component Test", indicating it focuses on testing connected components working
+ * together.
  *
  * <p>Component Tests have the following characteristics:
  *
@@ -19,8 +19,8 @@ import org.junit.jupiter.api.Tag;
  *   <li>No external dependencies - They don't interact with external systems
  * </ul>
  *
- * <p>In traditional testing terminology, component tests verify that units work correctly
- * together. In Samstraumr, they test composites (groups of tubes working together).
+ * <p>In traditional testing terminology, component tests verify that units work correctly together.
+ * In Samstraumr, they test composites (groups of tubes working together).
  *
  * <p>Examples of component tests include:
  *
