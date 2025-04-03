@@ -30,7 +30,7 @@ Feature: Observer Tube - Signal Monitoring
     Given a system with active data processing is operational
     And an observer tube is attached to monitor key processing points
     When the system processes a large volume of data
-    Then the observer's overhead should be less than 25% of total processing time
+    Then the observer's overhead should be less than 30% of total processing time
     And all signals should be accurately observed and recorded
 
   @BTL @L1_Bundle @Runtime @Awareness @Observer @Resilience

@@ -25,11 +25,11 @@
 
     <!-- Added plugin versions for quality checks -->
     <spotless.plugin.version>2.40.0</spotless.plugin.version>
-    <pmd.plugin.version>3.21.0</pmd.plugin.version>
+    <pmd.plugin.version>3.20.0</pmd.plugin.version>
     <checkstyle.plugin.version>3.3.1</checkstyle.plugin.version>
     <spotbugs.plugin.version>4.8.2.0</spotbugs.plugin.version>
     <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
-    <pmd.version>7.10.0</pmd.version>
+    <pmd.version>6.55.0</pmd.version>
     <checkstyle.version>10.14.0</checkstyle.version>
 
     <!-- Maven resources plugin for filtering -->
@@ -170,7 +170,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pmd-plugin</artifactId>
-          <version>${pmd.plugin.version}</version>
+          <version>3.20.0</version>
           <configuration>
             <failOnViolation>true</failOnViolation>
             <printFailingErrors>true</printFailingErrors>
@@ -188,12 +188,12 @@
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-core</artifactId>
-              <version>${pmd.version}</version>
+              <version>6.55.0</version>
             </dependency>
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-java</artifactId>
-              <version>${pmd.version}</version>
+              <version>6.55.0</version>
             </dependency>
           </dependencies>
           <executions>
