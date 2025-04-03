@@ -102,9 +102,12 @@ Tubes maintain two complementary state models:
 
 - [Glossary](./docs/reference/glossary.md): Terminology reference
 - [FAQ](./docs/reference/faq.md): Common questions and answers
+- [Getting Started](./docs/guides/getting-started.md): First steps with Samstraumr
+- [Prerequisites](./docs/guides/prerequisites.md): Setup requirements and tools
+- [Configuration Reference](./docs/reference/configuration-reference.md): Configuration variables and settings
+- [Project Structure](./docs/FOLDER_STRUCTURE.md): Project organization guide
 - [Testing Strategy](./docs/testing/test-strategy.md): Industry-aligned testing methodology
 - [LLM Context Proposal](./docs/proposals/llm-context-composite-tube-proposal.md): Experimental extension
-- [Folder Structure](./docs/FOLDER_STRUCTURE.md): Project organization guide
 
 ## Development Standards
 
