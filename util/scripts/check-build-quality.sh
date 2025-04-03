@@ -4,7 +4,7 @@
 # This script runs all quality checks and tests
 #
 # Usage:
-#   ./build-checks.sh [OPTIONS]
+#   ./util/scripts/check-build-quality.sh [OPTIONS]
 #
 # Options:
 #   --skip-spotless      Skip code formatting check (Spotless)
@@ -16,10 +16,14 @@
 #   --help               Show this help message
 #
 # Example:
-#   ./build-checks.sh --skip-spotbugs --skip-jacoco
-#   ./build-checks.sh --only=spotless,checkstyle
+#   ./util/scripts/check-build-quality.sh --skip-spotbugs --skip-jacoco
+#   ./util/scripts/check-build-quality.sh --only=spotless,checkstyle
 
 set -e
+
+# Get script directory
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." &> /dev/null && pwd 2> /dev/null)"
 
 # Parse command line arguments
 SKIP_SPOTLESS=false
@@ -33,7 +37,7 @@ show_help() {
   echo "Samstraumr Build Quality Check Script"
   echo ""
   echo "Usage:"
-  echo "  ./build-checks.sh [OPTIONS]"
+  echo "  ./util/scripts/check-build-quality.sh [OPTIONS]"
   echo ""
   echo "Options:"
   echo "  --skip-spotless      Skip code formatting check (Spotless)"
@@ -45,8 +49,8 @@ show_help() {
   echo "  --help               Show this help message"
   echo ""
   echo "Example:"
-  echo "  ./build-checks.sh --skip-spotbugs --skip-jacoco"
-  echo "  ./build-checks.sh --only=spotless,checkstyle"
+  echo "  ./util/scripts/check-build-quality.sh --skip-spotbugs --skip-jacoco"
+  echo "  ./util/scripts/check-build-quality.sh --only=spotless,checkstyle"
   exit 0
 }
 
@@ -121,10 +125,10 @@ mvn --version | head -n 1
 
 # Step 1: File encoding and line ending check
 print_header "Checking File Encoding and Line Endings"
-if [ -f "./check-encoding.sh" ]; then
-  ./check-encoding.sh || {
+if [ -f "$SCRIPT_DIR/check-encoding.sh" ]; then
+  $SCRIPT_DIR/check-encoding.sh || {
     print_error "File encoding or line ending check failed"
-    print_warning "Run './check-encoding.sh --fix' to fix encoding issues"
+    print_warning "Run '$SCRIPT_DIR/check-encoding.sh --fix' to fix encoding issues"
     exit 1
   }
   print_success "File encoding and line ending check passed"
@@ -279,11 +283,11 @@ if [ -n "$RUN_SPECIFIC" ]; then
   done
 else
   # Check encoding first if the script exists
-  if [ -f "./check-encoding.sh" ]; then
+  if [ -f "$SCRIPT_DIR/check-encoding.sh" ]; then
     print_header "Checking File Encoding and Line Endings"
-    ./check-encoding.sh || {
+    $SCRIPT_DIR/check-encoding.sh || {
       print_error "File encoding or line ending check failed"
-      print_warning "Run './check-encoding.sh --fix' to fix encoding issues"
+      print_warning "Run '$SCRIPT_DIR/check-encoding.sh --fix' to fix encoding issues"
       exit 1
     }
     print_success "File encoding and line ending check passed"
@@ -312,8 +316,8 @@ echo " - SpotBugs: target/spotbugsXml.xml"
 echo " - SonarQube: Check the SonarQube dashboard for comprehensive analysis"
 echo ""
 echo "Encoding and line ending checks:"
-echo " - Run './check-encoding.sh --verbose' for detailed encoding information"
-echo " - Run './check-encoding.sh --fix' to automatically fix issues"
+echo " - Run '$SCRIPT_DIR/check-encoding.sh --verbose' for detailed encoding information"
+echo " - Run '$SCRIPT_DIR/check-encoding.sh --fix' to automatically fix issues"
 
 # Make script executable
 chmod +x "$0"

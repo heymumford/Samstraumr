@@ -130,7 +130,8 @@ public class Composite {
    * @param resetTimeoutMs Reset timeout in milliseconds
    * @return This composite instance for method chaining
    */
-  public Composite enableCircuitBreaker(String tubeName, int failureThreshold, long resetTimeoutMs) {
+  public Composite enableCircuitBreaker(
+      String tubeName, int failureThreshold, long resetTimeoutMs) {
     validateTubeExists(tubeName);
     circuitBreakers.put(tubeName, new CircuitBreaker(tubeName, failureThreshold, resetTimeoutMs));
     logEvent("Enabled circuit breaker for tube: " + tubeName);
@@ -159,7 +160,8 @@ public class Composite {
     try {
       return processInternal(entryPoint, compositeData);
     } catch (Exception e) {
-      LOGGER.error("Error processing data through composite {}: {}", compositeId, e.getMessage(), e);
+      LOGGER.error(
+          "Error processing data through composite {}: {}", compositeId, e.getMessage(), e);
       logEvent("Processing error: " + e.getMessage());
       return Optional.empty();
     }

@@ -23,6 +23,9 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." &> /dev/null && pwd 2> /dev/null || echo 
 # Change to project root directory
 cd "$PROJECT_ROOT"
 
+# Source the Java environment setup script
+source "$(dirname "$0")/setup-java-env.sh"
+
 # Default values
 TEST_TYPE="all"
 PARALLEL=false
@@ -36,7 +39,7 @@ show_usage() {
     echo "======================"
     echo "Runs different types of tests for the Samstraumr framework"
     echo ""
-    echo "Usage: ./util/test/run-tests.sh [OPTIONS] [TEST_TYPE]"
+    echo "Usage: ./util/test-run.sh [OPTIONS] [TEST_TYPE]"
     echo ""
     echo "TEST TYPES:"
     echo "  orchestration - Run Orchestration Tests (highest level of ATL)"
@@ -61,12 +64,12 @@ show_usage() {
     echo "  -h, --help         Show this help message"
     echo ""
     echo "EXAMPLES:"
-    echo "  ./util/test/run-tests.sh tube           # Run tube tests"
-    echo "  ./util/test/run-tests.sh -p bundle      # Run bundle tests in parallel"
-    echo "  ./util/test/run-tests.sh -s acceptance  # Run acceptance tests without quality checks"
-    echo "  ./util/test/run-tests.sh -p -t 4 all    # Run all tests in parallel with 4 threads"
-    echo "  ./util/test/run-tests.sh atl            # Run Above The Line (critical) tests"
-    echo "  ./util/test/run-tests.sh btl            # Run Below The Line (robustness) tests"
+    echo "  ./util/test-run.sh tube           # Run tube tests"
+    echo "  ./util/test-run.sh -p bundle      # Run bundle tests in parallel"
+    echo "  ./util/test-run.sh -s acceptance  # Run acceptance tests without quality checks"
+    echo "  ./util/test-run.sh -p -t 4 all    # Run all tests in parallel with 4 threads"
+    echo "  ./util/test-run.sh atl            # Run Above The Line (critical) tests"
+    echo "  ./util/test-run.sh btl            # Run Below The Line (robustness) tests"
     echo ""
 }
 
@@ -115,6 +118,12 @@ fi
 QUALITY_FLAGS=""
 if [ "$SKIP_QUALITY" = true ]; then
     QUALITY_FLAGS="-P skip-quality-checks -Dspotless.check.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true -Djacoco.skip=true"
+else
+    # Run Spotless formatting first if quality checks are enabled
+    echo "🔍 Running code formatting with Spotless before tests..."
+    mvn spotless:apply -q || {
+        echo "⚠️ Warning: Spotless formatting failed, proceeding with tests anyway"
+    }
 fi
 
 # Set verbosity flags
@@ -177,5 +186,6 @@ case $TEST_TYPE in
         mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dmaven.test.skip=false
         ;;
 esac
+
 
 echo "✅ Tests completed"

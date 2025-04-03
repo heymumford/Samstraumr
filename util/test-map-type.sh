@@ -2,9 +2,9 @@
 # Filename: map-test-type.sh
 # Purpose: Maps between industry-standard and Samstraumr-specific test terminology
 # Location: util/test/mapping/
-# Usage: ./map-test-type.sh <test-type>
-#   Example: ./map-test-type.sh unit -> Returns "tube"
-#   Example: ./map-test-type.sh tube -> Returns "unit"
+# Usage: ./util/test-map-type.sh <test-type>
+#   Example: ./util/test-map-type.sh unit -> Returns "tube"
+#   Example: ./util/test-map-type.sh tube -> Returns "unit"
 
 # Get the test type and convert to lowercase
 test_type=$(echo "$1" | tr '[:upper:]' '[:lower:]')
