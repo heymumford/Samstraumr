@@ -1,9 +1,9 @@
 # Samstraumr Framework
 
-[![Version](https://img.shields.io/badge/version-1.2.3-blue)](https://github.com/heymumford/Samstraumr/releases) [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/)
+[![Version](https://img.shields.io/badge/version-1.2.4-blue)](https://github.com/heymumford/Samstraumr/releases) [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/)
 
 ```
-Version: 1.2.3
+Version: 1.2.4
 License: Mozilla Public License 2.0
 Maintainer: Eric C. Mumford (@heymumford)
 ```
@@ -41,7 +41,7 @@ Tubes are self-contained processing units with defined inputs, outputs, and resp
 
 [→ Core Concepts](./docs/concepts/core-concepts.md) | 
 [→ Tube Patterns](./docs/guides/tube-patterns.md) | 
-[→ Composites and Machines](./docs/CompositesAndMachines.md)
+[→ Composites and Machines](./docs/concepts/composites-and-machines.md)
 
 ### Identity Notation
 
@@ -105,7 +105,7 @@ Tubes maintain two complementary state models:
 - [Getting Started](./docs/guides/getting-started.md): First steps with Samstraumr
 - [Prerequisites](./docs/guides/prerequisites.md): Setup requirements and tools
 - [Configuration Reference](./docs/reference/configuration-reference.md): Configuration variables and settings
-- [Project Structure](./docs/FOLDER_STRUCTURE.md): Project organization guide
+- [Project Structure](./docs/reference/folder-structure.md): Project organization guide
 - [Testing Strategy](./docs/testing/test-strategy.md): Industry-aligned testing methodology
 - [LLM Context Proposal](./docs/proposals/llm-context-composite-tube-proposal.md): Experimental extension
 
