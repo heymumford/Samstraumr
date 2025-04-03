@@ -5,7 +5,7 @@
 ```
 Last updated: April 2, 2025
 Maintainer: Eric C. Mumford (@heymumford)
-Version: 0.5.1
+Version: --version
 License: Mozilla Public License 2.0
 ```
 
@@ -131,8 +131,14 @@ Samstraumr thrives within a garden of diverse practitioners tending their own im
 - **Text Encoding:** All text files use UTF-8 encoding
 - **Line Endings:** Unix-style (LF) line endings for all text files except Windows batch files
 - **File Formats:** `.editorconfig` and `.gitattributes` ensure consistent formatting
-- **Quality Checks:** Run `./check-encoding.sh` to verify file encoding and line endings
-- **Version Management:** Run `./update-version.sh <new-version>` to update version across the codebase
+- **Quality Checks:** Run `./util/quality/check-encoding.sh` to verify file encoding and line endings
+- **Version Management:** Run `./util/maintenance/update-version.sh <new-version>` to update version across the codebase
+- **Utility Scripts:** Various utility scripts are available in the `util/` directory, organized by category:
+  - `util/build/` - Build scripts (build-optimal.sh, build-performance.sh, etc.)
+  - `util/quality/` - Quality check scripts (build-checks.sh, check-encoding.sh, etc.)
+  - `util/maintenance/` - Maintenance scripts (update-version.sh, cleanup-maven.sh, etc.)
+  
+  Symbolic links to frequently used scripts are provided in the project root for convenience.
 
 ## Connect
 

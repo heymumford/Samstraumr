@@ -7,11 +7,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Build without tests: `mvn clean install -DskipTests`
 - Run all tests: `mvn test`
 - Run with performance optimizations:
-  - Linux/WSL: `./build-performance.sh` or `./build-optimal.sh` (recommended)
-  - Windows: `build-performance.bat`
-  - Custom command with optimizations: `./build-optimal.sh clean test -P atl-tests`
+  - Linux/WSL: `./util/build/build-performance.sh` or `./util/build/build-optimal.sh` (recommended)
+  - Windows: `util\build\build-performance.bat`
+  - Custom command with optimizations: `./util/build/build-optimal.sh clean test -P atl-tests`
   - With specific thread count: `mvn test -T 1C` (1 thread per CPU core)
-  - Fast development mode: `./build-optimal.sh fast` or `mvn compile -P fast -T 1C`
+  - Fast development mode: `./util/build/build-optimal.sh fast` or `mvn compile -P fast -T 1C`
+  
+  Note: Symbolic links to common scripts are provided in the project root (e.g., `./build-optimal.sh`)
 
 ## Test Commands
 ### Test Categorization
@@ -30,7 +32,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Non-functional: `@Performance`, `@Resilience`, `@Scale`
 
 ## Quality Check Commands
-- Run all quality checks: `./build-checks.sh`
+- Run all quality checks: `./util/quality/build-checks.sh`
 - Skip quality checks: `mvn install -P skip-quality-checks`
 - Run specific checks:
   - Formatting: `mvn spotless:check` (Fix: `mvn spotless:apply`)
@@ -39,9 +41,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - Bug detection: `mvn spotbugs:check`
   - Code coverage: `mvn jacoco:report`
 - File encoding and line ending checks:
-  - Check encoding and line endings: `./check-encoding.sh`
-  - Check with detailed output: `./check-encoding.sh --verbose`
-  - Automatically fix issues: `./check-encoding.sh --fix`
+  - Check encoding and line endings: `./util/quality/check-encoding.sh`
+  - Check with detailed output: `./util/quality/check-encoding.sh --verbose`
+  - Automatically fix issues: `./util/quality/check-encoding.sh --fix`
+  
+  Note: The `./build-checks.sh` symbolic link is available in the project root
 
 ## Code Style Guidelines
 - **Imports**: Specific imports (no wildcards). Standard Java first, then third-party, then project imports.
@@ -55,9 +59,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **File Format**: EditorConfig ensures consistent formatting across different IDEs.
 
 ## Maven Optimization
-- For faster builds, use `./build-optimal.sh` with appropriate flags:
-  - Development iterations: `./build-optimal.sh fast` (skips tests and checks)
-  - Clean local cache: `./cleanup-maven.sh`
+- For faster builds, use `./util/build/build-optimal.sh` with appropriate flags:
+  - Development iterations: `./util/build/build-optimal.sh fast` (skips tests and checks)
+  - Clean local cache: `./util/maintenance/cleanup-maven.sh`
 - Maven environment configuration:
   - Settings optimized in `~/.m2/settings.xml`
   - Memory settings: `MAVEN_OPTS="-Xmx1g -XX:+TieredCompilation -XX:TieredStopAtLevel=1"`
@@ -76,7 +80,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - JaCoCo: Code coverage
 - Version management
   - Central version.properties file in Samstraumr/ directory
-  - Update version with: `./update-version.sh <new-version>`
+  - Update version with: `./util/maintenance/update-version.sh <new-version>`
   - Resources filtered to include version information
 
 ## Quality Reports
