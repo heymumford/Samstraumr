@@ -1,11 +1,11 @@
-I'm getting emails# Samstraumr Framework
+# Samstraumr Framework
 
 > *Software that breathes, flows, and grows like a living stream*
 
 ```
 Last updated: April 2, 2025
 Maintainer: Eric C. Mumford (@heymumford)
-Version: 0.5.3
+Version: 0.5.4
 License: Mozilla Public License 2.0
 ```
 
