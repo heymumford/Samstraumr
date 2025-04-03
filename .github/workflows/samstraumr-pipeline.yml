@@ -41,63 +41,6 @@ jobs:
           echo "Working directory: $(pwd)"
           ls -la
 
-      - name: Initialize build environment
-        run: |
-          # Make sure util/test directory exists
-          mkdir -p ./util/test
-
-          # Check if run-tests.sh exists, if not, add a fallback version
-          if [ ! -f ./util/test/run-tests.sh ]; then
-            echo "Test runner script not found, creating fallback version"
-            cat > ./util/test/run-tests.sh << 'EOF'
-#!/bin/bash
-# Fallback test runner
-TEST_TYPE="${1:-all}"
-SKIP_QUALITY=""
-if [[ "$*" == *"--skip-quality"* ]]; then
-  SKIP_QUALITY="-P skip-quality-checks -Dspotless.check.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true -Djacoco.skip=true"
-fi
-
-case $TEST_TYPE in
-  critical|atl)
-    mvn test $SKIP_QUALITY -P atl-tests
-    ;;
-  btl)
-    mvn test $SKIP_QUALITY -P btl-tests
-    ;;
-  tube)
-    mvn test $SKIP_QUALITY -Dtest=*TubeTest
-    ;;
-  flow)
-    mvn test $SKIP_QUALITY -Dtest=*FlowTest
-    ;;
-  bundle)
-    mvn test $SKIP_QUALITY -Dtest=*BundleTest
-    ;;
-  stream)
-    mvn test $SKIP_QUALITY -Dtest=*StreamTest
-    ;;
-  adaptation)
-    mvn test $SKIP_QUALITY -Dtest=*AdaptationTest
-    ;;
-  machine)
-    mvn test $SKIP_QUALITY -Dcucumber.filter.tags="@L2_Machine"
-    ;;
-  acceptance)
-    mvn test $SKIP_QUALITY -Dcucumber.filter.tags="@Acceptance"
-    ;;
-  all)
-    mvn test $SKIP_QUALITY
-    ;;
-esac
-EOF
-          fi
-
-          chmod +x ./util/test/run-tests.sh
-          chmod +x ./util/build/build-performance.sh || echo "Warning: build-performance.sh not found"
-          chmod +x ./util/build/build-optimal.sh || echo "Warning: build-optimal.sh not found"
-          chmod +x ./util/quality/build-checks.sh || echo "Warning: build-checks.sh not found"
-
       - name: Verify compilation
         run: mvn -B clean compile
 
@@ -117,14 +60,10 @@ EOF
           distribution: 'temurin'
           cache: maven
 
-      - name: Prepare test environment
+      - name: Run ATL critical tests
         run: |
           chmod +x ./util/test/run-tests.sh
-          chmod +x ./util/build/build-performance.sh || true
-          chmod +x ./util/build/build-optimal.sh || true
-
-      - name: Run ATL critical tests
-        run: ./util/test/run-tests.sh atl --skip-quality
+          ./util/test/run-tests.sh atl --skip-quality
 
       - name: Upload ATL test results
         if: always()
@@ -137,8 +76,8 @@ EOF
           retention-days: 7
 
   # Unit and component tests
-  tube-bundle-tests:
-    name: Tube and Bundle Tests
+  unit-tests:
+    name: Unit and Component Tests
     needs: atl-tests
     runs-on: ubuntu-latest
     steps:
@@ -152,17 +91,20 @@ EOF
           distribution: 'temurin'
           cache: maven
 
-      - name: Prepare test environment
-        run: chmod +x ./util/test/run-tests.sh
-
       - name: Run Tube Tests
-        run: ./util/test/run-tests.sh tube --skip-quality
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          ./util/test/run-tests.sh tube --skip-quality
 
       - name: Run Flow Tests
-        run: ./util/test/run-tests.sh flow --skip-quality
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          ./util/test/run-tests.sh flow --skip-quality
 
-      - name: Run Bundle Tests
-        run: ./util/test/run-tests.sh bundle --skip-quality
+      - name: Run Composite Tests
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          mvn test -Dtest=*CompositeTest -P skip-quality-checks
 
       - name: Upload Unit Test Results
         if: always()
@@ -173,9 +115,9 @@ EOF
             **/target/surefire-reports/
           retention-days: 7
 
-  # System and property tests
-  system-adaptation-tests:
-    name: System and Adaptation Tests
+  # Integration tests
+  integration-tests:
+    name: Integration Tests
     needs: atl-tests
     runs-on: ubuntu-latest
     services:
@@ -204,27 +146,28 @@ EOF
           distribution: 'temurin'
           cache: maven
 
-      - name: Prepare test environment
-        run: chmod +x ./util/test/run-tests.sh
-
       - name: Run Stream Tests
-        run: ./util/test/run-tests.sh stream --skip-quality
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          ./util/test/run-tests.sh stream --skip-quality
 
       - name: Run Adaptation Tests
-        run: ./util/test/run-tests.sh adaptation --skip-quality
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          ./util/test/run-tests.sh adaptation --skip-quality
 
-      - name: Upload System Test Results
+      - name: Upload Integration Test Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: system-adaptation-test-reports
+          name: integration-test-reports
           path: |
             **/target/surefire-reports/
           retention-days: 7
 
   # End-to-end and acceptance tests
-  machine-acceptance-tests:
-    name: Machine and Acceptance Tests
+  e2e-tests:
+    name: E2E and Acceptance Tests
     needs: atl-tests
     runs-on: ubuntu-latest
     steps:
@@ -238,14 +181,15 @@ EOF
           distribution: 'temurin'
           cache: maven
 
-      - name: Prepare test environment
-        run: chmod +x ./util/test/run-tests.sh
-
       - name: Run Machine Tests
-        run: ./util/test/run-tests.sh machine --skip-quality
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          ./util/test/run-tests.sh machine --skip-quality
 
       - name: Run Acceptance Tests
-        run: ./util/test/run-tests.sh acceptance --skip-quality
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          ./util/test/run-tests.sh acceptance --skip-quality
 
       - name: Upload BDD Test Results
         if: always()
@@ -259,7 +203,7 @@ EOF
   # Quality analysis
   quality-analysis:
     name: Quality Analysis
-    needs: [tube-bundle-tests, system-adaptation-tests, machine-acceptance-tests]
+    needs: [unit-tests, integration-tests, e2e-tests]
     if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -282,35 +226,36 @@ EOF
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Prepare quality environment
+      - name: Run Spotless check
         run: |
-          # Check if quality scripts exist and make them executable
-          if [ -f ./util/quality/build-checks.sh ]; then
-            chmod +x ./util/quality/build-checks.sh
-            echo "Found build-checks.sh script"
+          chmod +x ./util/quality/build-checks.sh || true
+          if [ -x ./util/quality/build-checks.sh ]; then
+            ./util/quality/build-checks.sh --only=spotless || true
           else
-            echo "Warning: build-checks.sh not found, will use Maven directly"
+            mvn -B spotless:check || true
           fi
 
-      - name: Run quality checks
+      - name: Run Checkstyle
         run: |
-          if [ -f ./util/quality/build-checks.sh ]; then
-            # Run quality checks one by one
-            echo "Running quality checks incrementally with build-checks.sh"
-            # First run Spotless (code formatting)
-            ./util/quality/build-checks.sh --only=spotless || true
-            # Then run Checkstyle (code standards)
+          if [ -x ./util/quality/build-checks.sh ]; then
             ./util/quality/build-checks.sh --only=checkstyle || true
-            # Then run SpotBugs (bug detection)
+          else
+            mvn -B checkstyle:check || true
+          fi
+
+      - name: Run SpotBugs
+        run: |
+          if [ -x ./util/quality/build-checks.sh ]; then
             ./util/quality/build-checks.sh --only=spotbugs || true
-            # Finally run JaCoCo (code coverage)
+          else
+            mvn -B spotbugs:check || true
+          fi
+
+      - name: Generate JaCoCo report
+        run: |
+          if [ -x ./util/quality/build-checks.sh ]; then
             ./util/quality/build-checks.sh --only=jacoco || true
           else
-            echo "Running quality checks directly with Maven"
-            # Run quality checks incrementally
-            mvn -B spotless:check || true
-            mvn -B checkstyle:check || true
-            mvn -B spotbugs:check || true
             mvn -B jacoco:report || true
           fi
 
@@ -319,29 +264,20 @@ EOF
         with:
           path: test-reports
 
-      - name: List downloaded test reports
-        run: |
-          echo "Downloaded test reports structure:"
-          find test-reports -type f | sort
-
       - name: SonarQube analysis
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        if: env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != ''
         run: |
-          if [ -n "$SONAR_TOKEN" ] && [ -n "$SONAR_HOST_URL" ]; then
-            echo "Running SonarQube analysis..."
-            mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-              -Dsonar.projectKey=heymumford_Samstraumr \
-              -Dsonar.projectName="Samstraumr" \
-              -Dsonar.qualitygate.wait=true \
-              -Dsonar.coverage.jacoco.xmlReportPaths=**/jacoco.xml,**/target/site/jacoco/jacoco.xml,test-reports/**/jacoco.xml \
-              -Dsonar.java.spotbugs.reportPaths=**/spotbugsXml.xml,**/target/spotbugsXml.xml,test-reports/**/spotbugsXml.xml \
-              -Dsonar.java.checkstyle.reportPaths=**/checkstyle-result.xml,**/target/checkstyle-result.xml,test-reports/**/checkstyle-result.xml
-          else
-            echo "SonarQube analysis skipped - credentials not configured"
-          fi
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=heymumford_Samstraumr \
+            -Dsonar.projectName="Samstraumr" \
+            -Dsonar.qualitygate.wait=true \
+            -Dsonar.coverage.jacoco.xmlReportPaths=**/jacoco.xml,**/target/site/jacoco/jacoco.xml,test-reports/**/jacoco.xml \
+            -Dsonar.java.spotbugs.reportPaths=**/spotbugsXml.xml,**/target/spotbugsXml.xml,test-reports/**/spotbugsXml.xml \
+            -Dsonar.java.checkstyle.reportPaths=**/checkstyle-result.xml,**/target/checkstyle-result.xml,test-reports/**/checkstyle-result.xml
 
       - name: Upload Quality Reports
         if: always()
@@ -352,4 +288,36 @@ EOF
             **/target/site/jacoco/
             **/target/checkstyle-result.xml
             **/target/spotbugsXml.xml
+          retention-days: 7
+
+  # BTL tests - run if time permits and all other tests pass
+  btl-tests:
+    name: Below-The-Line Tests
+    needs: [unit-tests, integration-tests, e2e-tests]
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run BTL tests
+        run: |
+          chmod +x ./util/test/run-tests.sh
+          ./util/test/run-tests.sh btl --skip-quality
+
+      - name: Upload BTL test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: btl-test-reports
+          path: |
+            **/target/surefire-reports/
+            **/target/cucumber-reports/
           retention-days: 7

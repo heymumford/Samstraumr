@@ -41,7 +41,8 @@ show_usage() {
     echo "TEST TYPES:"
     echo "  tube      - Run Tube Tests (unit/JUnit)"
     echo "  flow      - Run Flow Tests (integration/JUnit)"
-    echo "  bundle    - Run Bundle Tests (component/JUnit)"
+    echo "  bundle    - Run Bundle Tests (component/JUnit) - [DEPRECATED]"
+    echo "  composite - Run Composite Tests (component/JUnit)"
     echo "  stream    - Run Stream Tests (system/TestContainers)"
     echo "  adaptation - Run Adaptation Tests (property/custom JUnit)"
     echo "  machine   - Run Machine Tests (e2e/Cucumber)"
@@ -91,7 +92,7 @@ while [[ $# -gt 0 ]]; do
             show_usage
             exit 0
             ;;
-        tube|flow|bundle|stream|adaptation|machine|acceptance|all|critical|atl|btl)
+        tube|flow|bundle|composite|stream|adaptation|machine|acceptance|all|critical|atl|btl)
             TEST_TYPE="$1"
             shift
             ;;
@@ -132,8 +133,12 @@ case $TEST_TYPE in
         mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*FlowTest
         ;;
     bundle)
-        echo "🧪 Running Bundle Tests (component/JUnit)"
+        echo "🧪 Running Bundle Tests (component/JUnit) - [DEPRECATED]"
         mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*BundleTest
+        ;;
+    composite)
+        echo "🧪 Running Composite Tests (component/JUnit)"
+        mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dtest=*CompositeTest
         ;;
     stream)
         echo "🧪 Running Stream Tests (system/TestContainers)"
