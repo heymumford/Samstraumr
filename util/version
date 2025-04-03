@@ -472,7 +472,7 @@ case "$COMMAND" in
     NEW_VERSION=$(calculate_new_version "$BUMP_TYPE")
     
     # Verify current version and tag are in sync before proceeding
-    local current_tag="v$CURRENT_VERSION"
+    current_tag="v$CURRENT_VERSION"
     if ! tag_exists "$current_tag"; then
       print_warning "Current version $CURRENT_VERSION does not have a matching tag $current_tag"
       echo -n "Do you want to continue bumping the version anyway? (y/n): "
@@ -510,7 +510,7 @@ case "$COMMAND" in
     fi
     
     # Verify the version we're setting doesn't already have a tag
-    local new_tag="v$NEW_VERSION"
+    new_tag="v$NEW_VERSION"
     if tag_exists "$new_tag"; then
       print_error "Tag $new_tag already exists. Cannot set version to $NEW_VERSION."
       print_warning "Run 'git tag -d $new_tag' to delete the existing tag if needed."
