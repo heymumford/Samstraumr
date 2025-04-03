@@ -54,7 +54,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **File Format**: EditorConfig ensures consistent formatting across different IDEs.
 
 ## Project Organization
-- Multi-module Maven project (Java 21)
+- Multi-module Maven project (Java 17)
 - BDD testing approach with Cucumber
 - Feature files contain detailed test documentation with tags for selective test execution
 - Quality checks integrated into the build process
