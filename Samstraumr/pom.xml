@@ -44,7 +44,7 @@
     <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
 
     <!-- Quality tool versions -->
-    <pmd.version>6.55.0</pmd.version>
+    <pmd.version>7.10.0</pmd.version>
     <checkstyle.version>10.14.0</checkstyle.version>
     <spotless.google.format.version>1.17.0</spotless.google.format.version>
   </properties>
