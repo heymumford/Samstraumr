@@ -285,6 +285,19 @@ shift
 
 # Default options
 AUTO_COMMIT=true
+BUMP_TYPE=""
+
+# First argument for "bump" command is the type, don't treat it as an option
+if [ "$COMMAND" = "bump" ] && [ $# -gt 0 ]; then
+  BUMP_TYPE=$1
+  shift
+fi
+
+# First argument for "set" command is the version, don't treat it as an option
+if [ "$COMMAND" = "set" ] && [ $# -gt 0 ]; then
+  NEW_VERSION=$1
+  shift
+fi
 
 # Process options
 while [ $# -gt 0 ]; do
@@ -312,13 +325,12 @@ case "$COMMAND" in
     ;;
   
   bump)
-    if [ $# -eq 0 ]; then
+    if [ -z "$BUMP_TYPE" ]; then
       print_error "Missing bump type (major, minor, patch)"
       show_usage
       exit 1
     fi
     
-    BUMP_TYPE=$1
     if [[ ! "$BUMP_TYPE" =~ ^(major|minor|patch)$ ]]; then
       print_error "Invalid bump type: $BUMP_TYPE. Must be major, minor, or patch."
       exit 1
@@ -338,13 +350,11 @@ case "$COMMAND" in
     ;;
   
   set)
-    if [ $# -eq 0 ]; then
+    if [ -z "$NEW_VERSION" ]; then
       print_error "Missing version number to set"
       show_usage
       exit 1
     fi
-    
-    NEW_VERSION=$1
     # Validate version format (x.y.z)
     if ! [[ $NEW_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
       print_error "Invalid version format: $NEW_VERSION. Must be in format x.y.z"
