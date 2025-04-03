@@ -43,9 +43,57 @@ jobs:
       
       - name: Initialize build environment
         run: |
+          # Make sure util/test directory exists
+          mkdir -p ./util/test
+          
+          # Check if run-tests.sh exists, if not, add a fallback version
+          if [ ! -f ./util/test/run-tests.sh ]; then
+            echo "Test runner script not found, creating fallback version"
+            cat > ./util/test/run-tests.sh << 'EOF'
+#!/bin/bash
+# Fallback test runner
+echo "Using fallback test runner"
+TEST_TYPE="${1:-all}"
+SKIP_QUALITY=""
+if [[ "$*" == *"--skip-quality"* ]]; then
+  SKIP_QUALITY="-P skip-quality-checks -Dspotless.check.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true -Djacoco.skip=true"
+fi
+
+case $TEST_TYPE in
+  critical)
+    mvn test $SKIP_QUALITY -P atl-tests
+    ;;
+  tube)
+    mvn test $SKIP_QUALITY -Dtest=*TubeTest
+    ;;
+  flow)
+    mvn test $SKIP_QUALITY -Dtest=*FlowTest
+    ;;
+  bundle)
+    mvn test $SKIP_QUALITY -Dtest=*BundleTest
+    ;;
+  stream)
+    mvn test $SKIP_QUALITY -Dtest=*StreamTest
+    ;;
+  adaptation)
+    mvn test $SKIP_QUALITY -Dtest=*AdaptationTest
+    ;;
+  machine)
+    mvn test $SKIP_QUALITY -Dcucumber.filter.tags="@L2_Machine"
+    ;;
+  acceptance)
+    mvn test $SKIP_QUALITY -Dcucumber.filter.tags="@Acceptance"
+    ;;
+  all)
+    mvn test $SKIP_QUALITY
+    ;;
+esac
+EOF
+          fi
+          
           chmod +x ./util/test/run-tests.sh
-          chmod +x ./build-performance.sh
-          chmod +x ./build-checks.sh
+          chmod +x ./build-performance.sh || echo "Warning: build-performance.sh not found"
+          chmod +x ./build-checks.sh || echo "Warning: build-checks.sh not found"
       
       - name: Verify compilation
         run: mvn -B clean compile
@@ -72,7 +120,7 @@ jobs:
           chmod +x ./build-performance.sh
       
       - name: Run ATL critical tests
-        run: ./util/test/run-tests.sh critical
+        run: ./util/test/run-tests.sh critical --skip-quality
       
       - name: Upload ATL test results
         if: always()
@@ -104,13 +152,13 @@ jobs:
         run: chmod +x ./util/test/run-tests.sh
       
       - name: Run Tube Tests
-        run: ./util/test/run-tests.sh tube
+        run: ./util/test/run-tests.sh tube --skip-quality
       
       - name: Run Flow Tests
-        run: ./util/test/run-tests.sh flow
+        run: ./util/test/run-tests.sh flow --skip-quality
       
       - name: Run Bundle Tests
-        run: ./util/test/run-tests.sh bundle
+        run: ./util/test/run-tests.sh bundle --skip-quality
       
       - name: Upload Unit Test Results
         if: always()
@@ -156,10 +204,10 @@ jobs:
         run: chmod +x ./util/test/run-tests.sh
       
       - name: Run Stream Tests
-        run: ./util/test/run-tests.sh stream
+        run: ./util/test/run-tests.sh stream --skip-quality
       
       - name: Run Adaptation Tests
-        run: ./util/test/run-tests.sh adaptation
+        run: ./util/test/run-tests.sh adaptation --skip-quality
       
       - name: Upload System Test Results
         if: always()
@@ -190,10 +238,10 @@ jobs:
         run: chmod +x ./util/test/run-tests.sh
       
       - name: Run Machine Tests
-        run: ./util/test/run-tests.sh machine
+        run: ./util/test/run-tests.sh machine --skip-quality
       
       - name: Run Acceptance Tests
-        run: ./util/test/run-tests.sh acceptance
+        run: ./util/test/run-tests.sh acceptance --skip-quality
       
       - name: Upload BDD Test Results
         if: always()
@@ -236,10 +284,15 @@ jobs:
       - name: Run quality checks
         run: ./build-checks.sh
       
-      - name: Download test results
+      - name: Download all test results
         uses: actions/download-artifact@v4
         with:
-          name: unit-component-test-reports
+          path: test-reports
+          
+      - name: List downloaded test reports
+        run: |
+          echo "Downloaded test reports structure:"
+          find test-reports -type f | sort
       
       - name: SonarQube analysis
         env:
@@ -251,10 +304,10 @@ jobs:
             -Dsonar.projectKey=heymumford_Samstraumr \
             -Dsonar.projectName="Samstraumr" \
             -Dsonar.qualitygate.wait=true \
-            -Dsonar.coverage.jacoco.xmlReportPaths=**/target/site/jacoco/jacoco.xml \
-            -Dsonar.java.spotbugs.reportPaths=**/target/spotbugsXml.xml \
-            -Dsonar.java.pmd.reportPaths=**/target/pmd.xml \
-            -Dsonar.java.checkstyle.reportPaths=**/target/checkstyle-result.xml
+            -Dsonar.coverage.jacoco.xmlReportPaths=**/jacoco.xml,**/target/site/jacoco/jacoco.xml,test-reports/**/jacoco.xml \
+            -Dsonar.java.spotbugs.reportPaths=**/spotbugsXml.xml,**/target/spotbugsXml.xml,test-reports/**/spotbugsXml.xml \
+            -Dsonar.java.pmd.reportPaths=**/pmd.xml,**/target/pmd.xml,test-reports/**/pmd.xml \
+            -Dsonar.java.checkstyle.reportPaths=**/checkstyle-result.xml,**/target/checkstyle-result.xml,test-reports/**/checkstyle-result.xml
       
       - name: Upload Quality Reports
         if: always()

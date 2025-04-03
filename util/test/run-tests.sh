@@ -114,7 +114,7 @@ fi
 # Set verbosity flags
 VERBOSE_FLAG=""
 if [ "$VERBOSE" = true ]; then
-    VERBOSE_FLAG="--debug"
+    VERBOSE_FLAG="-X"
 fi
 
 # Configure test specific settings
