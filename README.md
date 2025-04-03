@@ -5,7 +5,7 @@
 ```
 Last updated: April 2, 2025
 Maintainer: Eric C. Mumford (@heymumford)
-Version: 0.5.5
+Version: 0.5.6
 License: Mozilla Public License 2.0
 ```
 
