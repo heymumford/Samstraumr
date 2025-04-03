@@ -8,6 +8,10 @@ This directory contains utility scripts for the Samstraumr project, organized in
   - `version` - **NEW**: Unified version management utility
   - `test/` - Testing utilities
     - `run-tests.sh` - Comprehensive test runner for all test types
+    - `run-atl-tests.sh` - Runner for Above The Line tests
+    - `run-all-tests.sh` - Runner supporting multiple test terminologies
+    - `mapping/` - Test mapping utilities
+      - `map-test-type.sh` - Maps between industry-standard and Samstraumr terminology
 
 - `build/` - Scripts for building the project with different configurations
   - `build-optimal.sh` - Optimized build script with thread and memory settings
@@ -24,6 +28,10 @@ This directory contains utility scripts for the Samstraumr project, organized in
 - `maintenance/` - Scripts for project maintenance
   - `update-version.sh` - *(Deprecated)* Use the new `version` utility instead
   - `cleanup-maven.sh` - Cleans Maven repository cache
+  - `setup-fast.sh` - Creates a fast Maven profile for development
+  - `headers/` - Header standardization utilities
+    - `update-java-headers.sh` - Standardizes Java file headers
+    - `update-md-headers.sh` - Standardizes Markdown file headers
 
 ## Usage
 
@@ -31,13 +39,17 @@ Scripts must be run from their locations in the util/ directory. For example:
 
 ```bash
 # From project root
-./util/version bump patch      # Use the new version utility
-./util/test/run-tests.sh tube  # Run specific tests
-./util/build/build-optimal.sh  # Use optimized build
+./util/version bump patch                 # Use the new version utility 
+./util/test/run-tests.sh tube             # Run specific tests
+./util/test/run-atl-tests.sh              # Run Above The Line tests
+./util/test/run-all-tests.sh --both unit  # Run unit and tube tests
+./util/build/build-optimal.sh             # Use optimized build
+./util/maintenance/headers/update-md-headers.sh # Standardize Markdown headers
 
 # If you frequently run these scripts, consider adding the directories to your PATH
-export PATH=$PATH:$(pwd)/util:$(pwd)/util/build:$(pwd)/util/quality:$(pwd)/util/maintenance
+export PATH=$PATH:$(pwd)/util:$(pwd)/util/test:$(pwd)/util/build:$(pwd)/util/quality:$(pwd)/util/maintenance
 version bump patch
+run-atl-tests.sh
 build-optimal.sh
 ```
 

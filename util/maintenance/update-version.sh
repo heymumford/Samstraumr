@@ -1,75 +1,32 @@
 #!/bin/bash
-# Script to update version numbers throughout the codebase
-# Usage: ./update-version.sh [new-version]
+# Legacy script - redirects to the new unified version utility
+# This script is kept for backward compatibility
 
-set -e
+# Display deprecation warning
+echo -e "\033[1;33mWARNING: util/maintenance/update-version.sh is deprecated.\033[0m"
+echo -e "Please use \033[1;32m./util/version bump patch\033[0m (preferred) or \033[1;32m./util/version set VERSION\033[0m instead."
+echo ""
 
-# Function to print colored output
-print_header() {
-  echo -e "\033[1;34m===== $1 =====\033[0m"
-}
-
-print_success() {
-  echo -e "\033[1;32m✓ $1\033[0m"
-}
-
-print_warning() {
-  echo -e "\033[1;33m! $1\033[0m"
-}
-
-# Check if new version is provided
-if [ -z "$1" ]; then
-  echo "Usage: ./update-version.sh [new-version]"
-  echo "Example: ./update-version.sh 0.5.0"
-  exit 1
-fi
-
-# Get script directory
+# Get script directory and project root
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." &> /dev/null && pwd 2> /dev/null || echo "$SCRIPT_DIR")"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-# If the script is in util/maintenance, adjust PROJECT_ROOT
-if [[ "$SCRIPT_DIR" == */util/maintenance ]]; then
-  PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-fi
-
-# Change to project root directory to ensure paths are correct
+# Change to project root directory
 cd "$PROJECT_ROOT"
 
-NEW_VERSION="$1"
-VERSION_PROPERTIES_FILE="Samstraumr/version.properties"
-
-print_header "Updating Version to $NEW_VERSION"
-
-# Read current version
-CURRENT_VERSION=$(grep "samstraumr.version=" $VERSION_PROPERTIES_FILE | cut -d= -f2)
-echo "Current version: $CURRENT_VERSION"
-echo "New version: $NEW_VERSION"
-
-# Update version.properties
-sed -i "s/samstraumr.version=.*/samstraumr.version=$NEW_VERSION/" $VERSION_PROPERTIES_FILE
-print_success "Updated version.properties"
-
-# Update last updated date
-TODAY=$(date +"%B %d, %Y")
-sed -i "s/samstraumr.last.updated=.*/samstraumr.last.updated=$TODAY/" $VERSION_PROPERTIES_FILE
-print_success "Updated last updated date to $TODAY"
-
-# Update POM files
-sed -i "s/<version>$CURRENT_VERSION<\/version>/<version>$NEW_VERSION<\/version>/g" pom.xml
-sed -i "s/<version>$CURRENT_VERSION<\/version>/<version>$NEW_VERSION<\/version>/g" Samstraumr/pom.xml
-sed -i "s/<version>$CURRENT_VERSION<\/version>/<version>$NEW_VERSION<\/version>/g" Samstraumr/samstraumr-core/pom.xml
-
-# Update version property in pom.xml files
-sed -i "s/<samstraumr.version>$CURRENT_VERSION<\/samstraumr.version>/<samstraumr.version>$NEW_VERSION<\/samstraumr.version>/g" pom.xml
-sed -i "s/<samstraumr.version>$CURRENT_VERSION<\/samstraumr.version>/<samstraumr.version>$NEW_VERSION<\/samstraumr.version>/g" Samstraumr/pom.xml
-
-print_success "Updated POM files"
-
-# Update README.md version - match any version format, including non-numeric
-sed -i "s/Version: .*/Version: $NEW_VERSION/g" README.md
-print_success "Updated README.md"
-
-print_header "Version Update Complete"
-echo "Build the project to apply version changes to all resources"
-echo "Run: mvn clean install"
+# Pass all arguments to the new version utility
+if [ "$1" != "" ]; then
+  if [[ "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    # If argument is a version number (x.y.z format), use 'set'
+    ./util/version set "$1" "${@:2}"
+  else
+    # For any other input, display help
+    echo -e "\033[1;31mError: Invalid version format. Must be in format x.y.z\033[0m"
+    ./util/version --help
+    exit 1
+  fi
+else
+  # Default to 'bump patch' when no arguments are provided (most common use case)
+  echo -e "\033[1;32mDefaulting to patch version update\033[0m"
+  ./util/version bump patch
+fi

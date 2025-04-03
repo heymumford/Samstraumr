@@ -38,6 +38,13 @@ Guidelines for contributing to Samstraumr.
 Research papers and proposals for Samstraumr enhancements.
 - [LLM Context Proposal](/docs/research/llm-context-proposal.md) - Proposal for LLM integration
 
+### [Proposals](/docs/proposals/)
+Proposals and detailed design documents for Samstraumr.
+- [LLM Context Composite Tube Proposal](/docs/proposals/llm-context-composite-tube-proposal.md) - Proposal for LLM integration with composite tubes
+- [Samstraumr Testing Strategy](/docs/proposals/samstraumr-testing-strategy.md) - Comprehensive testing strategy proposal
+- [Samstraumr Analysis Essay](/docs/proposals/samstraumr-analysis-essay-refinement.docx) - Analysis and refinement of Samstraumr concepts
+- [Tube Components Integration](/docs/proposals/tube-components-integration-proposal.docx) - Proposal for integrating tube components
+
 ## Terminology
 
 Samstraumr uses domain-specific terminology derived from systems theory, while also supporting industry-standard equivalents. See the [Glossary](/docs/reference/glossary.md) for detailed definitions.
