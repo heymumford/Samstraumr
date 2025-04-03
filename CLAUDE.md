@@ -105,7 +105,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Imports**: Specific imports (no wildcards). Standard Java first, then third-party, then project imports.
 - **Naming**: PascalCase for classes, camelCase for methods/variables, ALL_CAPS for constants.
 - **Error Handling**: Custom exceptions with contextual messages; consistent logging before throwing exceptions.
-- **Logging**: Use SLF4J with Log4j2 implementation; consistent log levels; parameterized logging.
+- **Logging**: 
+  - Use SLF4J with Log4j2 implementation
+  - Follow log level guidelines in docs/LOGGING_STANDARDS.md
+  - Always use parameterized logging (LOGGER.info("Value: {}", value))
+  - Include exceptions in error logs (LOGGER.error("Message", exception))
+  - Never use System.out.println or System.err.println
 - **Testing**: Cucumber for BDD testing; feature files with descriptive scenarios.
 - **Documentation**: Javadoc for public APIs; comments for complex operations.
 - **Structure**: Final fields for immutability; private methods for implementation details.
