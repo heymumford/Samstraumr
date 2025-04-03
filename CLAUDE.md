@@ -144,7 +144,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - JaCoCo: Code coverage
 - Version management
   - Central version.properties file in Samstraumr/ directory
-  - Update version with: `./util/maintenance/update-version.sh <new-version>`
+  - Update version with: `./util/version bump patch` (preferred) or `./util/version set <new-version>`
+  - Always use patch version bumping for bugfixes and small improvements
   - Resources filtered to include version information
 
 ## Quality Reports
