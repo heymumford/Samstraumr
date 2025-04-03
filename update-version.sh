@@ -20,7 +20,7 @@ print_warning() {
 # Check if new version is provided
 if [ -z "$1" ]; then
   echo "Usage: ./update-version.sh [new-version]"
-  echo "Example: ./update-version.sh 0.5"
+  echo "Example: ./update-version.sh 0.5.0"
   exit 1
 fi
 
@@ -44,13 +44,18 @@ sed -i "s/samstraumr.last.updated=.*/samstraumr.last.updated=$TODAY/" $VERSION_P
 print_success "Updated last updated date to $TODAY"
 
 # Update POM files
-sed -i "s/<version>$CURRENT_VERSION<\/version>/<version>$NEW_VERSION<\/version>/" pom.xml
-sed -i "s/<version>$CURRENT_VERSION<\/version>/<version>$NEW_VERSION<\/version>/" Samstraumr/pom.xml
-sed -i "s/<version>$CURRENT_VERSION<\/version>/<version>$NEW_VERSION<\/version>/" Samstraumr/samstraumr-core/pom.xml
+sed -i "s/<version>$CURRENT_VERSION<\/version>/<version>$NEW_VERSION<\/version>/g" pom.xml
+sed -i "s/<version>$CURRENT_VERSION<\/version>/<version>$NEW_VERSION<\/version>/g" Samstraumr/pom.xml
+sed -i "s/<version>$CURRENT_VERSION<\/version>/<version>$NEW_VERSION<\/version>/g" Samstraumr/samstraumr-core/pom.xml
+
+# Update version property in pom.xml files
+sed -i "s/<samstraumr.version>$CURRENT_VERSION<\/samstraumr.version>/<samstraumr.version>$NEW_VERSION<\/samstraumr.version>/g" pom.xml
+sed -i "s/<samstraumr.version>$CURRENT_VERSION<\/samstraumr.version>/<samstraumr.version>$NEW_VERSION<\/samstraumr.version>/g" Samstraumr/pom.xml
+
 print_success "Updated POM files"
 
 # Update README.md version
-sed -i "s/Version: $CURRENT_VERSION/Version: $NEW_VERSION/" README.md
+sed -i "s/Version: [0-9.]\+/Version: $NEW_VERSION/g" README.md
 print_success "Updated README.md"
 
 print_header "Version Update Complete"
