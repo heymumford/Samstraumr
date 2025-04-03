@@ -33,6 +33,7 @@ Testing methodology and approach.
 Guidelines for contributing to Samstraumr.
 - [Contribution Guide](/docs/contribution/contributing.md) - How to contribute
 - [Code Standards](/docs/contribution/code-standards.md) - Coding standards and practices
+- [Configuration Standards](/docs/contribution/configuration-standards.md) - Best practices for configuration and avoiding hardcoded values
 
 ### [Research](/docs/research/)
 Research papers and proposals for Samstraumr enhancements.

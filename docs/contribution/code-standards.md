@@ -9,6 +9,7 @@ This document outlines the coding standards for contributing to Samstraumr.
 - **Testability**: Design code with testing in mind
 - **Documentation**: Document public APIs and complex logic
 - **Continuous Integration**: Always verify code passes all tests and checks before submitting
+- **Configuration**: Externalize configuration and avoid hardcoded values (see [Configuration Standards](configuration-standards.md))
 
 ## Java Code Style
 
