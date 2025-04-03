@@ -56,7 +56,7 @@ jobs:
     
     - name: Upload test reports
       if: success() || failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: tube-test-reports
         path: '**/target/surefire-reports/*.xml'
@@ -87,7 +87,7 @@ jobs:
     
     - name: Upload test reports
       if: success() || failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: flow-bundle-test-reports
         path: '**/target/surefire-reports/*.xml'
@@ -133,7 +133,7 @@ jobs:
     
     - name: Upload test reports
       if: success() || failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: stream-adaptation-test-reports
         path: '**/target/surefire-reports/*.xml'
@@ -164,7 +164,7 @@ jobs:
     
     - name: Upload Cucumber reports
       if: success() || failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: cucumber-reports
         path: '**/target/cucumber-reports/'
