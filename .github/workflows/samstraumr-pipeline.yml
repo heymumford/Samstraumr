@@ -1,4 +1,6 @@
-name: Samstraumr Pipeline v${{ steps.get_version.outputs.version }}
+name: Samstraumr Pipeline
+
+run-name: Samstraumr Pipeline
 
 on:
   push:
@@ -21,8 +23,31 @@ jobs:
       - name: Get version
         id: get_version
         run: |
-          chmod +x ./util/version
-          echo "version=$(./util/version export)" >> $GITHUB_OUTPUT
+          # Check for version.properties file
+          if [ -f "Samstraumr/version.properties" ]; then
+            # Make the version script executable
+            chmod +x ./util/version
+            # Extract the version
+            VERSION=$(./util/version export) || VERSION="0.0.0"
+          else
+            # Try to extract directly from properties file if available
+            if [ -f "Samstraumr/version.properties" ]; then
+              VERSION=$(grep "samstraumr.version=" "Samstraumr/version.properties" | cut -d= -f2)
+            else
+              # Fallback version if we can't determine it
+              VERSION="0.0.0"
+            fi
+          fi
+          
+          # Set the output variable
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          # Send a notice to GitHub Actions UI
+          echo "::notice::Samstraumr Pipeline v$VERSION"
+          
+          # Add to step summary
+          echo "# Samstraumr v$VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Build started for Samstraumr version $VERSION" >> $GITHUB_STEP_SUMMARY
 
   # Core initialization and build verification
   initialization:
@@ -57,6 +82,14 @@ jobs:
           java -version
           echo "Working directory: $(pwd)"
           ls -la
+
+      - name: Set Job Summary and Info
+        run: |
+          echo "# 🚀 Building Samstraumr v${{ needs.get-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: ${{ needs.get-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
 
       - name: Verify compilation
         run: mvn -B clean compile
@@ -338,3 +371,16 @@ jobs:
             **/target/surefire-reports/
             **/target/cucumber-reports/
           retention-days: 7
+          
+  # Update workflow summary with version information
+  workflow-summary:
+    name: Workflow Summary
+    if: always()
+    needs: [get-version, btl-tests, quality-analysis]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add Version to Workflow Summary
+        run: |
+          echo "# Samstraumr v${{ needs.get-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Build completed for Samstraumr version ${{ needs.get-version.outputs.version }}." >> $GITHUB_STEP_SUMMARY
