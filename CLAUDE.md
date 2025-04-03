@@ -18,26 +18,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Test Commands
 
 ### Test Runner Script
-- Run all tests: `./run-tests.sh all`
+- Run all tests: `./util/test/run-tests.sh all`
 - Run using either industry-standard or Samstraumr terminology:
   - Industry Standard:
-    - `./run-tests.sh smoke` (basic system assembly and connectivity)
-    - `./run-tests.sh unit` (individual units in isolation)
-    - `./run-tests.sh component` (connected components working together)
-    - `./run-tests.sh integration` (interactions between different parts)
-    - `./run-tests.sh api` (public interfaces and contracts)
-    - `./run-tests.sh system` (entire system as a whole)
-    - `./run-tests.sh endtoend` (user perspective and requirements)
-    - `./run-tests.sh property` (system properties across inputs)
+    - `./util/test/run-tests.sh smoke` (basic system assembly and connectivity)
+    - `./util/test/run-tests.sh unit` (individual units in isolation)
+    - `./util/test/run-tests.sh component` (connected components working together)
+    - `./util/test/run-tests.sh integration` (interactions between different parts)
+    - `./util/test/run-tests.sh api` (public interfaces and contracts)
+    - `./util/test/run-tests.sh system` (entire system as a whole)
+    - `./util/test/run-tests.sh endtoend` (user perspective and requirements)
+    - `./util/test/run-tests.sh property` (system properties across inputs)
   - Samstraumr Terminology:
-    - `./run-tests.sh orchestration` (basic system assembly and connectivity)
-    - `./run-tests.sh tube` (individual tubes in isolation)
-    - `./run-tests.sh composite` (or `bundle` for legacy) (connected tubes)
-    - `./run-tests.sh flow` (interactions between different parts)
-    - `./run-tests.sh machine` (public interfaces and contracts)
-    - `./run-tests.sh stream` (entire system as a whole)
-    - `./run-tests.sh acceptance` (user perspective and requirements)
-    - `./run-tests.sh adaptation` (system properties across inputs)
+    - `./util/test/run-tests.sh orchestration` (basic system assembly and connectivity)
+    - `./util/test/run-tests.sh tube` (individual tubes in isolation)
+    - `./util/test/run-tests.sh composite` (or `bundle` for legacy) (connected tubes)
+    - `./util/test/run-tests.sh flow` (interactions between different parts)
+    - `./util/test/run-tests.sh machine` (public interfaces and contracts)
+    - `./util/test/run-tests.sh stream` (entire system as a whole)
+    - `./util/test/run-tests.sh acceptance` (user perspective and requirements)
+    - `./util/test/run-tests.sh adaptation` (system properties across inputs)
 - Options:
   - Include equivalent tags: `--both` or `-b` (e.g., run both unit and tube tests)
   - Output to file: `--output <file>` or `-o <file>`
@@ -128,11 +128,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - Methods, variables, parameters: camelCase
   - Constants (static final fields): UPPER_SNAKE_CASE
   - Cucumber step methods: snake_case
-  - See docs/JAVA_NAMING_STANDARDS.md for complete details
+  - See docs/reference/standards/java-naming-standards.md for complete details
 - **Error Handling**: Custom exceptions with contextual messages; consistent logging before throwing exceptions.
 - **Logging**: 
   - Use SLF4J with Log4j2 implementation
-  - Follow log level guidelines in docs/LOGGING_STANDARDS.md
+  - Follow log level guidelines in docs/reference/standards/logging-standards.md
   - Always use parameterized logging (LOGGER.info("Value: {}", value))
   - Include exceptions in error logs (LOGGER.error("Message", exception))
   - Never use System.out.println or System.err.println
@@ -148,6 +148,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - Clean local cache: `./util/maintenance/cleanup-maven.sh`
 - Maven environment configuration:
   - Settings optimized in `~/.m2/settings.xml`
+  - Java environment setup: `source ./util/build/java-env-setup.sh` (handles encoding and suppresses redundant messages)
   - Memory settings: `MAVEN_OPTS="-Xmx1g -XX:+TieredCompilation -XX:TieredStopAtLevel=1"`
   - Parallel builds: `-T 1C` flag (1 thread per core)
   - Incremental compilation enabled for faster builds

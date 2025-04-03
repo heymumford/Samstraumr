@@ -16,8 +16,11 @@ NC='\033[0m' # No Color
 echo -e "${YELLOW}Running Above The Line (ATL) tests...${NC}"
 echo ""
 
-# Set Maven options for faster builds
-export MAVEN_OPTS="-Xmx1g -XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+# Set Maven options for faster builds and integrate JAVA_TOOL_OPTIONS
+source "$(dirname "$0")/../build/java-env-setup.sh"
+
+# Add additional Maven options for faster builds
+export MAVEN_OPTS="$MAVEN_OPTS -XX:+TieredCompilation -XX:TieredStopAtLevel=1"
 
 # Clean and install without running tests first
 echo -e "${YELLOW}Building project without tests...${NC}"
@@ -28,7 +31,9 @@ echo -e "${YELLOW}Running ATL tests...${NC}"
 mvn clean install -Dmaven.test.skip=false -DskipTests=false -P atl-tests
 
 # Check the exit status
-if [ $? -eq 0 ]; then
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -eq 0 ]; then
     echo -e "${GREEN}ATL tests PASSED!${NC}"
     exit 0
 else

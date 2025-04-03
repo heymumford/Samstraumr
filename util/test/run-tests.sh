@@ -23,6 +23,9 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." &> /dev/null && pwd 2> /dev/null || echo 
 # Change to project root directory
 cd "$PROJECT_ROOT"
 
+# Source the Java environment setup script
+source "$(dirname "$0")/../build/java-env-setup.sh"
+
 # Default values
 TEST_TYPE="all"
 PARALLEL=false
@@ -177,5 +180,6 @@ case $TEST_TYPE in
         mvn $PARALLEL_FLAG $QUALITY_FLAGS $VERBOSE_FLAG test -Dmaven.test.skip=false
         ;;
 esac
+
 
 echo "✅ Tests completed"
