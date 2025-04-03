@@ -352,7 +352,22 @@
       <id>atl-tests</id>
       <properties>
         <cucumber.filter.tags>@ATL</cucumber.filter.tags>
+        <skipTests>false</skipTests>
+        <maven.test.skip>false</maven.test.skip>
       </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/RunATLCucumberTest.java</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     
     <!-- BTL Tests Profile -->
@@ -360,7 +375,22 @@
       <id>btl-tests</id>
       <properties>
         <cucumber.filter.tags>@BTL</cucumber.filter.tags>
+        <skipTests>false</skipTests>
+        <maven.test.skip>false</maven.test.skip>
       </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/RunBTLCucumberTest.java</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     
     <!-- Tube Tests Profile -->
