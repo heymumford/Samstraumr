@@ -103,7 +103,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Code Style Guidelines
 - **Imports**: Specific imports (no wildcards). Standard Java first, then third-party, then project imports.
-- **Naming**: PascalCase for classes, camelCase for methods/variables, ALL_CAPS for constants.
+- **Naming**: 
+  - Classes, interfaces, enums, annotations: PascalCase
+  - Methods, variables, parameters: camelCase
+  - Constants (static final fields): UPPER_SNAKE_CASE
+  - Cucumber step methods: snake_case
+  - See docs/JAVA_NAMING_STANDARDS.md for complete details
 - **Error Handling**: Custom exceptions with contextual messages; consistent logging before throwing exceptions.
 - **Logging**: 
   - Use SLF4J with Log4j2 implementation
