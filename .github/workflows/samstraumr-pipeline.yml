@@ -26,9 +26,9 @@ jobs:
           # Check for version.properties file
           if [ -f "Samstraumr/version.properties" ]; then
             # Make the version script executable
-            chmod +x ./util/version
+            chmod +x ./util/version.sh
             # Extract the version
-            VERSION=$(./util/version export) || VERSION="0.0.0"
+            VERSION=$(./util/version.sh export) || VERSION="0.0.0"
           else
             # Try to extract directly from properties file if available
             if [ -f "Samstraumr/version.properties" ]; then
@@ -112,8 +112,8 @@ jobs:
 
       - name: Run Orchestration tests
         run: |
-          chmod +x ./util/test/run-tests.sh
-          ./util/test/run-tests.sh orchestration --skip-quality
+          chmod +x ./util/test-run.sh
+          ./util/test-run.sh orchestration --skip-quality
 
       - name: Upload Orchestration test results
         if: always()
@@ -143,17 +143,17 @@ jobs:
 
       - name: Run Tube Tests
         run: |
-          chmod +x ./util/test/run-tests.sh
-          ./util/test/run-tests.sh tube --skip-quality
+          chmod +x ./util/test-run.sh
+          ./util/test-run.sh tube --skip-quality
 
       - name: Run Flow Tests
         run: |
-          chmod +x ./util/test/run-tests.sh
-          ./util/test/run-tests.sh flow --skip-quality
+          chmod +x ./util/test-run.sh
+          ./util/test-run.sh flow --skip-quality
 
       - name: Run Composite Tests
         run: |
-          chmod +x ./util/test/run-tests.sh
+          # Using direct Maven command for Composite tests
           mvn test -Dtest=*CompositeTest -P skip-quality-checks
 
       - name: Upload Unit Test Results
@@ -198,13 +198,13 @@ jobs:
 
       - name: Run Stream Tests
         run: |
-          chmod +x ./util/test/run-tests.sh
-          ./util/test/run-tests.sh stream --skip-quality
+          chmod +x ./util/test-run.sh
+          ./util/test-run.sh stream --skip-quality
 
       - name: Run Adaptation Tests
         run: |
-          chmod +x ./util/test/run-tests.sh
-          ./util/test/run-tests.sh adaptation --skip-quality
+          chmod +x ./util/test-run.sh
+          ./util/test-run.sh adaptation --skip-quality
 
       - name: Upload Integration Test Results
         if: always()
@@ -233,13 +233,13 @@ jobs:
 
       - name: Run Machine Tests
         run: |
-          chmod +x ./util/test/run-tests.sh
-          ./util/test/run-tests.sh machine --skip-quality
+          chmod +x ./util/test-run.sh
+          ./util/test-run.sh machine --skip-quality
 
       - name: Run Acceptance Tests
         run: |
-          chmod +x ./util/test/run-tests.sh
-          ./util/test/run-tests.sh acceptance --skip-quality
+          chmod +x ./util/test-run.sh
+          ./util/test-run.sh acceptance --skip-quality
 
       - name: Upload BDD Test Results
         if: always()
@@ -278,35 +278,35 @@ jobs:
 
       - name: Run Spotless check
         run: |
-          chmod +x ./util/quality/build-checks.sh || true
-          if [ -x ./util/quality/build-checks.sh ]; then
-            ./util/quality/build-checks.sh --only=spotless || true
+          chmod +x ./util/scripts/check-build-quality.sh || true
+          if [ -x ./util/scripts/check-build-quality.sh ]; then
+            ./util/scripts/check-build-quality.sh --only=spotless || true
           else
             mvn -B spotless:check || true
           fi
 
       - name: Run Checkstyle
         run: |
-          if [ -x ./util/quality/build-checks.sh ]; then
-            ./util/quality/build-checks.sh --only=checkstyle || true
+          if [ -x ./util/scripts/check-build-quality.sh ]; then
+            ./util/scripts/check-build-quality.sh --only=checkstyle || true
           else
             mvn -B checkstyle:check || true
           fi
 
       - name: Run SpotBugs
         run: |
-          if [ -x ./util/quality/build-checks.sh ]; then
-            ./util/quality/build-checks.sh --only=spotbugs || true
+          if [ -x ./util/scripts/check-build-quality.sh ]; then
+            ./util/scripts/check-build-quality.sh --only=spotbugs || true
           else
             mvn -B spotbugs:check || true
           fi
 
       - name: Generate JaCoCo report
         run: |
-          if [ -x ./util/quality/build-checks.sh ]; then
-            ./util/quality/build-checks.sh --only=jacoco || true
+          if [ -x ./util/scripts/enable-coverage.sh ]; then
+            ./util/scripts/enable-coverage.sh --atl --custom='-Djacoco.skip=false -Dmaven.test.skip=true' || true
           else
-            mvn -B jacoco:report || true
+            mvn -B jacoco:report -Djacoco.skip=false || true
           fi
 
       - name: Download all test results
@@ -359,8 +359,8 @@ jobs:
 
       - name: Run BTL tests
         run: |
-          chmod +x ./util/test/run-tests.sh
-          ./util/test/run-tests.sh btl --skip-quality
+          chmod +x ./util/test-run.sh
+          ./util/test-run.sh btl --skip-quality
 
       - name: Upload BTL test results
         if: always()
@@ -428,10 +428,10 @@ jobs:
       - name: Generate Build Report
         run: |
           # Ensure script is executable
-          chmod +x ./util/build/generate-build-report.sh
+          chmod +x ./util/build-report.sh
           
           # Skip tests and quality checks for faster execution
-          ./util/build/generate-build-report.sh --skip-tests --skip-quality
+          ./util/build-report.sh --skip-tests --skip-quality
           
           # Show where report is generated
           echo "Report generated at: $(pwd)/target/samstraumr-report"
