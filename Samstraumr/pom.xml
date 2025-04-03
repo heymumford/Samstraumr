@@ -6,7 +6,7 @@
 
   <groupId>org.samstraumr</groupId>
   <artifactId>samstraumr-modules</artifactId>
-  <version>1.2.6</version>
+  <version>1.2.7</version>
   <name>Samstraumr Modules</name>
   <packaging>pom</packaging>
 
@@ -16,7 +16,7 @@
 
   <properties>
     <version.file.path>${project.basedir}/version.properties</version.file.path>
-    <samstraumr.version>1.2.6</samstraumr.version>
+    <samstraumr.version>1.2.7</samstraumr.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>

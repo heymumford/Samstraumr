@@ -6,7 +6,7 @@
 
   <groupId>org.samstraumr</groupId>
   <artifactId>samstraumr</artifactId>
-  <version>1.2.6</version>
+  <version>1.2.7</version>
   <name>Samstraumr</name>
   <packaging>pom</packaging>
   <description>
@@ -22,7 +22,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
-    <samstraumr.version>1.2.6</samstraumr.version>
+    <samstraumr.version>1.2.7</samstraumr.version>
     <version.file.path>${project.basedir}/Samstraumr/version.properties</version.file.path>
     <all.test.tags>@ATL or @BTL</all.test.tags>
     <atl.test.tags>@ATL</atl.test.tags>
