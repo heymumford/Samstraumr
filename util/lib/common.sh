@@ -854,6 +854,267 @@ function get_available_memory() {
 }
 
 #------------------------------------------------------------------------------
+# Build and Test Functions
+#------------------------------------------------------------------------------
+# Functions for building and testing projects consistently across scripts
+#
+# USAGE EXAMPLES:
+#   maven_cmd=$(build_maven_command "test" "atl-tests" true false)
+#   run_test_with_status "Unit Tests" "$maven_cmd"
+#   parse_args config "$@"
+#------------------------------------------------------------------------------
+
+# Standardized argument parsing using associative arrays
+# Usage: parse_args config_array "$@"
+# The config_array should be a pre-initialized associative array with defaults
+# Example:
+#   declare -A config=([verbose]=false [clean]=false [profile]="")
+#   parse_args config "$@"
+function parse_args() {
+  local -n args_ref=$1  # Reference to an associative array
+  shift
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h|--help)
+        args_ref[help]=true
+        shift
+        ;;
+      -v|--verbose)
+        args_ref[verbose]=true
+        shift
+        ;;
+      -c|--clean)
+        args_ref[clean]=true
+        shift
+        ;;
+      -p|--profile)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          args_ref[profile]="$2"
+          shift 2
+        else
+          print_error "Error: --profile requires an argument"
+          args_ref[help]=true
+          return 1
+        fi
+        ;;
+      --skip-quality)
+        args_ref[skip_quality]=true
+        shift
+        ;;
+      --cyclename)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          args_ref[cyclename]="$2"
+          shift 2
+        else
+          print_error "Error: --cyclename requires an argument"
+          args_ref[help]=true
+          return 1
+        fi
+        ;;
+      -o|--output)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          args_ref[output]="$2"
+          shift 2
+        else
+          print_error "Error: --output requires an argument"
+          args_ref[help]=true
+          return 1
+        fi
+        ;;
+      --)
+        # Stop processing options after --
+        shift
+        args_ref[positional]="${args_ref[positional]} $*"
+        break
+        ;;
+      -*)
+        print_error "Unknown option: $1"
+        args_ref[help]=true
+        return 1
+        ;;
+      *)
+        # Positional arguments
+        args_ref[positional]="${args_ref[positional]} $1"
+        shift
+        ;;
+    esac
+  done
+  
+  # Trim leading space from positional args
+  args_ref[positional]="${args_ref[positional]# }"
+  
+  return 0
+}
+
+# Build a standardized Maven command with consistent options
+# Usage: cmd=$(build_maven_command "goal" "profile" clean skip_quality)
+# Returns: Properly formatted Maven command string
+function build_maven_command() {
+  local goal="$1"
+  local profile="$2"
+  local clean="${3:-false}"
+  local skip_quality="${4:-false}"
+  
+  local cmd="mvn"
+  
+  # Add clean goal if requested
+  if [[ "$clean" == "true" ]]; then
+    cmd="$cmd clean"
+  fi
+  
+  # Add the main goal
+  cmd="$cmd $goal"
+  
+  # Add profile handling
+  if [[ -n "$profile" ]]; then
+    # Explicitly deactivate the fast profile which skips tests,
+    # and enable the requested profile, with skipTests=false
+    cmd="$cmd -P !fast,$profile -DskipTests=false -Dmaven.test.skip=false"
+  fi
+  
+  # Add skip quality flag if requested
+  if [[ "$skip_quality" == "true" ]]; then
+    cmd="$cmd -P skip-quality-checks"
+  fi
+  
+  echo "$cmd"
+}
+
+# Run a test with status reporting
+# Usage: run_test_with_status "Test name" "maven command" [verbose] [output_file]
+# Returns: 0 on success, non-zero on failure
+function run_test_with_status() {
+  local test_name="$1"
+  local maven_cmd="$2"
+  local verbose="${3:-false}"
+  local output_file="${4:-}"
+  local cyclename="${5:-Tests}"
+  
+  local timestamp
+  timestamp=$(date +"%H:%M:%S")
+  
+  # No run status
+  print_test_status "$cyclename" "$test_name" "no run"
+  
+  # Running status
+  print_test_status "$cyclename" "$test_name" "running"
+  
+  local result=0
+  local output
+  
+  if [[ -n "$output_file" ]]; then
+    # Run with output to file
+    print_debug "Executing: $maven_cmd > $output_file 2>&1"
+    eval "$maven_cmd" > "$output_file" 2>&1 || result=$?
+  else
+    # Run with normal output
+    print_debug "Executing: $maven_cmd"
+    eval "$maven_cmd" || result=$?
+  fi
+  
+  # Final status based on result
+  if [[ $result -eq 0 ]]; then
+    print_test_status "$cyclename" "$test_name" "pass"
+  else
+    print_test_status "$cyclename" "$test_name" "fail"
+  fi
+  
+  return $result
+}
+
+# Print test status with consistent formatting
+# Usage: print_test_status "cycle_name" "test_name" "status"
+# Status can be: no run, running, pass, fail, skip
+function print_test_status() {
+  local cycle_name="$1"
+  local test_name="$2"
+  local status="$3"
+  local timestamp
+  timestamp=$(date +"%H:%M:%S")
+  
+  case "$status" in
+    "no run")
+      local status_color=""
+      local status_text="no run"
+      if [[ "$USE_COLOR" == "true" ]]; then
+        status_color="${COLOR_RESET}"
+        status_text="\033[0;37mno run\033[0m"
+      fi
+      ;;
+    "running")
+      local status_color=""
+      local status_text="running"
+      if [[ "$USE_COLOR" == "true" ]]; then
+        status_color="${COLOR_BLUE}"
+        status_text="\033[0;34mrunning\033[0m"
+      fi
+      ;;
+    "pass")
+      local status_color=""
+      local status_text="pass"
+      if [[ "$USE_COLOR" == "true" ]]; then
+        status_color="${COLOR_GREEN}"
+        status_text="\033[0;32mpass\033[0m"
+      fi
+      ;;
+    "fail")
+      local status_color=""
+      local status_text="fail"
+      if [[ "$USE_COLOR" == "true" ]]; then
+        status_color="${COLOR_RED}"
+        status_text="\033[0;31mfail\033[0m"
+      fi
+      ;;
+    "skip")
+      local status_color=""
+      local status_text="skip"
+      if [[ "$USE_COLOR" == "true" ]]; then
+        status_color="${COLOR_YELLOW}"
+        status_text="\033[0;33mskip\033[0m"
+      fi
+      ;;
+    *)
+      local status_color=""
+      local status_text="$status"
+      ;;
+  esac
+  
+  if [[ "$USE_COLOR" == "true" ]]; then
+    echo -e "[$timestamp] ${COLOR_CYAN}${cycle_name}${COLOR_RESET} - ${COLOR_BOLD}$test_name${COLOR_RESET}: $status_text"
+  else
+    echo "[$timestamp] $cycle_name - $test_name: $status"
+  fi
+}
+
+# Standard script initialization
+# Usage: initialize_script [script_name]
+# Returns: 0 on success
+function initialize_script() {
+  local script_name="${1:-Script}"
+  
+  # Set strict mode
+  set -e
+  
+  # Determine paths
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"  # Adjust as needed
+  
+  # Source configuration
+  if [[ -f "${PROJECT_ROOT}/.samstraumr.config" ]]; then
+    source "${PROJECT_ROOT}/.samstraumr.config"
+  else
+    echo "Warning: Configuration file not found: ${PROJECT_ROOT}/.samstraumr.config"
+  fi
+  
+  # Set default options
+  VERBOSE=false
+  
+  print_debug "$script_name initialized"
+  return 0
+}
+
+#------------------------------------------------------------------------------
 # Git Functions
 #------------------------------------------------------------------------------
 # Functions for interacting with Git repositories
@@ -1001,6 +1262,13 @@ export -f is_mac
 export -f get_cpu_count
 export -f command_exists
 export -f get_available_memory
+
+# Build and Test Functions
+export -f parse_args
+export -f build_maven_command
+export -f run_test_with_status
+export -f print_test_status
+export -f initialize_script
 
 # Git Functions
 export -f get_git_branch

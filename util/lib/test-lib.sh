@@ -159,51 +159,115 @@ function get_cucumber_tag_expression() {
 # Test Execution Functions
 #------------------------------------------------------------------------------
 
+# Unified test execution function for all test types
+# This replaces the need for separate functions for different test types
+# Usage: run_test test_type [options]
+# Options can be passed via associative array: declare -A options=([clean]=true [verbose]=true)
+function run_test() {
+  local test_type="$1"
+  local -n options_ref="${2:-}"
+  
+  # Set default options if not provided
+  local clean="${options_ref[clean]:-false}"
+  local verbose="${options_ref[verbose]:-false}"
+  local profile="${options_ref[profile]:-}"
+  local output_file="${options_ref[output]:-}"
+  local skip_quality="${options_ref[skip_quality]:-false}"
+  local cyclename="${options_ref[cyclename]:-Tests}"
+  local include_equivalent="${options_ref[both]:-false}"
+  
+  # Map test type to profile if not explicitly provided
+  if [[ -z "$profile" ]]; then
+    profile=$(get_test_profile "$test_type")
+  fi
+  
+  # Get tag expression if needed for Cucumber
+  local tag_expression=""
+  if [[ "$include_equivalent" = "true" ]]; then
+    local equivalent_type=$(map_test_type "$test_type")
+    tag_expression=$(get_cucumber_tag_expression "$test_type" "true")
+  else
+    tag_expression=$(get_cucumber_tag_expression "$test_type" "false")
+  fi
+  
+  # Build Maven command using standardized function
+  local maven_cmd
+  maven_cmd=$(build_maven_command "test" "$profile" "$clean" "$skip_quality")
+  
+  # Add Cucumber tag expression if present
+  if [[ -n "$tag_expression" ]]; then
+    maven_cmd="$maven_cmd $tag_expression"
+  fi
+  
+  # Set test name based on type
+  local test_name
+  if [[ -n "$(map_test_type "$test_type")" && "$(map_test_type "$test_type")" != "unknown" ]]; then
+    # Use pretty names for known test types
+    test_name="$(capitalize_first "$test_type") Tests"
+  else
+    # Use as-is for special test types
+    test_name="$test_type"
+  fi
+  
+  # Add working directory
+  maven_cmd="cd ${SAMSTRAUMR_CORE_MODULE} && $maven_cmd"
+  
+  # Run the test with status reporting
+  run_test_with_status "$test_name" "$maven_cmd" "$verbose" "$output_file" "$cyclename"
+  local result=$?
+  
+  # Return result
+  return $result
+}
+
+# Run Cucumber tests specifically
 function run_cucumber_tests() {
   local test_type="$1"
   local profile="$2"
   local tag_expression="$3"
   local output_file="$4"
   
-  # Construct Maven command
-  local maven_cmd="mvn test -f \"${SAMSTRAUMR_CORE_MODULE}/pom.xml\" -P \"$profile\" ${SAMSTRAUMR_RUN_TESTS}"
+  # Create options associative array
+  declare -A options
+  options[profile]="$profile"
+  options[output]="$output_file"
   
-  # Add tag expression if provided
-  if [ -n "$tag_expression" ]; then
-    maven_cmd="$maven_cmd $tag_expression"
-  fi
-  
-  # Print command
-  print_info "Running command: $maven_cmd"
-  
-  # Execute command with or without output file
-  if [ -n "$output_file" ]; then
-    eval "$maven_cmd" | tee "$output_file"
-    return ${PIPESTATUS[0]}
-  else
-    eval "$maven_cmd"
-    return $?
-  fi
+  # Use the unified run_test function
+  run_test "$test_type" options
+  return $?
 }
 
+# Run Adam tube tests specifically
 function run_adam_tube_tests() {
   local profile="$1"
   local output_file="$2"
   
-  print_section "Running Adam Tube Tests"
-  print_info "Using profile: $profile"
+  # Create options associative array
+  declare -A options
+  options[profile]="$profile"
+  options[output]="$output_file"
+  options[cyclename]="Adam Tube Tests"
   
-  # Construct Maven command
-  local maven_cmd="mvn test -f \"${SAMSTRAUMR_CORE_MODULE}/pom.xml\" -P \"$profile\" ${SAMSTRAUMR_RUN_TESTS}"
-  
-  # Execute command with or without output file
-  if [ -n "$output_file" ]; then
-    eval "$maven_cmd" | tee "$output_file"
-    return ${PIPESTATUS[0]}
-  else
-    eval "$maven_cmd"
-    return $?
+  # Use the unified run_test function
+  run_test "adam" options
+  return $?
+}
+
+# Helper function to capitalize first letter of a string
+function capitalize_first() {
+  local input="$1"
+  if [[ -z "$input" ]]; then
+    echo ""
+    return
   fi
+  
+  local first_char
+  local rest
+  
+  first_char=$(echo "${input:0:1}" | tr '[:lower:]' '[:upper:]')
+  rest="${input:1}"
+  
+  echo "${first_char}${rest}"
 }
 
 #------------------------------------------------------------------------------
@@ -254,8 +318,10 @@ function show_test_types_help() {
 export -f map_test_type
 export -f get_test_profile
 export -f get_cucumber_tag_expression
+export -f run_test
 export -f run_cucumber_tests
 export -f run_adam_tube_tests
+export -f capitalize_first
 export -f print_test_summary
 export -f show_test_types_help
 

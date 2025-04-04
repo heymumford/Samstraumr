@@ -24,6 +24,7 @@ Where `<command>` can be one of:
 - `report` - Generate change management reports
 - `docs` - Generate documentation using Docmosis
 - `test-docmosis` - Run a smoke test for Docmosis integration
+- `install` - Initialize or update project configuration
 
 For help on any command:
 ```bash
@@ -114,9 +115,9 @@ Examples:
 
 ### Test Runner Commands
 
-- Unified CLI (recommended): `./s8r test <test-type>`
-- Alternative CLI: `./util/samstraumr test <test-type>`
-- Direct script: `./util/bin/test/run-tests.sh <test-type>`
+- Unified CLI (recommended): `./s8r test <test-type> [options]`
+- Alternative CLI: `./util/samstraumr test <test-type> [options]`
+- Direct script: `./util/bin/test/unified-test-runner.sh <test-type> [options]`
 
 Test types:
 - Industry Standard:
@@ -145,16 +146,20 @@ Test types:
 
 Options:
 - `-b, --both`: Include equivalent tags (e.g., run both unit and tube tests)
+- `-c, --clean`: Clean before running tests
 - `-o, --output <file>`: Write test output to file
 - `-p, --profile <profile>`: Use specific Maven profile
+- `-v, --verbose`: Show verbose output with detailed status
 - `--skip-quality`: Skip quality checks
+- `--cyclename <name>`: Specify a name for the test cycle (for reporting)
 
 Examples:
 ```bash
 ./s8r test unit                # Run unit tests
 ./s8r test --both unit         # Run unit and tube tests
-# Note: BTL tests disabled in v1.3.1
-# ./s8r test -p btl-tests flow   # Run flow tests with BTL profile (DISABLED)
+./s8r test -c tube             # Clean and run tube tests
+./s8r test -v adam             # Run Adam tube tests with verbose output
+./s8r test -v --cyclename "Integration Tests" flow  # Run flow tests with custom cycle name
 ./s8r test atl                 # Run critical tests
 ```
 
