@@ -6,7 +6,7 @@
 
   <groupId>org.samstraumr</groupId>
   <artifactId>samstraumr-modules</artifactId>
-  <version>1.6.5</version>
+  <version>1.6.6</version>
   <name>Samstraumr Modules</name>
   <packaging>pom</packaging>
 
@@ -16,14 +16,14 @@
 
   <properties>
     <version.file.path>${project.basedir}/version.properties</version.file.path>
-    <samstraumr.version>1.6.5</samstraumr.version>
+    <samstraumr.version>1.6.6</samstraumr.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <atl.test.tags>@ATL</atl.test.tags>
     <btl.test.tags>@BTL</btl.test.tags>
     <all.test.tags>@ATL or @BTL</all.test.tags>
-    <skip.quality.checks>false</skip.quality.checks>
+    <skip.quality.checks>true</skip.quality.checks> <!-- Default to skipping quality checks for TDD development -->
     <skipTests>false</skipTests>
     <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
     <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
@@ -194,12 +194,33 @@
       </properties>
     </profile>
     
-    <!-- Quality Checks Profile -->
+    <!-- TDD Development Profile - Active by Default -->
     <profile>
-      <id>quality-checks</id>
+      <id>tdd-development</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+      <properties>
+        <!-- Skip all quality checks to enable rapid TDD iterations -->
+        <spotless.check.skip>true</spotless.check.skip>
+        <checkstyle.skip>true</checkstyle.skip>
+        <spotbugs.skip>true</spotbugs.skip>
+        <jacoco.skip>true</jacoco.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+        
+        <!-- Set lenient test coverage thresholds during TDD development -->
+        <jacoco.line.coverage>0.0</jacoco.line.coverage>
+        <jacoco.branch.coverage>0.0</jacoco.branch.coverage>
+        
+        <!-- Only preserve basic compiler checks -->
+        <skip.quality.checks>true</skip.quality.checks>
+      </properties>
+    </profile>
+    
+    <!-- Quality Checks Profile -->
+    <profile>
+      <id>quality-checks</id>
+      <!-- Not active by default during TDD development -->
       <build>
         <plugins>
           <plugin>

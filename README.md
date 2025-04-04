@@ -4,7 +4,9 @@ Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford
 
 # Samstraumr: Adaptive Resilient Software Framework
 
-[![Version](https://img.shields.io/badge/version-1.6.3-blue)](https://github.com/heymumford/Samstraumr/releases) [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/) [![Maven](https://img.shields.io/badge/Maven-3.6%2B-purple)](https://maven.apache.org/)
+[![Version](https://img.shields.io/badge/version-1.6.6-blue)](https://github.com/heymumford/Samstraumr/releases) [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/) [![Maven](https://img.shields.io/badge/Maven-3.6%2B-purple)](https://maven.apache.org/)
+
+> **⚠️ CURRENT DEVELOPMENT STATUS:** This project is currently in active TDD-based development. The CI pipeline has been simplified to focus on basic compilation and structure validation. Full test suites and quality checks are temporarily disabled to enable rapid iteration during this phase.
 
 Samstraumr (S8r) is an enterprise Java framework for building resilient, self-healing software systems with adaptive components and event-driven architecture. Inspired by natural systems' resilience, it enables applications that autonomously monitor, adapt, and recover from disruptions.
 
@@ -99,27 +101,28 @@ Samstraumr implements a cohesive set of architectural concepts:
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/heymumford/Samstraumr.git
    cd Samstraumr
    ```
-
 2. Build the project:
+
    ```bash
    ./s8r build
    ```
-
 3. Run tests:
+
    ```bash
    ./s8r test all
    ```
-
 4. Maven dependency (for using in your projects):
+
    ```xml
    <dependency>
        <groupId>org.samstraumr</groupId>
        <artifactId>samstraumr-core</artifactId>
-       <version>1.6.3</version>
+       <version>1.6.6</version>
    </dependency>
    ```
 
@@ -178,6 +181,7 @@ ValidationResult result = (ValidationResult) validator.process("user@example.com
 
 ### Development
 
+- [TDD Development Guide](./docs/dev/tdd-development.md) ← Current development approach
 - [Testing Strategy](./docs/dev/test-strategy.md)
 - [BDD with Cucumber](./docs/dev/test-bdd-cucumber.md)
 - [Test Annotations](./docs/dev/test-annotations.md)
@@ -252,6 +256,7 @@ Samstraumr is licensed under the Mozilla Public License 2.0. See [LICENSE](./LIC
 - **LinkedIn:** [linkedin.com/in/eric-mumford](https://www.linkedin.com/in/eric-mumford/)
 
 [//]: # (SEO metadata)
+
 [//]: # (Description: Samstraumr (S8r): Enterprise-grade framework for resilient, self-healing software systems with adaptive components and event-driven architecture)
 [//]: # (Keywords: resilient systems, adaptive software, event-driven architecture, enterprise framework, self-healing systems, java framework, component-based architecture, systems theory, clean architecture)
 [//]: # (Author: Eric C. Mumford)

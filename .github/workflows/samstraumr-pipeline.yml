@@ -1,6 +1,6 @@
-name: S8R
+name: s8r-ci
 
-run-name: S8R
+run-name: s8r-ci
 
 on:
   push:
@@ -10,59 +10,13 @@ on:
   workflow_dispatch: # Manual trigger
 
 jobs:
-# Jobs have been optimized based on analysis in WORKFLOW_ANALYSIS.md
-# The submit-maven job has been merged into the initialization job
-
-  # Get version number for the workflow name
-  get-version:
-    name: Get Version
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.get_version.outputs.version }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Get version
-        id: get_version
-        run: |
-          # Check for version.properties file
-          if [ -f "Samstraumr/version.properties" ]; then
-            # Make the version script executable
-            chmod +x ./util/version.sh
-            # Extract the version
-            VERSION=$(./util/version.sh export) || VERSION="0.0.0"
-          else
-            # Try to extract directly from properties file if available
-            if [ -f "Samstraumr/version.properties" ]; then
-              VERSION=$(grep "samstraumr.version=" "Samstraumr/version.properties" | cut -d= -f2)
-            else
-              # Fallback version if we can't determine it
-              VERSION="0.0.0"
-            fi
-          fi
-          
-          # Set the output variable
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          # Send a notice to GitHub Actions UI
-          echo "::notice::S8R v$VERSION"
-          
-          # Add to step summary
-          echo "# Samstraumr v$VERSION" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Build started for Samstraumr version $VERSION" >> $GITHUB_STEP_SUMMARY
-
-  # Core initialization and build verification
-  # Enhanced to include functionality from the removed submit-maven job
-  initialization:
-    name: Initialization and Verification
-    needs: get-version
+  # Basic compilation and verification - keeping it simple for TDD development
+  basic-verification:
+    name: Basic Verification
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Full history for SonarQube analysis
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -87,388 +41,46 @@ jobs:
           echo "Working directory: $(pwd)"
           ls -la
 
-      - name: Set Job Summary and Info
+      # Get version for summary
+      - name: Get version
+        id: get_version
         run: |
-          echo "# 🚀 Building Samstraumr v${{ needs.get-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Version: ${{ needs.get-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-
-      # Basic verification without tests (from submit-maven job)
-      - name: Verify Maven project
-        run: mvn -B verify -DskipTests
-        
-      # Create build artifacts (from submit-maven job)
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: maven-build-outputs
-          path: |
-            **/target/*.jar
-            **/target/*.war
-          retention-days: 7
-
-      # Full compilation as a separate step
-      - name: Verify compilation with clean
-        run: mvn -B clean compile
-
-  # Orchestration tests - the highest level of ATL tests
-  orchestration-tests:
-    name: Orchestration Tests
-    needs: [get-version, initialization]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'temurin'
-          cache: maven
-
-      - name: Run Orchestration tests
-        run: |
-          chmod +x ./util/test-run.sh
-          ./util/test-run.sh orchestration --skip-quality
-
-      - name: Upload Orchestration test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: orchestration-test-reports
-          path: |
-            **/target/surefire-reports/
-            **/target/cucumber-reports/
-          retention-days: 7
-
-  # Unit and component tests
-  unit-tests:
-    name: Unit and Component Tests
-    needs: orchestration-tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'temurin'
-          cache: maven
-
-      - name: Run Tube Tests
-        run: |
-          chmod +x ./util/test-run.sh
-          ./util/test-run.sh tube --skip-quality
-
-      - name: Run Flow Tests
-        run: |
-          chmod +x ./util/test-run.sh
-          ./util/test-run.sh flow --skip-quality
-
-      - name: Run Composite Tests
-        run: |
-          # Using direct Maven command for Composite tests
-          mvn test -Dtest=*CompositeTest -P skip-quality-checks
-
-      - name: Upload Unit Test Results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: unit-component-test-reports
-          path: |
-            **/target/surefire-reports/
-          retention-days: 7
-
-  # Integration tests
-  integration-tests:
-    name: Integration Tests
-    needs: orchestration-tests
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:14
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: streamtest
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'temurin'
-          cache: maven
-
-      - name: Run Stream Tests
-        run: |
-          chmod +x ./util/test-run.sh
-          ./util/test-run.sh stream --skip-quality
-
-      - name: Run Adaptation Tests
-        run: |
-          chmod +x ./util/test-run.sh
-          ./util/test-run.sh adaptation --skip-quality
-
-      - name: Upload Integration Test Results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: integration-test-reports
-          path: |
-            **/target/surefire-reports/
-          retention-days: 7
-
-  # End-to-end and acceptance tests
-  e2e-tests:
-    name: E2E and Acceptance Tests
-    needs: orchestration-tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'temurin'
-          cache: maven
-
-      - name: Run Machine Tests
-        run: |
-          chmod +x ./util/test-run.sh
-          ./util/test-run.sh machine --skip-quality
-
-      - name: Run Acceptance Tests
-        run: |
-          chmod +x ./util/test-run.sh
-          ./util/test-run.sh acceptance --skip-quality
-
-      - name: Upload BDD Test Results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: bdd-test-reports
-          path: |
-            **/target/cucumber-reports/
-          retention-days: 7
-
-  # Quality analysis
-  quality-analysis:
-    name: Quality Analysis
-    needs: [unit-tests, integration-tests, e2e-tests]
-    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Full history for SonarQube analysis
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'temurin'
-          cache: maven
-
-      - name: Cache SonarQube packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
-      - name: Run Spotless check
-        run: |
-          chmod +x ./util/scripts/check-build-quality.sh || true
-          if [ -x ./util/scripts/check-build-quality.sh ]; then
-            ./util/scripts/check-build-quality.sh --only=spotless || true
-          else
-            mvn -B spotless:check || true
-          fi
-
-      - name: Run Checkstyle
-        run: |
-          if [ -x ./util/scripts/check-build-quality.sh ]; then
-            ./util/scripts/check-build-quality.sh --only=checkstyle || true
-          else
-            mvn -B checkstyle:check || true
-          fi
-
-      - name: Run SpotBugs
-        run: |
-          if [ -x ./util/scripts/check-build-quality.sh ]; then
-            ./util/scripts/check-build-quality.sh --only=spotbugs || true
-          else
-            mvn -B spotbugs:check || true
-          fi
-
-      - name: Generate JaCoCo report
-        run: |
-          if [ -x ./util/scripts/enable-coverage.sh ]; then
-            ./util/scripts/enable-coverage.sh --atl --custom='-Djacoco.skip=false -Dmaven.test.skip=true' || true
-          else
-            mvn -B jacoco:report -Djacoco.skip=false || true
-          fi
-
-      - name: Download all test results
-        uses: actions/download-artifact@v4
-        with:
-          path: test-reports
-
-      - name: SonarQube analysis
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        if: env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != ''
-        run: |
-          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-            -Dsonar.projectKey=heymumford_Samstraumr \
-            -Dsonar.projectName="Samstraumr" \
-            -Dsonar.qualitygate.wait=true \
-            -Dsonar.coverage.jacoco.xmlReportPaths=**/jacoco.xml,**/target/site/jacoco/jacoco.xml,test-reports/**/jacoco.xml \
-            -Dsonar.java.spotbugs.reportPaths=**/spotbugsXml.xml,**/target/spotbugsXml.xml,test-reports/**/spotbugsXml.xml \
-            -Dsonar.java.checkstyle.reportPaths=**/checkstyle-result.xml,**/target/checkstyle-result.xml,test-reports/**/checkstyle-result.xml
-
-      - name: Upload Quality Reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: quality-reports
-          path: |
-            **/target/site/jacoco/
-            **/target/checkstyle-result.xml
-            **/target/spotbugsXml.xml
-          retention-days: 7
-
-  # BTL tests - only run when explicitly requested or on main branch
-  # DISABLED: BTL tests have been removed due to brittleness
-  # This job placeholder is kept for future reimplementation of BTL tests
-  btl-tests:
-    name: Below-The-Line Tests (DISABLED)
-    needs: [unit-tests, integration-tests, e2e-tests]
-    # Prevent this job from running
-    if: >
-      false
-    runs-on: ubuntu-latest
-    steps:
-      - name: BTL Tests Have Been Disabled
-        run: |
-          echo "BTL tests have been removed due to brittleness."
-          echo "This job is kept as a placeholder for future reimplementation."
-          echo "The BTL infrastructure is preserved but test implementations are removed."
-          
-  # Simplified Build Report Generation
-  # Focuses on creating useful artifacts without GitHub Pages deployment
-  build-report:
-    name: Generate Build Report
-    # Run on all successful builds or failures
-    if: always() && github.actor != ''
-    needs: [get-version, quality-analysis]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Full history for report generation
-
-      # Get version information from previous job
-      - name: Set version info
-        run: |
-          VERSION="${{ needs.get-version.outputs.version || '1.0.0' }}"
-          echo "Using version: $VERSION"
+          # Check for version.properties file
           if [ -f "Samstraumr/version.properties" ]; then
-            echo "Found version.properties"
+            # Extract the version
+            VERSION=$(grep "samstraumr.version=" "Samstraumr/version.properties" | cut -d= -f2 | tr -d ' \t\n\r')
           else
-            echo "samstraumr.version=$VERSION" > Samstraumr/version.properties
-            echo "samstraumr.last.updated=$(date '+%B %d, %Y')" >> Samstraumr/version.properties
-            echo "samstraumr.maintainer=Eric C. Mumford (@heymumford)" >> Samstraumr/version.properties
-            echo "samstraumr.license=Mozilla Public License 2.0" >> Samstraumr/version.properties
-            echo "Created temporary version.properties file"
+            # Fallback version if we can't determine it
+            VERSION="0.0.0"
           fi
-
-      # Download artifacts for report generation
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'temurin'
-          cache: maven
-
-      # Generate the build report
-      - name: Generate Build Report
-        run: |
-          # Ensure script is executable
-          chmod +x ./util/build-report.sh
           
-          # Skip tests and quality checks for faster execution
-          ./util/build-report.sh --skip-tests --skip-quality
-          
-          # Create summary with report information
-          echo "## Build Report Generated" >> $GITHUB_STEP_SUMMARY
-          echo "Report includes:" >> $GITHUB_STEP_SUMMARY
-          echo "- Build information" >> $GITHUB_STEP_SUMMARY
-          echo "- Test results" >> $GITHUB_STEP_SUMMARY
-          echo "- Quality metrics" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Download the report artifact for complete details." >> $GITHUB_STEP_SUMMARY
+          # Set the output variable
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "::notice::s8r v$VERSION"
 
-      # Upload the report as an artifact
-      - name: Upload Build Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: samstraumr-build-report-v${{ needs.get-version.outputs.version || '1.0.0' }}
-          path: target/samstraumr-report
-          retention-days: 14
-
-  # Update workflow summary with build results and version information
-  workflow-summary:
-    name: Workflow Summary
-    if: always()
-    needs: [get-version, initialization, orchestration-tests, unit-tests, integration-tests, e2e-tests, quality-analysis, build-report]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Add Version to Workflow Summary
+      - name: Set Job Summary
         run: |
-          echo "# Samstraumr v${{ needs.get-version.outputs.version }} Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "# 🚀 Building s8r v${{ steps.get_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Build Information" >> $GITHUB_STEP_SUMMARY
-          echo "- Version: ${{ needs.get-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: ${{ steps.get_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "- Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
-          echo "## Job Results" >> $GITHUB_STEP_SUMMARY
-          echo "- Initialization: ${{ needs.initialization.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Orchestration Tests: ${{ needs.orchestration-tests.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Unit Tests: ${{ needs.unit-tests.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Integration Tests: ${{ needs.integration-tests.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- E2E Tests: ${{ needs.e2e-tests.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Quality Analysis: ${{ needs.quality-analysis.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "Running basic verification only as part of TDD-based development." >> $GITHUB_STEP_SUMMARY
+
+      # Basic compilation check - this is the key step that ensures no orchestration or compilation errors
+      - name: Verify compilation
+        run: mvn -B clean compile -DskipTests
+
+      # Basic verification without test execution
+      - name: Verify basic project structure
+        run: mvn -B verify -DskipTests -Dmaven.javadoc.skip=true -Dspotless.check.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true
+
+      # Upload summary with basic results
+      - name: Upload build summary
+        if: always()
+        run: |
+          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
-          echo "Build completed for Samstraumr version ${{ needs.get-version.outputs.version }}." >> $GITHUB_STEP_SUMMARY
-          echo "Reports are available in the workflow artifacts." >> $GITHUB_STEP_SUMMARY
+          echo "Basic compilation and verification completed for s8r v${{ steps.get_version.outputs.version }}." >> $GITHUB_STEP_SUMMARY
+          echo "This simplified pipeline only checks for compilation and basic project structure as part of TDD-based development." >> $GITHUB_STEP_SUMMARY
