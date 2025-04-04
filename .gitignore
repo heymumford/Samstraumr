@@ -1,106 +1,143 @@
-# Maven
-target/
-*.jar
-*.war
-*.ear
-*.class
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
-.flattened-pom.xml
-.repository/
-effective-pom.xml
-effective-settings.xml
-**/maven-status/
-**/maven-archiver/
-**/test-classes/
+#------------------------------------------------------------------------------
+# Samstraumr Project .gitignore
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# Maven & Build Tools
+#------------------------------------------------------------------------------
+# Build directories
+**/generated-resources/
 **/generated-sources/
 **/generated-test-sources/
-**/generated-resources/
+**/maven-archiver/
+**/maven-status/
 **/site/
+**/test-classes/
+.flattened-pom.xml
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+.repository/
+/bin/
+/build/
+/coverage/
+/dist/
+/out/
+buildNumber.properties
+dependency-reduced-pom.xml
+effective-pom.xml
+effective-settings.xml
+pom.xml.next
+pom.xml.releaseBackup
+pom.xml.tag
+pom.xml.versionsBackup
+release.properties
+target/
 
-# Backup files
-*.bak
-*~
-*.swp
-*.tmp
+# Java compiled artifacts
+*.class
+*.ear
+*.jar
+*.war
 
-# IDE files
-.idea/
-*.iml
-*.iws
-*.ipr
-.settings/
-.classpath
-.project
-.vscode/
-*.code-workspace
-*.sublime-workspace
-*.sublime-project
-.metadata/
-.recommenders/
-nbproject/
-nbactions.xml
-nb-configuration.xml
-.factorypath
+# JaCoCo reports
+**/jacoco.exec
+**/*.cov
+
+#------------------------------------------------------------------------------
+# Log Files
+#------------------------------------------------------------------------------
+**/application-*.log
+**/*.log
+**/*.log.*
+logs/
+
+#------------------------------------------------------------------------------
+# IDE & Editor Files
+#------------------------------------------------------------------------------
+# Eclipse
 .apt_generated/
 .apt_generated_test/
 .checkstyle
+.classpath
+.factorypath
+.metadata/
+.project
+.recommenders/
+.settings/
 
-# Build artifacts
-/bin/
-/out/
-/dist/
-/build/
-/coverage/
-logs/
-**/*.log
-**/*.log.*
-**/application-*.log
-**/*.cov
-**/jacoco.exec
+# IntelliJ IDEA
+*.iml
+*.ipr
+*.iws
+.idea/
 
-# OS specific files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-desktop.ini
-$RECYCLE.BIN/
+# NetBeans
+nb-configuration.xml
+nbactions.xml
+nbproject/
 
-# Configuration files with sensitive data
-docmosis.properties
-**/docmosis.properties
-**/*.env
-**/.env*
-**/*.key
-**/*.pem
-**/*.crt
-**/*.jks
-**/*.p12
-**/*.password
-**/*.secret
+# VS Code
+*.code-workspace
+.vscode/
 
-# User config
-# Never track any home directory user config
-~/.s8r/
-*/.s8r/user/
-/home/*/.s8r/
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
 
-# Temporary files and backups
-/temp/
-**/temp/
-**/tmp/
-/backup/
+#------------------------------------------------------------------------------
+# Temporary & Backup Files
+#------------------------------------------------------------------------------
+# Backup files
 **/backup*/
 **/scratch/
+*.bak
+*~
 .history/
+/backup/
+**/temp/
+**/tmp/
+/temp/
+*.swp
+*.tmp
+
+#------------------------------------------------------------------------------
+# OS Specific Files
+#------------------------------------------------------------------------------
+# macOS
+._*
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+
+# Windows
+$RECYCLE.BIN/
+desktop.ini
+ehthumbs.db
+Thumbs.db
+
+#------------------------------------------------------------------------------
+# Configuration & Security Files
+#------------------------------------------------------------------------------
+# Security files
+**/*.crt
+**/*.jks
+**/*.key
+**/*.p12
+**/*.password
+**/*.pem
+**/*.secret
+
+# Environment & configuration
+**/*.env
+**/.env*
+**/docmosis.properties
+docmosis.properties
+
+#------------------------------------------------------------------------------
+# Project Specific
+#------------------------------------------------------------------------------
+# User config directories - containing sensitive data
+*/.s8r/user/
+/home/*/.s8r/
+~/.s8r/
