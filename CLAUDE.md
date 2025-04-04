@@ -233,33 +233,60 @@ Examples:
 
 ## Version Management
 
+Samstraumr's version management system uses a modular architecture with separate components for different types of operations.
+
+### CLI Commands
+
 - Unified CLI (recommended): `./s8r version <command>`
 - Alternative CLI: `./util/samstraumr version <command>`
-- Direct script: `./util/bin/version/version-manager.sh <command>`
+- Modular implementation: `./util/bin/version/version-manager-modular.sh <command>`
+- Original implementation: `./util/bin/version/version-manager.sh <command>`
 
-Version commands:
+### Version Commands
+
+#### View Commands
 - `get`: Show current version information
+- `get -v`: Show detailed version info with tag status
 - `export`: Output only the current version (for scripts)
+- `verify`: Verify that version and tag are in sync
+- `history`: Show version history from git tags
+
+#### Modification Commands
 - `bump <type>`: Bump version (type: major, minor, patch)
 - `set <version>`: Set a specific version (format: x.y.z)
-- `verify`: Verify that version and tag are in sync
 - `fix-tag`: Create a git tag matching the current version
-- `test <type>`: Bump version, run tests, then commit and tag
-- `history`: Show version history
 
-Options:
+#### Workflow Commands
+- `test <type>`: Bump version, run tests, then commit and tag
+
+### Options
 - `--no-commit`: Don't automatically commit version changes
 - `--skip-tests`: Skip running tests (for test command only)
 - `--skip-quality`: Skip quality checks (for test command only)
 - `--push`: Push changes to remote (for test command only)
 
-Examples:
+### Examples
 ```bash
 ./s8r version get              # Show current version
-./s8r version bump patch       # Bump patch version
-./s8r version set 1.2.3        # Set version to 1.2.3
+./s8r version get -v           # Show detailed version info
+./s8r version bump patch       # Bump patch version (bug fixes)
+./s8r version bump minor       # Bump minor version (new features)
+./s8r version bump major       # Bump major version (breaking changes)
+./s8r version set 1.5.0        # Set version to 1.5.0
 ./s8r version test patch       # Bump patch, test, commit, tag
+./s8r version test patch --push # With remote push
 ```
+
+### Version Files
+
+- `Samstraumr/version.properties`: Primary version source of truth
+- Configuration: `.s8r/config/version.conf`
+- Implementation modules:
+  - `util/lib/version-lib.sh`: Core utilities
+  - `util/bin/version/commands/*.sh`: Command modules
+  - `util/bin/version/version-manager-modular.sh`: Command router
+
+For complete documentation, see [Version Management](docs/reference/version-management.md)
 
 ## Documentation Generation
 

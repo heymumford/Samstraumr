@@ -1,8 +1,8 @@
 # Getting Started with Samstraumr
 
-
 ## Table of Contents
 - [Setting Up Your Environment](#setting-up-your-environment)
+- [Using the CLI](#using-the-cli)
 - [Creating Your First Tube](#creating-your-first-tube)
 - [Understanding the Flow](#understanding-the-flow)
 - [Connecting Tubes Together](#connecting-tubes-together)
@@ -28,12 +28,100 @@ Maven dependency:
 <dependency>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-core</artifactId>
-    <version>0.6.1</version>
+    <version>1.4.1</version>
 </dependency>
+```
 
 ### Project Structure
 
 Recommended project organization:
+
+## Using the CLI
+
+Samstraumr includes a unified CLI interface called `s8r` that simplifies common tasks like building, testing, and version management.
+
+### Basic Commands
+
+```bash
+# Build the project (optimized settings)
+./s8r build
+
+# Run tests
+./s8r test all
+
+# Show current version
+./s8r version get
+```
+
+### Building the Project
+
+```bash
+# Fast build (skip quality checks)
+./s8r build fast
+
+# Clean and run tests
+./s8r build -c test
+
+# Full install with all tests
+./s8r build install
+```
+
+### Running Tests
+
+```bash
+# Run specific test types
+./s8r test unit                # Unit tests
+./s8r test integration         # Integration tests
+./s8r test atl                 # Above-The-Line (critical) tests
+
+# Run with specific profile
+./s8r test -p atl-tests flow
+```
+
+### Managing Versions
+
+The CLI includes a complete version management system:
+
+```bash
+# Show current version
+./s8r version get
+
+# Bump version components
+./s8r version bump patch       # Bug fixes (1.2.3 -> 1.2.4)
+./s8r version bump minor       # New features (1.2.3 -> 1.3.0)
+./s8r version bump major       # Breaking changes (1.2.3 -> 2.0.0)
+
+# Set specific version
+./s8r version set 1.5.0
+```
+
+For complete documentation of version management, see [Version Management](../reference/version-management.md).
+
+### Quality Checks
+
+```bash
+# Run all quality checks
+./s8r quality check
+
+# Run specific checks
+./s8r quality spotless         # Code formatting
+./s8r quality checkstyle       # Style checks
+./s8r quality encoding         # File encoding checks
+```
+
+### Getting Help
+
+Every command has built-in help available:
+
+```bash
+# Main help
+./s8r help
+
+# Command-specific help
+./s8r help build
+./s8r help test
+./s8r help version
+```
 
 
 ## Creating Your First Tube
