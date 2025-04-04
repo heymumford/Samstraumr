@@ -222,7 +222,9 @@ dist/
 downloads/
 eggs/
 .eggs/
+# Exclude Python libraries but keep our util/lib
 lib/
+!util/lib/
 lib64/
 parts/
 sdist/
