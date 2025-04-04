@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://heymumford.github.io/Samstraumr/sitemap.xml
+Sitemap: https://heymumford.github.io/Samstraumr/docs/site/xml/sitemap.xml
