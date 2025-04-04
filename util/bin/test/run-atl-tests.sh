@@ -175,6 +175,9 @@ if $VERBOSE; then
       print_test_status "$ATL_GROUP" "running"
       
       $MAVEN_CMD 2>&1 | tee "$OUTPUT_FILE" | while IFS= read -r line; do
+        # Echo the line to show Maven output
+        echo "$line"
+        
         # Look for different test execution markers in the Maven output
         # and update the status display accordingly
         if [[ "$line" == *"Running org.samstraumr.tube."* ]]; then
@@ -204,6 +207,9 @@ if $VERBOSE; then
       print_test_status "$ATL_GROUP" "running"
       
       $MAVEN_CMD 2>&1 | while IFS= read -r line; do
+        # Echo the line to show Maven output
+        echo "$line"
+        
         # Look for different test execution markers in the Maven output
         # and update the status display accordingly
         if [[ "$line" == *"Running org.samstraumr.tube."* ]]; then
