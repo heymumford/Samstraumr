@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Rationale for BDD Cucumber Tests in Samstraumr: A Holistic Approach to Software Quality
 
 > **⚠️ DEPRECATED**: This document has been merged into a comprehensive BDD documentation document.

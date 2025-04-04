@@ -1,0 +1,4 @@
+# Ignore all files in the user directory to prevent committing personal settings
+*
+# Except this .gitignore file
+!.gitignore

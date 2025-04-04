@@ -1,6 +1,10 @@
-# CLAUDE.md
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+# BUILD.md - Samstraumr Build Documentation
+
+This file provides comprehensive build and development documentation for the Samstraumr framework.
 
 ## Unified CLI Command
 
@@ -34,18 +38,18 @@ For help on any command:
 
 ## Configuration and Path Management
 
-Samstraumr uses a centralized configuration approach to manage paths and settings:
+Samstraumr uses a unified configuration system in the `.samstraumr` directory:
 
-- `.samstraumr.config` contains all project paths and key configuration settings
+- Configuration is centralized in `.samstraumr/config.json` with shell script compatibility in `.samstraumr/config.sh`
 - All utility scripts should source this file using:
 
   ```bash
   # At the top of each script
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"  # Adjust path as needed
-  source "${PROJECT_ROOT}/.samstraumr.config"
+  source "${PROJECT_ROOT}/.samstraumr/config.sh"
   ```
-- When refactoring file structures, use `./update-config-paths.sh` to update the configuration
+- When refactoring file structures, run `.samstraumr/update-scripts.sh` to update scripts
 - Use configuration variables like `${SAMSTRAUMR_CORE_MODULE}`, `${SAMSTRAUMR_JAVA_TEST}`, etc. for paths
 - Convert Java package paths to directory paths with `$(path_for_package "${SAMSTRAUMR_TEST_PACKAGE}")`
 
@@ -56,9 +60,11 @@ Scripts are organized in a hierarchical structure:
 ```
 /
 ├── s8r                    # Main entry point script (recommended)
-├── .s8r/                  # Project-specific configuration
-│   ├── config.json        # Project configuration
-│   └── config/            # Additional configuration files
+├── .samstraumr/           # Unified configuration system
+│   ├── config.json        # Primary configuration (JSON)
+│   ├── config.sh          # Shell script compatibility
+│   ├── templates/         # Configuration templates
+│   └── user/              # User-specific settings (gitignored)
 ├── util/
 │   ├── bin/               # Consolidated executable scripts
 │   │   ├── build/         # Build-related scripts
@@ -155,7 +161,7 @@ Options:
 - `-p, --profile <profile>`: Use specific Maven profile
 - `-v, --verbose`: Show verbose output with detailed status
 - `--skip-quality`: Skip quality checks
-- `--cyclename <name>`: Specify a name for the test cycle (for reporting)
+- `--cyclename <n>`: Specify a name for the test cycle (for reporting)
 
 Examples:
 
@@ -340,7 +346,7 @@ After running quality checks, reports are available in:
 - **SpotBugs**: `target/spotbugsXml.xml`
 - **Cucumber BDD**: `target/cucumber-reports/cucumber.html`
 
-For complete details, see [Quality Checks Documentation](/docs/contribution/QualityChecks.md)
+For complete details, see [Quality Checks Documentation](/docs/contribution/quality-checks.md)
 
 ## Version Management
 
@@ -417,7 +423,7 @@ Available commands:
 ### Version Files
 
 - `Samstraumr/version.properties`: Primary version source of truth
-- Configuration: `.s8r/config/version.conf`
+- Configuration: `.samstraumr/config/version.conf`
 - Implementation modules:
   - `util/lib/version-lib.sh`: Core utilities
   - `util/bin/version/commands/*.sh`: Command modules
@@ -443,7 +449,7 @@ Supported formats:
 
 Features:
 - Uses Docmosis document generation engine with license key from configuration
-- License key is stored in `~/.s8r/config.json` or set as `DOCMOSIS_KEY` environment variable
+- License key is stored in `~/.samstraumr/user/config.json` or set as `DOCMOSIS_KEY` environment variable
 - Automatically installs Docmosis JARs if needed
 - Templates are stored in `src/main/resources/templates/`
 - Generated documents include project version and timestamp
@@ -465,7 +471,7 @@ Examples:
   - Dry run a job: `act -j initialization --dryrun`
   - Run a specific job: `sudo act -j get-version`
   - Run with specific event: `sudo act workflow_dispatch -j get-version -W .github/workflows/samstraumr-pipeline.yml`
-  - Complete documentation: See `docs/contribution/ci-cd-guide.md`
+  - Complete documentation: See `docs/contribution/c-i-c-d-guide.md`
 - Badge management:
   - Generate all badges: `./util/bin/utils/generate-badges.sh all`
   - Generate specific badge: `./util/bin/utils/generate-badges.sh build`
@@ -505,7 +511,7 @@ Examples:
   - JaCoCo: Code coverage
 - Version management
   - Central version.properties file in Samstraumr/ directory
-  - Update version with: `./util/samstraumr version bump patch`
+  - Update version with: `./s8r version bump patch`
   - Always use patch version bumping for bugfixes and small improvements
   - Resources filtered to include version information
 
@@ -523,7 +529,7 @@ When writing bash scripts for this project, follow these guidelines:
 
 1. **Structure**:
    - Place scripts in the appropriate subdirectory under `util/bin/`
-   - Use the script template provided in `util/lib/script-template.sh`
+   - Use the script template provided in `.samstraumr/update-script-template.sh`
    - Always make scripts executable with `chmod +x`
 2. **Functional Programming**:
    - Main routine should be a series of function calls
@@ -535,7 +541,7 @@ When writing bash scripts for this project, follow these guidelines:
    - Document complex logic with inline comments
    - Provide help message with `-h` or `--help` flag
 4. **Configuration**:
-   - Source `.samstraumr.config` at the beginning of each script
+   - Source `.samstraumr/config.sh` at the beginning of each script
    - Use configuration variables instead of hardcoded values
    - Don't duplicate configuration that already exists
 5. **Error Handling**:
