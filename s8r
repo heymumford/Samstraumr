@@ -593,13 +593,42 @@ function handle_help_command() {
       show_test_help
       ;;
     version)
-      # Pass version help request to modular manager if available
-      if [ -f "${PROJECT_ROOT}/util/bin/version/version-manager-modular.sh" ]; then
-        # Pass all additional arguments
-        "${PROJECT_ROOT}/util/bin/version/version-manager-modular.sh" help "$@"
-      else
-        show_version_help
+      if [ -n "$1" ] && [ -d "${PROJECT_ROOT}/util/bin/version/commands" ]; then
+        # For version subcommands, direct to appropriate module
+        case "$1" in
+          get|export|verify|history)
+            if [ -f "${PROJECT_ROOT}/util/bin/version/commands/get-commands.sh" ]; then
+              source "${PROJECT_ROOT}/util/bin/version/commands/get-commands.sh"
+              show_help
+              return 0
+            fi
+            ;;
+          set|bump)
+            if [ -f "${PROJECT_ROOT}/util/bin/version/commands/set-commands.sh" ]; then
+              source "${PROJECT_ROOT}/util/bin/version/commands/set-commands.sh"
+              show_help
+              return 0
+            fi
+            ;;
+          fix-tag|push)
+            if [ -f "${PROJECT_ROOT}/util/bin/version/commands/git-commands.sh" ]; then
+              source "${PROJECT_ROOT}/util/bin/version/commands/git-commands.sh"
+              show_help
+              return 0
+            fi
+            ;;
+          test)
+            if [ -f "${PROJECT_ROOT}/util/bin/version/commands/test-commands.sh" ]; then
+              source "${PROJECT_ROOT}/util/bin/version/commands/test-commands.sh"
+              show_help
+              return 0
+            fi
+            ;;
+        esac
       fi
+      
+      # Default to standard version help
+      show_version_help
       ;;
     quality)
       show_quality_help
