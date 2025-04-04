@@ -47,6 +47,7 @@ S8r represents a fundamental shift in software architecture:
 - [BDD with Cucumber](dev/test-bdd-cucumber.md) - Behavior-driven development
 - [Contributing](contribution/contributing.md) - How to contribute to S8r
 - [Code Standards](contribution/code-standards.md) - Coding standards and style
+- [Clean Architecture](architecture/clean-architecture-migration.md) - Clean Architecture migration plan
 
 ## Quick Reference
 
@@ -108,3 +109,4 @@ machine.registerComposite(outputComposite);
 - **Migrating from Samstraumr**: See [Migration Guide](guides/migration/SamstraumrToS8rMigration.md)
 - **Contributing**: Check [Contributing Guide](contribution/contributing.md)
 - **Architecture**: See [Core Concepts](concepts/core-concepts.md)
+- **Clean Architecture**: See [Migration Plan](architecture/clean-architecture-migration.md)
