@@ -104,12 +104,21 @@ function print_header() {
   if [[ "$USE_COLOR" == "true" ]]; then
     echo -e "${COLOR_BLUE}${COLOR_BOLD}${text}${COLOR_RESET}"
     if [[ "$no_underline" != "true" ]]; then
-      echo -e "${COLOR_BLUE}${COLOR_BOLD}$(printf '=%.0s' $(seq 1 ${#text}))${COLOR_RESET}"
+      # Create underline with proper length
+      local underline=""
+      for ((i=0; i<${#text}; i++)); do
+        underline="${underline}="
+      done
+      echo -e "${COLOR_BLUE}${COLOR_BOLD}${underline}${COLOR_RESET}"
     fi
   else
     echo "$text"
     if [[ "$no_underline" != "true" ]]; then
-      echo "$(printf '=%.0s' $(seq 1 ${#text}))"
+      local underline=""
+      for ((i=0; i<${#text}; i++)); do
+        underline="${underline}="
+      done
+      echo "${underline}"
     fi
   fi
 }
@@ -123,12 +132,21 @@ function print_section() {
   if [[ "$USE_COLOR" == "true" ]]; then
     echo -e "${COLOR_CYAN}${COLOR_BOLD}${text}${COLOR_RESET}"
     if [[ "$no_underline" != "true" ]]; then
-      echo -e "${COLOR_CYAN}${COLOR_BOLD}$(printf '-%.0s' $(seq 1 ${#text}))${COLOR_RESET}"
+      # Create dashed underline with proper length
+      local underline=""
+      for ((i=0; i<${#text}; i++)); do
+        underline="${underline}-"
+      done
+      echo -e "${COLOR_CYAN}${COLOR_BOLD}${underline}${COLOR_RESET}"
     fi
   else
     echo "$text"
     if [[ "$no_underline" != "true" ]]; then
-      echo "$(printf '-%.0s' $(seq 1 ${#text}))"
+      local underline=""
+      for ((i=0; i<${#text}; i++)); do
+        underline="${underline}-"
+      done
+      echo "${underline}"
     fi
   fi
 }
