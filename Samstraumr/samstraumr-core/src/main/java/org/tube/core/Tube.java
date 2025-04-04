@@ -1,19 +1,12 @@
 /*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ *
  * Implementation of the Tube concept in the Samstraumr framework
- * 
- * This class implements the core functionality for Tube in the Samstraumr
- * tube-based processing framework. It provides the essential infrastructure for
- * the tube ecosystem to maintain its hierarchical design and data processing capabilities.
- * 
- * Key features:
- * - Implementation of the Tube concept
- * - Integration with the tube substrate model
- * - Support for hierarchical tube organization
  */
 
 package org.tube.core;
 
-// Standard Java imports
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
@@ -24,58 +17,16 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-// Third-party imports
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tube.core.exception.TubeInitializationException;
 
-  /**
-   * Factory method to create a new Tube instance.
-   *
-   * @param reason the reason for creating this tube
-   * @param environment the environment in which this tube operates
-   * @return a new Tube instance
-   * @throws TubeInitializationException if initialization fails
-   */
-  /**
-   * Validates the parameters used to create a tube.
-   *
-   * @param reason the reason for creating the tube
-   * @param environment the environment in which the tube operates
-   * @throws TubeInitializationException if parameters are invalid
-   */
-  /**
-   * Generates a unique SHA-256 ID from the provided parameters.
-   *
-   * @param parameters the parameters to hash
-   * @return a SHA-256 hash of the parameters as a hex string
-   * @throws TubeInitializationException if the hash generation fails
-   */
-  /**
-   * Gets the current status of this tube.
-   *
-   * @return the current TubeStatus
-   */
-  /**
-   * Sets the status of this tube.
-   *
-   * @param newStatus the new status to set
-   */
-  /**
-   * Logs an entry to the Mimir log with timestamp. This internal log allows the tube to maintain
-   * state information and debug data.
-   *
-   * @param logEntry the entry to log
-   */
-  /**
-   * Adds a reason to the tube's lineage.
-   *
-   * @param reason the reason to add to lineage
-   */
-  /**
-   * Updates the tube's awareness of environmental state changes.
-   *
-   * @param newState the new state of the environment
-   */
+/**
+ * Core implementation of the Tube concept in the Samstraumr framework.
+ *
+ * <p>This class provides the essential infrastructure for tubes to maintain their hierarchical
+ * design and data processing capabilities.
+ */
 public class Tube {
   private static final Logger LOGGER = LoggerFactory.getLogger(Tube.class);
   private static final int DEFAULT_TERMINATION_DELAY = 60; // seconds
@@ -153,21 +104,16 @@ public class Tube {
    * @throws TubeInitializationException if parameters are invalid
    */
   private static void validateParameters(String reason, Environment environment) {
-    if (environment == null) {
-      LOGGER.error("Environment cannot be null");
-      throw new TubeInitializationException(
-          "Environment cannot be null", new NullPointerException("Environment cannot be null"));
-    }
-
     if (reason == null || reason.trim().isEmpty()) {
       LOGGER.error("Reason cannot be null or empty");
-      throw new TubeInitializationException(
-          "Reason cannot be null or empty",
-          new IllegalArgumentException("Reason cannot be null or empty"));
+      throw new TubeInitializationException("Reason cannot be null or empty");
+    }
+
+    if (environment == null) {
+      LOGGER.error("Environment cannot be null");
+      throw new TubeInitializationException("Environment cannot be null");
     }
   }
-
-  // initializeTube method has been inlined in the constructor to avoid exceptions
 
   /**
    * Generates a unique SHA-256 ID from the provided parameters.
@@ -179,31 +125,23 @@ public class Tube {
   private static String generateSHA256UniqueId(String parameters) {
     try {
       MessageDigest digest = MessageDigest.getInstance(DIGEST_ALGORITHM);
-      byte[] hash = digest.digest((parameters + Instant.now().toString()).getBytes("UTF-8"));
-      return bytesToHex(hash);
-    } catch (NoSuchAlgorithmException e) {
-      LOGGER.error("Failed to generate unique ID: SHA-256 algorithm not found", e);
-      throw new TubeInitializationException("Failed to generate unique ID", e);
-    } catch (java.io.UnsupportedEncodingException e) {
-      LOGGER.error("UTF-8 encoding not supported", e);
-      throw new TubeInitializationException("UTF-8 encoding not supported", e);
-    }
-  }
+      byte[] encodedhash = digest.digest(parameters.getBytes());
 
-  private static String bytesToHex(byte[] hash) {
-    StringBuilder hexString = new StringBuilder(2 * hash.length);
-    for (byte b : hash) {
-      String hex = Integer.toHexString(0xff & b);
-      if (hex.length() == 1) {
-        hexString.append('0');
+      // Convert byte array to hex string
+      StringBuilder hexString = new StringBuilder();
+      for (byte b : encodedhash) {
+        String hex = Integer.toHexString(0xff & b);
+        if (hex.length() == 1) {
+          hexString.append('0');
+        }
+        hexString.append(hex);
       }
-      hexString.append(hex);
-    }
-    return hexString.toString();
-  }
 
-  public String getUniqueId() {
-    return uniqueId;
+      return hexString.toString();
+    } catch (NoSuchAlgorithmException e) {
+      LOGGER.error("Failed to generate unique ID: {}", e.getMessage());
+      throw new TubeInitializationException("Failed to generate unique ID", e);
+    }
   }
 
   /**
@@ -221,41 +159,74 @@ public class Tube {
    * @param newStatus the new status to set
    */
   public void setStatus(TubeStatus newStatus) {
-    if (newStatus != this.status) {
-      LOGGER.debug("Changing tube status from {} to {}", this.status, newStatus);
-      logToMimir("Status changed from " + this.status + " to " + newStatus);
-      this.status = newStatus;
-    }
+    this.status = newStatus;
+    logToMimir("Status changed to: " + newStatus);
   }
 
+  /**
+   * Sets the termination delay for this tube.
+   *
+   * @param delaySeconds delay in seconds before the tube is automatically terminated
+   * @throws IllegalArgumentException if the delay is not positive
+   * @throws IllegalStateException if the tube is already terminated
+   */
+  public void setTerminationDelay(int delaySeconds) {
+    if (delaySeconds <= 0) {
+      LOGGER.error("Termination delay must be positive: {}", delaySeconds);
+      throw new IllegalArgumentException("Termination delay must be positive");
+    }
+
+    if (status == TubeStatus.TERMINATED) {
+      LOGGER.error("Cannot set termination delay: tube is already terminated");
+      throw new IllegalStateException("Cannot set termination delay: tube is already terminated");
+    }
+
+    synchronized (this) {
+      if (terminationTimer != null) {
+        terminationTimer.cancel();
+      }
+      terminationTimer = new Timer();
+      terminationTimer.schedule(new TerminationTask(), delaySeconds * 1000L);
+    }
+
+    LOGGER.info("Setting termination delay to {} seconds", delaySeconds);
+    logToMimir("Termination delay set to " + delaySeconds + " seconds");
+  }
+
+  /**
+   * Gets the unique ID of this tube.
+   *
+   * @return the unique ID
+   */
+  public String getUniqueId() {
+    return uniqueId;
+  }
+
+  /**
+   * Gets the reason for this tube's creation.
+   *
+   * @return the reason string
+   */
   public String getReason() {
     return reason;
   }
 
+  /**
+   * Gets the lineage (history) of this tube.
+   *
+   * @return an unmodifiable view of the lineage
+   */
   public List<String> getLineage() {
     return Collections.unmodifiableList(lineage);
   }
 
-  public List<String> queryMimirLog() {
-    LOGGER.debug("Querying Mimir log. Current size: {}", mimirLog.size());
-    return Collections.unmodifiableList(mimirLog);
-  }
-
-  public synchronized void setTerminationDelay(int seconds) {
-    LOGGER.info("Setting termination delay to {} seconds", seconds);
-    try {
-      synchronized (this) {
-        if (terminationTimer != null) {
-          terminationTimer.cancel();
-        }
-        terminationTimer = new Timer();
-        terminationTimer.schedule(new TerminationTask(), seconds * 1000L);
-      }
-      logToMimir("Custom termination delay set to " + seconds + " seconds.");
-    } catch (IllegalArgumentException e) {
-      LOGGER.error("Invalid termination delay: {}", seconds, e);
-      throw new IllegalArgumentException("Invalid termination delay", e);
-    }
+  /**
+   * Gets the environment in which this tube operates.
+   *
+   * @return the tube's environment
+   */
+  public Environment getEnvironment() {
+    return environment;
   }
 
   /**
@@ -264,15 +235,28 @@ public class Tube {
    *
    * @param logEntry the entry to log
    */
-  public void logToMimir(String logEntry) {
-    if (logEntry == null || logEntry.isEmpty()) {
-      LOGGER.warn("Attempted to log empty or null entry to Mimir log");
-      return;
-    }
-
+  protected void logToMimir(String logEntry) {
     String timestampedEntry = Instant.now().toString() + ": " + logEntry;
     mimirLog.add(timestampedEntry);
-    LOGGER.trace("Mimir Log: {}", timestampedEntry);
+  }
+
+  /**
+   * Gets the Mimir log entries for this tube.
+   *
+   * @return an unmodifiable view of the Mimir log
+   */
+  public List<String> getMimirLog() {
+    return Collections.unmodifiableList(mimirLog);
+  }
+
+  /**
+   * Gets the current number of entries in the Mimir log.
+   *
+   * @return the number of log entries
+   */
+  public int getMimirLogSize() {
+    LOGGER.debug("Querying Mimir log. Current size: {}", mimirLog.size());
+    return mimirLog.size();
   }
 
   /**
@@ -281,11 +265,29 @@ public class Tube {
    * @param reason the reason to add to lineage
    */
   public void addToLineage(String reason) {
-    LOGGER.debug("Adding to lineage: {}", reason);
-    if (reason != null && !reason.trim().isEmpty()) {
+    if (reason != null && !reason.isEmpty()) {
       lineage.add(reason);
       logToMimir("Added to lineage: " + reason);
     }
+  }
+
+  /** Terminates this tube, canceling any scheduled tasks and releasing resources. */
+  public void terminate() {
+    synchronized (this) {
+      if (status == TubeStatus.TERMINATED) {
+        return;
+      }
+
+      if (terminationTimer != null) {
+        terminationTimer.cancel();
+        terminationTimer = null;
+      }
+
+      status = TubeStatus.TERMINATED;
+    }
+
+    LOGGER.info("Tube terminated: {}", uniqueId);
+    logToMimir("Tube terminated");
   }
 
   /**
@@ -294,50 +296,27 @@ public class Tube {
    * @param newState the new state of the environment
    */
   public void updateEnvironmentState(String newState) {
-    LOGGER.debug("Environment state changing from {} to {}", environmentState, newState);
-    this.environmentState = newState;
-
-    // Log appropriate messages based on state
-    if ("low memory".equals(newState)) {
-      logToMimir("Memory critically low");
-      LOGGER.warn("Tube {} environment experiencing low memory", uniqueId);
-    } else if ("high cpu".equals(newState)) {
-      logToMimir("CPU usage critically high");
-      LOGGER.warn("Tube {} environment experiencing high CPU usage", uniqueId);
-    } else if ("normal".equals(newState)) {
-      logToMimir("Environment operating normally");
-      LOGGER.info("Tube {} environment returned to normal state", uniqueId);
-    } else {
-      logToMimir("Environment state changed to: " + newState);
-      LOGGER.info("Tube {} environment state changed to: {}", uniqueId, newState);
+    if (newState != null && !newState.equals(environmentState)) {
+      String oldState = environmentState;
+      environmentState = newState;
+      logToMimir("Environment state changed: " + oldState + " -> " + newState);
     }
   }
 
+  /**
+   * Gets the current environment state.
+   *
+   * @return the current environment state
+   */
+  public String getEnvironmentState() {
+    return environmentState;
+  }
+
+  /** Task for handling automatic termination of tubes after a delay. */
   private class TerminationTask extends TimerTask {
     @Override
     public void run() {
-      synchronized (Tube.this) {
-        LOGGER.info("Executing termination task for Tube: {}", uniqueId);
-        logToMimir("Tube self-terminating.");
-        terminationTimer.cancel();
-        clearLogsAndLineage();
-        LOGGER.debug("Tube {} terminated. Mimir log and lineage cleared.", uniqueId);
-      }
-    }
-
-    private void clearLogsAndLineage() {
-      synchronized (mimirLog) {
-        mimirLog.clear();
-      }
-      synchronized (lineage) {
-        lineage.clear();
-      }
-    }
-  }
-
-  public static class TubeInitializationException extends RuntimeException {
-    public TubeInitializationException(String message, Throwable cause) {
-      super(message, cause);
+      terminate();
     }
   }
 }
