@@ -187,11 +187,11 @@ if $VERBOSE; then
           test_name=$(echo "$line" | grep -o "Running org.samstraumr.tube.[^ ]*" | sed 's/Running //')
           print_test_status "$test_name" "running"
         elif [[ "$line" == *"Tests run:"* ]]; then
-          # Extract test run statistics
-          local tests_run=$(echo "$line" | grep -o "Tests run: [0-9]*" | awk '{print $3}')
-          local failures=$(echo "$line" | grep -o "Failures: [0-9]*" | awk '{print $2}')
-          local errors=$(echo "$line" | grep -o "Errors: [0-9]*" | awk '{print $2}')
-          local skipped=$(echo "$line" | grep -o "Skipped: [0-9]*" | awk '{print $2}')
+          # Extract test run statistics - avoid using local in this context
+          tests_run=$(echo "$line" | grep -o "Tests run: [0-9]*" | awk '{print $3}')
+          failures=$(echo "$line" | grep -o "Failures: [0-9]*" | awk '{print $2}')
+          errors=$(echo "$line" | grep -o "Errors: [0-9]*" | awk '{print $2}')
+          skipped=$(echo "$line" | grep -o "Skipped: [0-9]*" | awk '{print $2}')
           
           if [[ "$failures" != "0" || "$errors" != "0" ]]; then
             print_test_status "$test_name" "fail"
@@ -219,11 +219,11 @@ if $VERBOSE; then
           test_name=$(echo "$line" | grep -o "Running org.samstraumr.tube.[^ ]*" | sed 's/Running //')
           print_test_status "$test_name" "running"
         elif [[ "$line" == *"Tests run:"* ]]; then
-          # Extract test run statistics
-          local tests_run=$(echo "$line" | grep -o "Tests run: [0-9]*" | awk '{print $3}')
-          local failures=$(echo "$line" | grep -o "Failures: [0-9]*" | awk '{print $2}')
-          local errors=$(echo "$line" | grep -o "Errors: [0-9]*" | awk '{print $2}')
-          local skipped=$(echo "$line" | grep -o "Skipped: [0-9]*" | awk '{print $2}')
+          # Extract test run statistics - avoid using local in this context
+          tests_run=$(echo "$line" | grep -o "Tests run: [0-9]*" | awk '{print $3}')
+          failures=$(echo "$line" | grep -o "Failures: [0-9]*" | awk '{print $2}')
+          errors=$(echo "$line" | grep -o "Errors: [0-9]*" | awk '{print $2}')
+          skipped=$(echo "$line" | grep -o "Skipped: [0-9]*" | awk '{print $2}')
           
           if [[ "$failures" != "0" || "$errors" != "0" ]]; then
             print_test_status "$test_name" "fail"

@@ -888,6 +888,10 @@ function parse_args() {
         args_ref[clean]=true
         shift
         ;;
+      -b|--both)
+        args_ref[both]=true
+        shift
+        ;;
       -p|--profile)
         if [[ -n "$2" && "$2" != -* ]]; then
           args_ref[profile]="$2"
@@ -969,8 +973,13 @@ function build_maven_command() {
   # Add profile handling
   if [[ -n "$profile" ]]; then
     # Explicitly deactivate the fast profile which skips tests,
-    # and enable the requested profile, with skipTests=false
-    cmd="$cmd -P !fast,$profile -DskipTests=false -Dmaven.test.skip=false"
+    # and enable the requested profile
+    cmd="$cmd -P !fast,$profile"
+    
+    # For test goals, explicitly disable test skipping
+    if [[ "$goal" == "test" || "$goal" == "verify" || "$goal" == "integration-test" ]]; then
+      cmd="$cmd -DskipTests=false -Dmaven.test.skip=false"
+    fi
   fi
   
   # Add skip quality flag if requested

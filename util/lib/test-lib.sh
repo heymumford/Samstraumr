@@ -183,10 +183,27 @@ function run_test() {
   
   # Get tag expression if needed for Cucumber
   local tag_expression=""
-  if [[ "$include_equivalent" = "true" ]]; then
+  
+  # Special handling for different test types
+  if [[ "$test_type" == "atl" || "$test_type" == "above-the-line" ]]; then
+    # ATL tests use a specific test runner (RunATLCucumberTest) that's defined in the atl-tests profile
+    # The profile already configures the runner class and Cucumber tags
+    # We should NOT set any additional tag expression for these tests
+    tag_expression=""
+  elif [[ "$test_type" == "btl" || "$test_type" == "below-the-line" ]]; then
+    # BTL tests are currently disabled in the project
+    # If re-enabled, they would work similarly to ATL tests
+    tag_expression=""
+  elif [[ "$test_type" == "adam" || "$test_type" == "adamtube" ]]; then
+    # Adam tube tests use a specific test runner (RunAdamTubeTests or RunAdamTubeATLTests)
+    # The profile already configures the runner class
+    tag_expression=""
+  elif [[ "$include_equivalent" = "true" ]]; then
+    # For regular test types with --both flag, include both industry-standard and Samstraumr tags
     local equivalent_type=$(map_test_type "$test_type")
     tag_expression=$(get_cucumber_tag_expression "$test_type" "true")
   else
+    # Regular test types just use their corresponding tag
     tag_expression=$(get_cucumber_tag_expression "$test_type" "false")
   fi
   
@@ -194,6 +211,15 @@ function run_test() {
   local maven_cmd
   maven_cmd=$(build_maven_command "test" "$profile" "$clean" "$skip_quality")
   
+  # For ATL and other specialized tests, we need to ensure we're using the 
+  # correct Maven configuration including explicit test skipping disablement
+  if [[ "$test_type" == "atl" || "$test_type" == "above-the-line" || 
+        "$test_type" == "btl" || "$test_type" == "below-the-line" || 
+        "$test_type" == "adam" || "$test_type" == "adamtube" ]]; then
+    # These test types require explicit disabling of test skipping
+    maven_cmd="$maven_cmd -DskipTests=false -Dmaven.test.skip=false"
+  fi
+
   # Add Cucumber tag expression if present
   if [[ -n "$tag_expression" ]]; then
     maven_cmd="$maven_cmd $tag_expression"
@@ -201,7 +227,13 @@ function run_test() {
   
   # Set test name based on type
   local test_name
-  if [[ -n "$(map_test_type "$test_type")" && "$(map_test_type "$test_type")" != "unknown" ]]; then
+  if [[ "$test_type" == "atl" ]]; then
+    test_name="Above-The-Line Tests"
+  elif [[ "$test_type" == "btl" ]]; then
+    test_name="Below-The-Line Tests"
+  elif [[ "$test_type" == "adam" ]]; then
+    test_name="Adam Tube Tests"
+  elif [[ -n "$(map_test_type "$test_type")" && "$(map_test_type "$test_type")" != "unknown" ]]; then
     # Use pretty names for known test types
     test_name="$(capitalize_first "$test_type") Tests"
   else

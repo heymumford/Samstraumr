@@ -117,9 +117,49 @@ function main() {
     fi
   fi
   
-  # Run the test using the unified run_test function
-  run_test "$test_type" config
-  local result=$?
+  # Special handling for ATL tests which require a specific test runner
+  if [[ "$test_type" == "atl" || "$test_type" == "above-the-line" ]]; then
+    print_info "Using specialized ATL test runner for Above-The-Line tests"
+    
+    # Build the arguments for the ATL test runner script
+    local atl_args=""
+    
+    # Map our config to ATL runner args
+    if [[ "${config[verbose]}" == "true" ]]; then
+      atl_args="$atl_args --verbose"
+    fi
+    
+    if [[ "${config[clean]}" == "true" ]]; then
+      atl_args="$atl_args --clean"
+    fi
+    
+    if [[ -n "${config[profile]}" ]]; then
+      atl_args="$atl_args --profile ${config[profile]}"
+    fi
+    
+    if [[ -n "${config[output]}" ]]; then
+      atl_args="$atl_args --output-file ${config[output]}"
+    fi
+    
+    if [[ "${config[skip_quality]}" == "true" ]]; then
+      atl_args="$atl_args --skip-quality"
+    fi
+    
+    if [[ -n "${config[cyclename]}" ]]; then
+      atl_args="$atl_args --cyclename ${config[cyclename]}"
+    fi
+    
+    # Run the ATL test runner script directly
+    print_debug "Executing ATL test runner: ${SCRIPT_DIR}/run-atl-tests.sh $atl_args"
+    
+    # Execute the ATL test runner script
+    cd "${PROJECT_ROOT}" && "${SCRIPT_DIR}/run-atl-tests.sh" $atl_args
+    local result=$?
+  else
+    # Run regular tests using the unified run_test function
+    run_test "$test_type" config
+    local result=$?
+  fi
   
   # Print summary
   if [[ "$result" -eq 0 ]]; then
