@@ -381,6 +381,12 @@ if [[ "$1" == "-h" || "$1" == "--help" ]]; then
   exit 0
 elif [[ "$1" == "help" ]]; then
   shift
+  if [ -z "$1" ]; then
+    # Just 'help' without command shows main help
+    show_help
+    exit 0
+  fi
+  
   command="$1"
   
   # Command-specific help

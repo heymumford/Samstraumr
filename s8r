@@ -583,6 +583,7 @@ function handle_test_docmosis_command() {
 
 function handle_help_command() {
   local help_topic="$1"
+  shift  # Remove the help topic from the arguments
   
   case "$help_topic" in
     build)
@@ -594,7 +595,8 @@ function handle_help_command() {
     version)
       # Pass version help request to modular manager if available
       if [ -f "${PROJECT_ROOT}/util/bin/version/version-manager-modular.sh" ]; then
-        "${PROJECT_ROOT}/util/bin/version/version-manager-modular.sh" help "$2"
+        # Pass all additional arguments
+        "${PROJECT_ROOT}/util/bin/version/version-manager-modular.sh" help "$@"
       else
         show_version_help
       fi
