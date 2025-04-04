@@ -22,7 +22,7 @@
     <oshi.version>6.4.7</oshi.version>
     <testcontainers.version>1.20.6</testcontainers.version>
     <mockito.version>5.8.0</mockito.version>
-    <junit.platform.version>1.10.2</junit.platform.version>
+    <junit.platform.version>1.12.1</junit.platform.version>
     <docmosis.version>4.8.0</docmosis.version>
     <barcode4j.version>2.1</barcode4j.version>
   </properties>
