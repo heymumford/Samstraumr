@@ -7,10 +7,11 @@
   <parent>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-modules</artifactId>
-    <version>1.6.5</version>
+    <version>1.6.7</version>
   </parent>
 
   <artifactId>samstraumr-core</artifactId>
+  <version>1.6.7</version>
   <packaging>jar</packaging>
   <name>Samstraumr Core</name>
 
@@ -248,7 +249,17 @@
   </build>
   
   <profiles>
-    <!-- ATL Tests Profile -->
+    <!-- Standard Tests Profile -->
+    <profile>
+      <id>tests</id>
+      <properties>
+        <cucumber.filter.tags>@ATL</cucumber.filter.tags>
+        <skipTests>false</skipTests>
+        <maven.test.skip>false</maven.test.skip>
+      </properties>
+    </profile>
+    
+    <!-- Legacy ATL Profile (for backward compatibility) -->
     <profile>
       <id>atl-tests</id>
       <properties>
@@ -256,16 +267,7 @@
       </properties>
     </profile>
     
-    <!-- BTL Tests Profile - DISABLED (Legacy BTL tests removed due to brittleness) -->
-    <profile>
-      <id>btl-tests</id>
-      <properties>
-        <cucumber.filter.tags>@BTL</cucumber.filter.tags>
-        <!-- Disable BTL tests by default -->
-        <skipTests>true</skipTests>
-        <maven.test.skip>true</maven.test.skip>
-      </properties>
-    </profile>
+    <!-- BTL profiles removed in test consolidation -->
     
     <!-- Smoke (Orchestration) Tests Profile -->
     <profile>
