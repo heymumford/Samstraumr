@@ -214,7 +214,7 @@ echo "Core module path: ${SAMSTRAUMR_CORE_MODULE}"
 
 The configuration includes project paths, package structures, Maven settings, and command mappings.
 
-For comprehensive build documentation, see the [Build Guide](./docs/guide/build.md).
+For comprehensive build documentation, see the [Build Guide](./docs/reference/build/index.md).
 
 ## When NOT to Use Samstraumr
 
