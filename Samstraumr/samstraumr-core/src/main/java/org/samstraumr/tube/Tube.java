@@ -1,5 +1,19 @@
+/*
+ * Implementation of the Tube concept in the Samstraumr framework
+ * 
+ * This class implements the core functionality for Tube in the Samstraumr
+ * tube-based processing framework. It provides the essential infrastructure for
+ * the tube ecosystem to maintain its hierarchical design and data processing capabilities.
+ * 
+ * Key features:
+ * - Implementation of the Tube concept
+ * - Integration with the tube substrate model
+ * - Support for hierarchical tube organization
+ */
+
 package org.samstraumr.tube;
 
+// Standard Java imports
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
@@ -10,9 +24,58 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+// Third-party imports
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+  /**
+   * Factory method to create a new Tube instance.
+   *
+   * @param reason the reason for creating this tube
+   * @param environment the environment in which this tube operates
+   * @return a new Tube instance
+   * @throws TubeInitializationException if initialization fails
+   */
+  /**
+   * Validates the parameters used to create a tube.
+   *
+   * @param reason the reason for creating the tube
+   * @param environment the environment in which the tube operates
+   * @throws TubeInitializationException if parameters are invalid
+   */
+  /**
+   * Generates a unique SHA-256 ID from the provided parameters.
+   *
+   * @param parameters the parameters to hash
+   * @return a SHA-256 hash of the parameters as a hex string
+   * @throws TubeInitializationException if the hash generation fails
+   */
+  /**
+   * Gets the current status of this tube.
+   *
+   * @return the current TubeStatus
+   */
+  /**
+   * Sets the status of this tube.
+   *
+   * @param newStatus the new status to set
+   */
+  /**
+   * Logs an entry to the Mimir log with timestamp. This internal log allows the tube to maintain
+   * state information and debug data.
+   *
+   * @param logEntry the entry to log
+   */
+  /**
+   * Adds a reason to the tube's lineage.
+   *
+   * @param reason the reason to add to lineage
+   */
+  /**
+   * Updates the tube's awareness of environmental state changes.
+   *
+   * @param newState the new state of the environment
+   */
 public class Tube {
   private static final Logger LOGGER = LoggerFactory.getLogger(Tube.class);
   private static final int DEFAULT_TERMINATION_DELAY = 60; // seconds
@@ -25,6 +88,7 @@ public class Tube {
   private final Environment environment;
   private volatile Timer terminationTimer;
   private String environmentState = "normal";
+  private TubeStatus status = TubeStatus.INITIALIZING;
 
   private Tube(String reason, Environment environment, String uniqueId) {
     this.reason = reason;
@@ -37,6 +101,7 @@ public class Tube {
     logToMimir("Tube initialized with ID: " + this.uniqueId);
     LOGGER.debug("Tube initialized with ID: {}", this.uniqueId);
     logToMimir("Initialization reason: " + this.reason);
+    this.status = TubeStatus.READY;
 
     // Initialize timer directly instead of using setTerminationDelay which might throw exceptions
     try {
@@ -139,6 +204,28 @@ public class Tube {
 
   public String getUniqueId() {
     return uniqueId;
+  }
+
+  /**
+   * Gets the current status of this tube.
+   *
+   * @return the current TubeStatus
+   */
+  public TubeStatus getStatus() {
+    return status;
+  }
+
+  /**
+   * Sets the status of this tube.
+   *
+   * @param newStatus the new status to set
+   */
+  public void setStatus(TubeStatus newStatus) {
+    if (newStatus != this.status) {
+      LOGGER.debug("Changing tube status from {} to {}", this.status, newStatus);
+      logToMimir("Status changed from " + this.status + " to " + newStatus);
+      this.status = newStatus;
+    }
   }
 
   public String getReason() {

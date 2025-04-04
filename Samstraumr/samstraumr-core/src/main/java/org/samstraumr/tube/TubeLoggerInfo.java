@@ -1,5 +1,19 @@
+/*
+ * Implementation of the TubeLoggerInfo concept in the Samstraumr framework
+ * 
+ * This class implements the core functionality for TubeLoggerInfo in the Samstraumr
+ * tube-based processing framework. It provides the essential infrastructure for
+ * the tube ecosystem to maintain its hierarchical design and data processing capabilities.
+ * 
+ * Key features:
+ * - Implementation of the TubeLoggerInfo concept
+ * - Integration with the tube substrate model
+ * - Support for hierarchical tube organization
+ */
+
 package org.samstraumr.tube;
 
+// Standard Java imports
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;

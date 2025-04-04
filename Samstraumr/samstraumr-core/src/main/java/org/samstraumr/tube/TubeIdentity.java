@@ -1,5 +1,20 @@
+/*
+ * Implementation of the TubeIdentity concept in the Samstraumr framework
+ * 
+ * This class implements the core functionality for TubeIdentity in the Samstraumr
+ * tube-based processing framework. It provides the essential infrastructure for
+ * the tube ecosystem to maintain its hierarchical design and data processing capabilities.
+ * 
+ * Key features:
+ * - Implementation of the TubeIdentity concept
+ * - Integration with the tube substrate model
+ * - Support for hierarchical tube organization
+ */
+
 package org.samstraumr.tube;
 
+// Standard Java imports
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,6 +24,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+// Third-party imports
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -27,6 +43,105 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <p>Once created, the core identity properties are immutable, ensuring a stable foundation for a
  * tube's existence throughout its lifecycle.
  */
+  /**
+   * Creates a new TubeIdentity with the specified properties.
+   *
+   * @param uniqueId The unique identifier for this tube
+   * @param reason The reason for creating this tube
+   * @param conceptionTime The timestamp when this tube was created
+   * @param environmentalContext The environmental context at creation time
+   * @param parent The parent tube's identity (may be null for "Adam" tubes)
+   * @param address The hierarchical address of this tube
+   */
+  /**
+   * Creates an "Adam" TubeIdentity with no parent. An Adam tube is the first tube created in a
+   * system or environment, and by definition cannot have a parent. It serves as the origin point
+   * for a tube hierarchy.
+   *
+   * @param reason The reason for creating this tube
+   * @param environment The environment in which this tube exists
+   * @return A new TubeIdentity instance representing an Adam tube
+   * @throws IllegalArgumentException if parent parameter is provided (Adam tubes must not have
+   *     parents)
+   */
+  /**
+   * Creates a child TubeIdentity with a parent reference. Child tubes must always have a valid
+   * parent reference, establishing a clear hierarchy.
+   *
+   * @param reason The reason for creating this tube
+   * @param environment The environment in which this tube exists
+   * @param parent The parent tube's identity
+   * @return A new TubeIdentity instance
+   * @throws IllegalArgumentException if parent is null (use createAdamIdentity for parentless
+   *     tubes)
+   */
+  /**
+   * Gets the unique identifier of this tube.
+   *
+   * @return The unique identifier
+   */
+  /**
+   * Gets the reason for creating this tube.
+   *
+   * @return The creation reason
+   */
+  /**
+   * Gets the timestamp when this tube was created.
+   *
+   * @return The conception timestamp
+   */
+  /**
+   * Gets the environmental context at the time of creation.
+   *
+   * @return An unmodifiable map of environmental context properties
+   */
+  /**
+   * Gets the parent tube's identity if it exists.
+   *
+   * @return The parent tube's identity or null if this is an "Adam" tube
+   */
+  /**
+   * Gets the hierarchical address of this tube.
+   *
+   * @return The hierarchical address
+   */
+  /**
+   * Gets the user-defined name for this tube if it exists.
+   *
+   * @return The user-defined name or null if not set
+   */
+  /**
+   * Sets a user-defined name for this tube.
+   *
+   * @param name The user-defined name
+   */
+  /**
+   * Gets the list of descendant tubes.
+   *
+   * @return An unmodifiable list of descendant tube identities
+   */
+  /**
+   * Registers a descendant tube with this tube.
+   *
+   * @param descendant The descendant tube's identity
+   */
+  /**
+   * Checks if this tube is an "Adam" tube (has no parent). Adam tubes are the first tubes created
+   * in a system and serve as origin points for tube hierarchies.
+   *
+   * @return true if this is an "Adam" tube (no parent), false otherwise
+   */
+  /**
+   * Checks if this tube is a child tube (has a parent). Child tubes always have a parent reference,
+   * establishing their position in the tube hierarchy.
+   *
+   * @return true if this is a child tube (has parent), false otherwise
+   */
+  /**
+   * Generates a birth certificate for this tube containing key identity information.
+   *
+   * @return A formatted string containing the birth certificate information
+   */
 public class TubeIdentity {
   private final String uniqueId;
   private final Instant conceptionTime;
@@ -73,13 +188,25 @@ public class TubeIdentity {
   }
 
   /**
-   * Creates an "Adam" TubeIdentity with no parent.
+   * Creates an "Adam" TubeIdentity with no parent. An Adam tube is the first tube created in a
+   * system or environment, and by definition cannot have a parent. It serves as the origin point
+   * for a tube hierarchy.
    *
    * @param reason The reason for creating this tube
    * @param environment The environment in which this tube exists
-   * @return A new TubeIdentity instance
+   * @return A new TubeIdentity instance representing an Adam tube
+   * @throws IllegalArgumentException if parent parameter is provided (Adam tubes must not have
+   *     parents)
    */
   public static TubeIdentity createAdamIdentity(String reason, Environment environment) {
+    if (reason == null || reason.trim().isEmpty()) {
+      throw new IllegalArgumentException("Adam tube must have a valid creation reason");
+    }
+
+    if (environment == null) {
+      throw new IllegalArgumentException("Adam tube must have a valid environment");
+    }
+
     String uniqueId = UUID.randomUUID().toString();
     Instant now = Instant.now();
     Map<String, String> context = environment.captureEnvironmentalContext();
@@ -89,15 +216,32 @@ public class TubeIdentity {
   }
 
   /**
-   * Creates a child TubeIdentity with a parent reference.
+   * Creates a child TubeIdentity with a parent reference. Child tubes must always have a valid
+   * parent reference, establishing a clear hierarchy.
    *
    * @param reason The reason for creating this tube
    * @param environment The environment in which this tube exists
    * @param parent The parent tube's identity
    * @return A new TubeIdentity instance
+   * @throws IllegalArgumentException if parent is null (use createAdamIdentity for parentless
+   *     tubes)
    */
   public static TubeIdentity createChildIdentity(
       String reason, Environment environment, TubeIdentity parent) {
+    if (reason == null || reason.trim().isEmpty()) {
+      throw new IllegalArgumentException("Child tube must have a valid creation reason");
+    }
+
+    if (environment == null) {
+      throw new IllegalArgumentException("Child tube must have a valid environment");
+    }
+
+    if (parent == null) {
+      throw new IllegalArgumentException(
+          "Child tube must have a parent reference. "
+              + "For tubes without parents, use createAdamIdentity instead.");
+    }
+
     String uniqueId = UUID.randomUUID().toString();
     Instant now = Instant.now();
     Map<String, String> context = environment.captureEnvironmentalContext();
@@ -200,12 +344,23 @@ public class TubeIdentity {
   }
 
   /**
-   * Checks if this tube is an "Adam" tube (has no parent).
+   * Checks if this tube is an "Adam" tube (has no parent). Adam tubes are the first tubes created
+   * in a system and serve as origin points for tube hierarchies.
    *
-   * @return true if this is an "Adam" tube, false otherwise
+   * @return true if this is an "Adam" tube (no parent), false otherwise
    */
   public boolean isAdamTube() {
     return parentIdentity == null;
+  }
+
+  /**
+   * Checks if this tube is a child tube (has a parent). Child tubes always have a parent reference,
+   * establishing their position in the tube hierarchy.
+   *
+   * @return true if this is a child tube (has parent), false otherwise
+   */
+  public boolean isChildTube() {
+    return parentIdentity != null;
   }
 
   /**
@@ -228,8 +383,10 @@ public class TubeIdentity {
 
     if (parentIdentity != null) {
       certificate.append("Parent ID: ").append(parentIdentity.getUniqueId()).append("\n");
+      certificate.append("Origin Type: Child Tube\n");
     } else {
-      certificate.append("Parent: None (Adam Tube)\n");
+      certificate.append("Parent: None\n");
+      certificate.append("Origin Type: Adam Tube (System Origin Point)\n");
     }
 
     certificate.append("\nEnvironmental Context:\n");

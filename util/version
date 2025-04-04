@@ -98,8 +98,13 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." &> /dev/null && pwd 2> /dev/null || echo "$S
 # Change to project root directory
 cd "$PROJECT_ROOT"
 
-# Version file path
-VERSION_PROPERTIES_FILE="Samstraumr/version.properties"
+# Source the configuration file if it exists
+if [ -f "${PROJECT_ROOT}/.samstraumr.config" ]; then
+  source "${PROJECT_ROOT}/.samstraumr.config"
+fi
+
+# Version file path - fallback to default if not defined in config
+VERSION_PROPERTIES_FILE="${VERSION_PROPERTIES_FILE:-Samstraumr/version.properties}"
 
 # Check if version.properties exists
 if [ ! -f "$VERSION_PROPERTIES_FILE" ]; then

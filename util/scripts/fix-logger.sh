@@ -1,9 +1,21 @@
 #!/bin/bash
-
 # This script fixes the logger variable in PatternSteps.java
 # by replacing all instances of the variable 'logger' with 'LOGGER'
 
-PATTERN_STEPS_FILE="Samstraumr/samstraumr-core/src/test/java/org/samstraumr/tube/steps/PatternSteps.java"
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
+# Source the configuration file
+if [ -f "${PROJECT_ROOT}/.samstraumr.config" ]; then
+  source "${PROJECT_ROOT}/.samstraumr.config"
+else
+  echo "Configuration file not found: ${PROJECT_ROOT}/.samstraumr.config"
+  exit 1
+fi
+
+# Construct file path using configuration variables
+PATTERN_STEPS_FILE="${SAMSTRAUMR_JAVA_TEST}/$(path_for_package "${SAMSTRAUMR_TEST_PACKAGE}")/steps/PatternSteps.java"
 
 echo "Fixing logger variables in $PATTERN_STEPS_FILE..."
 
@@ -14,4 +26,4 @@ echo "Logger variables fixed successfully."
 echo "Running tests to verify the fix..."
 
 # Run tests with quality checks skipped
-mvn test -P skip-quality-checks -Dspotless.check.skip=true -Dpmd.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true -Djacoco.skip=true -Dmaven.test.skip=false
+mvn -f "${SAMSTRAUMR_CORE_MODULE}/pom.xml" test -P "${SAMSTRAUMR_SKIP_QUALITY_PROFILE}" ${SAMSTRAUMR_SKIP_QUALITY} ${SAMSTRAUMR_RUN_TESTS}

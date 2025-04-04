@@ -90,6 +90,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <version>${junit.jupiter.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-suite-api</artifactId>
       <version>${junit.platform.version}</version>
@@ -98,6 +104,12 @@
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-suite</artifactId>
+      <version>${junit.platform.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-suite-engine</artifactId>
       <version>${junit.platform.version}</version>
       <scope>test</scope>
     </dependency>
@@ -115,6 +127,7 @@
       <version>${cucumber.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- JUnit 4 cucumber integration removed in favor of junit-platform-engine -->
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-picocontainer</artifactId>
@@ -622,6 +635,78 @@
                 <include>${test.includes}</include>
               </includes>
             </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- Adam Tube Tests Profile -->
+    <profile>
+      <id>adam-tube-tests</id>
+      <properties>
+        <skipTests>false</skipTests>
+        <maven.test.skip>false</maven.test.skip>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/RunAdamTubeTests.java</include>
+              </includes>
+              <useFile>false</useFile>
+              <testFailureIgnore>true</testFailureIgnore>
+              <forkCount>1</forkCount>
+              <reuseForks>true</reuseForks>
+              <systemPropertyVariables>
+                <cucumber.junit-platform.naming-strategy>long</cucumber.junit-platform.naming-strategy>
+              </systemPropertyVariables>
+            </configuration>
+            <dependencies>
+              <dependency>
+                <groupId>org.apache.maven.surefire</groupId>
+                <artifactId>surefire-junit-platform</artifactId>
+                <version>3.2.5</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- Adam Tube ATL Tests Profile -->
+    <profile>
+      <id>adam-tube-atl-tests</id>
+      <properties>
+        <skipTests>false</skipTests>
+        <maven.test.skip>false</maven.test.skip>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/RunAdamTubeATLTests.java</include>
+              </includes>
+              <useFile>false</useFile>
+              <testFailureIgnore>true</testFailureIgnore>
+              <forkCount>1</forkCount>
+              <reuseForks>true</reuseForks>
+              <systemPropertyVariables>
+                <cucumber.junit-platform.naming-strategy>long</cucumber.junit-platform.naming-strategy>
+              </systemPropertyVariables>
+            </configuration>
+            <dependencies>
+              <dependency>
+                <groupId>org.apache.maven.surefire</groupId>
+                <artifactId>surefire-junit-platform</artifactId>
+                <version>3.2.5</version>
+              </dependency>
+            </dependencies>
           </plugin>
         </plugins>
       </build>

@@ -5,7 +5,6 @@ import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME;
 
 import org.junit.platform.suite.api.ConfigurationParameter;
 import org.junit.platform.suite.api.IncludeEngines;
-import org.junit.platform.suite.api.SelectClasspathResource;
 import org.junit.platform.suite.api.Suite;
 import org.junit.platform.suite.api.SuiteDisplayName;
 
@@ -27,6 +26,7 @@ import org.junit.platform.suite.api.SuiteDisplayName;
  *   <li>Run BTL tests: -Dcucumber.filter.tags="@BTL"
  *   <li>Run specific level: -Dcucumber.filter.tags="@L0_Tube"
  *   <li>Run combinations: -Dcucumber.filter.tags="@ATL and @L0_Tube"
+ *   <li>Run Adam Tube tests: -Dcucumber.filter.tags="@AdamTube"
  * </ul>
  *
  * <p>Feature files are organized hierarchically in the following directories:
@@ -35,13 +35,22 @@ import org.junit.platform.suite.api.SuiteDisplayName;
  *   <li>tube/features: Core Tube features
  *   <li>composites/features: Composite Tube features
  * </ul>
+ *
+ * <p>Simplified usage examples:
+ *
+ * <ul>
+ *   <li>mvn test -Dtest=RunCucumberTest -Dcucumber.filter.tags="@ATL and @AdamTube"
+ *   <li>mvn test -Dtest=RunCucumberTest -Dcucumber.filter.tags="@SubstrateIdentity"
+ *   <li>mvn test -Dtest=RunCucumberTest -Dcucumber.filter.tags="@ATL and @L0_Tube and @Identity"
+ * </ul>
  */
 @Suite
 @SuiteDisplayName("Samstraumr BDD Tests")
 @IncludeEngines("cucumber")
-@SelectClasspathResource("tube/features")
-@SelectClasspathResource("composites/features")
-@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "org.samstraumr.tube.steps,org.samstraumr.tube.lifecycle.steps")
+@ConfigurationParameter(key = "cucumber.features", value = "src/test/resources/test")
+@ConfigurationParameter(
+    key = GLUE_PROPERTY_NAME,
+    value = "org.test.steps")
 @ConfigurationParameter(
     key = PLUGIN_PROPERTY_NAME,
     value =

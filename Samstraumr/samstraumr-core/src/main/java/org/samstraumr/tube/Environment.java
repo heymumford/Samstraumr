@@ -1,11 +1,31 @@
+/*
+ * System environment information provider for runtime context awareness.
+ * 
+ * This class provides a comprehensive abstraction for system environment information,
+ * enabling tubes to be aware of their execution context and adapt accordingly. It collects
+ * and organizes hardware, operating system, and network details to create a unique 
+ * environmental fingerprint that can be used for identification and decision-making.
+ * 
+ * Key features:
+ * - Hardware and OS information collection through OSHI library
+ * - Unique environment hash generation for fingerprinting
+ * - Structured environment context capture for tube adaptation
+ * - Resilient operation with graceful fallback for unavailable information
+ */
 package org.samstraumr.tube;
 
+// Standard Java imports
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+// Third-party imports
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +34,12 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import oshi.SystemInfo;
-import oshi.hardware.*;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.ComputerSystem;
+import oshi.hardware.GlobalMemory;
+import oshi.hardware.HWDiskStore;
+import oshi.hardware.HardwareAbstractionLayer;
+import oshi.hardware.NetworkIF;
 import oshi.software.os.OperatingSystem;
 import oshi.util.FormatUtil;
 
@@ -216,9 +241,9 @@ public class Environment {
    *
    * @return A map containing key environmental parameters
    */
-  public java.util.Map<String, String> captureEnvironmentalContext() {
-    java.util.Map<String, String> context = new java.util.HashMap<>();
-    
+  public Map<String, String> captureEnvironmentalContext() {
+    Map<String, String> context = new HashMap<>();
+
     context.put("hostname", getHostName());
     context.put("os", getOsName());
     context.put("osVersion", getOsVersion());
@@ -226,8 +251,8 @@ public class Environment {
     context.put("cpuCores", String.valueOf(getCpuCores()));
     context.put("totalMemory", getTotalMemory());
     context.put("envHash", getEnvironmentHash());
-    context.put("captureTime", java.time.Instant.now().toString());
-    
+    context.put("captureTime", Instant.now().toString());
+
     return context;
   }
 
@@ -239,7 +264,7 @@ public class Environment {
     } catch (NoSuchAlgorithmException e) {
       LOGGER.error("SHA-256 algorithm not found", e);
       throw new RuntimeException("SHA-256 algorithm not found", e);
-    } catch (java.io.UnsupportedEncodingException e) {
+    } catch (UnsupportedEncodingException e) {
       LOGGER.error("UTF-8 encoding not supported", e);
       throw new RuntimeException("UTF-8 encoding not supported", e);
     }
