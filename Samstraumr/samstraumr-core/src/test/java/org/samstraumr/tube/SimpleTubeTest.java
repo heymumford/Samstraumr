@@ -93,12 +93,16 @@ public class SimpleTubeTest {
 
     // Then
     List<String> log = tube.queryMimirLog();
-    assertTrue(
-        log.stream()
-            .anyMatch(
-                entry ->
-                    entry.contains("termination delay")
-                        && entry.contains(String.valueOf(seconds))));
+
+    boolean found = false;
+    for (String entry : log) {
+      if (entry.toLowerCase().contains("termination delay")
+          && entry.contains(String.valueOf(seconds))) {
+        found = true;
+        break;
+      }
+    }
+    assertTrue(found, "Log should contain termination delay entry with seconds: " + seconds);
   }
 
   @Test

@@ -204,9 +204,11 @@ public class AdamTubeSteps {
     for (int i = 0; i < 3; i++) {
       String reason = "Child " + i + " of Origin";
       Tube childTube = Tube.create(reason, environment);
-      // In a real implementation, we'd connect this to the parent
+      // Create child identity and connect to parent
       TubeIdentity childIdentity =
           TubeIdentity.createChildIdentity(reason, environment, originIdentity);
+      // Add child to parent's descendants list
+      originIdentity.addChild(childIdentity);
       childTubes.add(childTube);
 
       assertNotNull(childTube, "Child tube " + i + " should be created successfully");
