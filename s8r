@@ -389,7 +389,12 @@ function handle_test_command() {
 function handle_version_command() {
   # Set a variable to indicate we're calling from s8r
   export SAMSTRAUMR_CLI="s8r"
-  "${PROJECT_ROOT}/util/bin/version/version-manager.sh" "$@"
+  # Use modular version manager if available, fall back to regular one if not
+  if [ -f "${PROJECT_ROOT}/util/bin/version/version-manager-modular.sh" ]; then
+    "${PROJECT_ROOT}/util/bin/version/version-manager-modular.sh" "$@"
+  else
+    "${PROJECT_ROOT}/util/bin/version/version-manager.sh" "$@"
+  fi
 }
 
 function handle_quality_command() {

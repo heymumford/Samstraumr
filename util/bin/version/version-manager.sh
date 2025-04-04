@@ -43,15 +43,15 @@ VERSION_PROPERTY_NAME="samstraumr.version"
 #------------------------------------------------------------------------------
 
 function print_header() {
-  echo -e "${COLOR_BLUE}${COLOR_BOLD}$1${COLOR_RESET}"
+  echo -e "${COLOR_BLUE}${COLOR_BOLD}$1${COLOR_RESET}" >&2
 }
 
 function print_success() {
-  echo -e "${COLOR_GREEN}$1${COLOR_RESET}"
+  echo -e "${COLOR_GREEN}$1${COLOR_RESET}" >&2
 }
 
 function print_warning() {
-  echo -e "${COLOR_YELLOW}$1${COLOR_RESET}"
+  echo -e "${COLOR_YELLOW}$1${COLOR_RESET}" >&2
 }
 
 function print_error() {
@@ -59,7 +59,7 @@ function print_error() {
 }
 
 function print_info() {
-  echo -e "${COLOR_BLUE}$1${COLOR_RESET}"
+  echo -e "${COLOR_BLUE}$1${COLOR_RESET}" >&2
 }
 
 function show_help() {
@@ -103,7 +103,8 @@ function get_current_version() {
     return 1
   fi
   
-  grep "${VERSION_PROPERTY_NAME}=" "$VERSION_FILE" | cut -d= -f2
+  # Use grep to extract the version, trim whitespace and newlines
+  grep "${VERSION_PROPERTY_NAME}=" "$VERSION_FILE" | cut -d= -f2 | tr -d ' \t\n\r'
 }
 
 function validate_version() {
@@ -135,6 +136,10 @@ function set_version() {
     return 1
   fi
   
+  # Update last updated date
+  local today=$(date "+%B %d, %Y")
+  sed -i "s/samstraumr.last.updated=.*/samstraumr.last.updated=$today/" "$VERSION_FILE"
+  
   print_success "Version set from $current_version to $new_version"
   return 0
 }
@@ -146,12 +151,8 @@ function commit_version_change() {
   # Add version file to git
   git -C "$PROJECT_ROOT" add "$VERSION_FILE"
   
-  # Commit the change
-  git -C "$PROJECT_ROOT" commit -m "Bump version from $old_version to $new_version
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>"
+  # Commit the change with a simple message
+  git -C "$PROJECT_ROOT" commit -m "Bump version from $old_version to $new_version"
   
   if [ $? -ne 0 ]; then
     print_error "Failed to commit version change"
@@ -211,6 +212,7 @@ function bump_version() {
     return 1
   fi
   
+  # Return both versions
   echo "$current_version $new_version"
   return 0
 }
@@ -333,18 +335,41 @@ function handle_bump_command() {
     return 1
   fi
   
-  # Bump version
-  local versions=$(bump_version "$component")
-  if [ $? -ne 0 ]; then
+  # Get current version
+  local current_version=$(get_current_version)
+  if ! validate_version "$current_version"; then
+    print_error "Current version is not valid: $current_version"
     return 1
   fi
   
-  # Extract old and new versions
-  read -r old_version new_version <<< "$versions"
+  # Calculate new version
+  local new_version=""
+  # Split version into components
+  IFS='.' read -r major minor patch <<< "$current_version"
+  
+  # Bump appropriate component
+  case "$component" in
+    major)
+      new_version="$((major + 1)).0.0"
+      ;;
+    minor)
+      new_version="${major}.$((minor + 1)).0"
+      ;;
+    patch)
+      new_version="${major}.${minor}.$((patch + 1))"
+      ;;
+    *)
+      print_error "Invalid version component: $component (use major, minor, or patch)"
+      return 1
+      ;;
+  esac
+  
+  # Update version
+  set_version "$new_version"
   
   # Create commit and tag
   if [ "$no_commit" != true ]; then
-    commit_version_change "$old_version" "$new_version"
+    commit_version_change "$current_version" "$new_version"
     create_version_tag "$new_version"
   fi
   
@@ -401,28 +426,51 @@ function handle_test_command() {
     return 1
   fi
   
-  # Bump version
-  local versions=$(bump_version "$component")
-  if [ $? -ne 0 ]; then
+  # Get current version
+  local current_version=$(get_current_version)
+  if ! validate_version "$current_version"; then
+    print_error "Current version is not valid: $current_version"
     return 1
   fi
   
-  # Extract old and new versions
-  read -r old_version new_version <<< "$versions"
+  # Calculate new version
+  local new_version=""
+  # Split version into components
+  IFS='.' read -r major minor patch <<< "$current_version"
+  
+  # Bump appropriate component
+  case "$component" in
+    major)
+      new_version="$((major + 1)).0.0"
+      ;;
+    minor)
+      new_version="${major}.$((minor + 1)).0"
+      ;;
+    patch)
+      new_version="${major}.${minor}.$((patch + 1))"
+      ;;
+    *)
+      print_error "Invalid version component: $component (use major, minor, or patch)"
+      return 1
+      ;;
+  esac
+  
+  # Update version
+  set_version "$new_version"
   
   # Run tests
   if [ "$skip_tests" != true ]; then
     run_tests "$skip_quality"
     if [ $? -ne 0 ]; then
       # Revert version change
-      set_version "$old_version"
-      print_error "Tests failed. Version reverted to $old_version"
+      set_version "$current_version"
+      print_error "Tests failed. Version reverted to $current_version"
       return 1
     fi
   fi
   
   # Create commit and tag
-  commit_version_change "$old_version" "$new_version"
+  commit_version_change "$current_version" "$new_version"
   create_version_tag "$new_version"
   
   # Push changes

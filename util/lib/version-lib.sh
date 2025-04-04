@@ -1,15 +1,109 @@
 #!/bin/bash
 #==============================================================================
 # Filename: version-lib.sh
-# Description: Shared functions for version management scripts
+# Description: Core utilities for version management
 #==============================================================================
 
 # Determine script paths and load common library
 SCRIPT_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_LIB_DIR}/../.." && pwd)"
 
-# Source the common library
-source "${SCRIPT_LIB_DIR}/common.sh"
+# Source the common library if it exists
+if [ -f "${SCRIPT_LIB_DIR}/common.sh" ]; then
+  source "${SCRIPT_LIB_DIR}/common.sh"
+fi
+
+# Default paths and settings (can be overridden by version.conf)
+: ${VERSION_CONFIG_FILE:="${PROJECT_ROOT}/.s8r/config/version.conf"}
+: ${VERSION_FILE:="${PROJECT_ROOT}/Samstraumr/version.properties"}
+: ${VERSION_PROPERTY_NAME:="samstraumr.version"}
+: ${VERSION_DATE_PROPERTY_NAME:="samstraumr.last.updated"}
+: ${GIT_TAG_PREFIX:="v"}
+
+# Use existing color definitions if common.sh was loaded
+if ! declare -p COLOR_RED &> /dev/null; then
+  # Define our own color codes if they don't exist yet
+  COLOR_RED='\033[0;31m'
+  COLOR_GREEN='\033[0;32m'
+  COLOR_YELLOW='\033[0;33m'
+  COLOR_BLUE='\033[0;34m'
+  COLOR_RESET='\033[0m'
+  COLOR_BOLD='\033[1m'
+fi
+
+# Error codes
+ERR_GENERAL=1
+ERR_FILE_NOT_FOUND=2
+ERR_INVALID_VERSION=3
+ERR_GIT_OPERATION=4
+ERR_TEST_FAILURE=5
+
+# Log error message and return error code
+# Usage: version_error "Error message" [error_code]
+function version_error() {
+  local message="$1"
+  local code="${2:-$ERR_GENERAL}"
+  if type print_error &>/dev/null; then
+    print_error "$message"
+  else
+    echo -e "${COLOR_RED}Error: $message${COLOR_RESET}" >&2
+  fi
+  return "$code"
+}
+
+# Log success message
+# Usage: version_success "Success message"
+function version_success() {
+  if type print_success &>/dev/null; then
+    print_success "$1"
+  else
+    echo -e "${COLOR_GREEN}$1${COLOR_RESET}" >&2
+  fi
+}
+
+# Log warning message
+# Usage: version_warning "Warning message"
+function version_warning() {
+  if type print_warning &>/dev/null; then
+    print_warning "$1"
+  else
+    echo -e "${COLOR_YELLOW}$1${COLOR_RESET}" >&2
+  fi
+}
+
+# Log info message
+# Usage: version_info "Info message"
+function version_info() {
+  if type print_info &>/dev/null; then
+    print_info "$1"
+  else
+    echo -e "${COLOR_BLUE}$1${COLOR_RESET}" >&2
+  fi
+}
+
+# Log header message
+# Usage: version_header "Header message"
+function version_header() {
+  if type print_header &>/dev/null; then
+    print_header "$1"
+  else
+    echo -e "${COLOR_BLUE}${COLOR_BOLD}$1${COLOR_RESET}" >&2
+  fi
+}
+
+# Load configuration from version.conf if it exists
+function load_version_config() {
+  if [ -f "$VERSION_CONFIG_FILE" ]; then
+    source "$VERSION_CONFIG_FILE"
+    return 0
+  else
+    # Not an error if config doesn't exist yet
+    return 0
+  fi
+}
+
+# Initialize by loading configuration
+load_version_config
 
 #------------------------------------------------------------------------------
 # Version Management Functions
@@ -21,7 +115,7 @@ function get_current_version() {
   if [ ! -f "$version_file" ]; then
     print_error "Version properties file not found: $version_file"
     return 1
-  }
+  fi
   
   grep "samstraumr.version=" "$version_file" | cut -d= -f2
 }
@@ -32,7 +126,7 @@ function get_last_updated_date() {
   if [ ! -f "$version_file" ]; then
     print_error "Version properties file not found: $version_file"
     return 1
-  }
+  fi
   
   grep "samstraumr.last.updated=" "$version_file" | cut -d= -f2
 }
