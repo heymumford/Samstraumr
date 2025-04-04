@@ -11,6 +11,8 @@
 #   version              Manage project version
 #   quality              Run quality checks
 #   report               Generate change management reports
+#   docs                 Generate documentation using Docmosis
+#   test-docmosis        Run a smoke test for Docmosis integration
 #   help                 Show help for a command
 #
 # See './s8r help <command>' for more information on a specific command.
@@ -27,6 +29,39 @@ COLOR_YELLOW='\033[0;33m'
 COLOR_BLUE='\033[0;34m'
 COLOR_RESET='\033[0m'
 COLOR_BOLD='\033[1m'
+
+# Define user config directory
+USER_CONFIG_DIR="${HOME}/.s8r"
+USER_CONFIG_FILE="${USER_CONFIG_DIR}/config.json"
+
+# Ensure user config directory exists
+if [ ! -d "${USER_CONFIG_DIR}" ]; then
+  mkdir -p "${USER_CONFIG_DIR}"
+fi
+
+# Check if config file exists, create it if not
+if [ ! -f "${USER_CONFIG_FILE}" ]; then
+  # Create default config with Docmosis information
+  cat > "${USER_CONFIG_FILE}" << EOF
+{
+  "docmosis": {
+    "key": "",
+    "site": "Free Trial Java"
+  }
+}
+EOF
+  print_warning "Created default config file at ${USER_CONFIG_FILE}"
+  print_warning "Please add your Docmosis license key to this file"
+fi
+
+# Set environment variable for Docmosis if not already set
+if [ -z "${DOCMOSIS_KEY}" ]; then
+  # Try to extract from config.json using grep and cut (lightweight approach)
+  if [ -f "${USER_CONFIG_FILE}" ]; then
+    export DOCMOSIS_KEY=$(grep -o '"key": "[^"]*"' "${USER_CONFIG_FILE}" | cut -d'"' -f4)
+    export DOCMOSIS_SITE=$(grep -o '"site": "[^"]*"' "${USER_CONFIG_FILE}" | cut -d'"' -f4)
+  fi
+fi
 
 # Source the configuration file
 if [ -f "${PROJECT_ROOT}/.samstraumr.config" ]; then
@@ -79,6 +114,8 @@ function show_main_help() {
   echo "  version              Manage project version"
   echo "  quality              Run quality checks"
   echo "  report               Generate change management reports"
+  echo "  docs                 Generate documentation using Docmosis"
+  echo "  test-docmosis        Run a smoke test for Docmosis integration"
   echo "  help                 Show help for a command"
   echo ""
   echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
@@ -88,6 +125,8 @@ function show_main_help() {
   echo "  ./s8r version bump patch     # Bump patch version"
   echo "  ./s8r quality check          # Run quality checks"
   echo "  ./s8r report v1.2.8 v1.2.9   # Generate change report between versions"
+  echo "  ./s8r docs ./my-docs pdf     # Generate PDF documentation"
+  echo "  ./s8r test-docmosis          # Test Docmosis integration"
   echo "  ./s8r help test              # Show help for test command"
   echo ""
   echo "See './s8r help <command>' for more information on a specific command."
@@ -236,6 +275,64 @@ function show_report_help() {
   echo "  ./s8r report 1.0.0 1.2.0 -f pdf  # Create PDF report from 1.0.0 to 1.2.0"
 }
 
+function show_docs_help() {
+  echo -e "${COLOR_BOLD}Samstraumr Docs${COLOR_RESET} - Generate documentation using Docmosis"
+  echo ""
+  echo -e "${COLOR_BOLD}USAGE:${COLOR_RESET}"
+  echo "  ./s8r docs [options] [output-dir] [format]"
+  echo ""
+  echo -e "${COLOR_BOLD}ARGUMENTS:${COLOR_RESET}"
+  echo "  output-dir           Optional output directory (default: target/docs)"
+  echo "  format               Output format: pdf, docx, html (default: pdf)"
+  echo ""
+  echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  echo "  -h, --help           Display this help message"
+  echo ""
+  echo -e "${COLOR_BOLD}CONFIGURATION:${COLOR_RESET}"
+  echo "  The Docmosis license key can be provided in one of the following ways:"
+  echo "  1. As an environment variable: DOCMOSIS_KEY"
+  echo "  2. In the config file: ~/.s8r/config.json"
+  echo ""
+  echo "  The config file is automatically created with default values if not found."
+  echo ""
+  echo -e "${COLOR_BOLD}FEATURES:${COLOR_RESET}"
+  echo "  - Uses Docmosis license key stored in environment or config file"
+  echo "  - Automatically installs required Docmosis JARs if needed"
+  echo "  - Supports multiple output formats"
+  echo ""
+  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  echo "  ./s8r docs                        # Generate PDF docs in target/docs"
+  echo "  ./s8r docs ./my-docs              # Generate PDF docs in ./my-docs"
+  echo "  ./s8r docs ./my-docs docx         # Generate DOCX docs in ./my-docs"
+  echo "  ./s8r docs target/documentation html  # Generate HTML docs in target/documentation"
+}
+
+function show_test_docmosis_help() {
+  echo -e "${COLOR_BOLD}Samstraumr Test Docmosis${COLOR_RESET} - Run a smoke test for Docmosis integration"
+  echo ""
+  echo -e "${COLOR_BOLD}USAGE:${COLOR_RESET}"
+  echo "  ./s8r test-docmosis [options]"
+  echo ""
+  echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  echo "  -h, --help           Display this help message"
+  echo ""
+  echo -e "${COLOR_BOLD}DESCRIPTION:${COLOR_RESET}"
+  echo "  Runs a smoke test to verify that Docmosis is properly configured and working."
+  echo "  The test performs the following checks:"
+  echo "  - Verifies that the Docmosis license key is available"
+  echo "  - Validates the license key format"
+  echo "  - Checks that Docmosis JAR files are installed"
+  echo "  - Creates a simple document to test the integration"
+  echo ""
+  echo -e "${COLOR_BOLD}CONFIGURATION:${COLOR_RESET}"
+  echo "  The test uses the same configuration as the docs command:"
+  echo "  1. DOCMOSIS_KEY environment variable"
+  echo "  2. ~/.s8r/config.json file"
+  echo ""
+  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  echo "  ./s8r test-docmosis              # Run the Docmosis smoke test"
+}
+
 #------------------------------------------------------------------------------
 # Command Handler Functions
 #------------------------------------------------------------------------------
@@ -355,6 +452,103 @@ function handle_report_command() {
   "${PROJECT_ROOT}/generate-change-report.sh" "$from_version" "$to_version" "$@"
 }
 
+function handle_docs_command() {
+  # Check if this is a help request
+  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_docs_help
+    return 0
+  fi
+  
+  # Verify Docmosis environment variables are set
+  if [ -z "${DOCMOSIS_KEY}" ]; then
+    print_warning "DOCMOSIS_KEY environment variable is not set"
+    
+    # Check if config file exists
+    if [ -f "${USER_CONFIG_FILE}" ]; then
+      print_info "Reading Docmosis key from config file: ${USER_CONFIG_FILE}"
+      export DOCMOSIS_KEY=$(grep -o '"key": "[^"]*"' "${USER_CONFIG_FILE}" | cut -d'"' -f4)
+      export DOCMOSIS_SITE=$(grep -o '"site": "[^"]*"' "${USER_CONFIG_FILE}" | cut -d'"' -f4)
+    else
+      print_error "Docmosis configuration not found. Please set up the config file at ${USER_CONFIG_FILE}"
+      return 1
+    fi
+    
+    # Verify we have the key now
+    if [ -z "${DOCMOSIS_KEY}" ]; then
+      print_error "Docmosis license key not found in config file"
+      return 1
+    else
+      print_success "Docmosis license key loaded from config file"
+    fi
+  fi
+  
+  print_header "Generating Documentation with Docmosis"
+  
+  # Pass the environment variables to the script
+  export DOCMOSIS_KEY
+  export DOCMOSIS_SITE
+  
+  # Run generate-docmosis-docs.sh with arguments
+  "${PROJECT_ROOT}/generate-docmosis-docs.sh" "$@"
+  
+  # Check result
+  if [ $? -eq 0 ]; then
+    print_success "Documentation generated successfully!"
+  else
+    print_error "Documentation generation failed"
+    return 1
+  fi
+}
+
+function handle_test_docmosis_command() {
+  # Check if this is a help request
+  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_test_docmosis_help
+    return 0
+  fi
+  
+  # Verify Docmosis environment variables are set
+  if [ -z "${DOCMOSIS_KEY}" ]; then
+    print_warning "DOCMOSIS_KEY environment variable is not set"
+    
+    # Check if config file exists
+    if [ -f "${USER_CONFIG_FILE}" ]; then
+      print_info "Reading Docmosis key from config file: ${USER_CONFIG_FILE}"
+      export DOCMOSIS_KEY=$(grep -o '"key": "[^"]*"' "${USER_CONFIG_FILE}" | cut -d'"' -f4)
+      export DOCMOSIS_SITE=$(grep -o '"site": "[^"]*"' "${USER_CONFIG_FILE}" | cut -d'"' -f4)
+    else
+      print_error "Docmosis configuration not found. Please set up the config file at ${USER_CONFIG_FILE}"
+      return 1
+    fi
+    
+    # Verify we have the key now
+    if [ -z "${DOCMOSIS_KEY}" ]; then
+      print_error "Docmosis license key not found in config file"
+      return 1
+    else
+      print_success "Docmosis license key loaded from config file"
+    fi
+  fi
+  
+  print_header "Running Docmosis Integration Test"
+  
+  # Pass the environment variables to the script
+  export DOCMOSIS_KEY
+  export DOCMOSIS_SITE
+  
+  # Run test-docmosis.sh script
+  "${PROJECT_ROOT}/test-docmosis.sh" "$@"
+  
+  # Check result
+  if [ $? -eq 0 ]; then
+    print_success "Docmosis integration test passed!"
+    return 0
+  else
+    print_error "Docmosis integration test failed"
+    return 1
+  fi
+}
+
 function handle_help_command() {
   local help_topic="$1"
   
@@ -373,6 +567,12 @@ function handle_help_command() {
       ;;
     report)
       show_report_help
+      ;;
+    docs)
+      show_docs_help
+      ;;
+    test-docmosis)
+      show_test_docmosis_help
       ;;
     *)
       show_main_help
@@ -410,6 +610,12 @@ case "$COMMAND" in
     ;;
   report)
     handle_report_command "$@"
+    ;;
+  docs)
+    handle_docs_command "$@"
+    ;;
+  test-docmosis)
+    handle_test_docmosis_command "$@"
     ;;
   help)
     handle_help_command "$@"

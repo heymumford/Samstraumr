@@ -22,6 +22,8 @@ Where `<command>` can be one of:
 - `version` - Manage project version
 - `quality` - Run quality checks
 - `report` - Generate change management reports
+- `docs` - Generate documentation using Docmosis
+- `test-docmosis` - Run a smoke test for Docmosis integration
 
 For help on any command:
 ```bash
@@ -248,6 +250,37 @@ Examples:
 ./s8r version bump patch       # Bump patch version
 ./s8r version set 1.2.3        # Set version to 1.2.3
 ./s8r version test patch       # Bump patch, test, commit, tag
+```
+
+## Documentation Generation
+
+- Unified CLI (recommended): `./s8r docs [output-dir] [format]`
+- Alternative CLI: `./util/samstraumr docs [output-dir] [format]`
+- Direct script: `./generate-docmosis-docs.sh [output-dir] [format]`
+- Smoke test: `./s8r test-docmosis`
+
+Arguments:
+- `output-dir`: Optional output directory (default: target/docs)
+- `format`: Optional output format (default: pdf)
+
+Supported formats:
+- `pdf`: Adobe PDF format
+- `docx`: Microsoft Word format
+- `html`: HTML format for web viewing
+
+Features:
+- Uses Docmosis document generation engine with license key from configuration
+- License key is stored in `~/.s8r/config.json` or set as `DOCMOSIS_KEY` environment variable
+- Automatically installs Docmosis JARs if needed
+- Templates are stored in `src/main/resources/templates/`
+- Generated documents include project version and timestamp
+
+Examples:
+```bash
+./s8r docs                         # Generate PDF docs in target/docs
+./s8r docs ./my-docs               # Generate PDF docs in ./my-docs
+./s8r docs ./my-docs docx          # Generate DOCX docs in ./my-docs  
+./s8r docs target/outputs html     # Generate HTML docs in target/outputs
 ```
 
 ## CI/CD Pipeline Commands

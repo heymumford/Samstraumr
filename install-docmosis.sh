@@ -22,11 +22,58 @@ mkdir -p "${LIB_DIR}/net/sf/barcode4j/barcode4j/${BARCODE4J_VERSION}"
 # Check if JAR files exist in user's home directory
 DOCMOSIS_SRC="${HOME}/java-${DOCMOSIS_VERSION}.jar"
 DOCMOSIS_JAVADOC="${HOME}/java-${DOCMOSIS_VERSION}-javadoc.jar"
+DOCMOSIS_DOWNLOAD_URL="https://www.docmosis.com/resources/java-${DOCMOSIS_VERSION}.zip"
 
+# If JAR not found, attempt to download it
 if [ ! -f "${DOCMOSIS_SRC}" ]; then
-  echo "Error: Docmosis JAR file not found at ${DOCMOSIS_SRC}"
-  echo "Please ensure the Docmosis JAR files are in your home directory"
-  exit 1
+  echo "Docmosis JAR file not found at ${DOCMOSIS_SRC}"
+  echo "Attempting to download Docmosis..."
+  
+  # Create a temporary directory for download
+  TMP_DIR=$(mktemp -d)
+  DOWNLOAD_ZIP="${TMP_DIR}/docmosis.zip"
+  
+  # Download the Docmosis package
+  if command -v curl &> /dev/null; then
+    curl -L -o "${DOWNLOAD_ZIP}" "${DOCMOSIS_DOWNLOAD_URL}"
+  elif command -v wget &> /dev/null; then
+    wget -O "${DOWNLOAD_ZIP}" "${DOCMOSIS_DOWNLOAD_URL}"
+  else
+    echo "Error: Neither curl nor wget are available to download Docmosis"
+    echo "Please install Docmosis manually by downloading from ${DOCMOSIS_DOWNLOAD_URL}"
+    echo "and place the jar file at ${DOCMOSIS_SRC}"
+    rm -rf "${TMP_DIR}"
+    exit 1
+  fi
+  
+  # Unzip the downloaded file
+  if [ -f "${DOWNLOAD_ZIP}" ]; then
+    echo "Extracting Docmosis..."
+    unzip -q "${DOWNLOAD_ZIP}" -d "${TMP_DIR}"
+    
+    # Find and copy the jar files
+    if [ -f "${TMP_DIR}/java-${DOCMOSIS_VERSION}.jar" ]; then
+      cp "${TMP_DIR}/java-${DOCMOSIS_VERSION}.jar" "${DOCMOSIS_SRC}"
+      echo "Docmosis JAR downloaded and installed at ${DOCMOSIS_SRC}"
+    fi
+    
+    if [ -f "${TMP_DIR}/java-${DOCMOSIS_VERSION}-javadoc.jar" ]; then
+      cp "${TMP_DIR}/java-${DOCMOSIS_VERSION}-javadoc.jar" "${DOCMOSIS_JAVADOC}"
+    fi
+    
+    # Clean up temp directory
+    rm -rf "${TMP_DIR}"
+    
+    # Check if we have the JAR now
+    if [ ! -f "${DOCMOSIS_SRC}" ]; then
+      echo "Error: Could not find or download Docmosis JAR"
+      exit 1
+    fi
+  else
+    echo "Error: Failed to download Docmosis"
+    rm -rf "${TMP_DIR}"
+    exit 1
+  fi
 fi
 
 # Copy the JAR files to the local repository with proper Maven naming
