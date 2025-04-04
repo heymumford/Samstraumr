@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Samstraumr CLI Reference
 
 The S8r command-line interface provides a unified way to interact with the Samstraumr framework for tasks like building, testing, and managing versions.
