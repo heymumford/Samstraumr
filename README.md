@@ -2,71 +2,92 @@
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-# Samstraumr (S8r) Framework
+<!-- SEO metadata -->
+<meta name="description" content="Samstraumr (S8r): Enterprise-grade framework for resilient, self-healing software systems with adaptive components and event-driven architecture">
+<meta name="keywords" content="resilient systems, adaptive software, event-driven architecture, enterprise framework, self-healing systems, java framework, component-based architecture, systems theory, clean architecture">
+<meta name="author" content="Eric C. Mumford">
+<link rel="canonical" href="https://github.com/heymumford/Samstraumr" />
+
+# Samstraumr: Adaptive Resilient Software Framework
 
 [![Version](https://img.shields.io/badge/version-1.6.3-blue)](https://github.com/heymumford/Samstraumr/releases) [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/) [![Maven](https://img.shields.io/badge/Maven-3.6%2B-purple)](https://maven.apache.org/)
 
-> *"S8r (abbreviated from Samstraumr, Old Norse: 'unified flow'): A design framework for adaptive, self-aware software systems that embody the wisdom of natural systems."*
+Samstraumr (S8r) is an enterprise Java framework for building resilient, self-healing software systems with adaptive components and event-driven architecture. Inspired by natural systems' resilience, it enables applications that autonomously monitor, adapt, and recover from disruptions.
+
+> *"Samstraumr (Old Norse: 'unified flow'): A framework where components intelligently collaborate like organisms in an ecosystem, evolving to meet changing demands while maintaining system integrity."*
+
+## Table of Contents
+
+- [What is Samstraumr?](#what-is-samstraumr)
+- [Why Use Samstraumr?](#why-use-samstraumr)
+- [Core Concepts](#core-concepts)
+- [Getting Started](#getting-started)
+- [Documentation](#documentation)
+- [CLI Reference](#command-line-interface)
+- [When Not to Use](#when-not-to-use-samstraumr)
+- [Contributing](#contributing)
+- [License](#license)
+- [Connect](#connect)
 
 ## What is Samstraumr?
 
-Samstraumr is an elegant framework for building resilient, adaptive software systems inspired by systems theory and natural processes. It transcends traditional software architecture to create enterprise applications that:
+Samstraumr is an enterprise-grade framework for building resilient, adaptive software systems using Clean Architecture principles and event-driven communication. It creates applications that:
 
-- **Monitor themselves** and respond intelligently to changing conditions
-- **Adapt to stress** by reconfiguring their internal flows and relationships
-- **Scale organically** by growing precisely where needed
-- **Heal autonomously** when parts experience disruption
-- **Evolve over time** to better serve their purpose
+- **Self-monitor** with built-in observability and adapt to changing conditions
+- **Reconfigure under stress** by dynamically adjusting component relationships
+- **Scale precisely** where demand exists without system-wide changes
+- **Recover automatically** from component failures with graceful degradation
+- **Evolve continuously** without requiring complete system rewrites
 
-Samstraumr isn't meant to replace OOP or FP paradigms; rather, it provides a specialized solution for complex enterprise systems where resilience, adaptability, and long-term maintainability are paramount.
+Samstraumr implements natural systems theory in software, bringing biological resilience patterns to enterprise applications. It excels at managing complexity in distributed systems, service ecosystems, and high-reliability applications.
 
 ## Why Use Samstraumr?
 
-### Problems Solved
+### Enterprise Challenges Solved
 
-1. **Fragile Enterprise Systems**: Traditional architectures often create brittle systems that fail under unexpected conditions. Samstraumr's self-monitoring components detect and respond to problems automatically.
+1. **Fragile System Prevention**: Samstraumr's self-monitoring components detect and respond to problems automatically, preventing cascading failures in production systems.
 
-2. **Rigid Application Structure**: Conventional systems resist change as they grow. Samstraumr's composable architecture allows systems to evolve with changing requirements.
+2. **Technical Debt Reduction**: Clean Architecture principles and clear component boundaries prevent the accumulation of technical debt in long-lived enterprise applications.
 
-3. **Integration Complexity**: Connecting diverse systems traditionally creates tight coupling and hidden dependencies. Samstraumr's event-driven patterns enable loose coupling with clean boundaries.
+3. **Integration Simplification**: Event-driven patterns create loosely coupled integrations between disparate systems, eliminating hidden dependencies and complex integration logic.
 
-4. **Opaque System Behavior**: Most systems provide limited visibility into their internal operations. Samstraumr's built-in monitoring provides comprehensive observability.
+4. **Operational Transparency**: Comprehensive observability with built-in monitoring provides complete visibility into system behavior and component interactions.
 
-5. **Inconsistent Recovery**: Standard error handling often leads to unpredictable recovery behavior. Samstraumr implements consistent lifecycle management across all components.
+5. **Standardized Recovery**: Consistent lifecycle management allows components to recover predictably from failures using standardized recovery paths.
 
 ### Key Benefits
 
-For **Technical Leaders**:
-- Reduced technical debt through clear boundaries and self-monitoring
-- Evolutionary architecture that grows without complete rewrites
-- Built-in resilience and recovery mechanisms
-- Structured approach to managing complexity
+For **Enterprise Architects**:
+- Reduced technical debt through strict boundary enforcement
+- Evolution-friendly architecture that adapts without complete rewrites
+- Built-in resilience for mission-critical systems
+- Structured approach to managing distributed system complexity
 
-For **Developers**:
-- Well-defined component responsibilities
-- Naturally isolated units for easier testing
-- Consistent patterns across diverse functionality
-- Self-documenting relationships and states
+For **Development Teams**:
+- Well-defined component responsibilities with explicit contracts
+- Isolated components for easier parallel development and testing
+- Consistent patterns across different system domains
+- Self-documenting architecture with clear relationships
 
 For **Business Stakeholders**:
 - Lower maintenance costs through self-healing capabilities
-- Precise, targeted scaling in high-demand areas
-- Improved business continuity during disruptions
-- Future-friendly investment that evolves with requirements
+- Improved business continuity with fault-tolerant design
+- Targeted scaling that optimizes infrastructure costs
+- Future-friendly investment that evolves with business needs
 
 ## Core Concepts
 
-Samstraumr is built on a foundation of cohesive concepts that work together to create adaptive systems:
+Samstraumr implements a cohesive set of architectural concepts:
 
-- **Components**: Self-contained processing units with awareness of their state and context
+- **Components**: Self-contained processing units with awareness of state and context
 - **Composites**: Coordinated component collections forming processing pipelines
 - **Machines**: Orchestrated composites implementing complete subsystems
-- **Flow-Oriented Design**: Data and control move through clearly defined pathways
-- **Identity Management**: Precise, hierarchical identifiers for all system elements
-- **Event-Driven Architecture**: Loose coupling through event-based communication
-- **Clean Architecture**: Clear separation of domain, application, and infrastructure concerns
+- **Flow-Oriented Design**: Data and control moving through well-defined pathways
+- **Identity Management**: Hierarchical addressing for all system elements
+- **Event-Driven Communication**: Loose coupling through publish-subscribe patterns
+- **Clean Architecture**: Clear separation of domain, application, and infrastructure
 
-For deeper exploration, see the [Core Concepts documentation](./docs/concepts/core-concepts.md).
+[Learn more about core concepts →](./docs/concepts/core-concepts.md)
 
 ## Getting Started
 
@@ -103,7 +124,7 @@ For deeper exploration, see the [Core Concepts documentation](./docs/concepts/co
    </dependency>
    ```
 
-### Quick Start
+### Quick Start Example
 
 Create your first component:
 
@@ -120,7 +141,7 @@ Component validator = new EmailValidatorComponent(env);
 ValidationResult result = (ValidationResult) validator.process("user@example.com");
 ```
 
-For a complete introduction, see the [Getting Started Guide](./docs/guides/getting-started.md).
+[Complete getting started guide →](./docs/guides/getting-started.md)
 
 ## Documentation
 
@@ -176,7 +197,7 @@ Common commands:
 - `./s8r version` - Show or update version information
 - `./s8r help` - Display all commands and options
 
-For complete CLI documentation, see the [CLI Reference](./docs/reference/cli-reference.md).
+[Complete CLI reference →](./docs/reference/cli-reference.md)
 
 ## When NOT to Use Samstraumr
 
@@ -200,13 +221,7 @@ We welcome contributions from the community! Please read our [Contribution Guide
 4. Run tests and quality checks
 5. Submit a pull request
 
-For more details, see [Development Standards](./docs/contribution/code-standards.md).
-
-## Community and Support
-
-- **GitHub Issues**: Bug reports and feature requests
-- **Discussions**: Questions and community conversation
-- **Contributing**: See [Contribution Guidelines](./docs/contribution/contributing.md)
+[Development standards →](./docs/contribution/code-standards.md)
 
 ## License
 

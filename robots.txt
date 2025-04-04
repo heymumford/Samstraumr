@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://heymumford.github.io/Samstraumr/sitemap.xml
