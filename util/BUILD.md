@@ -1,0 +1,554 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Unified CLI Command
+
+Samstraumr provides a simplified command-line interface for all operations. The preferred command is:
+
+```bash
+./s8r <command> [options]
+```
+
+Alternatively, you can use the longer path:
+
+```bash
+./util/samstraumr <command> [options]
+```
+
+Where `<command>` can be one of:
+- `build` - Build the project with optimized settings
+- `test` - Run tests with support for different test types
+- `version` - Manage project version
+- `quality` - Run quality checks
+- `report` - Generate change management reports
+- `docs` - Generate documentation using Docmosis
+- `test-docmosis` - Run a smoke test for Docmosis integration
+- `install` - Initialize or update project configuration
+
+For help on any command:
+
+```bash
+./s8r help <command>
+```
+
+## Configuration and Path Management
+
+Samstraumr uses a centralized configuration approach to manage paths and settings:
+
+- `.samstraumr.config` contains all project paths and key configuration settings
+- All utility scripts should source this file using:
+
+  ```bash
+  # At the top of each script
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"  # Adjust path as needed
+  source "${PROJECT_ROOT}/.samstraumr.config"
+  ```
+- When refactoring file structures, use `./update-config-paths.sh` to update the configuration
+- Use configuration variables like `${SAMSTRAUMR_CORE_MODULE}`, `${SAMSTRAUMR_JAVA_TEST}`, etc. for paths
+- Convert Java package paths to directory paths with `$(path_for_package "${SAMSTRAUMR_TEST_PACKAGE}")`
+
+## Script Organization
+
+Scripts are organized in a hierarchical structure:
+
+```
+/
+├── s8r                    # Main entry point script (recommended)
+├── .s8r/                  # Project-specific configuration
+│   ├── config.json        # Project configuration
+│   └── config/            # Additional configuration files
+├── util/
+│   ├── bin/               # Consolidated executable scripts
+│   │   ├── build/         # Build-related scripts
+│   │   ├── test/          # Testing-related scripts
+│   │   ├── quality/       # Quality check scripts
+│   │   ├── docs/          # Documentation generation scripts
+│   │   ├── version/       # Version management scripts
+│   │   ├── utils/         # Utility scripts
+│   │   └── config/        # Configuration scripts
+│   ├── lib/               # Shared bash libraries
+│   │   ├── common.sh      # Common utility functions
+│   │   ├── build-lib.sh   # Build-related functions
+│   │   ├── test-lib.sh    # Test-related functions
+│   │   ├── quality-lib.sh # Quality-related functions
+│   │   └── version-lib.sh # Version-related functions
+│   └── samstraumr         # Alternative entry point CLI
+└── docs/                  # Documentation
+```
+
+All scripts follow functional programming principles with:
+- Clear separation of concerns
+- Single responsibility functions
+- Main routine as a series of function calls
+- No hardcoded values, using config variables instead
+
+## Build Commands
+
+- Unified CLI (recommended): `./s8r build [mode]`
+- Alternative CLI: `./util/samstraumr build [mode]`
+- Direct script: `./util/bin/build/build-optimal.sh [mode]`
+- Maven commands:
+  - Build project: `mvn clean install`
+  - Build without tests: `mvn clean install -DskipTests`
+  - Run all tests: `mvn test`
+
+Available modes:
+- `fast`: Fast build with quality checks skipped (default)
+- `compile`: Compile only
+- `test`: Compile and run tests
+- `package`: Create JAR package
+- `install`: Install to local repository
+
+Additional options:
+- `-c, --clean`: Clean before building
+- `-p, --profile <profile>`: Use specific Maven profile
+- `--skip-quality`: Skip quality checks
+
+Examples:
+
+```bash
+./s8r build                   # Fast build
+./s8r build test              # Run tests
+./s8r build -c test           # Clean and run tests
+./s8r build -p atl-tests test # Run tests with ATL profile
+```
+
+## Test Commands
+
+### Test Runner Commands
+
+- Unified CLI (recommended): `./s8r test <test-type> [options]`
+- Alternative CLI: `./util/samstraumr test <test-type> [options]`
+- Direct script: `./util/bin/test/unified-test-runner.sh <test-type> [options]`
+
+Test types:
+- Industry Standard:
+- `smoke` (basic system assembly and connectivity)
+- `unit` (individual units in isolation)
+- `component` (connected components working together)
+- `integration` (interactions between different parts)
+- `api` (public interfaces and contracts)
+- `system` (entire system as a whole)
+- `endtoend` (user perspective and requirements)
+- `property` (system properties across inputs)
+- Samstraumr Terminology:
+- `orchestration` (basic system assembly and connectivity)
+- `tube` (individual tubes in isolation)
+- `composite` (or `bundle` for legacy) (connected tubes)
+- `flow` (interactions between different parts)
+- `machine` (public interfaces and contracts)
+- `stream` (entire system as a whole)
+- `acceptance` (user perspective and requirements)
+- `adaptation` (system properties across inputs)
+- Special test types:
+- `all` (run all tests)
+- `atl` (Above-The-Line critical tests)
+- `btl` (Below-The-Line robustness tests) [DISABLED - tests removed v1.3.1]
+- `adam` (Adam tube identity tests)
+
+Options:
+- `-b, --both`: Include equivalent tags (e.g., run both unit and tube tests)
+- `-c, --clean`: Clean before running tests
+- `-o, --output <file>`: Write test output to file
+- `-p, --profile <profile>`: Use specific Maven profile
+- `-v, --verbose`: Show verbose output with detailed status
+- `--skip-quality`: Skip quality checks
+- `--cyclename <name>`: Specify a name for the test cycle (for reporting)
+
+Examples:
+
+```bash
+./s8r test unit                # Run unit tests
+./s8r test --both unit         # Run unit and tube tests
+./s8r test -c tube             # Clean and run tube tests
+./s8r test -v adam             # Run Adam tube tests with verbose output
+./s8r test -v --cyclename "Integration Tests" flow  # Run flow tests with custom cycle name
+./s8r test atl                 # Run critical tests
+```
+
+### Maven Test Profiles
+
+- Critical vs Robustness Tests:
+  - `mvn test -P atl-tests` (Above The Line - critical tests)
+  - `mvn test -P btl-tests` (Below The Line - robustness tests) [DISABLED - tests removed v1.3.1]
+- Industry Standard Test Profiles:
+  - `mvn test -P smoke-tests` (basic system verification)
+  - `mvn test -P unit-tests` (individual units)
+  - `mvn test -P component-tests` (connected components)
+  - `mvn test -P integration-tests` (interactions between parts)
+  - `mvn test -P api-tests` (public interfaces)
+  - `mvn test -P system-tests` (entire system)
+  - `mvn test -P endtoend-tests` (user perspective)
+  - `mvn test -P property-tests` (system properties)
+- Samstraumr Test Profiles:
+  - `mvn test -P orchestration-tests` (basic system verification)
+  - `mvn test -P tube-tests` (individual units)
+  - `mvn test -P composite-tests` (connected components)
+  - `mvn test -P flow-tests` (interactions between parts)
+  - `mvn test -P machine-tests` (public interfaces)
+  - `mvn test -P stream-tests` (entire system)
+  - `mvn test -P acceptance-tests` (user perspective)
+  - `mvn test -P adaptation-tests` (system properties)
+  - `mvn test -P adam-tube-tests` (all origin tube tests)
+  - `mvn test -P adam-tube-atl-tests` (critical origin tube tests)
+- Run with quality checks skipped: `mvn test -P skip-quality-checks`
+
+### Test Annotations and Tags
+
+- Terminology Mapping:
+  - Industry Standard → Samstraumr:
+    - `@SmokeTest` → `@OrchestrationTest`
+    - `@UnitTest` → `@TubeTest`
+    - `@ComponentTest` → `@CompositeTest` (formerly `@BundleTest`)
+    - `@IntegrationTest` → `@FlowTest`
+    - `@ApiTest` → `@MachineTest`
+    - `@SystemTest` → `@StreamTest`
+    - `@EndToEndTest` → `@AcceptanceTest`
+    - `@PropertyTest` → `@AdaptationTest`
+- Additional Tags:
+  - Criticality: `@ATL` (critical), `@BTL` (robustness)
+  - Layer-based: `@L0_Tube`, `@L1_Bundle`, `@L2_Machine`, `@L3_System`
+  - Capabilities: `@Identity`, `@Flow`, `@State`, `@Awareness`
+  - Lifecycle: `@Init`, `@Runtime`, `@Termination`
+  - Patterns: `@Observer`, `@Transformer`, `@Validator`, `@CircuitBreaker`
+  - Non-functional: `@Performance`, `@Resilience`, `@Scale`
+  - Identity Types: `@AdamTube` (origin point), `@SubstrateIdentity`, `@MemoryIdentity`
+
+## Quality Gates and Check Commands
+
+Samstraumr uses a comprehensive set of quality gates that must pass for a build to be considered successful.
+
+### Core Quality Gates
+
+1. **Spotless** - Code formatting using Google Java Style with custom import ordering
+2. **Checkstyle** - Style checking against the project's standards defined in checkstyle.xml
+3. **SpotBugs** - Static analysis for bug detection with "Max" effort and "Medium" threshold
+4. **JaCoCo** - Code coverage analysis and reporting
+5. **File Encoding** - UTF-8 encoding and proper line endings (LF) verification
+6. **SonarQube** - Comprehensive static code analysis with quality gate enforcement (in CI/CD)
+
+### Local Quality Check Commands
+
+- Unified CLI (recommended): `./s8r quality <command>`
+- Alternative CLI: `./util/samstraumr quality <command>`
+- Direct script: `./util/bin/quality/check-build-quality.sh`
+
+Quality commands:
+- `check`: Run all quality checks
+- `spotless`: Run Spotless formatting check
+- `checkstyle`: Run CheckStyle code style check
+- `spotbugs`: Run SpotBugs bug detection
+- `jacoco`: Run JaCoCo code coverage analysis
+- `encoding`: Check file encodings and line endings
+
+Options:
+- `-v, --verbose`: Show detailed output
+- `-f, --fix`: Fix issues automatically (where applicable)
+
+Examples:
+
+```bash
+./s8r quality check            # Run all quality checks
+./s8r quality spotless -f      # Run Spotless and fix issues
+./s8r quality encoding -f      # Check and fix file encodings
+```
+
+### Maven Quality Commands
+
+Maven profiles and direct commands for quality checks:
+
+```bash
+# Run all quality checks (validate phase)
+mvn validate -P quality-checks
+
+# Skip quality checks during build
+mvn clean install -P skip-quality-checks
+
+# Format code with Spotless
+mvn spotless:apply
+
+# Check code formatting
+mvn spotless:check
+
+# Run Checkstyle
+mvn checkstyle:check
+
+# Run SpotBugs
+mvn spotbugs:check
+
+# Generate JaCoCo coverage report
+mvn test jacoco:report
+```
+
+### CI/CD Quality Gates
+
+The GitHub Actions workflow implements quality gates in the `quality-analysis` job:
+
+1. **Spotless**: Checks code formatting against Google Java Style
+
+   ```yaml
+   - name: Run Spotless check
+     run: mvn -B spotless:check
+   ```
+2. **Checkstyle**: Verifies coding standards with custom rules
+
+   ```yaml
+   - name: Run Checkstyle
+     run: mvn -B checkstyle:check
+   ```
+3. **SpotBugs**: Performs static analysis for bug detection
+
+   ```yaml
+   - name: Run SpotBugs
+     run: mvn -B spotbugs:check
+   ```
+4. **JaCoCo**: Generates coverage reports for analysis
+
+   ```yaml
+   - name: Generate JaCoCo report
+     run: mvn -B jacoco:report -Djacoco.skip=false
+   ```
+5. **SonarQube**: Comprehensive analysis with quality gate enforcement
+
+   ```yaml
+   - name: SonarQube analysis
+     run: |
+       mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+         -Dsonar.qualitygate.wait=true
+   ```
+6. **Quality Report Artifacts**: Uploads quality reports for review
+
+   ```yaml
+   - name: Upload Quality Reports
+     uses: actions/upload-artifact@v4
+     with:
+       name: quality-reports
+       path: |
+         **/target/site/jacoco/
+         **/target/checkstyle-result.xml
+         **/target/spotbugsXml.xml
+   ```
+
+### Quality Report Locations
+
+After running quality checks, reports are available in:
+
+- **JaCoCo Coverage**: `target/site/jacoco/index.html`
+- **Checkstyle**: `target/checkstyle-result.xml`
+- **SpotBugs**: `target/spotbugsXml.xml`
+- **Cucumber BDD**: `target/cucumber-reports/cucumber.html`
+
+For complete details, see [Quality Checks Documentation](/docs/contribution/QualityChecks.md)
+
+## Version Management
+
+Samstraumr's version management system uses a modular architecture with separate components for different types of operations.
+
+### Versioning Scheme
+
+Samstraumr follows semantic versioning (MAJOR.MINOR.PATCH) with the following guidelines:
+- **PATCH**: Bug fixes and minor improvements (1.2.3 → 1.2.4)
+- Patch version can roll up to 999 before automatically incrementing the minor version
+- Example: 1.2.999 → 1.3.0 (when bumping patch)
+- **MINOR**: New features in a backward-compatible manner (1.2.3 → 1.3.0)
+- **MAJOR**: Incompatible API changes (1.2.3 → 2.0.0)
+
+### CLI Commands
+
+- Unified CLI (recommended): `./s8r version <command>`
+- Alternative CLI: `./util/samstraumr version <command>`
+- Modular implementation: `./util/bin/version/version-manager-modular.sh <command>`
+- Original implementation: `./util/bin/version/version-manager.sh <command>`
+
+Available commands:
+- `get`: Show current version information
+- `export`: Output only the current version (for scripts)
+- `bump <type>`: Bump version (type: major, minor, patch)
+- `set <version>`: Set a specific version (format: x.y.z)
+- `verify`: Verify that version and tag are in sync
+- `fix-tag`: Create a git tag matching the current version
+- `test <type>`: Bump version, run tests, then commit and tag
+- `history`: Show version history
+- `diagnose`: Run diagnostics to identify and fix version issues
+- `debug`: Show detailed version configuration information
+
+### Version Commands
+
+#### View Commands
+
+- `get`: Show current version information
+- `get -v`: Show detailed version info with tag status
+- `export`: Output only the current version (for scripts)
+- `verify`: Verify that version and tag are in sync
+- `history`: Show version history from git tags
+
+#### Modification Commands
+
+- `bump <type>`: Bump version (type: major, minor, patch)
+- `set <version>`: Set a specific version (format: x.y.z)
+- `fix-tag`: Create a git tag matching the current version
+
+#### Workflow Commands
+
+- `test <type>`: Bump version, run tests, then commit and tag
+
+### Options
+
+- `--no-commit`: Don't automatically commit version changes
+- `--skip-tests`: Skip running tests (for test command only)
+- `--skip-quality`: Skip quality checks (for test command only)
+- `--push`: Push changes to remote (for test command only)
+
+### Examples
+
+```bash
+./s8r version get              # Show current version
+./s8r version get -v           # Show detailed version info
+./s8r version bump patch       # Bump patch version (bug fixes)
+./s8r version bump minor       # Bump minor version (new features)
+./s8r version bump major       # Bump major version (breaking changes)
+./s8r version set 1.5.0        # Set version to 1.5.0
+./s8r version test patch       # Bump patch, test, commit, tag
+./s8r version test patch --push # With remote push
+```
+
+### Version Files
+
+- `Samstraumr/version.properties`: Primary version source of truth
+- Configuration: `.s8r/config/version.conf`
+- Implementation modules:
+  - `util/lib/version-lib.sh`: Core utilities
+  - `util/bin/version/commands/*.sh`: Command modules
+  - `util/bin/version/version-manager-modular.sh`: Command router
+
+For complete documentation, see [Version Management](docs/reference/version-management.md)
+
+## Documentation Generation
+
+- Unified CLI (recommended): `./s8r docs [output-dir] [format]`
+- Alternative CLI: `./util/samstraumr docs [output-dir] [format]`
+- Direct script: `./generate-docmosis-docs.sh [output-dir] [format]`
+- Smoke test: `./s8r test-docmosis`
+
+Arguments:
+- `output-dir`: Optional output directory (default: target/docs)
+- `format`: Optional output format (default: pdf)
+
+Supported formats:
+- `pdf`: Adobe PDF format
+- `docx`: Microsoft Word format
+- `html`: HTML format for web viewing
+
+Features:
+- Uses Docmosis document generation engine with license key from configuration
+- License key is stored in `~/.s8r/config.json` or set as `DOCMOSIS_KEY` environment variable
+- Automatically installs Docmosis JARs if needed
+- Templates are stored in `src/main/resources/templates/`
+- Generated documents include project version and timestamp
+
+Examples:
+
+```bash
+./s8r docs                         # Generate PDF docs in target/docs
+./s8r docs ./my-docs               # Generate PDF docs in ./my-docs
+./s8r docs ./my-docs docx          # Generate DOCX docs in ./my-docs  
+./s8r docs target/outputs html     # Generate HTML docs in target/outputs
+```
+
+## CI/CD Pipeline Commands
+
+- Local GitHub Actions workflow verification with Act:
+  - Install Act: `sudo curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash`
+  - List available jobs: `act -l`
+  - Dry run a job: `act -j initialization --dryrun`
+  - Run a specific job: `sudo act -j get-version`
+  - Run with specific event: `sudo act workflow_dispatch -j get-version -W .github/workflows/samstraumr-pipeline.yml`
+  - Complete documentation: See `docs/contribution/ci-cd-guide.md`
+- Badge management:
+  - Generate all badges: `./util/bin/utils/generate-badges.sh all`
+  - Generate specific badge: `./util/bin/utils/generate-badges.sh build`
+
+## Code Style Guidelines
+
+- **Imports**: Specific imports (no wildcards). Standard Java first, then third-party, then project imports.
+- **Naming**:
+  - Classes, interfaces, enums, annotations: PascalCase
+  - Methods, variables, parameters: camelCase
+  - Constants (static final fields): UPPER_SNAKE_CASE
+  - Cucumber step methods: snake_case
+  - See docs/reference/standards/java-naming-standards.md for complete details
+- **Error Handling**: Custom exceptions with contextual messages; consistent logging before throwing exceptions.
+- **Logging**:
+  - Use SLF4J with Log4j2 implementation
+  - Follow log level guidelines in docs/reference/standards/logging-standards.md
+  - Always use parameterized logging (LOGGER.info("Value: {}", value))
+  - Include exceptions in error logs (LOGGER.error("Message", exception))
+  - Never use System.out.println or System.err.println
+- **Testing**: Cucumber for BDD testing; feature files with descriptive scenarios.
+- **Documentation**: Javadoc for public APIs; comments for complex operations.
+- **Structure**: Final fields for immutability; private methods for implementation details.
+- **Encoding**: UTF-8 for all text files; LF (Unix-style) line endings for all text files except .bat and .cmd files.
+- **File Format**: EditorConfig ensures consistent formatting across different IDEs.
+
+## Project Organization
+
+- Multi-module Maven project (Java 17)
+- BDD testing approach with Cucumber
+- Feature files contain detailed test documentation with tags for selective test execution
+- Quality checks integrated into the build process
+  - Spotless: Code formatting
+  - SonarQube: Comprehensive static code analysis (external)
+  - Checkstyle: Coding standards
+  - SpotBugs: Bug detection
+  - JaCoCo: Code coverage
+- Version management
+  - Central version.properties file in Samstraumr/ directory
+  - Update version with: `./util/samstraumr version bump patch`
+  - Always use patch version bumping for bugfixes and small improvements
+  - Resources filtered to include version information
+
+## Quality Reports
+
+- Cucumber Reports: `target/cucumber-reports/cucumber.html`
+- JaCoCo Coverage: `target/site/jacoco/index.html`
+- CheckStyle: `target/checkstyle-result.xml`
+- SonarQube: Online dashboard
+- SpotBugs: `target/spotbugsXml.xml`
+
+## Bash Scripting Guidelines
+
+When writing bash scripts for this project, follow these guidelines:
+
+1. **Structure**:
+   - Place scripts in the appropriate subdirectory under `util/bin/`
+   - Use the script template provided in `util/lib/script-template.sh`
+   - Always make scripts executable with `chmod +x`
+2. **Functional Programming**:
+   - Main routine should be a series of function calls
+   - Each function should have a single responsibility
+   - Use meaningful function and variable names
+   - Document function parameters and return values
+3. **Documentation**:
+   - Include a header with description, usage, and examples
+   - Document complex logic with inline comments
+   - Provide help message with `-h` or `--help` flag
+4. **Configuration**:
+   - Source `.samstraumr.config` at the beginning of each script
+   - Use configuration variables instead of hardcoded values
+   - Don't duplicate configuration that already exists
+5. **Error Handling**:
+   - Check for required commands and tools
+   - Validate user input and arguments
+   - Provide meaningful error messages
+   - Use appropriate exit codes
+6. **Consistency**:
+   - Use the shared functions from `util/lib/*.sh`
+   - Follow the same command-line argument parsing approach
+   - Use consistent naming conventions
+   - Use the same coloring and output formatting

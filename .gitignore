@@ -183,8 +183,9 @@ Thumbs.db
 **/docmosis.properties
 docmosis.properties
 
-# LLM specific configuration - generated at install time
+# Build and LLM specific configuration - generated at install time
 /CLAUDE.md
+# New build documentation is now tracked in git
 
 #------------------------------------------------------------------------------
 # Dependency Management
