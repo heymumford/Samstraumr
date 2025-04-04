@@ -3,6 +3,8 @@ package org.samstraumr.tube.orchestration;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.samstraumr.tube.Environment;
@@ -27,9 +29,9 @@ public class BuildIntegrityTest {
   @DisplayName("Core environment should initialize")
   void environmentShouldInitialize() {
     Environment env = new Environment();
-    String params = env.getParameters();
+    Map<String, Object> params = env.getParameters();
     assertNotNull(params, "Environment parameters should not be null");
-    assertTrue(params.contains("hostname"), "Environment parameters should include hostname");
+    assertTrue(params.containsKey("hostname"), "Environment parameters should include hostname");
   }
 
   @Test

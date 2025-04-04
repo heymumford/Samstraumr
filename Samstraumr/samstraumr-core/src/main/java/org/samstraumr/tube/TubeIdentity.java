@@ -8,6 +8,7 @@
 package org.samstraumr.tube;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +40,10 @@ public class TubeIdentity {
   private final String reason;
   private final Map<String, String> environmentContext;
   private final List<String> lineage;
+  private TubeIdentity parentIdentity;
+  private List<TubeIdentity> descendants;
+  private String hierarchicalAddress;
+  private boolean isAdamTube;
 
   /**
    * Creates a new TubeIdentity with the specified properties.
@@ -53,6 +58,9 @@ public class TubeIdentity {
     this.environmentContext = new HashMap<>();
     this.lineage = new CopyOnWriteArrayList<>();
     this.lineage.add(reason);
+    this.descendants = new ArrayList<>();
+    this.isAdamTube = false;
+    this.hierarchicalAddress = "T<" + uniqueId.substring(0, 8) + ">";
   }
 
   /**
@@ -102,6 +110,17 @@ public class TubeIdentity {
   public Map<String, String> getEnvironmentContext() {
     return Collections.unmodifiableMap(environmentContext);
   }
+  
+  /**
+   * Gets the environmental context at the time of tube creation.
+   * This is an alias for getEnvironmentContext() for backward compatibility.
+   *
+   * @return An unmodifiable view of the environmental context
+   */
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "Returning unmodifiable view")
+  public Map<String, String> getEnvironmentalContext() {
+    return getEnvironmentContext();
+  }
 
   /**
    * Adds environmental context information.
@@ -129,6 +148,106 @@ public class TubeIdentity {
    */
   public void addToLineage(String entry) {
     lineage.add(entry);
+  }
+  
+  /**
+   * Creates an Adam (origin) tube identity without a parent reference.
+   * 
+   * @param reason The reason for creating this Adam tube
+   * @param environment The environment in which to create the tube
+   * @return A new Adam tube identity
+   */
+  public static TubeIdentity createAdamIdentity(String reason, Environment environment) {
+    TubeIdentity identity = createWithRandomId(reason);
+    identity.isAdamTube = true;
+    identity.hierarchicalAddress = "T<" + identity.getUniqueId().substring(0, 8) + ">";
+    
+    // Add environmental context
+    if (environment != null) {
+      for (String key : environment.getParameterKeys()) {
+        identity.addEnvironmentContext(key, environment.getParameter(key));
+      }
+    }
+    
+    return identity;
+  }
+  
+  /**
+   * Creates a child tube identity with a parent reference.
+   * 
+   * @param reason The reason for creating this child tube
+   * @param environment The environment in which to create the tube
+   * @param parentIdentity The parent tube's identity
+   * @return A new child tube identity
+   */
+  public static TubeIdentity createChildIdentity(String reason, Environment environment, 
+                                              TubeIdentity parentIdentity) {
+    TubeIdentity identity = createWithRandomId(reason);
+    identity.parentIdentity = parentIdentity;
+    
+    // Calculate hierarchical address based on parent
+    if (parentIdentity != null) {
+      identity.hierarchicalAddress = parentIdentity.getHierarchicalAddress() + 
+                                    "." + identity.getUniqueId().substring(0, 8);
+    } else {
+      identity.hierarchicalAddress = "T<" + identity.getUniqueId().substring(0, 8) + ">";
+    }
+    
+    // Add environmental context
+    if (environment != null) {
+      for (String key : environment.getParameterKeys()) {
+        identity.addEnvironmentContext(key, environment.getParameter(key));
+      }
+    }
+    
+    return identity;
+  }
+  
+  /**
+   * Gets the parent identity of this tube, if any.
+   * 
+   * @return The parent tube's identity, or null for Adam tubes
+   */
+  public TubeIdentity getParentIdentity() {
+    return parentIdentity;
+  }
+  
+  /**
+   * Gets the hierarchical address of this tube in the tube ecosystem.
+   * 
+   * @return The hierarchical address string
+   */
+  public String getHierarchicalAddress() {
+    return hierarchicalAddress;
+  }
+  
+  /**
+   * Determines if this is an Adam (origin) tube without a parent.
+   * 
+   * @return true if this is an Adam tube, false otherwise
+   */
+  public boolean isAdamTube() {
+    return isAdamTube;
+  }
+  
+  /**
+   * Gets the list of descendants of this tube.
+   * 
+   * @return An unmodifiable list of descendant identities
+   */
+  public List<TubeIdentity> getDescendants() {
+    return Collections.unmodifiableList(descendants);
+  }
+  
+  /**
+   * Adds a child tube to this tube's descendants.
+   * 
+   * @param childIdentity The child tube's identity
+   */
+  public void addChild(TubeIdentity childIdentity) {
+    if (childIdentity != null) {
+      descendants.add(childIdentity);
+    }
   }
 
   @Override

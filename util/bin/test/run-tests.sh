@@ -246,7 +246,7 @@ MAVEN_CMD="mvn test"
 if [ -n "$PROFILE" ]; then
   # Explicitly deactivate the fast profile which skips tests,
   # and enable our test profile, with skipTests=false
-  MAVEN_CMD="$MAVEN_CMD -P -fast,$PROFILE -DskipTests=false -Dmaven.test.skip=false"
+  MAVEN_CMD="$MAVEN_CMD -P !fast,$PROFILE -DskipTests=false -Dmaven.test.skip=false"
 fi
 
 # Add clean if requested (Put clean before test)

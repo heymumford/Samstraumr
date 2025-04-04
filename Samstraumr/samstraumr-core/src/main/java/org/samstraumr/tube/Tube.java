@@ -324,6 +324,16 @@ public class Tube {
   public List<String> getMimirLog() {
     return Collections.unmodifiableList(mimirLog);
   }
+  
+  /**
+   * Queries the Mimir log entries for this tube.
+   * This is an alias for getMimirLog() for backward compatibility.
+   *
+   * @return an unmodifiable view of the Mimir log
+   */
+  public List<String> queryMimirLog() {
+    return getMimirLog();
+  }
 
   /**
    * Gets the current number of entries in the Mimir log.

@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Map;
+
 import org.samstraumr.tube.Environment;
 import org.samstraumr.tube.Tube;
 import org.samstraumr.tube.composite.Composite;
@@ -35,17 +37,17 @@ public class OrchestrationSteps {
 
   @Then("the environment should have valid parameters")
   public void environmentShouldHaveValidParameters() {
-    String params = environment.getParameters();
+    Map<String, Object> params = environment.getParameters();
     assertNotNull(params, "Environment parameters should not be null");
     assertFalse(params.isEmpty(), "Environment parameters should not be empty");
   }
 
   @Then("the environment should contain runtime information")
   public void environmentShouldContainRuntimeInformation() {
-    String params = environment.getParameters();
-    assertTrue(params.contains("hostname"), "Environment parameters should include hostname");
+    Map<String, Object> params = environment.getParameters();
+    assertTrue(params.containsKey("hostname"), "Environment parameters should include hostname");
     assertTrue(
-        params.contains("cpuModel") || params.contains("processor"),
+        params.containsKey("cpu") || params.containsKey("processor"),
         "Environment parameters should include CPU information");
   }
 

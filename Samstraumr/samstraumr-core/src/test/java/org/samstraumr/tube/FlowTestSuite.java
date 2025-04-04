@@ -3,6 +3,8 @@ package org.samstraumr.tube;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +34,9 @@ public class FlowTestSuite {
   @BeforeEach
   void setUp() {
     // Configure mock environment
-    when(mockEnvironment.getParameters()).thenReturn("{\"hostname\":\"flow-test-host\"}");
+    Map<String, Object> params = new HashMap<>();
+    params.put("hostname", "flow-test-host");
+    when(mockEnvironment.getParameters()).thenReturn(params);
     when(mockEnvironment.getEnvironmentHash()).thenReturn("flow-test-hash");
 
     // Create tube for testing

@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +71,38 @@ public class Environment {
   public Map<String, Object> getParameters() {
     return new HashMap<>(environmentParameters);
   }
+  
+  /**
+   * Gets a specific parameter value.
+   *
+   * @param key the parameter key
+   * @return the parameter value, or null if not found
+   */
+  public String getParameter(String key) {
+    Object value = environmentParameters.get(key);
+    return value != null ? value.toString() : null;
+  }
+  
+  /**
+   * Sets a parameter value in the environment.
+   *
+   * @param key the parameter key
+   * @param value the parameter value
+   */
+  public void setParameter(String key, String value) {
+    if (key != null && value != null) {
+      environmentParameters.put(key, value);
+    }
+  }
+  
+  /**
+   * Gets all parameter keys in this environment.
+   *
+   * @return a set of parameter keys
+   */
+  public Set<String> getParameterKeys() {
+    return environmentParameters.keySet();
+  }
 
   /**
    * Gets a JSON representation of the environment parameters.
@@ -86,6 +119,16 @@ public class Environment {
    * @return the environment ID
    */
   public String getEnvironmentId() {
+    return environmentId;
+  }
+  
+  /**
+   * Gets the unique hash for this environment.
+   * This is an alias for getEnvironmentId() for backward compatibility.
+   *
+   * @return the environment hash
+   */
+  public String getEnvironmentHash() {
     return environmentId;
   }
 

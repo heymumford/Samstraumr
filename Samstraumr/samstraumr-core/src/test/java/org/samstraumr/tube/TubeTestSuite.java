@@ -3,7 +3,9 @@ package org.samstraumr.tube;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.samstraumr.tube.exception.TubeInitializationException;
 import org.samstraumr.tube.test.annotations.AboveTheLine;
 import org.samstraumr.tube.test.annotations.TubeTest;
 
@@ -35,7 +38,9 @@ public class TubeTestSuite {
   @BeforeEach
   void setUp() {
     // Configure mock environment
-    when(mockEnvironment.getParameters()).thenReturn("{\"hostname\":\"test-host\"}");
+    Map<String, Object> params = new HashMap<>();
+    params.put("hostname", "test-host");
+    when(mockEnvironment.getParameters()).thenReturn(params);
     when(mockEnvironment.getEnvironmentHash()).thenReturn("test-hash");
   }
 
@@ -102,7 +107,7 @@ public class TubeTestSuite {
     // When/Then
     Exception exception =
         assertThrows(
-            Tube.TubeInitializationException.class,
+            TubeInitializationException.class,
             () -> {
               Tube.create(TEST_REASON, null);
             });
@@ -116,7 +121,7 @@ public class TubeTestSuite {
     // When/Then
     Exception exception =
         assertThrows(
-            Tube.TubeInitializationException.class,
+            TubeInitializationException.class,
             () -> {
               Tube.create(null, mockEnvironment);
             });
