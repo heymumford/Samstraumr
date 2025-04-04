@@ -14,6 +14,7 @@
 #   docs                 Generate documentation using Docmosis
 #   test-docmosis        Run a smoke test for Docmosis integration
 #   install              Initialize or update project configuration
+#   hooks                Install or update git hooks
 #   help                 Show help for a command
 #
 # See './s8r help <command>' for more information on a specific command.
@@ -696,6 +697,9 @@ function handle_help_command() {
     test)
       show_test_help
       ;;
+    hooks)
+      show_hooks_help
+      ;;
     version)
       if [ -n "$1" ] && [ -d "${PROJECT_ROOT}/util/bin/version/commands" ]; then
         # For version subcommands, direct to appropriate module
@@ -795,6 +799,9 @@ case "$COMMAND" in
   install)
     handle_install_command "$@"
     ;;
+  hooks)
+    handle_hooks_command "$@"
+    ;;
   help)
     handle_help_command "$@"
     ;;
@@ -806,3 +813,138 @@ case "$COMMAND" in
 esac
 
 exit $?
+
+#------------------------------------------------------------------------------
+# Hooks Command
+#------------------------------------------------------------------------------
+
+function show_hooks_help() {
+  echo -e "${COLOR_BOLD}Samstraumr Hooks${COLOR_RESET} - Install or update git hooks for the repository"
+  echo ""
+  echo -e "${COLOR_BOLD}USAGE:${COLOR_RESET}"
+  echo "  ./s8r hooks [options]"
+  echo ""
+  echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  echo "  -h, --help           Display this help message"
+  echo "  -f, --force          Force overwrite of existing hooks"
+  echo "  -v, --verbose        Display verbose output during installation"
+  echo "  --list               List available hooks without installing"
+  echo ""
+  echo -e "${COLOR_BOLD}HOOKS INSTALLED:${COLOR_RESET}"
+  echo "  prepare-commit-msg:  Prevents AI assistant signatures in commit messages"
+  echo ""
+  echo -e "${COLOR_BOLD}DESCRIPTION:${COLOR_RESET}"
+  echo "  Installs Git hooks to improve the development workflow."
+  echo "  Hooks are installed from docs/contribution/git-hooks/ to .git/hooks/."
+}
+
+function handle_hooks_command() {
+  # Check if this is a help request
+  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_hooks_help
+    return 0
+  fi
+  
+  # Parse options
+  local force=false
+  local verbose=false
+  local list_only=false
+  
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -f|--force)
+        force=true
+        shift
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      --list)
+        list_only=true
+        shift
+        ;;
+      *)
+        print_error "Unknown option: $1"
+        show_hooks_help
+        return 1
+        ;;
+    esac
+  done
+  
+  # Source directory for hooks
+  local hooks_dir="${PROJECT_ROOT}/docs/contribution/git-hooks"
+  local git_hooks_dir="${PROJECT_ROOT}/.git/hooks"
+  
+  print_header "Samstraumr Git Hooks"
+  
+  # Check if hooks directory exists
+  if [ ! -d "$hooks_dir" ]; then
+    print_error "Hooks directory not found: $hooks_dir"
+    return 1
+  fi
+  
+  # Just list hooks if requested
+  if $list_only; then
+    echo -e "${COLOR_BOLD}Available Hooks:${COLOR_RESET}"
+    for hook in "$hooks_dir"/*; do
+      if [ -f "$hook" ]; then
+        hook_name=$(basename "$hook")
+        echo "  - $hook_name"
+        
+        # Show a brief description if verbose
+        if $verbose; then
+          description=$(grep -m 1 "Purpose:" "$hook" | cut -d ":" -f 2- | sed 's/^ *//')
+          if [ -n "$description" ]; then
+            echo "      $description"
+          fi
+        fi
+      fi
+    done
+    return 0
+  fi
+  
+  # Create git hooks directory if it doesn't exist
+  if [ ! -d "$git_hooks_dir" ]; then
+    mkdir -p "$git_hooks_dir"
+  fi
+  
+  # Install hooks
+  local installed_count=0
+  for hook in "$hooks_dir"/*; do
+    if [ -f "$hook" ]; then
+      hook_name=$(basename "$hook")
+      target="$git_hooks_dir/$hook_name"
+      
+      # Check if hook already exists and we're not forcing
+      if [ -f "$target" ] && ! $force; then
+        if $verbose; then
+          print_warning "Hook already exists: $hook_name (use --force to overwrite)"
+        fi
+        continue
+      fi
+      
+      # Copy the hook and make it executable
+      cp "$hook" "$target"
+      chmod +x "$target"
+      installed_count=$((installed_count + 1))
+      
+      if $verbose; then
+        print_success "Installed hook: $hook_name"
+      fi
+    fi
+  done
+  
+  if [ $installed_count -eq 0 ]; then
+    print_warning "No hooks were installed. Use --force to overwrite existing hooks."
+  else
+    print_success "Installed $installed_count git hooks"
+  fi
+  
+  # Show a brief message about what the hooks do
+  echo ""
+  echo -e "${COLOR_BOLD}Hooks installed:${COLOR_RESET}"
+  echo "- prepare-commit-msg: Prevents AI assistant signatures in commit messages"
+  
+  return 0
+}
