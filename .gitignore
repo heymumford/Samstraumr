@@ -46,6 +46,9 @@ target/
 # Gradle
 .gradle/
 **/build/
+# Except documentation build directories
+!docs/build/
+!docs/guide/
 !gradle/wrapper/gradle-wrapper.jar
 
 # SonarQube
@@ -208,6 +211,9 @@ __pycache__/
 env/
 venv/
 ENV/
+# Exclude docs/build and docs/guide which contain documentation
+!docs/build/
+!docs/guide/
 build/
 develop-eggs/
 dist/
