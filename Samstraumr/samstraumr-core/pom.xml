@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-modules</artifactId>
-    <version>1.6.1</version>
+    <version>1.6.2</version>
   </parent>
 
   <artifactId>samstraumr-core</artifactId>
@@ -23,6 +23,9 @@
     <lombok.version>1.18.30</lombok.version>
     <docmosis.version>22.2.03</docmosis.version>
     <archunit.version>1.2.0</archunit.version>
+    <mockito.version>5.8.0</mockito.version>
+    <testcontainers.version>1.19.3</testcontainers.version>
+    <pmd.version>7.0.0</pmd.version>
   </properties>
 
   <dependencies>
@@ -89,6 +92,13 @@
       <version>${junit-jupiter.version}</version>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-java</artifactId>
@@ -114,11 +124,62 @@
       <scope>test</scope>
     </dependency>
     
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-suite-engine</artifactId>
+      <version>1.10.1</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <version>${junit-jupiter.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
     <!-- ArchUnit for architectural testing -->
     <dependency>
       <groupId>com.tngtech.archunit</groupId>
       <artifactId>archunit-junit5</artifactId>
       <version>${archunit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- Mockito for testing -->
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- TestContainers for integration testing -->
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>${testcontainers.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${testcontainers.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
     
