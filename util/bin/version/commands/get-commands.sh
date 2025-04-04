@@ -16,16 +16,28 @@ source "${PROJECT_ROOT}/util/lib/version-lib.sh"
 #------------------------------------------------------------------------------
 
 function show_help() {
-  echo -e "${COLOR_BOLD}Version Retrieval Commands${COLOR_RESET}"
+  if type print_header &>/dev/null; then
+    print_header "Version Retrieval Commands"
+  else
+    echo "=== Version Retrieval Commands ==="
+  fi
   echo ""
-  echo -e "${COLOR_BOLD}COMMANDS:${COLOR_RESET}"
+  if type print_bold &>/dev/null; then
+    print_bold "COMMANDS:"
+  else
+    echo "COMMANDS:"
+  fi
   echo "  get                  Show current version information"
   echo "    -v, --verbose      Show detailed information"
   echo "  export               Output only the current version (for scripts)"
   echo "  verify               Verify that version and tag are in sync"
   echo "  history              Show version history"
   echo ""
-  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  if type print_bold &>/dev/null; then
+    print_bold "EXAMPLES:"
+  else
+    echo "EXAMPLES:"
+  fi
   echo "  get                  # Show current version"
   echo "  get -v               # Show detailed information"
   echo "  export               # Output only version number"
@@ -52,20 +64,42 @@ function cmd_get_version() {
   if [ "$verbose" = "true" ]; then
     version_header "Version Information"
     echo ""
-    echo -e "${COLOR_BOLD}Current Version:${COLOR_RESET} $current_version"
     
-    # Check if tag exists
-    local tag_exists=$(git -C "$PROJECT_ROOT" tag -l "${GIT_TAG_PREFIX}$current_version")
-    if [ -n "$tag_exists" ]; then
-      echo -e "${COLOR_BOLD}Version Tag:${COLOR_RESET} ${GIT_TAG_PREFIX}$current_version (exists)"
+    # Display using print functions if available
+    if type print_bold &>/dev/null; then
+      print_bold "Current Version:"
+      echo "$current_version"
+      
+      # Check if tag exists
+      local tag_exists=$(git -C "$PROJECT_ROOT" tag -l "${GIT_TAG_PREFIX}$current_version")
+      print_bold "Version Tag:"
+      if [ -n "$tag_exists" ]; then
+        echo "${GIT_TAG_PREFIX}$current_version (exists)"
+      else
+        echo "${GIT_TAG_PREFIX}$current_version (missing)"
+      fi
+      
+      # Show last commit info
+      print_bold "Last Commit:"
+      git -C "$PROJECT_ROOT" log -1 --pretty=format:"  %h (%ad) - %s" --date=short
+      echo ""
     else
-      echo -e "${COLOR_BOLD}Version Tag:${COLOR_RESET} ${GIT_TAG_PREFIX}$current_version (missing)"
+      # Fallback without color functions
+      echo "Current Version: $current_version"
+      
+      # Check if tag exists
+      local tag_exists=$(git -C "$PROJECT_ROOT" tag -l "${GIT_TAG_PREFIX}$current_version")
+      if [ -n "$tag_exists" ]; then
+        echo "Version Tag: ${GIT_TAG_PREFIX}$current_version (exists)"
+      else
+        echo "Version Tag: ${GIT_TAG_PREFIX}$current_version (missing)"
+      fi
+      
+      # Show last commit info
+      echo "Last Commit:"
+      git -C "$PROJECT_ROOT" log -1 --pretty=format:"  %h (%ad) - %s" --date=short
+      echo ""
     fi
-    
-    # Show last commit info
-    echo -e "${COLOR_BOLD}Last Commit:${COLOR_RESET}"
-    git -C "$PROJECT_ROOT" log -1 --pretty=format:"  %h (%ad) - %s" --date=short
-    echo ""
   else
     echo "Current version: $current_version"
   fi
@@ -94,7 +128,7 @@ function cmd_verify_version() {
   local tag_exists=$(git -C "$PROJECT_ROOT" tag -l "$tag_name")
   
   version_header "Version Tag Verification"
-  echo -e "Current version: $current_version"
+  echo "Current version: $current_version"
   
   if [ -z "$tag_exists" ]; then
     version_warning "No tag exists for current version $tag_name"
@@ -115,7 +149,12 @@ function cmd_show_version_history() {
     local date=$(git -C "$PROJECT_ROOT" log -1 --format=%ad --date=short "$tag")
     local message=$(git -C "$PROJECT_ROOT" tag -l --format="%(contents:subject)" "$tag")
     
-    echo -e "${COLOR_BOLD}$tag${COLOR_RESET} ($date): $message"
+    if type print_bold &>/dev/null; then
+      print_bold -n "$tag"
+      echo " ($date): $message"
+    else
+      echo "$tag ($date): $message"
+    fi
   done
   
   return 0

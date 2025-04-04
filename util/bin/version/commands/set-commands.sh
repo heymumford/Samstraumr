@@ -16,24 +16,44 @@ source "${PROJECT_ROOT}/util/lib/version-lib.sh"
 #------------------------------------------------------------------------------
 
 function show_help() {
-  echo -e "${COLOR_BOLD}Version Modification Commands${COLOR_RESET}"
+  if type print_header &>/dev/null; then
+    print_header "Version Modification Commands"
+  else
+    echo "=== Version Modification Commands ==="
+  fi
   echo ""
-  echo -e "${COLOR_BOLD}COMMANDS:${COLOR_RESET}"
+  if type print_bold &>/dev/null; then
+    print_bold "COMMANDS:"
+  else
+    echo "COMMANDS:"
+  fi
   echo "  set <version>        Set a specific version (format: x.y.z)"
   echo "  bump <type>          Bump version (type: major, minor, patch)"
   echo "    major              Increment major version (breaking changes)"
   echo "    minor              Increment minor version (new features)"
   echo "    patch              Increment patch version (bug fixes)"
   echo ""
-  echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  if type print_bold &>/dev/null; then
+    print_bold "OPTIONS:"
+  else
+    echo "OPTIONS:"
+  fi
   echo "  --no-commit          Don't automatically commit the version change"
   echo ""
-  echo -e "${COLOR_BOLD}FILES UPDATED:${COLOR_RESET}"
+  if type print_bold &>/dev/null; then
+    print_bold "FILES UPDATED:"
+  else
+    echo "FILES UPDATED:"
+  fi
   echo "  - version.properties (primary version source)"
   echo "  - Maven POM files (if present)"
   echo "  - README.md version badge (if present)"
   echo ""
-  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  if type print_bold &>/dev/null; then
+    print_bold "EXAMPLES:"
+  else
+    echo "EXAMPLES:"
+  fi
   echo "  set 1.2.3            # Set specific version"
   echo "  bump patch           # Increment patch version (1.2.3 -> 1.2.4)"
   echo "  bump minor           # Increment minor version (1.2.3 -> 1.3.0)"

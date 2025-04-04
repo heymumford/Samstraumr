@@ -16,21 +16,37 @@ source "${PROJECT_ROOT}/util/lib/version-lib.sh"
 #------------------------------------------------------------------------------
 
 function show_help() {
-  echo -e "${COLOR_BOLD}Git Integration Commands${COLOR_RESET}"
+  if type print_header &>/dev/null; then
+    print_header "Git Integration Commands"
+  else
+    echo "=== Git Integration Commands ==="
+  fi
   echo ""
-  echo -e "${COLOR_BOLD}COMMANDS:${COLOR_RESET}"
+  if type print_bold &>/dev/null; then
+    print_bold "COMMANDS:"
+  else
+    echo "COMMANDS:"
+  fi
   echo "  commit_version_change    Commit version changes to git"
   echo "  create_version_tag       Create git tag for version"
   echo "  fix-tag                  Create missing git tag for current version"
   echo "  push_version_changes     Push changes and tags to remote"
   echo ""
-  echo -e "${COLOR_BOLD}GIT OPERATIONS:${COLOR_RESET}"
+  if type print_bold &>/dev/null; then
+    print_bold "GIT OPERATIONS:"
+  else
+    echo "GIT OPERATIONS:"
+  fi
   echo "  - Commits modified version files"
   echo "  - Creates annotated tags with format v1.2.3"
   echo "  - Generates descriptive commit messages"
   echo "  - Optionally pushes changes to remote repository"
   echo ""
-  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  if type print_bold &>/dev/null; then
+    print_bold "EXAMPLES:"
+  else
+    echo "EXAMPLES:"
+  fi
   echo "  fix-tag               # Create missing tag for current version"
   echo "  push                  # Push changes and tags to remote"
 }
