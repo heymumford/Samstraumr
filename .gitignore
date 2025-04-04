@@ -43,6 +43,16 @@ target/
 **/jacoco.exec
 **/*.cov
 
+# Gradle
+.gradle/
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# SonarQube
+.sonar/
+.scannerwork/
+sonar-project.properties
+
 #------------------------------------------------------------------------------
 # Log Files
 #------------------------------------------------------------------------------
@@ -70,6 +80,7 @@ logs/
 *.ipr
 *.iws
 .idea/
+out/
 
 # NetBeans
 nb-configuration.xml
@@ -79,10 +90,26 @@ nbproject/
 # VS Code
 *.code-workspace
 .vscode/
+.history/
 
 # Sublime Text
 *.sublime-project
 *.sublime-workspace
+
+# Emacs
+\#*\#
+.\#*
+*~
+.emacs.desktop
+.emacs.desktop.lock
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+Session.vim
 
 #------------------------------------------------------------------------------
 # Temporary & Backup Files
@@ -109,12 +136,22 @@ nbproject/
 .DS_Store?
 .Spotlight-V100
 .Trashes
+ehthumbs.db
+Icon?
 
 # Windows
 $RECYCLE.BIN/
 desktop.ini
 ehthumbs.db
 Thumbs.db
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
 
 #------------------------------------------------------------------------------
 # Configuration & Security Files
@@ -127,14 +164,87 @@ Thumbs.db
 **/*.password
 **/*.pem
 **/*.secret
+**/*.keystore
+**/*.pfx
+**/*id_rsa*
+**/*id_ed25519*
+**/*.gpg
+**/*.pgp
+**/*.asc
 
 # Environment & configuration
 **/*.env
 **/.env*
+**/application-*.properties
+**/application-*.yml
+**/application-*.yaml
+**/.aws/
+**/.gcloud/
 **/docmosis.properties
 docmosis.properties
+
 # LLM specific configuration - generated at install time
 /CLAUDE.md
+
+#------------------------------------------------------------------------------
+# Dependency Management
+#------------------------------------------------------------------------------
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.npm/
+.yarn/
+.pnp.*
+.yarn-integrity
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+
+#------------------------------------------------------------------------------
+# Documentation & Generated Content
+#------------------------------------------------------------------------------
+# Jekyll (GitHub Pages)
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+
+# Documentation
+/site/
+/docs/api/
+/docs/javadoc/
+/javadoc/
+/apidocs/
+
+# Source maps
+*.js.map
+*.css.map
 
 #------------------------------------------------------------------------------
 # Project Specific
@@ -143,3 +253,10 @@ docmosis.properties
 */.s8r/user/
 /home/*/.s8r/
 ~/.s8r/
+
+# GitHub Pages build artifacts
+.jekyll-cache/
+_site/
+
+# Test coverage reports
+coverage/
