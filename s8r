@@ -405,12 +405,64 @@ function handle_test_command() {
   # Set a variable to indicate we're calling from s8r
   export SAMSTRAUMR_CLI="s8r"
   
+  # Check for missing test type
+  if [ $# -lt 1 ]; then
+    print_error "Missing test type argument"
+    show_test_help
+    return 1
+  fi
+  
+  # Parse arguments to transform s8r format to script format
+  local test_type="$1"
+  shift
+  
+  # Prepare arguments to pass to run-tests.sh
+  local script_args=("$test_type")
+  
+  # Process command-line arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -h|--help)
+        show_test_help
+        return 0
+        ;;
+      -v|--verbose)
+        script_args+=("--verbose")
+        shift
+        ;;
+      -o|--output)
+        script_args+=("--output-file" "$2")
+        shift 2
+        ;;
+      -p|--profile)
+        script_args+=("--profile" "$2")
+        shift 2
+        ;;
+      -b|--both)
+        script_args+=("--both")
+        shift
+        ;;
+      --skip-quality)
+        script_args+=("--skip-quality")
+        shift
+        ;;
+      --clean)
+        script_args+=("--clean")
+        shift
+        ;;
+      *)
+        print_error "Unknown option: $1"
+        show_test_help
+        return 1
+        ;;
+    esac
+  done
+  
   # Handle ATL tests separately since they have a dedicated script
-  if [ "$1" = "atl" ]; then
-    shift
-    "${PROJECT_ROOT}/util/bin/test/run-atl-tests.sh" "$@"
+  if [ "$test_type" = "atl" ]; then
+    "${PROJECT_ROOT}/util/bin/test/run-atl-tests.sh" "${script_args[@]:1}"
   else
-    "${PROJECT_ROOT}/util/bin/test/run-tests.sh" "$@"
+    "${PROJECT_ROOT}/util/bin/test/run-tests.sh" "${script_args[@]}"
   fi
 }
 
