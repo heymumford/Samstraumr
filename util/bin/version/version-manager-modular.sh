@@ -425,6 +425,22 @@ function handle_command() {
     bump)
       local component="$1"
       local no_commit="false"
+      
+      # Validate component exists
+      if [ -z "$component" ]; then
+        print_error "Missing version component (major, minor, or patch)"
+        show_help
+        return 1
+      fi
+      
+      # Validate component type
+      if [[ ! "$component" =~ ^(major|minor|patch)$ ]]; then
+        print_error "Invalid version component: $component (use major, minor, or patch)"
+        show_help
+        return 1
+      fi
+      
+      # Check for --no-commit flag
       if [[ "$*" == *"--no-commit"* ]]; then
         no_commit="true"
       fi
@@ -432,17 +448,26 @@ function handle_command() {
       # Get old version before bumping
       local old_version=$(get_current_version)
       
-      # Bump version
-      cmd_bump_version "$component"
+      print_header "Bumping $component Version"
+      print_info "Current version: $old_version"
       
-      # Get new version after bumping
-      local new_version=$(get_current_version)
+      # Calculate new version directly to avoid circular dependency
+      local -i major minor patch
+      IFS='.' read -r major minor patch <<< "$old_version"
       
-      # Create commit and tag if not skipped
-      if [ "$no_commit" != "true" ]; then
-        cmd_commit_version_change "$old_version" "$new_version" "$component"
-        cmd_create_version_tag "$new_version"
-      fi
+      local new_version=""
+      case "$component" in
+        major) new_version="$((major + 1)).0.0" ;;
+        minor) new_version="${major}.$((minor + 1)).0" ;;
+        patch) new_version="${major}.${minor}.$((patch + 1))" ;;
+      esac
+      
+      print_info "New version: $new_version"
+      
+      # Use cmd_set_version to set and update references
+      cmd_set_version "$new_version" "$no_commit"
+      
+      return $?
       ;;
     set)
       local new_version="$1"
