@@ -4,7 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Unified CLI Command
 
-Samstraumr provides a unified command-line interface for all operations:
+Samstraumr provides a simplified command-line interface for all operations. The preferred command is:
+
+```bash
+./s8r <command> [options]
+```
+
+Alternatively, you can use the longer path:
 
 ```bash
 ./util/samstraumr <command> [options]
@@ -15,10 +21,11 @@ Where `<command>` can be one of:
 - `test` - Run tests with support for different test types
 - `version` - Manage project version
 - `quality` - Run quality checks
+- `report` - Generate change management reports
 
 For help on any command:
 ```bash
-./util/samstraumr help <command>
+./s8r help <command>
 ```
 
 ## Configuration and Path Management
@@ -65,7 +72,8 @@ All scripts follow functional programming principles with:
 
 ## Build Commands
 
-- Unified CLI (recommended): `./util/samstraumr build [mode]`
+- Unified CLI (recommended): `./s8r build [mode]`
+- Alternative CLI: `./util/samstraumr build [mode]`
 - Direct script: `./util/bin/build/build-optimal.sh [mode]`
 - Maven commands:
   - Build project: `mvn clean install`
@@ -86,17 +94,18 @@ Additional options:
 
 Examples:
 ```bash
-./util/samstraumr build                   # Fast build
-./util/samstraumr build test              # Run tests
-./util/samstraumr build -c test           # Clean and run tests
-./util/samstraumr build -p atl-tests test # Run tests with ATL profile
+./s8r build                   # Fast build
+./s8r build test              # Run tests
+./s8r build -c test           # Clean and run tests
+./s8r build -p atl-tests test # Run tests with ATL profile
 ```
 
 ## Test Commands
 
 ### Test Runner Commands
 
-- Unified CLI: `./util/samstraumr test <test-type>`
+- Unified CLI (recommended): `./s8r test <test-type>`
+- Alternative CLI: `./util/samstraumr test <test-type>`
 - Direct script: `./util/bin/test/run-tests.sh <test-type>`
 
 Test types:
@@ -132,10 +141,10 @@ Options:
 
 Examples:
 ```bash
-./util/samstraumr test unit                # Run unit tests
-./util/samstraumr test --both unit         # Run unit and tube tests
-./util/samstraumr test -p btl-tests flow   # Run flow tests with BTL profile
-./util/samstraumr test atl                 # Run critical tests
+./s8r test unit                # Run unit tests
+./s8r test --both unit         # Run unit and tube tests
+./s8r test -p btl-tests flow   # Run flow tests with BTL profile
+./s8r test atl                 # Run critical tests
 ```
 
 ### Maven Test Profiles
@@ -188,7 +197,8 @@ Examples:
 
 ## Quality Check Commands
 
-- Unified CLI: `./util/samstraumr quality <command>`
+- Unified CLI (recommended): `./s8r quality <command>`
+- Alternative CLI: `./util/samstraumr quality <command>`
 - Direct script: `./util/bin/quality/check-encoding.sh`
 
 Quality commands:
@@ -205,14 +215,15 @@ Options:
 
 Examples:
 ```bash
-./util/samstraumr quality check            # Run all quality checks
-./util/samstraumr quality spotless -f      # Run Spotless and fix issues
-./util/samstraumr quality encoding -v      # Check encodings with verbose output
+./s8r quality check            # Run all quality checks
+./s8r quality spotless -f      # Run Spotless and fix issues
+./s8r quality encoding -v      # Check encodings with verbose output
 ```
 
 ## Version Management
 
-- Unified CLI: `./util/samstraumr version <command>`
+- Unified CLI (recommended): `./s8r version <command>`
+- Alternative CLI: `./util/samstraumr version <command>`
 - Direct script: `./util/bin/version/version-manager.sh <command>`
 
 Version commands:
@@ -233,10 +244,10 @@ Options:
 
 Examples:
 ```bash
-./util/samstraumr version get              # Show current version
-./util/samstraumr version bump patch       # Bump patch version
-./util/samstraumr version set 1.2.3        # Set version to 1.2.3
-./util/samstraumr version test patch       # Bump patch, test, commit, tag
+./s8r version get              # Show current version
+./s8r version bump patch       # Bump patch version
+./s8r version set 1.2.3        # Set version to 1.2.3
+./s8r version test patch       # Bump patch, test, commit, tag
 ```
 
 ## CI/CD Pipeline Commands

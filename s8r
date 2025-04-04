@@ -1,0 +1,424 @@
+#!/bin/bash
+#==============================================================================
+# Filename: s8r
+# Description: Primary entry point for Samstraumr CLI commands
+#==============================================================================
+# Usage: ./s8r <command> [options]
+#
+# Commands:
+#   build                Build the project with optimized settings
+#   test                 Run tests with support for different test types
+#   version              Manage project version
+#   quality              Run quality checks
+#   report               Generate change management reports
+#   help                 Show help for a command
+#
+# See './s8r help <command>' for more information on a specific command.
+#==============================================================================
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="${SCRIPT_DIR}"
+
+# Define color codes for terminal output
+COLOR_RED='\033[0;31m'
+COLOR_GREEN='\033[0;32m'
+COLOR_YELLOW='\033[0;33m'
+COLOR_BLUE='\033[0;34m'
+COLOR_RESET='\033[0m'
+COLOR_BOLD='\033[1m'
+
+# Source the configuration file
+if [ -f "${PROJECT_ROOT}/.samstraumr.config" ]; then
+  source "${PROJECT_ROOT}/.samstraumr.config"
+else
+  echo -e "${COLOR_RED}Error: Configuration file not found: ${PROJECT_ROOT}/.samstraumr.config${COLOR_RESET}" >&2
+  exit 1
+fi
+
+# Define module paths relative to project root
+SAMSTRAUMR_CORE_MODULE="${PROJECT_ROOT}/Samstraumr/samstraumr-core"
+
+#------------------------------------------------------------------------------
+# Utility Functions
+#------------------------------------------------------------------------------
+
+function print_header() {
+  echo -e "${COLOR_BLUE}${COLOR_BOLD}$1${COLOR_RESET}"
+}
+
+function print_success() {
+  echo -e "${COLOR_GREEN}$1${COLOR_RESET}"
+}
+
+function print_warning() {
+  echo -e "${COLOR_YELLOW}$1${COLOR_RESET}"
+}
+
+function print_error() {
+  echo -e "${COLOR_RED}Error: $1${COLOR_RESET}" >&2
+}
+
+function print_info() {
+  echo -e "${COLOR_BLUE}$1${COLOR_RESET}"
+}
+
+#------------------------------------------------------------------------------
+# Help Text Functions
+#------------------------------------------------------------------------------
+
+function show_main_help() {
+  echo -e "${COLOR_BOLD}Samstraumr CLI${COLOR_RESET} - s8r: Main command for Samstraumr operations"
+  echo ""
+  echo -e "${COLOR_BOLD}USAGE:${COLOR_RESET}"
+  echo "  ./s8r <command> [options]"
+  echo ""
+  echo -e "${COLOR_BOLD}COMMANDS:${COLOR_RESET}"
+  echo "  build                Build the project with optimized settings"
+  echo "  test                 Run tests with support for different test types"
+  echo "  version              Manage project version"
+  echo "  quality              Run quality checks"
+  echo "  report               Generate change management reports"
+  echo "  help                 Show help for a command"
+  echo ""
+  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  echo "  ./s8r build fast             # Fast build with quality checks skipped"
+  echo "  ./s8r test unit              # Run unit tests"
+  echo "  ./s8r test atl               # Run Above-The-Line tests"
+  echo "  ./s8r version bump patch     # Bump patch version"
+  echo "  ./s8r quality check          # Run quality checks"
+  echo "  ./s8r report v1.2.8 v1.2.9   # Generate change report between versions"
+  echo "  ./s8r help test              # Show help for test command"
+  echo ""
+  echo "See './s8r help <command>' for more information on a specific command."
+}
+
+function show_build_help() {
+  echo -e "${COLOR_BOLD}Samstraumr Build${COLOR_RESET} - Build the project with optimized settings"
+  echo ""
+  echo -e "${COLOR_BOLD}USAGE:${COLOR_RESET}"
+  echo "  ./s8r build [options] [mode]"
+  echo ""
+  echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  echo "  -h, --help                Display this help message"
+  echo "  -v, --verbose             Enable verbose output"
+  echo "  -c, --clean               Clean before building"
+  echo "  -p, --profile <profile>   Use specific Maven profile"
+  echo "  --skip-quality            Skip quality checks"
+  echo ""
+  echo -e "${COLOR_BOLD}MODES:${COLOR_RESET}"
+  echo "  fast                      Fast build with quality checks skipped (default)"
+  echo "  compile                   Compile only"
+  echo "  test                      Compile and run tests"
+  echo "  package                   Create JAR package"
+  echo "  install                   Install to local repository"
+  echo ""
+  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  echo "  ./s8r build                     # Fast build"
+  echo "  ./s8r build test                # Run tests"
+  echo "  ./s8r build -c test             # Clean and run tests"
+  echo "  ./s8r build -p atl-tests test   # Run tests with ATL profile"
+}
+
+function show_test_help() {
+  echo -e "${COLOR_BOLD}Samstraumr Test${COLOR_RESET} - Run tests with support for different test types"
+  echo ""
+  echo -e "${COLOR_BOLD}USAGE:${COLOR_RESET}"
+  echo "  ./s8r test [options] <test-type>"
+  echo ""
+  echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  echo "  -h, --help                    Display this help message"
+  echo "  -v, --verbose                 Enable verbose output"
+  echo "  -b, --both                    Include equivalent tests from other terminology"
+  echo "  -o, --output <file>           Write test output to file"
+  echo "  -p, --profile <profile>       Use specific Maven profile"
+  echo "  --skip-quality                Skip quality checks"
+  echo ""
+  echo -e "${COLOR_BOLD}TEST TYPES:${COLOR_RESET}"
+  echo "  Industry Standard       |  Samstraumr Equivalent"
+  echo "  --------------------    |  ----------------------"
+  echo "  smoke                   |  orchestration"
+  echo "  unit                    |  tube"
+  echo "  component               |  composite"
+  echo "  integration             |  flow"
+  echo "  api                     |  machine"
+  echo "  system                  |  stream"
+  echo "  endtoend                |  acceptance"
+  echo "  property                |  adaptation"
+  echo ""
+  echo "  Special test types: all, atl, btl, adam"
+  echo ""
+  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  echo "  ./s8r test unit                # Run unit tests only"
+  echo "  ./s8r test --both unit         # Run unit tests and equivalent tube tests"
+  echo "  ./s8r test -p btl-tests flow   # Run flow tests with BTL profile"
+  echo "  ./s8r test atl                 # Run all Above-The-Line tests"
+}
+
+function show_version_help() {
+  echo -e "${COLOR_BOLD}Samstraumr Version${COLOR_RESET} - Manage project version"
+  echo ""
+  echo -e "${COLOR_BOLD}USAGE:${COLOR_RESET}"
+  echo "  ./s8r version <command> [options]"
+  echo ""
+  echo -e "${COLOR_BOLD}COMMANDS:${COLOR_RESET}"
+  echo "  get                  Show current version information"
+  echo "  export               Output only the current version (for scripts)"
+  echo "  bump <type>          Bump version (type: major, minor, patch)"
+  echo "  set <version>        Set a specific version (format: x.y.z)"
+  echo "  verify               Verify that version and tag are in sync"
+  echo "  fix-tag              Create a git tag matching the current version"
+  echo "  test <type>          Bump version, run tests, then commit and tag"
+  echo "  history              Show version history"
+  echo ""
+  echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  echo "  -h, --help           Display this help message"
+  echo "  -v, --verbose        Enable verbose output"
+  echo "  --no-commit          Don't automatically commit the version change"
+  echo "  --skip-tests         Skip running tests (for test command only)"
+  echo "  --skip-quality       Skip quality checks (for test command only)"
+  echo "  --push               Push changes to remote (for test command only)"
+  echo ""
+  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  echo "  ./s8r version get                 # Show current version"
+  echo "  ./s8r version bump patch          # Bump patch version"
+  echo "  ./s8r version set 1.2.3           # Set version to 1.2.3"
+  echo "  ./s8r version test patch          # Bump patch, test, commit, tag"
+}
+
+function show_quality_help() {
+  echo -e "${COLOR_BOLD}Samstraumr Quality${COLOR_RESET} - Run quality checks"
+  echo ""
+  echo -e "${COLOR_BOLD}USAGE:${COLOR_RESET}"
+  echo "  ./s8r quality <command> [options]"
+  echo ""
+  echo -e "${COLOR_BOLD}COMMANDS:${COLOR_RESET}"
+  echo "  check                Run all quality checks"
+  echo "  spotless             Run Spotless formatting check"
+  echo "  checkstyle           Run CheckStyle code style check"
+  echo "  spotbugs             Run SpotBugs bug detection"
+  echo "  jacoco               Run JaCoCo code coverage analysis"
+  echo "  encoding             Check file encodings and line endings"
+  echo ""
+  echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  echo "  -h, --help           Display this help message"
+  echo "  -v, --verbose        Enable verbose output"
+  echo "  -f, --fix            Fix issues automatically (where applicable)"
+  echo ""
+  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  echo "  ./s8r quality check               # Run all quality checks"
+  echo "  ./s8r quality spotless -f         # Run Spotless and fix issues"
+  echo "  ./s8r quality encoding -v         # Check encodings with verbose output"
+}
+
+function show_report_help() {
+  echo -e "${COLOR_BOLD}Samstraumr Report${COLOR_RESET} - Generate change management reports"
+  echo ""
+  echo -e "${COLOR_BOLD}USAGE:${COLOR_RESET}"
+  echo "  ./s8r report <from-version> <to-version> [options]"
+  echo ""
+  echo -e "${COLOR_BOLD}ARGUMENTS:${COLOR_RESET}"
+  echo "  from-version         Starting version (e.g., v1.2.8 or 1.2.8)"
+  echo "  to-version           Ending version (e.g., v1.2.9, 1.2.9, or HEAD)"
+  echo ""
+  echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  echo "  -h, --help           Display this help message"
+  echo "  -o, --output <dir>   Directory for report output (default: target/reports)"
+  echo "  -f, --format <fmt>   Output format (pdf, docx, html) (default: docx)"
+  echo ""
+  echo -e "${COLOR_BOLD}REQUIREMENTS:${COLOR_RESET}"
+  echo "  - DOCMOSIS_KEY environment variable must be set with your license key"
+  echo "  - Docmosis JARs must be installed (run './install-docmosis.sh' first)"
+  echo ""
+  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  echo "  ./s8r report v1.2.8 v1.2.9       # Report changes from v1.2.8 to v1.2.9"
+  echo "  ./s8r report 1.2.8 HEAD          # Report all changes since 1.2.8"
+  echo "  ./s8r report 1.0.0 1.2.0 -f pdf  # Create PDF report from 1.0.0 to 1.2.0"
+}
+
+#------------------------------------------------------------------------------
+# Command Handler Functions
+#------------------------------------------------------------------------------
+
+function handle_build_command() {
+  # Set a variable to indicate we're calling from s8r
+  export SAMSTRAUMR_CLI="s8r"
+  
+  # We need to modify our approach to avoid conflicts with color variables
+  # For simplicity, let's use the util/build-optimal.sh script which is a wrapper
+  "${PROJECT_ROOT}/util/build-optimal.sh" "$@"
+}
+
+function handle_test_command() {
+  # Set a variable to indicate we're calling from s8r
+  export SAMSTRAUMR_CLI="s8r"
+  
+  # Handle ATL tests separately since they have a dedicated script
+  if [ "$1" = "atl" ]; then
+    shift
+    "${PROJECT_ROOT}/util/test-run-atl.sh" "$@"
+  else
+    "${PROJECT_ROOT}/util/test-run.sh" "$@"
+  fi
+}
+
+function handle_version_command() {
+  # Set a variable to indicate we're calling from s8r
+  export SAMSTRAUMR_CLI="s8r"
+  "${PROJECT_ROOT}/util/version" "$@"
+}
+
+function handle_quality_command() {
+  # Set a variable to indicate we're calling from s8r
+  export SAMSTRAUMR_CLI="s8r"
+  
+  local command="$1"
+  shift
+  
+  case "$command" in
+    check)
+      # Run all quality checks
+      print_header "Running All Quality Checks"
+      "${PROJECT_ROOT}/util/scripts/check-encoding.sh" "$@"
+      # Run Maven quality checks
+      cd "${PROJECT_ROOT}" && mvn verify
+      ;;
+    spotless)
+      # Run Spotless formatting check
+      print_header "Running Spotless Formatting Check"
+      local spotless_cmd="check"
+      if [[ "$*" == *"-f"* || "$*" == *"--fix"* ]]; then
+        spotless_cmd="apply"
+      fi
+      cd "${PROJECT_ROOT}" && mvn spotless:${spotless_cmd}
+      ;;
+    checkstyle)
+      # Run CheckStyle code style check
+      print_header "Running CheckStyle Code Style Check"
+      cd "${PROJECT_ROOT}" && mvn checkstyle:check
+      ;;
+    spotbugs)
+      # Run SpotBugs bug detection
+      print_header "Running SpotBugs Bug Detection"
+      cd "${PROJECT_ROOT}" && mvn spotbugs:check
+      ;;
+    jacoco)
+      # Run JaCoCo code coverage analysis
+      print_header "Running JaCoCo Code Coverage Analysis"
+      cd "${PROJECT_ROOT}" && mvn test jacoco:report
+      ;;
+    encoding)
+      # Check file encodings and line endings
+      "${PROJECT_ROOT}/util/scripts/check-encoding.sh" "$@"
+      ;;
+    *)
+      print_error "Unknown quality command: $command"
+      show_quality_help
+      return 1
+      ;;
+  esac
+}
+
+function handle_report_command() {
+  # Check if Docmosis environment variable is set
+  if [ -z "${DOCMOSIS_KEY}" ]; then
+    print_error "DOCMOSIS_KEY environment variable is not set"
+    echo "Set it with: export DOCMOSIS_KEY=your-license-key"
+    return 1
+  fi
+  
+  # Check if from-version and to-version are provided
+  if [ $# -lt 2 ]; then
+    print_error "Missing version arguments"
+    show_report_help
+    return 1
+  fi
+  
+  # Get from-version and to-version
+  local from_version="$1"
+  local to_version="$2"
+  shift 2
+  
+  # Check if Docmosis JARs are installed
+  if [ ! -d "${PROJECT_ROOT}/lib/com/docmosis" ]; then
+    print_warning "Docmosis JARs are not installed. Running install-docmosis.sh first."
+    "${PROJECT_ROOT}/install-docmosis.sh"
+    
+    # Check if installation was successful
+    if [ $? -ne 0 ]; then
+      print_error "Failed to install Docmosis JARs"
+      return 1
+    fi
+  fi
+  
+  # Run generate-change-report.sh with arguments
+  "${PROJECT_ROOT}/generate-change-report.sh" "$from_version" "$to_version" "$@"
+}
+
+function handle_help_command() {
+  local help_topic="$1"
+  
+  case "$help_topic" in
+    build)
+      show_build_help
+      ;;
+    test)
+      show_test_help
+      ;;
+    version)
+      show_version_help
+      ;;
+    quality)
+      show_quality_help
+      ;;
+    report)
+      show_report_help
+      ;;
+    *)
+      show_main_help
+      ;;
+  esac
+}
+
+#------------------------------------------------------------------------------
+# Main
+#------------------------------------------------------------------------------
+
+# Check if any arguments are provided
+if [ $# -eq 0 ]; then
+  show_main_help
+  exit 0
+fi
+
+# Get the command
+COMMAND="$1"
+shift
+
+# Handle the command
+case "$COMMAND" in
+  build)
+    handle_build_command "$@"
+    ;;
+  test)
+    handle_test_command "$@"
+    ;;
+  version)
+    handle_version_command "$@"
+    ;;
+  quality)
+    handle_quality_command "$@"
+    ;;
+  report)
+    handle_report_command "$@"
+    ;;
+  help)
+    handle_help_command "$@"
+    ;;
+  *)
+    print_error "Unknown command: $COMMAND"
+    show_main_help
+    exit 1
+    ;;
+esac
+
+exit $?
