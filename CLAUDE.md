@@ -2,6 +2,22 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Configuration and Path Management
+
+Samstraumr uses a centralized configuration approach to manage paths and settings:
+
+- `.samstraumr.config` contains all project paths and key configuration settings
+- All utility scripts should source this file using:
+  ```bash
+  # At the top of each script
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"  # Adjust path as needed
+  source "${PROJECT_ROOT}/.samstraumr.config"
+  ```
+- When refactoring file structures, use `./update-config-paths.sh` to update the configuration
+- Use configuration variables like `${SAMSTRAUMR_CORE_MODULE}`, `${SAMSTRAUMR_JAVA_TEST}`, etc. for paths
+- Convert Java package paths to directory paths with `$(path_for_package "${SAMSTRAUMR_TEST_PACKAGE}")`
+
 ## Build Commands
 - Build project: `mvn clean install`
 - Build without tests: `mvn clean install -DskipTests`
@@ -38,6 +54,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
     - `./util/test/run-tests.sh stream` (entire system as a whole)
     - `./util/test/run-tests.sh acceptance` (user perspective and requirements)
     - `./util/test/run-tests.sh adaptation` (system properties across inputs)
+    - `./util/run-adam-tube-tests.sh` (origin tube identity tests)
+    - `./util/run-adam-tube-tests.sh atl` (critical origin tube tests)
 - Options:
   - Include equivalent tags: `--both` or `-b` (e.g., run both unit and tube tests)
   - Output to file: `--output <file>` or `-o <file>`
@@ -66,6 +84,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - `mvn test -P stream-tests` (entire system)
   - `mvn test -P acceptance-tests` (user perspective)
   - `mvn test -P adaptation-tests` (system properties)
+  - `mvn test -P adam-tube-tests` (all origin tube tests)
+  - `mvn test -P adam-tube-atl-tests` (critical origin tube tests)
+- Direct Cucumber Tag Filtering with JUnit 4 runners:
+  - `mvn test -Dtest=RunAdamTubeTests` (all Adam tube tests)
+  - `mvn test -Dtest=RunAdamTubeATLTests` (critical Adam tube tests)
 - Run with quality checks skipped: `mvn test -P skip-quality-checks`
 
 ### Test Annotations and Tags
@@ -86,6 +109,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - Lifecycle: `@Init`, `@Runtime`, `@Termination`
   - Patterns: `@Observer`, `@Transformer`, `@Validator`, `@CircuitBreaker`
   - Non-functional: `@Performance`, `@Resilience`, `@Scale`
+  - Identity Types: `@AdamTube` (origin point), `@SubstrateIdentity`, `@MemoryIdentity`
 
 ## Quality Check Commands
 - Run all quality checks: `./util/quality/build-checks.sh`
