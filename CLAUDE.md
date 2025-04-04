@@ -211,11 +211,24 @@ Examples:
   - Non-functional: `@Performance`, `@Resilience`, `@Scale`
   - Identity Types: `@AdamTube` (origin point), `@SubstrateIdentity`, `@MemoryIdentity`
 
-## Quality Check Commands
+## Quality Gates and Check Commands
+
+Samstraumr uses a comprehensive set of quality gates that must pass for a build to be considered successful.
+
+### Core Quality Gates
+
+1. **Spotless** - Code formatting using Google Java Style with custom import ordering
+2. **Checkstyle** - Style checking against the project's standards defined in checkstyle.xml
+3. **SpotBugs** - Static analysis for bug detection with "Max" effort and "Medium" threshold
+4. **JaCoCo** - Code coverage analysis and reporting
+5. **File Encoding** - UTF-8 encoding and proper line endings (LF) verification
+6. **SonarQube** - Comprehensive static code analysis with quality gate enforcement (in CI/CD)
+
+### Local Quality Check Commands
 
 - Unified CLI (recommended): `./s8r quality <command>`
 - Alternative CLI: `./util/samstraumr quality <command>`
-- Direct script: `./util/bin/quality/check-encoding.sh`
+- Direct script: `./util/bin/quality/check-build-quality.sh`
 
 Quality commands:
 - `check`: Run all quality checks
@@ -233,8 +246,94 @@ Examples:
 ```bash
 ./s8r quality check            # Run all quality checks
 ./s8r quality spotless -f      # Run Spotless and fix issues
-./s8r quality encoding -v      # Check encodings with verbose output
+./s8r quality encoding -f      # Check and fix file encodings
 ```
+
+### Maven Quality Commands
+
+Maven profiles and direct commands for quality checks:
+
+```bash
+# Run all quality checks (validate phase)
+mvn validate -P quality-checks
+
+# Skip quality checks during build
+mvn clean install -P skip-quality-checks
+
+# Format code with Spotless
+mvn spotless:apply
+
+# Check code formatting
+mvn spotless:check
+
+# Run Checkstyle
+mvn checkstyle:check
+
+# Run SpotBugs
+mvn spotbugs:check
+
+# Generate JaCoCo coverage report
+mvn test jacoco:report
+```
+
+### CI/CD Quality Gates
+
+The GitHub Actions workflow implements quality gates in the `quality-analysis` job:
+
+1. **Spotless**: Checks code formatting against Google Java Style
+   ```yaml
+   - name: Run Spotless check
+     run: mvn -B spotless:check
+   ```
+
+2. **Checkstyle**: Verifies coding standards with custom rules
+   ```yaml
+   - name: Run Checkstyle
+     run: mvn -B checkstyle:check
+   ```
+   
+3. **SpotBugs**: Performs static analysis for bug detection
+   ```yaml
+   - name: Run SpotBugs
+     run: mvn -B spotbugs:check
+   ```
+   
+4. **JaCoCo**: Generates coverage reports for analysis
+   ```yaml
+   - name: Generate JaCoCo report
+     run: mvn -B jacoco:report -Djacoco.skip=false
+   ```
+   
+5. **SonarQube**: Comprehensive analysis with quality gate enforcement
+   ```yaml
+   - name: SonarQube analysis
+     run: |
+       mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+         -Dsonar.qualitygate.wait=true
+   ```
+
+6. **Quality Report Artifacts**: Uploads quality reports for review
+   ```yaml
+   - name: Upload Quality Reports
+     uses: actions/upload-artifact@v4
+     with:
+       name: quality-reports
+       path: |
+         **/target/site/jacoco/
+         **/target/checkstyle-result.xml
+         **/target/spotbugsXml.xml
+   ```
+
+### Quality Report Locations
+
+After running quality checks, reports are available in:
+
+- **JaCoCo Coverage**: `target/site/jacoco/index.html`
+- **Checkstyle**: `target/checkstyle-result.xml`
+- **SpotBugs**: `target/spotbugsXml.xml`
+- **Cucumber BDD**: `target/cucumber-reports/cucumber.html`
+
+For complete details, see [Quality Checks Documentation](/docs/contribution/QualityChecks.md)
 
 ## Version Management
 
