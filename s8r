@@ -265,7 +265,7 @@ function handle_test_command() {
 function handle_version_command() {
   # Set a variable to indicate we're calling from s8r
   export SAMSTRAUMR_CLI="s8r"
-  "${PROJECT_ROOT}/util/version" "$@"
+  "${PROJECT_ROOT}/util/bin/version/version-manager.sh" "$@"
 }
 
 function handle_quality_command() {

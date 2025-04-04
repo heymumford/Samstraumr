@@ -1,89 +1,26 @@
 #!/bin/bash
-# This is a redirect script that points to the new location
+#==============================================================================
+# Filename: version
+# Description: Utility script for version management
+#==============================================================================
 
-# Skip warnings when called from s8r
-if [[ "$SAMSTRAUMR_CLI" != "s8r" ]]; then
-  echo -e "\033[1;33mWARNING: version has been moved to util/bin/version/version-manager.sh\033[0m"
-  echo -e "Please use \033[1;32m./util/bin/version/version-manager.sh\033[0m instead."
-  echo ""
-fi
+# Determine script paths
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+VERSION_MANAGER="${SCRIPT_DIR}/bin/version/version-manager.sh"
 
-# When called from s8r, don't use common.sh to avoid color variable conflicts
+# Check if being called directly or via s8r
 if [[ "$SAMSTRAUMR_CLI" == "s8r" ]]; then
-  # Set project root
-  PROJECT_ROOT="/home/emumford/NativeLinuxProjects/Samstraumr"
-  VERSION_FILE="${PROJECT_ROOT}/Samstraumr/version.properties"
-  
-  # Command to execute
-  COMMAND="$1"
-  shift
-
-  # Check if version file exists
-  if [ ! -f "$VERSION_FILE" ]; then
-    echo "Error: Version file not found at $VERSION_FILE"
-    exit 1
-  fi
-  
-  # Extract current version
-  CURRENT_VERSION=$(grep "version=" "$VERSION_FILE" | cut -d= -f2)
-  
-  # Split version into components
-  IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
-  
-  case "$COMMAND" in
-    get)
-      echo "Current version: $CURRENT_VERSION"
-      ;;
-    bump)
-      # Check for version component to bump
-      if [ -z "$1" ]; then
-        echo "Error: Bump requires a version component (major, minor, or patch)"
-        exit 1
-      fi
-      
-      COMPONENT="$1"
-      case "$COMPONENT" in
-        major)
-          NEW_MAJOR=$((MAJOR + 1))
-          NEW_VERSION="${NEW_MAJOR}.0.0"
-          ;;
-        minor)
-          NEW_MINOR=$((MINOR + 1))
-          NEW_VERSION="${MAJOR}.${NEW_MINOR}.0"
-          ;;
-        patch)
-          NEW_PATCH=$((PATCH + 1))
-          NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
-          ;;
-        *)
-          echo "Error: Invalid version component: $COMPONENT (use major, minor, or patch)"
-          exit 1
-          ;;
-      esac
-      
-      # Update version file
-      sed -i "s/version=$CURRENT_VERSION/version=$NEW_VERSION/" "$VERSION_FILE"
-      echo "Version bumped from $CURRENT_VERSION to $NEW_VERSION"
-      
-      # Commit the change
-      cd "$PROJECT_ROOT" && git add "$VERSION_FILE"
-      git commit -m "Bump version from $CURRENT_VERSION to $NEW_VERSION
-      
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>"
-      
-      # Create a tag
-      git tag -a "v$NEW_VERSION" -m "Version $NEW_VERSION"
-      echo "Created tag v$NEW_VERSION"
-      ;;
-    *)
-      echo "Error: Unknown command: $COMMAND"
-      echo "Available commands: get, bump"
-      exit 1
-      ;;
-  esac
+  # Direct execution through s8r
+  "$VERSION_MANAGER" "$@"
 else
-  # Forward to new script for normal usage
-  /home/emumford/NativeLinuxProjects/Samstraumr/util/bin/version/version-manager.sh "$@"
+  # Show information about preferred usage
+  echo -e "\033[1;34mSamstraumr Version Manager\033[0m"
+  echo ""
+  echo -e "Preferred command: \033[1;32m./s8r version <command>\033[0m"
+  echo -e "Alternative command: \033[1;32m./util/bin/version/version-manager.sh <command>\033[0m"
+  echo ""
+  
+  # Execute the command
+  "$VERSION_MANAGER" "$@"
 fi
