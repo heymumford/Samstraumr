@@ -346,7 +346,7 @@ function update_version_in_files() {
   )
   
   print_info "Updating version in POM files:"
-  local pom_updated=false
+  local pom_update_failures=0
   
   for pom_file in "${pom_files[@]}"; do
     if [ -f "$pom_file" ]; then
@@ -354,105 +354,105 @@ function update_version_in_files() {
       local pom_backup="${pom_file}.bak"
       cp "$pom_file" "$pom_backup"
       
-      # Extract the current version in this POM file
-      local pom_version
-      pom_version=$(grep -oP '<version>\K[0-9]+\.[0-9]+\.[0-9]+(?=</version>)' "$pom_file" | head -1)
+      print_info "  Processing $pom_file"
       
-      if [ -z "$pom_version" ]; then
-        print_warning "  Skipped $pom_file (could not extract version)"
-        continue
-      fi
+      # Update in three specific locations:
+      # 1. Project version (in project element or parent element)
+      # 2. samstraumr.version property
+      # 3. Artifact version for core modules
       
-      print_info "  Found version $pom_version in $pom_file"
+      # Use sed to update project/parent version and samstraumr.version property
+      # Project version - carefully match version tags outside of dependency blocks
+      sed -i '/<dependency>/,/<\/dependency>/b; s/\(<version>\)[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(<\/version>\)/\1'"$new_version"'\2/g' "$pom_file"
       
-      # We need a more targeted approach to update only specific version tags
-      # Let's create a temporary file for modifications
-      local temp_file="${pom_file}.tmp"
+      # Parent version if it exists
+      sed -i '/<parent>/,/<\/parent>/s/\(<version>\)[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(<\/version>\)/\1'"$new_version"'\2/g' "$pom_file"
       
-      # Process the POM file using awk for precise targeting of versions
-      awk -v new="$new_version" '
-        # Flag for tracking position in file
-        BEGIN { 
-          in_parent = 0
-          in_dependency = 0
-          after_artifactId = 0
-          project_version_updated = 0
-        }
-        
-        # Detect parent section
-        /<parent>/ { in_parent = 1 }
-        /<\/parent>/ { in_parent = 0 }
-        
-        # Detect dependency sections
-        /<dependency>/ { in_dependency = 1 }
-        /<\/dependency>/ { in_dependency = 0 }
-        
-        # Track artifactId at project level (not in dependency)
-        !in_dependency && /<artifactId>/ { after_artifactId = 1 }
-        
-        # Replace version in parent section
-        in_parent && /<version>[0-9]+\.[0-9]+\.[0-9]+(<\/version>)/ {
-          gsub(/<version>[0-9]+\.[0-9]+\.[0-9]+<\/version>/, "<version>" new "</version>")
-        }
-        
-        # Replace project version (first version after artifactId, not in a dependency)
-        after_artifactId && !in_dependency && !project_version_updated && /<version>[0-9]+\.[0-9]+\.[0-9]+<\/version>/ {
-          gsub(/<version>[0-9]+\.[0-9]+\.[0-9]+<\/version>/, "<version>" new "</version>")
-          project_version_updated = 1
-          after_artifactId = 0
-        }
-        
-        # Replace samstraumr.version property
-        /<samstraumr\.version>[0-9]+\.[0-9]+\.[0-9]+<\/samstraumr\.version>/ {
-          gsub(/<samstraumr\.version>[0-9]+\.[0-9]+\.[0-9]+<\/samstraumr\.version>/, "<samstraumr.version>" new "</samstraumr.version>")
-        }
-        
-        # Print the line (modified or not)
-        { print }
-      ' "$pom_file" > "$temp_file"
+      # samstraumr.version property
+      sed -i 's/\(<samstraumr\.version>\)[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\(<\/samstraumr\.version>\)/\1'"$new_version"'\2/g' "$pom_file"
       
-      # Replace original with modified file if successful
-      if [ $? -eq 0 ] && [ -s "$temp_file" ]; then
-        mv "$temp_file" "$pom_file"
+      # Verify that at least some changes were made
+      # Exclude the backup file from the grep count
+      local updated_count=$(grep -c "$new_version" "$pom_file")
+      if [ "$updated_count" -gt 0 ]; then
+        # Examine changes made to provide better output
+        print_info "  Updated POM file: $pom_file"
       else
-        print_error "  Failed to update $pom_file properly"
-        rm -f "$temp_file" 2>/dev/null
+        print_warning "  No version changes detected in $pom_file"
+        pom_update_failures=$((pom_update_failures + 1))
       fi
-      
-      print_info "  Updated $pom_file from $pom_version to $new_version"
-      pom_updated=true
     else
       print_warning "  POM file not found: $pom_file"
+      pom_update_failures=$((pom_update_failures + 1))
     fi
   done
   
-  if [ "$pom_updated" = "true" ]; then
-    print_success "Updated POM files to version $new_version"
+  # Report overall success or failure with POM files
+  if [ $pom_update_failures -eq 0 ]; then
+    print_success "Successfully updated all POM files to version $new_version"
   else
-    print_warning "No POM files were updated"
+    print_warning "Some POM files ($pom_update_failures) may not have been updated properly"
   fi
   
-  # Update README.md version and badge
+  # Update README.md
+  # 1. Maven dependency example
+  # 2. Version badge
   if [ -f "${PROJECT_ROOT}/README.md" ]; then
     # Create a backup of README.md
     local readme_backup="${PROJECT_ROOT}/README.md.bak"
     cp "${PROJECT_ROOT}/README.md" "$readme_backup"
     
-    # Update version string
-    sed -i "s/Version: .*/Version: $new_version/g" "${PROJECT_ROOT}/README.md"
+    # Update Maven dependency version in the code example
+    sed -i 's|<version>[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*</version>|<version>'"$new_version"'</version>|g' "${PROJECT_ROOT}/README.md"
     
-    # Update version badge URL (only if it exists)
-    if grep -q "version-[0-9.]\+-blue" "${PROJECT_ROOT}/README.md"; then
-      sed -i "s|version-[0-9.]\+-blue|version-$new_version-blue|g" "${PROJECT_ROOT}/README.md"
-      print_success "Updated version and badge in README.md"
+    # Update version badge URL
+    sed -i 's|version-[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*-blue|version-'"$new_version"'-blue|g' "${PROJECT_ROOT}/README.md"
+    
+    # Verify changes were made
+    if grep -q "$new_version" "${PROJECT_ROOT}/README.md"; then
+      print_success "Updated version references in README.md"
     else
-      print_warning "Version badge not found in README.md, only updated version text"
+      print_warning "No version changes detected in README.md"
     fi
   else
     print_warning "README.md not found, skipping update"
   fi
   
-  print_success "Version update complete"
+  # Look for CLAUDE.md if it exists and update version references there as well
+  if [ -f "${PROJECT_ROOT}/CLAUDE.md" ]; then
+    # Create a backup
+    local claude_backup="${PROJECT_ROOT}/CLAUDE.md.bak"
+    cp "${PROJECT_ROOT}/CLAUDE.md" "$claude_backup"
+    
+    # Update version references
+    sed -i 's/[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/'"$new_version"'/g' "${PROJECT_ROOT}/CLAUDE.md"
+    
+    # Verify changes were made
+    if grep -q "$new_version" "${PROJECT_ROOT}/CLAUDE.md"; then
+      print_success "Updated version references in CLAUDE.md"
+    else
+      print_warning "No version changes detected in CLAUDE.md"
+    fi
+  fi
+  
+  # Success message
+  print_section "Version Update Summary"
+  print_success "Updated from $current_version to $new_version"
+  print_info "- version.properties updated (source of truth)"
+  print_info "- POM files synchronized"
+  print_info "- README.md version references updated"
+  if [ -f "${PROJECT_ROOT}/CLAUDE.md" ]; then
+    print_info "- CLAUDE.md version references updated"
+  fi
+  print_info "- Last updated date set to $today"
+  
+  # Suggest next steps
+  print_info ""
+  print_info "Suggested next steps:"
+  print_info "1. Review changes with: git diff"
+  print_info "2. Create a commit: git commit -am \"Bump version to $new_version\""
+  print_info "3. Create a tag: git tag -a v$new_version -m \"Version $new_version\""
+  
   return 0
 }
 
@@ -509,21 +509,25 @@ function commit_version_changes() {
   
   print_section "Committing Version Changes"
   
-  # Check for changes
-  if ! has_git_changes; then
-    print_warning "No files changed, skipping commit"
+  # Check for changes specifically in version-managed files
+  if ! has_version_managed_changes; then
+    print_warning "No version-managed files changed, skipping commit"
     return 0
   fi
   
-  # Files to commit
+  # Files to commit - synchronized files + additional documentation
   local file_list=(
-    "${PROJECT_ROOT}/README.md"
+    # Essential version-synchronized files
     "${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/Samstraumr/version.properties}"
     "${PROJECT_ROOT}/pom.xml"
     "${PROJECT_ROOT}/Samstraumr/pom.xml"
     "${PROJECT_ROOT}/Samstraumr/samstraumr-core/pom.xml"
-    "${PROJECT_ROOT}/docs/guides/getting-started.md"
+    "${PROJECT_ROOT}/README.md"
     "${PROJECT_ROOT}/CLAUDE.md"
+    
+    # Additional documentation that might mention version
+    "${PROJECT_ROOT}/docs/guides/getting-started.md"
+    "${PROJECT_ROOT}/docs/reference/version-management.md"
   )
   
   # Only add files that exist and have changes
@@ -539,8 +543,14 @@ function commit_version_changes() {
     return 0
   fi
   
-  # Create git add command
+  # Create git add command - explicitly add each changed file
   git add "${changed_files[@]}"
+  
+  # Show which files are being committed
+  print_info "Adding files to commit:"
+  for file in "${changed_files[@]}"; do
+    print_info "  - $file"
+  done
   
   # Create commit message based on bump type
   local commit_message=""
@@ -603,6 +613,45 @@ function show_version_history() {
 # Init
 #------------------------------------------------------------------------------
 
+# Check if there are any changes to commit in version-managed files
+# Usage: if has_version_managed_changes; then ... fi
+# Returns: 0 if there are changes, 1 otherwise
+function has_version_managed_changes() {
+  # List of synchronized version files to check
+  local files_to_check=(
+    "${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/Samstraumr/version.properties}"
+    "${PROJECT_ROOT}/pom.xml"
+    "${PROJECT_ROOT}/Samstraumr/pom.xml"
+    "${PROJECT_ROOT}/Samstraumr/samstraumr-core/pom.xml"
+    "${PROJECT_ROOT}/README.md"
+    "${PROJECT_ROOT}/CLAUDE.md"
+    "${PROJECT_ROOT}/docs/guides/getting-started.md"
+    "${PROJECT_ROOT}/docs/reference/version-management.md"
+  )
+  
+  # Check for changes in any of the version-related files
+  for file in "${files_to_check[@]}"; do
+    if [ -f "$file" ] && ! git diff-index --quiet HEAD -- "$file" 2>/dev/null; then
+      print_debug "Changed file: $file"
+      return 0  # Changes detected
+    fi
+  done
+  
+  # Check for untracked version files
+  for file in "${files_to_check[@]}"; do
+    if [ -f "$file" ] && git ls-files --error-unmatch -- "$file" 2>/dev/null; then
+      local status=$(git status --porcelain -- "$file" 2>/dev/null)
+      if [ -n "$status" ]; then
+        print_debug "Untracked/modified file: $file ($status)"
+        return 0  # Untracked/modified file
+      fi
+    fi
+  done
+  
+  print_debug "No changes detected in version-managed files"
+  return 1  # No changes detected
+}
+
 # Export functions
 export -f get_current_version
 export -f get_last_updated_date
@@ -613,6 +662,7 @@ export -f check_version_tag_alignment
 export -f create_git_tag_for_version
 export -f commit_version_changes
 export -f show_version_history
+export -f has_version_managed_changes
 
 # Print debug info if verbose
 if [ "${VERBOSE:-false}" = "true" ]; then

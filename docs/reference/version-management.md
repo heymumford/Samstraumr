@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Version Management
 
 This guide provides comprehensive documentation for Samstraumr's version management system.
@@ -153,11 +157,14 @@ Bump version without committing (useful for verification):
 
 ## Files Updated During Version Changes
 
-When you bump or set a version, the following files are updated:
+When you bump or set a version, the following files are automatically synchronized:
 
-1. `Samstraumr/version.properties` - The primary version source
-2. Maven POM files (if present)
-3. README.md version badge (if present)
+1. `Samstraumr/version.properties` - The primary version source (source of truth)
+2. `/pom.xml` - Root Maven POM file (both project version and properties)
+3. `/Samstraumr/pom.xml` - Module-level POM file (project version and properties)
+4. `/Samstraumr/samstraumr-core/pom.xml` - Core module POM file (project version and parent version)
+5. `/README.md` - Version badge URL and Maven dependency example
+6. `CLAUDE.md` - AI context file (if it exists)
 
 ## Versioning Strategy Guidelines
 
@@ -216,7 +223,7 @@ The version management system uses a modular architecture with separate componen
 
 1. `s8r` - Main CLI entry point
 2. `.s8r/config/version.conf` - Configuration settings
-3. `util/lib/version-lib.sh` - Core utilities
+3. `util/lib/version-lib.sh` - Core utilities and version synchronization
 4. `util/bin/version/commands/` - Command modules:
    - `get-commands.sh` - Version retrieval
    - `set-commands.sh` - Version modification
@@ -225,6 +232,18 @@ The version management system uses a modular architecture with separate componen
 5. `util/bin/version/version-manager-modular.sh` - Command router
 
 This architecture provides clear separation of concerns, making the system more maintainable and extensible.
+
+### Version Synchronization
+
+The synchronization of version numbers across all files is implemented in the `update_version_in_files()` function in `util/lib/version-lib.sh`. This function:
+
+1. Updates the version.properties file (source of truth)
+2. Updates all POM files through carefully targeted replacements
+3. Updates version references in README.md
+4. Updates any version references in CLAUDE.md if it exists
+5. Updates the "Last updated" date in version.properties
+
+The synchronization process uses a backup system to ensure no changes are lost in case of an error, and provides detailed progress information during execution.
 
 ## Best Practices
 

@@ -28,7 +28,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../../" && pwd)"
 
-# Source the version library
+# Source the version library for enhanced functionality
 source "${PROJECT_ROOT}/util/lib/version-lib.sh"
 
 # Source command modules
@@ -111,7 +111,7 @@ if ! type cmd_set_version &>/dev/null; then
     local new_version="$1"
     local old_version=$(get_current_version)
     
-    # Update version in files
+    # Update version across all files using the enhanced function from version-lib.sh
     update_version_in_files "$old_version" "$new_version"
     return $?
   }

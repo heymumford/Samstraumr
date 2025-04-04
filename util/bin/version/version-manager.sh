@@ -30,6 +30,9 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../../" && pwd)"
 VERSION_FILE="${PROJECT_ROOT}/Samstraumr/version.properties"
 VERSION_PROPERTY_NAME="samstraumr.version"
 
+# Source the version library for enhanced functionality
+source "${PROJECT_ROOT}/util/lib/version-lib.sh"
+
 # Define color codes if not already defined (ensures script works both standalone and via s8r)
 : ${COLOR_RED:='\033[0;31m'}
 : ${COLOR_GREEN:='\033[0;32m'}
@@ -128,20 +131,10 @@ function set_version() {
     return 1
   fi
   
-  # Update version file
-  sed -i "s/${VERSION_PROPERTY_NAME}=${current_version}/${VERSION_PROPERTY_NAME}=${new_version}/" "$VERSION_FILE"
+  # Use enhanced function from version-lib.sh that updates all files
+  update_version_in_files "$current_version" "$new_version"
   
-  if [ $? -ne 0 ]; then
-    print_error "Failed to update version in $VERSION_FILE"
-    return 1
-  fi
-  
-  # Update last updated date
-  local today=$(date "+%B %d, %Y")
-  sed -i "s/samstraumr.last.updated=.*/samstraumr.last.updated=$today/" "$VERSION_FILE"
-  
-  print_success "Version set from $current_version to $new_version"
-  return 0
+  return $?
 }
 
 function commit_version_change() {
