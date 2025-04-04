@@ -45,7 +45,8 @@ public class Tube {
   private final Instant conceptionTime;
   private TubeIdentity parentIdentity;
 
-  private Tube(String reason, Environment environment, String uniqueId, TubeIdentity parentIdentity) {
+  private Tube(
+      String reason, Environment environment, String uniqueId, TubeIdentity parentIdentity) {
     this.reason = reason;
     this.environment = environment;
     this.lineage = Collections.synchronizedList(new ArrayList<>(Collections.singletonList(reason)));
@@ -53,11 +54,11 @@ public class Tube {
     this.uniqueId = uniqueId;
     this.conceptionTime = Instant.now();
     this.parentIdentity = parentIdentity;
-    
+
     // Set initial lifecycle state to CONCEPTION
     this.lifecycleState = TubeLifecycleState.CONCEPTION;
     logToMimir("Tube conceived at: " + this.conceptionTime);
-    
+
     // Create tube identity based on whether it's an Adam tube or child tube
     if (parentIdentity == null) {
       this.identity = TubeIdentity.createAdamIdentity(reason, environment);
@@ -76,10 +77,10 @@ public class Tube {
     this.lifecycleState = TubeLifecycleState.INITIALIZING;
     LOGGER.debug("Tube initializing with ID: {}", this.uniqueId);
     logToMimir("Initialization reason: " + this.reason);
-    
+
     // Proceed through early lifecycle phases
     proceedThroughEarlyLifecycle();
-    
+
     // Initialize timer directly instead of using setTerminationDelay which might throw exceptions
     try {
       synchronized (this) {
@@ -94,7 +95,7 @@ public class Tube {
     }
 
     logToMimir("Environment: " + environment.getParameters());
-    
+
     // Mark tube as ready after all initialization is complete
     this.lifecycleState = TubeLifecycleState.READY;
     this.status = TubeStatus.READY;
@@ -126,7 +127,7 @@ public class Tube {
       throw new TubeInitializationException("Failed to initialize Tube", e);
     }
   }
-  
+
   /**
    * Factory method to create a new child Tube instance with a parent.
    *
@@ -137,7 +138,8 @@ public class Tube {
    * @throws TubeInitializationException if initialization fails
    */
   public static Tube createChildTube(String reason, Environment environment, Tube parent) {
-    LOGGER.info("Creating child Tube with reason: {} from parent: {}", reason, parent.getUniqueId());
+    LOGGER.info(
+        "Creating child Tube with reason: {} from parent: {}", reason, parent.getUniqueId());
 
     // Validate parameters
     validateParameters(reason, environment);
@@ -148,14 +150,15 @@ public class Tube {
 
     try {
       // Generate unique ID that includes a reference to the parent
-      String uniqueId = generateSHA256UniqueId(reason + parent.getUniqueId() + environment.getParameters());
+      String uniqueId =
+          generateSHA256UniqueId(reason + parent.getUniqueId() + environment.getParameters());
 
       // Create and return new child tube
       Tube childTube = new Tube(reason, environment, uniqueId, parent.getIdentity());
-      
+
       // Register child with parent
       parent.registerChild(childTube);
-      
+
       return childTube;
     } catch (Exception e) {
       LOGGER.error("Failed to initialize child Tube: {} - initialization failed", reason);
@@ -286,10 +289,10 @@ public class Tube {
   public List<String> getLineage() {
     return Collections.unmodifiableList(lineage);
   }
-  
+
   /**
    * Gets the identity of this tube.
-   * 
+   *
    * @return the tube's identity
    */
   public TubeIdentity getIdentity() {
@@ -324,10 +327,10 @@ public class Tube {
   public List<String> getMimirLog() {
     return Collections.unmodifiableList(mimirLog);
   }
-  
+
   /**
-   * Queries the Mimir log entries for this tube.
-   * This is an alias for getMimirLog() for backward compatibility.
+   * Queries the Mimir log entries for this tube. This is an alias for getMimirLog() for backward
+   * compatibility.
    *
    * @return an unmodifiable view of the Mimir log
    */
@@ -368,11 +371,11 @@ public class Tube {
         terminationTimer.cancel();
         terminationTimer = null;
       }
-      
+
       // Update lifecycle state first
       lifecycleState = TubeLifecycleState.TERMINATING;
       logToMimir("Tube entering termination phase");
-      
+
       // Perform termination operations
       preserveKnowledge();
       releaseResources();
@@ -385,58 +388,54 @@ public class Tube {
     LOGGER.info("Tube terminated: {}", uniqueId);
     logToMimir("Tube terminated at: " + Instant.now());
   }
-  
-  /**
-   * Preserves crucial knowledge before termination for potential future use.
-   */
+
+  /** Preserves crucial knowledge before termination for potential future use. */
   private void preserveKnowledge() {
     logToMimir("Preserving knowledge before termination");
     // In a full implementation, this would archive important learnings and experiences
   }
-  
-  /**
-   * Releases all resources allocated to this tube.
-   */
+
+  /** Releases all resources allocated to this tube. */
   private void releaseResources() {
     logToMimir("Releasing allocated resources");
     // In a full implementation, this would clean up all allocated resources
   }
-  
+
   /**
-   * Proceeds through the early lifecycle phases of tube development.
-   * This follows the biological metaphor from conception through early development.
+   * Proceeds through the early lifecycle phases of tube development. This follows the biological
+   * metaphor from conception through early development.
    */
   private void proceedThroughEarlyLifecycle() {
     logToMimir("Beginning early lifecycle development");
-    
+
     // CONFIGURING phase - establishing boundaries
     this.lifecycleState = TubeLifecycleState.CONFIGURING;
     logToMimir("Tube entering CONFIGURING phase (analog: Blastulation)");
     // In a full implementation, this would set up internal boundaries and structures
-    
+
     // SPECIALIZING phase - determining core functions
     this.lifecycleState = TubeLifecycleState.SPECIALIZING;
     logToMimir("Tube entering SPECIALIZING phase (analog: Gastrulation)");
     // In a full implementation, this would determine core functionality
-    
+
     // DEVELOPING_FEATURES phase - building specific capabilities
     this.lifecycleState = TubeLifecycleState.DEVELOPING_FEATURES;
     logToMimir("Tube entering DEVELOPING_FEATURES phase (analog: Organogenesis)");
     // In a full implementation, this would build specific capabilities
-    
+
     logToMimir("Completed early lifecycle development");
   }
-  
+
   /**
    * Registers a child tube with this tube.
-   * 
+   *
    * @param childTube the child tube to register
    */
   public void registerChild(Tube childTube) {
     if (childTube != null) {
       logToMimir("Registering child tube: " + childTube.getUniqueId());
       // In a full implementation, this would maintain a list of child tubes
-      
+
       // Add the child to our identity's descendants list
       if (this.identity != null && childTube.getIdentity() != null) {
         this.identity.addChild(childTube.getIdentity());

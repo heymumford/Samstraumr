@@ -71,7 +71,7 @@ public class Environment {
   public Map<String, Object> getParameters() {
     return new HashMap<>(environmentParameters);
   }
-  
+
   /**
    * Gets a specific parameter value.
    *
@@ -82,7 +82,7 @@ public class Environment {
     Object value = environmentParameters.get(key);
     return value != null ? value.toString() : null;
   }
-  
+
   /**
    * Sets a parameter value in the environment.
    *
@@ -94,7 +94,7 @@ public class Environment {
       environmentParameters.put(key, value);
     }
   }
-  
+
   /**
    * Gets all parameter keys in this environment.
    *
@@ -121,10 +121,10 @@ public class Environment {
   public String getEnvironmentId() {
     return environmentId;
   }
-  
+
   /**
-   * Gets the unique hash for this environment.
-   * This is an alias for getEnvironmentId() for backward compatibility.
+   * Gets the unique hash for this environment. This is an alias for getEnvironmentId() for backward
+   * compatibility.
    *
    * @return the environment hash
    */
