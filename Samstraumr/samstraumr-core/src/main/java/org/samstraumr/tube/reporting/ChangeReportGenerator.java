@@ -84,7 +84,8 @@ public class ChangeReportGenerator {
     System.out.println("Change Management Report Generator");
     System.out.println("----------------------------------");
     System.out.println(
-        "Usage: java -cp target/samstraumr-core.jar org.samstraumr.tube.reporting.ChangeReportGenerator <from-version> <to-version> [output-dir]");
+        "Usage: java -cp target/samstraumr-core.jar org.samstraumr.tube.reporting.ChangeReportGenerator"
+            + " <from-version> <to-version> [output-dir]");
     System.out.println();
     System.out.println("Arguments:");
     System.out.println("  from-version  The starting version (e.g., 1.2.8)");

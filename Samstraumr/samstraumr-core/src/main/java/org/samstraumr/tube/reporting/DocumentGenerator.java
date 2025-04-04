@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2025 Samstraumr Team
  */
+
 package org.samstraumr.tube.reporting;
 
 import java.io.File;

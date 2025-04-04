@@ -132,6 +132,10 @@ public class AdaptationTestSuite {
         case 2:
           tube.setTerminationDelay(random.nextInt(100) + 1);
           break;
+        default:
+          // Handle unexpected operation
+          tube.logToMimir("Unexpected operation");
+          break;
       }
     }
 
