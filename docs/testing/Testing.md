@@ -109,73 +109,85 @@ Samstraumr includes a custom test runner script for simplified test execution:
 
 ## Tag Ontology
 
-To organize our tests in a way that reflects Samstraumr's core principles, we've developed a comprehensive tag ontology that works in conjunction with our test types:
+> **⚠️ UPDATED**: We've developed an enhanced tag ontology based on the biological lifecycle model.
+> 
+> Please refer to the comprehensive [Test Tags and Annotations](./TestTagsAndAnnotations.md) documentation for the complete tagging strategy.
 
-### Test Type Tags
+To organize our tests in a way that reflects Samstraumr's core principles, we've developed a comprehensive tag ontology that works in conjunction with our test types.
+
+### Biological Lifecycle Tags
+
+Our enhanced tag ontology is built around the biological lifecycle model, which organizes tests across different developmental phases:
+
+| Tag | Biological Phase | Description | Test Focus | Primary Initiative |
+|-----|------------------|-------------|------------|-------------------|
+| `@Conception` | Fertilization/Zygote | Initial creation | Testing tube creation and initial identity | `@SubstrateIdentity` |
+| `@Embryonic` | Cleavage/Early Development | Basic structure formation | Testing basic structure and initialization | `@StructuralIdentity` |
+| `@Infancy` | Early Growth | Initial capabilities | Testing basic functionality and early interactions | `@MemoryIdentity` |
+| `@Childhood` | Growth and Development | Active development | Testing developing capabilities and adaptations | `@FunctionalIdentity` |
+| `@Adolescence` | Rapid Changes | Significant evolution | Testing changing capabilities and transitions | `@AdaptiveIdentity` |
+| `@Adulthood` | Maturity/Full Function | Complete capabilities | Testing full functionality and integration | `@CognitiveIdentity` |
+| `@Maturity` | Optimization Phase | Refined behavior | Testing optimized performance and specialized functions | `@SpecializedIdentity` |
+| `@Senescence` | Aging/Degradation | Graceful degradation | Testing adaptive failure handling | `@ResilienceIdentity` |
+| `@Termination` | Death Phase | Shutdown/cleanup | Testing proper resource release and state archiving | `@ClosureIdentity` |
+| `@Legacy` | Posthumous | Knowledge preservation | Testing knowledge transfer and historical data access | `@HeritageIdentity` |
+
+The first four phases (Conception, Embryonic, Infancy, and Childhood) have been fully implemented with feature files and step definitions.
+
+### Initiative and Epic Tags
+
+Tests are organized according to the Tube Lifecycle Model initiatives and epics, aligning with the biological metaphor:
+
+#### Initiative Tags
+
+| Tag | Description | Focus Area | Associated Lifecycle Phase |
+|-----|-------------|------------|----------------------------|
+| `@SubstrateIdentity` | Biological continuity analog | Tests for physical continuity aspects of tubes | Conception |
+| `@StructuralIdentity` | Basic structure formation | Tests for tube structure and form | Embryonic |
+| `@MemoryIdentity` | Psychological continuity analog | Tests for cognitive and memory aspects of tubes | Infancy |
+| `@FunctionalIdentity` | Operational capabilities | Tests for tube's functional behavior | Childhood |
+| `@AdaptiveIdentity` | Behavioral adaptation | Tests for tube's ability to adapt | Adolescence |
+| `@CognitiveIdentity` | Full interoperational awareness | Tests for tube's cognitive capabilities | Adulthood |
+| `@SpecializedIdentity` | Refined operation | Tests for specialized tube functions | Maturity |
+| `@ResilienceIdentity` | Graceful degradation | Tests for resilience and recovery | Senescence |
+| `@ClosureIdentity` | Proper termination | Tests for clean shutdown and archival | Termination |
+| `@HeritageIdentity` | Knowledge preservation | Tests for knowledge transfer | Legacy |
+
+#### Epic Tags by Initiative
+
+| Tag | Initiative | Description | Examples |
+|-----|------------|-------------|----------|
+| `@UniqueIdentification` | SubstrateIdentity | Tests for uniqueness aspects | UUID generation, immutability |
+| `@CreationTracking` | SubstrateIdentity | Tests for creation metadata | Timestamps, environmental capture |
+| `@ConnectionPoints` | StructuralIdentity | Tests for connection framework | Input/output ports, connectivity |
+| `@InternalStructure` | StructuralIdentity | Tests for tube structure | Processing mechanisms, boundaries |
+| `@StatePersistence` | MemoryIdentity | Tests for state management | State transitions, history |
+| `@ExperienceRecording` | MemoryIdentity | Tests for experience tracking | Processing records, categorization |
+| `@DataProcessing` | FunctionalIdentity | Tests for data handling | Processing operations, transformations |
+| `@StateLearning` | FunctionalIdentity | Tests for operational learning | Pattern recognition, optimization |
+
+### Legacy Tags
+
+For backward compatibility, we also maintain our original tag ontology:
+
+#### Test Type Tags
 
 | Tag | Description | Test Type |
 |-----|-------------|-----------|
 | `@TubeTest` | Individual tube unit tests | Tube Tests |
 | `@FlowTest` | Single tube data flow tests | Flow Tests |
 | `@BundleTest` | Connected tubes component tests | Bundle Tests |
-| `@StreamTest` | External integration tests | Stream Tests |
-| `@AdaptationTest` | Property-based adaptation tests | Adaptation Tests |
-| `@L2_Machine` | End-to-end machine tests | Machine Tests |
-| `@Acceptance` | Business requirement validation | BDD Acceptance Tests |
+| ... | ... | ... |
 
-### Hierarchical Structure
+#### Hierarchical Structure
 
 | Tag | Description | Example |
 |-----|-------------|---------|
 | `@L0_Tube` | Atomic tube component tests | Testing a single tube in isolation |
 | `@L1_Bundle` | Bundle-level integration tests | Testing connected tubes forming a bundle |
-| `@L2_Machine` | Complex machine composition tests | Testing interconnected bundles forming a machine |
-| `@L3_System` | Full system tests | Testing complete systems with multiple machines |
+| ... | ... | ... |
 
-### Critical Path Categorization
-
-The ATL/BTL categorization is a key part of Samstraumr's testing strategy, dividing tests by criticality:
-
-| Tag | Full Name | Description | Example |
-|-----|-----------|-------------|---------|
-| `@ATL` | Above The Line | Critical tests that MUST pass with every build | Core functionality tests that must pass |
-| `@BTL` | Below The Line | Important but non-blocking tests that can run separately | Edge cases and additional quality tests |
-
-This strategy enables faster feedback cycles while maintaining comprehensive coverage. See the complete [ATL/BTL Strategy](./ATL-BTL-Strategy.md) documentation for implementation details.
-
-### Core Capabilities
-
-| Tag | Description | Example |
-|-----|-------------|---------|
-| `@Identity` | UUID, naming, identification tests | Testing unique ID generation |
-| `@Flow` | Data movement and transformation | Testing data processing pipelines |
-| `@State` | State management and transitions | Testing state transitions and propagation |
-| `@Awareness` | Self-monitoring and environment awareness | Testing monitoring capabilities |
-
-### Lifecycle Tests
-
-| Tag | Description | Example |
-|-----|-------------|---------|
-| `@Init` | Initialization/construction tests | Testing component creation |
-| `@Runtime` | Normal operation tests | Testing standard processing operations |
-| `@Termination` | Shutdown/cleanup tests | Testing proper resource cleanup |
-
-### Patterns
-
-| Tag | Description | Example |
-|-----|-------------|---------|
-| `@Observer` | Monitoring pattern tests | Testing tubes that monitor without modifying |
-| `@Transformer` | Data transformation tests | Testing data transformation capabilities |
-| `@Validator` | Input validation tests | Testing data validation rules |
-| `@CircuitBreaker` | Fault tolerance tests | Testing isolation of failures |
-
-### Non-functional Requirements
-
-| Tag | Description | Example |
-|-----|-------------|---------|
-| `@Performance` | Speed and resource usage | Testing resource utilization and speed |
-| `@Resilience` | Recovery and fault handling | Testing recovery from failures |
-| `@Scale` | Load and scaling tests | Testing behavior under increased load |
+For a complete reference of all tags and how to use them effectively, see the [Test Tags and Annotations](./TestTagsAndAnnotations.md) document.
 
 ## Test Types
 
@@ -316,7 +328,7 @@ Scenario: Validator tube correctly identifies invalid data
 
 ## Running Tests
 
-Samstraumr provides a unified test runner script that simplifies test execution while supporting the various test types:
+Samstraumr provides a unified test runner script that simplifies test execution while supporting various test types, including our new biological lifecycle-based tags.
 
 ### Using the Test Runner Script
 
@@ -324,37 +336,76 @@ The recommended way to run Samstraumr tests is using the test runner script:
 
 ```bash
 # Run all tests
-./util/test/run-tests.sh all
+./util/test-run.sh all
 
 # Run tests by criticality
-./util/test/run-tests.sh atl          # Run Above The Line tests (critical, must pass)
-./util/test/run-tests.sh btl          # Run Below The Line tests (robustness, non-blocking)
-./util/test/run-tests.sh critical     # Alias for atl (for backward compatibility)
+./util/test-run.sh atl          # Run Above The Line tests (critical, must pass)
+./util/test-run.sh btl          # Run Below The Line tests (robustness, non-blocking)
 
-# Run tests by type
-./util/test/run-tests.sh tube         # Run Tube Tests (unit)
-./util/test/run-tests.sh flow         # Run Flow Tests (integration)
-./util/test/run-tests.sh bundle       # Run Bundle Tests (component)
-./util/test/run-tests.sh stream       # Run Stream Tests (system)
-./util/test/run-tests.sh adaptation   # Run Adaptation Tests (property)
-./util/test/run-tests.sh machine      # Run Machine Tests (e2e)
-./util/test/run-tests.sh acceptance   # Run BDD Acceptance Tests (business)
+# Run tests by traditional type
+./util/test-run.sh tube         # Run Tube Tests (unit)
+./util/test-run.sh flow         # Run Flow Tests (integration)
+./util/test-run.sh bundle       # Run Bundle Tests (component)
+./util/test-run.sh stream       # Run Stream Tests (system)
+./util/test-run.sh adaptation   # Run Adaptation Tests (property)
+./util/test-run.sh machine      # Run Machine Tests (e2e)
+./util/test-run.sh acceptance   # Run BDD Acceptance Tests (business)
+
+# Run tests by biological lifecycle phase
+./util/test-run.sh --tags="@Conception"   # Run initial creation phase tests
+./util/test-run.sh --tags="@Embryonic"    # Run structural formation phase tests
+./util/test-run.sh --tags="@Infancy"      # Run early capability development tests
+./util/test-run.sh --tags="@Childhood"    # Run functional development tests
+./util/test-run.sh --tags="@Adulthood"    # Run mature functionality tests
+
+# Run tests by initiative 
+./util/test-run.sh --tags="@SubstrateIdentity"    # Run physical continuity tests
+./util/test-run.sh --tags="@StructuralIdentity"   # Run structure formation tests
+./util/test-run.sh --tags="@MemoryIdentity"       # Run state/memory tests
+./util/test-run.sh --tags="@FunctionalIdentity"   # Run functional capability tests
+
+# Run by test type
+./util/test-run.sh --tags="@Positive"     # Run tests for expected behavior
+./util/test-run.sh --tags="@Negative"     # Run tests for error handling
 
 For help with all available options:
 
 ```bash
-./util/test/run-tests.sh --help
+./util/test-run.sh --help
+```
 
-#### Tagged Testing (Cucumber)
+### Maven Profile Test Execution
+
+For more direct control, you can use Maven profiles:
 
 ```bash
-# Run tests with specific tags
-mvn test -Dcucumber.filter.tags="@L2_Machine"    # Run Machine Tests
-mvn test -Dcucumber.filter.tags="@Acceptance"    # Run Acceptance Tests
+# Run biological phase tests
+mvn test -P conception-tests     # Run conception phase tests
+mvn test -P infancy-tests        # Run infancy phase tests
 
-# Combine tags for specific subsets
-mvn test -Dcucumber.filter.tags="@L0_Tube and @Identity"
-mvn test -Dcucumber.filter.tags="@ATL and @Resilience"
+# Run initiative-specific tests
+mvn test -P substrate-identity-tests   # Run substrate identity tests
+mvn test -P memory-identity-tests      # Run memory identity tests
+
+# Run positive/negative tests
+mvn test -P positive-tests       # Run tests for expected behavior
+mvn test -P negative-tests       # Run tests for error handling
+```
+
+### Tagged Testing with Cucumber
+
+For maximum flexibility, use cucumber tag combinations:
+
+```bash
+# Run tests with individual tags
+mvn test -Dcucumber.filter.tags="@Conception"          # Run conception phase tests
+mvn test -Dcucumber.filter.tags="@SubstrateIdentity"   # Run substrate identity tests
+
+# Combine tags for precise test targeting
+mvn test -Dcucumber.filter.tags="@SubstrateIdentity and @Conception"
+mvn test -Dcucumber.filter.tags="@MemoryIdentity and @Infancy and @Positive"
+mvn test -Dcucumber.filter.tags="@Conception and @ATL and @Identity"
+mvn test -Dcucumber.filter.tags="@L0_Tube and @Positive and not @BTL"
 
 ### Test Reports
 

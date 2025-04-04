@@ -10,14 +10,17 @@ This document provides a comprehensive reference for the test tags and annotatio
 4. [Domain-Specific Annotations](#domain-specific-annotations)
 5. [Criticality Annotations](#criticality-annotations)
 6. [Hierarchical Structure](#hierarchical-structure)
-7. [Capability Tags](#capability-tags)
-8. [Lifecycle Tags](#lifecycle-tags)
-9. [Pattern Tags](#pattern-tags)
-10. [Non-functional Tags](#non-functional-tags)
-11. [Using Tags in Combination](#using-tags-in-combination)
-12. [Implementation](#implementation)
-13. [Running Tests with Tags](#running-tests-with-tags)
-14. [Best Practices](#best-practices)
+7. [Biological Lifecycle Tags](#biological-lifecycle-tags)
+8. [Initiative and Epic Tags](#initiative-and-epic-tags)
+9. [Test Type Tags](#test-type-tags)
+10. [Capability Tags](#capability-tags)
+11. [Lifecycle Tags](#lifecycle-tags)
+12. [Pattern Tags](#pattern-tags)
+13. [Non-functional Tags](#non-functional-tags)
+14. [Using Tags in Combination](#using-tags-in-combination)
+15. [Implementation](#implementation)
+16. [Running Tests with Tags](#running-tests-with-tags)
+17. [Best Practices](#best-practices)
 
 ## Introduction
 
@@ -72,6 +75,91 @@ Tests are organized in a hierarchical manner, mirroring the compositional struct
 | `@L1_Bundle` | Composite Level | CTIT | Bundle-level integration tests | Testing connected tubes forming a bundle |
 | `@L2_Machine` | Machine Level | MCVT | Complex machine composition tests | Testing interconnected bundles forming a machine |
 | `@L3_System` | Acceptance Level | MCVT (User-focused) | Full system tests | Testing complete systems with multiple machines |
+
+## Biological Lifecycle Tags
+
+Tests are categorized based on the biological lifecycle model for tubes, representing different developmental phases. This model aligns software component development with biological development stages:
+
+| Tag | Biological Phase | Description | Test Focus | Primary Initiative | Key Capabilities |
+|-----|------------------|-------------|------------|-------------------|------------------|
+| `@Conception` | Fertilization/Zygote | Initial creation | Testing tube creation and initial identity | `@SubstrateIdentity` | `@Identity`, `@Awareness` |
+| `@Embryonic` | Cleavage/Early Development | Basic structure formation | Testing basic structure and initialization | `@StructuralIdentity` | `@Structure`, `@Resilience` |
+| `@Infancy` | Early Growth | Initial capabilities | Testing basic functionality and early interactions | `@MemoryIdentity` | `@State`, `@Learning` |
+| `@Childhood` | Growth and Development | Active development | Testing developing capabilities and adaptations | `@FunctionalIdentity` | `@Function`, `@Flow` |
+| `@Adolescence` | Rapid Changes | Significant evolution | Testing changing capabilities and transitions | `@AdaptiveIdentity` | `@Adaptation`, `@Optimization` |
+| `@Adulthood` | Maturity/Full Function | Complete capabilities | Testing full functionality and integration | `@CognitiveIdentity` | `@Integration`, `@Awareness` |
+| `@Maturity` | Optimization Phase | Refined behavior | Testing optimized performance and specialized functions | `@SpecializedIdentity` | `@Performance`, `@Efficiency` |
+| `@Senescence` | Aging/Degradation | Graceful degradation | Testing adaptive failure handling | `@ResilienceIdentity` | `@Resilience`, `@Recovery` |
+| `@Termination` | Death Phase | Shutdown/cleanup | Testing proper resource release and state archiving | `@ClosureIdentity` | `@Cleanup`, `@Archive` |
+| `@Legacy` | Posthumous | Knowledge preservation | Testing knowledge transfer and historical data access | `@HeritageIdentity` | `@Knowledge`, `@History` |
+
+### Implemented Phases
+
+The following phases have been fully implemented with feature files and step definitions:
+
+1. **Conception Phase** (`@Conception`): Tests that verify proper tube creation and initial identity establishment.
+   - Feature file: `conception-phase-tests.feature`
+   - Step definitions: `ConceptionPhaseSteps.java`
+   - Primary initiative: `@SubstrateIdentity`
+   - Key focus: UUID generation, creation timestamps, environmental context capture
+
+2. **Embryonic Phase** (`@Embryonic`): Tests that verify the formation of basic tube structure.
+   - Feature file: `embryonic-phase-tests.feature`
+   - Step definitions: `EmbryonicPhaseSteps.java`
+   - Primary initiative: `@StructuralIdentity`
+   - Key focus: Connection points, internal structure, structural resilience
+
+3. **Infancy Phase** (`@Infancy`): Tests that verify early development of tube capabilities.
+   - Feature file: `infancy-phase-tests.feature`
+   - Step definitions: `InfancyPhaseSteps.java`
+   - Primary initiative: `@MemoryIdentity`
+   - Key focus: State persistence, experience recording, basic learning
+
+4. **Childhood Phase** (`@Childhood`): Tests that verify functional development during active growth.
+   - Feature file: `childhood-phase-tests.feature`
+   - Step definitions: `ChildhoodPhaseSteps.java`
+   - Primary initiative: `@FunctionalIdentity`
+   - Key focus: Data processing, state learning, error recovery
+
+The remaining phases will be implemented incrementally as the framework matures.
+
+## Initiative and Epic Tags
+
+Tests are organized according to the Tube Lifecycle Model initiatives and epics:
+
+### Initiative Tags
+
+| Tag | Description | Focus Area |
+|-----|-------------|------------|
+| `@SubstrateIdentity` | Biological continuity analog | Tests for physical continuity aspects of tubes |
+| `@MemoryIdentity` | Psychological continuity analog | Tests for cognitive and memory aspects of tubes |
+| `@NarrativeIdentity` | Personal narrative analog | Tests for purpose and self-concept aspects of tubes |
+| `@CrossCuttingIdentity` | Identity aspects spanning multiple dimensions | Tests for identity features across categories |
+| `@SamstraumrSpecific` | Framework-specific verifications | Tests specific to Samstraumr implementation |
+
+### Epic Tags
+
+| Tag | Initiative | Description | Examples |
+|-----|------------|-------------|----------|
+| `@UniqueIdentification` | SubstrateIdentity | Tests for uniqueness aspects | UUID generation, immutability |
+| `@CreationTracking` | SubstrateIdentity | Tests for creation metadata | Timestamps, environmental capture |
+| `@LineageManagement` | SubstrateIdentity | Tests for ancestry tracking | Parent-child relationships |
+| `@HierarchicalAddressing` | SubstrateIdentity | Tests for addressing | Hierarchical IDs, resolution |
+| `@EnvironmentalContext` | SubstrateIdentity | Tests for environment awareness | System properties, resources |
+| `@StatePersistence` | MemoryIdentity | Tests for state management | State transitions, history |
+| `@ExperienceRecording` | MemoryIdentity | Tests for experience tracking | Processing records, categorization |
+| `@AdaptiveLearning` | MemoryIdentity | Tests for learning capability | Pattern recognition, adaptation |
+| `@PerformanceAwareness` | MemoryIdentity | Tests for self-monitoring | Metrics, optimizations |
+| `@PurposePreservation` | MemoryIdentity | Tests for purpose management | Core function, mission alignment |
+
+## Test Type Tags
+
+Tests are categorized based on their validation approach:
+
+| Tag | Description | When to Use |
+|-----|-------------|-------------|
+| `@Positive` | Tests for expected behavior | Verifying that components function correctly in normal conditions |
+| `@Negative` | Tests for error handling | Verifying that components handle errors and edge cases appropriately |
 
 ## Capability Tags
 
@@ -138,7 +226,7 @@ public @interface UnitTest {
 
 ## Running Tests with Tags
 
-Tests can be run using Maven profiles or custom scripts:
+Tests can be run using Maven profiles or custom scripts. The enhanced tagging system supports more granular test selection:
 
 ```bash
 # Run all unit tests (using industry standard terminology)
@@ -153,15 +241,38 @@ mvn test -Dcucumber.filter.tags="@L0_Tube and @Identity"
 # Run critical tests
 mvn test -P atl-tests
 
-# Using the unified script
-./run-tests.sh unit    # Run unit tests
-./run-tests.sh tube    # Run tube tests (equivalent)
-./run-tests.sh --tags="@Identity and @ATL"  # Run with tag combination
+# Run biological phase-specific tests
+mvn test -P conception-tests
+mvn test -P infancy-tests
+
+# Run initiative-specific tests
+mvn test -P substrate-identity-tests
+mvn test -P memory-identity-tests
+
+# Run positive or negative tests
+mvn test -P positive-tests
+mvn test -P negative-tests
+
+# Complex filter combinations
+mvn test -Dcucumber.filter.tags="@SubstrateIdentity and @Conception and @Positive"
+mvn test -Dcucumber.filter.tags="@MemoryIdentity and @ATL and not @Negative"
+
+# Using the unified script with biological lifecycle tags
+./util/test-run.sh --tags="@Conception"
+./util/test-run.sh --tags="@SubstrateIdentity and @Positive"
+./util/test-run.sh --tags="@MemoryIdentity and @Infancy"
+
+# Using the tag mapping script for dynamic tag resolution
+./util/test-map-bio-tags.sh initiative substrate  # Returns "SubstrateIdentity"
+./util/test-map-bio-tags.sh phase conception      # Returns "Conception"
+./util/test-map-bio-tags.sh epic uniqueidentification  # Returns "UniqueIdentification"
 ```
 
 ## Test Mapping
 
-The framework automatically maps between terminology sets, so using either term will include tests tagged with either annotation:
+The framework maps between terminology sets, allowing flexible test selection:
+
+### Standard Terminology Mapping
 
 | When you specify | Tests included |
 |------------------|----------------|
@@ -170,26 +281,48 @@ The framework automatically maps between terminology sets, so using either term 
 | `component-tests` profile | Tests with `@ComponentTest` or `@BundleTest` |
 | `bundle-tests` profile | Tests with `@BundleTest` or `@ComponentTest` |
 
+### Biological Lifecycle Mapping
+
+| Profile | Tests included |
+|---------|----------------|
+| `conception-tests` | Tests with `@Conception` |
+| `infancy-tests` | Tests with `@Infancy` |
+| `substrate-identity-tests` | Tests with `@SubstrateIdentity` |
+| `memory-identity-tests` | Tests with `@MemoryIdentity` |
+| `positive-tests` | Tests with `@Positive` |
+| `negative-tests` | Tests with `@Negative` |
+
 ## Best Practices
 
-1. Each test should have at minimum:
+1. Each test should have these essential tag categories:
    - One hierarchical tag (`@L0_Tube`, `@L1_Bundle`, etc.)
    - One critical path tag (`@ATL` or `@BTL`)
+   - One biological phase tag (`@Conception`, `@Infancy`, etc.)
+   - One initiative tag (`@SubstrateIdentity`, `@MemoryIdentity`, etc.)
+   - One test type tag (`@Positive` or `@Negative`)
    - One capability or pattern tag
 
-2. Tests should be executed in order of increasing complexity:
+2. Tests should be executed in order of biological development:
+   - Start with `@Conception` phase tests
+   - Progress through `@Embryonic`, `@Infancy`, etc.
+   - End with `@Termination` and `@Legacy` phase tests
+
+3. Tests should be executed in order of architectural complexity:
    - Start with `@L0_Tube` tests
    - Progress to `@L1_Bundle`, `@L2_Machine`, and finally `@L3_System` tests
 
-3. Critical path tests should always be run first:
+4. Critical path tests should always be run first:
    - Always run `@ATL` tests before `@BTL` tests
    - Failures in `@ATL` tests should block further testing
 
-4. Tag combinations should be used for targeted testing:
-   - When troubleshooting identity issues: `@Identity`
-   - When testing state transitions: `@State @Runtime`
-   - When testing initialization: `@Init`
+5. Tag combinations should be used for targeted testing:
+   - For creation phase issues: `@Conception and @SubstrateIdentity`
+   - For early development memory issues: `@Infancy and @MemoryIdentity`
+   - For specific capabilities: `@Identity and @SubstrateIdentity`
+   - For error handling: `@Negative and @BTL`
 
-5. **Consistency**: Use annotations consistently across the codebase
-6. **Clarity**: Choose the most descriptive annotations for each test
-7. **Completeness**: Include both industry-standard and domain-specific annotations
+6. **Consistency**: Use annotations consistently across the codebase
+7. **Granularity**: Use specific tag combinations for precise test targeting
+8. **Completeness**: Include all relevant tag categories for maximum flexibility
+9. **Expressiveness**: Choose tags that clearly communicate test purpose and scope
+10. **Maintainability**: Keep tag structure aligned with the biological lifecycle model

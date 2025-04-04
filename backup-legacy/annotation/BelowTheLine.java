@@ -10,6 +10,10 @@ import org.junit.jupiter.api.Tag;
 /**
  * Marks a test as "Below The Line" (BTL), indicating it is an important but non-blocking test that
  * can run separately from the main build pipeline.
+ * 
+ * <p>⚠️ DEPRECATED: This annotation has been replaced by {@link BTL}.
+ * Please use the {@link BTL} annotation instead for all new code.
+ * This annotation will be removed in a future release.
  *
  * <p>Below The Line tests have the following characteristics:
  *
@@ -31,7 +35,10 @@ import org.junit.jupiter.api.Tag;
  *   <li>Rare user scenarios
  *   <li>Resource-intensive tests
  * </ul>
+ * 
+ * @deprecated Use {@link BTL} instead. This annotation will be removed in a future release.
  */
+@Deprecated
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Tag("BTL")

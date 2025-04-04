@@ -1,6 +1,16 @@
 /*
 Filename: TubeInitializationTest.feature
 Purpose: Validates initialization, uniqueness, and logging capabilities of atomic Tube instances.
+
+⚠️ DEPRECATED: This file has been replaced by the biological lifecycle testing model.
+Please use the following files instead:
+- /tube/features/L0_Tube/lifecycle/conception-phase-tests.feature (for tube creation and identity)
+- /tube/features/L0_Tube/lifecycle/embryonic-phase-tests.feature (for structural formation)
+- /tube/features/L0_Tube/lifecycle/infancy-phase-tests.feature (for early capabilities)
+- /tube/features/L0_Tube/lifecycle/childhood-phase-tests.feature (for functional development)
+
+This file will be removed in a future release.
+
 Goals:
   - Ensure that tubes initialize with unique identifiers
   - Ensure that environment details are properly captured and logged

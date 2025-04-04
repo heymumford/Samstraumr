@@ -24,13 +24,14 @@ import org.junit.platform.suite.api.SuiteDisplayName;
  * <p>Tests can be included by either:
  *
  * <ul>
- *   <li>Using the {@code @AboveTheLine} annotation
+ *   <li>Using the {@code @ATL} annotation (preferred)
+ *   <li>Using the {@code @AboveTheLine} annotation (deprecated)
  *   <li>Using the {@code @Tag("ATL")} annotation
  * </ul>
  */
 @Suite
 @SuiteDisplayName("Above The Line (ATL) Tests - Critical Path")
-@SelectPackages({"org.samstraumr.tube"})
+@SelectPackages({"org.samstraumr.tube", "org.samstraumr.tube.lifecycle"})
 @IncludeTags("ATL")
 public class ATLTestRunner {
   // This class is just a test runner configuration with no implementation

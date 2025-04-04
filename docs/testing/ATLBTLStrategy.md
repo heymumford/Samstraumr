@@ -58,8 +58,10 @@ Samstraumr implements the ATL/BTL strategy across both JUnit and Cucumber tests:
 ### JUnit Implementation
 
 - **Annotations**: 
-  - `@AboveTheLine`: Marks tests as critical
-  - `@BelowTheLine`: Marks tests as important but non-blocking
+  - `@ATL`: Marks tests as critical (preferred)
+  - `@BTL`: Marks tests as important but non-blocking (preferred)
+  - `@AboveTheLine`: Marks tests as critical (deprecated)
+  - `@BelowTheLine`: Marks tests as important but non-blocking (deprecated)
 
 - **Test Runners**:
   - `ATLTestRunner`: Executes only Above The Line tests

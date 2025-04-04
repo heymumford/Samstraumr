@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.samstraumr.tube.annotations.AdaptationTest;
+import org.samstraumr.tube.test.annotations.AdaptationTest;
 
 /**
  * Adaptation Tests focus on tube behavior under changing conditions. These property-based tests

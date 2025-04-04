@@ -13,7 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.samstraumr.tube.test.annotations.AboveTheLine;
+import org.samstraumr.tube.test.annotations.ATL;
 import org.samstraumr.tube.test.annotations.TubeTest;
 
 /**
@@ -24,7 +24,7 @@ import org.samstraumr.tube.test.annotations.TubeTest;
  * tube functionality.
  */
 @TubeTest
-@AboveTheLine
+@ATL
 @ExtendWith(MockitoExtension.class)
 public class TubeTest {
 

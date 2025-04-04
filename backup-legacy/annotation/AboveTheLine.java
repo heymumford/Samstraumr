@@ -10,6 +10,10 @@ import org.junit.jupiter.api.Tag;
 /**
  * Marks a test as "Above The Line" (ATL), indicating it is a critical test that MUST pass with
  * every build.
+ * 
+ * <p>⚠️ DEPRECATED: This annotation has been replaced by {@link ATL}.
+ * Please use the {@link ATL} annotation instead for all new code.
+ * This annotation will be removed in a future release.
  *
  * <p>Above The Line tests have the following characteristics:
  *
@@ -31,7 +35,10 @@ import org.junit.jupiter.api.Tag;
  *   <li>Key user journeys
  *   <li>Identity and initialization tests
  * </ul>
+ * 
+ * @deprecated Use {@link ATL} instead. This annotation will be removed in a future release.
  */
+@Deprecated
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Tag("ATL")

@@ -46,8 +46,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Maven Test Profiles
 - Critical vs Robustness Tests:
-  - `mvn test -P atl-tests` (Above The Line - critical tests)
-  - `mvn test -P btl-tests` (Below The Line - robustness tests)
+  - `mvn test -P ATL-tests` (Above The Line - critical tests)
+  - `mvn test -P BTL-tests` (Below The Line - robustness tests)
 - Industry Standard Test Profiles:
   - `mvn test -P smoke-tests` (basic system verification)
   - `mvn test -P unit-tests` (individual units)

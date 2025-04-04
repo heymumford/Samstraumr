@@ -24,6 +24,7 @@
     <btl.test.tags>@BTL</btl.test.tags>
     <all.test.tags>@ATL or @BTL</all.test.tags>
     <skip.quality.checks>false</skip.quality.checks>
+    <skipTests>false</skipTests>
     <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
     <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
     <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
@@ -142,13 +143,33 @@
   <profiles>
     <!-- ATL Tests Profile -->
     <profile>
+      <id>ATL-tests</id>
+      <properties>
+        <cucumber.filter.tags>${atl.test.tags}</cucumber.filter.tags>
+        <skipTests>false</skipTests>
+        <maven.test.skip>false</maven.test.skip>
+      </properties>
+    </profile>
+    
+    <!-- Legacy ATL Profile (for backward compatibility) -->
+    <profile>
       <id>atl-tests</id>
       <properties>
         <cucumber.filter.tags>${atl.test.tags}</cucumber.filter.tags>
+        <skipTests>false</skipTests>
+        <maven.test.skip>false</maven.test.skip>
       </properties>
     </profile>
     
     <!-- BTL Tests Profile -->
+    <profile>
+      <id>BTL-tests</id>
+      <properties>
+        <cucumber.filter.tags>${btl.test.tags}</cucumber.filter.tags>
+      </properties>
+    </profile>
+    
+    <!-- Legacy BTL Profile (for backward compatibility) -->
     <profile>
       <id>btl-tests</id>
       <properties>

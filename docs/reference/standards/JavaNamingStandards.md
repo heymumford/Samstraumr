@@ -196,6 +196,8 @@ private String TBDFormat;
 ```
 
 This exception applies only to the following acronyms:
+- ATL (Above The Line) - for critical tests
+- BTL (Below The Line) - for robustness tests
 - FAQ (Frequently Asked Questions)
 - TBD (Tube Based Development)
 - Other domain-specific acronyms documented in the project glossary

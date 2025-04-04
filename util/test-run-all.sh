@@ -36,14 +36,14 @@ function show_help() {
   echo "Examples:"
   echo "  $0 unit                  # Run unit tests only"
   echo "  $0 --both unit           # Run unit tests and tube tests"
-  echo "  $0 --profile btl-tests integration # Run integration tests with BTL profile"
+  echo "  $0 --profile BTL-tests integration # Run integration tests with BTL profile"
   echo ""
 }
 
 # Default values
 INCLUDE_EQUIVALENT=false
 OUTPUT_FILE=""
-MAVEN_PROFILE="atl-tests"
+MAVEN_PROFILE="ATL-tests"
 
 # Parse command line options
 while [[ $# -gt 0 ]]; do

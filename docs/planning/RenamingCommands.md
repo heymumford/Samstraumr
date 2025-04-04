@@ -20,7 +20,7 @@ mv -v docs/planning/tmp-reorg-plan.md docs/planning/TempReorgPlan.md
 # Testing directory
 mv -v docs/testing/TEST_STANDARDIZATION.md docs/testing/TestStandardization.md
 mv -v docs/testing/testing-annotations.md docs/testing/TestingAnnotations.md
-mv -v docs/testing/atl-btl-strategy.md docs/testing/AtlBtlStrategy.md
+mv -v docs/testing/atl-btl-strategy.md docs/testing/ATLBTLStrategy.md
 mv -v docs/testing/test-strategy.md docs/testing/TestStrategy.md
 mv -v docs/testing/bdd-with-cucumber.md docs/testing/BddWithCucumber.md
 

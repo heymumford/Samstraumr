@@ -13,13 +13,25 @@ import io.cucumber.java.en.*;
 /**
  * Step definitions for low-level tube initialization tests.
  *
+ * <p>⚠️ DEPRECATED: This class is being replaced by the more specialized biological 
+ * lifecycle step definitions. Please use the following step classes instead:
+ * <ul>
+ *   <li>{@link ConceptionPhaseSteps} - For initial tube creation</li>
+ *   <li>{@link EmbryonicPhaseSteps} - For structural formation</li>
+ * </ul>
+ * This class will be maintained only for backward compatibility and may be removed in 
+ * a future release.
+ *
  * <p>These step definitions test the fundamental initialization behaviors of tubes,
  * focusing on the first two phases of the biological lifecycle model:
  * <ul>
  *   <li>Creation Phase (Fertilization/Zygote Analog)</li>
  *   <li>Initialization Phase (Cleavage/Early Cell Division Analog)</li>
  * </ul>
+ *
+ * @deprecated Use {@link ConceptionPhaseSteps} and {@link EmbryonicPhaseSteps} instead
  */
+@Deprecated
 public class TubeInitializationSteps extends BaseLifecycleSteps {
     
     @Given("a basic environment for initialization")

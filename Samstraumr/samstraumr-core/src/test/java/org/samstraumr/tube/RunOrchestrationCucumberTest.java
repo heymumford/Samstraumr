@@ -23,7 +23,7 @@ import org.samstraumr.tube.test.annotations.OrchestrationTest;
 @ConfigurationParameter(
     key = PLUGIN_PROPERTY_NAME,
     value = "pretty, html:target/cucumber-reports/orchestration-report.html")
-@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "org.samstraumr.tube.steps")
+@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "org.samstraumr.tube.steps,org.samstraumr.tube.lifecycle.steps")
 @ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "@Orchestration")
 @OrchestrationTest
 @AboveTheLine

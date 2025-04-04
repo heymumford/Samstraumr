@@ -15,7 +15,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.samstraumr.tube.annotations.StreamTest;
+import org.samstraumr.tube.test.annotations.StreamTest;
 import org.samstraumr.tube.bundle.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

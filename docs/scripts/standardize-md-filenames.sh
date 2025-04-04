@@ -73,7 +73,7 @@ if [ -f "docs/testing/testing-annotations.md" ]; then
   mv -v docs/testing/testing-annotations.md docs/testing/TestingAnnotations.md
 fi
 if [ -f "docs/testing/atl-btl-strategy.md" ]; then
-  mv -v docs/testing/atl-btl-strategy.md docs/testing/AtlBtlStrategy.md
+  mv -v docs/testing/atl-btl-strategy.md docs/testing/ATLBTLStrategy.md
 fi
 if [ -f "docs/testing/test-strategy.md" ]; then
   mv -v docs/testing/test-strategy.md docs/testing/TestStrategy.md

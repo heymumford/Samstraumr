@@ -24,13 +24,14 @@ import org.junit.platform.suite.api.SuiteDisplayName;
  * <p>Tests can be included by either:
  *
  * <ul>
- *   <li>Using the {@code @BelowTheLine} annotation
+ *   <li>Using the {@code @BTL} annotation (preferred)
+ *   <li>Using the {@code @BelowTheLine} annotation (deprecated)
  *   <li>Using the {@code @Tag("BTL")} annotation
  * </ul>
  */
 @Suite
 @SuiteDisplayName("Below The Line (BTL) Tests - Robustness Path")
-@SelectPackages({"org.samstraumr.tube"})
+@SelectPackages({"org.samstraumr.tube", "org.samstraumr.tube.lifecycle"})
 @IncludeTags("BTL")
 public class BTLTestRunner {
   // This class is just a test runner configuration with no implementation

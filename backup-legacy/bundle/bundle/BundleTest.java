@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 import org.samstraumr.tube.Environment;
-import org.samstraumr.tube.test.annotations.BelowTheLine;
+import org.samstraumr.tube.test.annotations.BTL;
 import org.samstraumr.tube.test.annotations.BundleTest;
 
 /**
@@ -17,7 +17,7 @@ import org.samstraumr.tube.test.annotations.BundleTest;
  * functionality but are not critical for every build.
  */
 @BundleTest
-@BelowTheLine
+@BTL
 public class BundleTest {
 
   @Test

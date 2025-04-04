@@ -211,6 +211,26 @@ public class Environment {
     return UNKNOWN;
   }
 
+  /**
+   * Captures the current environmental context as a map of key-value pairs.
+   *
+   * @return A map containing key environmental parameters
+   */
+  public java.util.Map<String, String> captureEnvironmentalContext() {
+    java.util.Map<String, String> context = new java.util.HashMap<>();
+    
+    context.put("hostname", getHostName());
+    context.put("os", getOsName());
+    context.put("osVersion", getOsVersion());
+    context.put("cpuModel", getCpuModel());
+    context.put("cpuCores", String.valueOf(getCpuCores()));
+    context.put("totalMemory", getTotalMemory());
+    context.put("envHash", getEnvironmentHash());
+    context.put("captureTime", java.time.Instant.now().toString());
+    
+    return context;
+  }
+
   public String getEnvironmentHash() {
     try {
       MessageDigest digest = MessageDigest.getInstance("SHA-256");

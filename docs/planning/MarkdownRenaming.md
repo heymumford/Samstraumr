@@ -25,7 +25,7 @@ According to our file organization standards:
 - FOLDER_STRUCTURE.md → FolderStructure.md
 
 #### Documentation files needing consistency
-- ATL-BTL-Strategy.md → AtlBtlStrategy.md (consistent with other files in testing/)
+- ATL-BTL-Strategy.md → ATLBTLStrategy.md (ATL and BTL are acronyms that should be uppercase)
 - BundleToCompositeRefactoring.md → (Already PascalCase, keep)
 - CompositesAndMachines.md → (Already PascalCase, keep)
 - CoreConcepts.md → (Already PascalCase, keep)

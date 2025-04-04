@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.samstraumr.tube.Environment;
-import org.samstraumr.tube.annotations.MachineTest;
+import org.samstraumr.tube.test.annotations.MachineTest;
 import org.samstraumr.tube.bundle.Bundle;
 import org.samstraumr.tube.bundle.BundleFactory;
 import org.slf4j.Logger;

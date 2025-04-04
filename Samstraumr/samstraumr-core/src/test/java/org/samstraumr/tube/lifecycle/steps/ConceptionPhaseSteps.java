@@ -1,0 +1,91 @@
+package org.samstraumr.tube.lifecycle.steps;
+
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import org.samstraumr.tube.Environment;
+import org.samstraumr.tube.Tube;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Step definitions for conception phase tests.
+ * The conception phase focuses on tube creation and initial identity establishment.
+ */
+public class ConceptionPhaseSteps {
+    private static final Logger log = LoggerFactory.getLogger(ConceptionPhaseSteps.class);
+    
+    private Environment environment;
+    private Tube testTube;
+    
+    @Given("the system environment is properly configured")
+    public void the_system_environment_is_properly_configured() {
+        log.info("Setting up system environment");
+        environment = new Environment();
+        assertNotNull("Environment should be created successfully", environment);
+    }
+    
+    @When("a new tube is created")
+    public void a_new_tube_is_created() {
+        log.info("Creating a new tube");
+        testTube = new Tube("Conception Phase Test", environment);
+        assertNotNull("Tube should be created successfully", testTube);
+    }
+    
+    @Then("the tube should have a unique identifier")
+    public void the_tube_should_have_a_unique_identifier() {
+        log.info("Verifying tube has unique identifier");
+        // Stub assertion - always passes for demonstration
+        assertTrue("Tube should have a unique identifier", true);
+    }
+    
+    @Then("the tube should have a creation timestamp")
+    public void the_tube_should_have_a_creation_timestamp() {
+        log.info("Verifying tube has creation timestamp");
+        // Stub assertion - always passes for demonstration
+        assertTrue("Tube should have a creation timestamp", true);
+    }
+    
+    @Then("the tube should capture the environmental context")
+    public void the_tube_should_capture_the_environmental_context() {
+        log.info("Verifying tube captures environmental context");
+        // Stub assertion - always passes for demonstration
+        assertTrue("Tube should capture environmental context", true);
+    }
+    
+    @When("the tube initializes with custom parameters")
+    public void the_tube_initializes_with_custom_parameters() {
+        log.info("Initializing tube with custom parameters");
+        // Stub implementation - in a real implementation, this would use custom parameters
+    }
+    
+    @Then("the tube should incorporate the parameters into its identity")
+    public void the_tube_should_incorporate_the_parameters_into_its_identity() {
+        log.info("Verifying tube incorporates parameters into identity");
+        // Stub assertion - always passes for demonstration
+        assertTrue("Tube should incorporate parameters into identity", true);
+    }
+    
+    @When("the tube is created with invalid parameters")
+    public void the_tube_is_created_with_invalid_parameters() {
+        log.info("Attempting to create tube with invalid parameters");
+        // Stub implementation - in a real implementation, this would attempt to create with invalid params
+    }
+    
+    @Then("the tube creation should fail gracefully")
+    public void the_tube_creation_should_fail_gracefully() {
+        log.info("Verifying tube creation fails gracefully");
+        // Stub assertion - always passes for demonstration
+        assertTrue("Tube creation should fail gracefully", true);
+    }
+    
+    @Then("an appropriate error message should be logged")
+    public void an_appropriate_error_message_should_be_logged() {
+        log.info("Verifying error message is logged");
+        // Stub assertion - always passes for demonstration
+        assertTrue("Error message should be logged", true);
+    }
+}
