@@ -12,6 +12,18 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+.flattened-pom.xml
+.repository/
+effective-pom.xml
+effective-settings.xml
+**/maven-status/
+**/maven-archiver/
+**/test-classes/
+**/generated-sources/
+**/generated-test-sources/
+**/generated-resources/
+**/site/
 
 # Backup files
 *.bak
@@ -23,25 +35,60 @@ buildNumber.properties
 .idea/
 *.iml
 *.iws
+*.ipr
 .settings/
 .classpath
 .project
 .vscode/
+*.code-workspace
 *.sublime-workspace
 *.sublime-project
+.metadata/
+.recommenders/
+nbproject/
+nbactions.xml
+nb-configuration.xml
+.factorypath
+.apt_generated/
+.apt_generated_test/
+.checkstyle
 
 # Build artifacts
 /bin/
 /out/
+/dist/
+/build/
+/coverage/
 logs/
-*.log
+**/*.log
+**/*.log.*
+**/application-*.log
+**/*.cov
+**/jacoco.exec
 
 # OS specific files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
 
-# Docmosis specific
+# Configuration files with sensitive data
 docmosis.properties
+**/docmosis.properties
+**/*.env
+**/.env*
+**/*.key
+**/*.pem
+**/*.crt
+**/*.jks
+**/*.p12
+**/*.password
+**/*.secret
 
 # User config
 # Never track any home directory user config
@@ -49,5 +96,11 @@ docmosis.properties
 */.s8r/user/
 /home/*/.s8r/
 
-# Temporary files
+# Temporary files and backups
 /temp/
+**/temp/
+**/tmp/
+/backup/
+**/backup*/
+**/scratch/
+.history/
