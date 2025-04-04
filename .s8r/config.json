@@ -1,0 +1,22 @@
+{
+  "project": {
+    "name": "Samstraumr",
+    "version": "1.3.0",
+    "default_command": "build",
+    "scripts_dir": "util/bin"
+  },
+  "paths": {
+    "src": "Samstraumr/samstraumr-core/src",
+    "docs": "docs",
+    "tests": "Samstraumr/samstraumr-core/src/test",
+    "templates": "Samstraumr/samstraumr-core/src/main/resources/templates",
+    "output": "target"
+  },
+  "commands": {
+    "build": "util/bin/build/build-optimal.sh",
+    "test": "util/bin/test/run-tests.sh",
+    "version": "util/bin/version/version-manager.sh",
+    "docs": "util/bin/docs/generate-docmosis-docs.sh",
+    "quality": "util/bin/quality/check-encoding.sh"
+  }
+}

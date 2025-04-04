@@ -34,12 +34,19 @@ COLOR_BOLD='\033[1m'
 USER_CONFIG_DIR="${HOME}/.s8r"
 USER_CONFIG_FILE="${USER_CONFIG_DIR}/config.json"
 
-# Ensure user config directory exists
+# Setup configuration directories
+# User config in home directory
 if [ ! -d "${USER_CONFIG_DIR}" ]; then
   mkdir -p "${USER_CONFIG_DIR}"
 fi
 
-# Check if config file exists, create it if not
+# Project-level .s8r directory
+PROJECT_CONFIG_DIR="${PROJECT_ROOT}/.s8r"
+if [ ! -d "${PROJECT_CONFIG_DIR}" ]; then
+  mkdir -p "${PROJECT_CONFIG_DIR}/config"
+fi
+
+# Check if user config file exists, create it if not
 if [ ! -f "${USER_CONFIG_FILE}" ]; then
   # Create default config with Docmosis information
   cat > "${USER_CONFIG_FILE}" << EOF
@@ -52,6 +59,21 @@ if [ ! -f "${USER_CONFIG_FILE}" ]; then
 EOF
   print_warning "Created default config file at ${USER_CONFIG_FILE}"
   print_warning "Please add your Docmosis license key to this file"
+fi
+
+# Copy project-specific config if it doesn't exist
+PROJECT_CONFIG_FILE="${PROJECT_CONFIG_DIR}/config.json"
+if [ ! -f "${PROJECT_CONFIG_FILE}" ]; then
+  # Create default project config file 
+  cat > "${PROJECT_CONFIG_FILE}" << EOF
+{
+  "project": {
+    "name": "Samstraumr",
+    "default_command": "build",
+    "scripts_dir": "util/bin"
+  }
+}
+EOF
 fi
 
 # Set environment variable for Docmosis if not already set
@@ -341,9 +363,8 @@ function handle_build_command() {
   # Set a variable to indicate we're calling from s8r
   export SAMSTRAUMR_CLI="s8r"
   
-  # We need to modify our approach to avoid conflicts with color variables
-  # For simplicity, let's use the util/build-optimal.sh script which is a wrapper
-  "${PROJECT_ROOT}/util/build-optimal.sh" "$@"
+  # Use the script from the canonical location in util/bin
+  "${PROJECT_ROOT}/util/bin/build/build-optimal.sh" "$@"
 }
 
 function handle_test_command() {
@@ -353,9 +374,9 @@ function handle_test_command() {
   # Handle ATL tests separately since they have a dedicated script
   if [ "$1" = "atl" ]; then
     shift
-    "${PROJECT_ROOT}/util/test-run-atl.sh" "$@"
+    "${PROJECT_ROOT}/util/bin/test/run-atl-tests.sh" "$@"
   else
-    "${PROJECT_ROOT}/util/test-run.sh" "$@"
+    "${PROJECT_ROOT}/util/bin/test/run-tests.sh" "$@"
   fi
 }
 
@@ -376,7 +397,7 @@ function handle_quality_command() {
     check)
       # Run all quality checks
       print_header "Running All Quality Checks"
-      "${PROJECT_ROOT}/util/scripts/check-encoding.sh" "$@"
+      "${PROJECT_ROOT}/util/bin/quality/check-encoding.sh" "$@"
       # Run Maven quality checks
       cd "${PROJECT_ROOT}" && mvn verify
       ;;
@@ -406,7 +427,7 @@ function handle_quality_command() {
       ;;
     encoding)
       # Check file encodings and line endings
-      "${PROJECT_ROOT}/util/scripts/check-encoding.sh" "$@"
+      "${PROJECT_ROOT}/util/bin/quality/check-encoding.sh" "$@"
       ;;
     *)
       print_error "Unknown quality command: $command"
@@ -449,7 +470,7 @@ function handle_report_command() {
   fi
   
   # Run generate-change-report.sh with arguments
-  "${PROJECT_ROOT}/generate-change-report.sh" "$from_version" "$to_version" "$@"
+  "${PROJECT_ROOT}/util/bin/docs/generate-change-report.sh" "$from_version" "$to_version" "$@"
 }
 
 function handle_docs_command() {
@@ -489,7 +510,7 @@ function handle_docs_command() {
   export DOCMOSIS_SITE
   
   # Run generate-docmosis-docs.sh with arguments
-  "${PROJECT_ROOT}/generate-docmosis-docs.sh" "$@"
+  "${PROJECT_ROOT}/util/bin/docs/generate-docmosis-docs.sh" "$@"
   
   # Check result
   if [ $? -eq 0 ]; then
@@ -537,7 +558,7 @@ function handle_test_docmosis_command() {
   export DOCMOSIS_SITE
   
   # Run test-docmosis.sh script
-  "${PROJECT_ROOT}/test-docmosis.sh" "$@"
+  "${PROJECT_ROOT}/util/bin/docs/test-docmosis.sh" "$@"
   
   # Check result
   if [ $? -eq 0 ]; then

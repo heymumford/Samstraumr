@@ -50,28 +50,20 @@ Samstraumr uses a centralized configuration approach to manage paths and setting
 
 Scripts are organized in a hierarchical structure:
 ```
-/
-├── s8r                    # Main entry point script (recommended)
-├── .s8r/                  # Project-specific configuration
-│   ├── config.json        # Project configuration
-│   └── config/            # Additional configuration files
-├── util/
-│   ├── bin/               # Consolidated executable scripts
-│   │   ├── build/         # Build-related scripts
-│   │   ├── test/          # Testing-related scripts
-│   │   ├── quality/       # Quality check scripts
-│   │   ├── docs/          # Documentation generation scripts
-│   │   ├── version/       # Version management scripts
-│   │   ├── utils/         # Utility scripts
-│   │   └── config/        # Configuration scripts
-│   ├── lib/               # Shared bash libraries
-│   │   ├── common.sh      # Common utility functions
-│   │   ├── build-lib.sh   # Build-related functions
-│   │   ├── test-lib.sh    # Test-related functions
-│   │   ├── quality-lib.sh # Quality-related functions
-│   │   └── version-lib.sh # Version-related functions
-│   └── samstraumr         # Alternative entry point CLI
-└── docs/                  # Documentation
+/util
+├── bin/           # Consolidated executable scripts
+│   ├── build/     # Build-related scripts
+│   ├── test/      # Testing-related scripts
+│   ├── quality/   # Quality check scripts
+│   ├── version/   # Version management scripts
+│   └── utils/     # Utility scripts
+├── lib/           # Shared bash libraries
+│   ├── common.sh      # Common utility functions
+│   ├── build-lib.sh   # Build-related functions
+│   ├── test-lib.sh    # Test-related functions
+│   ├── quality-lib.sh # Quality-related functions
+│   └── version-lib.sh # Version-related functions
+└── samstraumr     # Main entry point CLI
 ```
 
 All scripts follow functional programming principles with:

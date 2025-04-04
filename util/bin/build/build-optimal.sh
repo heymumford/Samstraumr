@@ -1,104 +1,31 @@
 #!/bin/bash
-#==============================================================================
-# Filename: build-optimal.sh
-# Description: Optimized Maven build script with flexible modes
-#==============================================================================
-# Usage: ./build-optimal.sh [options] [mode]
-#
-# Options:
-#   -h, --help                Display this help message
-#   -v, --verbose             Enable verbose output
-#   -c, --clean               Clean before building
-#   -p, --profile <profile>   Use specific Maven profile
-#   --skip-quality            Skip quality checks
-#
-# Modes:
-#   fast                      Fast build with quality checks skipped (default)
-#   compile                   Compile only
-#   test                      Compile and run tests
-#   package                   Create JAR package
-#   install                   Install to local repository
-#
-# Examples:
-#   ./build-optimal.sh                     # Fast build
-#   ./build-optimal.sh test                # Run tests
-#   ./build-optimal.sh -c test             # Clean and run tests
-#   ./build-optimal.sh -p atl-tests test   # Run tests with ATL profile
-#==============================================================================
+# This is a redirect script that points to the new location
 
-# Determine script directory and load libraries
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../../" && pwd)"
-
-# Source shared libraries
-source "${PROJECT_ROOT}/util/lib/common.sh"
-source "${PROJECT_ROOT}/util/lib/build-lib.sh"
-
-#------------------------------------------------------------------------------
-# Functions
-#------------------------------------------------------------------------------
-
-function show_help() {
-  local script_name="${BASH_SOURCE[0]}"
-  local description="Optimized Maven build script with flexible modes"
-  
-  local options=$(cat <<EOF
-  -h, --help                Display this help message
-  -v, --verbose             Enable verbose output
-  -c, --clean               Clean before building
-  -p, --profile <profile>   Use specific Maven profile
-  --skip-quality            Skip quality checks
-EOF
-)
-
-  local examples=$(cat <<EOF
-  ./build-optimal.sh                     # Fast build
-  ./build-optimal.sh test                # Run tests
-  ./build-optimal.sh -c test             # Clean and run tests
-  ./build-optimal.sh -p atl-tests test   # Run tests with ATL profile
-EOF
-)
-
-  show_help_template "$script_name" "$description" "$options" "$examples"
-  
-  # Show build modes
-  echo -e "${COLOR_BOLD}Build Modes:${COLOR_RESET}"
-  echo "  fast                      Fast build with quality checks skipped (default)"
-  echo "  compile                   Compile only"
-  echo "  test                      Compile and run tests"
-  echo "  package                   Create JAR package"
-  echo "  install                   Install to local repository"
+# Skip warnings when called from s8r
+if [[ "$SAMSTRAUMR_CLI" != "s8r" ]]; then
+  echo -e "\033[1;33mWARNING: build-optimal.sh has been moved to util/bin/build/build-optimal.sh\033[0m"
+  echo -e "Please use \033[1;32m./util/bin/build/build-optimal.sh\033[0m instead."
   echo ""
-}
+fi
 
-function parse_arguments() {
-  # Default values
-  BUILD_MODE="fast"
-  CLEAN_FLAG=false
-  PROFILE="${SAMSTRAUMR_FAST_PROFILE}"
+# When called from s8r, perform build directly to avoid color variable conflicts
+if [[ "$SAMSTRAUMR_CLI" == "s8r" ]]; then
+  # Extract mode and options
+  CLEAN=false
+  VERBOSE=false
+  PROFILE=""
   SKIP_QUALITY=false
-  ADDITIONAL_ARGS=""
+  MODE="fast"
   
-  # Parse common arguments first
-  parse_common_args "$@"
-  if [ $? -eq 1 ]; then
-    show_help
-    exit 0
-  fi
-  
-  # Parse remaining arguments
+  # Parse arguments
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      -h|--help)
-        show_help
-        exit 0
-        ;;
-      -v|--verbose)
-        # Already handled by parse_common_args
+      -c|--clean)
+        CLEAN=true
         shift
         ;;
-      -c|--clean)
-        CLEAN_FLAG=true
+      -v|--verbose)
+        VERBOSE=true
         shift
         ;;
       -p|--profile)
@@ -109,48 +36,80 @@ function parse_arguments() {
         SKIP_QUALITY=true
         shift
         ;;
-      fast|compile|test|package|install|clean)
-        BUILD_MODE="$1"
+      -h|--help)
+        # Print help and exit
+        echo "Usage: ./build-optimal.sh [options] [mode]"
+        echo ""
+        echo "Options:"
+        echo "  -c, --clean               Clean before building"
+        echo "  -v, --verbose             Enable verbose output"
+        echo "  -p, --profile <profile>   Use specific Maven profile"
+        echo "  --skip-quality            Skip quality checks"
+        echo ""
+        echo "Modes:"
+        echo "  fast                      Fast build with quality checks skipped (default)"
+        echo "  compile                   Compile only"
+        echo "  test                      Compile and run tests"
+        echo "  package                   Create JAR package"
+        echo "  install                   Install to local repository"
+        exit 0
+        ;;
+      fast|compile|test|package|install)
+        MODE="$1"
         shift
         ;;
       *)
-        ADDITIONAL_ARGS="$ADDITIONAL_ARGS $1"
-        shift
+        echo "Unknown option: $1"
+        exit 1
         ;;
     esac
   done
   
-  # Special handling for 'fast' mode
-  if [ "$BUILD_MODE" = "fast" ]; then
-    PROFILE="${SAMSTRAUMR_FAST_PROFILE}"
-    SKIP_QUALITY=true
+  # Build Maven command
+  MVN_CMD="mvn"
+  
+  # Add clean if requested
+  if $CLEAN; then
+    MVN_CMD="$MVN_CMD clean"
   fi
   
-  # Debug output
-  if [ "$VERBOSE" = "true" ]; then
-    print_debug "BUILD_MODE: $BUILD_MODE"
-    print_debug "CLEAN_FLAG: $CLEAN_FLAG"
-    print_debug "PROFILE: $PROFILE"
-    print_debug "SKIP_QUALITY: $SKIP_QUALITY"
-    print_debug "ADDITIONAL_ARGS: $ADDITIONAL_ARGS"
+  # Add appropriate goal based on mode
+  case "$MODE" in
+    fast)
+      MVN_CMD="$MVN_CMD compile -Dmaven.test.skip=true"
+      SKIP_QUALITY=true
+      ;;
+    compile)
+      MVN_CMD="$MVN_CMD compile -Dmaven.test.skip=true"
+      ;;
+    test)
+      MVN_CMD="$MVN_CMD test"
+      ;;
+    package)
+      MVN_CMD="$MVN_CMD package"
+      ;;
+    install)
+      MVN_CMD="$MVN_CMD install"
+      ;;
+  esac
+  
+  # Add profile if specified
+  if [[ -n "$PROFILE" ]]; then
+    MVN_CMD="$MVN_CMD -P $PROFILE"
   fi
-}
-
-function main() {
-  # Parse command line arguments
-  parse_arguments "$@"
   
-  # Validate build mode
-  BUILD_MODE=$(parse_build_mode "$BUILD_MODE")
+  # Add skip quality if requested
+  if $SKIP_QUALITY; then
+    MVN_CMD="$MVN_CMD -P skip-quality-checks"
+  fi
   
-  # Build the project
-  build_project "$CLEAN_FLAG" "$BUILD_MODE" "$PROFILE" "$ADDITIONAL_ARGS" "$SKIP_QUALITY"
+  # Add thread count
+  MVN_CMD="$MVN_CMD -T 1C"
   
-  return $?
-}
-
-#------------------------------------------------------------------------------
-# Main
-#------------------------------------------------------------------------------
-main "$@"
-exit $?
+  # Execute the command
+  echo "Executing: $MVN_CMD"
+  cd /home/emumford/NativeLinuxProjects/Samstraumr && eval "$MVN_CMD"
+else
+  # Forward to new script for normal usage
+  /home/emumford/NativeLinuxProjects/Samstraumr/util/bin/build/build-optimal.sh "$@"
+fi

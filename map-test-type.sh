@@ -1,1 +1,0 @@
-bin/map-test-type.sh

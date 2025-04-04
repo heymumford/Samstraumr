@@ -1,1 +1,0 @@
-bin/update-md-headers.sh

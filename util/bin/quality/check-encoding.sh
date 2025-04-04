@@ -1,149 +1,86 @@
 #!/bin/bash
-#==============================================================================
-# Filename: check-encoding.sh
-# Description: Check and fix file encodings and line endings
-#==============================================================================
-# Usage: ./check-encoding.sh [options] [path]
-#
-# Options:
-#   -h, --help          Display this help message
-#   -v, --verbose       Enable verbose output and show all files
-#   -f, --fix           Fix issues automatically
-#   -p, --path <path>   Specify the path to check (default: project root)
-#
-# Examples:
-#   ./check-encoding.sh                  # Check all files in project
-#   ./check-encoding.sh -v               # Check all files with verbose output
-#   ./check-encoding.sh -f               # Fix encoding issues automatically
-#   ./check-encoding.sh -p src/main/java # Check only files in src/main/java
-#==============================================================================
+# This is a redirect script that points to the new location
 
-# Determine script directory and load libraries
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../../" && pwd)"
+# Skip warnings when called from s8r
+if [[ "$SAMSTRAUMR_CLI" != "s8r" ]]; then
+  echo -e "\033[1;33mWARNING: check-encoding.sh has been moved to util/bin/quality/check-encoding.sh\033[0m"
+  echo -e "Please use \033[1;32m./util/bin/quality/check-encoding.sh\033[0m instead."
+  echo ""
+fi
 
-# Source shared libraries
-source "${PROJECT_ROOT}/util/lib/common.sh"
-source "${PROJECT_ROOT}/util/lib/quality-lib.sh"
-
-#------------------------------------------------------------------------------
-# Functions
-#------------------------------------------------------------------------------
-
-function show_help() {
-  local script_name="${BASH_SOURCE[0]}"
-  local description="Check and fix file encodings and line endings"
+# When called from s8r, perform check directly to avoid color variable conflicts
+if [[ "$SAMSTRAUMR_CLI" == "s8r" ]]; then
+  # Parse arguments
+  VERBOSE=false
+  FIX_MODE=false
   
-  local options=$(cat <<EOF
-  -h, --help          Display this help message
-  -v, --verbose       Enable verbose output and show all files
-  -f, --fix           Fix issues automatically
-  -p, --path <path>   Specify the path to check (default: project root)
-EOF
-)
-
-  local examples=$(cat <<EOF
-  ./check-encoding.sh                  # Check all files in project
-  ./check-encoding.sh -v               # Check all files with verbose output
-  ./check-encoding.sh -f               # Fix encoding issues automatically
-  ./check-encoding.sh -p src/main/java # Check only files in src/main/java
-EOF
-)
-
-  show_help_template "$script_name" "$description" "$options" "$examples"
-}
-
-function parse_arguments() {
-  # Default values
-  CHECK_PATH="${PROJECT_ROOT}"
-  FIX_ISSUES=false
-  
-  # Parse common arguments first
-  parse_common_args "$@"
-  if [ $? -eq 1 ]; then
-    show_help
-    exit 0
-  fi
-  
-  # Parse remaining arguments
+  # Parse command line arguments
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      -h|--help)
-        show_help
-        exit 0
-        ;;
       -v|--verbose)
-        # Already handled by parse_common_args
+        VERBOSE=true
         shift
         ;;
       -f|--fix)
-        FIX_ISSUES=true
+        FIX_MODE=true
         shift
         ;;
-      -p|--path)
-        CHECK_PATH="$2"
-        shift 2
+      -h|--help)
+        echo "Usage: ./check-encoding.sh [options]"
+        echo ""
+        echo "Options:"
+        echo "  -v, --verbose   Enable verbose output"
+        echo "  -f, --fix       Fix encoding and line ending issues"
+        echo "  -h, --help      Display this help message"
+        exit 0
         ;;
       *)
-        # Assume this is a path
-        CHECK_PATH="$1"
-        shift
+        echo "Unknown option: $1"
+        exit 1
         ;;
     esac
   done
   
-  # Make sure CHECK_PATH is an absolute path
-  if [[ "$CHECK_PATH" != /* ]]; then
-    CHECK_PATH="${PROJECT_ROOT}/${CHECK_PATH}"
-  fi
+  # Set project root
+  PROJECT_ROOT="/home/emumford/NativeLinuxProjects/Samstraumr"
   
-  # Debug output
-  if [ "$VERBOSE" = "true" ]; then
-    print_debug "CHECK_PATH: $CHECK_PATH"
-    print_debug "FIX_ISSUES: $FIX_ISSUES"
-  fi
-}
-
-function check_requirements() {
-  # Check for required commands
-  local required_commands=("file" "dos2unix")
-  local missing_commands=()
+  # Run the check (simplified version)
+  echo "Checking file encodings and line endings..."
   
-  for cmd in "${required_commands[@]}"; do
-    if ! command -v "$cmd" &> /dev/null; then
-      missing_commands+=("$cmd")
+  # Find files with wrong encoding (non-UTF-8)
+  echo "Checking for non-UTF-8 encoded files..."
+  cd "$PROJECT_ROOT" && find . -type f -name "*.java" -o -name "*.xml" -o -name "*.properties" -o -name "*.md" | while read -r file; do
+    if [[ "$file" != *"target/"* && "$file" != *".git/"* ]]; then
+      if ! file -bi "$file" | grep -q "charset=utf-8"; then
+        echo "  Non-UTF-8 encoding: $file"
+        if $FIX_MODE; then
+          echo "    Converting to UTF-8..."
+          iconv -f ISO-8859-1 -t UTF-8 "$file" > "${file}.utf8" && mv "${file}.utf8" "$file"
+        fi
+      elif $VERBOSE; then
+        echo "  OK: $file (UTF-8)"
+      fi
     fi
   done
   
-  if [ ${#missing_commands[@]} -gt 0 ]; then
-    print_error "Missing required commands: ${missing_commands[*]}"
-    print_info "Please install them using your package manager:"
-    echo "  Ubuntu/Debian: sudo apt-get install file dos2unix"
-    echo "  RHEL/CentOS: sudo yum install file dos2unix"
-    echo "  macOS: brew install file dos2unix"
-    return 1
-  fi
+  # Find files with wrong line endings (Windows CRLF)
+  echo "Checking for CRLF line endings..."
+  cd "$PROJECT_ROOT" && find . -type f -name "*.java" -o -name "*.xml" -o -name "*.properties" -o -name "*.md" | while read -r file; do
+    if [[ "$file" != *"target/"* && "$file" != *".git/"* && "$file" != *".bat" && "$file" != *".cmd" ]]; then
+      if grep -q $'\r' "$file"; then
+        echo "  CRLF line endings: $file"
+        if $FIX_MODE; then
+          echo "    Converting to LF..."
+          dos2unix "$file" 2>/dev/null
+        fi
+      elif $VERBOSE; then
+        echo "  OK: $file (LF)"
+      fi
+    fi
+  done
   
-  return 0
-}
-
-function main() {
-  # Parse command line arguments
-  parse_arguments "$@"
-  
-  # Check requirements
-  if ! check_requirements; then
-    exit 1
-  fi
-  
-  # Check file encodings
-  check_file_encoding "$CHECK_PATH" "$VERBOSE" "$FIX_ISSUES"
-  
-  return $?
-}
-
-#------------------------------------------------------------------------------
-# Main
-#------------------------------------------------------------------------------
-main "$@"
-exit $?
+  echo "Encoding check complete."
+else
+  # Forward to new script for normal usage
+  /home/emumford/NativeLinuxProjects/Samstraumr/util/bin/quality/check-encoding.sh "$@"
+fi
