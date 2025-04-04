@@ -63,6 +63,13 @@
       <version>${oshi.version}</version>
     </dependency>
     
+    <!-- SpotBugs Annotations -->
+    <dependency>
+      <groupId>com.github.spotbugs</groupId>
+      <artifactId>spotbugs-annotations</artifactId>
+      <version>4.8.2</version>
+    </dependency>
+    
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
