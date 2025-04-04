@@ -235,12 +235,33 @@ Examples:
 
 Samstraumr's version management system uses a modular architecture with separate components for different types of operations.
 
+### Versioning Scheme
+
+Samstraumr follows semantic versioning (MAJOR.MINOR.PATCH) with the following guidelines:
+- **PATCH**: Bug fixes and minor improvements (1.2.3 → 1.2.4)
+  - Patch version can roll up to 999 before automatically incrementing the minor version
+  - Example: 1.2.999 → 1.3.0 (when bumping patch)
+- **MINOR**: New features in a backward-compatible manner (1.2.3 → 1.3.0)
+- **MAJOR**: Incompatible API changes (1.2.3 → 2.0.0)
+
 ### CLI Commands
 
 - Unified CLI (recommended): `./s8r version <command>`
 - Alternative CLI: `./util/samstraumr version <command>`
 - Modular implementation: `./util/bin/version/version-manager-modular.sh <command>`
 - Original implementation: `./util/bin/version/version-manager.sh <command>`
+
+Available commands:
+- `get`: Show current version information
+- `export`: Output only the current version (for scripts)
+- `bump <type>`: Bump version (type: major, minor, patch)
+- `set <version>`: Set a specific version (format: x.y.z)
+- `verify`: Verify that version and tag are in sync
+- `fix-tag`: Create a git tag matching the current version
+- `test <type>`: Bump version, run tests, then commit and tag
+- `history`: Show version history
+- `diagnose`: Run diagnostics to identify and fix version issues
+- `debug`: Show detailed version configuration information
 
 ### Version Commands
 

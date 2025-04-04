@@ -164,6 +164,8 @@ When you bump or set a version, the following files are updated:
 ### When to Bump Versions
 
 - **PATCH** (1.2.3 → 1.2.4): Bug fixes and small improvements that don't add functionality or break existing APIs.
+  - Patch version can roll up to 999 before automatically incrementing the minor version
+  - Example: 1.2.999 → 1.3.0 (when bumping patch)
 - **MINOR** (1.2.3 → 1.3.0): New features in a backward-compatible manner.
 - **MAJOR** (1.2.3 → 2.0.0): Incompatible API changes or significant architectural changes.
 

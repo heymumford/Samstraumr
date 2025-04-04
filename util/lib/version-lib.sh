@@ -241,7 +241,14 @@ function calculate_new_version() {
       new_version="${major}.$((minor + 1)).0"
       ;;
     patch)
-      new_version="${major}.${minor}.$((patch + 1))"
+      # Allow patch to go to 999 before rolling over
+      if [ "$patch" -lt 999 ]; then
+        new_version="${major}.${minor}.$((patch + 1))"
+      else
+        # Roll over patch to 0 and increment minor
+        new_version="${major}.$((minor + 1)).0"
+        version_info "Patch version reached 999, incrementing minor version instead"
+      fi
       ;;
   esac
   
