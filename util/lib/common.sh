@@ -41,9 +41,11 @@ VERBOSE="${VERBOSE:-false}"
 # Source the configuration file
 if [ -f "${PROJECT_ROOT}/.samstraumr.config" ]; then
   source "${PROJECT_ROOT}/.samstraumr.config"
+elif [ -f "${PROJECT_ROOT}/.samstraumr/config.sh" ]; then
+  source "${PROJECT_ROOT}/.samstraumr/config.sh"
 else
-  echo "Error: Configuration file not found: ${PROJECT_ROOT}/.samstraumr.config"
-  echo "The common.sh library requires this configuration file to function correctly."
+  echo "Error: Configuration file not found: ${PROJECT_ROOT}/.samstraumr.config or ${PROJECT_ROOT}/.samstraumr/config.sh"
+  echo "The common.sh library requires a configuration file to function correctly."
   exit 1
 fi
 
@@ -1111,7 +1113,7 @@ function initialize_script() {
   
   # Source configuration
   if [[ -f "${PROJECT_ROOT}/.samstraumr.config" ]]; then
-    source "${PROJECT_ROOT}/.samstraumr.config"
+    source "$(cd "$(dirname "${BASH_SOURCE[0]}")" source "${PROJECT_ROOT}/.samstraumr.configsource "${PROJECT_ROOT}/.samstraumr.config pwd)/../../.samstraumr/config.sh""
   else
     echo "Warning: Configuration file not found: ${PROJECT_ROOT}/.samstraumr.config"
   fi
