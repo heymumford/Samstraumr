@@ -24,9 +24,8 @@
     <maven.compiler.target>17</maven.compiler.target>
     <samstraumr.version>1.6.7</samstraumr.version>
     <version.file.path>${project.basedir}/Samstraumr/version.properties</version.file.path>
-    <all.test.tags>@ATL or @BTL</all.test.tags>
-    <atl.test.tags>@ATL</atl.test.tags>
-    <btl.test.tags>@BTL</btl.test.tags>
+    <all.test.tags>@ATL</all.test.tags>
+    <test.tags>@ATL</test.tags>
     <skip.quality.checks>true</skip.quality.checks> <!-- Default to skipping quality checks for TDD development -->
     <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
     <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>

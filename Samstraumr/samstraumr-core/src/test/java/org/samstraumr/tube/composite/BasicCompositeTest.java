@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
+ * Gemini Deep Research, Claude 3.7.
+ */
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
@@ -9,17 +14,15 @@ import org.junit.jupiter.api.Test;
 import org.samstraumr.tube.Environment;
 import org.samstraumr.tube.composite.Composite;
 import org.samstraumr.tube.composite.CompositeFactory;
-import org.samstraumr.tube.test.annotations.BTL;
 import org.samstraumr.tube.test.annotations.CompositeTest;
 
 /**
  * Unit tests for the Composite class and CompositeFactory.
  *
- * <p>These are Below The Line (BTL) tests that provide comprehensive coverage of composite
- * functionality but are not critical for every build.
+ * <p>These tests provide comprehensive coverage of composite functionality
+ * focusing on creation, connections, and data flow.
  */
 @CompositeTest
-@BTL
 public class BasicCompositeTest {
 
   @Test

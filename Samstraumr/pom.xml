@@ -20,9 +20,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
-    <atl.test.tags>@ATL</atl.test.tags>
-    <btl.test.tags>@BTL</btl.test.tags>
-    <all.test.tags>@ATL or @BTL</all.test.tags>
+    <test.tags>@ATL</test.tags>
+    <all.test.tags>@ATL</all.test.tags>
     <skip.quality.checks>true</skip.quality.checks> <!-- Default to skipping quality checks for TDD development -->
     <skipTests>false</skipTests>
     <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
@@ -141,11 +140,11 @@
   </build>
   
   <profiles>
-    <!-- ATL Tests Profile -->
+    <!-- Standard Tests Profile -->
     <profile>
-      <id>ATL-tests</id>
+      <id>tests</id>
       <properties>
-        <cucumber.filter.tags>${atl.test.tags}</cucumber.filter.tags>
+        <cucumber.filter.tags>${test.tags}</cucumber.filter.tags>
         <skipTests>false</skipTests>
         <maven.test.skip>false</maven.test.skip>
       </properties>
@@ -155,33 +154,13 @@
     <profile>
       <id>atl-tests</id>
       <properties>
-        <cucumber.filter.tags>${atl.test.tags}</cucumber.filter.tags>
+        <cucumber.filter.tags>${test.tags}</cucumber.filter.tags>
         <skipTests>false</skipTests>
         <maven.test.skip>false</maven.test.skip>
       </properties>
     </profile>
     
-    <!-- BTL Tests Profile - DISABLED (Legacy BTL tests removed due to brittleness) -->
-    <profile>
-      <id>BTL-tests</id>
-      <properties>
-        <cucumber.filter.tags>${btl.test.tags}</cucumber.filter.tags>
-        <!-- Disable BTL tests by default -->
-        <skipTests>true</skipTests>
-        <maven.test.skip>true</maven.test.skip>
-      </properties>
-    </profile>
-    
-    <!-- Legacy BTL Profile (for backward compatibility) - DISABLED -->
-    <profile>
-      <id>btl-tests</id>
-      <properties>
-        <cucumber.filter.tags>${btl.test.tags}</cucumber.filter.tags>
-        <!-- Disable BTL tests by default -->
-        <skipTests>true</skipTests>
-        <maven.test.skip>true</maven.test.skip>
-      </properties>
-    </profile>
+    <!-- BTL profiles removed in test consolidation -->
     
     <!-- Skip Quality Checks Profile -->
     <profile>
