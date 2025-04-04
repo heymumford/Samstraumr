@@ -13,6 +13,7 @@
 #   report               Generate change management reports
 #   docs                 Generate documentation using Docmosis
 #   test-docmosis        Run a smoke test for Docmosis integration
+#   install              Initialize or update project configuration
 #   help                 Show help for a command
 #
 # See './s8r help <command>' for more information on a specific command.
@@ -144,6 +145,7 @@ function show_main_help() {
   echo "  report               Generate change management reports"
   echo "  docs                 Generate documentation using Docmosis"
   echo "  test-docmosis        Run a smoke test for Docmosis integration"
+  echo "  install              Initialize or update project configuration"
   echo "  help                 Show help for a command"
   echo ""
   echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
@@ -155,6 +157,7 @@ function show_main_help() {
   echo "  ./s8r report v1.2.8 v1.2.9   # Generate change report between versions"
   echo "  ./s8r docs ./my-docs pdf     # Generate PDF documentation"
   echo "  ./s8r test-docmosis          # Test Docmosis integration"
+  echo "  ./s8r install                # Initialize configuration"
   echo "  ./s8r help test              # Show help for test command"
   echo ""
   echo "See './s8r help <command>' for more information on a specific command."
@@ -359,6 +362,31 @@ function show_test_docmosis_help() {
   echo ""
   echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
   echo "  ./s8r test-docmosis              # Run the Docmosis smoke test"
+}
+
+function show_install_help() {
+  echo -e "${COLOR_BOLD}Samstraumr Install${COLOR_RESET} - Initialize or update project configuration"
+  echo ""
+  echo -e "${COLOR_BOLD}USAGE:${COLOR_RESET}"
+  echo "  ./s8r install [options]"
+  echo ""
+  echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  echo "  -h, --help           Display this help message"
+  echo "  -f, --force          Force overwrite of existing configuration files"
+  echo "  -v, --verbose        Display verbose output during configuration"
+  echo ""
+  echo -e "${COLOR_BOLD}DESCRIPTION:${COLOR_RESET}"
+  echo "  Initializes or updates Samstraumr configuration files and directories."
+  echo "  This command will:"
+  echo "  - Create necessary configuration directories"
+  echo "  - Set up project-specific configuration files"
+  echo "  - Install the CLAUDE.md file for LLM context"
+  echo "  - Create user-specific configuration if needed"
+  echo ""
+  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  echo "  ./s8r install                # Standard installation"
+  echo "  ./s8r install --force        # Force overwrite of existing files"
+  echo "  ./s8r install --verbose      # Show detailed progress"
 }
 
 #------------------------------------------------------------------------------
@@ -581,6 +609,84 @@ function handle_test_docmosis_command() {
   fi
 }
 
+function handle_install_command() {
+  # Check if this is a help request
+  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_install_help
+    return 0
+  fi
+  
+  # Determine if we should suppress the output header (avoid redundancy)
+  # Check if verbose mode is enabled
+  local is_verbose=false
+  for arg in "$@"; do
+    if [[ "$arg" == "-v" || "$arg" == "--verbose" ]]; then
+      is_verbose=true
+      break
+    fi
+  done
+  
+  # Only show our header if not in verbose mode
+  if ! $is_verbose; then
+    print_header "Running Configuration Installation"
+  fi
+  
+  # Capture any important environment variables before running the script
+  # This ensures that the environment doesn't get modified between runs
+  local saved_docmosis_key="${DOCMOSIS_KEY}"
+  local saved_docmosis_site="${DOCMOSIS_SITE}"
+  
+  # Prepare for the command execution
+  local install_result=0
+  
+  # Run install-config.sh with all arguments
+  if $is_verbose; then
+    # In verbose mode, show all output
+    "${PROJECT_ROOT}/util/bin/config/install-config.sh" "$@"
+    install_result=$?
+  else
+    # In normal mode, filter noise but keep exit status
+    set -o pipefail
+    # Capture output to variable to avoid redundancy
+    local output
+    output=$(${PROJECT_ROOT}/util/bin/config/install-config.sh "$@" 2>&1)
+    install_result=$?
+    # If successful, filter and display the output
+    if [ $install_result -eq 0 ]; then
+      # Filter the output to remove common noise and duplication
+      echo "$output" | grep -v "^$" | \
+                       grep -v "===" | \
+                       grep -v "config installed successfully" | \
+                       grep -v "Installing Samstraumr Configuration" | \
+                       grep -v "Directory already exists" | \
+                       awk '!seen[$0]++' | \
+                       sort
+    else
+      # Show full output in case of error
+      echo "$output" | awk '!seen[$0]++'
+    fi
+    set +o pipefail
+  fi
+  
+  # Restore environment if it was modified by the script
+  if [ -n "${saved_docmosis_key}" ]; then
+    export DOCMOSIS_KEY="${saved_docmosis_key}"
+  fi
+  if [ -n "${saved_docmosis_site}" ]; then
+    export DOCMOSIS_SITE="${saved_docmosis_site}"
+  fi
+  
+  # Check result
+  if [ $install_result -eq 0 ]; then
+    # Add consistent success message
+    print_success "Samstraumr configuration installed successfully!"
+    return 0
+  else
+    print_error "Samstraumr configuration installation failed"
+    return 1
+  fi
+}
+
 function handle_help_command() {
   local help_topic="$1"
   shift  # Remove the help topic from the arguments
@@ -642,6 +748,9 @@ function handle_help_command() {
     test-docmosis)
       show_test_docmosis_help
       ;;
+    install)
+      show_install_help
+      ;;
     *)
       show_main_help
       ;;
@@ -684,6 +793,9 @@ case "$COMMAND" in
     ;;
   test-docmosis)
     handle_test_docmosis_command "$@"
+    ;;
+  install)
+    handle_install_command "$@"
     ;;
   help)
     handle_help_command "$@"

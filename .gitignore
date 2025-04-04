@@ -133,6 +133,8 @@ Thumbs.db
 **/.env*
 **/docmosis.properties
 docmosis.properties
+# LLM specific configuration - generated at install time
+/CLAUDE.md
 
 #------------------------------------------------------------------------------
 # Project Specific
