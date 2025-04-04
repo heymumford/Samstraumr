@@ -10,8 +10,9 @@ import org.junit.jupiter.api.Tag;
 /**
  * Legacy annotation for "Below The Line" tests.
  *
- * <p><strong>NOTE: BTL test implementations have been temporarily removed (v1.3.1) due to brittleness
- * and integration issues. The BTL infrastructure is preserved for future reimplementation.</strong>
+ * <p><strong>NOTE: BTL test implementations have been temporarily removed (v1.3.1) due to
+ * brittleness and integration issues. The BTL infrastructure is preserved for future
+ * reimplementation.</strong>
  *
  * @deprecated Use {@link BTL} instead
  */

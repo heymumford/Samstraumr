@@ -31,9 +31,11 @@ All code changes should include tests that:
 
 ## Commit Guidelines
 
-- Use clear, descriptive commit messages
+- Use clear, descriptive commit messages following the conventional commit format
 - Reference issue numbers when applicable
 - Keep commits focused on a single logical change
+- Follow the [Git Commit Guidelines](GitCommits.md) for detailed formatting instructions
+- Use the provided git hooks to ensure consistent commit messages
 
 ## Pull Request Process
 

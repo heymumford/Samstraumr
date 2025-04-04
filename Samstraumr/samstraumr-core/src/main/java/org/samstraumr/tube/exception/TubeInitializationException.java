@@ -10,8 +10,8 @@ package org.samstraumr.tube.exception;
 /**
  * Exception thrown when a Tube fails to initialize correctly.
  *
- * <p>This exception indicates problems during the creation or initialization phase of a Tube,
- * such as invalid parameters, missing resources, or other initialization failures.
+ * <p>This exception indicates problems during the creation or initialization phase of a Tube, such
+ * as invalid parameters, missing resources, or other initialization failures.
  */
 public class TubeInitializationException extends RuntimeException {
 
