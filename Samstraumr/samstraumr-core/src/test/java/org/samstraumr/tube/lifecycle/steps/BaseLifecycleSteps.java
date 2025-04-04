@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.samstraumr.tube.Environment;
 import org.samstraumr.tube.Tube;
+import org.samstraumr.tube.TubeIdentity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +22,14 @@ public abstract class BaseLifecycleSteps {
 
   // Test context fields - accessible to all derived step classes
   protected Tube testTube;
+  protected Tube parentTube;
+  protected Tube originTube;
   protected Environment environment;
   protected Exception exceptionThrown;
   protected Map<String, Object> testContext;
+  protected TubeIdentity tubeIdentity;
+  protected TubeIdentity parentIdentity;
+  protected TubeIdentity originIdentity;
 
   /** Constructor initializes the shared test context. */
   public BaseLifecycleSteps() {
@@ -102,5 +108,62 @@ public abstract class BaseLifecycleSteps {
     assertNotNull(testTube, "Test tube should not be null");
     assertNotNull(testTube.getUniqueId(), "Tube should have a unique ID");
     assertTrue(testTube.getUniqueId().length() > 0, "Tube ID should not be empty");
+  }
+
+  /**
+   * Creates and initializes an origin (Adam) tube with its identity.
+   *
+   * @param reason The reason for creating this tube
+   * @return The created origin tube
+   */
+  protected Tube createOriginTube(String reason) {
+    if (environment == null) {
+      environment = prepareEnvironment();
+    }
+
+    // Create the origin tube
+    originTube = Tube.create(reason, environment);
+    assertNotNull(originTube, "Origin tube should be created successfully");
+
+    // Create the identity - in a production system this would be part of the tube
+    originIdentity = TubeIdentity.createAdamIdentity(reason, environment);
+    assertNotNull(originIdentity, "Origin identity should be created successfully");
+
+    storeInContext("originTube", originTube);
+    storeInContext("originIdentity", originIdentity);
+
+    return originTube;
+  }
+
+  /**
+   * Creates and initializes a child tube with its identity.
+   *
+   * @param reason The reason for creating this tube
+   * @param parentTube The parent tube
+   * @param parentIdentity The parent tube's identity
+   * @return The created child tube
+   */
+  protected Tube createChildTube(String reason, Tube parentTube, TubeIdentity parentIdentity) {
+    if (environment == null) {
+      environment = prepareEnvironment();
+    }
+
+    assertNotNull(parentTube, "Parent tube must not be null");
+    assertNotNull(parentIdentity, "Parent identity must not be null");
+
+    // Create the child tube
+    Tube childTube = Tube.create(reason, environment);
+    assertNotNull(childTube, "Child tube should be created successfully");
+
+    // Create the child identity - in a production system this would be part of the tube
+    TubeIdentity childIdentity =
+        TubeIdentity.createChildIdentity(reason, environment, parentIdentity);
+    assertNotNull(childIdentity, "Child identity should be created successfully");
+
+    // Connect parent and child
+    parentIdentity.addChild(childIdentity);
+    parentTube.registerChild(childTube);
+
+    return childTube;
   }
 }
