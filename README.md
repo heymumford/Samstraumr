@@ -2,12 +2,6 @@
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-<!-- SEO metadata -->
-<meta name="description" content="Samstraumr (S8r): Enterprise-grade framework for resilient, self-healing software systems with adaptive components and event-driven architecture">
-<meta name="keywords" content="resilient systems, adaptive software, event-driven architecture, enterprise framework, self-healing systems, java framework, component-based architecture, systems theory, clean architecture">
-<meta name="author" content="Eric C. Mumford">
-<link rel="canonical" href="https://github.com/heymumford/Samstraumr" />
-
 # Samstraumr: Adaptive Resilient Software Framework
 
 [![Version](https://img.shields.io/badge/version-1.6.3-blue)](https://github.com/heymumford/Samstraumr/releases) [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/) [![Maven](https://img.shields.io/badge/Maven-3.6%2B-purple)](https://maven.apache.org/)
@@ -40,6 +34,11 @@ Samstraumr is an enterprise-grade framework for building resilient, adaptive sof
 - **Evolve continuously** without requiring complete system rewrites
 
 Samstraumr implements natural systems theory in software, bringing biological resilience patterns to enterprise applications. It excels at managing complexity in distributed systems, service ecosystems, and high-reliability applications.
+
+Learn more:
+- [Origins and Vision](./docs/concepts/origins-and-vision.md) - The 30-year journey behind Samstraumr
+- [Systems Theory Foundation](./docs/concepts/systems-theory-foundation.md) - How natural systems inspire the architecture
+- [Core Concepts](./docs/concepts/core-concepts.md) - The key principles and building blocks
 
 ## Why Use Samstraumr?
 
@@ -199,6 +198,24 @@ Common commands:
 
 [Complete CLI reference →](./docs/reference/cli-reference.md)
 
+### Configuration System
+
+Samstraumr uses a unified configuration system in the `.samstraumr` directory. This provides a consistent environment for both the CLI tool and shell scripts.
+
+#### Usage in Shell Scripts
+
+```bash
+# Source the unified configuration
+source "${PROJECT_ROOT}/.samstraumr/config.sh"
+
+# Use configuration variables
+echo "Core module path: ${SAMSTRAUMR_CORE_MODULE}"
+```
+
+The configuration includes project paths, package structures, Maven settings, and command mappings.
+
+For comprehensive build documentation, see the [Build Guide](./docs/guide/build.md).
+
 ## When NOT to Use Samstraumr
 
 While Samstraumr excels at complex enterprise systems, it may not be the best choice for:
@@ -232,3 +249,9 @@ Samstraumr is licensed under the Mozilla Public License 2.0. See [LICENSE](./LIC
 - **Author:** [Eric C. Mumford](mailto:heymumford@samstraumr.org)
 - **GitHub:** [github.com/heymumford](https://github.com/heymumford)
 - **LinkedIn:** [linkedin.com/in/eric-mumford](https://www.linkedin.com/in/eric-mumford/)
+
+[//]: # (SEO metadata)
+[//]: # (Description: Samstraumr (S8r): Enterprise-grade framework for resilient, self-healing software systems with adaptive components and event-driven architecture)
+[//]: # (Keywords: resilient systems, adaptive software, event-driven architecture, enterprise framework, self-healing systems, java framework, component-based architecture, systems theory, clean architecture)
+[//]: # (Author: Eric C. Mumford)
+[//]: # (Canonical: https://github.com/heymumford/Samstraumr)
