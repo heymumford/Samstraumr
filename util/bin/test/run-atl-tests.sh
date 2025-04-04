@@ -76,12 +76,12 @@ MAVEN_CMD="mvn test"
 
 # Add profile
 if [ -n "$PROFILE" ]; then
-  MAVEN_CMD="$MAVEN_CMD -P $PROFILE"
+  MAVEN_CMD="$MAVEN_CMD -P $PROFILE -DskipTests=false"
 fi
 
-# Add clean if requested
+# Add clean if requested (Put clean before test)
 if $CLEAN; then
-  MAVEN_CMD="$MAVEN_CMD clean"
+  MAVEN_CMD="mvn clean ${MAVEN_CMD#mvn}"
 fi
 
 # Add skip quality if requested
