@@ -576,12 +576,8 @@ function commit_version_changes() {
       ;;
   esac
   
-  # Add Claude attribution
-  commit_message="$commit_message
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>"
+  # Final commit message
+  commit_message="$commit_message"
   
   # Create the commit
   if git commit -m "$commit_message"; then
