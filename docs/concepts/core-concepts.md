@@ -10,6 +10,7 @@
 - [Self-Awareness: Software That Knows Itself](#self-awareness-software-that-knows-itself)
 - [Core Principles in Practice](#core-principles-in-practice)
 - [The Journey Ahead](#the-journey-ahead)
+- [Related Documentation](#related-documentation)
 
 ## Introduction: A New Way of Seeing Software
 
@@ -130,3 +131,12 @@ public void assessHealth() {
     setProperty("lastHealthCheck", Instant.now());
 }
 ```
+
+## Related Documentation
+
+- [Main Documentation](../../README.md) - Return to main Samstraumr documentation
+- [Architecture Overview](../architecture/README.md) - Technical architecture details
+- [Getting Started Guide](../guides/getting-started.md) - Practical implementation of concepts
+- [Systems Theory Foundation](./systems-theory-foundation.md) - The natural foundations
+- [State Management](./state-management.md) - Detailed view of component state
+- [Identity Addressing](./identity-addressing.md) - Component identity principles
