@@ -12,6 +12,8 @@
 **/maven-archiver/
 **/maven-status/
 **/site/
+# Except the docs/site directory
+!docs/site/
 **/test-classes/
 .flattened-pom.xml
 .mvn/timing.properties
@@ -248,6 +250,9 @@ _site/
 /docs/javadoc/
 /javadoc/
 /apidocs/
+# But allow docs/site directory which contains important site files
+!docs/site/
+!docs/site/xml/
 
 # Source maps
 *.js.map
