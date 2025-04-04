@@ -1,10 +1,10 @@
 /*
  * Implementation of the TubeLifecycleState concept in the Samstraumr framework
- * 
+ *
  * This class implements the core functionality for TubeLifecycleState in the Samstraumr
  * tube-based processing framework. It provides the essential infrastructure for
  * the tube ecosystem to maintain its hierarchical design and data processing capabilities.
- * 
+ *
  * Key features:
  * - Implementation of the TubeLifecycleState concept
  * - Integration with the tube substrate model
@@ -28,27 +28,27 @@ package org.samstraumr.tube;
  * <p>This enum extends the basic TubeStatus by providing more granular lifecycle states that map to
  * biological development stages, enabling a more nuanced model of tube evolution.
  */
-  /**
-   * Constructs a TubeLifecycleState with a description and biological analog.
-   *
-   * @param description A short description of the state
-   * @param biologicalAnalog The corresponding biological developmental stage
-   */
-  /**
-   * Gets the description of this lifecycle state.
-   *
-   * @return The state description
-   */
-  /**
-   * Gets the biological analog for this lifecycle state.
-   *
-   * @return The biological analog description
-   */
-  /**
-   * Returns a string representation of this lifecycle state.
-   *
-   * @return A string containing the state name, description, and biological analog
-   */
+/**
+ * Constructs a TubeLifecycleState with a description and biological analog.
+ *
+ * @param description A short description of the state
+ * @param biologicalAnalog The corresponding biological developmental stage
+ */
+/**
+ * Gets the description of this lifecycle state.
+ *
+ * @return The state description
+ */
+/**
+ * Gets the biological analog for this lifecycle state.
+ *
+ * @return The biological analog description
+ */
+/**
+ * Returns a string representation of this lifecycle state.
+ *
+ * @return A string containing the state name, description, and biological analog
+ */
 public enum TubeLifecycleState {
   // Creation & Early Development (Embryonic)
   CONCEPTION("Initial creation", "Fertilization/Zygote"),

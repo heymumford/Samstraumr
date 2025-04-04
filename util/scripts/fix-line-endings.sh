@@ -1,6 +1,5 @@
 #!/bin/bash
 # Script to fix line endings for all files according to .gitattributes
-# Created: 2025-04-02
 
 set -e
 

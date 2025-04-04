@@ -2,9 +2,6 @@
 #==============================================================================
 # Filename: quality-lib.sh
 # Description: Shared functions for quality scripts
-# Author: Claude
-# Created: 2025-04-03
-# Updated: 2025-04-03
 #==============================================================================
 
 # Determine script paths and load common library
@@ -282,21 +279,14 @@ function update_file_headers() {
       continue
     fi
     
-    # Skip files with up-to-date headers
-    if grep -q "Updated: $(date +%Y-%m-%d)" "$file"; then
-      continue
-    fi
-    
     local file_content=$(<"$file")
     local header_to_apply="$header_content"
     
     # Replace placeholders in the header
     header_to_apply="${header_to_apply//FILENAME/$(basename "$file")}"
-    header_to_apply="${header_to_apply//YEAR/$(date +%Y)}"
-    header_to_apply="${header_to_apply//DATE/$(date +%Y-%m-%d)}"
     
     # Check if file already has a header
-    if grep -q "Copyright" "$file" || grep -q "Author:" "$file"; then
+    if grep -q "Licensed" "$file" || grep -q "/*" "$file"; then
       # Replace existing header
       if [ "$file_type" = "java" ]; then
         # For Java files, replace everything before the package declaration

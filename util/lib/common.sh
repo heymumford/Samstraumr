@@ -2,9 +2,6 @@
 #==============================================================================
 # Filename: common.sh
 # Description: Common utility functions for Samstraumr bash scripts
-# Author: Claude
-# Created: 2025-04-03
-# Updated: 2025-04-03
 #==============================================================================
 
 # Exit on error

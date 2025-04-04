@@ -2,9 +2,6 @@
 #==============================================================================
 # Filename: build-optimal.sh
 # Description: Optimized Maven build script with flexible modes
-# Author: Original author (refactored by Claude)
-# Created: 2025-04-03
-# Updated: 2025-04-03
 #==============================================================================
 # Usage: ./build-optimal.sh [options] [mode]
 #

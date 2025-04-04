@@ -2,9 +2,6 @@
 #==============================================================================
 # Filename: run-atl-tests.sh
 # Description: Run Above-The-Line (ATL) tests - critical tests that must pass
-# Author: Original author (refactored by Claude)
-# Created: 2025-04-03
-# Updated: 2025-04-03
 #==============================================================================
 # Usage: ./run-atl-tests.sh [options]
 #

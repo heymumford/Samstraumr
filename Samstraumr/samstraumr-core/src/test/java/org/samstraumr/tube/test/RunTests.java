@@ -1,27 +1,26 @@
 /*
- * Copyright (c) 2025 Samstraumr Development Team
- * 
+ *
  * Licensed under the MIT License (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  * Test execution utility for Samstraumr with unified terminology support.
- * 
+ *
  * This class provides a flexible test runner that bridges the gap between industry-standard
  * and Samstraumr-specific terminology. It allows tests to be run using either set of terms,
- * facilitating a more intuitive testing experience for developers familiar with standard 
+ * facilitating a more intuitive testing experience for developers familiar with standard
  * testing terminology while maintaining Samstraumr's domain-specific naming conventions.
- * 
+ *
  * Key features:
  * - Support for both industry-standard and Samstraumr-specific test tags
  * - Bidirectional terminology mapping between equivalent concepts
  * - Ability to include tests from both terminologies in a single run
  * - Comprehensive test execution summary generation
- * 
+ *
  * Usage example:
  * ```
  * // Run unit tests (industry-standard) and tube tests (Samstraumr equivalent)
  * RunTests.runAndPrintResults("unit", true);
- * 
+ *
  * // Run only Samstraumr-specific acceptance tests
  * RunTests.runAndPrintResults("acceptance", false);
  * ```
@@ -29,13 +28,11 @@
 
 package org.samstraumr.tube.test;
 
-// Standard Java imports
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-// Third-party imports
 import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
@@ -67,7 +64,7 @@ public class RunTests {
     map.put("endtoend", "acceptance");
     map.put("property", "adaptation");
     map.put("adam", "adamtube");
-    
+
     // Also add the reverse mappings
     map.put("orchestration", "smoke");
     map.put("tube", "unit");
@@ -117,14 +114,17 @@ public class RunTests {
    */
   public static void runAndPrintResults(String tag, boolean includeEquivalent) {
     TestExecutionSummary summary = runTestsWithTag(tag, includeEquivalent);
-    
+
     StringWriter stringWriter = new StringWriter();
     PrintWriter printWriter = new PrintWriter(stringWriter);
     summary.printTo(printWriter);
     printWriter.flush();
-    
-    LOGGER.info("Test execution summary for tag '{}' (including equivalent: {}):\n{}", 
-        tag, includeEquivalent, stringWriter.toString());
+
+    LOGGER.info(
+        "Test execution summary for tag '{}' (including equivalent: {}):\n{}",
+        tag,
+        includeEquivalent,
+        stringWriter.toString());
   }
 
   public static void main(String[] args) {
@@ -135,7 +135,7 @@ public class RunTests {
 
     String tag = args[0];
     boolean includeEquivalent = args.length > 1 && Boolean.parseBoolean(args[1]);
-    
+
     LOGGER.info("Running tests with tag: '{}', include equivalent: {}", tag, includeEquivalent);
     runAndPrintResults(tag, includeEquivalent);
   }

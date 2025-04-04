@@ -2,9 +2,6 @@
 #==============================================================================
 # Filename: version-lib.sh
 # Description: Shared functions for version management scripts
-# Author: Claude
-# Created: 2025-04-03
-# Updated: 2025-04-03
 #==============================================================================
 
 # Determine script paths and load common library

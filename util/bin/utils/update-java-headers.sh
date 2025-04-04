@@ -2,9 +2,6 @@
 #==============================================================================
 # Filename: update-java-headers.sh
 # Description: Update file headers in Java source files
-# Author: Original author (refactored by Claude)
-# Created: 2025-04-03
-# Updated: 2025-04-03
 #==============================================================================
 # Usage: ./update-java-headers.sh [options] [path]
 #
@@ -97,11 +94,10 @@ function parse_arguments() {
 /*
  * FILENAME
  * 
- * Copyright (c) YEAR Samstraumr Project Contributors
- * 
- * This file is part of the Samstraumr Framework.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
  *
- * Updated: DATE
+ * [PURPOSE_DESCRIPTION]
  */
 EOF
     

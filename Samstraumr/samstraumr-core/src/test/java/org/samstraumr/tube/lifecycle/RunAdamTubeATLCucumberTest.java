@@ -30,7 +30,9 @@ import org.junit.platform.suite.api.SuiteDisplayName;
     value =
         "pretty, json:target/cucumber-reports/adam-tube-ATL.json, html:target/cucumber-reports/adam-tube-ATL.html")
 @ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "@ATL and @AdamTube")
-@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "org.samstraumr.tube.steps,org.samstraumr.tube.lifecycle.steps")
+@ConfigurationParameter(
+    key = GLUE_PROPERTY_NAME,
+    value = "org.samstraumr.tube.steps,org.samstraumr.tube.lifecycle.steps")
 public class RunAdamTubeATLCucumberTest {
   // This class serves as a cucumber test runner
 }

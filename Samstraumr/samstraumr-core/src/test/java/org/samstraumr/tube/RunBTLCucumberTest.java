@@ -28,8 +28,12 @@ import org.junit.platform.suite.api.SuiteDisplayName;
 @Suite
 @SuiteDisplayName("Below The Line (BTL) BDD Tests - Robustness Path")
 @IncludeEngines("cucumber")
-@ConfigurationParameter(key = "cucumber.features", value = "src/test/resources/tube/features, src/test/resources/composites/features")
-@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "org.samstraumr.tube.steps,org.samstraumr.tube.lifecycle.steps")
+@ConfigurationParameter(
+    key = "cucumber.features",
+    value = "src/test/resources/tube/features, src/test/resources/composites/features")
+@ConfigurationParameter(
+    key = GLUE_PROPERTY_NAME,
+    value = "org.samstraumr.tube.steps,org.samstraumr.tube.lifecycle.steps")
 @ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "@BTL")
 @ConfigurationParameter(
     key = PLUGIN_PROPERTY_NAME,

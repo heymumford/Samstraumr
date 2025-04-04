@@ -23,6 +23,8 @@
     <testcontainers.version>1.20.6</testcontainers.version>
     <mockito.version>5.8.0</mockito.version>
     <junit.platform.version>1.10.2</junit.platform.version>
+    <docmosis.version>4.8.0</docmosis.version>
+    <barcode4j.version>2.1</barcode4j.version>
   </properties>
   
   <dependencies>
@@ -170,7 +172,40 @@
     </dependency>
   </dependencies>
   
+  <!-- Local repository for Docmosis JARs -->
+  <repositories>
+    <repository>
+      <id>project-lib</id>
+      <name>Project Library Repository</name>
+      <url>file://${project.basedir}/../../lib</url>
+    </repository>
+    <!-- Barcode4j is available from Maven Central -->
+    <repository>
+      <id>maven-central</id>
+      <name>Maven Central</name>
+      <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+  </repositories>
+  
   <profiles>
+    <!-- Docmosis Profile -->
+    <profile>
+      <id>docmosis-report</id>
+      <dependencies>
+        <!-- Docmosis -->
+        <dependency>
+          <groupId>com.docmosis</groupId>
+          <artifactId>docmosis-java</artifactId>
+          <version>${docmosis.version}</version>
+        </dependency>
+        <!-- Barcode4j for Docmosis -->
+        <dependency>
+          <groupId>net.sf.barcode4j</groupId>
+          <artifactId>barcode4j</artifactId>
+          <version>${barcode4j.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
     <!-- Industry-Standard Test Profiles -->
     
     <!-- Smoke Tests Profile (Orchestration Tests) -->

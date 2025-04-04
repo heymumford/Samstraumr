@@ -1,22 +1,21 @@
 /*
- * Copyright (c) 2025 Samstraumr Development Team
- * 
+ *
  * Licensed under the MIT License (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  * Step definitions for the Adam Tube concept in Cucumber BDD tests.
- * 
+ *
  * This class contains step definitions for testing the Adam Tube concept, which represents
  * the first tube created in a system with no parent. These tests validate the properties,
  * constraints, and behaviors of Adam Tubes as origin points in tube hierarchies.
- * 
+ *
  * Key features:
  * - Validation of Adam Tube creation and identification
  * - Testing of hierarchical address format for root-level tubes
  * - Verification of parent-child relationships from origin tubes
  * - Constraint validation to prevent invalid Adam Tube configurations
  * - Descendant tracking capabilities from origin tubes
- * 
+ *
  * Usage example:
  * ```
  * // In feature file:
@@ -28,21 +27,18 @@
 
 package org.tube.test.steps;
 
-// Standard Java imports
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-// Samstraumr imports
 import org.samstraumr.tube.Environment;
 import org.samstraumr.tube.Tube;
 import org.samstraumr.tube.TubeIdentity;
-
-// Third-party imports
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -95,15 +91,18 @@ public class AdamTubeSteps {
     LOGGER.info("Verifying tube has a creation timestamp");
     Instant timestamp = originIdentity.getConceptionTime();
     assertNotNull(timestamp, "Creation timestamp should not be null");
-    assertTrue(timestamp.isBefore(Instant.now()) || timestamp.equals(Instant.now()),
+    assertTrue(
+        timestamp.isBefore(Instant.now()) || timestamp.equals(Instant.now()),
         "Creation timestamp should be in the past or present");
   }
 
   @Then("the tube should capture the environmental context")
   public void the_tube_should_capture_the_environmental_context() {
     LOGGER.info("Verifying tube captures environmental context");
-    assertNotNull(originIdentity.getEnvironmentalContext(), "Environmental context should not be null");
-    assertFalse(originIdentity.getEnvironmentalContext().isEmpty(), 
+    assertNotNull(
+        originIdentity.getEnvironmentalContext(), "Environmental context should not be null");
+    assertFalse(
+        originIdentity.getEnvironmentalContext().isEmpty(),
         "Environmental context should not be empty");
   }
 

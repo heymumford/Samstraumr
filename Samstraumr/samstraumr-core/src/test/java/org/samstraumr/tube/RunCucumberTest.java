@@ -48,9 +48,7 @@ import org.junit.platform.suite.api.SuiteDisplayName;
 @SuiteDisplayName("Samstraumr BDD Tests")
 @IncludeEngines("cucumber")
 @ConfigurationParameter(key = "cucumber.features", value = "src/test/resources/test")
-@ConfigurationParameter(
-    key = GLUE_PROPERTY_NAME,
-    value = "org.test.steps")
+@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "org.test.steps")
 @ConfigurationParameter(
     key = PLUGIN_PROPERTY_NAME,
     value =

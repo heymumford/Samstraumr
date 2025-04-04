@@ -2,9 +2,6 @@
 #==============================================================================
 # Filename: create-symlinks.sh
 # Description: Create symbolic links for backward compatibility
-# Author: Claude
-# Created: 2025-04-03
-# Updated: 2025-04-03
 #==============================================================================
 
 # Determine script directory and project root

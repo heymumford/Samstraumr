@@ -2,9 +2,6 @@
 #==============================================================================
 # Filename: run-tests.sh
 # Description: Main test runner with support for different test types and profiles
-# Author: Original author (refactored by Claude)
-# Created: 2025-04-03
-# Updated: 2025-04-03
 #==============================================================================
 # Usage: ./run-tests.sh [options] <test-type>
 #

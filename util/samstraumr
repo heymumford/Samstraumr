@@ -2,9 +2,6 @@
 #==============================================================================
 # Filename: samstraumr
 # Description: Main entry point for Samstraumr CLI commands
-# Author: Claude
-# Created: 2025-04-03
-# Updated: 2025-04-03
 #==============================================================================
 # Usage: ./samstraumr <command> [options]
 #

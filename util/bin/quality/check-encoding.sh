@@ -2,9 +2,6 @@
 #==============================================================================
 # Filename: check-encoding.sh
 # Description: Check and fix file encodings and line endings
-# Author: Original author (refactored by Claude)
-# Created: 2025-04-03
-# Updated: 2025-04-03
 #==============================================================================
 # Usage: ./check-encoding.sh [options] [path]
 #

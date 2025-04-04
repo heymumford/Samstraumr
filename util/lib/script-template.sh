@@ -2,9 +2,6 @@
 #==============================================================================
 # Filename: script-name.sh
 # Description: Brief description of what the script does
-# Author: Your Name
-# Created: YYYY-MM-DD
-# Updated: YYYY-MM-DD
 #==============================================================================
 # Usage: ./script-name.sh [options] <args>
 #

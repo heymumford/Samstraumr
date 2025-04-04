@@ -1,6 +1,4 @@
 /*
- * Copyright (c) 2025 Samstraumr Development Team
- * 
  * Licensed under the [LICENSE NAME] License, Version X.X (the "License");
  * you may not use this file except in compliance with the License.
  * 

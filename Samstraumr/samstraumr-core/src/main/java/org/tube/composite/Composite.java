@@ -5,10 +5,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
-import org.tube.core.Environment;
-import org.tube.core.Tube;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tube.core.Environment;
+import org.tube.core.Tube;
 
 public class Composite {
   private static final Logger LOGGER = LoggerFactory.getLogger(Composite.class);
