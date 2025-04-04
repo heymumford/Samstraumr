@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Documentation Standards
 
 This document defines the standardized approach to documentation in the Samstraumr project. Following these standards ensures consistency and improves readability across all project documentation.
@@ -11,6 +15,7 @@ Documentation is organized into specific sections based on content type:
 | `/docs/concepts/`      | Core architectural concepts     | `core-concepts.md`, `systems-theory-foundation.md` |
 | `/docs/guides/`        | How-to guides and tutorials     | `getting-started.md`, `migration-guide.md`         |
 | `/docs/reference/`     | Technical reference material    | `api-reference.md`, `configuration-reference.md`   |
+| `/docs/architecture/`  | Architectural documentation     | `clean/README.md`, `event/README.md`              |
 | `/docs/testing/`       | Testing approach and strategies | `test-strategy.md`, `bdd-with-cucumber.md`         |
 | `/docs/contribution/`  | Guidelines for contributors     | `contributing.md`, `code-standards.md`             |
 | `/docs/research/`      | Research papers and proposals   | `llm-context-proposal.md`                          |
@@ -55,8 +60,8 @@ When referring to other documentation files:
 
 1. **Use relative paths with .md extension**:
    - ✅ `[Core Concepts](../concepts/core-concepts.md)`
-   - ❌ `[Core Concepts](../concepts/core-concepts.md)` (absolute path)
-   - ❌ `[Core Concepts](../concepts/core-concepts.md)` (missing extension)
+   - ❌ `[Core Concepts](/docs/concepts/core-concepts)` (absolute path)
+   - ❌ `[Core Concepts](../concepts/core-concepts)` (missing extension)
 2. **For section links, use lowercase anchor references**:
    - ✅ `[Configuration Options](./configuration.md#configuration-options)`
    - ❌ `[Configuration Options](./configuration.md#-configuration--options)`
@@ -84,7 +89,7 @@ For images in documentation:
 1. **Store images in an `images/` directory** within the relevant documentation section
 2. **Use descriptive file names**: `tube-lifecycle-diagram.png` instead of `diagram1.png`
 3. **Always include alt text**:
-   - ✅ `![Tube lifecycle diagram showing stages from creation to termination](./images/tube-lifecycle-diagram.png.md)`
+   - ✅ `![Tube lifecycle diagram showing stages from creation to termination](./images/tube-lifecycle-diagram.png)`
    - ❌ `![](./images/diagram.png)`
 
 ### Lists
@@ -94,6 +99,29 @@ For better readability:
 1. **Use numbered lists for sequential steps**
 2. **Use bullet points for unordered items**
 3. **Be consistent with punctuation** (either use periods at the end of each item or don't)
+
+## Test File Naming
+
+### Java test classes
+
+Java test classes should follow these conventions:
+
+1. **Unit tests:** `{ComponentName}Test.java`
+2. **Integration tests:** `{ComponentName}IntegrationTest.java`
+3. **Runner classes:** `Run{Category}Test.java`
+
+### Cucumber feature files
+
+Feature files should follow this naming pattern:
+
+```
+{functionality-area}-test.feature
+```
+
+For example:
+- tube-initialization-test.feature
+- bundle-connection-test.feature
+- system-resilience-test.feature
 
 ## Documentation Types
 
@@ -106,7 +134,7 @@ Each major directory should have a README.md file that:
 3. **Provides usage examples** where applicable
 4. **Links to more detailed documentation** when needed
 
-### Api documentation
+### API documentation
 
 For API documentation:
 

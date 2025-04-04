@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Contributing
 
 Thank you for your interest in contributing to Samstraumr! This guide will help you understand the contribution process and expectations.
@@ -7,8 +11,8 @@ Thank you for your interest in contributing to Samstraumr! This guide will help 
 1. **Fork the Repository**: Create your own fork of the repository
 2. **Create a Branch**: Create a branch for your contribution
 3. **Make Changes**: Implement your changes following the coding standards
-4. **Run Tests**: Ensure all tests pass with `./run-tests.sh all`
-5. **Run Quality Checks**: Verify code quality with `./build-checks.sh`
+4. **Run Tests**: Ensure all tests pass with `./s8r test all`
+5. **Run Quality Checks**: Verify code quality with `./s8r quality check`
 6. **Submit a Pull Request**: Open a PR with a clear description of your changes
 
 ## Code Standards
