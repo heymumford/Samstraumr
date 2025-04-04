@@ -1,9 +1,25 @@
 #!/bin/bash
 # This is a redirect script that points to the new location
 
-echo -e "\033[1;33mWARNING: version has been moved to util/bin/version/version-manager.sh\033[0m"
-echo -e "Please use \033[1;32m./util/bin/version/version-manager.sh\033[0m instead."
-echo ""
+# Skip warnings when called from s8r
+if [[ "$SAMSTRAUMR_CLI" != "s8r" ]]; then
+  echo -e "\033[1;33mWARNING: version has been moved to util/bin/version/version-manager.sh\033[0m"
+  echo -e "Please use \033[1;32m./util/bin/version/version-manager.sh\033[0m instead."
+  echo ""
+fi
 
-# Forward to new script
-/home/emumford/NativeLinuxProjects/Samstraumr/util/bin/version/version-manager.sh "$@"
+# When called from s8r, don't use common.sh to avoid color variable conflicts
+if [[ "$SAMSTRAUMR_CLI" == "s8r" ]]; then
+  # Extract the version from version.properties
+  VERSION_FILE="/home/emumford/NativeLinuxProjects/Samstraumr/Samstraumr/version.properties"
+  if [ -f "$VERSION_FILE" ]; then
+    VERSION=$(grep "version=" "$VERSION_FILE" | cut -d= -f2)
+    echo "Current version: $VERSION"
+  else
+    echo "Error: Version file not found at $VERSION_FILE"
+    exit 1
+  fi
+else
+  # Forward to new script for normal usage
+  /home/emumford/NativeLinuxProjects/Samstraumr/util/bin/version/version-manager.sh "$@"
+fi
