@@ -88,6 +88,7 @@ import org.junit.platform.suite.api.SuiteDisplayName;
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "org.samstraumr.tube.lifecycle.steps")
 @ConfigurationParameter(
     key = PLUGIN_PROPERTY_NAME,
-    value = "pretty, html:target/cucumber-reports/lifecycle/cucumber.html, "
-        + "json:target/cucumber-reports/lifecycle/cucumber.json")
+    value =
+        "pretty, html:target/cucumber-reports/lifecycle/cucumber.html, "
+            + "json:target/cucumber-reports/lifecycle/cucumber.json")
 public class RunTubeLifecycleCucumberTest {}
