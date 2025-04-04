@@ -2,6 +2,25 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Unified CLI Command
+
+Samstraumr provides a unified command-line interface for all operations:
+
+```bash
+./util/samstraumr <command> [options]
+```
+
+Where `<command>` can be one of:
+- `build` - Build the project with optimized settings
+- `test` - Run tests with support for different test types
+- `version` - Manage project version
+- `quality` - Run quality checks
+
+For help on any command:
+```bash
+./util/samstraumr help <command>
+```
+
 ## Configuration and Path Management
 
 Samstraumr uses a centralized configuration approach to manage paths and settings:
@@ -18,54 +37,112 @@ Samstraumr uses a centralized configuration approach to manage paths and setting
 - Use configuration variables like `${SAMSTRAUMR_CORE_MODULE}`, `${SAMSTRAUMR_JAVA_TEST}`, etc. for paths
 - Convert Java package paths to directory paths with `$(path_for_package "${SAMSTRAUMR_TEST_PACKAGE}")`
 
+## Script Organization
+
+Scripts are organized in a hierarchical structure:
+```
+/util
+├── bin/           # Consolidated executable scripts
+│   ├── build/     # Build-related scripts
+│   ├── test/      # Testing-related scripts
+│   ├── quality/   # Quality check scripts
+│   ├── version/   # Version management scripts
+│   └── utils/     # Utility scripts
+├── lib/           # Shared bash libraries
+│   ├── common.sh      # Common utility functions
+│   ├── build-lib.sh   # Build-related functions
+│   ├── test-lib.sh    # Test-related functions
+│   ├── quality-lib.sh # Quality-related functions
+│   └── version-lib.sh # Version-related functions
+└── samstraumr     # Main entry point CLI
+```
+
+All scripts follow functional programming principles with:
+- Clear separation of concerns
+- Single responsibility functions
+- Main routine as a series of function calls
+- No hardcoded values, using config variables instead
+
 ## Build Commands
-- Build project: `mvn clean install`
-- Build without tests: `mvn clean install -DskipTests`
-- Run all tests: `mvn test`
-- Run with performance optimizations:
-  - Linux/WSL: `./util/build/build-performance.sh` or `./util/build/build-optimal.sh` (recommended)
-  - Windows: `util\build\build-performance.bat`
-  - Custom command with optimizations: `./util/build/build-optimal.sh clean test -P atl-tests`
-  - With specific thread count: `mvn test -T 1C` (1 thread per CPU core)
-  - Fast development mode: `./util/build/build-optimal.sh fast` or `mvn compile -P fast -T 1C`
-  
-  ⚠️ **IMPORTANT:** All scripts must be run from their locations in the util directory
+
+- Unified CLI (recommended): `./util/samstraumr build [mode]`
+- Direct script: `./util/bin/build/build-optimal.sh [mode]`
+- Maven commands:
+  - Build project: `mvn clean install`
+  - Build without tests: `mvn clean install -DskipTests`
+  - Run all tests: `mvn test`
+
+Available modes:
+- `fast`: Fast build with quality checks skipped (default)
+- `compile`: Compile only
+- `test`: Compile and run tests
+- `package`: Create JAR package
+- `install`: Install to local repository
+
+Additional options:
+- `-c, --clean`: Clean before building
+- `-p, --profile <profile>`: Use specific Maven profile
+- `--skip-quality`: Skip quality checks
+
+Examples:
+```bash
+./util/samstraumr build                   # Fast build
+./util/samstraumr build test              # Run tests
+./util/samstraumr build -c test           # Clean and run tests
+./util/samstraumr build -p atl-tests test # Run tests with ATL profile
+```
 
 ## Test Commands
 
-### Test Runner Script
-- Run all tests: `./util/test/run-tests.sh all`
-- Run using either industry-standard or Samstraumr terminology:
-  - Industry Standard:
-    - `./util/test/run-tests.sh smoke` (basic system assembly and connectivity)
-    - `./util/test/run-tests.sh unit` (individual units in isolation)
-    - `./util/test/run-tests.sh component` (connected components working together)
-    - `./util/test/run-tests.sh integration` (interactions between different parts)
-    - `./util/test/run-tests.sh api` (public interfaces and contracts)
-    - `./util/test/run-tests.sh system` (entire system as a whole)
-    - `./util/test/run-tests.sh endtoend` (user perspective and requirements)
-    - `./util/test/run-tests.sh property` (system properties across inputs)
-  - Samstraumr Terminology:
-    - `./util/test/run-tests.sh orchestration` (basic system assembly and connectivity)
-    - `./util/test/run-tests.sh tube` (individual tubes in isolation)
-    - `./util/test/run-tests.sh composite` (or `bundle` for legacy) (connected tubes)
-    - `./util/test/run-tests.sh flow` (interactions between different parts)
-    - `./util/test/run-tests.sh machine` (public interfaces and contracts)
-    - `./util/test/run-tests.sh stream` (entire system as a whole)
-    - `./util/test/run-tests.sh acceptance` (user perspective and requirements)
-    - `./util/test/run-tests.sh adaptation` (system properties across inputs)
-    - `./util/run-adam-tube-tests.sh` (origin tube identity tests)
-    - `./util/run-adam-tube-tests.sh atl` (critical origin tube tests)
-- Options:
-  - Include equivalent tags: `--both` or `-b` (e.g., run both unit and tube tests)
-  - Output to file: `--output <file>` or `-o <file>`
-  - Use specific Maven profile: `--profile <profile>` or `-p <profile>`
-  - Help: `--help` or `-h`
+### Test Runner Commands
+
+- Unified CLI: `./util/samstraumr test <test-type>`
+- Direct script: `./util/bin/test/run-tests.sh <test-type>`
+
+Test types:
+- Industry Standard:
+  - `smoke` (basic system assembly and connectivity)
+  - `unit` (individual units in isolation)
+  - `component` (connected components working together)
+  - `integration` (interactions between different parts)
+  - `api` (public interfaces and contracts)
+  - `system` (entire system as a whole)
+  - `endtoend` (user perspective and requirements)
+  - `property` (system properties across inputs)
+- Samstraumr Terminology:
+  - `orchestration` (basic system assembly and connectivity)
+  - `tube` (individual tubes in isolation)
+  - `composite` (or `bundle` for legacy) (connected tubes)
+  - `flow` (interactions between different parts)
+  - `machine` (public interfaces and contracts)
+  - `stream` (entire system as a whole)
+  - `acceptance` (user perspective and requirements)
+  - `adaptation` (system properties across inputs)
+- Special test types:
+  - `all` (run all tests)
+  - `atl` (Above-The-Line critical tests)
+  - `btl` (Below-The-Line robustness tests)
+  - `adam` (Adam tube identity tests)
+
+Options:
+- `-b, --both`: Include equivalent tags (e.g., run both unit and tube tests)
+- `-o, --output <file>`: Write test output to file
+- `-p, --profile <profile>`: Use specific Maven profile
+- `--skip-quality`: Skip quality checks
+
+Examples:
+```bash
+./util/samstraumr test unit                # Run unit tests
+./util/samstraumr test --both unit         # Run unit and tube tests
+./util/samstraumr test -p btl-tests flow   # Run flow tests with BTL profile
+./util/samstraumr test atl                 # Run critical tests
+```
 
 ### Maven Test Profiles
+
 - Critical vs Robustness Tests:
-  - `mvn test -P ATL-tests` (Above The Line - critical tests)
-  - `mvn test -P BTL-tests` (Below The Line - robustness tests)
+  - `mvn test -P atl-tests` (Above The Line - critical tests)
+  - `mvn test -P btl-tests` (Below The Line - robustness tests)
 - Industry Standard Test Profiles:
   - `mvn test -P smoke-tests` (basic system verification)
   - `mvn test -P unit-tests` (individual units)
@@ -86,12 +163,10 @@ Samstraumr uses a centralized configuration approach to manage paths and setting
   - `mvn test -P adaptation-tests` (system properties)
   - `mvn test -P adam-tube-tests` (all origin tube tests)
   - `mvn test -P adam-tube-atl-tests` (critical origin tube tests)
-- Direct Cucumber Tag Filtering with JUnit 4 runners:
-  - `mvn test -Dtest=RunAdamTubeTests` (all Adam tube tests)
-  - `mvn test -Dtest=RunAdamTubeATLTests` (critical Adam tube tests)
 - Run with quality checks skipped: `mvn test -P skip-quality-checks`
 
 ### Test Annotations and Tags
+
 - Terminology Mapping:
   - Industry Standard → Samstraumr:
     - `@SmokeTest` → `@OrchestrationTest`
@@ -112,20 +187,60 @@ Samstraumr uses a centralized configuration approach to manage paths and setting
   - Identity Types: `@AdamTube` (origin point), `@SubstrateIdentity`, `@MemoryIdentity`
 
 ## Quality Check Commands
-- Run all quality checks: `./util/quality/build-checks.sh`
-- Skip quality checks: `mvn install -P skip-quality-checks` or `./util/quality/skip-quality-build.sh`
-- Run specific checks:
-  - Formatting: `mvn spotless:check` (Fix: `mvn spotless:apply`)
-  - Code analysis: SonarQube (external)
-  - Coding standards: `mvn checkstyle:check`
-  - Bug detection: `mvn spotbugs:check`
-  - Code coverage: `mvn jacoco:report`
-- File encoding and line ending checks:
-  - Check encoding and line endings: `./util/quality/check-encoding.sh`
-  - Check with detailed output: `./util/quality/check-encoding.sh --verbose`
-  - Automatically fix issues: `./util/quality/check-encoding.sh --fix`
+
+- Unified CLI: `./util/samstraumr quality <command>`
+- Direct script: `./util/bin/quality/check-encoding.sh`
+
+Quality commands:
+- `check`: Run all quality checks
+- `spotless`: Run Spotless formatting check
+- `checkstyle`: Run CheckStyle code style check
+- `spotbugs`: Run SpotBugs bug detection
+- `jacoco`: Run JaCoCo code coverage analysis
+- `encoding`: Check file encodings and line endings
+
+Options:
+- `-v, --verbose`: Show detailed output
+- `-f, --fix`: Fix issues automatically (where applicable)
+
+Examples:
+```bash
+./util/samstraumr quality check            # Run all quality checks
+./util/samstraumr quality spotless -f      # Run Spotless and fix issues
+./util/samstraumr quality encoding -v      # Check encodings with verbose output
+```
+
+## Version Management
+
+- Unified CLI: `./util/samstraumr version <command>`
+- Direct script: `./util/bin/version/version-manager.sh <command>`
+
+Version commands:
+- `get`: Show current version information
+- `export`: Output only the current version (for scripts)
+- `bump <type>`: Bump version (type: major, minor, patch)
+- `set <version>`: Set a specific version (format: x.y.z)
+- `verify`: Verify that version and tag are in sync
+- `fix-tag`: Create a git tag matching the current version
+- `test <type>`: Bump version, run tests, then commit and tag
+- `history`: Show version history
+
+Options:
+- `--no-commit`: Don't automatically commit version changes
+- `--skip-tests`: Skip running tests (for test command only)
+- `--skip-quality`: Skip quality checks (for test command only)
+- `--push`: Push changes to remote (for test command only)
+
+Examples:
+```bash
+./util/samstraumr version get              # Show current version
+./util/samstraumr version bump patch       # Bump patch version
+./util/samstraumr version set 1.2.3        # Set version to 1.2.3
+./util/samstraumr version test patch       # Bump patch, test, commit, tag
+```
 
 ## CI/CD Pipeline Commands
+
 - Local GitHub Actions workflow verification with Act:
   - Install Act: `sudo curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash`
   - List available jobs: `act -l`
@@ -134,18 +249,11 @@ Samstraumr uses a centralized configuration approach to manage paths and setting
   - Run with specific event: `sudo act workflow_dispatch -j get-version -W .github/workflows/samstraumr-pipeline.yml`
   - Complete documentation: See `docs/contribution/ci-cd-guide.md`
 - Badge management:
-  - Generate all badges: `./util/badges/generate-badges.sh all`
-  - Generate specific badge: `./util/badges/generate-badges.sh build`
-- Build Reports:
-  - Quick build report (recommended): `./util/build/generate-build-report.sh --skip-tests --skip-quality`
-  - Full build report: `./util/build/generate-build-report.sh`
-  - Skip tests during report generation: `./util/build/generate-build-report.sh --skip-tests`
-  - Skip quality checks during report generation: `./util/build/generate-build-report.sh --skip-quality`
-  - Specify custom output directory: `./util/build/generate-build-report.sh --output /path/to/output`
-  - View report: `xdg-open target/samstraumr-report/index.html` (Linux/WSL)
-  - Build report documentation: See `docs/contribution/build-report-guide.md`
+  - Generate all badges: `./util/bin/utils/generate-badges.sh all`
+  - Generate specific badge: `./util/bin/utils/generate-badges.sh build`
 
 ## Code Style Guidelines
+
 - **Imports**: Specific imports (no wildcards). Standard Java first, then third-party, then project imports.
 - **Naming**: 
   - Classes, interfaces, enums, annotations: PascalCase
@@ -166,18 +274,8 @@ Samstraumr uses a centralized configuration approach to manage paths and setting
 - **Encoding**: UTF-8 for all text files; LF (Unix-style) line endings for all text files except .bat and .cmd files.
 - **File Format**: EditorConfig ensures consistent formatting across different IDEs.
 
-## Maven Optimization
-- For faster builds, use `./util/build/build-optimal.sh` with appropriate flags:
-  - Development iterations: `./util/build/build-optimal.sh fast` (skips tests and checks)
-  - Clean local cache: `./util/maintenance/cleanup-maven.sh`
-- Maven environment configuration:
-  - Settings optimized in `~/.m2/settings.xml`
-  - Java environment setup: `source ./util/build/java-env-setup.sh` (handles encoding and suppresses redundant messages)
-  - Memory settings: `MAVEN_OPTS="-Xmx1g -XX:+TieredCompilation -XX:TieredStopAtLevel=1"`
-  - Parallel builds: `-T 1C` flag (1 thread per core)
-  - Incremental compilation enabled for faster builds
-
 ## Project Organization
+
 - Multi-module Maven project (Java 17)
 - BDD testing approach with Cucumber
 - Feature files contain detailed test documentation with tags for selective test execution
@@ -189,13 +287,51 @@ Samstraumr uses a centralized configuration approach to manage paths and setting
   - JaCoCo: Code coverage
 - Version management
   - Central version.properties file in Samstraumr/ directory
-  - Update version with: `./util/version bump patch` (preferred) or `./util/version set <new-version>`
+  - Update version with: `./util/samstraumr version bump patch`
   - Always use patch version bumping for bugfixes and small improvements
   - Resources filtered to include version information
 
 ## Quality Reports
+
 - Cucumber Reports: `target/cucumber-reports/cucumber.html`
 - JaCoCo Coverage: `target/site/jacoco/index.html`
 - CheckStyle: `target/checkstyle-result.xml`
 - SonarQube: Online dashboard
 - SpotBugs: `target/spotbugsXml.xml`
+
+## Bash Scripting Guidelines
+
+When writing bash scripts for this project, follow these guidelines:
+
+1. **Structure**:
+   - Place scripts in the appropriate subdirectory under `util/bin/`
+   - Use the script template provided in `util/lib/script-template.sh`
+   - Always make scripts executable with `chmod +x`
+
+2. **Functional Programming**:
+   - Main routine should be a series of function calls
+   - Each function should have a single responsibility
+   - Use meaningful function and variable names
+   - Document function parameters and return values
+
+3. **Documentation**:
+   - Include a header with description, usage, and examples
+   - Document complex logic with inline comments
+   - Provide help message with `-h` or `--help` flag
+
+4. **Configuration**:
+   - Source `.samstraumr.config` at the beginning of each script
+   - Use configuration variables instead of hardcoded values
+   - Don't duplicate configuration that already exists
+
+5. **Error Handling**:
+   - Check for required commands and tools
+   - Validate user input and arguments
+   - Provide meaningful error messages
+   - Use appropriate exit codes
+
+6. **Consistency**:
+   - Use the shared functions from `util/lib/*.sh`
+   - Follow the same command-line argument parsing approach
+   - Use consistent naming conventions
+   - Use the same coloring and output formatting

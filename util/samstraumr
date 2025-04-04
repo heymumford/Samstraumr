@@ -1,0 +1,321 @@
+#!/bin/bash
+#==============================================================================
+# Filename: samstraumr
+# Description: Main entry point for Samstraumr CLI commands
+# Author: Claude
+# Created: 2025-04-03
+# Updated: 2025-04-03
+#==============================================================================
+# Usage: ./samstraumr <command> [options]
+#
+# Commands:
+#   build                Build the project with optimized settings
+#   test                 Run tests with support for different test types
+#   version              Manage project version
+#   quality              Run quality checks
+#   help                 Show help for a command
+#
+# See './samstraumr help <command>' for more information on a specific command.
+#==============================================================================
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Source the configuration file
+if [ -f "${PROJECT_ROOT}/.samstraumr.config" ]; then
+  source "${PROJECT_ROOT}/.samstraumr.config"
+else
+  echo "Error: Configuration file not found: ${PROJECT_ROOT}/.samstraumr.config"
+  exit 1
+fi
+
+# Define ANSI color codes
+COLOR_RED='\033[0;31m'
+COLOR_GREEN='\033[0;32m'
+COLOR_YELLOW='\033[0;33m'
+COLOR_BLUE='\033[0;34m'
+COLOR_RESET='\033[0m'
+COLOR_BOLD='\033[1m'
+
+#------------------------------------------------------------------------------
+# Functions
+#------------------------------------------------------------------------------
+
+function print_header() {
+  echo -e "${COLOR_BLUE}${COLOR_BOLD}$1${COLOR_RESET}"
+}
+
+function print_error() {
+  echo -e "${COLOR_RED}Error: $1${COLOR_RESET}" >&2
+}
+
+function print_info() {
+  echo -e "${COLOR_BLUE}$1${COLOR_RESET}"
+}
+
+function show_main_help() {
+  echo -e "${COLOR_BOLD}Samstraumr CLI${COLOR_RESET} - Main entry point for Samstraumr commands"
+  echo ""
+  echo -e "${COLOR_BOLD}USAGE:${COLOR_RESET}"
+  echo "  ./samstraumr <command> [options]"
+  echo ""
+  echo -e "${COLOR_BOLD}COMMANDS:${COLOR_RESET}"
+  echo "  build                Build the project with optimized settings"
+  echo "  test                 Run tests with support for different test types"
+  echo "  version              Manage project version"
+  echo "  quality              Run quality checks"
+  echo "  help                 Show help for a command"
+  echo ""
+  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  echo "  ./samstraumr build fast          # Fast build with quality checks skipped"
+  echo "  ./samstraumr test unit           # Run unit tests"
+  echo "  ./samstraumr version bump patch  # Bump patch version"
+  echo "  ./samstraumr quality check       # Run quality checks"
+  echo "  ./samstraumr help test           # Show help for test command"
+  echo ""
+  echo "See './samstraumr help <command>' for more information on a specific command."
+}
+
+function show_build_help() {
+  echo -e "${COLOR_BOLD}Samstraumr Build${COLOR_RESET} - Build the project with optimized settings"
+  echo ""
+  echo -e "${COLOR_BOLD}USAGE:${COLOR_RESET}"
+  echo "  ./samstraumr build [options] [mode]"
+  echo ""
+  echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  echo "  -h, --help                Display this help message"
+  echo "  -v, --verbose             Enable verbose output"
+  echo "  -c, --clean               Clean before building"
+  echo "  -p, --profile <profile>   Use specific Maven profile"
+  echo "  --skip-quality            Skip quality checks"
+  echo ""
+  echo -e "${COLOR_BOLD}MODES:${COLOR_RESET}"
+  echo "  fast                      Fast build with quality checks skipped (default)"
+  echo "  compile                   Compile only"
+  echo "  test                      Compile and run tests"
+  echo "  package                   Create JAR package"
+  echo "  install                   Install to local repository"
+  echo ""
+  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  echo "  ./samstraumr build                     # Fast build"
+  echo "  ./samstraumr build test                # Run tests"
+  echo "  ./samstraumr build -c test             # Clean and run tests"
+  echo "  ./samstraumr build -p atl-tests test   # Run tests with ATL profile"
+}
+
+function show_test_help() {
+  echo -e "${COLOR_BOLD}Samstraumr Test${COLOR_RESET} - Run tests with support for different test types"
+  echo ""
+  echo -e "${COLOR_BOLD}USAGE:${COLOR_RESET}"
+  echo "  ./samstraumr test [options] <test-type>"
+  echo ""
+  echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  echo "  -h, --help                    Display this help message"
+  echo "  -v, --verbose                 Enable verbose output"
+  echo "  -b, --both                    Include equivalent tests from other terminology"
+  echo "  -o, --output <file>           Write test output to file"
+  echo "  -p, --profile <profile>       Use specific Maven profile"
+  echo "  --skip-quality                Skip quality checks"
+  echo ""
+  echo -e "${COLOR_BOLD}TEST TYPES:${COLOR_RESET}"
+  echo "  Industry Standard       |  Samstraumr Equivalent"
+  echo "  --------------------    |  ----------------------"
+  echo "  smoke                   |  orchestration"
+  echo "  unit                    |  tube"
+  echo "  component               |  composite"
+  echo "  integration             |  flow"
+  echo "  api                     |  machine"
+  echo "  system                  |  stream"
+  echo "  endtoend                |  acceptance"
+  echo "  property                |  adaptation"
+  echo ""
+  echo "  Special test types: all, atl, btl, adam"
+  echo ""
+  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  echo "  ./samstraumr test unit                # Run unit tests only"
+  echo "  ./samstraumr test --both unit         # Run unit tests and equivalent tube tests"
+  echo "  ./samstraumr test -p btl-tests flow   # Run flow tests with BTL profile"
+}
+
+function show_version_help() {
+  echo -e "${COLOR_BOLD}Samstraumr Version${COLOR_RESET} - Manage project version"
+  echo ""
+  echo -e "${COLOR_BOLD}USAGE:${COLOR_RESET}"
+  echo "  ./samstraumr version <command> [options]"
+  echo ""
+  echo -e "${COLOR_BOLD}COMMANDS:${COLOR_RESET}"
+  echo "  get                  Show current version information"
+  echo "  export               Output only the current version (for scripts)"
+  echo "  bump <type>          Bump version (type: major, minor, patch)"
+  echo "  set <version>        Set a specific version (format: x.y.z)"
+  echo "  verify               Verify that version and tag are in sync"
+  echo "  fix-tag              Create a git tag matching the current version"
+  echo "  test <type>          Bump version, run tests, then commit and tag"
+  echo "  history              Show version history"
+  echo ""
+  echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  echo "  -h, --help           Display this help message"
+  echo "  -v, --verbose        Enable verbose output"
+  echo "  --no-commit          Don't automatically commit the version change"
+  echo "  --skip-tests         Skip running tests (for test command only)"
+  echo "  --skip-quality       Skip quality checks (for test command only)"
+  echo "  --push               Push changes to remote (for test command only)"
+  echo ""
+  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  echo "  ./samstraumr version get                 # Show current version"
+  echo "  ./samstraumr version bump patch          # Bump patch version"
+  echo "  ./samstraumr version set 1.2.3           # Set version to 1.2.3"
+  echo "  ./samstraumr version test patch          # Bump patch, test, commit, tag"
+}
+
+function show_quality_help() {
+  echo -e "${COLOR_BOLD}Samstraumr Quality${COLOR_RESET} - Run quality checks"
+  echo ""
+  echo -e "${COLOR_BOLD}USAGE:${COLOR_RESET}"
+  echo "  ./samstraumr quality <command> [options]"
+  echo ""
+  echo -e "${COLOR_BOLD}COMMANDS:${COLOR_RESET}"
+  echo "  check                Run all quality checks"
+  echo "  spotless             Run Spotless formatting check"
+  echo "  checkstyle           Run CheckStyle code style check"
+  echo "  spotbugs             Run SpotBugs bug detection"
+  echo "  jacoco               Run JaCoCo code coverage analysis"
+  echo "  encoding             Check file encodings and line endings"
+  echo ""
+  echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  echo "  -h, --help           Display this help message"
+  echo "  -v, --verbose        Enable verbose output"
+  echo "  -f, --fix            Fix issues automatically (where applicable)"
+  echo ""
+  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  echo "  ./samstraumr quality check               # Run all quality checks"
+  echo "  ./samstraumr quality spotless -f         # Run Spotless and fix issues"
+  echo "  ./samstraumr quality encoding -v         # Check encodings with verbose output"
+}
+
+function handle_build_command() {
+  "${SCRIPT_DIR}/bin/build/build-optimal.sh" "$@"
+}
+
+function handle_test_command() {
+  # Special case for ATL tests
+  if [ "$1" = "atl" ]; then
+    "${SCRIPT_DIR}/bin/test/run-atl-tests.sh" "${@:2}"
+  else
+    "${SCRIPT_DIR}/bin/test/run-tests.sh" "$@"
+  fi
+}
+
+function handle_version_command() {
+  "${SCRIPT_DIR}/bin/version/version-manager.sh" "$@"
+}
+
+function handle_quality_command() {
+  local command="$1"
+  shift
+  
+  case "$command" in
+    check)
+      # Run all quality checks
+      print_header "Running All Quality Checks"
+      "${SCRIPT_DIR}/bin/quality/check-encoding.sh" "$@"
+      "${SCRIPT_DIR}/bin/build/build-optimal.sh" --skip-quality test
+      ;;
+    spotless)
+      # Run Spotless formatting check
+      print_header "Running Spotless Formatting Check"
+      local fix_flag=""
+      if [[ "$*" == *"-f"* || "$*" == *"--fix"* ]]; then
+        fix_flag="--fix"
+      fi
+      mvn -f "${SAMSTRAUMR_CORE_MODULE}/pom.xml" spotless:${fix_flag:-check}
+      ;;
+    checkstyle)
+      # Run CheckStyle code style check
+      print_header "Running CheckStyle Code Style Check"
+      mvn -f "${SAMSTRAUMR_CORE_MODULE}/pom.xml" checkstyle:check
+      ;;
+    spotbugs)
+      # Run SpotBugs bug detection
+      print_header "Running SpotBugs Bug Detection"
+      mvn -f "${SAMSTRAUMR_CORE_MODULE}/pom.xml" spotbugs:check
+      ;;
+    jacoco)
+      # Run JaCoCo code coverage analysis
+      print_header "Running JaCoCo Code Coverage Analysis"
+      mvn -f "${SAMSTRAUMR_CORE_MODULE}/pom.xml" test jacoco:report
+      ;;
+    encoding)
+      # Check file encodings and line endings
+      "${SCRIPT_DIR}/bin/quality/check-encoding.sh" "$@"
+      ;;
+    *)
+      print_error "Unknown quality command: $command"
+      show_quality_help
+      return 1
+      ;;
+  esac
+}
+
+function handle_help_command() {
+  local help_topic="$1"
+  
+  case "$help_topic" in
+    build)
+      show_build_help
+      ;;
+    test)
+      show_test_help
+      ;;
+    version)
+      show_version_help
+      ;;
+    quality)
+      show_quality_help
+      ;;
+    *)
+      show_main_help
+      ;;
+  esac
+}
+
+#------------------------------------------------------------------------------
+# Main
+#------------------------------------------------------------------------------
+
+# Check if any arguments are provided
+if [ $# -eq 0 ]; then
+  show_main_help
+  exit 0
+fi
+
+# Get the command
+COMMAND="$1"
+shift
+
+# Handle the command
+case "$COMMAND" in
+  build)
+    handle_build_command "$@"
+    ;;
+  test)
+    handle_test_command "$@"
+    ;;
+  version)
+    handle_version_command "$@"
+    ;;
+  quality)
+    handle_quality_command "$@"
+    ;;
+  help)
+    handle_help_command "$@"
+    ;;
+  *)
+    print_error "Unknown command: $COMMAND"
+    show_main_help
+    exit 1
+    ;;
+esac
+
+exit $?
