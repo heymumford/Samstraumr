@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-modules</artifactId>
-    <version>1.6.3</version>
+    <version>1.6.5</version>
   </parent>
 
   <artifactId>samstraumr-core</artifactId>
@@ -93,12 +93,8 @@
       <scope>test</scope>
     </dependency>
     
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.13.2</version>
-      <scope>test</scope>
-    </dependency>
+    <!-- JUnit 4 dependency removed in favor of JUnit 5 only -->
+    <!-- Cucumber dependencies -->
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-java</artifactId>
@@ -131,12 +127,7 @@
       <scope>test</scope>
     </dependency>
     
-    <dependency>
-      <groupId>org.junit.vintage</groupId>
-      <artifactId>junit-vintage-engine</artifactId>
-      <version>${junit-jupiter.version}</version>
-      <scope>test</scope>
-    </dependency>
+    <!-- JUnit Vintage Engine dependency removed to ensure exclusive use of JUnit 5 -->
     
     <!-- ArchUnit for architectural testing -->
     <dependency>

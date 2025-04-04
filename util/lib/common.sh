@@ -1113,7 +1113,7 @@ function initialize_script() {
   
   # Source configuration
   if [[ -f "${PROJECT_ROOT}/.samstraumr.config" ]]; then
-    source "$(cd "$(dirname "${BASH_SOURCE[0]}")" source "${PROJECT_ROOT}/.samstraumr.configsource "${PROJECT_ROOT}/.samstraumr.config pwd)/../../.samstraumr/config.sh""
+    source "${PROJECT_ROOT}/.samstraumr.config"
   else
     echo "Warning: Configuration file not found: ${PROJECT_ROOT}/.samstraumr.config"
   fi
