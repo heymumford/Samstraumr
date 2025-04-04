@@ -1,4 +1,4 @@
-# Documentation Standards
+# DocumentationStandards
 
 This document defines the naming conventions and organization standards for documentation and tests in the Samstraumr project.
 
@@ -21,7 +21,7 @@ Documentation is organized into the following sections:
 5. **contribution/** - Guidelines for contributors
 6. **research/** - Research proposals and experimental features
 
-### Naming Examples
+### Naming examples
 
 | Topic | Correct Filename |
 |-------|-----------------|
@@ -34,7 +34,7 @@ Documentation is organized into the following sections:
 
 ## Test File Naming
 
-### Java Test Classes
+### Java test classes
 
 Java test classes should follow these conventions:
 
@@ -42,7 +42,7 @@ Java test classes should follow these conventions:
 2. **Integration tests:** `{ComponentName}IntegrationTest.java`
 3. **Runner classes:** `Run{Category}Test.java`
 
-### Cucumber Feature Files
+### Cucumber feature files
 
 Feature files should follow this naming pattern:
 
@@ -68,7 +68,7 @@ See [Getting Started](../guides/getting-started.md) for more information.
 Each documentation file should begin with a level 1 header that matches the title case of the file:
 
 ```markdown
-# Core Concepts
+# DocumentationStandards
 ```
 
 Second-level headers should use title case:
@@ -81,4 +81,3 @@ Third-level and below headers should use sentence case:
 
 ```markdown
 ### Managing composite state
-```

@@ -1,4 +1,4 @@
-# Bundle to Composite Refactoring
+# BundleToCompositeRefactoring
 
 ## Overview
 
@@ -85,4 +85,3 @@ If you're working with existing code that uses the Bundle pattern, here's how to
 
 ## Timeline
 
-The deprecated classes and annotations will be maintained for compatibility until the next major version release. After that, they will be removed from the codebase.

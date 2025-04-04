@@ -1,10 +1,10 @@
-# File Naming Conventions
+# FileNamingConventions
 
 This document outlines the standard naming conventions for files within the Samstraumr project.
 
 ## Markdown Files
 
-### General Rules
+### General rules
 
 1. **README.md Files**
    - Use **UPPER_CASE** (e.g., `README.md`) 
@@ -19,7 +19,7 @@ This document outlines the standard naming conventions for files within the Sams
    - Multi-word names in PascalCase, no separators (e.g., `LoggingStandards.md`, not `Logging-Standards.md`)
    - For acronyms, keep the acronym in all caps (e.g., `FAQ.md`, `TBD.md`, `APIReference.md`, `CICDGuide.md`)
 
-### Directory-Specific Patterns
+### Directory-specific patterns
 
 - **docs/concepts/**: `CoreConcepts.md`, `StateManagement.md`
 - **docs/guides/**: `GettingStarted.md`, `MigrationGuide.md`
@@ -29,7 +29,7 @@ This document outlines the standard naming conventions for files within the Sams
 
 ## Source Code
 
-### Java Files
+### Java files
 
 1. **Class Files**
    - Use **PascalCase** for class names (e.g., `TubeLogger.java`, `BundleFactory.java`)
@@ -40,7 +40,7 @@ This document outlines the standard naming conventions for files within the Sams
    - Use **lowercase** for package names (e.g., `org.samstraumr.tube`)
    - Use periods to separate hierarchical packages
 
-### Cucumber Feature Files
+### Cucumber feature files
 
 1. **Feature Files**
    - Use **kebab-case** with descriptive names ending in `-test.feature` (e.g., `tube-initialization-test.feature`)
@@ -91,10 +91,10 @@ This document outlines the standard naming conventions for files within the Sams
 To ensure all files follow these conventions, we have created standardization scripts:
 
 ```bash
-# Run the Markdown standardization script
+# FileNamingConventions
 ./docs/scripts/standardize-md-filenames.sh
 
-# Run the Cucumber feature file standardization script
+# FileNamingConventions
 ./docs/scripts/standardize-feature-filenames.sh
 ```
 
@@ -122,4 +122,3 @@ When adding new files to the project, follow these guidelines:
 
 3. If adding new file types not covered by these conventions:
    - Update this document with the appropriate conventions
-   - Add detection and fixing logic to the standardization script

@@ -1,4 +1,4 @@
-# Samstraumr File Organization Standards
+# FileOrganization
 
 This document describes the standardized file organization for the Samstraumr project.
 
@@ -16,7 +16,7 @@ The root directory should contain only essential files:
 
 ## Directory Structure
 
-### Code Organization
+### Code organization
 
 - **Samstraumr/** - Main code module
   - **samstraumr-core/** - Core library functionality
@@ -45,13 +45,13 @@ The root directory should contain only essential files:
   - **scripts/** - Helper scripts
   - Various main utility scripts with function-based prefixes
 
-### Temporary Files
+### Temporary files
 
 - **temp/** - Temporary work files (not committed to Git)
 
 ## File Naming Conventions
 
-### Documentation Files
+### Documentation files
 
 - For standard project docs in project root, use **UPPER_CASE** (e.g., `README.md`, `LICENSE`)
 - For supporting documentation files, use **PascalCase** (e.g., `Contributing.md`, `UserGuide.md`, `DeveloperGuide.md`)
@@ -83,4 +83,3 @@ The root directory should contain only essential files:
 
 ## Implementation Notes
 
-This file organization was standardized in April 2025 as part of the project's structural improvements. Any legacy files should be progressively moved to their appropriate locations to maintain consistency.

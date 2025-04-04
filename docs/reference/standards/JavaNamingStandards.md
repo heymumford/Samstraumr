@@ -1,4 +1,4 @@
-# Java Naming Standards
+# JavaNamingStandards
 
 *Last update: April 3, 2025*
 
@@ -8,7 +8,7 @@ This document defines the standard naming conventions for Java code in the Samst
 
 ## Classes and Interfaces
 
-### Class Names
+### Class names
 
 Class names should follow **PascalCase** convention:
 
@@ -18,7 +18,7 @@ public class Environment { ... }
 public class BundleFactory { ... }
 ```
 
-### Interface Names
+### Interface names
 
 Interface names should follow **PascalCase** convention, often with adjectives:
 
@@ -27,7 +27,7 @@ public interface Connectable { ... }
 public interface Processable { ... }
 ```
 
-### Enum Names
+### Enum names
 
 Enum names should follow **PascalCase** convention:
 
@@ -49,7 +49,7 @@ private void initializeComponents() { ... }
 
 ## Variables
 
-### Instance Variables
+### Instance variables
 
 Instance variable names should follow **camelCase** convention:
 
@@ -69,7 +69,7 @@ private static final int DEFAULT_TERMINATION_DELAY = 60;
 public static final int MAX_RETRY_COUNT = 3;
 ```
 
-### Parameter Names
+### Parameter names
 
 Parameter names should follow **camelCase** convention:
 
@@ -78,7 +78,7 @@ public void setTerminationDelay(int seconds) { ... }
 public Tube(String reason, Environment environment) { ... }
 ```
 
-### Local Variables
+### Local variables
 
 Local variable names should follow **camelCase** convention:
 
@@ -108,7 +108,7 @@ Annotation names should follow **PascalCase** convention:
 
 ## Test Classes
 
-### Test Class Names
+### Test class names
 
 Test classes should be named with a descriptive name followed by `Test` or `TestSuite`:
 
@@ -118,7 +118,7 @@ public class BundleConnectionTest { ... }
 public class CompositeIntegrationTest { ... }
 ```
 
-### Test Method Names
+### Test method names
 
 Test method names should be descriptive and follow **camelCase** convention or **snake_case** for readability:
 
@@ -132,7 +132,7 @@ public void shouldCreateTubeWithValidReason() { ... }
 public void tube_should_log_initialization_details() { ... }
 ```
 
-### Cucumber Test Step Methods
+### Cucumber test step methods
 
 Cucumber test step methods should follow the Cucumber standard using **snake_case** with underscores for spaces:
 
@@ -184,7 +184,7 @@ However, acronyms in constants should be all uppercase:
 private static final String XML_SCHEMA = "schema.xsd";
 ```
 
-### Exceptions for Specific Acronyms
+### Exceptions for specific acronyms
 
 Certain acronyms are recognized as having special importance and may be fully capitalized even in class names, method names, and variables:
 
@@ -232,4 +232,3 @@ public class ValidationException extends Exception { ... }
 1. **Be Descriptive**: Names should be meaningful and communicate intent
 2. **Be Consistent**: Follow established patterns in the codebase
 3. **Avoid Abbreviations**: Use full words unless the abbreviation is well-known
-4. **Respect Domain Language**: Use terminology consistent with systems theory and project glossary

@@ -1,125 +1,125 @@
-# Samstraumr CLI Examples
+# S8r Examples
 
 This document provides reference examples for using the Samstraumr CLI (`s8r`) for common operations.
 
 ## Version Management
 
-### Viewing Version Information
+### Viewing version information
 
 ```bash
-# Show current version info
+# S8r Examples
 ./s8r version get
 
-# Show detailed version info with tag status
+# S8r Examples
 ./s8r version get -v
 
-# Output only the current version (for scripts)
+# S8r Examples
 ./s8r version export
 ```
 
-### Modifying Versions
+### Modifying versions
 
 ```bash
-# Bump patch version (bug fixes)
+# S8r Examples
 ./s8r version bump patch
 
-# Bump minor version (new features)
+# S8r Examples
 ./s8r version bump minor
 
-# Bump major version (breaking changes)
+# S8r Examples
 ./s8r version bump major
 
-# Set to a specific version
+# S8r Examples
 ./s8r version set 1.5.1
 ```
 
-### Version Workflow Commands
+### Version workflow commands
 
 ```bash
-# Bump patch version, run tests, commit and tag
+# S8r Examples
 ./s8r version test patch
 
-# Bump minor version, run tests, commit and tag, and push to remote
+# S8r Examples
 ./s8r version test minor --push
 
-# Bump patch version with commit but skip tests and quality checks
+# S8r Examples
 ./s8r version test patch --skip-tests --skip-quality
 ```
 
-### Version Verification
+### Version verification
 
 ```bash
-# Verify that version and tag are in sync
+# S8r Examples
 ./s8r version verify
 
-# Create a git tag matching the current version
+# S8r Examples
 ./s8r version fix-tag
 
-# Show version history from git tags
+# S8r Examples
 ./s8r version history
 ```
 
 ## Build Commands
 
 ```bash
-# Fast build (default)
+# S8r Examples
 ./s8r build
 
-# Run tests
+# S8r Examples
 ./s8r build test
 
-# Clean and run tests
+# S8r Examples
 ./s8r build -c test
 
-# Run tests with ATL profile
+# S8r Examples
 ./s8r build -p atl-tests test
 ```
 
 ## Test Commands
 
 ```bash
-# Run unit tests
+# S8r Examples
 ./s8r test unit
 
-# Run unit and tube tests
+# S8r Examples
 ./s8r test --both unit
 
-# Clean and run tube tests
+# S8r Examples
 ./s8r test -c tube
 
-# Run Adam tube tests with verbose output
+# S8r Examples
 ./s8r test -v adam
 
-# Run critical tests
+# S8r Examples
 ./s8r test atl
 ```
 
 ## Quality Check Commands
 
 ```bash
-# Run all quality checks
+# S8r Examples
 ./s8r quality check
 
-# Run Spotless and fix issues
+# S8r Examples
 ./s8r quality spotless -f
 
-# Check encodings with verbose output
+# S8r Examples
 ./s8r quality encoding -v
 ```
 
 ## Documentation Generation
 
 ```bash
-# Generate PDF docs in target/docs
+# S8r Examples
 ./s8r docs
 
-# Generate PDF docs in custom directory
+# S8r Examples
 ./s8r docs ./my-docs
 
-# Generate DOCX docs in custom directory
+# S8r Examples
 ./s8r docs ./my-docs docx
 
-# Generate HTML docs in target/outputs
+# S8r Examples
 ./s8r docs target/outputs html
 ```
 
@@ -128,32 +128,32 @@ This document provides reference examples for using the Samstraumr CLI (`s8r`) f
 Here's a complete workflow example for making changes, running tests, updating the version, and pushing:
 
 ```bash
-# 1. Make code changes
+# S8r Examples
 
-# 2. Run quality checks
+# S8r Examples
 ./s8r quality check
 
-# 3. Fix any quality issues
+# S8r Examples
 ./s8r quality spotless -f
 
-# 4. Run tests
+# S8r Examples
 ./s8r test unit
 
-# 5. Bump version, run tests again, commit, tag, and push
+# S8r Examples
 ./s8r version test minor --push
 
-# Alternatively, do these steps separately:
-# ./s8r version bump minor  # Bump version
-# ./s8r test all            # Run all tests
-# git add .                 # Add changes
-# git commit -m "..."       # Commit changes
-# ./s8r version fix-tag     # Create version tag
-# git push && git push --tags  # Push changes
+# S8r Examples
+# S8r Examples
+# S8r Examples
+# S8r Examples
+# S8r Examples
+# S8r Examples
+# S8r Examples
 ```
 
 ## Output Examples
 
-### Version Get Command
+### Version get command
 
 ```
 [0;34m[1mCurrent Version[0m
@@ -162,7 +162,7 @@ Here's a complete workflow example for making changes, running tests, updating t
 [0;34m→ Last updated: April 04, 2025[0m
 ```
 
-### Version Bump Command
+### Version bump command
 
 ```
 [0;34m[1mBumping patch Version[0m
@@ -184,7 +184,7 @@ Here's a complete workflow example for making changes, running tests, updating t
 [0;32m✓ Version update complete[0m
 ```
 
-### Version Test Command
+### Version test command
 
 ```
 [0;34m[1mBumping patch Version[0m
@@ -213,4 +213,3 @@ Here's a complete workflow example for making changes, running tests, updating t
 [0;34m→ Pushing changes to remote...[0m
 [0;32m✓ Changes pushed to remote[0m
 [0;32m✓ Version test process complete[0m
-```

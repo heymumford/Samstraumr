@@ -19,11 +19,11 @@ Use this report as a form of system awareness to guide improvements and adaptati
 
 ## Quick Navigation
 
-- [Build Status](build-status.html) - Flow status of the build pipeline
-- [Build Metrics](build-metrics.html) - Quantitative measures of the build
-- [Test Results](surefire-report.html) - Detailed test outcomes
-- [Code Coverage](jacoco/index.html) - Test coverage analysis
-- [Code Quality](checkstyle.html) - Coding standards compliance
+- [Build Status](build-status.html.md) - Flow status of the build pipeline
+- [Build Metrics](build-metrics.html.md) - Quantitative measures of the build
+- [Test Results](surefire-report.html.md) - Detailed test outcomes
+- [Code Coverage](jacoco/index.html.md) - Test coverage analysis
+- [Code Quality](checkstyle.html.md) - Coding standards compliance
 
 ## Report Generation
 
@@ -33,4 +33,3 @@ This report was automatically generated as part of the build process. To generat
 mvn clean site -P build-report
 ```
 
-The report will be generated in `target/samstraumr-report/`.

@@ -1,4 +1,4 @@
-# Proposal for Configuration Improvements in Samstraumr
+# Proposal for Configuration Improvement
 
 After reviewing utility scripts and identifying hardcoded paths that may break during refactoring, this document proposes a more maintainable approach using environment variables and project-level key-value configuration.
 
@@ -18,56 +18,56 @@ After reviewing utility scripts and identifying hardcoded paths that may break d
 
 ## Proposed Solution
 
-### 1. Create a Central Configuration File
+### 1. create a central configuration file
 
 Create a `.samstraumr.config` file in the project root with key-value pairs:
 
 ```bash
-# Project structure
+# Proposal for Configuration Improvement
 SAMSTRAUMR_PROJECT_ROOT="${SAMSTRAUMR_PROJECT_ROOT:-$(pwd)}"
 SAMSTRAUMR_CORE_MODULE="${SAMSTRAUMR_PROJECT_ROOT}/Samstraumr/samstraumr-core"
 SAMSTRAUMR_SRC_MAIN="${SAMSTRAUMR_CORE_MODULE}/src/main"
 SAMSTRAUMR_SRC_TEST="${SAMSTRAUMR_CORE_MODULE}/src/test"
 SAMSTRAUMR_TARGET="${SAMSTRAUMR_CORE_MODULE}/target"
 
-# Java source structure
+# Proposal for Configuration Improvement
 SAMSTRAUMR_JAVA_MAIN="${SAMSTRAUMR_SRC_MAIN}/java"
 SAMSTRAUMR_JAVA_TEST="${SAMSTRAUMR_SRC_TEST}/java"
 SAMSTRAUMR_RESOURCES_TEST="${SAMSTRAUMR_SRC_TEST}/resources"
 
-# Package structure
+# Proposal for Configuration Improvement
 SAMSTRAUMR_CORE_PACKAGE="org.tube.core"
 SAMSTRAUMR_TEST_PACKAGE="org.test"
 SAMSTRAUMR_COMPOSITE_PACKAGE="org.tube.composite"
 SAMSTRAUMR_MACHINE_PACKAGE="org.tube.machine"
 
-# Test resources
+# Proposal for Configuration Improvement
 SAMSTRAUMR_TEST_FEATURES="${SAMSTRAUMR_RESOURCES_TEST}/test/features"
 SAMSTRAUMR_TEST_PATTERNS="${SAMSTRAUMR_RESOURCES_TEST}/test/patterns"
 
-# Maven profiles
+# Proposal for Configuration Improvement
 SAMSTRAUMR_FAST_PROFILE="fast"
 SAMSTRAUMR_SKIP_QUALITY_PROFILE="skip-quality-checks"
 SAMSTRAUMR_ATL_PROFILE="atl-tests"
 SAMSTRAUMR_BTL_PROFILE="btl-tests"
 
-# Maven options
+# Proposal for Configuration Improvement
 SAMSTRAUMR_PARALLEL_FLAG="-T 1C"
 SAMSTRAUMR_MEMORY_OPTS="-Xmx1g -XX:+TieredCompilation -XX:TieredStopAtLevel=1"
 ```
 
-### 2. Source this Configuration in All Scripts
+### 2. source this configuration in all scripts
 
 Add to the beginning of all utility scripts:
 
 ```bash
-#!/bin/bash
+# Proposal for Configuration Improvement
 
-# Determine script directory and project root
+# Proposal for Configuration Improvement
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-# Source the configuration file
+# Proposal for Configuration Improvement
 if [ -f "${PROJECT_ROOT}/.samstraumr.config" ]; then
   source "${PROJECT_ROOT}/.samstraumr.config"
 else
@@ -76,9 +76,9 @@ else
 fi
 ```
 
-### 3. Refactor Scripts to Use Configuration Variables
+### 3. refactor scripts to use configuration variables
 
-#### Example 1: Fix Logger Script
+#### Example 1: fix logger script
 
 **Current:**
 ```bash
@@ -92,7 +92,7 @@ PATTERN_STEPS_FILE="${SAMSTRAUMR_JAVA_TEST}/${SAMSTRAUMR_TEST_PACKAGE//./\/}/ste
 sed -i 's/logger\./LOGGER\./g' "$PATTERN_STEPS_FILE"
 ```
 
-#### Example 2: Standardize Feature Files
+#### Example 2: standardize feature files
 
 **Current:**
 ```bash
@@ -111,7 +111,7 @@ if [ -f "${EXAMPLES_DIR}/TBD-AtomicBoundaryTest-Example.feature" ]; then
 fi
 ```
 
-#### Example 3: Optimal Build Script
+#### Example 3: optimal build script
 
 **Current:**
 ```bash
@@ -125,18 +125,18 @@ echo "🚀 Building Samstraumr with optimized settings"
 mvn -f "${SAMSTRAUMR_CORE_MODULE}/pom.xml" $CLEAN $MODE ${SAMSTRAUMR_PARALLEL_FLAG} $PROFILE $ADDITIONAL_ARGS
 ```
 
-### 4. Create a Update Script for Path Changes
+### 4. create a update script for path changes
 
 When paths change due to refactoring (as in the recent move from `org.samstraumr.tube` to `org.tube`), create a simple script to update the central configuration:
 
 ```bash
-#!/bin/bash
-# update-paths.sh - Updates paths after refactoring
+# Proposal for Configuration Improvement
+# Proposal for Configuration Improvement
 
-# Source the current configuration
+# Proposal for Configuration Improvement
 source ./.samstraumr.config
 
-# Update path configurations
+# Proposal for Configuration Improvement
 sed -i 's/SAMSTRAUMR_CORE_PACKAGE="org.tube.core"/SAMSTRAUMR_CORE_PACKAGE="org.newpath.core"/g' ./.samstraumr.config
 sed -i 's/SAMSTRAUMR_TEST_PACKAGE="org.test"/SAMSTRAUMR_TEST_PACKAGE="org.newpath.test"/g' ./.samstraumr.config
 
@@ -169,4 +169,3 @@ echo "Configuration updated. Please review .samstraumr.config to verify changes.
 4. Progressively update remaining scripts
 5. Add documentation in CLAUDE.md about the configuration approach
 
-This approach will greatly simplify future refactoring and make the build system more robust against structural changes.

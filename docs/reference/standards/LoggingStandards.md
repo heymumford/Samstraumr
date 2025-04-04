@@ -1,4 +1,4 @@
-# Logging Standards
+# LoggingStandards
 
 *Last update: April 3, 2025*
 
@@ -18,7 +18,7 @@ private static final Logger LOGGER = LoggerFactory.getLogger(ClassName.class);
 
 Use the appropriate log level for each message based on the following guidelines:
 
-### ERROR
+### Error
 - Use for exceptional conditions that prevent normal system operation
 - Should include error details and context to assist with troubleshooting
 - Usually represents an issue that requires immediate attention
@@ -29,7 +29,7 @@ LOGGER.error("Failed to initialize Environment", exception);
 LOGGER.error("Critical system error: {}", errorDetails);
 ```
 
-### WARN
+### Warn
 - Use for potential issues that don't prevent normal operation but may indicate problems
 - Should highlight situations that might need attention if they recur
 - Examples: deprecated API usage, retry attempts, fallbacks to secondary mechanisms
@@ -39,7 +39,7 @@ LOGGER.warn("The Bundle class is deprecated. Use Composite instead.");
 LOGGER.warn("Failed to get hostname", exception);
 ```
 
-### INFO
+### Info
 - Use for significant normal events and milestones
 - Provides high-level operational view of system behavior
 - Should be limited to important state changes and actions
@@ -50,7 +50,7 @@ LOGGER.info("Environment initialized successfully");
 LOGGER.info("Added transformation bundle: {}", name);
 ```
 
-### DEBUG
+### Debug
 - Use for detailed information useful during development and troubleshooting
 - Should provide context about operations without flooding logs
 - Typically not enabled in production environments
@@ -61,7 +61,7 @@ LOGGER.debug("Tube initialized with ID: {}", tubeId);
 LOGGER.debug("Adding to lineage: {}", reason);
 ```
 
-### TRACE
+### Trace
 - Use for the most detailed diagnostic information
 - Should only be enabled for specific troubleshooting
 - Examples: detailed process steps, low-level function calls
@@ -177,4 +177,3 @@ public void tearDown() {
 
 2. **Limit high-frequency logging** in performance-critical sections
 
-3. **Consider sampling** for very high-volume events

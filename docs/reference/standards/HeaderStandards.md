@@ -1,4 +1,4 @@
-# Header Standards
+# HeaderStandards
 
 ## Overview
 This document outlines the standards for file headers in the Samstraumr project.
@@ -22,26 +22,26 @@ This document outlines the standards for file headers in the Samstraumr project.
 
 ## Bash Script Headers
 ```bash
-#!/bin/bash
-#==============================================================================
-# Filename: script-name.sh
-# Description: Brief description of what the script does
-#==============================================================================
-# Usage: ./script-name.sh [options] <args>
+# HeaderStandards
+# HeaderStandards
+# HeaderStandards
+# HeaderStandards
+# HeaderStandards
+# HeaderStandards
 #
-# Options:
-#   -h, --help          Display this help message
-#   -v, --verbose       Enable verbose output
+# HeaderStandards
+# HeaderStandards
+# HeaderStandards
 #
-# Examples:
-#   ./script-name.sh                # Basic usage
-#   ./script-name.sh -v             # With verbose output
-#==============================================================================
+# HeaderStandards
+# HeaderStandards
+# HeaderStandards
+# HeaderStandards
 ```
 
 ## Markdown File Headers
 ```markdown
-# Document Title
+# HeaderStandards
 
 Brief description of the document's purpose.
 ```
