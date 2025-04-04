@@ -29,21 +29,15 @@ This document tracks the current development tasks in a simple Kanban-style boar
   - Add automatic README updates
   - Create changelog generation
 
-- [ ] **Refactor .docx and .rtf files to Markdown**
-  - Convert all proposal documents to Markdown format
-  - Standardize headers and formatting
-
-### 🔄 IN PROGRESS
-
-- [ ] **Document format standardization**
-  - Convert .docx and .rtf files to Markdown
-  - Created conversion script: docs/scripts/convert-to-markdown.sh
-  - Needs tools: pandoc, unrtf, libreoffice-writer
-  - Owner: @emumford
-  - Started: 2025-04-04
-  - Related: docs/scripts/convert-to-markdown.sh
-
 ### ✅ DONE
+
+- [x] **Document format standardization**
+  - Converted all .docx and .rtf files to Markdown format
+  - Created script for future conversions
+  - Standardized filename conventions across documentation
+  - Created centralized standardization script for all doc directories
+  - Completed: 2025-04-04
+  - Related: docs/scripts/convert-to-markdown.sh, docs/scripts/standardize-filenames.sh
 
 - [x] **Planning infrastructure improvements**
   - Created Kanban-style planning board

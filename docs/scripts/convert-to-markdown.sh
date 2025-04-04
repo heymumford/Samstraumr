@@ -51,8 +51,17 @@ function command_exists() {
 function check_dependencies() {
   local missing_tools=()
   
-  # List of tools to check
-  local tools=("pandoc" "textutil" "libreoffice" "unrtf")
+  # List of tools to check - platform specific
+  local tools=()
+  
+  # Basic tools for all platforms
+  tools+=("pandoc" "libreoffice" "unrtf")
+  
+  # Platform-specific tools
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS-specific tools
+    tools+=("textutil")
+  fi
   
   for tool in "${tools[@]}"; do
     if ! command_exists "$tool"; then
