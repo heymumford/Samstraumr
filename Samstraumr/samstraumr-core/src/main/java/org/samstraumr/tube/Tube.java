@@ -40,20 +40,46 @@ public class Tube {
   private volatile Timer terminationTimer;
   private String environmentState = "normal";
   private TubeStatus status = TubeStatus.INITIALIZING;
+  private TubeLifecycleState lifecycleState = TubeLifecycleState.CONCEPTION;
+  private final TubeIdentity identity;
+  private final Instant conceptionTime;
+  private TubeIdentity parentIdentity;
 
-  private Tube(String reason, Environment environment, String uniqueId) {
+  private Tube(String reason, Environment environment, String uniqueId, TubeIdentity parentIdentity) {
     this.reason = reason;
     this.environment = environment;
     this.lineage = Collections.synchronizedList(new ArrayList<>(Collections.singletonList(reason)));
     this.mimirLog = Collections.synchronizedList(new LinkedList<>());
     this.uniqueId = uniqueId;
+    this.conceptionTime = Instant.now();
+    this.parentIdentity = parentIdentity;
+    
+    // Set initial lifecycle state to CONCEPTION
+    this.lifecycleState = TubeLifecycleState.CONCEPTION;
+    logToMimir("Tube conceived at: " + this.conceptionTime);
+    
+    // Create tube identity based on whether it's an Adam tube or child tube
+    if (parentIdentity == null) {
+      this.identity = TubeIdentity.createAdamIdentity(reason, environment);
+      logToMimir("Created Adam tube identity: " + this.identity.getUniqueId());
+    } else {
+      this.identity = TubeIdentity.createChildIdentity(reason, environment, parentIdentity);
+      logToMimir("Created child tube identity with parent: " + parentIdentity.getUniqueId());
+      // Add parent lineage to this tube's lineage
+      if (parentIdentity != null) {
+        this.lineage.addAll(parentIdentity.getLineage());
+      }
+    }
 
     // Initialize in the constructor without throwing exceptions
-    logToMimir("Tube initialized with ID: " + this.uniqueId);
-    LOGGER.debug("Tube initialized with ID: {}", this.uniqueId);
+    logToMimir("Tube entering initialization phase");
+    this.lifecycleState = TubeLifecycleState.INITIALIZING;
+    LOGGER.debug("Tube initializing with ID: {}", this.uniqueId);
     logToMimir("Initialization reason: " + this.reason);
-    this.status = TubeStatus.READY;
-
+    
+    // Proceed through early lifecycle phases
+    proceedThroughEarlyLifecycle();
+    
     // Initialize timer directly instead of using setTerminationDelay which might throw exceptions
     try {
       synchronized (this) {
@@ -68,6 +94,11 @@ public class Tube {
     }
 
     logToMimir("Environment: " + environment.getParameters());
+    
+    // Mark tube as ready after all initialization is complete
+    this.lifecycleState = TubeLifecycleState.READY;
+    this.status = TubeStatus.READY;
+    logToMimir("Tube ready for operation");
   }
 
   /**
@@ -88,11 +119,47 @@ public class Tube {
       // Generate unique ID
       String uniqueId = generateSHA256UniqueId(reason + environment.getParameters());
 
-      // Create and return new tube
-      return new Tube(reason, environment, uniqueId);
+      // Create and return new Adam tube (no parent)
+      return new Tube(reason, environment, uniqueId, null);
     } catch (Exception e) {
       LOGGER.error("Failed to initialize Tube: {} - initialization failed", reason);
       throw new TubeInitializationException("Failed to initialize Tube", e);
+    }
+  }
+  
+  /**
+   * Factory method to create a new child Tube instance with a parent.
+   *
+   * @param reason the reason for creating this tube
+   * @param environment the environment in which this tube operates
+   * @param parent the parent tube that is creating this child tube
+   * @return a new child Tube instance
+   * @throws TubeInitializationException if initialization fails
+   */
+  public static Tube createChildTube(String reason, Environment environment, Tube parent) {
+    LOGGER.info("Creating child Tube with reason: {} from parent: {}", reason, parent.getUniqueId());
+
+    // Validate parameters
+    validateParameters(reason, environment);
+    if (parent == null) {
+      LOGGER.error("Parent tube cannot be null for child tube creation");
+      throw new TubeInitializationException("Parent tube cannot be null for child tube creation");
+    }
+
+    try {
+      // Generate unique ID that includes a reference to the parent
+      String uniqueId = generateSHA256UniqueId(reason + parent.getUniqueId() + environment.getParameters());
+
+      // Create and return new child tube
+      Tube childTube = new Tube(reason, environment, uniqueId, parent.getIdentity());
+      
+      // Register child with parent
+      parent.registerChild(childTube);
+      
+      return childTube;
+    } catch (Exception e) {
+      LOGGER.error("Failed to initialize child Tube: {} - initialization failed", reason);
+      throw new TubeInitializationException("Failed to initialize child Tube", e);
     }
   }
 
@@ -219,6 +286,15 @@ public class Tube {
   public List<String> getLineage() {
     return Collections.unmodifiableList(lineage);
   }
+  
+  /**
+   * Gets the identity of this tube.
+   * 
+   * @return the tube's identity
+   */
+  public TubeIdentity getIdentity() {
+    return identity;
+  }
 
   /**
    * Gets the environment in which this tube operates.
@@ -282,12 +358,81 @@ public class Tube {
         terminationTimer.cancel();
         terminationTimer = null;
       }
+      
+      // Update lifecycle state first
+      lifecycleState = TubeLifecycleState.TERMINATING;
+      logToMimir("Tube entering termination phase");
+      
+      // Perform termination operations
+      preserveKnowledge();
+      releaseResources();
 
+      // Update final states
+      lifecycleState = TubeLifecycleState.TERMINATED;
       status = TubeStatus.TERMINATED;
     }
 
     LOGGER.info("Tube terminated: {}", uniqueId);
-    logToMimir("Tube terminated");
+    logToMimir("Tube terminated at: " + Instant.now());
+  }
+  
+  /**
+   * Preserves crucial knowledge before termination for potential future use.
+   */
+  private void preserveKnowledge() {
+    logToMimir("Preserving knowledge before termination");
+    // In a full implementation, this would archive important learnings and experiences
+  }
+  
+  /**
+   * Releases all resources allocated to this tube.
+   */
+  private void releaseResources() {
+    logToMimir("Releasing allocated resources");
+    // In a full implementation, this would clean up all allocated resources
+  }
+  
+  /**
+   * Proceeds through the early lifecycle phases of tube development.
+   * This follows the biological metaphor from conception through early development.
+   */
+  private void proceedThroughEarlyLifecycle() {
+    logToMimir("Beginning early lifecycle development");
+    
+    // CONFIGURING phase - establishing boundaries
+    this.lifecycleState = TubeLifecycleState.CONFIGURING;
+    logToMimir("Tube entering CONFIGURING phase (analog: Blastulation)");
+    // In a full implementation, this would set up internal boundaries and structures
+    
+    // SPECIALIZING phase - determining core functions
+    this.lifecycleState = TubeLifecycleState.SPECIALIZING;
+    logToMimir("Tube entering SPECIALIZING phase (analog: Gastrulation)");
+    // In a full implementation, this would determine core functionality
+    
+    // DEVELOPING_FEATURES phase - building specific capabilities
+    this.lifecycleState = TubeLifecycleState.DEVELOPING_FEATURES;
+    logToMimir("Tube entering DEVELOPING_FEATURES phase (analog: Organogenesis)");
+    // In a full implementation, this would build specific capabilities
+    
+    logToMimir("Completed early lifecycle development");
+  }
+  
+  /**
+   * Registers a child tube with this tube.
+   * 
+   * @param childTube the child tube to register
+   */
+  public void registerChild(Tube childTube) {
+    if (childTube != null) {
+      logToMimir("Registering child tube: " + childTube.getUniqueId());
+      // In a full implementation, this would maintain a list of child tubes
+      
+      // Add the child to our identity's descendants list
+      if (this.identity != null && childTube.getIdentity() != null) {
+        this.identity.addChild(childTube.getIdentity());
+        logToMimir("Added child tube identity to descendants list");
+      }
+    }
   }
 
   /**
