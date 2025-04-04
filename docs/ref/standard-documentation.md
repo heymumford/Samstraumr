@@ -6,16 +6,16 @@ This document defines the standardized approach to documentation in the Samstrau
 
 Documentation is organized into specific sections based on content type:
 
-| Directory | Purpose | Example Files |
-|-----------|---------|---------------|
-| `/docs/concepts/` | Core architectural concepts | `core-concepts.md`, `systems-theory-foundation.md` |
-| `/docs/guides/` | How-to guides and tutorials | `getting-started.md`, `migration-guide.md` |
-| `/docs/reference/` | Technical reference material | `api-reference.md`, `configuration-reference.md` |
-| `/docs/testing/` | Testing approach and strategies | `test-strategy.md`, `bdd-with-cucumber.md` |
-| `/docs/contribution/` | Guidelines for contributors | `contributing.md`, `code-standards.md` |
-| `/docs/research/` | Research papers and proposals | `llm-context-proposal.md` |
-| `/docs/planning/` | Development planning documents | `documentation-standardization-plan.md` |
-| `/docs/compatibility/` | Compatibility information | `compatibility-report.md` |
+|       Directory        |             Purpose             |                   Example Files                    |
+|------------------------|---------------------------------|----------------------------------------------------|
+| `/docs/concepts/`      | Core architectural concepts     | `core-concepts.md`, `systems-theory-foundation.md` |
+| `/docs/guides/`        | How-to guides and tutorials     | `getting-started.md`, `migration-guide.md`         |
+| `/docs/reference/`     | Technical reference material    | `api-reference.md`, `configuration-reference.md`   |
+| `/docs/testing/`       | Testing approach and strategies | `test-strategy.md`, `bdd-with-cucumber.md`         |
+| `/docs/contribution/`  | Guidelines for contributors     | `contributing.md`, `code-standards.md`             |
+| `/docs/research/`      | Research papers and proposals   | `llm-context-proposal.md`                          |
+| `/docs/planning/`      | Development planning documents  | `documentation-standardization-plan.md`            |
+| `/docs/compatibility/` | Compatibility information       | `compatibility-report.md`                          |
 
 ## File Naming Conventions
 
@@ -24,11 +24,9 @@ All documentation files should follow these naming conventions:
 1. **Use kebab-case**: Files should use lowercase with hyphens separating words.
    - ✅ `getting-started.md`, `api-reference.md`, `code-standards.md`
    - ❌ `GettingStarted.md`, `API_Reference.md`, `codeStandards.md`
-
 2. **Be descriptive but concise**: File names should clearly indicate the content.
    - ✅ `test-strategy.md`, `version-management.md`
    - ❌ `doc1.md`, `info.md`
-
 3. **Follow section-based prefixes** (optional): For complex documentation structures, prefixes can help organize content.
    - `concept-tube-identity.md`
    - `guide-first-composite.md`
@@ -41,15 +39,12 @@ Header styles should be consistent throughout all documentation:
 1. **Level 1 Headers (#)**: Match the title case of the file name. There should only be one Level 1 header per document, at the very top.
    - File name: `core-concepts.md`
    - Level 1 header: `# Core Concepts`
-
 2. **Level 2 Headers (##)**: Use title case (Each Major Word Capitalized).
    - `## Getting Started`
    - `## Implementation Details`
-
 3. **Level 3+ Headers (###, ####, etc.)**: Use sentence case (Only first word capitalized).
    - `### Configuration options`
    - `### Running the tests`
-
 4. **Header Structure**: Follow a logical hierarchy. Don't skip levels (e.g., don't follow a Level 2 header with a Level 4 header).
 
 ## Content Standards
@@ -62,7 +57,6 @@ When referring to other documentation files:
    - ✅ `[Core Concepts](../concepts/core-concepts.md)`
    - ❌ `[Core Concepts](../concepts/core-concepts.md)` (absolute path)
    - ❌ `[Core Concepts](../concepts/core-concepts.md)` (missing extension)
-
 2. **For section links, use lowercase anchor references**:
    - ✅ `[Configuration Options](./configuration.md#configuration-options)`
    - ❌ `[Configuration Options](./configuration.md#-configuration--options)`
@@ -72,6 +66,7 @@ When referring to other documentation files:
 For code samples:
 
 1. **Always specify the language for syntax highlighting**:
+
    ```java
    public class Example {
        public static void main(String[] args) {
@@ -79,9 +74,7 @@ For code samples:
        }
    }
    ```
-
 2. **Indent consistently** (4 spaces within code blocks)
-
 3. **Keep code blocks focused and minimal**, showing only the relevant parts
 
 ### Images

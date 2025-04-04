@@ -1,6 +1,5 @@
 # Glossary
 
-
 This document contains definitions of terms used throughout the Samstraumr project.
 
 ## Terms
@@ -24,4 +23,3 @@ This document contains definitions of terms used throughout the Samstraumr proje
 - **Dynamic State**: The moment-to-moment context and conditions captured as properties and metrics
 
 ---
-

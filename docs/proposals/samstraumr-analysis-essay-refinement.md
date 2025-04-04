@@ -305,399 +305,507 @@ adaptable, and ultimately more valuable software systems.
 
 #### Works cited
 
-1.  Samstraumr/README.md at main · heymumford/Samstraumr · GitHub,
-    > accessed on April 3, 2025,
-    > [[https://github.com/heymumford/Samstraumr/blob/main/README.md]{.underline}](https://github.com/heymumford/Samstraumr/blob/main/README.md)
+1. Samstraumr/README.md at main · heymumford/Samstraumr · GitHub,
 
-2.  What is Tech Debt? Signs & How to Effectively Manage It \|
-    > Atlassian, accessed on April 3, 2025,
-    > [[https://www.atlassian.com/agile/software-development/technical-debt]{.underline}](https://www.atlassian.com/agile/software-development/technical-debt)
+   > accessed on April 3, 2025,
+   > [[https://github.com/heymumford/Samstraumr/blob/main/README.md]{.underline}](https://github.com/heymumford/Samstraumr/blob/main/README.md)
 
-3.  What is Technical Debt? Causes, Types & Definition Guide - Sonar,
-    > accessed on April 3, 2025,
-    > [[https://www.sonarsource.com/learn/technical-debt/]{.underline}](https://www.sonarsource.com/learn/technical-debt/)
+2. What is Tech Debt? Signs & How to Effectively Manage It \|
 
-4.  What Is Technical Debt? \| Definition and Examples - ProductPlan,
-    > accessed on April 3, 2025,
-    > [[https://www.productplan.com/glossary/technical-debt/]{.underline}](https://www.productplan.com/glossary/technical-debt/)
+   > Atlassian, accessed on April 3, 2025,
+   > [[https://www.atlassian.com/agile/software-development/technical-debt]{.underline}](https://www.atlassian.com/agile/software-development/technical-debt)
 
-5.  Pipeline (software) - Wikipedia, accessed on April 3, 2025,
-    > [[https://en.wikipedia.org/wiki/Pipeline\_(software)]{.underline}](https://en.wikipedia.org/wiki/Pipeline_(software))
+3. What is Technical Debt? Causes, Types & Definition Guide - Sonar,
 
-6.  heymumford/Samstraumr: Samstraumr helps you build \... - GitHub,
-    > accessed on April 3, 2025,
-    > [[https://github.com/heymumford/Samstraumr]{.underline}](https://github.com/heymumford/Samstraumr)
+   > accessed on April 3, 2025,
+   > [[https://www.sonarsource.com/learn/technical-debt/]{.underline}](https://www.sonarsource.com/learn/technical-debt/)
 
-7.  Electron tube \| Vacuum Tubes, Cathode Rays, & Applications \|
-    > Britannica, accessed on April 3, 2025,
-    > [[https://www.britannica.com/technology/electron-tube]{.underline}](https://www.britannica.com/technology/electron-tube)
+4. What Is Technical Debt? \| Definition and Examples - ProductPlan,
 
-8.  Vacuum tube - Wikipedia, accessed on April 3, 2025,
-    > [[https://en.wikipedia.org/wiki/Vacuum_tube]{.underline}](https://en.wikipedia.org/wiki/Vacuum_tube)
+   > accessed on April 3, 2025,
+   > [[https://www.productplan.com/glossary/technical-debt/]{.underline}](https://www.productplan.com/glossary/technical-debt/)
 
-9.  Vacuum Tubes: The World Before Transistors - Engineering.com,
-    > accessed on April 3, 2025,
-    > [[https://www.engineering.com/vacuum-tubes-the-world-before-transistors/]{.underline}](https://www.engineering.com/vacuum-tubes-the-world-before-transistors/)
+5. Pipeline (software) - Wikipedia, accessed on April 3, 2025,
+
+   > [[https://en.wikipedia.org/wiki/Pipeline\_(software)]{.underline}](https://en.wikipedia.org/wiki/Pipeline_(software))
+
+6. heymumford/Samstraumr: Samstraumr helps you build \... - GitHub,
+
+   > accessed on April 3, 2025,
+   > [[https://github.com/heymumford/Samstraumr]{.underline}](https://github.com/heymumford/Samstraumr)
+
+7. Electron tube \| Vacuum Tubes, Cathode Rays, & Applications \|
+
+   > Britannica, accessed on April 3, 2025,
+   > [[https://www.britannica.com/technology/electron-tube]{.underline}](https://www.britannica.com/technology/electron-tube)
+
+8. Vacuum tube - Wikipedia, accessed on April 3, 2025,
+
+   > [[https://en.wikipedia.org/wiki/Vacuum_tube]{.underline}](https://en.wikipedia.org/wiki/Vacuum_tube)
+
+9. Vacuum Tubes: The World Before Transistors - Engineering.com,
+
+   > accessed on April 3, 2025,
+   > [[https://www.engineering.com/vacuum-tubes-the-world-before-transistors/]{.underline}](https://www.engineering.com/vacuum-tubes-the-world-before-transistors/)
 
 10. ᐉ What is The Vacuum Tube: Main Types, Pros and Cons, accessed on
+
     > April 3, 2025,
     > [[https://vacuum-tubes.com/what-is-the-vacuum-tube/]{.underline}](https://vacuum-tubes.com/what-is-the-vacuum-tube/)
 
 11. Exploration of Diode Valves and Vacuum Tubes: Operating Principles,
+
     > Theoretical Insights, and Formulas - Allelco, accessed on April 3,
     > 2025,
     > [[https://www.allelcoelec.com/blog/exploration-of-diode-valves-and-vacuum-tubes-operating-principles,theoretical-insights,and-formulas.html]{.underline}](https://www.allelcoelec.com/blog/exploration-of-diode-valves-and-vacuum-tubes-operating-principles,theoretical-insights,and-formulas.html)
 
 12. What is a Vacuum tube? \| Lenovo US, accessed on April 3, 2025,
+
     > [[https://www.lenovo.com/us/en/glossary/vacuum-tube/]{.underline}](https://www.lenovo.com/us/en/glossary/vacuum-tube/)
 
 13. Tube software - All industrial manufacturers - DirectIndustry,
+
     > accessed on April 3, 2025,
     > [[https://www.directindustry.com/industrial-manufacturer/tube-software-110876.html]{.underline}](https://www.directindustry.com/industrial-manufacturer/tube-software-110876.html)
 
 14. Programming Tube \| TRUMPF, accessed on April 3, 2025,
+
     > [[https://www.trumpf.com/en_US/products/software/programming-software/programming-tube/]{.underline}](https://www.trumpf.com/en_US/products/software/programming-software/programming-tube/)
 
 15. Development of Educational Software for Designing Shell-and-Tube
+
     > Heat Exchangers \| Request PDF - ResearchGate, accessed on April
     > 3, 2025,
     > [[https://www.researchgate.net/publication/275685566_Development_of_Educational_Software_for_Designing_Shell-and-Tube_Heat_Exchangers]{.underline}](https://www.researchgate.net/publication/275685566_Development_of_Educational_Software_for_Designing_Shell-and-Tube_Heat_Exchangers)
 
 16. Software Development for Thermal Design of Shell and Tube Heat
+
     > Exchanger, accessed on April 3, 2025,
     > [[https://www.semanticscholar.org/paper/Software-Development-for-Thermal-Design-of-Shell-Upadhyay/d1a0be81cd5425ce9fb4367b52f8b0f142058ca3]{.underline}](https://www.semanticscholar.org/paper/Software-Development-for-Thermal-Design-of-Shell-Upadhyay/d1a0be81cd5425ce9fb4367b52f8b0f142058ca3)
 
 17. The SAM (Successive Approximation Model) Approach to eLearning - ELM
+
     > Learning, accessed on April 3, 2025,
     > [[https://elmlearning.com/hub/instructional-design/sam-successive-approximation-model/]{.underline}](https://elmlearning.com/hub/instructional-design/sam-successive-approximation-model/)
 
 18. SAM: A Rapid Design And Development Model - eLearning Industry,
+
     > accessed on April 3, 2025,
     > [[https://elearningindustry.com/sam-successive-approximation-model-for-rapid-instructional-design]{.underline}](https://elearningindustry.com/sam-successive-approximation-model-for-rapid-instructional-design)
 
 19. 7 Tips To Implement The SAM Model In eLearning, accessed on April 3,
+
     > 2025,
     > [[https://elearningindustry.com/tips-implement-sam-model-in-elearning]{.underline}](https://elearningindustry.com/tips-implement-sam-model-in-elearning)
 
 20. What Is Trunk Based Development: How It Works? - Aviator, accessed
+
     > on April 3, 2025,
     > [[https://www.aviator.co/blog/trunk-based-development/]{.underline}](https://www.aviator.co/blog/trunk-based-development/)
 
 21. Custom Software vs Off the Shelf: Which Saves You More Money in the
+
     > Long Run?, accessed on April 3, 2025,
     > [[https://kitrum.com/blog/custom-software-vs-off-the-shelf/]{.underline}](https://kitrum.com/blog/custom-software-vs-off-the-shelf/)
 
 22. Initial cost vs. lifetime cost of software development \|
+
     > LLlnformatics - LLInformatics, accessed on April 3, 2025,
     > [[https://www.llinformatics.com/blog/initial-cost-vs-lifetime-cost-of-software-development]{.underline}](https://www.llinformatics.com/blog/initial-cost-vs-lifetime-cost-of-software-development)
 
 23. Should You Build or Buy Software? AI Might Change Your Answer -
+
     > FormAssembly, accessed on April 3, 2025,
     > [[https://www.formassembly.com/blog/build-or-buy-software/]{.underline}](https://www.formassembly.com/blog/build-or-buy-software/)
 
 24. Definition of elegant program \| PCMag, accessed on April 3, 2025,
+
     > [[https://www.pcmag.com/encyclopedia/term/elegant-program]{.underline}](https://www.pcmag.com/encyclopedia/term/elegant-program)
 
 25. What Makes a Program Elegant? - Communications of the ACM, accessed
+
     > on April 3, 2025,
     > [[https://cacm.acm.org/blogcacm/what-makes-a-program-elegant/]{.underline}](https://cacm.acm.org/blogcacm/what-makes-a-program-elegant/)
 
 26. Mastering Elegant Code Part 2: 6 Techniques for Writing Elegant
+
     > Code - Security Journey, accessed on April 3, 2025,
     > [[https://www.securityjourney.com/post/mastering-elegant-code-part-2-6-techniques-for-writing-elegant-code]{.underline}](https://www.securityjourney.com/post/mastering-elegant-code-part-2-6-techniques-for-writing-elegant-code)
 
 27. Software Elegance - Jenkov.com, accessed on April 3, 2025,
+
     > [[https://jenkov.com/tutorials/software-elegance/index.html]{.underline}](https://jenkov.com/tutorials/software-elegance/index.html)
 
 28. Culture & behaviours - Rolls-Royce Career, accessed on April 3,
+
     > 2025,
     > [[https://careers.rolls-royce.com/usa/what-we-offer/culture-and-behaviours]{.underline}](https://careers.rolls-royce.com/usa/what-we-offer/culture-and-behaviours)
 
 29. Inspiring Greatness - Rolls-Royce, accessed on April 3, 2025,
+
     > [[https://www.rolls-roycemotorcars.com/en_GB/inspiring-greatness.html]{.underline}](https://www.rolls-roycemotorcars.com/en_GB/inspiring-greatness.html)
 
 30. Values - Rolls-Royce, accessed on April 3, 2025,
+
     > [[https://www.rolls-roycemotorcars.com/en_GB/inspiring-greatness/values.html]{.underline}](https://www.rolls-roycemotorcars.com/en_GB/inspiring-greatness/values.html)
 
 31. Our Culture & Values - BMW Group Careers, accessed on April 3, 2025,
+
     > [[https://www.bmwgroup.jobs/br/en/culture.html]{.underline}](https://www.bmwgroup.jobs/br/en/culture.html)
 
 32. Time Consciousness: Eternal Now: Exploring the Concept of Eternal
+
     > Now in Modern Philosophy - FasterCapital, accessed on April 3,
     > 2025,
     > [[https://fastercapital.com/content/Time-Consciousness\--Eternal-Now\-\--Exploring-the-Concept-of-Eternal-Now-in-Modern-Philosophy.html]{.underline}](https://fastercapital.com/content/Time-Consciousness--Eternal-Now---Exploring-the-Concept-of-Eternal-Now-in-Modern-Philosophy.html)
 
 33. The eternal now - Alan Watts\' Philosophy on Authentic Living -
+
     > Medium, accessed on April 3, 2025,
     > [[https://medium.com/@matthewandersonnel/embracing-the-eternal-now-insights-from-alan-watts-a15f9e8503a7]{.underline}](https://medium.com/@matthewandersonnel/embracing-the-eternal-now-insights-from-alan-watts-a15f9e8503a7)
 
 34. Time & Experience: Twins of the Eternal Now? - ResearchGate,
+
     > accessed on April 3, 2025,
     > [[https://www.researchgate.net/publication/279506213_Time_Experience_Twins_of_the_Eternal_Now]{.underline}](https://www.researchgate.net/publication/279506213_Time_Experience_Twins_of_the_Eternal_Now)
 
 35. WALKING IN THE ETERNAL NOW \| PDF - SlideShare, accessed on April 3,
+
     > 2025,
     > [[https://www.slideshare.net/slideshow/walking-in-the-eternal-now/14917656]{.underline}](https://www.slideshare.net/slideshow/walking-in-the-eternal-now/14917656)
 
 36. State Machines Vs Reactive Programming \| Restackio, accessed on
+
     > April 3, 2025,
     > [[https://www.restack.io/p/state-machines-vs-reactive-programming-answer-cat-ai]{.underline}](https://www.restack.io/p/state-machines-vs-reactive-programming-answer-cat-ai)
 
 37. Reactive programming vs. reactive systems - Akka, accessed on April
+
     > 3, 2025,
     > [[https://akka.io/blog/reactive-programming-versus-reactive-systems]{.underline}](https://akka.io/blog/reactive-programming-versus-reactive-systems)
 
 38. What Is Reactive Programming? \| Built In, accessed on April 3,
+
     > 2025,
     > [[https://builtin.com/articles/reactive-programming]{.underline}](https://builtin.com/articles/reactive-programming)
 
 39. The Benefits of Event-Driven Architecture - PubNub, accessed on
+
     > April 3, 2025,
     > [[https://www.pubnub.com/blog/the-benefits-of-event-driven-architecture/]{.underline}](https://www.pubnub.com/blog/the-benefits-of-event-driven-architecture/)
 
 40. Event-Driven Architecture - AWS, accessed on April 3, 2025,
+
     > [[https://aws.amazon.com/event-driven-architecture/]{.underline}](https://aws.amazon.com/event-driven-architecture/)
 
 41. Event-Driven Architecture (EDA): A Complete Introduction -
+
     > Confluent, accessed on April 3, 2025,
     > [[https://www.confluent.io/learn/event-driven-architecture/]{.underline}](https://www.confluent.io/learn/event-driven-architecture/)
 
 42. The Complete Guide to Event-Driven Architecture - Solace, accessed
+
     > on April 3, 2025,
     > [[https://solace.com/what-is-event-driven-architecture/]{.underline}](https://solace.com/what-is-event-driven-architecture/)
 
 43. Composition Over Inheritance: Building Flexible and Adaptable
+
     > Object-Oriented Designs \| by Teni Gada \| Medium, accessed on
     > April 3, 2025,
     > [[https://medium.com/@tenigada/composition-over-inheritance-building-flexible-and-adaptable-object-oriented-designs-8b8966ec4193]{.underline}](https://medium.com/@tenigada/composition-over-inheritance-building-flexible-and-adaptable-object-oriented-designs-8b8966ec4193)
 
 44. Constraint-Based Object-Oriented Programming - Prezi, accessed on
+
     > April 3, 2025,
     > [[https://prezi.com/p/vxujez69h-zg/constraint-based-object-oriented-programming/]{.underline}](https://prezi.com/p/vxujez69h-zg/constraint-based-object-oriented-programming/)
 
 45. Procedural vs Object-Oriented Programming: Understanding the Key
+
     > Differences, accessed on April 3, 2025,
     > [[https://algocademy.com/blog/procedural-vs-object-oriented-programming-understanding-the-key-differences/]{.underline}](https://algocademy.com/blog/procedural-vs-object-oriented-programming-understanding-the-key-differences/)
 
 46. Integrating Constraints with an Object-Oriented Language, accessed
+
     > on April 3, 2025,
     > [[https://constraints.cs.washington.edu/cip/kaleidoscope-ecoop-92.pdf]{.underline}](https://constraints.cs.washington.edu/cip/kaleidoscope-ecoop-92.pdf)
 
 47. Immutability in Functional Programming - Ada Beat, accessed on April
+
     > 3, 2025,
     > [[https://adabeat.com/fp/immutability-in-functional-programming/]{.underline}](https://adabeat.com/fp/immutability-in-functional-programming/)
 
 48. What are the advantages and disadvantages of immutable languages?,
+
     > accessed on April 3, 2025,
     > [[https://langdev.stackexchange.com/questions/444/what-are-the-advantages-and-disadvantages-of-immutable-languages]{.underline}](https://langdev.stackexchange.com/questions/444/what-are-the-advantages-and-disadvantages-of-immutable-languages)
 
 49. Immutability -- Practical Functional Programming \| Part 3 - Sandro
+
     > Maglione, accessed on April 3, 2025,
     > [[https://www.sandromaglione.com/articles/immutability-practical-functional-programming-part-3]{.underline}](https://www.sandromaglione.com/articles/immutability-practical-functional-programming-part-3)
 
 50. Trying to understand the benefits of immutability in imperative
+
     > programming, accessed on April 3, 2025,
     > [[https://softwareengineering.stackexchange.com/questions/430112/trying-to-understand-the-benefits-of-immutability-in-imperative-programming]{.underline}](https://softwareengineering.stackexchange.com/questions/430112/trying-to-understand-the-benefits-of-immutability-in-imperative-programming)
 
 51. Systems theory - Wikipedia, accessed on April 2, 2025,
+
     > [[https://en.wikipedia.org/wiki/Systems_theory]{.underline}](https://en.wikipedia.org/wiki/Systems_theory)
 
 52. Systems Theory - Sedona Sky Academy, accessed on April 2, 2025,
+
     > [[https://www.sedonasky.org/blog/systems-theory]{.underline}](https://www.sedonasky.org/blog/systems-theory)
 
 53. Systems theory \| Social Dynamics, Complexity & Interdependence \|
+
     > Britannica, accessed on April 2, 2025,
     > [[https://www.britannica.com/topic/systems-theory]{.underline}](https://www.britannica.com/topic/systems-theory)
 
 54. www.britannica.com, accessed on April 2, 2025,
+
     > [[https://www.britannica.com/topic/systems-theory#:\~:text=systems%20theory%2C%20in%20social%20science,history%20in%20the%20social%20sciences.]{.underline}](https://www.britannica.com/topic/systems-theory#:~:text=systems%20theory%2C%20in%20social%20science,history%20in%20the%20social%20sciences.)
 
 55. Systems Theory - Sage Publishing, accessed on April 2, 2025,
+
     > [[https://us.sagepub.com/sites/default/files/upm-binaries/32947_Chapter1.pdf]{.underline}](https://us.sagepub.com/sites/default/files/upm-binaries/32947_Chapter1.pdf)
 
 56. en.wikipedia.org, accessed on April 2, 2025,
+
     > [[https://en.wikipedia.org/wiki/Systems_theory#:\~:text=Ludwig%20von%20Bertalanffy%20began%20developing,%3A%20Foundations%2C%20Development%2C%20Applications.]{.underline}](https://en.wikipedia.org/wiki/Systems_theory#:~:text=Ludwig%20von%20Bertalanffy%20began%20developing,%3A%20Foundations%2C%20Development%2C%20Applications.)
 
 57. Ludwig von Bertalanffy, General System Theory (1968) - Panarchy.org,
+
     > accessed on April 2, 2025,
     > [[https://www.panarchy.org/vonbertalanffy/systems.1968.html]{.underline}](https://www.panarchy.org/vonbertalanffy/systems.1968.html)
 
 58. Tektology - Wikipedia, accessed on April 2, 2025,
+
     > [[https://en.wikipedia.org/wiki/Tektology]{.underline}](https://en.wikipedia.org/wiki/Tektology)
 
 59. en.wikipedia.org, accessed on April 2, 2025,
+
     > [[https://en.wikipedia.org/wiki/Systems_theory#:\~:text=In%20the%20most%20general%20sense,%22elements%20in%20standing%20relationship.%22]{.underline}](https://en.wikipedia.org/wiki/Systems_theory#:~:text=In%20the%20most%20general%20sense,%22elements%20in%20standing%20relationship.%22)
 
 60. Systems Theory - The Social Work Graduate, accessed on April 2,
+
     > 2025,
     > [[https://www.thesocialworkgraduate.com/post/systems-theory]{.underline}](https://www.thesocialworkgraduate.com/post/systems-theory)
 
 61. Systems Theory, accessed on April 2, 2025,
+
     > [[https://www.siue.edu/\~adheil/Systems%20Theory%20Paper.pdf]{.underline}](https://www.siue.edu/~adheil/Systems%20Theory%20Paper.pdf)
 
 62. Interdependence - The Personal MBA, accessed on April 2, 2025,
+
     > [[https://personalmba.com/interdependence/]{.underline}](https://personalmba.com/interdependence/)
 
 63. Understanding Structural Family Systems Theory & Therapy - My People
+
     > Patterns, accessed on April 2, 2025,
     > [[https://www.mypeoplepatterns.com/structural-family-systems-theory]{.underline}](https://www.mypeoplepatterns.com/structural-family-systems-theory)
 
 64. Family Systems Theory, accessed on April 2, 2025,
+
     > [[https://web.pdx.edu/\~cbcm/CFS410U/FamilySystemsTheory.pdf]{.underline}](https://web.pdx.edu/~cbcm/CFS410U/FamilySystemsTheory.pdf)
 
 65. Systems Theories - Structural Learning, accessed on April 2, 2025,
+
     > [[https://www.structural-learning.com/post/systems-theories]{.underline}](https://www.structural-learning.com/post/systems-theories)
 
 66. Systems Theory - The Decision Lab, accessed on April 2, 2025,
+
     > [[https://thedecisionlab.com/reference-guide/psychology/systems-theory]{.underline}](https://thedecisionlab.com/reference-guide/psychology/systems-theory)
 
 67. Feedback loops in system thinking \| by Myroslava Zelenska - Medium,
+
     > accessed on April 2, 2025,
     > [[https://medium.com/@myroslavazel/feedback-loops-in-system-thinking-7ef06e2ff310]{.underline}](https://medium.com/@myroslavazel/feedback-loops-in-system-thinking-7ef06e2ff310)
 
 68. Emergent Properties - Stanford Encyclopedia of Philosophy, accessed
+
     > on April 2, 2025,
     > [[https://plato.stanford.edu/entries/properties-emergent/]{.underline}](https://plato.stanford.edu/entries/properties-emergent/)
 
 69. Emergence: The Key to Understanding Complex Systems - Systems
+
     > Thinking Alliance, accessed on April 2, 2025,
     > [[https://systemsthinkingalliance.org/the-crucial-role-of-emergence-in-systems-thinking/]{.underline}](https://systemsthinkingalliance.org/the-crucial-role-of-emergence-in-systems-thinking/)
 
 70. Emergent Behavior --- Theory - Daposto - Medium, accessed on April
+
     > 2, 2025,
     > [[https://daposto.medium.com/emergent-behavior-theory-a58ef44c0cf0]{.underline}](https://daposto.medium.com/emergent-behavior-theory-a58ef44c0cf0)
 
 71. Emergence - SEBoK, accessed on April 2, 2025,
+
     > [[https://sebokwiki.org/wiki/Emergence]{.underline}](https://sebokwiki.org/wiki/Emergence)
 
 72. The Role of Emergence in Service Systems, accessed on April 2, 2025,
+
     > [[https://www.sdlogic.net/pdf/post2018/20-Polese-Sarno-Vargo-2020-HICCS.pdf]{.underline}](https://www.sdlogic.net/pdf/post2018/20-Polese-Sarno-Vargo-2020-HICCS.pdf)
 
 73. systemsthinkingalliance.org, accessed on April 2, 2025,
+
     > [[https://systemsthinkingalliance.org/the-crucial-role-of-emergence-in-systems-thinking/#:\~:text=Emergent%20properties%20are%20often%20described,behaviour%20of%20individual%20parts%20alone.&text=The%20key%20characteristics%20of%20emergence,wholeness%2C%20dynamic%20and%20downward%20causation.]{.underline}](https://systemsthinkingalliance.org/the-crucial-role-of-emergence-in-systems-thinking/#:~:text=Emergent%20properties%20are%20often%20described,behaviour%20of%20individual%20parts%20alone.&text=The%20key%20characteristics%20of%20emergence,wholeness%2C%20dynamic%20and%20downward%20causation.)
 
 74. Systems biology - Wikipedia, accessed on April 2, 2025,
+
     > [[https://en.wikipedia.org/wiki/Systems_biology]{.underline}](https://en.wikipedia.org/wiki/Systems_biology)
 
 75. Systems Biology -- Old Concepts, New Science, New Challenges - PMC,
+
     > accessed on April 2, 2025,
     > [[https://pmc.ncbi.nlm.nih.gov/articles/PMC3065319/]{.underline}](https://pmc.ncbi.nlm.nih.gov/articles/PMC3065319/)
 
 76. Perspective: Systems biology beyond biology - Frontiers, accessed on
+
     > April 2, 2025,
     > [[https://www.frontiersin.org/journals/systems-biology/articles/10.3389/fsysb.2022.987135/full]{.underline}](https://www.frontiersin.org/journals/systems-biology/articles/10.3389/fsysb.2022.987135/full)
 
 77. The Historical Evolution of Modern Systems Biology - Clemson
+
     > University, accessed on April 2, 2025,
     > [[https://people.computing.clemson.edu/\~steve/Papers/FunSys/prelimdraft1.doc]{.underline}](https://people.computing.clemson.edu/~steve/Papers/FunSys/prelimdraft1.doc)
 
 78. A Brief History of Systems Biology: "Every object that biology
+
     > studies is a system of systems." Francois Jacob (1974) - PubMed
     > Central, accessed on April 2, 2025,
     > [[https://pmc.ncbi.nlm.nih.gov/articles/PMC1626627/]{.underline}](https://pmc.ncbi.nlm.nih.gov/articles/PMC1626627/)
 
 79. An Overview of the Systems Engineering Knowledge Domain - MIT,
+
     > accessed on April 2, 2025,
     > [[http://web.mit.edu/esd.83/www/notebook/sysengkd.pdf]{.underline}](http://web.mit.edu/esd.83/www/notebook/sysengkd.pdf)
 
 80. Systems engineering - Wikipedia, accessed on April 2, 2025,
+
     > [[https://en.wikipedia.org/wiki/Systems_engineering]{.underline}](https://en.wikipedia.org/wiki/Systems_engineering)
 
 81. A Brief History of Systems Engineering - SEBoK, accessed on April 2,
+
     > 2025,
     > [[https://sebokwiki.org/wiki/A_Brief_History_of_Systems_Engineering]{.underline}](https://sebokwiki.org/wiki/A_Brief_History_of_Systems_Engineering)
 
 82. (Brief) History of Systems Engineering - INCOSE, accessed on April
+
     > 2, 2025,
     > [[https://www.incose.org/about-systems-engineering/history-of-systems-engineering]{.underline}](https://www.incose.org/about-systems-engineering/history-of-systems-engineering)
 
 83. www.incose.org, accessed on April 2, 2025,
+
     > [[https://www.incose.org/about-systems-engineering/history-of-systems-engineering#:\~:text=The%20term%20systems%20engineering%20dates,engineering%20during%20World%20War%20II.]{.underline}](https://www.incose.org/about-systems-engineering/history-of-systems-engineering#:~:text=The%20term%20systems%20engineering%20dates,engineering%20during%20World%20War%20II.)
 
 84. About Systems Engineering - INCOSE, accessed on April 2, 2025,
+
     > [[https://www.incose.org/about-systems-engineering]{.underline}](https://www.incose.org/about-systems-engineering)
 
 85. Introduction to systems theory in social work - Online MSW Programs,
+
     > accessed on April 2, 2025,
     > [[https://www.onlinemswprograms.com/social-work/theories/systems-theory-social-work/]{.underline}](https://www.onlinemswprograms.com/social-work/theories/systems-theory-social-work/)
 
 86. Systems theory in anthropology - Wikipedia, accessed on April 2,
+
     > 2025,
     > [[https://en.wikipedia.org/wiki/Systems_theory_in_anthropology]{.underline}](https://en.wikipedia.org/wiki/Systems_theory_in_anthropology)
 
 87. www.rep.routledge.com, accessed on April 2, 2025,
+
     > [[https://www.rep.routledge.com/articles/thematic/systems-theory-in-social-science/v-1#:\~:text=Systems%20theory%20in%20the%20first,Gabriel%20Almond%20in%20political%20science.]{.underline}](https://www.rep.routledge.com/articles/thematic/systems-theory-in-social-science/v-1#:~:text=Systems%20theory%20in%20the%20first,Gabriel%20Almond%20in%20political%20science.)
 
 88. Ludwig von Bertalanffy - Wikipedia, accessed on April 2, 2025,
+
     > [[https://en.wikipedia.org/wiki/Ludwig_von_Bertalanffy]{.underline}](https://en.wikipedia.org/wiki/Ludwig_von_Bertalanffy)
 
 89. Ludwig von Bertalanffy: Man Behind General Systems Theory - The
+
     > Systems Thinking, accessed on April 2, 2025,
     > [[https://thesystemsthinking.com/ludwig-von-bertalanffy-exploring-the-world-through-general-systems-theory/]{.underline}](https://thesystemsthinking.com/ludwig-von-bertalanffy-exploring-the-world-through-general-systems-theory/)
 
 90. Improving Healthcare by Embracing Systems Theory - PMC - PubMed
+
     > Central, accessed on April 2, 2025,
     > [[https://pmc.ncbi.nlm.nih.gov/articles/PMC4947551/]{.underline}](https://pmc.ncbi.nlm.nih.gov/articles/PMC4947551/)
 
 91. thesystemsthinking.com, accessed on April 2, 2025,
+
     > [[https://thesystemsthinking.com/ludwig-von-bertalanffy-exploring-the-world-through-general-systems-theory/#:\~:text=Ludwig%20von%20Bertalanffy%20developed%20General,can%20affect%20the%20whole%20system.]{.underline}](https://thesystemsthinking.com/ludwig-von-bertalanffy-exploring-the-world-through-general-systems-theory/#:~:text=Ludwig%20von%20Bertalanffy%20developed%20General,can%20affect%20the%20whole%20system.)
 
 92. Cybernetics - MIT, accessed on April 2, 2025,
+
     > [[https://web.mit.edu/esd.83/www/notebook/Cybernetics.PDF]{.underline}](https://web.mit.edu/esd.83/www/notebook/Cybernetics.PDF)
 
 93. From Cybernetics to AI: the pioneering work of Norbert Wiener - Max
+
     > Planck Neuroscience, accessed on April 2, 2025,
     > [[https://maxplanckneuroscience.org/from-cybernetics-to-ai-the-pioneering-work-of-norbert-wiener/]{.underline}](https://maxplanckneuroscience.org/from-cybernetics-to-ai-the-pioneering-work-of-norbert-wiener/)
 
 94. Norbert Wiener, the Pioneer of Cybernetics - IT Museum DataArt,
+
     > accessed on April 2, 2025,
     > [[https://museum.dataart.com/short-stories/norbert-wiener]{.underline}](https://museum.dataart.com/short-stories/norbert-wiener)
 
 95. Norbert Wiener: The Father of Cybernetics - The Systems Thinking,
+
     > accessed on April 2, 2025,
     > [[https://thesystemsthinking.com/norbert-wiener-the-father-of-cybernetics/]{.underline}](https://thesystemsthinking.com/norbert-wiener-the-father-of-cybernetics/)
 
 96. A Brief History of Systems Thinking, accessed on April 2, 2025,
+
     > [[https://systemsthinkingalliance.org/brief-history-of-systems-thinking/]{.underline}](https://systemsthinkingalliance.org/brief-history-of-systems-thinking/)
 
 97. System Theory in International Relations: Alexander Bogdanov\'s
+
     > Tektology Potential, accessed on April 2, 2025,
     > [[https://journals.eco-vector.com/0869-0499/article/view/676204]{.underline}](https://journals.eco-vector.com/0869-0499/article/view/676204)
 
 98. Aleksandr Bogdanov and Systems Theory - PhilArchive, accessed on
+
     > April 2, 2025,
     > [[https://philarchive.org/archive/GARABA-3]{.underline}](https://philarchive.org/archive/GARABA-3)
 
 99. Alexander Bogdanov - Wikipedia, accessed on April 2, 2025,
+
     > [[https://en.wikipedia.org/wiki/Alexander_Bogdanov]{.underline}](https://en.wikipedia.org/wiki/Alexander_Bogdanov)
 
 100. en.wikipedia.org, accessed on April 2, 2025,
+
      > [[https://en.wikipedia.org/wiki/Tektology#:\~:text=According%20to%20Bogdanov%20%22the%20aim,considered%20that%20any%20complex%20should]{.underline}](https://en.wikipedia.org/wiki/Tektology#:~:text=According%20to%20Bogdanov%20%22the%20aim,considered%20that%20any%20complex%20should)
 
 101. DOE Explains\...Systems Biology - Department of Energy, accessed on
+
      > April 2, 2025,
      > [[https://www.energy.gov/science/doe-explainssystems-biology]{.underline}](https://www.energy.gov/science/doe-explainssystems-biology)
 
 102. Biological system - Wikipedia, accessed on April 2, 2025,
+
      > [[https://en.wikipedia.org/wiki/Biological_system]{.underline}](https://en.wikipedia.org/wiki/Biological_system)
 
 103. System - Definition and Examples - Biology Online Dictionary,
+
      > accessed on April 2, 2025,
      > [[https://www.biologyonline.com/dictionary/system]{.underline}](https://www.biologyonline.com/dictionary/system)
 
 104. Biological Systems \| List of High Impact Articles \| 587, accessed
+
      > on April 2, 2025,
      > [[https://www.iomcworld.com/scholarly/biological-systems-journals-articles-ppts-list-587.html]{.underline}](https://www.iomcworld.com/scholarly/biological-systems-journals-articles-ppts-list-587.html)
 
 105. Human body systems: Overview, anatomy, functions - Kenhub, accessed
+
      > on April 2, 2025,
      > [[https://www.kenhub.com/en/library/anatomy/human-body-systems]{.underline}](https://www.kenhub.com/en/library/anatomy/human-body-systems)
 
 106. en.wikipedia.org, accessed on April 2, 2025,
+
      > [[https://en.wikipedia.org/wiki/Biological_system#:\~:text=A%20biological%20system%20is%20a,scale%20are%20populations%20of%20organisms.]{.underline}](https://en.wikipedia.org/wiki/Biological_system#:~:text=A%20biological%20system%20is%20a,scale%20are%20populations%20of%20organisms.)
 
 107. accessed on December 31, 1969,
+
      > [[https://github.com/heymumford/Samstraumr/blob/main/Proposals%20Documentation.md]{.underline}](https://github.com/heymumford/Samstraumr/blob/main/Proposals%20Documentation.md)
 
 108. accessed on December 31, 1969,
+
      > [[https://github.com/heymumford/Samstraumr/blob/main/SamstraumrTestingStrategy.md]{.underline}](https://github.com/heymumford/Samstraumr/blob/main/SamstraumrTestingStrategy.md)

@@ -8,17 +8,14 @@ This document summarizes the changes made to support the transition from the leg
    - Updated `Bundle.java` to properly delegate to `Composite`
    - Implemented `Bundle.BundleEvent` and `Bundle.CircuitBreaker` adapter classes
    - Fixed `BundleFactory` to properly create instances with delegation to `CompositeFactory`
-
 2. **Test Framework Compatibility**
    - Added PostgreSQL TestContainers dependency to support `StreamTest`
    - Fixed imports in test files for annotations
    - Enhanced `RunTests.java` to map between industry-standard and Samstraumr-specific terminology
    - Fixed `RunATLCucumberTest.java` to support both JUnit and Cucumber-based ATL tests
-
 3. **Type Compatibility Issues**
    - Fixed `StreamTest.java` to use the fully qualified `org.samstraumr.tube.composite.Composite.CircuitBreaker` type
    - Fixed `PatternSteps.java` to address `Bundle.BundleEvent` inconsistencies
-
 4. **Documentation**
    - Created a README.md in the bundle package explaining the compatibility approach
    - Created a run-atl-tests.sh script to simplify running ATL tests

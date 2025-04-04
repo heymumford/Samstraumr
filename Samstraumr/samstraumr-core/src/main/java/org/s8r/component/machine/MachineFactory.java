@@ -1,13 +1,12 @@
 /**
  * Copyright (c) 2025 Eric C. Mumford (@heymumford)
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
- * If a copy of the MPL was not distributed with this file, You can obtain one at
+ *
+ * <p>This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy
+ * of the MPL was not distributed with this file, You can obtain one at
  * https://github.com/heymumford/Samstraumr/blob/main/LICENSE
  *
- * Factory for creating machine instances in the S8r framework
+ * <p>Factory for creating machine instances in the S8r framework
  */
-
 package org.s8r.component.machine;
 
 import java.util.Collections;
@@ -25,15 +24,16 @@ import org.slf4j.LoggerFactory;
 /**
  * Factory for creating and managing Machine instances.
  *
- * <p>This class provides methods to create preconfigured machines for common processing
- * patterns. It maintains a global registry of all machines created through the factory,
- * allowing for centralized lifecycle management.
+ * <p>This class provides methods to create preconfigured machines for common processing patterns.
+ * It maintains a global registry of all machines created through the factory, allowing for
+ * centralized lifecycle management.
  *
  * <p>The factory offers specialized machine configurations for different use cases such as:
+ *
  * <ul>
- *   <li>Data processing with input, transformation, and output stages</li>
- *   <li>Monitoring systems with observers and validators</li>
- *   <li>Custom machines with specialized composite arrangements</li>
+ *   <li>Data processing with input, transformation, and output stages
+ *   <li>Monitoring systems with observers and validators
+ *   <li>Custom machines with specialized composite arrangements
  * </ul>
  */
 public class MachineFactory {
@@ -200,12 +200,11 @@ public class MachineFactory {
     return false;
   }
 
-  /** 
+  /**
    * Shuts down all registered machines.
-   * 
-   * <p>This method initiates an orderly shutdown of all machines in the registry,
-   * allowing them to clean up resources and preserve their final state before
-   * being removed from the registry.
+   *
+   * <p>This method initiates an orderly shutdown of all machines in the registry, allowing them to
+   * clean up resources and preserve their final state before being removed from the registry.
    */
   public static void shutdownAllMachines() {
     LOGGER.info("Shutting down all {} registered machines", MACHINE_REGISTRY.size());

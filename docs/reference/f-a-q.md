@@ -1,6 +1,5 @@
 # F a Q
 
-
 This document contains frequently asked questions about the Samstraumr project.
 
 ## General Questions
@@ -29,4 +28,3 @@ Run `mvn test` or use the specific test commands documented in the project confi
 Follow the guidelines in the [ATL/BTL Strategy](./a-t-l--b-t-l--strategy.md) documentation.
 
 ---
-

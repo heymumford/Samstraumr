@@ -61,7 +61,6 @@ This document tracks the progress of the file reorganization effort in the Samst
    - `WORKFLOW_ANALYSIS.md` → `docs/contribution/WORKFLOW_ANALYSIS.md`
    - `README.md.new` → `docs/planning/README-NEW-DRAFT.md`
    - `Tube Components and Samstraumr Integration_ (1).docx` → `docs/proposals/`
-
 2. **Script Files**
    - `map-test-type.sh` → `util/test-map-type.sh`
    - `run-tests.sh` → `util/test-run.sh`
@@ -70,7 +69,6 @@ This document tracks the progress of the file reorganization effort in the Samst
    - `update-java-headers.sh` → `util/scripts/update-java-headers.sh`
    - `update-md-headers.sh` → `util/scripts/update-md-headers.sh`
    - `update-version.sh` → `util/version.sh`
-
 3. **Temporary Files**
    - `minimal_output.txt` → `temp/minimal_output.txt`
    - `tmpfile` → `temp/tmpfile`

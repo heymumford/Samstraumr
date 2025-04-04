@@ -52,4 +52,3 @@ If you need assistance with your contribution, you can:
 - Open an issue with the "question" label
 - Reach out to the maintainers via email
 - Check the [FAQ](../ref/ref-faq.md) for common questions
-

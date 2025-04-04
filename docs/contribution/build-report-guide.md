@@ -182,6 +182,7 @@ Leverage GitHub Actions to publish the build report to GitHub Pages:
 3. Publish to GitHub Pages
 
 Example workflow addition:
+
 ```yaml
   report-generation:
     name: Generate Build Report
@@ -271,4 +272,3 @@ For Samstraumr, we recommend implementing:
 2. **Stage 2**: Develop custom report styling that aligns with Samstraumr visual identity
 3. **Stage 3**: Create a GitHub Action workflow that publishes reports to GitHub Pages
 4. **Stage 4**: Integrate trend analysis to track metrics over time
-

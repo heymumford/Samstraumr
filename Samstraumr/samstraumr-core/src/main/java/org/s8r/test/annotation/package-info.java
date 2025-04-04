@@ -17,6 +17,7 @@
  * semantic meaning to tags using Java's type system.
  *
  * <p>When adding new annotations to this package, follow these guidelines:
+ *
  * <ul>
  *   <li>Use clear, descriptive names
  *   <li>Include detailed JavaDoc explaining the purpose and usage

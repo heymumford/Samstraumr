@@ -9,7 +9,8 @@
 package org.s8r.core.tube;
 
 /**
- * Represents the different lifecycle states of a component based on the biological development model.
+ * Represents the different lifecycle states of a component based on the biological development
+ * model.
  *
  * <p>This enum is part of the simplified package structure, replacing the more specific
  * TubeLifecycleState with a more general LifecycleState enum in the s8r.core.tube package.

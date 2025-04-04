@@ -1,12 +1,12 @@
-# Samstraumr Framework
+# S8r Framework
 
-[![Version](https://img.shields.io/badge/version-1.6.2-blue)](https://github.com/heymumford/Samstraumr/releases) [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/)
+[![Version](https://img.shields.io/badge/version-1.6.3-blue)](https://github.com/heymumford/Samstraumr/releases) [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/)
 
-> *"Samstraumr (Old Norse: 'unified flow'): A design framework for adaptive, self-aware software systems that embody the wisdom of natural systems."*
+> *"S8r (abbreviated from Samstraumr, Old Norse: 'unified flow'): A design framework for adaptive, self-aware software systems that embody the wisdom of natural systems."*
 
-## What is Samstraumr?
+## What is S8r?
 
-Samstraumr is a revolutionary framework for building resilient, adaptive software systems inspired by systems theory and natural processes. It transcends traditional software architecture to create applications that:
+S8r is a revolutionary framework for building resilient, adaptive software systems inspired by systems theory and natural processes. It transcends traditional software architecture to create applications that:
 
 - **Monitor themselves** and respond intelligently to changing conditions
 - **Adapt to stress** by reconfiguring their internal flows and relationships
@@ -14,29 +14,29 @@ Samstraumr is a revolutionary framework for building resilient, adaptive softwar
 - **Heal autonomously** when parts experience disruption
 - **Evolve over time** to better serve their purpose
 
-For software developers, Samstraumr offers a structured way to build systems that are both more robust and more flexible. For business stakeholders, it provides a foundation for applications that require less maintenance, recover gracefully from failures, and evolve alongside changing requirements.
+For software developers, S8r offers a structured way to build systems that are both more robust and more flexible. For business stakeholders, it provides a foundation for applications that require less maintenance, recover gracefully from failures, and evolve alongside changing requirements.
 
-For researchers and system theorists, Samstraumr represents a practical implementation of living systems principles in digital form—a bridge between natural wisdom and technological innovation.
+For researchers and system theorists, S8r represents a practical implementation of living systems principles in digital form—a bridge between natural wisdom and technological innovation.
 
 ## Core Concepts
 
-At the heart of Samstraumr lies a simple but powerful metaphor: software as a network of mindful tubes, directing the flow of data and functionality with purpose and awareness.
+At the heart of S8r lies a simple but powerful metaphor: software as a network of mindful components, directing the flow of data and functionality with purpose and awareness.
 
 ### Building Blocks
 
-- **Tubes**: Self-contained processing units that are aware of their own state and context
-- **Composites**: Coordinated tube collections forming processing pipelines
+- **Components**: Self-contained processing units that are aware of their own state and context
+- **Composites**: Coordinated component collections forming processing pipelines
 - **Machines**: Orchestrated composites implementing complete subsystems
 
 ### Fundamental Principles
 
 1. **Flow-Oriented Design**: Data and control move through clearly defined pathways
-2. **State Duality**: Components maintain both structural state (what they are) and dynamic state (what they're experiencing)
+2. **State Management**: Components maintain a unified state representing both structure and behavior
 3. **Self-Awareness**: Components monitor their own health and performance
 4. **Adaptive Response**: Systems reconfigure based on changing conditions
 5. **Identity Clarity**: Every element has a precise, hierarchical identifier
 
-## Why Samstraumr?
+## Why S8r?
 
 ### For Technical Leaders and Architects
 
@@ -61,76 +61,77 @@ At the heart of Samstraumr lies a simple but powerful metaphor: software as a ne
 
 ## Documentation
 
-### Conceptual Foundation
+### Getting Started
 
-- [Core Concepts](./docs/concepts/CoreConcepts.md): The fundamental building blocks and principles
-- [Systems Theory Foundation](./docs/concepts/SystemsTheoryFoundation.md): The natural wisdom behind the framework
-- [State Management](./docs/concepts/StateManagement.md): The dual approach to tracking component state
-- [Identity and Addressing](./docs/concepts/IdentityAddressing.md): Hierarchical naming and component identification
+- [Prerequisites](./docs/guides/prerequisites.md): System requirements and dependencies
+- [Getting Started](./docs/guides/getting-started.md): Your first steps with S8r
+- [Maven Structure](./docs/guides/MavenStructureGuide.md): Understanding the Maven structure
 
-### Implementation Guides
+### Core Concepts
 
-- [Getting Started](./docs/guides/GettingStarted.md): Your first steps with Samstraumr
-- [Migration Guide](./docs/guides/MigrationGuide.md): Integrating Samstraumr with existing systems
-- [Tube Patterns](./docs/guides/TubePatterns.md): Common implementation patterns for tubes
-- [Composition Strategies](./docs/guides/CompositionStrategies.md): Approaches to combining tubes into larger structures
+- [Core Concepts](./docs/concepts/core-concepts.md): The fundamental building blocks and principles
+- [Systems Theory Foundation](./docs/concepts/systems-theory-foundation.md): The natural wisdom behind the framework
+- [State Management](./docs/concepts/state-management.md): Managing component lifecycle states
+- [Identity Addressing](./docs/concepts/identity-addressing.md): Component identity and addressing
+- [Composites & Machines](./docs/concepts/composites-and-machines.md): Building complex structures
+
+### Migration
+
+- [S8r Migration Guide](./docs/guides/migration/SamstraumrToS8rMigration.md): Migrating from Samstraumr to S8r
+- [Bundle to Composite](./docs/guides/migration/BundleToCompositeRefactoring.md): Migrating from bundles to composites
 
 ### Technical Reference
 
-- [API Reference](./docs/reference/ConfigurationReference.md): Complete API documentation
-- [Configuration](./docs/reference/ConfigurationReference.md): Configuration options and strategies
-- [Glossary](./docs/reference/Glossary.md): Terminology and definitions
-- [FAQ](./docs/reference/FAQ.md): Frequently asked questions
+- [Configuration](./docs/reference/configuration-reference.md): Configuration options and strategies
+- [Glossary](./docs/reference/glossary.md): Terminology and definitions
+- [FAQ](./docs/reference/f-a-q.md): Frequently asked questions
 
-### Testing and Quality
+### Standards & Development
 
-- [Test Strategy](./docs/testing/TestStrategy.md): Comprehensive testing approach
-- [BDD with Cucumber](./docs/testing/BddWithCucumber.md): Behavior-driven development approach
-- [Testing Annotations](./docs/testing/TestingAnnotations.md): Standard and Samstraumr-specific test annotations
-- [Quality Standards](./docs/contribution/QualityChecks.md): Code quality and performance standards
-
-### Research and Proposals
-
-- [LLM Context Proposal](./docs/research/LlmContextProposal.md): Integrating large language models with Samstraumr
-- [Tube Lifecycle Design](./docs/proposals/TubeLifecycleDesign.md): Biological lifecycle model for tubes
+- [Documentation Standards](./docs/reference/standards/documentation-standards.md): Documentation guidelines
+- [Java Naming Standards](./docs/reference/standards/JavaNamingStandards.md): Java naming conventions
+- [Testing Strategy](./docs/dev/test-strategy.md): Comprehensive testing approach
+- [BDD with Cucumber](./docs/dev/test-bdd-cucumber.md): Behavior-driven development approach
 
 ## Development and Contribution
 
 ### Getting Started as a Developer
 
 1. Clone the repository: `git clone https://github.com/heymumford/Samstraumr.git`
-2. Build the project: `mvn clean install` or `./util/build-optimal.sh`
-3. Run tests: `mvn test` or `./util/test-run.sh all`
+2. Build the project: `mvn clean install` or `./s8r build`
+3. Run tests: `mvn test` or `./s8r test all`
 
 ### Development Standards
 
 - **Code Style**: Follows [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html) with modifications
 - **Documentation**: Javadoc for public APIs, inline comments for complex operations
 - **Testing**: All code changes should include appropriate tests
-- **Quality Checks**: All submissions must pass quality checks (`./util/scripts/check-build-quality.sh`)
+- **Quality Checks**: All submissions must pass quality checks (`./s8r quality check`)
 
-### Build Commands
+### Command-Line Interface
 
-- **Standard Build**: `mvn clean install`
-- **Optimized Build**: `./util/build-optimal.sh`
-- **Fast Development**: `./util/build-optimal.sh fast`
-- **Quality Checks**: `./util/scripts/check-build-quality.sh`
+S8r provides a simplified CLI for all operations:
 
-### Test Commands
+```
+./s8r <command> [options]
+```
 
-- **All Tests**: `./util/test-run.sh all`
-- **Unit Tests**: `./util/test-run.sh unit` or `./util/test-run.sh tube`
-- **Industry Standard**: `./util/test-run.sh --help` for all options
+Common commands:
+- `./s8r build [mode]` - Build the project (fast, test, package)
+- `./s8r test <type>` - Run tests (all, component, composite, etc.)
+- `./s8r quality check` - Run quality checks
+- `./s8r version` - Show or update version information
+- `./s8r help` - Display all commands and options
 
 ## Community and Support
 
 - **GitHub Issues**: Bug reports and feature requests
 - **Discussions**: Questions and community conversation
-- **Contributing**: See [Contribution Guidelines](./docs/contribution/Contributing.md)
+- **Contributing**: See [Contribution Guidelines](./docs/contribution/contributing.md)
 
 ## License
 
-Samstraumr is licensed under the Mozilla Public License 2.0. See [LICENSE](./LICENSE) for details.
+S8r is licensed under the Mozilla Public License 2.0. See [LICENSE](./LICENSE) for details.
 
 ## Connect
 

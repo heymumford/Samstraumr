@@ -5,15 +5,12 @@
 1. **Multiple Documentation Directories**:
    - `docs/`, `docs-new/`, and `docs-reorganized/` contain similar content
    - Confusing for contributors to know which is authoritative
-
 2. **Inconsistent Top-Level Structure**:
    - Random mix of folders, scripts, and documentation files
    - No clear organization for project artifacts
-
 3. **Unnecessary Nesting**:
    - Test code has deep hierarchies that could be simplified
    - Utility scripts are scattered in multiple locations
-
 4. **Unused Directories**:
    - `bin/` directory appears nearly empty
    - `temp_view/` directory seems temporary

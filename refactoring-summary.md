@@ -12,24 +12,20 @@
      - `version/` - Version management scripts
      - `utils/` - Utility scripts
      - `config/` - Configuration scripts
-
 2. **Removed Redundancy**
    - Eliminated duplicate scripts in root directory
    - Removed all `.bak` files
    - Removed unnecessary symlinks
    - Cleaned up build artifacts
-
 3. **Implemented Standardized Configuration**
    - Created `.s8r/` directory for project-specific configuration
    - Added `config.json` with project settings
    - Set up user-specific configuration in `~/.s8r/config.json`
    - Moved Docmosis configuration to proper location
-
 4. **Improved Documentation**
    - Updated `CLAUDE.md` with new directory structure
    - Created proper `CHANGELOG.md`
    - Reorganized documentation files
-
 5. **Enhanced Build Process**
    - Updated `.gitignore` to exclude proper files
    - Ensured all scripts are executable

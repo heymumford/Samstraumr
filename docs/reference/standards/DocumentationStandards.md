@@ -23,14 +23,14 @@ Documentation is organized into the following sections:
 
 ### Naming examples
 
-| Topic | Correct Filename |
-|-------|-----------------|
-| Core concepts | concepts/core-concepts.md |
-| Getting started | guides/getting-started.md |
-| FAQ | reference/faq.md |
-| Testing strategy | testing/test-strategy.md |
-| Contributing guide | contribution/contributing.md |
-| LLM proposal | research/llm-context-proposal.md |
+|       Topic        |         Correct Filename         |
+|--------------------|----------------------------------|
+| Core concepts      | concepts/core-concepts.md        |
+| Getting started    | guides/getting-started.md        |
+| FAQ                | reference/faq.md                 |
+| Testing strategy   | testing/test-strategy.md         |
+| Contributing guide | contribution/contributing.md     |
+| LLM proposal       | research/llm-context-proposal.md |
 
 ## Test File Naming
 
@@ -81,3 +81,4 @@ Third-level and below headers should use sentence case:
 
 ```markdown
 ### Managing composite state
+```

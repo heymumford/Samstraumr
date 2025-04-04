@@ -16,6 +16,7 @@ import org.junit.platform.suite.api.SuiteDisplayName;
  * categories.
  *
  * <p>Key features:
+ *
  * <ul>
  *   <li>Unified feature file locations
  *   <li>Consistent reporting formats
@@ -30,7 +31,8 @@ import org.junit.platform.suite.api.SuiteDisplayName;
 @IncludeEngines("cucumber")
 @ConfigurationParameter(
     key = "cucumber.features",
-    value = "src/test/resources/tube/features, src/test/resources/composites/features, src/test/resources/test")
+    value =
+        "src/test/resources/tube/features, src/test/resources/composites/features, src/test/resources/test")
 @ConfigurationParameter(
     key = GLUE_PROPERTY_NAME,
     value = "org.samstraumr.tube.steps,org.samstraumr.tube.lifecycle.steps,org.s8r.test.steps")

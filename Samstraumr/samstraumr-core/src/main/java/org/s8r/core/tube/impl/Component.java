@@ -28,10 +28,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Core implementation of the Component concept in the S8r framework.
  *
- * <p>This class is a complete replacement of the legacy Tube implementation, providing
- * a cleaner, more maintainable approach to the component model. It implements the
- * essential infrastructure for components to maintain their hierarchical design and data processing
- * capabilities.
+ * <p>This class is a complete replacement of the legacy Tube implementation, providing a cleaner,
+ * more maintainable approach to the component model. It implements the essential infrastructure for
+ * components to maintain their hierarchical design and data processing capabilities.
  */
 public class Component {
   private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Component.class);
@@ -61,50 +60,51 @@ public class Component {
     this.lineage = new ArrayList<>();
     this.lineage.add(reason);
     this.memoryLog = new LinkedList<>();
-    
+
     // Validate environment
     if (environment == null) {
       throw new InitializationException("Environment cannot be null");
     }
     this.environment = environment;
-    
+
     // Initialize logger
     this.logger = new Logger(uniqueId);
-    
+
     // Log creation
     logToMemory("Component created with reason: " + reason);
     logToMemory("Environment: " + environment.getEnvironmentId());
     logger.info("Component created with reason: " + reason, "CREATION");
-    
+
     // Create identity
     if (parentIdentity != null) {
       this.identity = Identity.createChildIdentity(reason, environment, parentIdentity);
       logToMemory("Created with parent identity: " + parentIdentity.getUniqueId());
-      logger.info("Created with parent identity: " + parentIdentity.getUniqueId(), "IDENTITY", "CHILD");
+      logger.info(
+          "Created with parent identity: " + parentIdentity.getUniqueId(), "IDENTITY", "CHILD");
     } else {
       this.identity = Identity.createAdamIdentity(reason, environment);
       logToMemory("Created as Adam component (no parent)");
       logger.info("Created as Adam component (no parent)", "IDENTITY", "ADAM");
     }
-    
+
     // Proceed through early lifecycle phases
     logToMemory("Starting lifecycle development");
     this.lifecycleState = LifecycleState.INITIALIZING;
     logger.debug("Component entering INITIALIZING phase", "LIFECYCLE", "INIT");
-    
+
     // Advanced initialization
     initialize();
-    
+
     // Proceed through early lifecycle phases
     proceedThroughEarlyLifecycle();
-    
+
     // Update status
     this.status = Status.READY;
     this.lifecycleState = LifecycleState.READY;
     logToMemory("Component initialized and ready");
     logger.info("Component initialized and ready", "LIFECYCLE", "READY");
   }
-  
+
   /**
    * Creates a new component with the specified reason and environment.
    *
@@ -120,11 +120,11 @@ public class Component {
     if (environment == null) {
       throw new InitializationException("Environment cannot be null");
     }
-    
+
     String uniqueId = generateUniqueId(reason, environment);
     return new Component(reason, environment, uniqueId, null);
   }
-  
+
   /**
    * Creates a child component with a parent reference.
    *
@@ -144,35 +144,33 @@ public class Component {
     if (parent == null) {
       throw new InitializationException("Parent component cannot be null");
     }
-    
+
     String uniqueId = generateUniqueId(reason, environment);
     Component child = new Component(reason, environment, uniqueId, parent.getIdentity());
-    
+
     // Add to parent's lineage if applicable
     for (String entry : parent.getLineage()) {
       child.addToLineage(entry);
     }
-    
+
     // Register child with parent
     parent.registerChild(child);
-    
+
     return child;
   }
-  
-  /**
-   * Performs additional initialization steps.
-   */
+
+  /** Performs additional initialization steps. */
   private void initialize() {
     logger.debug("Initializing component...", "LIFECYCLE", "INIT");
-    
+
     // Set up termination timer
     setupTerminationTimer(DEFAULT_TERMINATION_DELAY);
-    
+
     // Additional initialization can be added here
     logToMemory("Additional initialization complete");
     logger.info("Component initialization complete", "LIFECYCLE", "INIT");
   }
-  
+
   /**
    * Sets up a timer for component termination.
    *
@@ -182,7 +180,7 @@ public class Component {
     if (terminationTimer != null) {
       terminationTimer.cancel();
     }
-    
+
     terminationTimer = new Timer("ComponentTerminator-" + uniqueId);
     terminationTimer.schedule(
         new TimerTask() {
@@ -192,10 +190,10 @@ public class Component {
           }
         },
         delaySeconds * 1000L);
-    
+
     logToMemory("Termination timer set for " + delaySeconds + " seconds");
   }
-  
+
   /**
    * Sets the termination delay for this component.
    *
@@ -204,51 +202,45 @@ public class Component {
   public void setTerminationDelay(int seconds) {
     setupTerminationTimer(seconds);
   }
-  
-  /**
-   * Terminates this component, releasing resources.
-   */
+
+  /** Terminates this component, releasing resources. */
   public void terminate() {
     logToMemory("Component termination initiated");
     logger.info("Component termination initiated", "LIFECYCLE", "TERMINATE");
-    
+
     // Cancel timer if active
     if (terminationTimer != null) {
       terminationTimer.cancel();
       terminationTimer = null;
       logger.debug("Termination timer canceled", "LIFECYCLE", "TERMINATE");
     }
-    
+
     // Update states
     this.status = Status.TERMINATED;
     this.lifecycleState = LifecycleState.TERMINATED;
-    
+
     // Perform cleanup operations
     preserveKnowledge();
     releaseResources();
-    
+
     logToMemory("Component terminated");
     logger.info("Component terminated", "LIFECYCLE", "TERMINATE");
   }
-  
-  /**
-   * Preserves crucial knowledge before termination for potential future use.
-   */
+
+  /** Preserves crucial knowledge before termination for potential future use. */
   private void preserveKnowledge() {
     logToMemory("Preserving knowledge before termination");
     logger.debug("Preserving knowledge before termination", "LIFECYCLE", "TERMINATE");
     // In a full implementation, this would archive important learnings and experiences
   }
 
-  /**
-   * Releases all resources allocated to this component.
-   */
+  /** Releases all resources allocated to this component. */
   private void releaseResources() {
     logToMemory("Releasing allocated resources");
     logger.debug("Releasing allocated resources", "LIFECYCLE", "TERMINATE");
     // In a full implementation, this would clean up all allocated resources
   }
-  
+
   /**
    * Logs a message to the memory log.
    *
@@ -259,7 +251,7 @@ public class Component {
     memoryLog.add(logEntry);
     LOGGER.debug(logEntry);
   }
-  
+
   /**
    * Gets the unique identifier for this component.
    *
@@ -268,7 +260,7 @@ public class Component {
   public String getUniqueId() {
     return uniqueId;
   }
-  
+
   /**
    * Gets the reason for creating this component.
    *
@@ -277,7 +269,7 @@ public class Component {
   public String getReason() {
     return reason;
   }
-  
+
   /**
    * Gets the current status of this component.
    *
@@ -286,7 +278,7 @@ public class Component {
   public Status getStatus() {
     return status;
   }
-  
+
   /**
    * Sets the status of this component.
    *
@@ -300,7 +292,7 @@ public class Component {
       logger.info("Status changed: " + oldStatus + " -> " + newStatus, "STATUS");
     }
   }
-  
+
   /**
    * Gets the current lifecycle state of this component.
    *
@@ -309,7 +301,7 @@ public class Component {
   public LifecycleState getLifecycleState() {
     return lifecycleState;
   }
-  
+
   /**
    * Sets the lifecycle state of this component.
    *
@@ -321,15 +313,15 @@ public class Component {
       this.lifecycleState = newState;
       logToMemory("Lifecycle state changed: " + oldState + " -> " + newState);
       logger.info(
-          "Lifecycle state changed: " + oldState.name() + " -> " + newState.name(), 
-          "LIFECYCLE", 
+          "Lifecycle state changed: " + oldState.name() + " -> " + newState.name(),
+          "LIFECYCLE",
           newState.name());
     }
   }
-  
+
   /**
-   * Proceeds through the early lifecycle phases of component development.
-   * This follows the biological metaphor from conception through early development.
+   * Proceeds through the early lifecycle phases of component development. This follows the
+   * biological metaphor from conception through early development.
    */
   public void proceedThroughEarlyLifecycle() {
     logToMemory("Beginning early lifecycle development");
@@ -353,7 +345,7 @@ public class Component {
     logToMemory("Completed early lifecycle development");
     logger.info("Completed early lifecycle development", "LIFECYCLE", "DEVELOPMENT");
   }
-  
+
   /**
    * Gets the identity of this component.
    *
@@ -362,7 +354,7 @@ public class Component {
   public Identity getIdentity() {
     return identity;
   }
-  
+
   /**
    * Gets the environment in which this component is operating.
    *
@@ -371,7 +363,7 @@ public class Component {
   public Environment getEnvironment() {
     return environment;
   }
-  
+
   /**
    * Gets the lineage information for this component.
    *
@@ -380,7 +372,7 @@ public class Component {
   public List<String> getLineage() {
     return Collections.unmodifiableList(lineage);
   }
-  
+
   /**
    * Adds an entry to the component's lineage.
    *
@@ -389,7 +381,7 @@ public class Component {
   public void addToLineage(String entry) {
     lineage.add(entry);
   }
-  
+
   /**
    * Gets the memory log entries for this component.
    *
@@ -398,7 +390,7 @@ public class Component {
   public List<String> queryMemoryLog() {
     return Collections.unmodifiableList(memoryLog);
   }
-  
+
   /**
    * Gets the size of the memory log.
    *
@@ -407,7 +399,7 @@ public class Component {
   public int getMemoryLogSize() {
     return memoryLog.size();
   }
-  
+
   /**
    * Gets the conception time (creation timestamp) for this component.
    *
@@ -416,7 +408,7 @@ public class Component {
   public Instant getConceptionTime() {
     return conceptionTime;
   }
-  
+
   /**
    * Gets the parent identity of this component, if any.
    *
@@ -425,7 +417,7 @@ public class Component {
   public Identity getParentIdentity() {
     return parentIdentity;
   }
-  
+
   /**
    * Registers a child component with this component.
    *
@@ -434,8 +426,9 @@ public class Component {
   public void registerChild(Component childComponent) {
     if (childComponent != null) {
       logToMemory("Registering child component: " + childComponent.getUniqueId());
-      logger.info("Registering child component: " + childComponent.getUniqueId(), "HIERARCHY", "CHILD");
-      
+      logger.info(
+          "Registering child component: " + childComponent.getUniqueId(), "HIERARCHY", "CHILD");
+
       // Add the child to our identity's descendants list
       if (this.identity != null && childComponent.getIdentity() != null) {
         this.identity.addChild(childComponent.getIdentity());
@@ -444,7 +437,7 @@ public class Component {
       }
     }
   }
-  
+
   /**
    * Gets the current environment state.
    *
@@ -453,7 +446,7 @@ public class Component {
   public String getEnvironmentState() {
     return environmentState;
   }
-  
+
   /**
    * Updates the component's awareness of environmental state changes.
    *
@@ -467,7 +460,7 @@ public class Component {
       logger.info("Environment state changed: " + oldState + " -> " + newState, "ENVIRONMENT");
     }
   }
-  
+
   /**
    * Generates a unique identifier based on the reason and environment.
    *
@@ -480,7 +473,7 @@ public class Component {
       MessageDigest digest = MessageDigest.getInstance(DIGEST_ALGORITHM);
       String input = reason + "-" + environment.getEnvironmentId() + "-" + Instant.now();
       byte[] hash = digest.digest(input.getBytes());
-      
+
       // Convert byte array to hex string
       StringBuilder hexString = new StringBuilder();
       for (byte b : hash) {
@@ -490,14 +483,14 @@ public class Component {
         }
         hexString.append(hex);
       }
-      
+
       return hexString.toString();
     } catch (NoSuchAlgorithmException e) {
       LOGGER.error("Failed to generate unique ID", e);
       return "fallback-" + System.nanoTime();
     }
   }
-  
+
   @Override
   public String toString() {
     return "Component["

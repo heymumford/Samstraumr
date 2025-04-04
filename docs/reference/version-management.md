@@ -18,42 +18,42 @@ All version management commands are accessible through the `s8r` CLI:
 
 ### View commands
 
-| Command | Description | Example |
-|---------|-------------|---------|
-| `get` | Display current version | `./s8r version get` |
-| `get -v` | Show detailed version info | `./s8r version get -v` |
-| `export` | Output only version number | `./s8r version export` |
-| `history` | Show version history | `./s8r version history` |
-| `verify` | Check version-tag alignment | `./s8r version verify` |
+|  Command  |         Description         |         Example         |
+|-----------|-----------------------------|-------------------------|
+| `get`     | Display current version     | `./s8r version get`     |
+| `get -v`  | Show detailed version info  | `./s8r version get -v`  |
+| `export`  | Output only version number  | `./s8r version export`  |
+| `history` | Show version history        | `./s8r version history` |
+| `verify`  | Check version-tag alignment | `./s8r version verify`  |
 
 ### Modification commands
 
-| Command | Description | Example |
-|---------|-------------|---------|
-| `bump major` | Increment major version | `./s8r version bump major` |
-| `bump minor` | Increment minor version | `./s8r version bump minor` |
-| `bump patch` | Increment patch version | `./s8r version bump patch` |
-| `set <version>` | Set specific version | `./s8r version set 1.2.3` |
+|     Command     |       Description       |          Example           |
+|-----------------|-------------------------|----------------------------|
+| `bump major`    | Increment major version | `./s8r version bump major` |
+| `bump minor`    | Increment minor version | `./s8r version bump minor` |
+| `bump patch`    | Increment patch version | `./s8r version bump patch` |
+| `set <version>` | Set specific version    | `./s8r version set 1.2.3`  |
 
 ### Git integration commands
 
-| Command | Description | Example |
-|---------|-------------|---------|
-| `fix-tag` | Create missing version tag | `./s8r version fix-tag` |
-| `bump <type> --no-commit` | Bump without commit/tag | `./s8r version bump patch --no-commit` |
-| `test <type>` | Bump, test, commit, tag | `./s8r version test patch` |
-| `test <type> --push` | Test with remote push | `./s8r version test patch --push` |
+|          Command          |        Description         |                Example                 |
+|---------------------------|----------------------------|----------------------------------------|
+| `fix-tag`                 | Create missing version tag | `./s8r version fix-tag`                |
+| `bump <type> --no-commit` | Bump without commit/tag    | `./s8r version bump patch --no-commit` |
+| `test <type>`             | Bump, test, commit, tag    | `./s8r version test patch`             |
+| `test <type> --push`      | Test with remote push      | `./s8r version test patch --push`      |
 
 ## Command Options
 
-| Option | Description |
-|--------|-------------|
-| `-h, --help` | Display help information |
-| `-v, --verbose` | Enable detailed output |
-| `--no-commit` | Skip Git commit/tag creation |
-| `--skip-tests` | Skip running tests (for test command) |
-| `--skip-quality` | Skip quality checks (for test command) |
-| `--push` | Push changes to remote (for test command) |
+|      Option      |                Description                |
+|------------------|-------------------------------------------|
+| `-h, --help`     | Display help information                  |
+| `-v, --verbose`  | Enable detailed output                    |
+| `--no-commit`    | Skip Git commit/tag creation              |
+| `--skip-tests`   | Skip running tests (for test command)     |
+| `--skip-quality` | Skip quality checks (for test command)    |
+| `--push`         | Push changes to remote (for test command) |
 
 ## Detailed Usage Guide
 

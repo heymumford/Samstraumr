@@ -1,7 +1,7 @@
 # Testing Annotations
 
 > **⚠️ DEPRECATED**: This document has been merged into a comprehensive test tags and annotations document.
-> 
+>
 > Please refer to the consolidated document for the most up-to-date information:
 > [Test Tags and Annotations](test-tags-and-annotations.md)
 
@@ -13,76 +13,76 @@ Samstraumr maintains both domain-specific terminology and industry-standard term
 
 ### Industry-standard annotations
 
-| Annotation | Description | Usage |
-|------------|-------------|-------|
-| `@UnitTest` | Tests for a single component in isolation | `@UnitTest public class UserValidatorTest` |
-| `@ComponentTest` | Tests for a group of collaborating components | `@ComponentTest public class UserServiceTest` |
-| `@IntegrationTest` | Tests for interactions between subsystems | `@IntegrationTest public class PaymentProcessingTest` |
-| `@ApiTest` | Tests for API behavior | `@ApiTest public class RestApiTest` |
-| `@SystemTest` | Tests for entire system behaviors | `@SystemTest public class EndToEndOrderTest` |
-| `@EndToEndTest` | Tests that verify complete business flows | `@EndToEndTest public class UserJourneyTest` |
-| `@PropertyTest` | Tests based on property verification | `@PropertyTest public class DataConsistencyTest` |
-| `@SmokeTest` | Basic verification tests | `@SmokeTest public class BasicFunctionalityTest` |
+|     Annotation     |                  Description                  |                         Usage                         |
+|--------------------|-----------------------------------------------|-------------------------------------------------------|
+| `@UnitTest`        | Tests for a single component in isolation     | `@UnitTest public class UserValidatorTest`            |
+| `@ComponentTest`   | Tests for a group of collaborating components | `@ComponentTest public class UserServiceTest`         |
+| `@IntegrationTest` | Tests for interactions between subsystems     | `@IntegrationTest public class PaymentProcessingTest` |
+| `@ApiTest`         | Tests for API behavior                        | `@ApiTest public class RestApiTest`                   |
+| `@SystemTest`      | Tests for entire system behaviors             | `@SystemTest public class EndToEndOrderTest`          |
+| `@EndToEndTest`    | Tests that verify complete business flows     | `@EndToEndTest public class UserJourneyTest`          |
+| `@PropertyTest`    | Tests based on property verification          | `@PropertyTest public class DataConsistencyTest`      |
+| `@SmokeTest`       | Basic verification tests                      | `@SmokeTest public class BasicFunctionalityTest`      |
 
 ### Domain-specific annotations
 
-| Annotation | Description | Industry Equivalent |
-|------------|-------------|---------------------|
-| `@TubeTest` | Tests for individual tubes | `@UnitTest` |
-| `@BundleTest` | Tests for bundles of tubes | `@ComponentTest` |
-| `@MachineTest` | Tests for composite machines | `@IntegrationTest` |
-| `@SystemTest` | Tests for entire systems | `@SystemTest` |
-| `@FlowTest` | Tests for end-to-end flows | `@EndToEndTest` |
+|   Annotation   |         Description          | Industry Equivalent |
+|----------------|------------------------------|---------------------|
+| `@TubeTest`    | Tests for individual tubes   | `@UnitTest`         |
+| `@BundleTest`  | Tests for bundles of tubes   | `@ComponentTest`    |
+| `@MachineTest` | Tests for composite machines | `@IntegrationTest`  |
+| `@SystemTest`  | Tests for entire systems     | `@SystemTest`       |
+| `@FlowTest`    | Tests for end-to-end flows   | `@EndToEndTest`     |
 
 ### Criticality annotations
 
-| Annotation | Description |
-|------------|-------------|
-| `@ATL` | Above The Line - Critical path tests that must always pass |
-| `@BTL` | Below The Line - Robustness tests for edge cases and resilience |
+| Annotation |                           Description                           |
+|------------|-----------------------------------------------------------------|
+| `@ATL`     | Above The Line - Critical path tests that must always pass      |
+| `@BTL`     | Below The Line - Robustness tests for edge cases and resilience |
 
 ### Layer-based annotations
 
-| Annotation | Description |
-|------------|-------------|
-| `@L0_Tube` | Tests focusing on individual tubes |
-| `@L1_Bundle` | Tests focusing on bundles of tubes |
+|  Annotation   |                  Description                   |
+|---------------|------------------------------------------------|
+| `@L0_Tube`    | Tests focusing on individual tubes             |
+| `@L1_Bundle`  | Tests focusing on bundles of tubes             |
 | `@L2_Machine` | Tests focusing on machines composed of bundles |
-| `@L3_System` | Tests focusing on system-level behaviors |
+| `@L3_System`  | Tests focusing on system-level behaviors       |
 
 ### Capability annotations
 
-| Annotation | Description |
-|------------|-------------|
-| `@Identity` | Tests for identity management capabilities |
-| `@Flow` | Tests for data flow capabilities |
-| `@State` | Tests for state management capabilities |
-| `@Awareness` | Tests for environmental awareness |
+|  Annotation  |                Description                 |
+|--------------|--------------------------------------------|
+| `@Identity`  | Tests for identity management capabilities |
+| `@Flow`      | Tests for data flow capabilities           |
+| `@State`     | Tests for state management capabilities    |
+| `@Awareness` | Tests for environmental awareness          |
 
 ### Lifecycle annotations
 
-| Annotation | Description |
-|------------|-------------|
-| `@Init` | Tests for initialization behavior |
-| `@Runtime` | Tests for runtime behavior |
+|   Annotation   |              Description              |
+|----------------|---------------------------------------|
+| `@Init`        | Tests for initialization behavior     |
+| `@Runtime`     | Tests for runtime behavior            |
 | `@Termination` | Tests for proper shutdown and cleanup |
 
 ### Pattern annotations
 
-| Annotation | Description |
-|------------|-------------|
-| `@Observer` | Tests for observer pattern implementation |
-| `@Transformer` | Tests for transformation pattern implementation |
-| `@Validator` | Tests for validation pattern implementation |
+|    Annotation     |                   Description                    |
+|-------------------|--------------------------------------------------|
+| `@Observer`       | Tests for observer pattern implementation        |
+| `@Transformer`    | Tests for transformation pattern implementation  |
+| `@Validator`      | Tests for validation pattern implementation      |
 | `@CircuitBreaker` | Tests for circuit breaker pattern implementation |
 
 ### Non-functional annotations
 
-| Annotation | Description |
-|------------|-------------|
+|   Annotation   |              Description              |
+|----------------|---------------------------------------|
 | `@Performance` | Tests for performance characteristics |
-| `@Resilience` | Tests for system resilience |
-| `@Scale` | Tests for scaling behavior |
+| `@Resilience`  | Tests for system resilience           |
+| `@Scale`       | Tests for scaling behavior            |
 
 ## Annotation Implementation
 
@@ -139,12 +139,12 @@ mvn test -P atl-tests
 
 The framework automatically maps between terminology sets, so using either term will include tests tagged with either annotation:
 
-| When you specify | Tests included |
-|------------------|----------------|
-| `unit-tests` profile | Tests with `@UnitTest` or `@TubeTest` |
-| `tube-tests` profile | Tests with `@TubeTest` or `@UnitTest` |
+|     When you specify      |                Tests included                |
+|---------------------------|----------------------------------------------|
+| `unit-tests` profile      | Tests with `@UnitTest` or `@TubeTest`        |
+| `tube-tests` profile      | Tests with `@TubeTest` or `@UnitTest`        |
 | `component-tests` profile | Tests with `@ComponentTest` or `@BundleTest` |
-| `bundle-tests` profile | Tests with `@BundleTest` or `@ComponentTest` |
+| `bundle-tests` profile    | Tests with `@BundleTest` or `@ComponentTest` |
 
 ## Best Practices
 

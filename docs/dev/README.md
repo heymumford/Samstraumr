@@ -5,6 +5,7 @@ This directory contains documentation related to development, testing, and imple
 ## Available Documents
 
 ### Testing
+
 - **[test-strategy.md](./test-strategy.md)**: Overall testing strategy
 - **[test-bdd-cucumber.md](./test-bdd-cucumber.md)**: BDD with Cucumber implementation
 - **[test-annotations.md](./test-annotations.md)**: Testing annotations reference

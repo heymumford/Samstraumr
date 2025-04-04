@@ -38,17 +38,20 @@ This guide details all prerequisites and setup requirements for developing with 
 #### Jdk installation
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt update
 sudo apt install openjdk-17-jdk
 ```
 
 **Fedora/RHEL:**
+
 ```bash
 sudo dnf install java-17-openjdk-devel
 ```
 
 **macOS (using Homebrew):**
+
 ```bash
 brew tap homebrew/cask-versions
 brew install --cask temurin17
@@ -65,17 +68,20 @@ Download from [Adoptium](https://adoptium.net/temurin/releases/?version=17)
 #### Maven installation
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt update
 sudo apt install maven
 ```
 
 **Fedora/RHEL:**
+
 ```bash
 sudo dnf install maven
 ```
 
 **macOS (using Homebrew):**
+
 ```bash
 brew install maven
 ```
@@ -91,17 +97,20 @@ Download from [Maven website](https://maven.apache.org/download.cgi) and add to 
 #### Git installation
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt update
 sudo apt install git git-lfs
 ```
 
 **Fedora/RHEL:**
+
 ```bash
 sudo dnf install git git-lfs
 ```
 
 **macOS (using Homebrew):**
+
 ```bash
 brew install git git-lfs
 ```
@@ -118,6 +127,7 @@ Testcontainers is used for integration tests and requires either Docker or Podma
 #### Docker installation
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt update
 sudo apt install docker.io
@@ -126,6 +136,7 @@ sudo usermod -aG docker $USER  # Log out and in again after this
 ```
 
 **Fedora/RHEL:**
+
 ```bash
 sudo dnf install docker
 sudo systemctl enable --now docker
@@ -141,12 +152,14 @@ Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 #### Podman installation (alternative to docker)
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt update
 sudo apt install podman
 ```
 
 **Fedora/RHEL:**
+
 ```bash
 sudo dnf install podman
 ```
@@ -160,6 +173,7 @@ sudo dnf install podman
 #### Act installation
 
 **All Linux/macOS:**
+
 ```bash
 curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
 # Prerequisites
@@ -167,11 +181,13 @@ curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo ba
 ```
 
 **macOS (using Homebrew):**
+
 ```bash
 brew install act
 ```
 
 **Windows:**
+
 ```bash
 choco install act-cli
 ```
@@ -179,6 +195,7 @@ choco install act-cli
 #### Act configuration
 
 Create the configuration file:
+
 ```bash
 mkdir -p ~/.config/act
 echo "-P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest" > ~/.config/act/actrc
@@ -194,6 +211,7 @@ For code quality analysis with SonarQube.
 Download from [SonarQube website](https://docs.sonarqube.org/latest/analyzing-source-code/scanners/sonarscanner/)
 
 **Linux/macOS (using Homebrew):**
+
 ```bash
 brew install sonar-scanner
 ```

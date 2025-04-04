@@ -19,12 +19,13 @@ import org.s8r.test.annotation.OrchestrationTest;
  * core components function correctly.
  *
  * <p>These tests focus on:
+ *
  * <ul>
  *   <li>System assembly and connectivity
  *   <li>Basic component interaction
  *   <li>Core system flows
  * </ul>
- * 
+ *
  * <p>This runner is part of the package structure simplification initiative, centralizing test
  * runners into the org.s8r.test.runner package.
  */

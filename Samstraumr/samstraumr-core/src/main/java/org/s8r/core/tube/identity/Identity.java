@@ -16,8 +16,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.s8r.core.env.Environment;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Represents the identity of a component based on the biological continuity model.

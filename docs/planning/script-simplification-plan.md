@@ -2,28 +2,24 @@
 
 ## Current Issues
 
-1. **Excessive Duplication**: 
+1. **Excessive Duplication**:
    - Significant code duplication between `run-tests.sh` and `run-atl-tests.sh`
    - Duplicated argument parsing logic
    - Duplicated test execution functions
    - Duplicated output handling code
-
 2. **Scattered Color Definitions**:
    - Color codes defined independently in multiple files
    - Inconsistent naming (`COLOR_RED` vs `STATUS_RED`)
    - Multiple implementations of similar formatting utilities
-
 3. **Inconsistent Command-Line Parsing**:
    - Different patterns used across scripts
    - Some use `case` statements, others use custom logic
    - Common argument parsing functions in `common.sh` aren't consistently used
-
 4. **Test Type Mapping Redundancy**:
    - Test type mapping implemented in:
      - `s8r` (lines 410-479)
      - `test-lib.sh` (lines 17-98)
      - `run-tests.sh` (lines 102-240)
-
 5. **Duplicated Maven Command Building**:
    - Maven command construction duplicated in multiple files
    - Similar logic with slight variations
@@ -37,17 +33,14 @@
    - Use only `common.sh` for color definitions
    - Create standardized print functions for consistent output
    - Remove duplicate color definitions from other scripts
-
 2. **Add Standardized Argument Parsing**:
    - Create a generalized argument parsing function in `common.sh`
    - Support common flag patterns (-v/--verbose, etc.)
    - Use associative arrays for configuration
-
 3. **Create Maven Command Builder**:
    - Implement a unified function for Maven command construction
    - Support profiles, goals, and other common parameters
    - Handle clean, skip tests, and other flags consistently
-
 4. **Implement Script Initialization Helper**:
    - Create a standard initialization function for all scripts
    - Handle path determination and config loading
@@ -59,12 +52,10 @@
    - Combine `run-tests.sh` and `run-atl-tests.sh` into a single script
    - Use a parameterized approach for different test types
    - Centralize test reporting and result handling
-
 2. **Centralize Test Type Mapping**:
    - Move all test type mapping logic to `test-lib.sh`
    - Create utility functions for test type conversion
    - Ensure consistent handling of test types across the codebase
-
 3. **Simplify Test Output and Reporting**:
    - Create a unified test reporting function in `test-lib.sh`
    - Standardize test result formatting and display
@@ -76,7 +67,6 @@
    - Use the command pattern for cleaner organization
    - Leverage the enhanced libraries for consistent behavior
    - Reduce the main script size by modularizing functionality
-
 2. **Improve Help Documentation**:
    - Move help text to separate files
    - Implement dynamic help generation for commands

@@ -7,7 +7,7 @@ import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME;
 import org.junit.platform.suite.api.ConfigurationParameter;
 import org.junit.platform.suite.api.IncludeEngines;
 import org.junit.platform.suite.api.Suite;
-import org.s8r.test.annotation.ATL; // Using ATL instead of AboveTheLine for consistency
+import org.s8r.test.annotation.ATL;
 import org.s8r.test.annotation.OrchestrationTest;
 
 /**

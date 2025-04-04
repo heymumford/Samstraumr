@@ -6,18 +6,18 @@ This design document outlines a comprehensive refactoring of the Samstraumr Tube
 
 Drawing from the comparative analysis of developmental stages in animals, plants, and insects, we can identify fundamental patterns that apply to the lifecycle of a Tube:
 
-| Biological Development Stage | Corresponding Tube Lifecycle Stage | Key Characteristics |
-|------------------------------|-----------------------------------|---------------------|
-| Fertilization & Zygote Formation | Creation & Identity Establishment | Birth of entity with unique identity and initial purpose |
-| Cleavage & Early Cell Division | Initialization & Resource Allocation | Rapid establishment of core structures and capabilities |
-| Blastulation & Early Organization | Configuration & Dependency Resolution | Formation of basic structural organization and connections |
-| Gastrulation & Germ Layer Formation | Specialization & Interface Development | Determination of fundamental functional capabilities |
-| Organogenesis | Feature Development & Implementation | Development of specific processing capabilities |
-| Post-Embryonic Growth | Operational & Adaptive Phase | Active functioning, responding to environment |
-| Metamorphosis | Transformation & Evolution | Significant restructuring based on environmental demands |
-| Maturity & Reproduction | Stable Operation & Tube Spawning | Optimal functioning and ability to create new tubes |
-| Aging & Senescence | Degradation & Maintenance Phase | Declining performance requiring intervention |
-| Death & Nutrient Recycling | Termination & Resource Reclamation | Controlled shutdown and resource release |
+|    Biological Development Stage     |   Corresponding Tube Lifecycle Stage   |                    Key Characteristics                     |
+|-------------------------------------|----------------------------------------|------------------------------------------------------------|
+| Fertilization & Zygote Formation    | Creation & Identity Establishment      | Birth of entity with unique identity and initial purpose   |
+| Cleavage & Early Cell Division      | Initialization & Resource Allocation   | Rapid establishment of core structures and capabilities    |
+| Blastulation & Early Organization   | Configuration & Dependency Resolution  | Formation of basic structural organization and connections |
+| Gastrulation & Germ Layer Formation | Specialization & Interface Development | Determination of fundamental functional capabilities       |
+| Organogenesis                       | Feature Development & Implementation   | Development of specific processing capabilities            |
+| Post-Embryonic Growth               | Operational & Adaptive Phase           | Active functioning, responding to environment              |
+| Metamorphosis                       | Transformation & Evolution             | Significant restructuring based on environmental demands   |
+| Maturity & Reproduction             | Stable Operation & Tube Spawning       | Optimal functioning and ability to create new tubes        |
+| Aging & Senescence                  | Degradation & Maintenance Phase        | Declining performance requiring intervention               |
+| Death & Nutrient Recycling          | Termination & Resource Reclamation     | Controlled shutdown and resource release                   |
 
 ## 2. Proposed Tube Lifecycle Model
 
@@ -30,6 +30,7 @@ Drawing from the comparative analysis of developmental stages in animals, plants
 - Purpose definition (reason for existence)
 
 **Implementation Elements:**
+
 ```java
 // Enhanced Tube Creation
 public static Tube create(String reason, Environment environment, Tube parent) {
@@ -57,6 +58,7 @@ public static Tube create(String reason, Environment environment, Tube parent) {
 - Fundamental behavior patterns established
 
 **Implementation Elements:**
+
 ```java
 // Lifecycle-aware initialization process
 private void initialize() {
@@ -85,6 +87,7 @@ private void initialize() {
 - Basic structural integrity validation
 
 **Implementation Elements:**
+
 ```java
 // Configuration phase with boundary establishment
 public void configure(TubeConfiguration config) {
@@ -115,6 +118,7 @@ public void configure(TubeConfiguration config) {
 - Fundamental response patterns
 
 **Implementation Elements:**
+
 ```java
 // Specialization based on configuration
 public void specialize(TubeSpecialization specialization) {
@@ -144,6 +148,7 @@ public void specialize(TubeSpecialization specialization) {
 - Capability testing and validation
 
 **Implementation Elements:**
+
 ```java
 // Feature development and integration
 public void developFeatures(Set<TubeFeature> features) {
@@ -174,6 +179,7 @@ public void developFeatures(Set<TubeFeature> features) {
 - Performance optimization
 
 **Implementation Elements:**
+
 ```java
 // Operational mode with adaptive capabilities
 public void activate() {
@@ -211,6 +217,7 @@ public void processEnvironmentalFeedback(EnvironmentalFeedback feedback) {
 - Emergence with new capabilities
 
 **Implementation Elements:**
+
 ```java
 // Transformation process for significant adaptation
 public void transform(TransformationCatalyst catalyst) {
@@ -237,12 +244,13 @@ public void transform(TransformationCatalyst catalyst) {
 ### 2.8 stability phase (maturity & reproduction analog)
 
 **Key Concepts:**
-- Optimal functioning 
+- Optimal functioning
 - Ability to spawn new tubes
 - Knowledge transfer to offspring
 - Consistent performance
 
 **Implementation Elements:**
+
 ```java
 // Stability and reproduction capabilities
 public boolean isStable() {
@@ -274,6 +282,7 @@ public Tube spawnChildTube(String childReason, ChildSpecification specs) {
 - Partial reset capabilities
 
 **Implementation Elements:**
+
 ```java
 // Degradation detection and management
 public void checkHealth() {
@@ -315,6 +324,7 @@ private void performMaintenance() {
 - Legacy transfer
 
 **Implementation Elements:**
+
 ```java
 // Enhanced termination with knowledge preservation
 public void terminate() {
@@ -505,26 +515,31 @@ public class TubeEnvironmentalAwareness {
 To implement this lifecycle model, we propose a phased approach:
 
 ### Phase 1: enhanced identity and creation
+
 - Implement TubeIdentity class with UUID, lineage, and creation metadata
 - Enhanced Tube creation with environmental context capture
 - Basic lifecycle state management
 
 ### Phase 2: memory systems
+
 - Implement the three memory systems (episodic, semantic, procedural)
 - Add knowledge transfer capabilities
 - Develop pattern recognition for experiences
 
 ### Phase 3: lifecycle stages
+
 - Implement configuration, specialization, and feature development phases
 - Enhance state transitions based on the biological lifecycle model
 - Add monitoring for lifecycle progression
 
 ### Phase 4: environmental adaptation
+
 - Implement enhanced environmental awareness
 - Add adaptation strategies
 - Develop transformation capabilities
 
 ### Phase 5: advanced lifecycle features
+
 - Add degradation detection and maintenance
 - Implement tube spawning capabilities
 - Develop knowledge archiving for terminated tubes
@@ -564,4 +579,3 @@ Feature: Tube Lifecycle Stages
 ## 8. Conclusion
 
 By drawing parallels between biological development and Tube lifecycle, we create a more adaptive, resilient, and sophisticated component model. This approach enhances the Samstraumr framework's ability to create truly dynamic systems that respond effectively to changing conditions while maintaining identity continuity.
-

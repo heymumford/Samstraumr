@@ -1,7 +1,7 @@
 # Bdd with Cucumber
 
 > **⚠️ DEPRECATED**: This document has been merged into a comprehensive BDD documentation document.
-> 
+>
 > Please refer to the consolidated document for the most up-to-date information:
 > [BDD Documentation](bdd-documentation.md)
 
@@ -83,13 +83,11 @@ Run tests with specific tags using:
    - Use domain terminology
    - Keep scenarios independent
    - Use declarative (what) not imperative (how) language
-
 2. **Step Definitions**:
    - Keep steps reusable
    - Maintain appropriate granularity
    - Follow the Arrange-Act-Assert pattern
    - Use domain objects rather than UI details
-
 3. **Test Organization**:
    - Group related scenarios in a feature
    - Use the Background section for common setup
@@ -101,10 +99,9 @@ Run tests with specific tags using:
 Samstraumr maintains a dual terminology system:
 
 | Industry Standard | Samstraumr Equivalent |
-|-------------------|------------------------|
+|-------------------|-----------------------|
 | Unit Test         | Tube Test             |
 | Component Test    | Bundle Test           |
 | Integration Test  | Machine Test          |
 | System Test       | System Test           |
 | End-to-End Test   | Flow Test             |
-

@@ -1,7 +1,7 @@
 # What is Behavior Driven Development (BDD)
 
 > **⚠️ DEPRECATED**: This document has been merged into a comprehensive BDD documentation document.
-> 
+>
 > Please refer to the consolidated document for the most up-to-date information:
 > [BDD Documentation](/docs/testing/BddDocumentation.md)
 
@@ -30,25 +30,18 @@ Behavior-Driven Development (BDD) is a collaborative approach to software develo
 **Practical Operations of BDD**
 
 1. **Writing User Stories**:
-
    - **Template**:
      - **As a** [user role]
      - **I want** [feature]
      - **So that** [benefit]
-
    - **Purpose**: Captures who needs what and why, focusing on delivering business value.
-
 2. **Defining Acceptance Criteria with Scenarios**:
-
    - **Format**:
      - **Given** [initial context]
      - **When** [event occurs]
      - **Then** [outcome]
-
    - **Purpose**: Breaks down user stories into specific, testable examples of desired behavior.
-
 3. **Automating Scenarios**:
-
    - **Tools**: Use BDD frameworks like Cucumber, JBehave, or SpecFlow to turn written scenarios into executable tests.
 
    - **Purpose**: Ensures that specifications are always up-to-date and that the system behaves as expected.
@@ -59,11 +52,8 @@ Behavior-Driven Development (BDD) is a collaborative approach to software develo
      - Write code to fulfill the scenarios.
      - Run automated tests to verify behavior.
      - Refactor code while keeping tests green.
-
    - **Purpose**: Aligns development with defined behaviors, reducing defects and rework.
-
 5. **Continuous Feedback and Refinement**:
-
    - **Feedback Loop**: Failing tests highlight deviations from expected behavior, allowing for immediate correction.
 
    - **Collaboration**: Regular discussions among team members to refine requirements based on new insights or changes.
@@ -71,7 +61,6 @@ Behavior-Driven Development (BDD) is a collaborative approach to software develo
 ---
 
 **Example of BDD in Action**
-
 
 **User Story: Customer Withdraws Cash**
 
@@ -97,7 +86,6 @@ Behavior-Driven Development (BDD) is a collaborative approach to software develo
 - **Then** the ATM should display an insufficient funds message
 - **And** cash should not be dispensed
 - **And** the card is returned
-
 
 ---
 

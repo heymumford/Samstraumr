@@ -701,4 +701,3 @@ When implementing these tests:
 5. Consider parameterized tests for scenarios with multiple similar cases
 6. Implement proper test fixtures for complex setup requirements
 7. Use BDD-style Cucumber features for acceptance tests that span multiple units
-

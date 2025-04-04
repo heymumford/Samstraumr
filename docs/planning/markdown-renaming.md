@@ -13,18 +13,21 @@ According to our file organization standards:
 ## Files to Rename
 
 ### Root level
+
 - CLAUDE.md - (keep as is)
 - README.md - (keep as is)
 
 ### Docs/ directory
 
 #### All-caps files to rename to pascalcase
+
 - DOCUMENTATION_STANDARDS.md → DocumentationStandards.md
 - JAVA_NAMING_STANDARDS.md → JavaNamingStandards.md
 - LOGGING_STANDARDS.md → LoggingStandards.md
 - FOLDER_STRUCTURE.md → FolderStructure.md
 
 #### Documentation files needing consistency
+
 - ATL-BTL-Strategy.md → ATLBTLStrategy.md (ATL and BTL are acronyms that should be uppercase)
 - BundleToCompositeRefactoring.md → (Already PascalCase, keep)
 - CompositesAndMachines.md → (Already PascalCase, keep)
@@ -41,10 +44,12 @@ According to our file organization standards:
 - TubePatterns.md → (Already PascalCase, keep)
 
 #### Docs/compatibility/
+
 - COMPATIBILITY_FIXES.md → CompatibilityFixes.md
 - COMPATIBILITY_REPORT.md → CompatibilityReport.md
 
 #### Docs/planning/
+
 - DOCUMENTATION_PLAN.md → DocumentationPlan.md
 - FILE_REORGANIZATION_PROGRESS.md → FileReorganizationProgress.md
 - FOLDER_REFACTORING_PLAN.md → FolderRefactoringPlan.md
@@ -53,12 +58,15 @@ According to our file organization standards:
 - SCRIPT_REORGANIZATION.md → ScriptReorganization.md
 
 #### Docs/testing/
+
 - TEST_STANDARDIZATION.md → TestStandardization.md
 
 #### Docs/contribution/
+
 - WORKFLOW_ANALYSIS.md → WorkflowAnalysis.md
 
 ### Util/ directory
+
 - VERSION_SCRIPTS.md → VersionScripts.md (in keeping with PascalCase convention)
 - README.md - (keep as is)
 

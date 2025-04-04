@@ -4,14 +4,14 @@ This page shows the current flow status of the Samstraumr build pipeline, simila
 
 ## Pipeline Flow Status
 
-| Stage | Status | Description |
-|-------|--------|-------------|
+|     Stage      |          Status          |                Description                |
+|----------------|--------------------------|-------------------------------------------|
 | INITIALIZATION | ${initialization.status} | Project setup and environment preparation |
-| ORCHESTRATION | ${orchestration.status} | Basic system assembly verification |
-| PROCESSING | ${processing.status} | Core build and compilation |
-| VALIDATION | ${validation.status} | Test execution and verification |
-| ANALYSIS | ${analysis.status} | Code quality and metrics analysis |
-| REPORTING | ${reporting.status} | Report generation and publishing |
+| ORCHESTRATION  | ${orchestration.status}  | Basic system assembly verification        |
+| PROCESSING     | ${processing.status}     | Core build and compilation                |
+| VALIDATION     | ${validation.status}     | Test execution and verification           |
+| ANALYSIS       | ${analysis.status}       | Code quality and metrics analysis         |
+| REPORTING      | ${reporting.status}      | Report generation and publishing          |
 
 Legend:
 - <span style="color: green;">FLOWING</span>: Stage completed successfully
@@ -54,10 +54,10 @@ Generates and publishes reports on the build results, providing visibility into 
 
 ## Recent Builds
 
-| Build | Date | Status | Duration | Trigger |
-|-------|------|--------|----------|---------|
+|      Build      |     Date      |     Status      |     Duration      |     Trigger      |
+|-----------------|---------------|-----------------|-------------------|------------------|
 | ${build.number} | ${build.date} | ${build.status} | ${build.duration} | ${build.trigger} |
-| ... | ... | ... | ... | ... |
+| ...             | ...           | ...             | ...               | ...              |
 
 ## Notifications
 

@@ -1,94 +1,97 @@
 # Core Concepts
 
-
 ## Table of Contents
+
 - [Introduction: A New Way of Seeing Software](#introduction-a-new-way-of-seeing-software)
-- [The Tube: Fundamental Building Block](#the-tube-fundamental-building-block)
+- [The Component: Fundamental Building Block](#the-component-fundamental-building-block)
 - [Flow: The Movement of Information and Control](#flow-the-movement-of-information-and-control)
 - [Identity: Clear Names in a Complex World](#identity-clear-names-in-a-complex-world)
-- [States: Dual Awareness of Being and Becoming](#states-dual-awareness-of-being-and-becoming)
+- [State: Unified Lifecycle Management](#state-unified-lifecycle-management)
 - [Self-Awareness: Software That Knows Itself](#self-awareness-software-that-knows-itself)
 - [Core Principles in Practice](#core-principles-in-practice)
 - [The Journey Ahead](#the-journey-ahead)
 
-## Introduction: a New Way of Seeing Software
+## Introduction: A New Way of Seeing Software
 
 For too long, we've built software as if it were a static machine—something to be assembled once and maintained with occasional repairs. But what if we could create systems that behave more like living organisms—adapting, evolving, and responding intelligently to their environment?
 
-Samstraumr represents a fundamental shift in how we conceive of and design software. Rather than thinking in terms of classes, functions, and data structures alone, we invite you to envision systems composed of mindful, flowing pathways—**tubes** that carry functionality, data, and awareness throughout your application.
+S8r represents a fundamental shift in how we conceive of and design software. Rather than thinking in terms of classes, functions, and data structures alone, we invite you to envision systems composed of mindful, flowing pathways—**components** that carry functionality, data, and awareness throughout your application.
 
-This document introduces the core concepts that make Samstraumr unique and powerful. Each concept builds upon the others to create a cohesive approach to software that embraces complexity without becoming complicated.
+This document introduces the core concepts that make S8r unique and powerful. Each concept builds upon the others to create a cohesive approach to software that embraces complexity without becoming complicated.
 
-## The Tube: Fundamental Building Block
+## The Component: Fundamental Building Block
 
-At the heart of Samstraumr lies the tube—a self-contained, purposeful unit that processes inputs and produces outputs while maintaining awareness of its own state and context.
+At the heart of S8r lies the component—a self-contained, purposeful unit that processes inputs and produces outputs while maintaining awareness of its own state and context.
 
-### Anatomy of a tube
+### Anatomy of a Component
 
-A tube combines several essential elements:
+A component combines several essential elements:
 
 1. **Processing Logic**: The core functionality that transforms inputs into outputs
 2. **Monitoring Capabilities**: The ability to observe and evaluate its own operation
 3. **Resource Management**: Control over the resources needed for operation
-4. **State Tracking**: Awareness of both design state and dynamic state
+4. **State Management**: Unified tracking of lifecycle and operational states
 5. **Identity**: A clear, unique identifier within the larger system
 
 ```java
-// Example of a basic tube structure (simplified)
-public class DataValidatorTube implements Tube {
-    private final BirthCertificate identity;
-    private TubeState designState;
-    private DynamicState currentState;
-    private final TubeProcessor processor;
-    private final TubeMonitor monitor;
-    private final TubeResourceManager resources;
-
-    // Tube implementation methods
+// Example of a basic component structure (simplified)
+public class DataValidatorComponent implements Component {
+    private final Identity identity;
+    private State state;
+    private final Environment environment;
+    private final Logger logger;
+    private final Map<String, Object> properties;
+    
+    // Component implementation methods
 }
+```
 
-This birth certificate serves as both documentation and a formal verification mechanism, allowing tubes to authenticate themselves and others within the system.
+The identity serves as both documentation and a formal verification mechanism, allowing components to authenticate themselves and others within the system.
 
-## States: Dual Awareness of Being and Becoming
+## State: Unified Lifecycle Management
 
-Samstraumr components maintain a dual state system—a recognition that systems must balance stability with adaptability.
+S8r components maintain a unified state system that captures both the lifecycle phase and operational status of a component.
 
-### Design state
+### Component States
 
-The Design State represents the fundamental operational mode of a component—its core condition that changes infrequently but significantly:
+The State enum represents the fundamental operational and developmental phases of a component:
 
-- **FLOWING**: Normal operation with inputs processing and outputs generating
-- **BLOCKED**: Temporarily unable to process inputs due to internal or external factors
-- **ADAPTING**: Actively reconfiguring to respond to changing conditions
-- **ERROR**: Experiencing issues that prevent normal operation
+- **CONCEPTION**: Initial creation phase
+- **INITIALIZING**: Setting up internal structures
+- **CONFIGURING**: Establishing boundaries and configuration
+- **SPECIALIZING**: Determining core functionality
+- **DEVELOPING_FEATURES**: Building specific capabilities
+- **READY**: Configured and ready for operation
+- **ACTIVE**: Fully operational and processing
+- **DEGRADED**: Operating with reduced capabilities
+- **TERMINATING**: In process of shutting down
+- **TERMINATED**: No longer operating
 
-### Dynamic state
+### State Transitions
 
-The Dynamic State captures the moment-to-moment context and conditions—the ephemeral details that shift frequently during operation:
+State changes follow a biological-inspired lifecycle:
 
-- Processing statistics
-- Resource utilization
-- Queue lengths
-- Error counts
-- Performance metrics
-- Contextual information
-- Learning progress
+1. **Creation Phase**: CONCEPTION → INITIALIZING → CONFIGURING
+2. **Development Phase**: SPECIALIZING → DEVELOPING_FEATURES → READY
+3. **Operational Phase**: READY → ACTIVE ↔ DEGRADED
+4. **Termination Phase**: TERMINATING → TERMINATED
 
-### State transitions
+### State Propagation and Recovery
 
-State changes follow meaningful patterns:
+S8r implements sophisticated patterns for managing state across components:
 
-1. **Design State Transitions**: Deliberate, significant changes that often trigger system-wide responses
-2. **Dynamic State Evolution**: Continuous, incremental adjustments that reflect operational realities
-3. **State Propagation**: The way state changes in one component influence others
-4. **Recovery Paths**: Predetermined routes back to healthy states after disruptions
+1. **State Propagation**: The way state changes in one component influence others
+2. **Recovery Paths**: Predetermined routes back to healthy states after disruptions
+3. **Parent-Child Relationships**: How state flows through component hierarchies
+4. **Environment Awareness**: How environmental conditions affect state transitions
 
 ## Self-Awareness: Software That Knows Itself
 
-Perhaps the most revolutionary aspect of Samstraumr is its emphasis on self-awareness—the ability of software components to observe, evaluate, and adjust their own operation.
+Perhaps the most revolutionary aspect of S8r is its emphasis on self-awareness—the ability of software components to observe, evaluate, and adjust their own operation.
 
-### Dimensions of awareness
+### Dimensions of Awareness
 
-Tubes maintain awareness across several dimensions:
+Components maintain awareness across several dimensions:
 
 1. **Health Awareness**: Understanding of operational wellness
 2. **Resource Awareness**: Knowledge of resource consumption and needs
@@ -96,7 +99,7 @@ Tubes maintain awareness across several dimensions:
 4. **History Awareness**: Memory of past states and transitions
 5. **Capability Awareness**: Understanding of current processing abilities
 
-### Awareness in action
+### Awareness in Action
 
 This self-awareness manifests in practical behaviors:
 
@@ -104,27 +107,26 @@ This self-awareness manifests in practical behaviors:
 - **Adaptive Scaling**: Adjusting resource usage based on demand
 - **Predictive Preparation**: Anticipating needs based on observed patterns
 - **Graceful Degradation**: Maintaining core functionality when resources are constrained
-- **Cooperative Load Balancing**: Working with other tubes to optimize system-wide performance
+- **Cooperative Load Balancing**: Working with other components to optimize system-wide performance
 
 ```java
 // Example of awareness in action (simplified)
 public void assessHealth() {
-    VitalStats stats = gatherVitalStats();
+    Map<String, Object> stats = gatherVitalStats();
 
-    if (stats.getErrorRate() > errorThreshold) {
+    if ((double)stats.get("errorRate") > errorThreshold) {
         // Self-healing attempt
         performRecoveryProcedure();
 
-        if (gatherVitalStats().getErrorRate() > criticalThreshold) {
-            // If recovery fails, change design state
-            setDesignState(TubeState.ERROR);
-            notifyBundle();
+        if ((double)gatherVitalStats().get("errorRate") > criticalThreshold) {
+            // If recovery fails, change state
+            setState(State.DEGRADED);
+            notifyParent();
         }
     }
 
-    // Update dynamic state with latest metrics
-    updateDynamicState(new DynamicState.Builder()
-        .withMetrics(stats)
-        .withTimestamp(Instant.now())
-        .build());
+    // Update property with latest metrics
+    setProperty("healthStats", stats);
+    setProperty("lastHealthCheck", Instant.now());
 }
+```

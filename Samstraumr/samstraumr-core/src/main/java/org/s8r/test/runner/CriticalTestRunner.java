@@ -25,7 +25,7 @@ import org.s8r.test.annotation.ATL;
  *
  * <p>This runner is designed to be used in the main build pipeline to provide immediate feedback on
  * critical issues.
- * 
+ *
  * <p>This runner is part of the package structure simplification initiative, centralizing test
  * runners into the org.s8r.test.runner package.
  */

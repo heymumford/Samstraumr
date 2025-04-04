@@ -34,7 +34,6 @@ Samstraumr follows the [Google Java Style Guide](https://google.github.io/styleg
   5. Protected methods
   6. Private methods
   7. Inner classes/interfaces
-
 - **Method Structure**:
   1. Input validation
   2. Core logic
@@ -97,13 +96,11 @@ All code must pass the following quality checks:
    - `./util/build/build-performance.sh` - Build with optimizations (Linux/WSL)
    - `./util/build/build-optimal.sh` - Recommended optimized build (Linux/WSL)
    - `./util/build/build-optimal.sh fast` - Fast development build, skipping tests and checks
-
 2. **Test Execution**
    - `./run-tests.sh all` - Run all tests
    - `./run-tests.sh <test-type>` - Run specific test type (e.g., unit, component, integration)
    - `mvn test -P <profile>` - Run tests with specific Maven profile (e.g., atl-tests, unit-tests)
    - See the project configuration files for complete test command reference
-
 3. **Quality Checks**
    - `./util/quality/build-checks.sh` - Run all quality checks
    - `./util/quality/skip-quality-build.sh` - Build without quality checks
@@ -117,15 +114,12 @@ To verify GitHub workflows locally before pushing:
    - Install [Act](https://github.com/nektos/act) on your system
    - For Linux: `sudo curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash`
    - Or place in /usr/local/bin: `sudo mv act /usr/local/bin/`
-
 2. **Configure Act**
    - Create configuration: `echo "-P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest" > ~/.config/act/actrc`
-
 3. **Run Workflows Locally**
    - List available workflows: `act -l`
    - Run a specific job with dry-run: `act -j initialization --dryrun`
    - Run a specific job: `act -j initialization`
    - Run with specific event: `act workflow_dispatch -j get-version -W .github/workflows/samstraumr-pipeline.yml`
-
 4. **Badge Updates**
    - GitHub Actions automatically updates the build status badge in the README

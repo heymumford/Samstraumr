@@ -213,3 +213,4 @@ Here's a complete workflow example for making changes, running tests, updating t
 [0;34m→ Pushing changes to remote...[0m
 [0;32m✓ Changes pushed to remote[0m
 [0;32m✓ Version test process complete[0m
+```

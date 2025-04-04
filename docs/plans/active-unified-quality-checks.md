@@ -42,12 +42,10 @@ Currently, quality checks are scattered across multiple scripts and configuratio
    - JaCoCo
    - Spotless
    - OWASP Dependency Check
-
 2. ⬜ Analyze current configuration for each tool:
    - Document current settings
    - Identify inconsistencies
    - Determine optimal configuration
-
 3. ⬜ Map current scripts to functions:
    - Identify duplicate functionality
    - Determine common patterns
@@ -60,12 +58,10 @@ Currently, quality checks are scattered across multiple scripts and configuratio
    - SpotBugs: `quality-tools/spotbugs/spotbugs-exclude.xml`
    - PMD: `quality-tools/pmd/ruleset.xml`
    - JaCoCo: Configure via Maven
-
 2. ⬜ Define quality thresholds:
    - Code coverage: Line coverage > 80%, branch coverage > 70%
    - Complexity: Cyclomatic complexity < 15
    - Duplication: < 3% duplicated code
-
 3. ⬜ Create profiles for different quality levels:
    - Standard: Basic quality checks for development
    - Strict: Thorough checks for releases
@@ -76,13 +72,11 @@ Currently, quality checks are scattered across multiple scripts and configuratio
 1. ⬜ Create a unified script structure:
    - `util/bin/quality/check-quality.sh`: Main entry point
    - Modules for each tool/function
-
 2. ⬜ Implement script functions:
    - `check_style()`: Run style checks
    - `check_bugs()`: Run bug detection
    - `check_coverage()`: Run coverage checks
    - `check_security()`: Run security checks
-
 3. ⬜ Add reporting functionality:
    - Generate consolidated HTML report
    - Output summary to console
@@ -93,11 +87,9 @@ Currently, quality checks are scattered across multiple scripts and configuratio
 1. ⬜ Integrate with s8r CLI:
    - Add quality commands to s8r CLI
    - Implement standard options
-
 2. ⬜ Integrate with CI pipeline:
    - Add quality check job to GitHub Actions
    - Configure reporting
-
 3. ⬜ Add pre-commit hooks:
    - Run basic quality checks before commit
    - Allow bypassing for WIP commits
@@ -108,18 +100,17 @@ Currently, quality checks are scattered across multiple scripts and configuratio
    - Tool configuration
    - Script usage
    - Quality metrics
-
 2. ⬜ Update CLAUDE.md and contribution guidelines
 
 ## Implementation Schedule
 
-| Phase | Task | Target Start | Target Completion | Status |
-|-------|------|--------------|-------------------|--------|
-| 1 | Inventory and Analysis | 2025-04-10 | 2025-04-12 | ⬜ Not Started |
-| 2 | Tool Configuration Standardization | 2025-04-12 | 2025-04-15 | ⬜ Not Started |
-| 3 | Script Implementation | 2025-04-15 | 2025-04-17 | ⬜ Not Started |
-| 4 | Integration | 2025-04-17 | 2025-04-19 | ⬜ Not Started |
-| 5 | Documentation and Training | 2025-04-19 | 2025-04-20 | ⬜ Not Started |
+| Phase |                Task                | Target Start | Target Completion |    Status     |
+|-------|------------------------------------|--------------|-------------------|---------------|
+| 1     | Inventory and Analysis             | 2025-04-10   | 2025-04-12        | ⬜ Not Started |
+| 2     | Tool Configuration Standardization | 2025-04-12   | 2025-04-15        | ⬜ Not Started |
+| 3     | Script Implementation              | 2025-04-15   | 2025-04-17        | ⬜ Not Started |
+| 4     | Integration                        | 2025-04-17   | 2025-04-19        | ⬜ Not Started |
+| 5     | Documentation and Training         | 2025-04-19   | 2025-04-20        | ⬜ Not Started |
 
 ## Success Criteria
 

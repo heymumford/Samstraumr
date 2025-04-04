@@ -1,7 +1,7 @@
 # Composites and Machines
 
-
 ## Table of Contents
+
 - [Introduction: From Cells to Organisms](#introduction-from-cells-to-organisms)
 - [Composites: Collaborative Communities](#composites-collaborative-communities)
 - [Machines: Orchestrated Systems](#machines-orchestrated-systems)
@@ -11,37 +11,37 @@
 - [Implementation Guidelines](#implementation-guidelines)
 - [Real-World Examples](#real-world-examples)
 
-## Introduction: from Cells to Organisms
+## Introduction: From Cells to Organisms
 
 Nature teaches us that complexity emerges gradually through thoughtful organization. A single cell does remarkable work, but when cells collaborate in specialized groups—forming tissues, then organs, then full systems—they create capabilities that no single cell could manifest alone.
 
-Samstraumr embodies this wisdom in software through its hierarchical structure:
+S8r embodies this wisdom in software through its hierarchical structure:
 
-- **Tubes**: Individual processing units with specific responsibilities
-- **Composites**: Collaborative collections of tubes working toward related goals
+- **Components**: Individual processing units with specific responsibilities
+- **Composites**: Collaborative collections of components working toward related goals
 - **Machines**: Orchestrated systems of composites addressing complex domains
 
-This progressive composition allows systems to grow organically, maintaining clarity even as their capabilities expand. Just as you can understand your circulatory system without needing to track each individual blood cell, developers can work with composites and machines without managing every internal tube directly.
+This progressive composition allows systems to grow organically, maintaining clarity even as their capabilities expand. Just as you can understand your circulatory system without needing to track each individual cell, developers can work with composites and machines without managing every internal component directly.
 
 ## Composites: Collaborative Communities
 
-### What is a composite?
+### What is a Composite?
 
-A composite is a collection of tubes united by a common purpose or domain responsibility. Like a heart composed of specialized chambers and valves, a composite brings together complementary tubes that collaborate to fulfill a shared mission.
+A composite is a collection of components united by a common purpose or domain responsibility. Like a heart composed of specialized chambers and valves, a composite brings together complementary components that collaborate to fulfill a shared mission.
 
-### Key characteristics
+### Key Characteristics
 
-1. **Shared Context**: Tubes within a composite often share resources, configuration, and state awareness
+1. **Shared Context**: Components within a composite often share resources, configuration, and state awareness
 
-2. **Protected Communication**: Internal tube-to-tube communication happens through controlled, managed pathways
+2. **Protected Communication**: Internal component-to-component communication happens through controlled, managed pathways
 
 3. **Unified Interface**: A composite presents a coherent external interface while managing complexity internally
 
 4. **Collective Identity**: Referenced through the `C<ID>` notation, each composite maintains its own integrity
 
-### Composite composition
+### Composite Composition
 
-Create composites by grouping tubes that:
+Create composites by grouping components that:
 
 - Work within the same domain
 - Process related data
@@ -51,62 +51,77 @@ Create composites by grouping tubes that:
 ```java
 // Example composite composition (simplified)
 public class AuthenticationComposite implements Composite {
-    private final Tube loginProcessor;
-    private final Tube credentialValidator;
-    private final Tube tokenGenerator;
-    private final Tube accessManager;
+    private final Component loginProcessor;
+    private final Component credentialValidator;
+    private final Component tokenGenerator;
+    private final Component accessManager;
 
     // Composite state management
-    private CompositeState state;
+    private State state;
+    private final Identity identity;
+    private final Environment environment;
 
     // Methods for configuration, initialization, etc.
 }
+```
 
-### Machine state management
+## Machines: Orchestrated Systems
 
-Machines extend the state concept further:
+### What is a Machine?
 
-- **Machine Design State**: Reflects the system's overall operational status
-    - `OPERATIONAL`: System functioning within expected parameters
-    - `PARTIAL`: Some composites degraded but core functions operational
-    - `REORGANIZING`: Major internal restructuring in progress
-    - `IMPAIRED`: Critical capabilities unavailable
+A machine is a cohesive system composed of multiple composites working together to provide comprehensive functionality in a specific domain. If composites are like organs, machines are like entire biological systems—the circulatory system, nervous system, or immune system.
 
-- **Machine Dynamic State**: Complex state tracking health, performance, and capabilities
-    - System-wide health indicators
-    - Cross-composite performance metrics
-    - Capability availability matrix
-    - Resource allocation tracking
+### Key Characteristics
+
+1. **Domain Completeness**: A machine addresses a complete functional domain
+2. **Orchestration**: Coordinates the activities of multiple composites
+3. **System Boundaries**: Clear interfaces to other machines and external systems
+4. **Resource Governance**: Manages resources across all contained composites
+
+### Machine State Management
+
+Machines implement sophisticated state management:
+
+- **Machine State**: Reflects the system's overall operational status
+  - `OPERATIONAL`: System functioning within expected parameters
+  - `PARTIAL`: Some composites degraded but core functions operational
+  - `ADAPTING`: Major internal reorganization in progress
+  - `DEGRADED`: Critical capabilities unavailable
+- **Machine Properties**: Complex tracking for health, performance, and capabilities
+  - System-wide health indicators
+  - Cross-composite performance metrics
+  - Capability availability matrix
+  - Resource allocation tracking
 
 ## The Flow of Communication
 
-In Samstraumr, communication follows natural pathways inspired by biological systems:
+In S8r, communication follows natural pathways inspired by biological systems:
 
-### Internal to composite communication
+### Internal to Composite Communication
 
-- **Direct Pathways**: Tubes within a composite communicate through established, direct channels
+- **Direct Pathways**: Components within a composite communicate through established, direct channels
 - **Mediated Exchange**: The composite may provide internal messaging services or shared memory spaces
-- **State Observation**: Tubes can observe each other's states through the composite's coordination
+- **State Observation**: Components can observe each other's states through the composite's coordination
 
-### Composite to composite communication
+### Composite to Composite Communication
 
 - **Formal Interfaces**: Communication occurs through well-defined public interfaces
 - **Machine Mediation**: The parent machine often regulates or monitors inter-composite exchanges
 - **Protocol Enforcement**: Communication follows established protocols matching composite capabilities
 
-### Cross-machine communication
+### Cross-Machine Communication
 
 - **System Boundaries**: Clear demarcation of where one machine ends and another begins
 - **Contract-Based Exchange**: Formalized contracts define what can be exchanged and how
-- **Identity-Based Routing**: Full identity notation (`M<ID>.C<ID>.T<ID>`) enables precise addressing
+- **Identity-Based Routing**: Full identity notation (`M<ID>.C<ID>.CO<ID>`) enables precise addressing
 
 ## State Propagation and Awareness
 
 State changes ripple through the hierarchy in meaningful ways:
 
-1. **Bottom-Up Propagation**: Significant tube state changes affect composite state, which may affect machine state
+1. **Bottom-Up Propagation**: Significant component state changes affect composite state, which may affect machine state
 
-2. **Top-Down Influence**: Machine state transitions may trigger adaptation in contained composites and tubes
+2. **Top-Down Influence**: Machine state transitions may trigger adaptation in contained composites and components
 
 3. **Horizontal Awareness**: Peers at the same level may observe and respond to each other's state changes
 
@@ -115,47 +130,64 @@ State changes ripple through the hierarchy in meaningful ways:
 ```java
 // Example of state propagation (simplified)
 public void evaluateCompositeState() {
-    int flowingCount = 0;
-    int errorCount = 0;
+    int readyCount = 0;
+    int degradedCount = 0;
 
-    for (Tube tube : tubes) {
-        if (tube.getDesignState() == TubeState.FLOWING) {
-            flowingCount++;
-        } else if (tube.getDesignState() == TubeState.ERROR) {
-            errorCount++;
+    for (Component component : components) {
+        if (component.getState() == State.READY || component.getState() == State.ACTIVE) {
+            readyCount++;
+        } else if (component.getState() == State.DEGRADED) {
+            degradedCount++;
         }
     }
 
-    if (errorCount > criticalThreshold) {
-        setDesignState(CompositeState.CRITICAL);
+    if (degradedCount > criticalThreshold) {
+        setState(State.DEGRADED);
         notifyMachine();
-    } else if (flowingCount < minimumFlowingRequired) {
-        setDesignState(CompositeState.DEGRADED);
+    } else if (readyCount < minimumRequiredReady) {
+        setState(State.DEGRADED);
     } else {
-        setDesignState(CompositeState.FLOWING);
+        setState(State.READY);
     }
 }
+```
+
+## Real-World Examples
+
+### Content Platform Machine
+
+```
 M0 (Content Platform)
 ├── C0 (Content Creation Composite)
-│   ├── T0 (Text Editor Tube)
-│   ├── T1 (Media Manager Tube)
-│   └── T2 (Version Control Tube)
+│   ├── CO0 (Text Editor Component)
+│   ├── CO1 (Media Manager Component)
+│   └── CO2 (Version Control Component)
 ├── C1 (Content Storage Composite)
-│   ├── T0 (Database Interface Tube)
-│   ├── T1 (Caching Tube)
-│   └── T2 (Backup Tube)
+│   ├── CO0 (Database Interface Component)
+│   ├── CO1 (Caching Component)
+│   └── CO2 (Backup Component)
 └── C2 (Content Delivery Composite)
-    ├── T0 (Template Processor Tube)
-    ├── T1 (Page Assembler Tube)
-    └── T2 (Delivery Optimizer Tube)
+    ├── CO0 (Template Processor Component)
+    ├── CO1 (Page Assembler Component)
+    └── CO2 (Delivery Optimizer Component)
+```
+
+### Payment Platform Machine
+
+```
 M0 (Payment Platform)
 ├── C0 (Customer Management Composite)
-│   ├── T0 (Account Lookup Tube)
-│   └── T1 (Profile Validation Tube)
+│   ├── CO0 (Account Lookup Component)
+│   └── CO1 (Profile Validation Component)
 ├── C1 (Transaction Processing Composite)
-│   ├── T0 (Payment Gateway Tube)
-│   ├── T1 (Fraud Detection Tube)
-│   └── T2 (Receipt Generator Tube)
+│   ├── CO0 (Payment Gateway Component)
+│   ├── CO1 (Fraud Detection Component)
+│   └── CO2 (Receipt Generator Component)
 └── C2 (Reporting Composite)
-    ├── T0 (Transaction Logger Tube)
-    ├── T1 (Analytics Tube)
+    ├── CO0 (Transaction Logger Component)
+    ├── CO1 (Analytics Component)
+    └── CO2 (Reporting Generator Component)
+```
+
+```
+```

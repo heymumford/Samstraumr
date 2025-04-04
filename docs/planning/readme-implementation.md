@@ -15,26 +15,32 @@ We've reorganized the Samstraumr documentation to create a more structured, comp
 ## Key Files Created or Updated
 
 ### Root level
+
 - `README.md` - Comprehensive overview and table of contents
 - `docs/README.md` - Documentation structure guide
 
 ### Concepts
+
 - `docs/concepts/core-concepts.md` - Fundamental building blocks and principles
 - `docs/concepts/systems-theory-foundation.md` - Theoretical underpinnings
 - `docs/concepts/state-management.md` - Dual state approach
 - `docs/concepts/identity-addressing.md` - Naming and hierarchical addressing
 
 ### Guides
+
 - `docs/guides/getting-started.md` - First steps with Samstraumr
 
 ### Reference
+
 - `docs/reference/glossary.md` - Terminology definitions
 - `docs/reference/faq.md` - Frequently asked questions
 
 ### Testing
+
 - `docs/testing/test-strategy.md` - Comprehensive testing approach
 
 ### Plans
+
 - `docs/DOCUMENTATION_PLAN.md` - Detailed reorganization plan
 
 ## Implementation Steps Completed

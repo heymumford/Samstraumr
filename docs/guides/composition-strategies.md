@@ -1,6 +1,7 @@
 # Composition Strategies
 
 ## Table of Contents
+
 - [Introduction: The Art of Composition](#introduction-the-art-of-composition)
 - [Foundational Principles](#foundational-principles)
 - [Composite Patterns](#composite-patterns)
@@ -1933,4 +1934,3 @@ public class DynamicRecompositionExample {
 ```
 
 ---
-

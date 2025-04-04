@@ -1,13 +1,12 @@
 /**
  * Copyright (c) 2025 Eric C. Mumford (@heymumford)
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
- * If a copy of the MPL was not distributed with this file, You can obtain one at
+ *
+ * <p>This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy
+ * of the MPL was not distributed with this file, You can obtain one at
  * https://github.com/heymumford/Samstraumr/blob/main/LICENSE
  *
- * System environment information provider for runtime context awareness
+ * <p>System environment information provider for runtime context awareness
  */
-
 package org.s8r.component.core;
 
 import java.io.UnsupportedEncodingException;
@@ -41,8 +40,8 @@ import oshi.util.FormatUtil;
 /**
  * Provides comprehensive system environment information.
  *
- * <p>This class is part of the simplified package structure, moved to org.s8r.component.core
- * to better integrate with the core component model.
+ * <p>This class is part of the simplified package structure, moved to org.s8r.component.core to
+ * better integrate with the core component model.
  *
  * <p>It abstracts system environment details, enabling components to be aware of their execution
  * context and adapt accordingly. It collects hardware, OS, and network details to create a unique

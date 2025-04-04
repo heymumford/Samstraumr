@@ -41,6 +41,7 @@ Sensitive information should NEVER be hardcoded:
 - **Test Credentials**: Store test credentials in separate properties files outside source control
 
 Example pattern for accessing credentials:
+
 ```java
 // Get from environment variable with fallback to properties
 private String getDbPassword() {
@@ -126,11 +127,9 @@ Based on analysis of the codebase, the following hardcoded values should be para
 1. **Circuit Breaker Parameters**
    - Currently: Hardcoded in `BundleFactory.java`
    - Recommendation: Move to configuration properties
-
 2. **Log Configuration**
    - Currently: Hardcoded in `log4j2.xml`
    - Recommendation: Make log levels, paths, and retention configurable
-
 3. **Test Database Credentials**
    - Currently: Hardcoded in `StreamTestSuite.java`
    - Recommendation: Move to test properties file
@@ -140,7 +139,6 @@ Based on analysis of the codebase, the following hardcoded values should be para
 1. **Bundle ID Generation**
    - Currently: Hardcoded timestamp-based IDs in `BundleFactory.java`
    - Recommendation: Create configurable ID generation strategy
-
 2. **Email Validation Pattern**
    - Currently: Hardcoded in `AcceptanceTestSteps.java`
    - Recommendation: Move to ValidationConstants class

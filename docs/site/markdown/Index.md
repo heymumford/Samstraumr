@@ -32,4 +32,3 @@ This report was automatically generated as part of the build process. To generat
 ```
 mvn clean site -P build-report
 ```
-

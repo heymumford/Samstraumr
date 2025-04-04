@@ -7,11 +7,9 @@ After reviewing utility scripts and identifying hardcoded paths that may break d
 1. **Hardcoded Directory Structure**:
    - Scripts directly reference paths like `Samstraumr/samstraumr-core/src/test/java/org/samstraumr/tube/...`
    - Recent refactoring of the directory structure from `org/samstraumr/tube/*` to `org/tube/*` and `org/test/*` would break these scripts
-
 2. **Duplicated Path Definitions**:
    - Multiple scripts define the same paths independently
    - No central configuration file for important paths and settings
-
 3. **Mixed Build Command Styles**:
    - Some scripts use relative paths, others use absolute paths
    - Inconsistent use of Maven parameters and profiles
@@ -81,12 +79,14 @@ fi
 #### Example 1: fix logger script
 
 **Current:**
+
 ```bash
 PATTERN_STEPS_FILE="Samstraumr/samstraumr-core/src/test/java/org/samstraumr/tube/steps/PatternSteps.java"
 sed -i 's/logger\./LOGGER\./g' "$PATTERN_STEPS_FILE"
 ```
 
 **Refactored:**
+
 ```bash
 PATTERN_STEPS_FILE="${SAMSTRAUMR_JAVA_TEST}/${SAMSTRAUMR_TEST_PACKAGE//./\/}/steps/PatternSteps.java"
 sed -i 's/logger\./LOGGER\./g' "$PATTERN_STEPS_FILE"
@@ -95,6 +95,7 @@ sed -i 's/logger\./LOGGER\./g' "$PATTERN_STEPS_FILE"
 #### Example 2: standardize feature files
 
 **Current:**
+
 ```bash
 if [ -f "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-AtomicBoundaryTest-Example.feature" ]; then
   mv -v "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-AtomicBoundaryTest-Example.feature" \
@@ -103,6 +104,7 @@ fi
 ```
 
 **Refactored:**
+
 ```bash
 EXAMPLES_DIR="${SAMSTRAUMR_TEST_FEATURES}/examples"
 if [ -f "${EXAMPLES_DIR}/TBD-AtomicBoundaryTest-Example.feature" ]; then
@@ -114,12 +116,14 @@ fi
 #### Example 3: optimal build script
 
 **Current:**
+
 ```bash
 echo "🚀 Building Samstraumr with optimized settings"
 mvn $CLEAN $MODE $PARALLEL_FLAG $PROFILE $ADDITIONAL_ARGS
 ```
 
 **Refactored:**
+
 ```bash
 echo "🚀 Building Samstraumr with optimized settings"
 mvn -f "${SAMSTRAUMR_CORE_MODULE}/pom.xml" $CLEAN $MODE ${SAMSTRAUMR_PARALLEL_FLAG} $PROFILE $ADDITIONAL_ARGS
@@ -145,18 +149,15 @@ echo "Configuration updated. Please review .samstraumr.config to verify changes.
 
 ## Benefits
 
-1. **Single Point of Truth**: 
+1. **Single Point of Truth**:
    - All paths and important configurations defined in one place
    - Reduces risk of inconsistency across scripts
-
 2. **Easier Refactoring**:
    - When paths change, only update the central configuration file
    - Scripts automatically use the new paths
-
 3. **Better Documentation**:
    - New developers can quickly understand project structure
    - Configuration file serves as documentation
-
 4. **Environment Flexibility**:
    - Different environments can override variables as needed
    - CI/CD systems can inject custom configurations
@@ -168,4 +169,3 @@ echo "Configuration updated. Please review .samstraumr.config to verify changes.
 3. Test the script works correctly
 4. Progressively update remaining scripts
 5. Add documentation in CLAUDE.md about the configuration approach
-

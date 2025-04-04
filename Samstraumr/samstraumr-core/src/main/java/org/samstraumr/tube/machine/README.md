@@ -1,6 +1,6 @@
 # Machine Component
 
-The Machine component represents the highest level of composition in the Samstraumr architecture. 
+The Machine component represents the highest level of composition in the Samstraumr architecture.
 It manages and orchestrates multiple Composite components to form a complete processing system.
 
 ## Key Components

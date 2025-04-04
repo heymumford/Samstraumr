@@ -28,34 +28,34 @@ Samstraumr's testing strategy is aligned with industry-standard testing concepts
 Our test strategy is organized according to a modified version of Mike Cohn's Test Pyramid, with considerations for the specific domain of distributed, flow-based systems:
 
 ```
-                    /\
-                   /  \
-                  / UI \
-                 /------\
-                /  API   \
-               /----------\
-              / Integration \
-             /--------------\
-            /   Component    \
-           /------------------\
-          /       Unit         \
-         /----------------------\
+           /\
+          /  \
+         / UI \
+        /------\
+       /  API   \
+      /----------\
+     / Integration \
+    /--------------\
+   /   Component    \
+  /------------------\
+ /       Unit         \
+/----------------------\
 ```
 
 ## Terminology Mapping
 
 Samstraumr uses domain-specific terminology that aligns with the core concepts of our system. The following table maps our terminology to industry-standard testing terms:
 
-| Industry Standard | Samstraumr Term | Description |
-|-------------------|-----------------|-------------|
-| Smoke Test        | Orchestration Test | Verifies the basic system assembly and connectivity |
-| Unit Test         | Tube Test       | Tests individual tubes in isolation |
-| Component Test    | Composite Test  | Tests connected tubes working together |
-| Integration Test  | Flow Test       | Tests interaction between different parts of the system |
-| API/Contract Test | Machine Test    | Tests public interfaces and contracts |
-| System Test       | Stream Test     | Tests the entire system as a whole |
-| End-to-End Test   | Acceptance Test | Tests the system from the user's perspective |
-| Property Test     | Adaptation Test | Tests system properties across a range of inputs |
+| Industry Standard |  Samstraumr Term   |                       Description                       |
+|-------------------|--------------------|---------------------------------------------------------|
+| Smoke Test        | Orchestration Test | Verifies the basic system assembly and connectivity     |
+| Unit Test         | Tube Test          | Tests individual tubes in isolation                     |
+| Component Test    | Composite Test     | Tests connected tubes working together                  |
+| Integration Test  | Flow Test          | Tests interaction between different parts of the system |
+| API/Contract Test | Machine Test       | Tests public interfaces and contracts                   |
+| System Test       | Stream Test        | Tests the entire system as a whole                      |
+| End-to-End Test   | Acceptance Test    | Tests the system from the user's perspective            |
+| Property Test     | Adaptation Test    | Tests system properties across a range of inputs        |
 
 ## Above the Line Vs Below the Line
 

@@ -1,9 +1,9 @@
 # A T L B T L Strategy
 
-
 This document outlines the Above the Line (ATL) and Below the Line (BTL) testing strategy implemented in Samstraumr, providing guidelines for categorizing tests and ensuring efficient test execution.
 
 ## Table of Contents
+
 - [Introduction](#introduction)
 - [Key Concepts](#key-concepts)
 - [Implementation](#implementation)
@@ -57,12 +57,11 @@ Samstraumr implements the ATL/BTL strategy across both JUnit and Cucumber tests:
 
 ### Junit implementation
 
-- **Annotations**: 
+- **Annotations**:
   - `@ATL`: Marks tests as critical (preferred)
   - `@BTL`: Marks tests as important but non-blocking (preferred)
   - `@AboveTheLine`: Marks tests as critical (deprecated)
   - `@BelowTheLine`: Marks tests as important but non-blocking (deprecated)
-
 - **Test Runners**:
   - `ATLTestRunner`: Executes only Above The Line tests
   - `BTLTestRunner`: Executes only Below The Line tests
@@ -72,7 +71,6 @@ Samstraumr implements the ATL/BTL strategy across both JUnit and Cucumber tests:
 - **Tags**:
   - `@ATL`: Marks scenarios as critical
   - `@BTL`: Marks scenarios as important but non-blocking
-
 - **Runners**:
   - `RunATLCucumberTest`: Executes only Above The Line scenarios
   - `RunBTLCucumberTest`: Executes only Below The Line scenarios
@@ -149,3 +147,4 @@ The ATL/BTL strategy is designed to optimize continuous integration:
 
 By following this ATL/BTL testing strategy, Samstraumr achieves a balance between fast feedback for critical functionality and comprehensive coverage for the entire system.
 
+```

@@ -27,6 +27,7 @@ Where `<command>` can be one of:
 - `install` - Initialize or update project configuration
 
 For help on any command:
+
 ```bash
 ./s8r help <command>
 ```
@@ -37,6 +38,7 @@ Samstraumr uses a centralized configuration approach to manage paths and setting
 
 - `.samstraumr.config` contains all project paths and key configuration settings
 - All utility scripts should source this file using:
+
   ```bash
   # At the top of each script
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -50,6 +52,7 @@ Samstraumr uses a centralized configuration approach to manage paths and setting
 ## Script Organization
 
 Scripts are organized in a hierarchical structure:
+
 ```
 /
 ├── s8r                    # Main entry point script (recommended)
@@ -104,6 +107,7 @@ Additional options:
 - `--skip-quality`: Skip quality checks
 
 Examples:
+
 ```bash
 ./s8r build                   # Fast build
 ./s8r build test              # Run tests
@@ -121,28 +125,28 @@ Examples:
 
 Test types:
 - Industry Standard:
-  - `smoke` (basic system assembly and connectivity)
-  - `unit` (individual units in isolation)
-  - `component` (connected components working together)
-  - `integration` (interactions between different parts)
-  - `api` (public interfaces and contracts)
-  - `system` (entire system as a whole)
-  - `endtoend` (user perspective and requirements)
-  - `property` (system properties across inputs)
+- `smoke` (basic system assembly and connectivity)
+- `unit` (individual units in isolation)
+- `component` (connected components working together)
+- `integration` (interactions between different parts)
+- `api` (public interfaces and contracts)
+- `system` (entire system as a whole)
+- `endtoend` (user perspective and requirements)
+- `property` (system properties across inputs)
 - Samstraumr Terminology:
-  - `orchestration` (basic system assembly and connectivity)
-  - `tube` (individual tubes in isolation)
-  - `composite` (or `bundle` for legacy) (connected tubes)
-  - `flow` (interactions between different parts)
-  - `machine` (public interfaces and contracts)
-  - `stream` (entire system as a whole)
-  - `acceptance` (user perspective and requirements)
-  - `adaptation` (system properties across inputs)
+- `orchestration` (basic system assembly and connectivity)
+- `tube` (individual tubes in isolation)
+- `composite` (or `bundle` for legacy) (connected tubes)
+- `flow` (interactions between different parts)
+- `machine` (public interfaces and contracts)
+- `stream` (entire system as a whole)
+- `acceptance` (user perspective and requirements)
+- `adaptation` (system properties across inputs)
 - Special test types:
-  - `all` (run all tests)
-  - `atl` (Above-The-Line critical tests)
-  - `btl` (Below-The-Line robustness tests) [DISABLED - tests removed v1.3.1]
-  - `adam` (Adam tube identity tests)
+- `all` (run all tests)
+- `atl` (Above-The-Line critical tests)
+- `btl` (Below-The-Line robustness tests) [DISABLED - tests removed v1.3.1]
+- `adam` (Adam tube identity tests)
 
 Options:
 - `-b, --both`: Include equivalent tags (e.g., run both unit and tube tests)
@@ -154,6 +158,7 @@ Options:
 - `--cyclename <name>`: Specify a name for the test cycle (for reporting)
 
 Examples:
+
 ```bash
 ./s8r test unit                # Run unit tests
 ./s8r test --both unit         # Run unit and tube tests
@@ -243,6 +248,7 @@ Options:
 - `-f, --fix`: Fix issues automatically (where applicable)
 
 Examples:
+
 ```bash
 ./s8r quality check            # Run all quality checks
 ./s8r quality spotless -f      # Run Spotless and fix issues
@@ -281,38 +287,39 @@ mvn test jacoco:report
 The GitHub Actions workflow implements quality gates in the `quality-analysis` job:
 
 1. **Spotless**: Checks code formatting against Google Java Style
+
    ```yaml
    - name: Run Spotless check
      run: mvn -B spotless:check
    ```
-
 2. **Checkstyle**: Verifies coding standards with custom rules
+
    ```yaml
    - name: Run Checkstyle
      run: mvn -B checkstyle:check
    ```
-   
 3. **SpotBugs**: Performs static analysis for bug detection
+
    ```yaml
    - name: Run SpotBugs
      run: mvn -B spotbugs:check
    ```
-   
 4. **JaCoCo**: Generates coverage reports for analysis
+
    ```yaml
    - name: Generate JaCoCo report
      run: mvn -B jacoco:report -Djacoco.skip=false
    ```
-   
 5. **SonarQube**: Comprehensive analysis with quality gate enforcement
+
    ```yaml
    - name: SonarQube analysis
      run: |
        mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
          -Dsonar.qualitygate.wait=true
    ```
-
 6. **Quality Report Artifacts**: Uploads quality reports for review
+
    ```yaml
    - name: Upload Quality Reports
      uses: actions/upload-artifact@v4
@@ -343,8 +350,8 @@ Samstraumr's version management system uses a modular architecture with separate
 
 Samstraumr follows semantic versioning (MAJOR.MINOR.PATCH) with the following guidelines:
 - **PATCH**: Bug fixes and minor improvements (1.2.3 → 1.2.4)
-  - Patch version can roll up to 999 before automatically incrementing the minor version
-  - Example: 1.2.999 → 1.3.0 (when bumping patch)
+- Patch version can roll up to 999 before automatically incrementing the minor version
+- Example: 1.2.999 → 1.3.0 (when bumping patch)
 - **MINOR**: New features in a backward-compatible manner (1.2.3 → 1.3.0)
 - **MAJOR**: Incompatible API changes (1.2.3 → 2.0.0)
 
@@ -370,6 +377,7 @@ Available commands:
 ### Version Commands
 
 #### View Commands
+
 - `get`: Show current version information
 - `get -v`: Show detailed version info with tag status
 - `export`: Output only the current version (for scripts)
@@ -377,20 +385,24 @@ Available commands:
 - `history`: Show version history from git tags
 
 #### Modification Commands
+
 - `bump <type>`: Bump version (type: major, minor, patch)
 - `set <version>`: Set a specific version (format: x.y.z)
 - `fix-tag`: Create a git tag matching the current version
 
 #### Workflow Commands
+
 - `test <type>`: Bump version, run tests, then commit and tag
 
 ### Options
+
 - `--no-commit`: Don't automatically commit version changes
 - `--skip-tests`: Skip running tests (for test command only)
 - `--skip-quality`: Skip quality checks (for test command only)
 - `--push`: Push changes to remote (for test command only)
 
 ### Examples
+
 ```bash
 ./s8r version get              # Show current version
 ./s8r version get -v           # Show detailed version info
@@ -437,6 +449,7 @@ Features:
 - Generated documents include project version and timestamp
 
 Examples:
+
 ```bash
 ./s8r docs                         # Generate PDF docs in target/docs
 ./s8r docs ./my-docs               # Generate PDF docs in ./my-docs
@@ -460,14 +473,14 @@ Examples:
 ## Code Style Guidelines
 
 - **Imports**: Specific imports (no wildcards). Standard Java first, then third-party, then project imports.
-- **Naming**: 
+- **Naming**:
   - Classes, interfaces, enums, annotations: PascalCase
   - Methods, variables, parameters: camelCase
   - Constants (static final fields): UPPER_SNAKE_CASE
   - Cucumber step methods: snake_case
   - See docs/reference/standards/java-naming-standards.md for complete details
 - **Error Handling**: Custom exceptions with contextual messages; consistent logging before throwing exceptions.
-- **Logging**: 
+- **Logging**:
   - Use SLF4J with Log4j2 implementation
   - Follow log level guidelines in docs/reference/standards/logging-standards.md
   - Always use parameterized logging (LOGGER.info("Value: {}", value))
@@ -512,29 +525,24 @@ When writing bash scripts for this project, follow these guidelines:
    - Place scripts in the appropriate subdirectory under `util/bin/`
    - Use the script template provided in `util/lib/script-template.sh`
    - Always make scripts executable with `chmod +x`
-
 2. **Functional Programming**:
    - Main routine should be a series of function calls
    - Each function should have a single responsibility
    - Use meaningful function and variable names
    - Document function parameters and return values
-
 3. **Documentation**:
    - Include a header with description, usage, and examples
    - Document complex logic with inline comments
    - Provide help message with `-h` or `--help` flag
-
 4. **Configuration**:
    - Source `.samstraumr.config` at the beginning of each script
    - Use configuration variables instead of hardcoded values
    - Don't duplicate configuration that already exists
-
 5. **Error Handling**:
    - Check for required commands and tools
    - Validate user input and arguments
    - Provide meaningful error messages
    - Use appropriate exit codes
-
 6. **Consistency**:
    - Use the shared functions from `util/lib/*.sh`
    - Follow the same command-line argument parsing approach

@@ -67,7 +67,6 @@ This board tracks the current implementation tasks for the S8r framework. For a 
   - **Category**: Refactor
   - **Completed**: 2025-04-06
   - **Related**: [Package Refactoring Plan](../architecture/package-refactoring.md)
-
 - [x] **Complete Composite Component implementation**
   - Created Composite class in new package structure
   - Implemented CompositeFactory with standard patterns
@@ -78,7 +77,6 @@ This board tracks the current implementation tasks for the S8r framework. For a 
   - **Category**: Feature
   - **Completed**: 2025-04-06
   - **Related**: [Implementation](../architecture/implementation.md)
-
 - [x] **Implement Machine abstraction**
   - Created Machine class in new package structure
   - Implemented MachineFactory with predefined machine types
@@ -88,7 +86,6 @@ This board tracks the current implementation tasks for the S8r framework. For a 
   - **Category**: Feature
   - **Completed**: 2025-04-06
   - **Related**: [Implementation](../architecture/implementation.md)
-
 - [x] **S8r Core Component Implementation**
   - Created Component class to replace legacy Tube
   - Implemented Status and LifecycleState enums

@@ -1,27 +1,28 @@
 # Identity Addressing
 
 ## Table of Contents
+
 - [Introduction: The Power of Names](#introduction-the-power-of-names)
-- [The Birth Certificate Concept](#the-birth-certificate-concept)
+- [The Identity Concept](#the-identity-concept)
 - [Hierarchical Addressing Scheme](#hierarchical-addressing-scheme)
 - [Identity in Practice](#identity-in-practice)
 - [Addressing Patterns](#addressing-patterns)
 - [Advanced Identity Concepts](#advanced-identity-concepts)
 - [Implementation Guidelines](#implementation-guidelines)
 
-## Introduction: the Power of Names
+## Introduction: The Power of Names
 
 "To name a thing is to know a thing." This ancient wisdom holds true in software as much as in mythology. In complex systems, clear identity becomes not just a convenience but a necessity—the foundation upon which awareness, communication, and trust are built.
 
-Samstraumr's approach to identity draws inspiration from both natural systems (where each cell knows its place and purpose) and human social structures (where hierarchies of belonging help organize complexity). The result is a naming system that provides both technical precision and intuitive understanding.
+S8r's approach to identity draws inspiration from both natural systems (where each cell knows its place and purpose) and human social structures (where hierarchies of belonging help organize complexity). The result is a naming system that provides both technical precision and intuitive understanding.
 
-## The Birth Certificate Concept
+## The Identity Concept
 
-At the heart of Samstraumr's identity approach lies the concept of a "birth certificate"—a formal declaration of a component's existence, lineage, and place within the system.
+At the heart of S8r's identity approach lies the concept of a clear, formal identity—a declaration of a component's existence, lineage, and place within the system.
 
 ### Elements of identity
 
-A Samstraumr birth certificate typically includes:
+An S8r identity typically includes:
 
 1. **Unique Identifier**: A machine-readable ID that uniquely identifies the component
 2. **Creation Time**: The moment the component came into existence
@@ -34,7 +35,7 @@ A Samstraumr birth certificate typically includes:
 ### Implementation example
 
 ```java
-public class BirthCertificate {
+public class Identity {
     private final String id;
     private final Instant creationTime;
     private final String creatorId;
@@ -64,32 +65,29 @@ public class BirthCertificate {
 
 ## Hierarchical Addressing Scheme
 
-Samstraumr uses a hierarchical addressing scheme that reflects the organizational structure of the system. This approach provides both locality (understanding a component's neighborhood) and globality (uniquely identifying it within the entire system).
+S8r uses a hierarchical addressing scheme that reflects the organizational structure of the system. This approach provides both locality (understanding a component's neighborhood) and globality (uniquely identifying it within the entire system).
 
 ### Addressing levels
 
 The standard addressing format follows this pattern:
 
-1. **Tube Level**: `T<ID>` (e.g., `T7`)
+1. **Component Level**: `CO<ID>` (e.g., `CO7`)
    - A single atomic processing unit
-
-2. **Composite Level**: `C<ID>.T<ID>` (e.g., `C3.T2`)
-   - A tube within a specific composite
-
-3. **Machine Level**: `M<ID>.C<ID>.T<ID>` (e.g., `M0.C1.T4`)
-   - A tube within a composite within a specific machine
-
-4. **System Level**: `S<ID>.M<ID>.C<ID>.T<ID>` (e.g., `S5.M2.C8.T1`)
+2. **Composite Level**: `C<ID>.CO<ID>` (e.g., `C3.CO2`)
+   - A component within a specific composite
+3. **Machine Level**: `M<ID>.C<ID>.CO<ID>` (e.g., `M0.C1.CO4`)
+   - A component within a composite within a specific machine
+4. **System Level**: `S<ID>.M<ID>.C<ID>.CO<ID>` (e.g., `S5.M2.C8.CO1`)
    - For distributed systems with multiple interconnected systems
 
 ### Semantic addressing
 
-Beyond pure identifiers, Samstraumr often uses semantic addressing to improve human understanding:
+Beyond pure identifiers, S8r often uses semantic addressing to improve human understanding:
 
 ```
-DataValidator.InputProcessor.T3
+DataValidator.InputProcessor.CO3
 |             |             |
-|             |             +-- Tube number
+|             |             +-- Component number
 |             +-- Composite name (semantic)
 +-- Machine name (semantic)
 ```
@@ -114,7 +112,7 @@ Identity is not merely a label but a foundational aspect of component functional
 
 Components transition through identity stages:
 
-1. **Creation**: Issuance of birth certificate
+1. **Creation**: Issuance of identity
 2. **Registration**: Enrollment in the system registry
 3. **Active Life**: Period of normal operation
 4. **Retirement**: Graceful shutdown and deregistration
@@ -131,7 +129,7 @@ The most straightforward approach, where a component specifies the complete addr
 ```java
 public void sendMessage(String targetAddress, Message message) {
     AddressResolver resolver = AddressResolver.getInstance();
-    Tube target = resolver.resolveAddress(targetAddress);
+    Component target = resolver.resolveAddress(targetAddress);
     if (target != null) {
         target.receive(message);
     } else {
@@ -145,9 +143,9 @@ public void sendMessage(String targetAddress, Message message) {
 Similar to relative file paths, where components reference others relative to their own position:
 
 ```
-// From M1.C2.T3
-../T4      // Refers to M1.C2.T4 (sibling)
-../T*      // Refers to all tubes in M1.C2 (siblings)
+// From M1.C2.CO3
+../CO4      // Refers to M1.C2.CO4 (sibling)
+../CO*      // Refers to all components in M1.C2 (siblings)
 ../*       // Refers to all components in M1.C2 (parent and siblings)
 ../../C3/* // Refers to all components in M1.C3 (cousin composite)
 ```
@@ -157,12 +155,12 @@ Similar to relative file paths, where components reference others relative to th
 Using wildcards and patterns to address groups of components:
 
 ```java
-// All validation tubes in any composite
+// All validation components in any composite
 resolver.resolvePattern("*.*.Validator*");
 
-// All tubes in error state in the DataProcessor machine
+// All components in degraded state in the DataProcessor machine
 resolver.resolvePattern("DataProcessor.*.*", 
-                       state -> state.getDesignState() == TubeState.ERROR);
+                     state -> state.getState() == State.DEGRADED);
 ```
 
 ### Service discovery
@@ -171,7 +169,7 @@ For dynamic systems, service-oriented addressing where components are found by c
 
 ```java
 // Find components offering a specific service
-List<Tube> validators = resolver.findByCapability("data-validation");
+List<Component> validators = resolver.findByCapability("data-validation");
 ```
 
 ## Advanced Identity Concepts
@@ -183,7 +181,7 @@ For sophisticated systems, additional identity mechanisms provide enhanced capab
 When systems need to communicate across boundaries:
 
 ```
-external://OtherSystem/PaymentProcessor.TransactionManager.T2
+external://OtherSystem/PaymentProcessor.TransactionManager.CO2
 ```
 
 ### Temporal addressing
@@ -192,7 +190,7 @@ Referring to components at specific points in time:
 
 ```
 // Reference the state of a component as it existed at a specific time
-historical://2023-04-15T08:30:00Z/OrderProcessor.C2.T4
+historical://2023-04-15T08:30:00Z/OrderProcessor.C2.CO4
 ```
 
 ### Virtual and logical addressing
@@ -222,7 +220,7 @@ When implementing identity and addressing:
 ```java
 public class AddressResolver {
     private static AddressResolver instance;
-    private final Map<String, Tube> addressRegistry;
+    private final Map<String, Component> addressRegistry;
     
     // Singleton pattern
     public static AddressResolver getInstance() {
@@ -236,19 +234,19 @@ public class AddressResolver {
         addressRegistry = new ConcurrentHashMap<>();
     }
     
-    public void register(String address, Tube tube) {
-        addressRegistry.put(address, tube);
+    public void register(String address, Component component) {
+        addressRegistry.put(address, component);
     }
     
     public void unregister(String address) {
         addressRegistry.remove(address);
     }
     
-    public Tube resolveAddress(String address) {
+    public Component resolveAddress(String address) {
         return addressRegistry.get(address);
     }
     
-    public List<Tube> resolvePattern(String pattern) {
+    public List<Component> resolvePattern(String pattern) {
         // Pattern matching logic
         Pattern compiledPattern = Pattern.compile(convertGlobToRegex(pattern));
         return addressRegistry.entrySet().stream()
@@ -261,3 +259,8 @@ public class AddressResolver {
 }
 ```
 
+---
+
+*"The true identity of a system emerges not from its individual components, but from the relationships they form and the journey they share."*
+
+[← Return to Core Concepts](./core-concepts.md) | [Explore Component Patterns →](../guides/component-patterns.md)

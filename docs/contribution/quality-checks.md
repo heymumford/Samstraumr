@@ -200,30 +200,31 @@ The GitHub Actions workflow (`.github/workflows/samstraumr-pipeline.yml`) implem
 This job runs after all tests have completed and performs the following checks:
 
 1. **Spotless**: Checks code formatting
+
    ```yaml
    - name: Run Spotless check
      run: mvn -B spotless:check
    ```
-
 2. **Checkstyle**: Verifies coding standards
+
    ```yaml
    - name: Run Checkstyle
      run: mvn -B checkstyle:check
    ```
-
 3. **SpotBugs**: Performs static analysis
+
    ```yaml
    - name: Run SpotBugs
      run: mvn -B spotbugs:check
    ```
-
 4. **JaCoCo**: Generates coverage reports
+
    ```yaml
    - name: Generate JaCoCo report
      run: mvn -B jacoco:report -Djacoco.skip=false
    ```
-
 5. **SonarQube**: Runs when configured with appropriate secrets
+
    ```yaml
    - name: SonarQube analysis
      env:
@@ -323,15 +324,12 @@ After running tests and quality checks, reports are available in the following l
 - **JaCoCo**: `target/site/jacoco/index.html`
   - Shows code coverage metrics with highlighted source code
   - Includes line, branch, and method coverage statistics
-
 - **Checkstyle**: `target/checkstyle-result.xml`
   - Lists all style violations with file and line references
   - Contains detailed messages about each issue
-
 - **SpotBugs**: `target/spotbugsXml.xml`
   - Contains all detected bugs categorized by type
   - Includes bug patterns, priorities, and locations
-
 - **Cucumber**: `target/cucumber-reports/cucumber.html`
   - Comprehensive BDD test report with scenarios and steps
   - Shows pass/fail status and execution time

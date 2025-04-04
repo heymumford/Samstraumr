@@ -3,7 +3,8 @@
  *
  * <p>This package contains the fundamental abstractions and implementations for the tube-based
  * processing model in the S8r framework. It is part of the package simplification initiative,
- * providing a more streamlined and intuitive organization under the simplified org.s8r root package.
+ * providing a more streamlined and intuitive organization under the simplified org.s8r root
+ * package.
  *
  * <p>The tube concept in S8r represents self-contained processing units that can be composed into
  * more complex structures. Tubes are inspired by biological systems and follow a lifecycle pattern
@@ -19,6 +20,7 @@
  * </ul>
  *
  * <p>When adding new classes to this package, follow these guidelines:
+ *
  * <ul>
  *   <li>Focus on core abstractions rather than specific implementations
  *   <li>Use clear, concise naming that describes the concept

@@ -1,13 +1,12 @@
 /**
  * Copyright (c) 2025 Eric C. Mumford (@heymumford)
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
- * If a copy of the MPL was not distributed with this file, You can obtain one at
+ *
+ * <p>This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy
+ * of the MPL was not distributed with this file, You can obtain one at
  * https://github.com/heymumford/Samstraumr/blob/main/LICENSE
  *
- * Machine-level abstraction for orchestrating composites in the S8r framework
+ * <p>Machine-level abstraction for orchestrating composites in the S8r framework
  */
-
 package org.s8r.component.machine;
 
 import java.time.Instant;
@@ -28,16 +27,17 @@ import org.slf4j.LoggerFactory;
 /**
  * Highest level of composition in the S8r architecture, orchestrating multiple Composites.
  *
- * <p>Machine represents a complete processing system composed of interconnected Composites.
- * It provides a comprehensive management layer for complex workflows, state management,
- * and system-level operations.
+ * <p>Machine represents a complete processing system composed of interconnected Composites. It
+ * provides a comprehensive management layer for complex workflows, state management, and
+ * system-level operations.
  *
  * <p>Key features include:
+ *
  * <ul>
- *   <li>Composite management and interconnection</li>
- *   <li>State tracking and event logging</li>
- *   <li>Lifecycle management (activate/deactivate/shutdown)</li>
- *   <li>Identity-based hierarchical organization</li>
+ *   <li>Composite management and interconnection
+ *   <li>State tracking and event logging
+ *   <li>Lifecycle management (activate/deactivate/shutdown)
+ *   <li>Identity-based hierarchical organization
  * </ul>
  */
 public class Machine {
@@ -235,11 +235,11 @@ public class Machine {
     return this;
   }
 
-  /** 
-   * Initiates the machine shutdown process. 
-   * 
-   * <p>This begins an orderly shutdown of all composites, ensuring a proper
-   * cleanup of resources and final state preservation.
+  /**
+   * Initiates the machine shutdown process.
+   *
+   * <p>This begins an orderly shutdown of all composites, ensuring a proper cleanup of resources
+   * and final state preservation.
    */
   public void shutdown() {
     if (active.compareAndSet(true, false)) {

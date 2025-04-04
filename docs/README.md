@@ -1,71 +1,110 @@
-# Samstraumr Documentation
+# S8r Documentation
 
-Welcome to the Samstraumr documentation. This guide will help you navigate the available documentation resources.
+Welcome to the S8r framework documentation. S8r (pronounced "sater") is a component-based architecture that provides a unified approach to building software systems with self-awareness and adaptive capabilities.
 
-## Directory Structure
+## About S8r
 
-Samstraumr documentation is organized into the following directories:
+S8r represents a fundamental shift in software architecture:
 
-- **[core/](./core/)**: Core concepts and architectural foundations
-- **[dev/](./dev/)**: Development guides, testing frameworks, and implementation details
-- **[guides/](./guides/)**: User guides, tutorials, and instructional content
-- **[ref/](./ref/)**: Reference material, standards, and specifications
-- **[plans/](./plans/)**: Active plans, completed work, and planning artifacts
-- **[contrib/](./contrib/)**: Contribution guides and standards
-- **[tools/](./tools/)**: Documentation for tools and scripts
-- **[specs/](./specs/)**: Technical specifications and proposals
-- **[assets/](./assets/)**: Images, templates, and static resources
+- **Component-Based Design**: Build systems from self-contained, aware components
+- **Unified State Management**: Single state model for both lifecycle and operational status
+- **Identity & Awareness**: Components with clear identities and contextual awareness
+- **Hierarchical Composition**: Build complex systems through Composites and Machines
+- **Test-Driven Development**: Comprehensive testing framework with BDD support
 
-## Key Documents
+## Documentation Map
 
-### Getting Started
-- [Getting Started Guide](./guides/getting-started.md): First steps with Samstraumr
-- [Prerequisites](./guides/prerequisites.md): Required environment setup
-- [Core Concepts Overview](./core/concept-overview.md): Understanding Samstraumr's core concepts
+### 🚀 Getting Started
 
-### Development
-- [Test Strategy](./dev/test-strategy.md): Testing approach and organization
-- [BDD with Cucumber](./dev/test-bdd-cucumber.md): Behavior-driven development approach
+- [Introduction](guides/introduction.md) - Overview of S8r concepts and benefits
+- [Prerequisites](guides/prerequisites.md) - System requirements and dependencies
+- [Getting Started](guides/getting-started.md) - Setting up S8r in your environment
+- [Maven Structure](guides/MavenStructureGuide.md) - Organization and build process
 
-### Standards & Guidelines
-- [Java Naming Standards](./ref/standard-java-naming.md): Java code style and conventions
-- [Documentation Standards](./ref/standard-documentation.md): Documentation guidelines
-- [Logging Standards](./ref/standard-logging.md): Logging best practices
+### 🔍 Core Concepts
 
-### Contributing
-- [Contribution Guide](./contrib/contrib-guide.md): How to contribute to Samstraumr
-- [Code Standards](./contrib/contrib-code-standards.md): Code quality standards
-- [Git Commit Guidelines](./contrib/contrib-git-commits.md): Commit message standards
+- [Core Architecture](concepts/core-concepts.md) - Component model fundamentals
+- [State Management](concepts/state-management.md) - Unified lifecycle states
+- [Identity System](concepts/identity-addressing.md) - Component identity
+- [Composites & Machines](concepts/composites-and-machines.md) - Building complex structures
 
-### Project Planning
-- [Kanban Board](./plans/kanban.md): Current work and priorities
-- [Work Tracking Guide](./plans/work-tracking-guide.md): How we track work
+### 📘 Guides
 
-## Document Naming Conventions
+- [Composition Patterns](guides/composition-strategies.md) - Component composition strategies
+- [Migration from Samstraumr](guides/migration/SamstraumrToS8rMigration.md) - Upgrading to S8r
+- [Common Component Patterns](guides/component-patterns.md) - Design patterns for components
 
-We use prefix-based naming to organize documents within each directory:
+### 📝 Reference
 
-- `concept-*`: Core concepts documentation
-- `dev-*`: Development-focused documentation
-- `guide-*`: User guides and tutorials
-- `ref-*`: Reference documentation
-- `standard-*`: Standards and specifications
-- `tool-*`: Tool documentation
-- `spec-*`: Technical specifications
-- `active-*`: Active plans and work
-- `complete-*`: Completed plans and work
-- `archived-*`: Historical plans and documents
-- `contrib-*`: Contribution-related documentation
-- `test-*`: Testing-related documentation
+- [API Reference](reference/api-reference.md) - Complete API documentation
+- [Configuration](reference/configuration-reference.md) - Configuration options
+- [Glossary](reference/glossary.md) - Terminology and definitions
+- [Examples](reference/s8r-examples.md) - Code examples and use cases
 
-## Terminology
+### 🧪 Development
 
-Samstraumr uses domain-specific terminology derived from systems theory, while also supporting industry-standard equivalents. See the [Glossary](./ref/ref-glossary.md) for detailed definitions.
+- [Testing Strategy](dev/test-strategy.md) - Comprehensive testing approach
+- [BDD with Cucumber](dev/test-bdd-cucumber.md) - Behavior-driven development
+- [Contributing](contribution/contributing.md) - How to contribute to S8r
+- [Code Standards](contribution/code-standards.md) - Coding standards and style
 
-## Navigation
+## Quick Reference
 
-The suggested reading order for newcomers is:
+### Component Creation
 
-1. [Core Concepts Overview](./core/concept-overview.md)
-2. [Getting Started Guide](./guides/getting-started.md)
-3. [Tube Patterns](./guides/tube-patterns.md)
+```java
+// Create a basic component
+Environment env = new Environment.Builder("test-env")
+    .withParameter("key", "value")
+    .build();
+    
+Component component = Component.create("reason", env);
+
+// Create a child component
+Component child = Component.createChild("child-reason", env, component);
+```
+
+### State Management
+
+```java
+// Check component state
+if (component.getState() == State.READY) {
+    component.setState(State.ACTIVE);
+}
+
+// Handle termination
+component.terminate();
+```
+
+### Composite Construction
+
+```java
+// Create a composite
+Composite composite = CompositeFactory.create("validation-flow", env);
+
+// Add components
+composite.addComponent("validator", validatorComponent);
+composite.addComponent("processor", processorComponent);
+
+// Connect components
+composite.connect("validator", "processor");
+```
+
+### Machine Orchestration
+
+```java
+// Create a machine
+Machine machine = MachineFactory.create("data-pipeline", env);
+
+// Register composites
+machine.registerComposite(inputComposite);
+machine.registerComposite(processingComposite);
+machine.registerComposite(outputComposite);
+```
+
+## Key Documentation
+
+- **New to S8r**: Start with [Introduction](guides/introduction.md)
+- **Migrating from Samstraumr**: See [Migration Guide](guides/migration/SamstraumrToS8rMigration.md)
+- **Contributing**: Check [Contributing Guide](contribution/contributing.md)
+- **Architecture**: See [Core Concepts](concepts/core-concepts.md)

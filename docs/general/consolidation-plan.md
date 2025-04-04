@@ -1,81 +1,129 @@
-# Consolidation Plan
+# S8r Documentation Consolidation Plan
 
-Based on the analysis of duplicate and overlapping files in the codebase, here's a plan to consolidate them effectively.
+This plan builds upon the previous consolidation efforts while focusing on the transition from Samstraumr to S8r terminology and architecture. It specifically aims to reduce documentation file count by merging similar content and updating terminology.
 
-## 1. Documentation Files with Clear Redundancy
+## 1. Core Concept Documents
 
-### Folder structure documentation
-- **Duplicate Files**: 
-  - `/docs/FolderStructure.md`
-  - `/docs/reference/FolderStructure.md`
-- **Plan**: 
-  - Keep `/docs/reference/FolderStructure.md` as the canonical version
-  - Remove `/docs/FolderStructure.md`
-  - Create a symbolic link from old to new location (not possible with git, but can add a redirect notice)
+### Consolidate concept documentation
 
-### Java naming standards
-- **Duplicate Files**: 
-  - `/docs/JavaNamingStandards.md`
-  - `/docs/reference/standards/JavaNamingStandards.md`
-- **Plan**: 
-  - Keep `/docs/reference/standards/JavaNamingStandards.md` as the canonical version (it has the newer content with acronym exceptions)
-  - Remove `/docs/JavaNamingStandards.md`
-  - Add a notice to the README.md pointing to the new location
+- **Overlapping Files**:
+  - `/docs/concepts/core-concepts.md` (S8r terminology)
+  - `/docs/core/concept-overview.md` (Samstraumr terminology)
+  - `/docs/concepts/composites-and-machines.md`
+  - `/docs/core/concept-composites.md`
+- **Plan**:
+  - Keep `/docs/concepts/core-concepts.md` as the canonical version with S8r terminology
+  - Update terminology in all concept documents (tube → component, etc.)
+  - Merge unique content from `/docs/core/concept-composites.md` into `/docs/concepts/composites-and-machines.md`
+  - Add redirects from old documents to new ones
+  - Delete duplicate files after updating all references
 
-### Documentation standards
-- **Duplicate Files**: 
-  - `/docs/DocumentationStandards.md`
-  - `/docs/reference/standards/DocumentationStandards.md`
-- **Plan**: 
-  - Keep `/docs/reference/standards/DocumentationStandards.md` as the canonical version
-  - Remove `/docs/DocumentationStandards.md`
-  - Add a notice to the README.md pointing to the new location
+### Identity documentation
 
-### Logging standards
-- **Duplicate Files**: 
-  - `/docs/LoggingStandards.md`
-  - `/docs/reference/standards/LoggingStandards.md`
-- **Plan**: 
-  - Keep `/docs/reference/standards/LoggingStandards.md` as the canonical version
-  - Remove `/docs/LoggingStandards.md`
-  - Add a notice to the README.md pointing to the new location
+- **Overlapping Files**:
+  - `/docs/concepts/identity-addressing.md`
+  - `/docs/core/concept-identity.md`
+- **Plan**:
+  - Merge into a single `/docs/concepts/identity-addressing.md` file
+  - Update terminology to be S8r-compliant (TubeIdentity → ComponentIdentity)
+  - Add examples using S8r component naming
 
-## 2. Test Documentation with Significant Overlap
+### State management
+
+- **Overlapping Files**:
+  - `/docs/concepts/state-management.md`
+  - `/docs/core/concept-state.md`
+- **Plan**:
+  - Consolidate into `/docs/concepts/state-management.md`
+  - Update to explain the unified State model in S8r (vs dual TubeStatus/TubeLifecycleState in Samstraumr)
+  - Add diagrams illustrating the state transitions in the new model
+
+## 2. Testing Documentation
 
 ### Testing strategy
-- **Overlapping Files**: 
-  - `/docs/testing/TestingStrategy.md` (comprehensive)
-  - `/docs/testing/TestStrategy.md` (concise)
-  - `/docs/proposals/SamstraumrTestingStrategy.md` (early draft)
-- **Plan**: 
-  - Create a merged document at `/docs/testing/TestingStrategy.md` incorporating the best content from all three
-  - Remove `/docs/testing/TestStrategy.md` and `/docs/proposals/SamstraumrTestingStrategy.md`
-  - Add clear heading and TOC to help navigation of the comprehensive document
 
-### Bdd documentation
-- **Overlapping Files**: 
-  - `/Samstraumr/samstraumr-core/RationaleOnUsingBDD.md` (conceptual rationale)
-  - `/Samstraumr/samstraumr-core/WhatIsBDD.md` (introduction and concepts)
-  - `/docs/testing/BddWithCucumber.md` (practical implementation)
-- **Plan**: 
-  - Create a new comprehensive BDD document at `/docs/testing/BddDocumentation.md` with clear sections:
-    1. What is BDD? (from WhatIsBDD.md)
-    2. Why Samstraumr uses BDD (from RationaleOnUsingBDD.md)
-    3. Implementing BDD with Cucumber (from BddWithCucumber.md)
-  - Keep all original documents for now but add deprecation notices
-  - Add references in README.md to the new consolidated version
+- **Overlapping Files**:
+  - `/docs/testing/testing-strategy.md`
+  - `/docs/testing/test-strategy.md`
+  - `/docs/dev/test-strategy.md`
+- **Plan**:
+  - Keep `/docs/testing/testing-strategy.md` as the canonical version
+  - Update terminology (tube → component, bundle → composite)
+  - Add redirects from other files to the canonical version
+  - Delete duplicate files after updating all references
+
+### BDD documentation
+
+- **Overlapping Files**:
+  - `/docs/testing/bdd-documentation.md`
+  - `/docs/testing/bdd-with-cucumber.md`
+  - `/Samstraumr/samstraumr-core/RationaleOnUsingBDD.md`
+  - `/Samstraumr/samstraumr-core/WhatIsBDD.md`
+- **Plan**:
+  - Keep `/docs/testing/bdd-documentation.md` as the comprehensive reference
+  - Update examples to use S8r component terminology
+  - Add redirects from other files to the canonical version
+  - Create a new quick-start guide that focuses on S8r component testing with Cucumber
 
 ### Test annotations
-- **Overlapping Files**: 
-  - `/docs/testing/TestingAnnotations.md` (comprehensive)
-  - `/Samstraumr/samstraumr-core/src/test/resources/TagOntology.md` (focused on tags)
-- **Plan**: 
-  - Merge unique content from TagOntology.md into TestingAnnotations.md
-  - Rename `/docs/testing/TestingAnnotations.md` to `/docs/testing/TestTagsAndAnnotations.md`
-  - Add appropriate cross-references
-  - Keep TagOntology.md in its test resources location as a quick reference for test developers, but add reference to the main document
 
-## 3. Implementation Approach
+- **Overlapping Files**:
+  - `/docs/testing/test-tags-and-annotations.md`
+  - `/docs/testing/testing-annotations.md`
+  - `/docs/dev/test-annotations.md`
+- **Plan**:
+  - Consolidate into `/docs/testing/test-tags-and-annotations.md`
+  - Update annotation names (TubeTest → ComponentTest)
+  - Add mapping between old and new annotations for migration
+
+## 3. Migration and Getting Started Guides
+
+### Migration guides
+
+- **Files to Update**:
+  - `/docs/guides/migration/SamstraumrToS8rMigration.md` (Keep and enhance)
+  - `/docs/guides/migration.md` (Redirect to SamstraumrToS8rMigration.md)
+  - `/docs/guides/migration-guide.md` (Redirect to SamstraumrToS8rMigration.md)
+- **New Files to Create**:
+  - `/docs/guides/component-patterns.md` (to replace tube-patterns.md)
+
+### Getting started
+
+- **Files to Update**:
+  - `/docs/guides/introduction.md` (Already updated to S8r)
+  - `/docs/guides/getting-started.md` (Update with S8r examples)
+  - `/docs/guides/prerequisites.md` (Update with S8r requirements)
+
+## 4. Reference Documentation
+
+### Standards documentation
+
+- **Overlapping Files**:
+  - Root level standards files:
+    - `/docs/documentation-standards.md`
+    - `/docs/java-naming-standards.md`
+    - `/docs/logging-standards.md`
+  - Reference directory standards:
+    - `/docs/reference/standards/documentation-standards.md`
+    - `/docs/reference/standards/JavaNamingStandards.md`
+    - `/docs/reference/standards/LoggingStandards.md`
+  - Ref directory standards:
+    - `/docs/ref/standard-documentation.md`
+    - `/docs/ref/standard-java-naming.md`
+    - `/docs/ref/standard-logging.md`
+- **Plan**:
+  - Keep `/docs/reference/standards/` as the canonical location
+  - Update all standards with S8r terminology
+  - Add redirects from other files to the canonical versions
+  - Delete duplicate files after updating all references
+
+### API references
+
+- **Plan**:
+  - Create `/docs/reference/s8r-api-reference.md` with Component API documentation
+  - Create `/docs/reference/s8r-javadoc-guide.md` with JavaDoc generation instructions for S8r
+
+## 5. Implementation Approach
 
 For each set of duplicate files:
 
@@ -86,11 +134,18 @@ For each set of duplicate files:
 5. Remove the duplicate files
 6. Update documentation to reflect the new structure
 
-## 4. Testing Strategy
+## 6. Consolidation Order
 
-For each consolidation:
+1. **First Phase**: Migrate core concepts and guides to S8r terminology
+2. **Second Phase**: Consolidate testing documentation
+3. **Third Phase**: Update and consolidate reference materials
+4. **Final Phase**: Clean up remaining duplicates and ensure cross-references
 
-1. Make a single change at a time
-2. Run appropriate tests after each change
-3. Verify navigation between documents works correctly
-4. Ensure cross-references are updated
+## 7. Metrics
+
+- Initial file count: ~100 documentation files
+- Target file count: ~60 documentation files (40% reduction)
+- Criteria for keeping separate files:
+  - Serves a distinct audience or purpose
+  - Contains unique content that doesn't fit contextually in other documents
+  - Is actively referenced from multiple locations

@@ -32,25 +32,18 @@ BDD focuses on defining the behavior of a system from the outside in, encouragin
 ### Practical operations of bdd
 
 1. **Writing User Stories**:
-
    - **Template**:
      - **As a** [user role]
      - **I want** [feature]
      - **So that** [benefit]
-
    - **Purpose**: Captures who needs what and why, focusing on delivering business value.
-
 2. **Defining Acceptance Criteria with Scenarios**:
-
    - **Format**:
      - **Given** [initial context]
      - **When** [event occurs]
      - **Then** [outcome]
-
    - **Purpose**: Breaks down user stories into specific, testable examples of desired behavior.
-
 3. **Automating Scenarios**:
-
    - **Tools**: Use BDD frameworks like Cucumber, JBehave, or SpecFlow to turn written scenarios into executable tests.
 
    - **Purpose**: Ensures that specifications are always up-to-date and that the system behaves as expected.
@@ -61,11 +54,8 @@ BDD focuses on defining the behavior of a system from the outside in, encouragin
      - Write code to fulfill the scenarios.
      - Run automated tests to verify behavior.
      - Refactor code while keeping tests green.
-
    - **Purpose**: Aligns development with defined behaviors, reducing defects and rework.
-
 5. **Continuous Feedback and Refinement**:
-
    - **Feedback Loop**: Failing tests highlight deviations from expected behavior, allowing for immediate correction.
 
    - **Collaboration**: Regular discussions among team members to refine requirements based on new insights or changes.
@@ -178,13 +168,11 @@ Run tests with specific tags using:
    - Use domain terminology
    - Keep scenarios independent
    - Use declarative (what) not imperative (how) language
-
 2. **Step Definitions**:
    - Keep steps reusable
    - Maintain appropriate granularity
    - Follow the Arrange-Act-Assert pattern
    - Use domain objects rather than UI details
-
 3. **Test Organization**:
    - Group related scenarios in a feature
    - Use the Background section for common setup

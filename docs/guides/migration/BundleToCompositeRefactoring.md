@@ -25,14 +25,11 @@ The following changes were implemented:
    - `BundleEvent` → `CompositeEvent`
    - `BundleFunction` → `CompositeFunction`
    - `BundleData` → `CompositeData`
-
 2. **Package Structure**:
    - `org.samstraumr.tube.bundle` → `org.samstraumr.tube.composite`
-
 3. **Test Classes**:
    - `BundleTest` → `CompositeTest`
    - `@BundleTest` annotation → `@CompositeTest` annotation
-
 4. **Documentation**:
    - `docs/BundlesAndMachines.md` → `docs/concepts/composites-and-machines.md`
    - Updated all references from "Bundle" to "Composite" in docs
@@ -51,37 +48,36 @@ To maintain backward compatibility during the transition period:
 If you're working with existing code that uses the Bundle pattern, here's how to migrate to the new Composite pattern:
 
 1. Replace all imports:
+
    ```java
    // Old
    import org.samstraumr.tube.bundle.Bundle;
    import org.samstraumr.tube.bundle.BundleFactory;
-   
+
    // New
    import org.samstraumr.tube.composite.Composite;
    import org.samstraumr.tube.composite.CompositeFactory;
    ```
-
 2. Update method calls:
+
    ```java
    // Old
    Bundle bundle = BundleFactory.createBundle(env);
    bundle.getBundleId();
-   
+
    // New
    Composite composite = CompositeFactory.createComposite(env);
    composite.getCompositeId();
    ```
-
 3. Replace test annotations:
+
    ```java
    // Old
    @BundleTest
-   
+
    // New
    @CompositeTest
    ```
-
 4. Update documentation references to point to the new docs.
 
 ## Timeline
-

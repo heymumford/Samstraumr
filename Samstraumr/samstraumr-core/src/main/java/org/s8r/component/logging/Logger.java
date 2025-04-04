@@ -1,13 +1,12 @@
 /**
  * Copyright (c) 2025 Eric C. Mumford (@heymumford)
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
- * If a copy of the MPL was not distributed with this file, You can obtain one at
+ *
+ * <p>This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy
+ * of the MPL was not distributed with this file, You can obtain one at
  * https://github.com/heymumford/Samstraumr/blob/main/LICENSE
  *
- * Implementation of the unified Logger for components in the S8r framework
+ * <p>Implementation of the unified Logger for components in the S8r framework
  */
-
 package org.s8r.component.logging;
 
 import java.awt.Color;
@@ -21,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * Provides enhanced logging functionality for components.
  *
  * <p>This class offers logging capabilities with component-specific contextual information and
- * categorization through tags. It's part of the simplified package structure, replacing the 
+ * categorization through tags. It's part of the simplified package structure, replacing the
  * combination of TubeLogger and TubeLoggerInfo with a single, integrated class.
  */
 public class Logger {
@@ -220,9 +219,9 @@ public class Logger {
 
   /**
    * Contains metadata for component logging, including identifiers and visual cues.
-   * 
-   * <p>This inner class integrates what was previously a separate LoggerInfo class,
-   * maintaining all the same functionality while reducing the number of separate files.
+   *
+   * <p>This inner class integrates what was previously a separate LoggerInfo class, maintaining all
+   * the same functionality while reducing the number of separate files.
    */
   public static class LoggerInfo {
     private final String componentId;
@@ -259,15 +258,15 @@ public class Logger {
         String message, String level, String[] tags, Map<String, Object> additionalContext) {
       Map<String, Object> logInfo = new HashMap<>();
       logInfo.put("componentId", componentId);
-      
+
       if (compositeId != null) {
         logInfo.put("compositeId", compositeId);
       }
-      
+
       if (machineId != null) {
         logInfo.put("machineId", machineId);
       }
-      
+
       logInfo.put("message", message);
       logInfo.put("level", level);
       logInfo.put("sequenceNumber", sequenceNumber.getAndIncrement());
@@ -284,9 +283,9 @@ public class Logger {
 
     /**
      * Generates a color-based visual hash from a component ID.
-     * 
-     * <p>This method creates a consistent color representation based on the component ID,
-     * allowing for quick visual identification of log entries from the same component.
+     *
+     * <p>This method creates a consistent color representation based on the component ID, allowing
+     * for quick visual identification of log entries from the same component.
      *
      * @param id The component ID to hash
      * @return A hex color code representing the component ID
@@ -294,7 +293,7 @@ public class Logger {
     private String generateVisualHash(String id) {
       // Using a positive long value to avoid Integer.MIN_VALUE issue when taking absolute value
       long hash = id.hashCode() & 0xFFFFFFFFL;
-      Color color = 
+      Color color =
           new Color((int) (hash % 255), (int) ((hash >> 8) % 255), (int) ((hash >> 16) % 255));
       return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }

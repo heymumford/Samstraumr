@@ -4,10 +4,11 @@ package org.s8r.core.tube.identity;
  * A utility class for inspecting Identity instances.
  *
  * <p>This class is part of the simplified package structure, replacing the more specific
- * TubeIdentityInspector with a more general IdentityInspector in the s8r.core.tube.identity package.
+ * TubeIdentityInspector with a more general IdentityInspector in the s8r.core.tube.identity
+ * package.
  *
- * <p>It is intended for debugging and testing, to show how Identity objects are
- * constructed and what they contain in memory.
+ * <p>It is intended for debugging and testing, to show how Identity objects are constructed and
+ * what they contain in memory.
  */
 public class IdentityInspector {
 
@@ -96,8 +97,7 @@ public class IdentityInspector {
     System.out.println("\n" + inspect(childId));
 
     // Create a second-generation child
-    Identity grandchildId =
-        Identity.createChildIdentity("Grandchild Component Demo", env, childId);
+    Identity grandchildId = Identity.createChildIdentity("Grandchild Component Demo", env, childId);
     childId.addChild(grandchildId);
     System.out.println("\n" + inspect(grandchildId));
   }

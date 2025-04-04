@@ -7,33 +7,39 @@ This directory contains the testing framework for the Samstraumr project, organi
 Tests are organized hierarchically following Martin Fowler's test organization principles, with tests grouped by component level complexity:
 
 ### Hierarchical Structure
+
 - `@L0_Tube` - Atomic tube component tests
 - `@L1_Bundle` - Bundle-level integration tests
 - `@L2_Machine` - Complex machine composition tests
 - `@L3_System` - Full system tests
 
 ### Critical Path Categorization
+
 - `@ATL` - Above-the-line critical tests (must pass)
 - `@BTL` - Below-the-line robustness tests
 
 ### Core Capabilities
+
 - `@Identity` - UUID, naming, identification tests
 - `@Flow` - Data movement and transformation
 - `@State` - State management and transitions
 - `@Awareness` - Self-monitoring and environment awareness
 
 ### Lifecycle Tests
+
 - `@Init` - Initialization/construction tests
 - `@Runtime` - Normal operation tests
 - `@Termination` - Shutdown/cleanup tests
 
 ### Patterns
+
 - `@Observer` - Monitoring pattern tests
 - `@Transformer` - Data transformation tests
 - `@Validator` - Input validation tests
 - `@CircuitBreaker` - Fault tolerance tests
 
 ### Non-functional
+
 - `@Performance` - Speed and resource usage
 - `@Resilience` - Recovery and fault handling
 - `@Scale` - Load and scaling tests

@@ -315,20 +315,21 @@ patterns with context-specific terminology.
 
 **Table 1: Comparative Developmental Stages and Modern Classifications**
 
-  ---------------------------- ----------------------------------------------------------------------------------------------------------------- --------------------------------------------------------------------------------------------------------- --------------------------------------------------------------------------------------------------------------------------------------------------------------
-  **Stage Category**           **Animals**                                                                                                       **Plants**                                                                                                **Insects**
-                                                                                                                                                                                                                                                           
-  **Early Development**        Fertilization, Cleavage (Morula), Blastulation (Blastula/Blastocyst), Gastrulation (Germ Layers), Organogenesis   Fertilization (Zygote), Globular Stage, Heart Stage, Torpedo Stage, Maturation Stage (Seed Formation)     Fertilization (Egg), Initial Cleavage
-                                                                                                                                                                                                                                                           
-  **Immature/Juvenile**        Embryo (post-organogenesis), Fetus (in mammals), Larva (in some groups)                                           Embryo within seed, Seedling                                                                              Larva (Holometabola), Nymph (Hemimetabola, Ametabola)
-                                                                                                                                                                                                                                                           
-  **Transformation**           Metamorphosis (in some groups)                                                                                    Germination, Vegetative Growth                                                                            Metamorphosis (Pupa in Holometabola, Molting in Hemimetabola/Ametabola)
-                                                                                                                                                                                                                                                           
-  **Adult Stage**              Adult (Reproductive Maturity)                                                                                     Mature Plant (Reproductive Maturity: Flowering, Fruiting)                                                 Adult (Reproductive Maturity)
-                                                                                                                                                                                                                                                           
-  **Modern Classifications**   Embryogenesis, Post-Embryonic Development, Metamorphosis (if applicable)                                          Embryogenesis, Germination, Seedling Development, Vegetative Growth, Reproductive Development, Maturity   Ametabolous (Simple), Hemimetabolous (Incomplete), Holometabolous (Complete); Stages: Egg, Nymph/Larva, Pupa (if applicable), Adult; Instars (between molts)
-                                                                                                                                                                                                                                                           
-  ---------------------------- ----------------------------------------------------------------------------------------------------------------- --------------------------------------------------------------------------------------------------------- --------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------- ----------------------------------------------------------------------------------------------------------------- --------------------------------------------------------------------------------------------------------- --------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+**Stage Category**           **Animals**                                                                                                       **Plants**                                                                                                **Insects**
+
+**Early Development**        Fertilization, Cleavage (Morula), Blastulation (Blastula/Blastocyst), Gastrulation (Germ Layers), Organogenesis   Fertilization (Zygote), Globular Stage, Heart Stage, Torpedo Stage, Maturation Stage (Seed Formation)     Fertilization (Egg), Initial Cleavage
+
+**Immature/Juvenile**        Embryo (post-organogenesis), Fetus (in mammals), Larva (in some groups)                                           Embryo within seed, Seedling                                                                              Larva (Holometabola), Nymph (Hemimetabola, Ametabola)
+
+**Transformation**           Metamorphosis (in some groups)                                                                                    Germination, Vegetative Growth                                                                            Metamorphosis (Pupa in Holometabola, Molting in Hemimetabola/Ametabola)
+
+**Adult Stage**              Adult (Reproductive Maturity)                                                                                     Mature Plant (Reproductive Maturity: Flowering, Fruiting)                                                 Adult (Reproductive Maturity)
+
+**Modern Classifications**   Embryogenesis, Post-Embryonic Development, Metamorphosis (if applicable)                                          Embryogenesis, Germination, Seedling Development, Vegetative Growth, Reproductive Development, Maturity   Ametabolous (Simple), Hemimetabolous (Incomplete), Holometabolous (Complete); Stages: Egg, Nymph/Larva, Pupa (if applicable), Adult; Instars (between molts)
+
+---------------------------- ----------------------------------------------------------------------------------------------------------------- --------------------------------------------------------------------------------------------------------- --------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 **Conclusion**
 
@@ -352,31 +353,31 @@ governing the development of life.
 
 **Works cited**
 
-1.  Animal embryonic development - Wikipedia, accessed on April 3, 2025,
+1. Animal embryonic development - Wikipedia, accessed on April 3, 2025,
 
-2.  Animal Development I: Fertilization & Cleavage \| Organismal
-    Biology - Georgia Tech, accessed on April 3, 2025,
+2. Animal Development I: Fertilization & Cleavage \| Organismal
+   Biology - Georgia Tech, accessed on April 3, 2025,
 
-3.  Life cycles and the evolution of developmental patterns -
-    Developmental Biology - NCBI, accessed on April 3, 2025,
+3. Life cycles and the evolution of developmental patterns -
+   Developmental Biology - NCBI, accessed on April 3, 2025,
 
-4.  The Circle of Life: The Stages of Animal Development - Developmental
-    Biology - NCBI, accessed on April 3, 2025,
+4. The Circle of Life: The Stages of Animal Development - Developmental
+   Biology - NCBI, accessed on April 3, 2025,
 
-5.  An Introduction to Early Developmental Processes - Developmental
-    Biology - NCBI, accessed on April 3, 2025,
+5. An Introduction to Early Developmental Processes - Developmental
+   Biology - NCBI, accessed on April 3, 2025,
 
-6.  Fertilization and Early Embryonic Development - OpenEd CUNY,
-    accessed on April 3, 2025,
+6. Fertilization and Early Embryonic Development - OpenEd CUNY,
+   accessed on April 3, 2025,
 
-7.  24.6. Fertilization and Early Embryonic Development --Concepts of
-    Biology, accessed on April 3, 2025,
+7. 24.6. Fertilization and Early Embryonic Development --Concepts of
+   Biology, accessed on April 3, 2025,
 
-8.  Principles of Self-Organization of the Mammalian Embryo - PMC -
-    PubMed Central, accessed on April 3, 2025,
+8. Principles of Self-Organization of the Mammalian Embryo - PMC -
+   PubMed Central, accessed on April 3, 2025,
 
-9.  Animal Development II: Gastrulation & Organogenesis \| Organismal
-    Biology - Georgia Tech, accessed on April 3, 2025,
+9. Animal Development II: Gastrulation & Organogenesis \| Organismal
+   Biology - Georgia Tech, accessed on April 3, 2025,
 
 10. Cell Movements and the Shaping of the Vertebrate Body - NCBI,
     accessed on April 3, 2025,

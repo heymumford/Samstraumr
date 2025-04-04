@@ -1,7 +1,7 @@
 # Testing
 
-
 ## Table of Contents
+
 - [Introduction](#introduction)
 - [Testing Philosophy](#testing-philosophy)
 - [Test Types](#test-types)
@@ -49,6 +49,7 @@ Samstraumr adopts Behavior-Driven Development (BDD) with Cucumber, creating a un
 Samstraumr uses a variety of testing tools and frameworks to support its comprehensive testing strategy:
 
 ### Junit 5
+
 The foundation of Samstraumr's testing infrastructure, providing core testing capabilities:
 
 - **Extensions**: Custom extensions for property-based testing, parameterized tests, and dynamic test generation
@@ -563,3 +564,4 @@ You can simulate the CI pipeline locally to catch issues before pushing:
 ```bash
 # Testing
 ./build-checks.sh && ./build-performance.sh test -P atl-tests
+```

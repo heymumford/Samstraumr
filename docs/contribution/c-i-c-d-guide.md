@@ -48,21 +48,23 @@ The build report will be generated in `target/samstraumr-report/index.html`.
 ### Installation
 
 1. **Linux/WSL**:
+
    ```bash
    sudo curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
    ```
-   
+
    Alternatively, download the binary and place in your path:
+
    ```bash
    sudo mv act /usr/local/bin/
    ```
-
 2. **macOS**:
+
    ```bash
    brew install act
    ```
-
 3. **Windows**:
+
    ```bash
    choco install act-cli
    ```
@@ -70,12 +72,13 @@ The build report will be generated in `target/samstraumr-report/index.html`.
 ### Configuration
 
 1. Create a configuration file:
+
    ```bash
    mkdir -p ~/.config/act
    echo "-P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest" > ~/.config/act/actrc
    ```
-
 2. Configure for root user if needed (for docker socket access):
+
    ```bash
    sudo mkdir -p /root/.config/act
    sudo bash -c 'echo "-P ubuntu-latest=ghcr.io/catthehacker/ubuntu:act-latest" > /root/.config/act/actrc'
@@ -84,27 +87,28 @@ The build report will be generated in `target/samstraumr-report/index.html`.
 ### Running workflows locally
 
 1. **List Available Jobs**:
+
    ```bash
    act -l
    ```
-
 2. **Dry Run** (no actual execution):
+
    ```bash
    act -j initialization --dryrun
    ```
-
 3. **Run Individual Jobs**:
+
    ```bash
    sudo act -j get-version
    sudo act -j initialization
    ```
-
 4. **Run with Specific Event**:
+
    ```bash
    sudo act workflow_dispatch -j get-version -W .github/workflows/samstraumr-pipeline.yml
    ```
-
 5. **Run Entire Workflow**:
+
    ```bash
    sudo act
    ```
@@ -114,12 +118,10 @@ The build report will be generated in `target/samstraumr-report/index.html`.
 1. **Permission Issues**:
    - If you encounter permission errors with Docker/Podman: `sudo act` to run with elevated privileges
    - Ensure Docker daemon is running: `systemctl status docker` (or equivalent)
-
 2. **Image Issues**:
    - Act uses container images to simulate GitHub runners
    - Medium size image (~500MB) is recommended: `ghcr.io/catthehacker/ubuntu:act-latest`
    - If images won't pull, check internet connection and registry access
-
 3. **Act Not Finding Workflows**:
    - Use `-W .github/workflows/samstraumr-pipeline.yml` to explicitly specify workflow file
    - Ensure you're running act from the repository root directory
@@ -129,11 +131,12 @@ The build report will be generated in `target/samstraumr-report/index.html`.
 For version bumps and badge updates:
 
 1. **Bump Version**:
+
    ```bash
    ./util/version bump patch
    ```
-
 2. **Generate Badges**:
+
    ```bash
    ./util/badges/generate-badges.sh all
    ```
@@ -144,7 +147,6 @@ For version bumps and badge updates:
    - Run at minimum: `act -j initialization --dryrun`
    - Run all tests locally: `./run-tests.sh all`
    - Check code quality: `./util/quality/build-checks.sh`
-
 2. **Pull Request Workflow**:
    - Create feature branch
    - Make changes and run local verification
@@ -152,9 +154,7 @@ For version bumps and badge updates:
    - Verify GitHub Actions pipeline passes
    - Address review comments
    - Merge when approved
-
 3. **Badge Status**:
    - Green: All tests passing
    - Yellow: In progress
    - Red: Tests failing
-   

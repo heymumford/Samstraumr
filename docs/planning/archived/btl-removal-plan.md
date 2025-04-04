@@ -61,7 +61,7 @@ Update the test scripts to remove BTL test execution but preserve the BTL infras
 
 Keep these annotations as part of the testing infrastructure:
 
-- `org.samstraumr.tube.annotations.BTL.java` 
+- `org.samstraumr.tube.annotations.BTL.java`
 - `org.samstraumr.tube.annotations.BelowTheLine.java`
 
 ### 2. BTL Testing Documentation

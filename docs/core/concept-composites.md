@@ -1,7 +1,7 @@
 # Composites and Machines
 
-
 ## Table of Contents
+
 - [Introduction: From Cells to Organisms](#introduction-from-cells-to-organisms)
 - [Composites: Collaborative Communities](#composites-collaborative-communities)
 - [Machines: Orchestrated Systems](#machines-orchestrated-systems)
@@ -159,3 +159,4 @@ M0 (Payment Platform)
 └── C2 (Reporting Composite)
     ├── T0 (Transaction Logger Tube)
     ├── T1 (Analytics Tube)
+```

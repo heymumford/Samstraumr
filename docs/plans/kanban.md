@@ -25,7 +25,6 @@ This document tracks the current development tasks in a Kanban-style board. Each
   - **Category**: Build/CI
   - **Plan**: [active-unified-quality-checks.md](./active-unified-quality-checks.md)
   - **Estimated completion**: 2025-04-20
-
 - [ ] **Improve documentation generation**
   - Add automatic README updates
   - Create changelog generation
@@ -33,7 +32,6 @@ This document tracks the current development tasks in a Kanban-style board. Each
   - **Category**: Documentation
   - **Plan**: [active-documentation-generation.md](./active-documentation-generation.md)
   - **Estimated completion**: 2025-04-30
-
 - [ ] **Standardize TODOs and FIXMEs**
   - Create consistent format for code TODOs
   - Link TODOs to GitHub issues
@@ -49,7 +47,7 @@ This document tracks the current development tasks in a Kanban-style board. Each
   - Convert all documentation files to kebab-case ✅
   - Update header formatting to follow standards ✅
   - Fix cross-references between files ✅
-  - Simplify directory structure ✅ 
+  - Simplify directory structure ✅
   - Create READMEs for new directory structure ✅
   - Create migration script for remaining files ✅
   - Finalize automatic cross-reference updates
@@ -58,7 +56,6 @@ This document tracks the current development tasks in a Kanban-style board. Each
   - **Owner**: Claude Code
   - **Plan**: [active-documentation-standardization.md](./active-documentation-standardization.md)
   - **Estimated completion**: 2025-04-06
-
 - [ ] **Complete unified testing approach implementation**
   - Fix ATL test discovery issues
   - Add tests for unified test runner
@@ -78,7 +75,6 @@ This document tracks the current development tasks in a Kanban-style board. Each
   - **Category**: Documentation
   - **Completed**: 2025-04-04
   - **Related**: [work-tracking-guide.md](./work-tracking-guide.md)
-
 - [x] **Planning infrastructure improvements**
   - Created Kanban-style planning board
   - Implemented task tracking for To Do, In Progress, and Done
@@ -89,7 +85,6 @@ This document tracks the current development tasks in a Kanban-style board. Each
   - **Category**: Project Management
   - **Completed**: 2025-04-04
   - **Related**: [kanban.md](./kanban.md)
-
 - [x] **Git workflow improvements**
   - Added git hooks for code quality
   - Implemented hook to prevent AI signatures in commit messages
@@ -98,7 +93,6 @@ This document tracks the current development tasks in a Kanban-style board. Each
   - **Category**: DevOps
   - **Completed**: 2025-04-04
   - **Related**: [../contrib/git-workflow.md](../contrib/git-workflow.md)
-
 - [x] **Script simplification**
   - Created unified test runner
   - Standardized argument parsing
@@ -107,7 +101,6 @@ This document tracks the current development tasks in a Kanban-style board. Each
   - **Category**: DevOps
   - **Completed**: 2025-04-04
   - **Related**: [complete-test-refactoring-summary.md](./complete-test-refactoring-summary.md)
-
 - [x] **Version management refactoring**
   - Modularized version management scripts
   - Added semantic versioning support
@@ -116,7 +109,6 @@ This document tracks the current development tasks in a Kanban-style board. Each
   - **Category**: Build
   - **Completed**: 2025-04-03
   - **Related**: [complete-version-refactoring-summary.md](./complete-version-refactoring-summary.md)
-
 - [x] **Folder structure reorganization**
   - Flattened package hierarchy
   - Standardized resource locations
@@ -128,6 +120,7 @@ This document tracks the current development tasks in a Kanban-style board. Each
 ## Task Templates
 
 ### New task template
+
 ```markdown
 - [ ] **Task Name**
   - Brief description of the task
@@ -141,6 +134,7 @@ This document tracks the current development tasks in a Kanban-style board. Each
 ```
 
 ### Completed task template
+
 ```markdown
 - [x] **Task Name**
   - Brief description of what was done

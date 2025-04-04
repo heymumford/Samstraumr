@@ -7,6 +7,7 @@ This document analyzes each job in the GitHub workflow, its purpose, and its val
 ## Job Analysis
 
 ### 1. `submit-maven`
+
 **Description:** Basic Maven verification job that runs `mvn verify -DskipTests` and uploads JAR artifacts.
 **Purpose:** Quick verification that the project can be built without running tests.
 **Value Assessment:** ⚠️ **QUESTIONABLE VALUE**
@@ -16,6 +17,7 @@ This document analyzes each job in the GitHub workflow, its purpose, and its val
 - **Recommendation:** REMOVE - redundant with `initialization` job
 
 ### 2. `get-version`
+
 **Description:** Extracts the project version from version.properties.
 **Purpose:** Provides version information to other jobs and the workflow summary.
 **Value Assessment:** ✅ **VALUABLE**
@@ -25,6 +27,7 @@ This document analyzes each job in the GitHub workflow, its purpose, and its val
 - **Recommendation:** KEEP - essential for versioning
 
 ### 3. `initialization`
+
 **Description:** Validates that the code compiles and caches Maven packages.
 **Purpose:** Basic project verification and environment setup.
 **Value Assessment:** ✅ **VALUABLE**
@@ -34,6 +37,7 @@ This document analyzes each job in the GitHub workflow, its purpose, and its val
 - **Recommendation:** KEEP & ENHANCE - merge with `submit-maven` functionality
 
 ### 4. `orchestration-tests`
+
 **Description:** Runs orchestration tests (highest level of ATL tests).
 **Purpose:** Validates system assembly and connectivity.
 **Value Assessment:** ✅ **VALUABLE**
@@ -43,6 +47,7 @@ This document analyzes each job in the GitHub workflow, its purpose, and its val
 - **Recommendation:** KEEP - essential first test layer
 
 ### 5. `unit-tests` (includes tube, flow, composite tests)
+
 **Description:** Runs unit and component level tests.
 **Purpose:** Validates individual components and their interactions.
 **Value Assessment:** ✅ **VALUABLE**
@@ -51,6 +56,7 @@ This document analyzes each job in the GitHub workflow, its purpose, and its val
 - **Recommendation:** KEEP - core testing layer
 
 ### 6. `integration-tests` (stream and adaptation tests)
+
 **Description:** Runs integration tests with database services.
 **Purpose:** Tests component interactions and system behaviors.
 **Value Assessment:** ✅ **VALUABLE**
@@ -59,6 +65,7 @@ This document analyzes each job in the GitHub workflow, its purpose, and its val
 - **Recommendation:** KEEP - important for system stability
 
 ### 7. `e2e-tests` (machine and acceptance tests)
+
 **Description:** Runs end-to-end and acceptance tests.
 **Purpose:** Validates system from user perspective.
 **Value Assessment:** ✅ **VALUABLE**
@@ -67,6 +74,7 @@ This document analyzes each job in the GitHub workflow, its purpose, and its val
 - **Recommendation:** KEEP - validates user scenarios
 
 ### 8. `quality-analysis`
+
 **Description:** Runs code quality tools (Spotless, Checkstyle, SpotBugs, JaCoCo, SonarQube).
 **Purpose:** Ensures code quality and standards compliance.
 **Value Assessment:** ✅ **VALUABLE**
@@ -76,6 +84,7 @@ This document analyzes each job in the GitHub workflow, its purpose, and its val
 - **Recommendation:** KEEP - essential for code quality
 
 ### 9. `btl-tests`
+
 **Description:** Runs Below-The-Line tests for robustness.
 **Purpose:** Additional tests for edge cases and robustness.
 **Value Assessment:** ⚠️ **CONDITIONAL VALUE**
@@ -85,6 +94,7 @@ This document analyzes each job in the GitHub workflow, its purpose, and its val
 - **Recommendation:** MAKE OPTIONAL - run only in specific contexts
 
 ### 10. `build-report`
+
 **Description:** Generates and publishes build reports.
 **Purpose:** Creates documentation and metrics reports.
 **Value Assessment:** ⚠️ **QUESTIONABLE VALUE**
@@ -94,6 +104,7 @@ This document analyzes each job in the GitHub workflow, its purpose, and its val
 - **Recommendation:** SIMPLIFY - keep artifact generation, remove GitHub Pages deployment
 
 ### 11. `workflow-summary`
+
 **Description:** Adds a summary to the GitHub Actions UI.
 **Purpose:** Provides an overview of the build process.
 **Value Assessment:** ✅ **VALUABLE**
@@ -106,7 +117,7 @@ This document analyzes each job in the GitHub workflow, its purpose, and its val
 
 1. **Remove:** `submit-maven` (redundant with initialization)
 2. **Keep:** `get-version`, `initialization`, `orchestration-tests`, `unit-tests`, `integration-tests`, `e2e-tests`, `quality-analysis`, `workflow-summary`
-3. **Modify:** 
+3. **Modify:**
    - `btl-tests` - Make optional, triggered by labels or manual dispatch only
    - `build-report` - Simplify to focus on useful artifacts without unnecessary deployment
 

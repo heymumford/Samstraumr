@@ -89,6 +89,7 @@ Technical debt and future improvements in code should be tracked using a standar
 ```
 
 Example:
+
 ```java
 // TODO [P2] (#123): Implement error handling for network failures
 ```
@@ -103,6 +104,7 @@ Example:
 ### Categories (Optional)
 
 Categories can be added in parentheses:
+
 ```java
 // TODO [P1] (BUG) (#123): Fix null pointer exception
 ```

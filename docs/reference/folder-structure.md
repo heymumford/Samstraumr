@@ -24,11 +24,11 @@ Samstraumr follows a multi-module Maven project structure with a focus on mainta
 
 The project root contains these main directories:
 
-| Directory | Purpose |
-|-----------|---------|
-| **`Samstraumr/`** | Main code module containing the core library |
-| **`docs/`** | Comprehensive documentation organized by topic |
-| **`util/`** | Utility scripts for building, testing, and maintenance |
+|     Directory     |                        Purpose                         |
+|-------------------|--------------------------------------------------------|
+| **`Samstraumr/`** | Main code module containing the core library           |
+| **`docs/`**       | Comprehensive documentation organized by topic         |
+| **`util/`**       | Utility scripts for building, testing, and maintenance |
 
 Top-level files include:
 
@@ -69,36 +69,36 @@ Samstraumr/samstraumr-core/
 
 ### Source code packages
 
-| Package | Purpose | Key Classes |
-|---------|---------|-------------|
-| `org.samstraumr.tube` | Core tube implementation | `Tube`, `Environment`, `TubeStatus` |
-| `org.samstraumr.tube.bundle` | Legacy bundle implementation | `Bundle`, `BundleFactory` |
-| `org.samstraumr.tube.composite` | Composite pattern implementation | `Composite`, `CompositeFactory` |
+|             Package             |             Purpose              |             Key Classes             |
+|---------------------------------|----------------------------------|-------------------------------------|
+| `org.samstraumr.tube`           | Core tube implementation         | `Tube`, `Environment`, `TubeStatus` |
+| `org.samstraumr.tube.bundle`    | Legacy bundle implementation     | `Bundle`, `BundleFactory`           |
+| `org.samstraumr.tube.composite` | Composite pattern implementation | `Composite`, `CompositeFactory`     |
 
 ### Test code organization
 
-| Package | Purpose | Key Classes |
-|---------|---------|-------------|
-| `org.samstraumr.tube.test` | Common test utilities | `RunTests` |
-| `org.samstraumr.tube.steps` | Cucumber step definitions | `*Steps.java` classes |
-| `org.samstraumr.tube.test.annotations` | Test annotations | Test categorization annotations |
-| `org.samstraumr.tube.test.runners` | Test runners | `ATLTestRunner`, `BTLTestRunner` |
+|                Package                 |          Purpose          |           Key Classes            |
+|----------------------------------------|---------------------------|----------------------------------|
+| `org.samstraumr.tube.test`             | Common test utilities     | `RunTests`                       |
+| `org.samstraumr.tube.steps`            | Cucumber step definitions | `*Steps.java` classes            |
+| `org.samstraumr.tube.test.annotations` | Test annotations          | Test categorization annotations  |
+| `org.samstraumr.tube.test.runners`     | Test runners              | `ATLTestRunner`, `BTLTestRunner` |
 
 ## Documentation Organization
 
 Documentation in the `docs/` directory is organized by topic:
 
-| Directory | Content | Key Files |
-|-----------|---------|-----------|
-| `docs/concepts/` | Core theoretical concepts | `core-concepts.md`, `state-management.md` |
-| `docs/guides/` | How-to guides and tutorials | `getting-started.md`, `tube-patterns.md` |
-| `docs/reference/` | Technical reference information | `glossary.md`, `configuration-reference.md` |
-| `docs/testing/` | Testing approach | `test-strategy.md`, `bdd-with-cucumber.md` |
-| `docs/contribution/` | Contribution guidelines | `code-standards.md`, `configuration-standards.md` |
-| `docs/research/` | Research papers | `llm-context-proposal.md` |
-| `docs/proposals/` | Design proposals | Various design proposals |
-| `docs/compatibility/` | Compatibility information | `COMPATIBILITY_REPORT.md` |
-| `docs/site/` | Templates for site generation | Build report templates |
+|       Directory       |             Content             |                     Key Files                     |
+|-----------------------|---------------------------------|---------------------------------------------------|
+| `docs/concepts/`      | Core theoretical concepts       | `core-concepts.md`, `state-management.md`         |
+| `docs/guides/`        | How-to guides and tutorials     | `getting-started.md`, `tube-patterns.md`          |
+| `docs/reference/`     | Technical reference information | `glossary.md`, `configuration-reference.md`       |
+| `docs/testing/`       | Testing approach                | `test-strategy.md`, `bdd-with-cucumber.md`        |
+| `docs/contribution/`  | Contribution guidelines         | `code-standards.md`, `configuration-standards.md` |
+| `docs/research/`      | Research papers                 | `llm-context-proposal.md`                         |
+| `docs/proposals/`     | Design proposals                | Various design proposals                          |
+| `docs/compatibility/` | Compatibility information       | `COMPATIBILITY_REPORT.md`                         |
+| `docs/site/`          | Templates for site generation   | Build report templates                            |
 
 Top-level documentation files include:
 
@@ -111,13 +111,13 @@ Top-level documentation files include:
 
 Utility scripts in the `util/` directory are organized by function:
 
-| Directory | Purpose | Key Scripts |
-|-----------|---------|-------------|
-| `util/badges/` | Build status badge generation | `generate-badges.sh` |
-| `util/build/` | Build optimization scripts | `build-optimal.sh`, `generate-build-report.sh` |
-| `util/maintenance/` | Maintenance utilities | `cleanup-maven.sh`, `update-version.sh` |
-| `util/quality/` | Quality check scripts | `build-checks.sh`, `check-encoding.sh` |
-| `util/test/` | Test execution utilities | `run-tests.sh`, `run-atl-tests.sh`, `map-test-type.sh` |
+|      Directory      |            Purpose            |                      Key Scripts                       |
+|---------------------|-------------------------------|--------------------------------------------------------|
+| `util/badges/`      | Build status badge generation | `generate-badges.sh`                                   |
+| `util/build/`       | Build optimization scripts    | `build-optimal.sh`, `generate-build-report.sh`         |
+| `util/maintenance/` | Maintenance utilities         | `cleanup-maven.sh`, `update-version.sh`                |
+| `util/quality/`     | Quality check scripts         | `build-checks.sh`, `check-encoding.sh`                 |
+| `util/test/`        | Test execution utilities      | `run-tests.sh`, `run-atl-tests.sh`, `map-test-type.sh` |
 
 The root of `util/` contains:
 
@@ -128,35 +128,35 @@ The root of `util/` contains:
 
 Samstraumr follows these file and directory naming conventions:
 
-| Item Type | Convention | Example |
-|-----------|------------|---------|
-| Documentation files | kebab-case.md | `core-concepts.md` |
-| Directories | lowercase-with-dashes | `util/build/` |
-| Java classes | PascalCase | `TubeLogger.java` |
-| Java interfaces | PascalCase | `TubeInitializer.java` |
-| Shell scripts | kebab-case.sh | `run-tests.sh` |
-| Properties | kebab-case.properties | `version.properties` |
-| XML configuration | lowercase.xml | `log4j2.xml` |
+|      Item Type      |      Convention       |        Example         |
+|---------------------|-----------------------|------------------------|
+| Documentation files | kebab-case.md         | `core-concepts.md`     |
+| Directories         | lowercase-with-dashes | `util/build/`          |
+| Java classes        | PascalCase            | `TubeLogger.java`      |
+| Java interfaces     | PascalCase            | `TubeInitializer.java` |
+| Shell scripts       | kebab-case.sh         | `run-tests.sh`         |
+| Properties          | kebab-case.properties | `version.properties`   |
+| XML configuration   | lowercase.xml         | `log4j2.xml`           |
 
 ## Key Files Reference
 
 ### Configuration files
 
-| File | Location | Purpose |
-|------|----------|---------|
-| `log4j2.xml` | `Samstraumr/samstraumr-core/src/main/resources/` | Logging configuration |
-| `version.properties` | `Samstraumr/` | Version information |
-| `checkstyle.xml` | `Samstraumr/` | Code style configuration |
+|         File         |                     Location                     |         Purpose          |
+|----------------------|--------------------------------------------------|--------------------------|
+| `log4j2.xml`         | `Samstraumr/samstraumr-core/src/main/resources/` | Logging configuration    |
+| `version.properties` | `Samstraumr/`                                    | Version information      |
+| `checkstyle.xml`     | `Samstraumr/`                                    | Code style configuration |
 
 ### Important documentation files
 
-| File | Location | Purpose |
-|------|----------|---------|
-| `CLAUDE.md` | Project root | Special configuration file for AI tooling |
-| `docs/guides/getting-started.md` | `docs/guides/` | Initial setup guide |
-| `docs/reference/glossary.md` | `docs/reference/` | Terminology definitions |
-| `docs/contribution/code-standards.md` | `docs/contribution/` | Coding standards |
-| `docs/reference/configuration-reference.md` | `docs/reference/` | Configuration reference |
+|                    File                     |       Location       |                  Purpose                  |
+|---------------------------------------------|----------------------|-------------------------------------------|
+| `CLAUDE.md`                                 | Project root         | Special configuration file for AI tooling |
+| `docs/guides/getting-started.md`            | `docs/guides/`       | Initial setup guide                       |
+| `docs/reference/glossary.md`                | `docs/reference/`    | Terminology definitions                   |
+| `docs/contribution/code-standards.md`       | `docs/contribution/` | Coding standards                          |
+| `docs/reference/configuration-reference.md` | `docs/reference/`    | Configuration reference                   |
 
 ## Best Practices
 
@@ -198,3 +198,4 @@ Samstraumr/
 │   └── ...
 ├── pom.xml                      # Parent POM
 └── ...                          # Other top-level files
+```

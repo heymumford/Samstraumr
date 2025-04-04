@@ -15,10 +15,10 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Contains metadata for component logging, including identifiers and visual cues.
- * 
+ *
  * <p>This class is part of the simplified package structure, replacing the more specific
  * TubeLoggerInfo with a more general LoggerInfo class in the s8r.core.tube.logging package.
- * 
+ *
  * <p>It maintains component identifiers, sequence numbers for log entries, and visual
  * representations of the component identity to aid in log analysis and visualization.
  */
@@ -57,15 +57,15 @@ public class LoggerInfo {
       String message, String level, String[] tags, Map<String, Object> additionalContext) {
     Map<String, Object> logInfo = new HashMap<>();
     logInfo.put("componentId", componentId);
-    
+
     if (compositeId != null) {
       logInfo.put("compositeId", compositeId);
     }
-    
+
     if (machineId != null) {
       logInfo.put("machineId", machineId);
     }
-    
+
     logInfo.put("message", message);
     logInfo.put("level", level);
     logInfo.put("sequenceNumber", sequenceNumber.getAndIncrement());
@@ -82,9 +82,9 @@ public class LoggerInfo {
 
   /**
    * Generates a color-based visual hash from a component ID.
-   * 
-   * <p>This method creates a consistent color representation based on the component ID,
-   * allowing for quick visual identification of log entries from the same component.
+   *
+   * <p>This method creates a consistent color representation based on the component ID, allowing
+   * for quick visual identification of log entries from the same component.
    *
    * @param id The component ID to hash
    * @return A hex color code representing the component ID
@@ -92,7 +92,7 @@ public class LoggerInfo {
   private String generateVisualHash(String id) {
     // Using a positive long value to avoid Integer.MIN_VALUE issue when taking absolute value
     long hash = id.hashCode() & 0xFFFFFFFFL;
-    Color color = 
+    Color color =
         new Color((int) (hash % 255), (int) ((hash >> 8) % 255), (int) ((hash >> 16) % 255));
     return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
   }

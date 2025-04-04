@@ -1,14 +1,17 @@
 # HeaderStandards
 
 ## Overview
+
 This document outlines the standards for file headers in the Samstraumr project.
 
 ## Principles
+
 - Headers should be simple and clean
 - No author information, creation dates, or modification dates
 - Focus on purpose and functionality, not metadata
 
 ## Java File Headers
+
 ```java
 /*
  * [FILENAME]
@@ -21,6 +24,7 @@ This document outlines the standards for file headers in the Samstraumr project.
 ```
 
 ## Bash Script Headers
+
 ```bash
 # HeaderStandards
 # HeaderStandards
@@ -40,6 +44,7 @@ This document outlines the standards for file headers in the Samstraumr project.
 ```
 
 ## Markdown File Headers
+
 ```markdown
 # HeaderStandards
 
@@ -47,6 +52,7 @@ Brief description of the document's purpose.
 ```
 
 ## Header Update Tools
+
 To update headers across the codebase, use:
 
 - For Java files: `./util/bin/utils/update-java-headers.sh`

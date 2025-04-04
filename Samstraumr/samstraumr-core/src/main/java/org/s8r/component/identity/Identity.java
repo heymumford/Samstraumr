@@ -1,13 +1,12 @@
 /**
  * Copyright (c) 2025 Eric C. Mumford (@heymumford)
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
- * If a copy of the MPL was not distributed with this file, You can obtain one at
+ *
+ * <p>This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy
+ * of the MPL was not distributed with this file, You can obtain one at
  * https://github.com/heymumford/Samstraumr/blob/main/LICENSE
  *
- * Implementation of the component identity concept in the S8r framework
+ * <p>Implementation of the component identity concept in the S8r framework
  */
-
 package org.s8r.component.identity;
 
 import java.time.Instant;
@@ -20,7 +19,6 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.s8r.component.core.State;
 
 /**
  * Represents the identity of a component based on the biological continuity model.

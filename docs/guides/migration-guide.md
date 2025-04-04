@@ -1,7 +1,7 @@
 # Migration Guide
 
-
 ## Table of Contents
+
 - [Introduction: The Journey of Transformation](#introduction-the-journey-of-transformation)
 - [Assessing Your Current Landscape](#assessing-your-current-landscape)
 - [The Strangler Fig Pattern](#the-strangler-fig-pattern)
@@ -761,3 +761,4 @@ notification system saw a 70% reduction in incident rate after migration
 - Data loss incidents were eliminated through improved state management
 - End-to-end visibility improved with consistent monitoring across all tubes
 - The
+```

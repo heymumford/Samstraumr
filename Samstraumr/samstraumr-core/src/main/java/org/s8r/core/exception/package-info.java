@@ -15,6 +15,7 @@
  * </ul>
  *
  * <p>When adding new exceptions, follow these guidelines:
+ *
  * <ul>
  *   <li>Use clear, descriptive names that indicate the type of failure
  *   <li>Include the standard three constructors

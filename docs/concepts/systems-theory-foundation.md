@@ -1,7 +1,7 @@
 # Systems Theory Foundation
 
-
 ## Table of Contents
+
 - [Introduction: Where Code Meets Nature](#introduction-where-code-meets-nature)
 - [The Historical Streams](#the-historical-streams)
 - [Key Principles: Nature's Wisdom in Software](#key-principles-natures-wisdom-in-software)
@@ -69,14 +69,14 @@ No single neuron in your brain understands mathematics, yet together they create
 
 ## Two Worlds in Dialogue
 
-| In Nature's Garden | In Samstraumr's Digital Landscape |
-|-----------------|---------------------------|
-| Cells, tissues, organs, organisms | Tubes, bundles, machines |
-| Homeostasis (body temperature regulation) | State monitoring and adaptation |
-| Membranes and skin | Tube interfaces and encapsulation |
-| Specialized organs (heart, lungs, liver) | Tubes with focused responsibilities |
-| Ecological interdependence | Module relationships through flows |
-| Evolution through natural selection | Self-modification and learning |
+|            In Nature's Garden             |  In Samstraumr's Digital Landscape  |
+|-------------------------------------------|-------------------------------------|
+| Cells, tissues, organs, organisms         | Tubes, bundles, machines            |
+| Homeostasis (body temperature regulation) | State monitoring and adaptation     |
+| Membranes and skin                        | Tube interfaces and encapsulation   |
+| Specialized organs (heart, lungs, liver)  | Tubes with focused responsibilities |
+| Ecological interdependence                | Module relationships through flows  |
+| Evolution through natural selection       | Self-modification and learning      |
 
 ## Bringing Natural Wisdom to Digital Landscapes
 

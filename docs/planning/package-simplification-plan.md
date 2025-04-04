@@ -10,16 +10,13 @@ This document outlines a comprehensive plan to simplify and optimize the package
    - Parallel structures with `org.samstraumr.tube` and `org.tube` packages
    - Multiple implementations of the same functionality across packages
    - Duplicate exception classes in different locations
-
 2. **Verbose Naming Conventions**
    - Full "Samstraumr" name used extensively in packages and artifacts
    - Redundant prefixes in class names within already namespaced packages
-
 3. **Complex Test Organization**
    - Test annotations duplicated across multiple packages
    - Overly complicated test runner hierarchy
    - Multiple implementations of similar test steps
-
 4. **Deep Package Nesting**
    - Some packages are 6+ levels deep (e.g., `org.samstraumr.tube.lifecycle.steps.adam`)
    - Complex navigation and import statements
@@ -89,24 +86,23 @@ org.s8r                         (← replace org.samstraumr)
 
 ## Migration Strategy
 
-To ensure minimal disruption, we'll adopt a gradual migration approach:
+To create a clean and coherent codebase, we'll adopt a complete replacement approach:
 
-1. **Create New Structure Alongside Old**:
-   - Establish new packages without removing existing ones
-   - Begin transitioning code in manageable chunks
-
-2. **Bridge Old and New with Compatibility Layer**:
-   - Create shim classes where needed to support both structures
-   - Use delegation to preserve existing API contracts
-
-3. **Incremental Migration**:
-   - Package-by-package transition to new structure
-   - Complete one component before moving to the next
-
-4. **Deprecation and Cleanup**:
-   - Mark old packages and classes as deprecated
-   - Set clear timeline for removal
-   - Provide migration guides for any breaking changes
+1. **Create New Structure with Complete Functionality**:
+   - Establish new packages with full implementation (not just shells)
+   - Focus on correctness and simplicity rather than compatibility
+2. **Aggressive Replacement**:
+   - Replace entire components at once rather than piecemeal migration
+   - Fully replace old implementations rather than creating adapters
+   - Use refactoring tools to update all references in one operation
+3. **Clean Cut Over**:
+   - Identify all integration points with external systems
+   - Plan for complete replacement in a single change window
+   - Perform thorough testing before and after replacement
+4. **Removal of Legacy Code**:
+   - Immediately remove old implementations after replacement
+   - No periods of dual maintenance
+   - No deprecated periods - clean cuts only
 
 ## Success Criteria
 

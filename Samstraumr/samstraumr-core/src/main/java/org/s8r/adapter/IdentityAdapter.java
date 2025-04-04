@@ -55,30 +55,31 @@ public class IdentityAdapter {
    * @param environment The environment (required for TubeIdentity creation)
    * @return A legacy TubeIdentity object with the same properties
    */
-  public static TubeIdentity toLegacyIdentity(Identity newIdentity, org.samstraumr.tube.Environment environment) {
+  public static TubeIdentity toLegacyIdentity(
+      Identity newIdentity, org.samstraumr.tube.Environment environment) {
     if (newIdentity == null) {
       return null;
     }
 
     TubeIdentity legacyIdentity;
-    
+
     if (newIdentity.isAdamComponent()) {
-      legacyIdentity = TubeIdentity.createAdamIdentity(
-          newIdentity.getReason(), 
-          (environment != null) ? environment : new org.samstraumr.tube.Environment());
+      legacyIdentity =
+          TubeIdentity.createAdamIdentity(
+              newIdentity.getReason(),
+              (environment != null) ? environment : new org.samstraumr.tube.Environment());
     } else {
       // For non-Adam identities, we need a parent identity
       TubeIdentity parentLegacyIdentity = null;
       if (newIdentity.getParentIdentity() != null) {
-        parentLegacyIdentity = toLegacyIdentity(
-            newIdentity.getParentIdentity(), 
-            environment);
+        parentLegacyIdentity = toLegacyIdentity(newIdentity.getParentIdentity(), environment);
       }
-      
-      legacyIdentity = TubeIdentity.createChildIdentity(
-          newIdentity.getReason(),
-          (environment != null) ? environment : new org.samstraumr.tube.Environment(),
-          parentLegacyIdentity);
+
+      legacyIdentity =
+          TubeIdentity.createChildIdentity(
+              newIdentity.getReason(),
+              (environment != null) ? environment : new org.samstraumr.tube.Environment(),
+              parentLegacyIdentity);
     }
 
     // Copy lineage (skipping the first entry which is already set during creation)

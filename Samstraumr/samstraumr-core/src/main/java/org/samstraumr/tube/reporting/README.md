@@ -31,22 +31,24 @@ Command-line tool for generating change management reports. It takes a from-vers
 ### Installation
 
 1. Install the Docmosis JARs:
+
    ```
    ./install-docmosis.sh
    ```
-
 2. Set your license key as an environment variable:
+
    ```
    export DOCMOSIS_KEY=your-license-key
    ```
-   
+
    You may want to add this to your `~/.bashrc` or `~/.zshrc` to make it persistent:
+
    ```
    echo 'export DOCMOSIS_KEY=your-license-key' >> ~/.bashrc
    source ~/.bashrc
    ```
-
 3. Build with the Docmosis profile:
+
    ```
    mvn clean install -P docmosis-report
    ```
@@ -79,7 +81,7 @@ java -cp target/samstraumr-core.jar org.samstraumr.tube.reporting.ChangeReportGe
 - Project Name: Samstraumr
 - Version: 1.2.9
 - Generated: 2025-04-03 14:30:00
-- Changes: 
+- Changes:
   - Added change management reporting
   - Fixed issue with tube initialization
   - Improved test coverage for core modules

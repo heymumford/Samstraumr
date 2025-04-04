@@ -13,9 +13,9 @@ package org.s8r.core.exception;
  * <p>This exception indicates problems during the creation or initialization phase of a component
  * (such as a Tube), including invalid parameters, missing resources, or other initialization
  * failures.
- * 
- * <p>This is part of the simplified package structure, replacing the more specific exceptions
- * like TubeInitializationException with a more general, centralized exception.
+ *
+ * <p>This is part of the simplified package structure, replacing the more specific exceptions like
+ * TubeInitializationException with a more general, centralized exception.
  */
 public class InitializationException extends RuntimeException {
 

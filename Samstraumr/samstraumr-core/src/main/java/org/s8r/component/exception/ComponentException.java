@@ -1,20 +1,19 @@
 /**
  * Copyright (c) 2025 Eric C. Mumford (@heymumford)
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
- * If a copy of the MPL was not distributed with this file, You can obtain one at
+ *
+ * <p>This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy
+ * of the MPL was not distributed with this file, You can obtain one at
  * https://github.com/heymumford/Samstraumr/blob/main/LICENSE
  *
- * Base exception for component-related errors in the S8r framework
+ * <p>Base exception for component-related errors in the S8r framework
  */
-
 package org.s8r.component.exception;
 
 /**
  * Base exception for component-related errors in the S8r framework.
- * 
- * <p>This exception serves as the base class for all component-specific exceptions,
- * providing a unified approach to error handling in the component model.
+ *
+ * <p>This exception serves as the base class for all component-specific exceptions, providing a
+ * unified approach to error handling in the component model.
  */
 public class ComponentException extends RuntimeException {
 

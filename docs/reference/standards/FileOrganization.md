@@ -11,7 +11,7 @@ The root directory should contain only essential files:
 - **LICENSE** - Project license
 - **pom.xml** - Parent Maven build file
 - **.gitignore** - Git ignore rules
-- **.gitattributes** - Git attributes 
+- **.gitattributes** - Git attributes
 - **.editorconfig** - Editor standardization
 
 ## Directory Structure
@@ -82,4 +82,3 @@ The root directory should contain only essential files:
 6. **Documentation proximity** - Keep documentation close to the code it describes
 
 ## Implementation Notes
-

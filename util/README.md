@@ -7,21 +7,25 @@ This directory contains utility scripts for the Samstraumr project. We have reor
 ### Root Level Scripts (Flattened Structure)
 
 #### Version Management
+
 - `version` - Unified and consolidated version management utility (preferred)
 - `version.sh` - Legacy wrapper (deprecated)
 
 #### Build Scripts
+
 - `build-optimal.sh` - Optimized build script with thread and memory settings
 - `build-performance.sh` - Performance-focused build script
 - `build-report.sh` - Generates a comprehensive build report
 
 #### Testing Scripts
+
 - `test-run.sh` - Comprehensive test runner for all test types
 - `test-run-atl.sh` - Runner for Above The Line tests
 - `test-run-all.sh` - Runner supporting multiple test terminologies
 - `test-map-type.sh` - Maps between industry-standard and Samstraumr terminology
 
 #### Setup and Environment Scripts
+
 - `setup-java-env.sh` - Sets up Java environment variables
 - `setup-java17-compat.sh` - Java 17 compatibility script
 - `update-version-test.sh` - Updates version, runs tests, and creates git tag (deprecated)
@@ -29,9 +33,11 @@ This directory contains utility scripts for the Samstraumr project. We have reor
 ### Utility Scripts
 
 #### `/scripts/` directory
+
 Contains helper scripts with consistent naming conventions:
 
 ##### Quality Scripts
+
 - `check-build-quality.sh` - Runs all quality checks
 - `check-encoding.sh` - Verifies file encoding and line endings
 - `fix-pmd.sh` - Fixes PMD-related issues
@@ -39,15 +45,18 @@ Contains helper scripts with consistent naming conventions:
 - `setup-quality-tools.sh` - Enables quality tools in the build
 
 ##### Maintenance Scripts
+
 - `clean-maven.sh` - Cleans Maven repository cache
 - `fix-line-endings.sh` - Corrects line endings in text files
 - `setup-fast-build.sh` - Creates a fast Maven profile for development
 
 ##### Header Management
+
 - `update-java-headers.sh` - Standardizes Java file headers
 - `update-md-headers.sh` - Standardizes Markdown file headers
 
 ##### Other Utilities
+
 - `generate-badges.sh` - Generates status badges
 - `fix-logger.sh` - Fixes logger implementation issues
 

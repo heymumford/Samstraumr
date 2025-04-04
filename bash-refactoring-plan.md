@@ -1,6 +1,7 @@
 # Bash Script Reorganization and Refactoring Plan
 
 ## Current Issues
+
 1. Too many scripts scattered throughout the codebase
 2. Inconsistent organization and naming conventions
 3. Missing or incomplete documentation
@@ -11,6 +12,7 @@
 ## Reorganization Plan
 
 ### New Directory Structure
+
 ```
 /util
 ├── bin         # Consolidated executable scripts
@@ -29,7 +31,9 @@
 ```
 
 ### Script Template
+
 Each script will follow this template:
+
 ```bash
 #!/bin/bash
 #==============================================================================

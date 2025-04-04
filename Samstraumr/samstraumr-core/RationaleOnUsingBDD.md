@@ -1,7 +1,7 @@
 # Rationale for BDD Cucumber Tests in Samstraumr: A Holistic Approach to Software Quality
 
 > **⚠️ DEPRECATED**: This document has been merged into a comprehensive BDD documentation document.
-> 
+>
 > Please refer to the consolidated document for the most up-to-date information:
 > [BDD Documentation](/docs/testing/BddDocumentation.md)
 
@@ -26,21 +26,17 @@ We propose using Behavior-Driven Development (BDD) with Cucumber tests to create
 1. **Alignment with Samstraumr Philosophy**:
    - BDD's focus on behavior meshes perfectly with Samstraumr's concept of tubes with evolving purposes.
    - Cucumber's natural language scenarios reflect the "ubiquitous language" principle, bridging technical and non-technical stakeholders.
-
 2. **Living Documentation**:
    - Cucumber features serve as executable specifications, evolving alongside the system they describe.
    - This aligns with Samstraumr's adaptive nature, ensuring documentation remains current.
-
 3. **Holistic Testing**:
    - BDD scenarios can describe both unit-level tube behavior and system-wide interactions, capturing Samstraumr's multi-layered complexity.
-
 4. **Cynefin Framework Integration**:
    - BDD supports different approaches for various Cynefin domains:
      - Simple: Straightforward scenarios for well-understood behaviors.
      - Complicated: Detailed scenarios with multiple steps for complex but knowable processes.
      - Complex: Scenarios that allow for emergent behaviors and multiple valid outcomes.
      - Chaotic: Rapid prototyping of scenarios to probe and respond to unpredictable situations.
-
 5. **TDD Principles**:
    - Writing scenarios before implementation encourages thoughtful design and clear specification of expected behaviors.
 
@@ -49,18 +45,14 @@ We propose using Behavior-Driven Development (BDD) with Cucumber tests to create
 1. **Test Coverage**:
    - Ensures comprehensive testing of individual tubes and their interactions.
    - Facilitates testing of adaptive behaviors and purpose evolution.
-
 2. **Maintainability**:
    - Natural language scenarios are easier to update as the system evolves.
    - Reduces the gap between specification and implementation.
-
 3. **Collaboration**:
    - Encourages involvement of all stakeholders in defining system behavior.
    - Supports Samstraumr's emphasis on holistic system understanding.
-
 4. **Traceability**:
    - Links features directly to implementing code, aiding in impact analysis and debugging.
-
 5. **Continuous Integration/Deployment**:
    - Cucumber tests can be easily integrated into CI/CD pipelines, supporting Samstraumr's dynamic nature.
 
@@ -71,11 +63,9 @@ We propose using Behavior-Driven Development (BDD) with Cucumber tests to create
 1. **Initial Setup**:
    - Investment in BDD tools and training for the team.
    - Time spent on defining an initial set of features and scenarios.
-
 2. **Learning Curve**:
    - Team members need to adapt to thinking in terms of behaviors and scenarios.
    - Potential initial slowdown in development velocity.
-
 3. **Ongoing Maintenance**:
    - Regular updates to scenarios as the system evolves.
    - Potential for scenario bloat if not managed carefully.
@@ -85,14 +75,11 @@ We propose using Behavior-Driven Development (BDD) with Cucumber tests to create
 1. **Quality Risks**:
    - Increased likelihood of bugs and unexpected behaviors in Samstraumr's complex, adaptive systems.
    - Difficulty in verifying system-wide behaviors and emergent properties.
-
 2. **Documentation Drift**:
    - Static documentation quickly becomes outdated, leading to misunderstandings and errors.
    - Loss of clear communication channel between technical and non-technical stakeholders.
-
 3. **Reduced Agility**:
    - Without clear, executable specifications, adapting to changes becomes more challenging and risky.
-
 4. **Increased Technical Debt**:
    - Lack of comprehensive, up-to-date testing leads to accumulation of hidden issues and complexity.
 

@@ -35,7 +35,6 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
    - Convert all PascalCase filenames (e.g., `GettingStarted.md` → `getting-started.md`)
    - Convert all UPPERCASE filenames (e.g., `KANBAN.md` → `kanban.md`)
    - Convert filenames with spaces and special characters (e.g., `Life Cycle Stage Comparison_.md` → `life-cycle-stage-comparison.md`)
-
 2. ⬜ Reorganize files into proper directories:
    - Move remaining files in root `/docs` to appropriate subdirectories
    - Consolidate duplicate files (e.g., `FolderStructure.md` appears in multiple locations)
@@ -47,12 +46,10 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
    - Level 1 headers match title case of file
    - Level 2 headers use title case
    - Level 3+ headers use sentence case
-
 2. ⬜ Standardize cross-references:
    - Convert absolute paths to relative paths
    - Ensure all links include .md extension
    - Fix broken links from file reorganization
-
 3. ⬜ Standardize code blocks and formatting:
    - Add language specifiers to all code blocks
    - Ensure consistent tab/space usage
@@ -65,7 +62,6 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
    - Update ongoing plans to reflect current status
    - Remove obsolete plans that no longer apply
    - Consolidate duplicate planning information
-
 2. ⬜ Ensure all planning documents follow the new standards:
    - Rename to kebab-case
    - Update headers to follow conventions
@@ -78,7 +74,6 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
    - Update `standardize-md-filenames.sh` to handle additional cases
    - Create script to check and update header formatting
    - Create script to validate cross-references
-
 2. ⬜ Add documentation standards check to CI pipeline:
    - Verify filename conventions
    - Check header formatting
@@ -86,13 +81,13 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
 
 ## Implementation Schedule
 
-| Phase | Task | Start Date | Target Completion | Status |
-|-------|------|------------|-------------------|--------|
-| 1 | Inventory and Analysis | 2025-04-03 | 2025-04-04 | ✅ Complete |
-| 2 | File Naming and Organization | 2025-04-04 | 2025-04-06 | 🔄 In Progress |
-| 3 | Content Standardization | 2025-04-06 | 2025-04-08 | ⬜ Not Started |
-| 4 | Planning Document Cleanup | 2025-04-08 | 2025-04-09 | ⬜ Not Started |
-| 5 | Automation and Verification | 2025-04-09 | 2025-04-10 | ⬜ Not Started |
+| Phase |             Task             | Start Date | Target Completion |     Status     |
+|-------|------------------------------|------------|-------------------|----------------|
+| 1     | Inventory and Analysis       | 2025-04-03 | 2025-04-04        | ✅ Complete     |
+| 2     | File Naming and Organization | 2025-04-04 | 2025-04-06        | 🔄 In Progress |
+| 3     | Content Standardization      | 2025-04-06 | 2025-04-08        | ⬜ Not Started  |
+| 4     | Planning Document Cleanup    | 2025-04-08 | 2025-04-09        | ⬜ Not Started  |
+| 5     | Automation and Verification  | 2025-04-09 | 2025-04-10        | ⬜ Not Started  |
 
 ## Future Considerations
 

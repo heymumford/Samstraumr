@@ -44,7 +44,6 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
    - Convert all PascalCase filenames (e.g., `GettingStarted.md` → `getting-started.md`)
    - Convert all UPPERCASE filenames (e.g., `KANBAN.md` → `kanban.md`)
    - Convert filenames with spaces and special characters (e.g., `Life Cycle Stage Comparison_.md` → `life-cycle-stage-comparison.md`)
-
 2. ✅ Reorganize files into proper directories:
    - Move remaining files in root `/docs` to appropriate subdirectories
    - Consolidate duplicate files (e.g., `FolderStructure.md` appears in multiple locations)
@@ -56,12 +55,10 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
    - Level 1 headers match title case of file
    - Level 2 headers use title case
    - Level 3+ headers use sentence case
-
 2. 🔄 Standardize cross-references:
    - Convert absolute paths to relative paths
    - Ensure all links include .md extension
    - Fix broken links from file reorganization
-
 3. ⬜ Standardize code blocks and formatting:
    - Add language specifiers to all code blocks
    - Ensure consistent tab/space usage
@@ -71,7 +68,7 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
 
 1. ✅ Reduce from 20 directories to 9 core directories
 2. ✅ Implement prefix-based file naming convention
-3. ✅ Create READEME.md files for each directory with navigation guidance 
+3. ✅ Create READEME.md files for each directory with navigation guidance
 4. 🔄 Migrate remaining files with script to automate the process
 5. 🔄 Update all cross-references to match new structure
 
@@ -81,7 +78,6 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
    - Update `standardize-filenames.sh` to handle additional cases
    - Create script to check and update header formatting
    - Create script to validate cross-references
-
 2. ⬜ Add documentation standards check to CI pipeline:
    - Verify filename conventions
    - Check header formatting
@@ -89,13 +85,13 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
 
 ## Implementation Schedule
 
-| Phase | Task | Start Date | Target Completion | Status |
-|-------|------|------------|-------------------|--------|
-| 1 | Inventory and Analysis | 2025-04-03 | 2025-04-04 | ✅ Complete |
-| 2 | File Naming and Organization | 2025-04-04 | 2025-04-06 | ✅ Complete |
-| 3 | Content Standardization | 2025-04-06 | 2025-04-08 | 🔄 In Progress |
-| 4 | Directory Simplification | 2025-04-06 | 2025-04-07 | 🔄 In Progress |
-| 5 | Automation and Verification | 2025-04-09 | 2025-04-10 | ⬜ Not Started |
+| Phase |             Task             | Start Date | Target Completion |     Status     |
+|-------|------------------------------|------------|-------------------|----------------|
+| 1     | Inventory and Analysis       | 2025-04-03 | 2025-04-04        | ✅ Complete     |
+| 2     | File Naming and Organization | 2025-04-04 | 2025-04-06        | ✅ Complete     |
+| 3     | Content Standardization      | 2025-04-06 | 2025-04-08        | 🔄 In Progress |
+| 4     | Directory Simplification     | 2025-04-06 | 2025-04-07        | 🔄 In Progress |
+| 5     | Automation and Verification  | 2025-04-09 | 2025-04-10        | ⬜ Not Started  |
 
 ## Future Considerations
 

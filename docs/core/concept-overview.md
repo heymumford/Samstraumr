@@ -1,7 +1,7 @@
 # Core Concepts
 
-
 ## Table of Contents
+
 - [Introduction: A New Way of Seeing Software](#introduction-a-new-way-of-seeing-software)
 - [The Tube: Fundamental Building Block](#the-tube-fundamental-building-block)
 - [Flow: The Movement of Information and Control](#flow-the-movement-of-information-and-control)
@@ -128,3 +128,4 @@ public void assessHealth() {
         .withTimestamp(Instant.now())
         .build());
 }
+```

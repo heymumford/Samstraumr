@@ -19,10 +19,12 @@ To use these templates:
 
 1. Install your Docmosis license key
 2. Ensure you have the Docmosis JARs installed:
+
    ```
    ./install-docmosis.sh
    ```
 3. Build with the docmosis-report profile:
+
    ```
    mvn clean install -P docmosis-report
    ```

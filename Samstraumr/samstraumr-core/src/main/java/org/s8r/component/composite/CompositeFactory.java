@@ -1,13 +1,12 @@
 /**
  * Copyright (c) 2025 Eric C. Mumford (@heymumford)
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
- * If a copy of the MPL was not distributed with this file, You can obtain one at
+ *
+ * <p>This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy
+ * of the MPL was not distributed with this file, You can obtain one at
  * https://github.com/heymumford/Samstraumr/blob/main/LICENSE
  *
- * Factory for creating various types of composite structures in the S8r framework
+ * <p>Factory for creating various types of composite structures in the S8r framework
  */
-
 package org.s8r.component.composite;
 
 import java.util.Collections;
@@ -23,13 +22,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Factory for creating and managing composites of various patterns.
  *
- * <p>This factory class provides methods for creating standard composite structures
- * and maintains a registry of all created composites. The factory offers predefined
- * patterns such as transformation, validation, processing, and observer composites.
+ * <p>This factory class provides methods for creating standard composite structures and maintains a
+ * registry of all created composites. The factory offers predefined patterns such as
+ * transformation, validation, processing, and observer composites.
  *
- * <p>The composites created by this factory follow common architectural patterns
- * used in data processing pipelines, making it easy to implement standard flows
- * without having to manually wire components together.
+ * <p>The composites created by this factory follow common architectural patterns used in data
+ * processing pipelines, making it easy to implement standard flows without having to manually wire
+ * components together.
  */
 public class CompositeFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(CompositeFactory.class);
@@ -138,8 +137,7 @@ public class CompositeFactory {
         .connect("formatter", "output");
 
     // Enable circuit breakers
-    composite.enableCircuitBreaker("parser", 2, 10000)
-            .enableCircuitBreaker("processor", 3, 15000);
+    composite.enableCircuitBreaker("parser", 2, 10000).enableCircuitBreaker("processor", 3, 15000);
 
     LOGGER.info("Created standard processing composite: {}", composite.getCompositeId());
     return composite;

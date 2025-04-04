@@ -3,6 +3,7 @@
 This document contains the commands to standardize markdown file naming across the project.
 
 ## Renaming Strategy
+
 - README.md files remain in UPPER_CASE
 - CLAUDE.md remains in UPPER_CASE
 - Other documentation files use PascalCase
@@ -114,3 +115,4 @@ fi
 # Renaming Commands
 echo "Checking for any remaining files that don't follow conventions..."
 find . -name "*.md" | grep -v "README.md" | grep -v "CLAUDE.md" | grep -E "[^A-Z][A-Z]|[^a-z][a-z]|_|-"
+```

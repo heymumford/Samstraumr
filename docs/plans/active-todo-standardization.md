@@ -36,21 +36,21 @@ Currently, TODOs and FIXMEs are scattered throughout the codebase in various for
 ### Phase 1: Define Standards
 
 1. ⬜ Define standard format for TODOs:
+
    ```java
    // TODO [Priority] (Issue): Description
    ```
-   
+
    Example:
+
    ```java
    // TODO [P2] (#123): Implement error handling for network failures
    ```
-
 2. ⬜ Define priority levels:
    - P0: Critical (must be fixed immediately)
    - P1: High (should be fixed soon)
    - P2: Medium (fix when time permits)
    - P3: Low (nice to have)
-
 3. ⬜ Define categories:
    - BUG: Bug fix
    - FEAT: New feature
@@ -66,12 +66,10 @@ Currently, TODOs and FIXMEs are scattered throughout the codebase in various for
    - Extract TODO comments with pattern matching
    - Parse priority, issue, and description
    - Generate a Markdown report
-
 2. ⬜ Integrate with GitHub:
    - Create issues for high-priority TODOs
    - Add labels based on categories
    - Link TODOs to existing issues
-
 3. ⬜ Add CI check for TODO format:
    - Verify TODOs follow the standard format
    - Require issue numbers for P0/P1 TODOs
@@ -91,12 +89,12 @@ Currently, TODOs and FIXMEs are scattered throughout the codebase in various for
 
 ## Implementation Schedule
 
-| Phase | Task | Target Start | Target Completion | Status |
-|-------|------|--------------|-------------------|--------|
-| 1 | Define Standards | 2025-04-10 | 2025-04-11 | ⬜ Not Started |
-| 2 | Create Tracking Tools | 2025-04-11 | 2025-04-13 | 🔄 In Progress |
-| 3 | Standardize Existing TODOs | 2025-04-13 | 2025-04-14 | ⬜ Not Started |
-| 4 | Documentation and Training | 2025-04-14 | 2025-04-15 | ⬜ Not Started |
+| Phase |            Task            | Target Start | Target Completion |     Status     |
+|-------|----------------------------|--------------|-------------------|----------------|
+| 1     | Define Standards           | 2025-04-10   | 2025-04-11        | ⬜ Not Started  |
+| 2     | Create Tracking Tools      | 2025-04-11   | 2025-04-13        | 🔄 In Progress |
+| 3     | Standardize Existing TODOs | 2025-04-13   | 2025-04-14        | ⬜ Not Started  |
+| 4     | Documentation and Training | 2025-04-14   | 2025-04-15        | ⬜ Not Started  |
 
 ## Success Criteria
 

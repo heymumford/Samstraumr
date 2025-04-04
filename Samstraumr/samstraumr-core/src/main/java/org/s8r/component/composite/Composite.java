@@ -1,13 +1,12 @@
 /**
  * Copyright (c) 2025 Eric C. Mumford (@heymumford)
- * 
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
- * If a copy of the MPL was not distributed with this file, You can obtain one at
+ *
+ * <p>This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy
+ * of the MPL was not distributed with this file, You can obtain one at
  * https://github.com/heymumford/Samstraumr/blob/main/LICENSE
  *
- * Implementation of the Composite pattern for components in the S8r framework
+ * <p>Implementation of the Composite pattern for components in the S8r framework
  */
-
 package org.s8r.component.composite;
 
 import java.time.Instant;
@@ -23,7 +22,6 @@ import java.util.function.Function;
 
 import org.s8r.component.core.Component;
 import org.s8r.component.core.Environment;
-import org.s8r.component.exception.ComponentException;
 import org.s8r.component.identity.Identity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,16 +29,17 @@ import org.slf4j.LoggerFactory;
 /**
  * A container for multiple components that acts as a coordinated unit.
  *
- * <p>This class enables the creation of structured component arrangements
- * with defined data flow paths. It supports various patterns including transformation,
- * validation, observation, and processing chains.
+ * <p>This class enables the creation of structured component arrangements with defined data flow
+ * paths. It supports various patterns including transformation, validation, observation, and
+ * processing chains.
  *
  * <p>Features:
+ *
  * <ul>
- *   <li>Component connection management via directed graph</li>
- *   <li>Data transformation and validation pipelines</li>
- *   <li>Circuit breaker pattern for fault tolerance</li>
- *   <li>Event logging for monitoring and diagnostics</li>
+ *   <li>Component connection management via directed graph
+ *   <li>Data transformation and validation pipelines
+ *   <li>Circuit breaker pattern for fault tolerance
+ *   <li>Event logging for monitoring and diagnostics
  * </ul>
  */
 public class Composite {
@@ -127,7 +126,8 @@ public class Composite {
     connections.computeIfAbsent(sourceName, k -> new ArrayList<>()).add(targetName);
 
     logEvent(String.format("Connected components: %s -> %s", sourceName, targetName));
-    LOGGER.debug("Connected components in composite {}: {} -> {}", compositeId, sourceName, targetName);
+    LOGGER.debug(
+        "Connected components in composite {}: {} -> {}", compositeId, sourceName, targetName);
     return this;
   }
 
@@ -172,7 +172,8 @@ public class Composite {
   public Composite enableCircuitBreaker(
       String componentName, int failureThreshold, long resetTimeoutMs) {
     validateComponentExists(componentName);
-    circuitBreakers.put(componentName, new CircuitBreaker(componentName, failureThreshold, resetTimeoutMs));
+    circuitBreakers.put(
+        componentName, new CircuitBreaker(componentName, failureThreshold, resetTimeoutMs));
     logEvent("Enabled circuit breaker for component: " + componentName);
     return this;
   }
@@ -237,7 +238,8 @@ public class Composite {
       }
 
       // Get downstream connections
-      List<String> downstreamComponents = connections.getOrDefault(componentName, Collections.emptyList());
+      List<String> downstreamComponents =
+          connections.getOrDefault(componentName, Collections.emptyList());
 
       // If this is a terminal component (no downstream connections), return the result
       if (downstreamComponents.isEmpty()) {
@@ -466,8 +468,8 @@ public class Composite {
 
       if (failureCount >= failureThreshold) {
         open.set(true);
-        LOGGER.warn("Circuit breaker opened for component {}: Failure threshold reached", 
-            componentName);
+        LOGGER.warn(
+            "Circuit breaker opened for component {}: Failure threshold reached", componentName);
       }
     }
 

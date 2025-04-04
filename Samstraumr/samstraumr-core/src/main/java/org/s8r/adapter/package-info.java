@@ -1,9 +1,9 @@
 /**
  * Adapter classes to provide backward compatibility for the S8r framework.
  *
- * <p>This package contains adapter classes that bridge the legacy API with the new, simplified
- * API structure. It facilitates a smooth migration path by allowing existing code to continue
- * using the old API while gradually transitioning to the new structure.
+ * <p>This package contains adapter classes that bridge the legacy API with the new, simplified API
+ * structure. It facilitates a smooth migration path by allowing existing code to continue using the
+ * old API while gradually transitioning to the new structure.
  *
  * <p>The adapters in this package serve as bidirectional translators between the old
  * (org.samstraumr.tube.*) and new (org.s8r.core.*) package structures, enabling incremental
@@ -18,6 +18,7 @@
  * </ul>
  *
  * <p>Use these adapters when:
+ *
  * <ul>
  *   <li>You need to integrate legacy code with new code
  *   <li>You want to gradually migrate existing implementations
