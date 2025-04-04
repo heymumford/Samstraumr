@@ -6,7 +6,7 @@
 
   <groupId>org.samstraumr</groupId>
   <artifactId>samstraumr</artifactId>
-  <version>1.4.12</version>
+  <version>1.5.0</version>
   <name>Samstraumr</name>
   <packaging>pom</packaging>
   <description>
@@ -22,7 +22,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
-    <samstraumr.version>1.4.12</samstraumr.version>
+    <samstraumr.version>1.5.0</samstraumr.version>
     <version.file.path>${project.basedir}/Samstraumr/version.properties</version.file.path>
     <all.test.tags>@ATL or @BTL</all.test.tags>
     <atl.test.tags>@ATL</atl.test.tags>
@@ -41,6 +41,20 @@
     <maven.site.plugin.version>3.12.1</maven.site.plugin.version>
     <maven.project.info.reports.plugin.version>3.4.5</maven.project.info.reports.plugin.version>
     <cucumber.reporting.version>5.7.5</cucumber.reporting.version>
+    
+    <!-- New quality tool properties -->
+    <pmd.plugin.version>3.21.0</pmd.plugin.version>
+    <owasp.plugin.version>8.4.2</owasp.plugin.version>
+    <archunit.version>1.2.0</archunit.version>
+    <findsecbugs.version>1.12.0</findsecbugs.version>
+    <javadoc.plugin.version>3.6.0</javadoc.plugin.version>
+    
+    <!-- Coverage thresholds -->
+    <jacoco.line.coverage>0.70</jacoco.line.coverage>
+    <jacoco.branch.coverage>0.60</jacoco.branch.coverage>
+    <jacoco.complexity.max>20</jacoco.complexity.max>
+    <jacoco.method.complexity.max>10</jacoco.method.complexity.max>
+    <jacoco.skip>false</jacoco.skip>
   </properties>
   
   <build>
@@ -74,6 +88,7 @@
         </plugin>
         
         <!-- Quality plugins -->
+        <!-- Spotless Configuration -->
         <plugin>
           <groupId>com.diffplug.spotless</groupId>
           <artifactId>spotless-maven-plugin</artifactId>
@@ -88,10 +103,33 @@
               <importOrder>
                 <order>java,javax,org,com,</order>
               </importOrder>
+              <!-- Add license header management -->
+              <licenseHeader>
+                <file>${project.basedir}/java-standard-header-template.txt</file>
+              </licenseHeader>
             </java>
+            <!-- Add XML formatting -->
+            <xml>
+              <includes>
+                <include>**/src/**/*.xml</include>
+                <include>**/pom.xml</include>
+              </includes>
+              <eclipseWtp>
+                <type>XML</type>
+              </eclipseWtp>
+            </xml>
+            <!-- Add Markdown formatting -->
+            <markdown>
+              <includes>
+                <include>**/*.md</include>
+              </includes>
+              <flexmark />
+              <endWithNewline />
+            </markdown>
           </configuration>
         </plugin>
         
+        <!-- Checkstyle Configuration -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
@@ -108,9 +146,13 @@
             <consoleOutput>true</consoleOutput>
             <failsOnError>true</failsOnError>
             <includeTestSourceDirectory>true</includeTestSourceDirectory>
+            <!-- Add suppressions file -->
+            <suppressionsLocation>${project.basedir}/quality-tools/checkstyle-suppressions.xml</suppressionsLocation>
+            <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
           </configuration>
         </plugin>
         
+        <!-- SpotBugs Configuration -->
         <plugin>
           <groupId>com.github.spotbugs</groupId>
           <artifactId>spotbugs-maven-plugin</artifactId>
@@ -119,9 +161,31 @@
             <effort>Max</effort>
             <threshold>Medium</threshold>
             <xmlOutput>true</xmlOutput>
+            <!-- Add exclude filter -->
+            <excludeFilterFile>${project.basedir}/quality-tools/spotbugs-exclude.xml</excludeFilterFile>
+            <!-- Add security analysis -->
+            <plugins>
+              <plugin>
+                <groupId>com.h3xstream.findsecbugs</groupId>
+                <artifactId>findsecbugs-plugin</artifactId>
+                <version>${findsecbugs.version}</version>
+              </plugin>
+            </plugins>
+            <!-- Output formats for better integration -->
+            <htmlOutput>true</htmlOutput>
+            <outputDirectory>${project.build.directory}/spotbugs</outputDirectory>
           </configuration>
+          <dependencies>
+            <!-- Add FindSecBugs dependency -->
+            <dependency>
+              <groupId>com.h3xstream.findsecbugs</groupId>
+              <artifactId>findsecbugs-plugin</artifactId>
+              <version>${findsecbugs.version}</version>
+            </dependency>
+          </dependencies>
         </plugin>
         
+        <!-- JaCoCo Configuration -->
         <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
@@ -138,6 +202,157 @@
               <phase>test</phase>
               <goals>
                 <goal>report</goal>
+              </goals>
+            </execution>
+            <!-- Coverage threshold checks -->
+            <execution>
+              <id>check</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <rule>
+                    <element>BUNDLE</element>
+                    <limits>
+                      <!-- Overall coverage requirements -->
+                      <limit>
+                        <counter>LINE</counter>
+                        <value>COVEREDRATIO</value>
+                        <minimum>${jacoco.line.coverage}</minimum>
+                      </limit>
+                      <limit>
+                        <counter>BRANCH</counter>
+                        <value>COVEREDRATIO</value>
+                        <minimum>${jacoco.branch.coverage}</minimum>
+                      </limit>
+                    </limits>
+                  </rule>
+                  <rule>
+                    <element>CLASS</element>
+                    <limits>
+                      <limit>
+                        <counter>COMPLEXITY</counter>
+                        <value>TOTALCOUNT</value>
+                        <maximum>${jacoco.complexity.max}</maximum>
+                      </limit>
+                    </limits>
+                  </rule>
+                  <rule>
+                    <element>METHOD</element>
+                    <limits>
+                      <limit>
+                        <counter>COMPLEXITY</counter>
+                        <value>TOTALCOUNT</value>
+                        <maximum>${jacoco.method.complexity.max}</maximum>
+                      </limit>
+                    </limits>
+                  </rule>
+                </rules>
+                <!-- Exclude test classes and exception classes from coverage requirements -->
+                <excludes>
+                  <exclude>**/*Test.class</exclude>
+                  <exclude>**/*Steps.class</exclude>
+                  <exclude>**/*Exception.class</exclude>
+                </excludes>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        
+        <!-- PMD for additional static analysis -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <version>${pmd.plugin.version}</version>
+          <configuration>
+            <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
+            <targetJdk>${maven.compiler.target}</targetJdk>
+            <printFailingErrors>true</printFailingErrors>
+            <failOnViolation>true</failOnViolation>
+            <linkXRef>false</linkXRef>
+            <skipPmdError>true</skipPmdError>
+            <analysisCache>true</analysisCache>
+            <minimumTokens>100</minimumTokens>
+            <skipEmptyReport>true</skipEmptyReport>
+            <rulesets>
+              <ruleset>${project.basedir}/quality-tools/pmd-ruleset.xml</ruleset>
+            </rulesets>
+            <!-- Don't generate site report to avoid skin issues -->
+            <skip>false</skip>
+            <skipEmptyReport>true</skipEmptyReport>
+            <excludeFromFailureFile>${project.basedir}/quality-tools/pmd-exclude.properties</excludeFromFailureFile>
+          </configuration>
+          <executions>
+            <execution>
+              <id>pmd-check</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>check</goal>
+                <goal>cpd-check</goal>
+              </goals>
+            </execution>
+          </executions>
+          <dependencies>
+            <dependency>
+              <groupId>net.sourceforge.pmd</groupId>
+              <artifactId>pmd-core</artifactId>
+              <version>7.0.0</version>
+            </dependency>
+            <dependency>
+              <groupId>net.sourceforge.pmd</groupId>
+              <artifactId>pmd-java</artifactId>
+              <version>7.0.0</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        
+        <!-- New: OWASP Dependency Check for security vulnerabilities -->
+        <plugin>
+          <groupId>org.owasp</groupId>
+          <artifactId>dependency-check-maven</artifactId>
+          <version>${owasp.plugin.version}</version>
+          <configuration>
+            <failBuildOnCVSS>7</failBuildOnCVSS>
+            <formats>
+              <format>HTML</format>
+              <format>XML</format>
+            </formats>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        
+        <!-- New: JavaDoc Check for documentation quality -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${javadoc.plugin.version}</version>
+          <configuration>
+            <source>${maven.compiler.source}</source>
+            <doclint>all,-missing</doclint>
+            <failOnWarnings>false</failOnWarnings>
+            <detectJavaApiLink>true</detectJavaApiLink>
+            <quiet>true</quiet>
+          </configuration>
+          <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>check-javadoc</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>javadoc</goal>
               </goals>
             </execution>
           </executions>
@@ -175,6 +390,63 @@
         <spotbugs.skip>true</spotbugs.skip>
         <jacoco.skip>true</jacoco.skip>
       </properties>
+    </profile>
+    
+    <!-- Coverage Profile -->
+    <profile>
+      <id>coverage</id>
+      <properties>
+        <jacoco.skip>false</jacoco.skip>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>prepare-agent</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>report</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>check</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <rule>
+                      <element>BUNDLE</element>
+                      <limits>
+                        <limit>
+                          <counter>LINE</counter>
+                          <value>COVEREDRATIO</value>
+                          <minimum>${jacoco.line.coverage}</minimum>
+                        </limit>
+                        <limit>
+                          <counter>BRANCH</counter>
+                          <value>COVEREDRATIO</value>
+                          <minimum>${jacoco.branch.coverage}</minimum>
+                        </limit>
+                      </limits>
+                    </rule>
+                  </rules>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     
     <!-- Quality Checks Profile -->
@@ -227,6 +499,38 @@
           <plugin>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
+          </plugin>
+          
+          <!-- PMD Plugin -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- Security Checks Profile (OWASP Dependency Check can be slow, so it's in a separate profile) -->
+    <profile>
+      <id>security-checks</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.owasp</groupId>
+            <artifactId>dependency-check-maven</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- Documentation Checks Profile -->
+    <profile>
+      <id>doc-checks</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
           </plugin>
         </plugins>
       </build>

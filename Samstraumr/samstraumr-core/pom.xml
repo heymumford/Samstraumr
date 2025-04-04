@@ -1,44 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-modules</artifactId>
-    <version>1.4.12</version>
-    <relativePath>../pom.xml</relativePath>
+    <version>1.5.0</version>
   </parent>
 
   <artifactId>samstraumr-core</artifactId>
-  <name>Samstraumr Core</name>
   <packaging>jar</packaging>
+  <name>Samstraumr Core</name>
 
   <properties>
-    <junit.jupiter.version>5.10.2</junit.jupiter.version>
-    <cucumber.version>7.15.0</cucumber.version>
-    <slf4j.version>2.0.12</slf4j.version>
-    <log4j.version>2.22.1</log4j.version>
-    <jackson.version>2.16.1</jackson.version>
-    <oshi.version>6.4.7</oshi.version>
-    <testcontainers.version>1.20.6</testcontainers.version>
-    <mockito.version>5.8.0</mockito.version>
-    <junit.platform.version>1.10.2</junit.platform.version>
-    <docmosis.version>4.8.0</docmosis.version>
-    <barcode4j.version>2.1</barcode4j.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <cucumber.version>7.14.0</cucumber.version>
+    <junit-jupiter.version>5.10.1</junit-jupiter.version>
+    <slf4j.version>2.0.9</slf4j.version>
+    <log4j2.version>2.22.0</log4j2.version>
+    <lombok.version>1.18.30</lombok.version>
+    <docmosis.version>22.2.03</docmosis.version>
+    <archunit.version>1.2.0</archunit.version>
   </properties>
-  
+
   <dependencies>
     <!-- Core Dependencies -->
     <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    
+    <!-- System Information -->
+    <dependency>
+      <groupId>com.github.oshi</groupId>
+      <artifactId>oshi-core</artifactId>
+      <version>6.4.8</version>
+    </dependency>
+    
+    <!-- JSON Processing -->
+    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
+      <version>2.16.1</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${jackson.version}</version>
+      <version>2.16.1</version>
     </dependency>
+    
+    <!-- SpotBugs Annotations -->
+    <dependency>
+      <groupId>com.github.spotbugs</groupId>
+      <artifactId>spotbugs-annotations</artifactId>
+      <version>4.8.3</version>
+    </dependency>
+    
+    <!-- Logging Framework -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -46,77 +68,27 @@
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j2-impl</artifactId>
+      <version>${log4j2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
-      <version>${log4j.version}</version>
+      <version>${log4j2.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
-      <version>${log4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-slf4j2-impl</artifactId>
-      <version>${log4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.github.oshi</groupId>
-      <artifactId>oshi-core</artifactId>
-      <version>${oshi.version}</version>
-    </dependency>
-    
-    <!-- SpotBugs Annotations -->
-    <dependency>
-      <groupId>com.github.spotbugs</groupId>
-      <artifactId>spotbugs-annotations</artifactId>
-      <version>4.8.2</version>
+      <version>${log4j2.version}</version>
     </dependency>
     
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-api</artifactId>
-      <version>${junit.jupiter.version}</version>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${junit-jupiter.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>${junit.jupiter.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-params</artifactId>
-      <version>${junit.jupiter.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.vintage</groupId>
-      <artifactId>junit-vintage-engine</artifactId>
-      <version>${junit.jupiter.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-suite-api</artifactId>
-      <version>${junit.platform.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-suite</artifactId>
-      <version>${junit.platform.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-suite-engine</artifactId>
-      <version>${junit.platform.version}</version>
-      <scope>test</scope>
-    </dependency>
-    
-    <!-- BDD Testing with Cucumber -->
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-java</artifactId>
@@ -129,310 +101,110 @@
       <version>${cucumber.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- JUnit 4 cucumber integration removed in favor of junit-platform-engine -->
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-picocontainer</artifactId>
       <version>${cucumber.version}</version>
       <scope>test</scope>
     </dependency>
-    
-    <!-- TestContainers for Stream Tests -->
     <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>testcontainers</artifactId>
-      <version>${testcontainers.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <version>${testcontainers.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>${testcontainers.version}</version>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-suite</artifactId>
+      <version>1.10.1</version>
       <scope>test</scope>
     </dependency>
     
-    <!-- Mockito for Test Mocking -->
+    <!-- ArchUnit for architectural testing -->
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>${mockito.version}</version>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit-junit5</artifactId>
+      <version>${archunit.version}</version>
       <scope>test</scope>
     </dependency>
+    
+    <!-- Document Generation (Optional) - Commented out for testing 
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-junit-jupiter</artifactId>
-      <version>${mockito.version}</version>
-      <scope>test</scope>
+      <groupId>com.docmosis</groupId>
+      <artifactId>docmosis-core</artifactId>
+      <version>${docmosis.version}</version>
+      <optional>true</optional>
+      <scope>provided</scope>
     </dependency>
+    -->
   </dependencies>
-  
-  <!-- Local repository for Docmosis JARs -->
-  <repositories>
-    <repository>
-      <id>project-lib</id>
-      <name>Project Library Repository</name>
-      <url>file://${project.basedir}/../../lib</url>
-    </repository>
-    <!-- Barcode4j is available from Maven Central -->
-    <repository>
-      <id>maven-central</id>
-      <name>Maven Central</name>
-      <url>https://repo.maven.apache.org/maven2</url>
-    </repository>
-  </repositories>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+            <include>**/*Tests.java</include>
+            <include>**/*TestSuite.java</include>
+          </includes>
+          <systemPropertyVariables>
+            <cucumber.filter.tags>${cucumber.filter.tags}</cucumber.filter.tags>
+          </systemPropertyVariables>
+          <!-- Explicitly enable tests -->
+          <skipTests>false</skipTests>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+      </plugin>
+      
+      <!-- Quality Checks (inherited from parent pom) -->
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+    
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    
+    <!-- Add test resources configuration -->
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+  </build>
   
   <profiles>
-    <!-- Docmosis Profile -->
-    <profile>
-      <id>docmosis-report</id>
-      <dependencies>
-        <!-- Docmosis -->
-        <dependency>
-          <groupId>com.docmosis</groupId>
-          <artifactId>docmosis-java</artifactId>
-          <version>${docmosis.version}</version>
-        </dependency>
-        <!-- Barcode4j for Docmosis -->
-        <dependency>
-          <groupId>net.sf.barcode4j</groupId>
-          <artifactId>barcode4j</artifactId>
-          <version>${barcode4j.version}</version>
-        </dependency>
-      </dependencies>
-    </profile>
-    <!-- Industry-Standard Test Profiles -->
-    
-    <!-- Smoke Tests Profile (Orchestration Tests) -->
-    <profile>
-      <id>smoke-tests</id>
-      <properties>
-        <cucumber.filter.tags>@Smoke or @Orchestration</cucumber.filter.tags>
-        <test.includes>**/orchestration/**/*Test.java,**/*OrchestrationTest.java,**/*SmokeTest.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <!-- Unit Tests Profile (Tube Tests) -->
-    <profile>
-      <id>unit-tests</id>
-      <properties>
-        <cucumber.filter.tags>@Unit or @Tube</cucumber.filter.tags>
-        <test.includes>**/*UnitTest.java,**/*TubeTest.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <!-- Component Tests Profile (Composite Tests) -->
-    <profile>
-      <id>component-tests</id>
-      <properties>
-        <cucumber.filter.tags>@Component or @Composite</cucumber.filter.tags>
-        <test.includes>**/*ComponentTest.java,**/*CompositeTest.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <!-- Integration Tests Profile (Flow Tests) -->
-    <profile>
-      <id>integration-tests</id>
-      <properties>
-        <cucumber.filter.tags>@Integration or @Flow</cucumber.filter.tags>
-        <test.includes>**/*IntegrationTest.java,**/*FlowTest.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <!-- API Tests Profile (Machine Tests) -->
-    <profile>
-      <id>api-tests</id>
-      <properties>
-        <cucumber.filter.tags>@Api or @Machine</cucumber.filter.tags>
-        <test.includes>**/*ApiTest.java,**/*MachineTest.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <!-- System Tests Profile (Stream Tests) -->
-    <profile>
-      <id>system-tests</id>
-      <properties>
-        <cucumber.filter.tags>@System or @Stream</cucumber.filter.tags>
-        <test.includes>**/*SystemTest.java,**/*StreamTest.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <!-- End-to-End Tests Profile (Acceptance Tests) -->
-    <profile>
-      <id>endtoend-tests</id>
-      <properties>
-        <cucumber.filter.tags>@EndToEnd or @Acceptance</cucumber.filter.tags>
-        <test.includes>**/*EndToEndTest.java,**/*AcceptanceTest.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <!-- Property Tests Profile (Adaptation Tests) -->
-    <profile>
-      <id>property-tests</id>
-      <properties>
-        <cucumber.filter.tags>@Property or @Adaptation</cucumber.filter.tags>
-        <test.includes>**/*PropertyTest.java,**/*AdaptationTest.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <!-- Samstraumr-Specific Test Profiles -->
-    
-    <!-- Orchestration Tests Profile (Highest level ATL tests) -->
-    <profile>
-      <id>orchestration-tests</id>
-      <properties>
-        <cucumber.filter.tags>@Orchestration or @Smoke</cucumber.filter.tags>
-        <test.includes>**/orchestration/**/*Test.java,**/*OrchestrationTest.java,**/*SmokeTest.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
     <!-- ATL Tests Profile -->
     <profile>
       <id>atl-tests</id>
       <properties>
         <cucumber.filter.tags>@ATL</cucumber.filter.tags>
-        <skipTests>false</skipTests>
-        <maven.test.skip>false</maven.test.skip>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>**/RunATLCucumberTest.java</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
     
-    <!-- BTL Tests Profile - DISABLED (Legacy BTL tests removed due to brittleness) 
-         To be reimplemented in the future when architecture stabilizes -->
+    <!-- BTL Tests Profile - DISABLED (Legacy BTL tests removed due to brittleness) -->
     <profile>
       <id>btl-tests</id>
       <properties>
@@ -441,483 +213,95 @@
         <skipTests>true</skipTests>
         <maven.test.skip>true</maven.test.skip>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <!-- BTL test runners removed, keeping structure for future implementation -->
-              <skipTests>true</skipTests>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
     
-    <!-- Tube Tests Profile -->
+    <!-- Smoke (Orchestration) Tests Profile -->
+    <profile>
+      <id>orchestration-tests</id>
+      <properties>
+        <cucumber.filter.tags>@OrchestrationTest</cucumber.filter.tags>
+      </properties>
+    </profile>
+    
+    <!-- Unit (Tube) Tests Profile -->
     <profile>
       <id>tube-tests</id>
       <properties>
-        <cucumber.filter.tags>@Tube or @Unit</cucumber.filter.tags>
-        <test.includes>**/*TubeTest.java,**/*UnitTest.java</test.includes>
+        <cucumber.filter.tags>@TubeTest</cucumber.filter.tags>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
     
-    <!-- Flow Tests Profile -->
-    <profile>
-      <id>flow-tests</id>
-      <properties>
-        <cucumber.filter.tags>@Flow or @Integration</cucumber.filter.tags>
-        <test.includes>**/*FlowTest.java,**/*IntegrationTest.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <!-- Composite Tests Profile (formerly Bundle) -->
+    <!-- Component (Composite/Bundle) Tests Profile -->
     <profile>
       <id>composite-tests</id>
       <properties>
-        <cucumber.filter.tags>@Composite or @Component</cucumber.filter.tags>
-        <test.includes>**/*CompositeTest.java,**/*ComponentTest.java</test.includes>
+        <cucumber.filter.tags>@CompositeTest</cucumber.filter.tags>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
     
-    <!-- Legacy Bundle Tests Profile (for backward compatibility) -->
+    <!-- Integration (Flow) Tests Profile -->
     <profile>
-      <id>bundle-tests</id>
+      <id>flow-tests</id>
       <properties>
-        <cucumber.filter.tags>@Composite or @Component</cucumber.filter.tags>
-        <test.includes>**/*BundleTest.java,**/*CompositeTest.java,**/*ComponentTest.java</test.includes>
+        <cucumber.filter.tags>@FlowTest</cucumber.filter.tags>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
     
-    <!-- Stream Tests Profile -->
-    <profile>
-      <id>stream-tests</id>
-      <properties>
-        <cucumber.filter.tags>@Stream or @System</cucumber.filter.tags>
-        <test.includes>**/*StreamTest.java,**/*SystemTest.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <!-- Adaptation Tests Profile -->
-    <profile>
-      <id>adaptation-tests</id>
-      <properties>
-        <cucumber.filter.tags>@Adaptation or @Property</cucumber.filter.tags>
-        <test.includes>**/*AdaptationTest.java,**/*PropertyTest.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <!-- Machine Tests Profile -->
+    <!-- API (Machine) Tests Profile -->
     <profile>
       <id>machine-tests</id>
       <properties>
-        <cucumber.filter.tags>@Machine or @Api</cucumber.filter.tags>
-        <test.includes>**/*MachineTest.java,**/*ApiTest.java</test.includes>
+        <cucumber.filter.tags>@MachineTest</cucumber.filter.tags>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
     
-    <!-- Acceptance Tests Profile -->
+    <!-- System (Stream) Tests Profile -->
+    <profile>
+      <id>stream-tests</id>
+      <properties>
+        <cucumber.filter.tags>@StreamTest</cucumber.filter.tags>
+      </properties>
+    </profile>
+    
+    <!-- E2E (Acceptance) Tests Profile -->
     <profile>
       <id>acceptance-tests</id>
       <properties>
-        <cucumber.filter.tags>@Acceptance or @EndToEnd</cucumber.filter.tags>
-        <test.includes>**/*AcceptanceTest.java,**/*EndToEndTest.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <!-- Fast Profile for development iterations -->
-    <profile>
-      <id>fast</id>
-      <properties>
-        <maven.test.skip>true</maven.test.skip>
-        <spotless.check.skip>true</spotless.check.skip>
-        <checkstyle.skip>true</checkstyle.skip>
-        <spotbugs.skip>true</spotbugs.skip>
-        <jacoco.skip>true</jacoco.skip>
+        <cucumber.filter.tags>@AcceptanceTest</cucumber.filter.tags>
       </properties>
     </profile>
     
-    <!-- Skip Quality Checks Profile -->
+    <!-- Property (Adaptation) Tests Profile -->
     <profile>
-      <id>skip-quality-checks</id>
+      <id>adaptation-tests</id>
       <properties>
-        <spotless.check.skip>true</spotless.check.skip>
-        <checkstyle.skip>true</checkstyle.skip>
-        <spotbugs.skip>true</spotbugs.skip>
-        <jacoco.skip>true</jacoco.skip>
+        <cucumber.filter.tags>@AdaptationTest</cucumber.filter.tags>
       </properties>
-    </profile>
-    
-    <!-- Lifecycle Tests Profile -->
-    <profile>
-      <id>lifecycle-tests</id>
-      <properties>
-        <cucumber.filter.tags>@L0_Tube</cucumber.filter.tags>
-        <test.includes>**/lifecycle/**/*Test.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
     
     <!-- Adam Tube Tests Profile -->
     <profile>
       <id>adam-tube-tests</id>
       <properties>
-        <skipTests>false</skipTests>
-        <maven.test.skip>false</maven.test.skip>
+        <cucumber.filter.tags>@AdamTube</cucumber.filter.tags>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>**/RunAdamTubeTests.java</include>
-              </includes>
-              <useFile>false</useFile>
-              <testFailureIgnore>true</testFailureIgnore>
-              <forkCount>1</forkCount>
-              <reuseForks>true</reuseForks>
-              <systemPropertyVariables>
-                <cucumber.junit-platform.naming-strategy>long</cucumber.junit-platform.naming-strategy>
-              </systemPropertyVariables>
-            </configuration>
-            <dependencies>
-              <dependency>
-                <groupId>org.apache.maven.surefire</groupId>
-                <artifactId>surefire-junit-platform</artifactId>
-                <version>3.2.5</version>
-              </dependency>
-            </dependencies>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
     
     <!-- Adam Tube ATL Tests Profile -->
     <profile>
       <id>adam-tube-atl-tests</id>
       <properties>
-        <skipTests>false</skipTests>
-        <maven.test.skip>false</maven.test.skip>
+        <cucumber.filter.tags>@AdamTube and @ATL</cucumber.filter.tags>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>**/RunAdamTubeATLTests.java</include>
-              </includes>
-              <useFile>false</useFile>
-              <testFailureIgnore>true</testFailureIgnore>
-              <forkCount>1</forkCount>
-              <reuseForks>true</reuseForks>
-              <systemPropertyVariables>
-                <cucumber.junit-platform.naming-strategy>long</cucumber.junit-platform.naming-strategy>
-              </systemPropertyVariables>
-            </configuration>
-            <dependencies>
-              <dependency>
-                <groupId>org.apache.maven.surefire</groupId>
-                <artifactId>surefire-junit-platform</artifactId>
-                <version>3.2.5</version>
-              </dependency>
-            </dependencies>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <!-- Substrate Identity Tests Profile -->
-    <profile>
-      <id>substrate-identity-tests</id>
-      <properties>
-        <cucumber.filter.tags>@SubstrateIdentity</cucumber.filter.tags>
-        <test.includes>**/lifecycle/**/*Test.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <!-- Memory Identity Tests Profile -->
-    <profile>
-      <id>memory-identity-tests</id>
-      <properties>
-        <cucumber.filter.tags>@MemoryIdentity</cucumber.filter.tags>
-        <test.includes>**/lifecycle/**/*Test.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <!-- Biological Phase Tests Profiles -->
-    <profile>
-      <id>conception-tests</id>
-      <properties>
-        <cucumber.filter.tags>@Conception</cucumber.filter.tags>
-        <test.includes>**/lifecycle/**/*Test.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <profile>
-      <id>infancy-tests</id>
-      <properties>
-        <cucumber.filter.tags>@Infancy</cucumber.filter.tags>
-        <test.includes>**/lifecycle/**/*Test.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <profile>
-      <id>embryonic-tests</id>
-      <properties>
-        <cucumber.filter.tags>@Embryonic</cucumber.filter.tags>
-        <test.includes>**/lifecycle/**/*Test.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <profile>
-      <id>childhood-tests</id>
-      <properties>
-        <cucumber.filter.tags>@Childhood</cucumber.filter.tags>
-        <test.includes>**/lifecycle/**/*Test.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <!-- Test Type Profiles -->
-    <profile>
-      <id>positive-tests</id>
-      <properties>
-        <cucumber.filter.tags>@Positive</cucumber.filter.tags>
-        <test.includes>**/lifecycle/**/*Test.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <profile>
-      <id>negative-tests</id>
-      <properties>
-        <cucumber.filter.tags>@Negative</cucumber.filter.tags>
-        <test.includes>**/lifecycle/**/*Test.java</test.includes>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>${test.includes}</include>
-              </includes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
+  
+  <!-- Repositories temporarily commented out for testing
+  <repositories>
+    <repository>
+      <id>docmosis-repository</id>
+      <url>https://maven.docmosis.com/releases</url>
+    </repository>
+  </repositories>
+  -->
 </project>

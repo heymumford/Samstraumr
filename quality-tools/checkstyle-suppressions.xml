@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<\!DOCTYPE suppressions PUBLIC
+  "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+  "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+<suppressions>
+  <\!-- Suppress checks for test files -->
+  <suppress files=".*[/\\]src[/\\]test[/\\].*" checks="JavadocMethod"/>
+  <suppress files=".*[/\\]src[/\\]test[/\\].*" checks="JavadocVariable"/>
+  <suppress files=".*[/\\]src[/\\]test[/\\].*" checks="JavadocType"/>
+  <suppress files=".*[/\\]src[/\\]test[/\\].*" checks="JavadocPackage"/>
+  <suppress files=".*[/\\]src[/\\]test[/\\].*" checks="MagicNumber"/>
+  <suppress files=".*[/\\]src[/\\]test[/\\].*" checks="VisibilityModifier"/>
+  
+  <\!-- Suppress checks for cucumber step definition methods -->
+  <suppress files=".*Steps\.java$" checks="MethodName"/>
+  <suppress files=".*Steps\.java$" checks="LineLength"/>
+  
+  <\!-- Suppress certain checks for generated code -->
+  <suppress files=".*[/\\]target[/\\]generated-sources[/\\].*" checks=".*"/>
+  
+  <\!-- Suppress line length checks for feature files (Cucumber files) -->
+  <suppress files=".*\.feature$" checks="LineLength"/>
+  
+  <\!-- Suppress checks for exception classes -->
+  <suppress files=".*Exception\.java$" checks="MagicNumber|MethodCount"/>
+  
+  <\!-- Suppress naming checks for factory methods that might mimic constructors -->
+  <suppress files=".*Factory\.java$" checks="MethodName"/>
+  
+  <\!-- Suppress indentation checks for enums in some cases -->
+  <suppress files=".*\.java$" checks="Indentation" lines="enum"/>
+</suppressions>
