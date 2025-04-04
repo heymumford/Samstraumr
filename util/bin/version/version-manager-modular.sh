@@ -229,16 +229,144 @@ if ! type cmd_test_version_bump &>/dev/null; then
 fi
 
 #------------------------------------------------------------------------------
+# Diagnostic Functions
+#------------------------------------------------------------------------------
+
+# Run diagnostics to identify and fix version issues
+function run_version_diagnostics() {
+  print_header "Version Management Diagnostics"
+  
+  # Check version file existence
+  local version_file="${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/Samstraumr/version.properties}"
+  
+  echo "Checking version configuration..."
+  
+  if [ -f "$version_file" ]; then
+    print_success "Version file exists: $version_file"
+    
+    # Check version property existence
+    if grep -q "^samstraumr.version=" "$version_file"; then
+      local current_version=$(grep "^samstraumr.version=" "$version_file" | cut -d= -f2)
+      
+      if [ -z "$current_version" ]; then
+        print_error "Version property is empty in $version_file"
+        
+        # Try to extract version from git tag
+        if command -v git &>/dev/null && git rev-parse --is-inside-work-tree &>/dev/null; then
+          local git_version=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//')
+          
+          if [ -n "$git_version" ] && [[ "$git_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            print_info "Found version from git tag: $git_version"
+            
+            # Offer to fix
+            print_warning "Would you like to set version to $git_version? (y/n)"
+            read -r response
+            if [[ "$response" =~ ^[Yy]$ ]]; then
+              sed -i "s/^samstraumr.version=.*/samstraumr.version=$git_version/" "$version_file"
+              print_success "Version set to $git_version"
+            fi
+          else
+            print_warning "No version tag found in git"
+            print_info "Setting default version to 1.0.0"
+            sed -i "s/^samstraumr.version=.*/samstraumr.version=1.0.0/" "$version_file"
+            print_success "Version set to 1.0.0"
+          fi
+        else
+          print_warning "Git not available, setting default version to 1.0.0"
+          sed -i "s/^samstraumr.version=.*/samstraumr.version=1.0.0/" "$version_file"
+          print_success "Version set to 1.0.0"
+        fi
+      else
+        if [[ "$current_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          print_success "Valid version found: $current_version"
+        else
+          print_error "Invalid version format: $current_version"
+          print_info "Setting default version to 1.0.0"
+          sed -i "s/^samstraumr.version=.*/samstraumr.version=1.0.0/" "$version_file"
+          print_success "Version set to 1.0.0"
+        fi
+      fi
+    else
+      print_error "Version property not found in $version_file"
+      print_info "Adding version property with default value 1.0.0"
+      echo "samstraumr.version=1.0.0" >> "$version_file"
+      print_success "Version property added"
+    fi
+  else
+    print_error "Version file not found: $version_file"
+    print_info "Creating version file with default settings"
+    
+    # Create parent directory if it doesn't exist
+    mkdir -p "$(dirname "$version_file")"
+    
+    # Create version file with default content
+    cat > "$version_file" << EOF
+# Samstraumr Project Version
+# This file is the single source of truth for project versioning
+
+# Project version
+samstraumr.version=1.0.0
+
+# Last updated date
+samstraumr.last.updated=$(date +"%B %d, %Y")
+
+# Maintainer info
+samstraumr.maintainer=Eric C. Mumford (@heymumford)
+
+# License
+samstraumr.license=Mozilla Public License 2.0
+EOF
+    print_success "Created version file: $version_file"
+  fi
+  
+  # Verify git tags
+  if command -v git &>/dev/null && git rev-parse --is-inside-work-tree &>/dev/null; then
+    print_info "Checking git tags..."
+    
+    local current_version=$(grep "^samstraumr.version=" "$version_file" | cut -d= -f2)
+    local tag_name="v$current_version"
+    
+    if git tag | grep -q "^$tag_name$"; then
+      print_success "Git tag exists for current version: $tag_name"
+    else
+      print_warning "Git tag missing for current version: $tag_name"
+      print_info "You can create it with: ./version-manager-modular.sh fix-tag"
+    fi
+  fi
+  
+  print_header "Diagnostic Complete"
+  echo ""
+  print_info "Current version: $(grep "^samstraumr.version=" "$version_file" | cut -d= -f2)"
+  print_info "Version file: $version_file"
+  echo ""
+  print_success "Run 'get -v' to see detailed version information"
+}
+
+#------------------------------------------------------------------------------
 # Help Function
 #------------------------------------------------------------------------------
 
 function show_help() {
-  echo -e "${COLOR_BOLD}Samstraumr Version Manager (Modular)${COLOR_RESET}"
+  if [[ "$USE_COLOR" == "true" ]]; then
+    echo -e "${COLOR_BOLD}Samstraumr Version Manager (Modular)${COLOR_RESET}"
+  else
+    echo "Samstraumr Version Manager (Modular)"
+  fi
   echo ""
-  echo -e "${COLOR_BOLD}USAGE:${COLOR_RESET}"
+  
+  if [[ "$USE_COLOR" == "true" ]]; then
+    echo -e "${COLOR_BOLD}USAGE:${COLOR_RESET}"
+  else
+    echo "USAGE:"
+  fi
   echo "  ./version-manager-modular.sh <command> [options]"
   echo ""
-  echo -e "${COLOR_BOLD}COMMANDS:${COLOR_RESET}"
+  
+  if [[ "$USE_COLOR" == "true" ]]; then
+    echo -e "${COLOR_BOLD}COMMANDS:${COLOR_RESET}"
+  else
+    echo "COMMANDS:"
+  fi
   echo "  get                  Show current version information"
   echo "  export               Output only the current version (for scripts)"
   echo "  bump <type>          Bump version (type: major, minor, patch)"
@@ -247,8 +375,14 @@ function show_help() {
   echo "  fix-tag              Create a git tag matching the current version"
   echo "  test <type>          Bump version, run tests, then commit and tag"
   echo "  history              Show version history"
+  echo "  diagnose             Run diagnostics to identify and fix version issues"
   echo ""
-  echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  
+  if [[ "$USE_COLOR" == "true" ]]; then
+    echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  else
+    echo "OPTIONS:"
+  fi
   echo "  -h, --help           Display this help message"
   echo "  -v, --verbose        Enable verbose output"
   echo "  --no-commit          Don't automatically commit the version change"
@@ -256,11 +390,17 @@ function show_help() {
   echo "  --skip-quality       Skip quality checks (for test command only)"
   echo "  --push               Push changes to remote (for test command only)"
   echo ""
-  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  
+  if [[ "$USE_COLOR" == "true" ]]; then
+    echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  else
+    echo "EXAMPLES:"
+  fi
   echo "  ./version-manager-modular.sh get                 # Show current version"
   echo "  ./version-manager-modular.sh bump patch          # Bump patch version"
   echo "  ./version-manager-modular.sh set 1.2.3           # Set version to 1.2.3"
   echo "  ./version-manager-modular.sh test patch          # Bump patch, test, commit, tag"
+  echo "  ./version-manager-modular.sh diagnose            # Run diagnostics"
 }
 
 #------------------------------------------------------------------------------
@@ -351,6 +491,36 @@ function handle_command() {
       ;;
     history)
       cmd_show_version_history
+      ;;
+    diagnose)
+      # Run diagnostic tests to identify and fix version issues
+      run_version_diagnostics
+      ;;
+    debug)
+      # Display detailed version and configuration information
+      print_header "Version Configuration Debug Information"
+      
+      # Show paths and config
+      print_info "PROJECT_ROOT: $PROJECT_ROOT"
+      print_info "VERSION_FILE: ${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/Samstraumr/version.properties}"
+      print_info "VERSION_CONFIG_FILE: $VERSION_CONFIG_FILE"
+      
+      # Show loaded functions
+      print_info "Available commands:"
+      declare -F | grep -E 'cmd_|version_' | sed 's/declare -f /  /'
+      
+      # Show current version
+      local current_version=$(get_current_version)
+      print_info "Current version: $current_version"
+      
+      # Show git status
+      if command -v git &>/dev/null && git rev-parse --is-inside-work-tree &>/dev/null; then
+        print_info "Git branch: $(git -C "$PROJECT_ROOT" rev-parse --abbrev-ref HEAD)"
+        print_info "Git status:"
+        git -C "$PROJECT_ROOT" status --short
+      else
+        print_warning "Git not available or not a git repository"
+      fi
       ;;
     *)
       show_help

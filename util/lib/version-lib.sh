@@ -102,6 +102,37 @@ function load_version_config() {
   fi
 }
 
+# Validates that a version string follows semantic versioning format
+# Usage: validate_version "1.2.3"
+# Returns: 0 if valid, 1 otherwise
+function validate_version() {
+  local version="$1"
+  
+  # Check if version is empty
+  if [ -z "$version" ]; then
+    version_error "Version cannot be empty" $ERR_INVALID_VERSION
+    return $ERR_INVALID_VERSION
+  fi
+  
+  # Check version format (MAJOR.MINOR.PATCH)
+  if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    version_error "Invalid version format: $version (must be in format x.y.z)" $ERR_INVALID_VERSION
+    return $ERR_INVALID_VERSION
+  fi
+  
+  # Extract components to ensure they're valid numbers
+  local -i major minor patch
+  IFS='.' read -r major minor patch <<< "$version"
+  
+  # Validate components are non-negative numbers
+  if [ "$major" -lt 0 ] || [ "$minor" -lt 0 ] || [ "$patch" -lt 0 ]; then
+    version_error "Version components must be non-negative: $version" $ERR_INVALID_VERSION
+    return $ERR_INVALID_VERSION
+  fi
+  
+  return 0
+}
+
 # Initialize by loading configuration
 load_version_config
 
@@ -109,15 +140,55 @@ load_version_config
 # Version Management Functions
 #------------------------------------------------------------------------------
 
+# Get the current version from version.properties
+# Usage: get_current_version
+# Returns: Current version or fallback version if not found
 function get_current_version() {
   local version_file="${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/Samstraumr/version.properties}"
+  local fallback_version="1.0.0"
   
+  # Check if version file exists
   if [ ! -f "$version_file" ]; then
     print_error "Version properties file not found: $version_file"
+    print_warning "Using fallback version: $fallback_version"
+    echo "$fallback_version"
     return 1
   fi
   
-  grep "samstraumr.version=" "$version_file" | cut -d= -f2
+  # Get version from file
+  local version=$(grep "samstraumr.version=" "$version_file" | cut -d= -f2)
+  
+  # Validate that version is not empty
+  if [ -z "$version" ]; then
+    print_error "Version property is empty in $version_file"
+    
+    # Try to extract version from git tag as fallback
+    if command -v git &>/dev/null && git rev-parse --is-inside-work-tree &>/dev/null; then
+      local git_version=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//')
+      
+      if [ -n "$git_version" ] && [[ "$git_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        print_warning "Using git tag as fallback version: $git_version"
+        echo "$git_version"
+        return 0
+      fi
+    fi
+    
+    # Use hard-coded fallback as last resort
+    print_warning "Using fallback version: $fallback_version"
+    echo "$fallback_version"
+    return 1
+  fi
+  
+  # Validate semantic version format
+  if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    print_error "Invalid version format in $version_file: '$version'"
+    print_warning "Using fallback version: $fallback_version"
+    echo "$fallback_version"
+    return 1
+  fi
+  
+  echo "$version"
+  return 0
 }
 
 function get_last_updated_date() {
@@ -131,46 +202,132 @@ function get_last_updated_date() {
   grep "samstraumr.last.updated=" "$version_file" | cut -d= -f2
 }
 
+# Calculate a new version based on bump type
+# Usage: calculate_new_version "patch|minor|major"
+# Returns: New version string
 function calculate_new_version() {
-  local current_version=$(get_current_version)
   local bump_type="$1"
+  local current_version=$(get_current_version)
+  
+  # Check if bump type is valid
+  if [ -z "$bump_type" ]; then
+    version_error "Missing bump type (use 'major', 'minor', or 'patch')" $ERR_INVALID_VERSION
+    return $ERR_INVALID_VERSION
+  fi
+  
+  # Validate bump type
+  if [[ ! "$bump_type" =~ ^(major|minor|patch)$ ]]; then
+    version_error "Invalid bump type: $bump_type (must be 'major', 'minor', or 'patch')" $ERR_INVALID_VERSION
+    return $ERR_INVALID_VERSION
+  fi
+  
+  # Check if current version is valid
+  if ! validate_version "$current_version"; then
+    version_error "Cannot calculate new version: current version is invalid" $ERR_INVALID_VERSION
+    return $ERR_INVALID_VERSION
+  fi
   
   # Split version into components
+  local -i major minor patch
   IFS='.' read -r major minor patch <<< "$current_version"
   
+  # Calculate new version based on bump type
+  local new_version=""
   case "$bump_type" in
     major)
-      echo "$((major + 1)).0.0"
+      new_version="$((major + 1)).0.0"
       ;;
     minor)
-      echo "$major.$((minor + 1)).0"
+      new_version="${major}.$((minor + 1)).0"
       ;;
     patch)
-      echo "$major.$minor.$((patch + 1))"
-      ;;
-    *)
-      print_error "Invalid bump type: $bump_type"
-      return 1
+      new_version="${major}.${minor}.$((patch + 1))"
       ;;
   esac
+  
+  # Validate the calculated version
+  if ! validate_version "$new_version"; then
+    version_error "Calculated version is invalid: $new_version" $ERR_INVALID_VERSION
+    return $ERR_INVALID_VERSION
+  fi
+  
+  echo "$new_version"
+  return 0
 }
 
+# Update version across all project files
+# Usage: update_version_in_files "current_version" "new_version"
+# Returns: 0 on success, error code on failure
 function update_version_in_files() {
   local current_version="$1"
   local new_version="$2"
   local version_file="${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/Samstraumr/version.properties}"
   
+  # Validate input parameters
+  if [ -z "$current_version" ]; then
+    version_error "Missing current version parameter" $ERR_INVALID_VERSION
+    return $ERR_INVALID_VERSION
+  fi
+  
+  if [ -z "$new_version" ]; then
+    version_error "Missing new version parameter" $ERR_INVALID_VERSION
+    return $ERR_INVALID_VERSION
+  fi
+  
+  # Validate version formats
+  if ! validate_version "$new_version"; then
+    version_error "Cannot update to invalid version: $new_version" $ERR_INVALID_VERSION
+    return $ERR_INVALID_VERSION
+  fi
+  
+  # Check if version file exists
+  if [ ! -f "$version_file" ]; then
+    version_error "Version properties file not found: $version_file" $ERR_FILE_NOT_FOUND
+    return $ERR_FILE_NOT_FOUND
+  fi
+  
+  # Create a backup of the version file
+  local backup_file="${version_file}.bak"
+  cp "$version_file" "$backup_file"
+  
   print_section "Updating Version to $new_version"
   print_info "Current version: $current_version"
   print_info "New version:     $new_version"
+  print_info "Backup created:  $backup_file"
   
   # Update version.properties - This is the source of truth for version
-  sed -i "s/samstraumr.version=.*/samstraumr.version=$new_version/" "$version_file"
+  # Check if property line exists, add it if not
+  if grep -q "^samstraumr.version=" "$version_file"; then
+    # Update existing property
+    sed -i "s/^samstraumr.version=.*/samstraumr.version=$new_version/" "$version_file"
+  else
+    # Property doesn't exist, add it
+    echo "samstraumr.version=$new_version" >> "$version_file"
+  fi
+  
+  # Verify the update was successful
+  local updated_version=$(grep "^samstraumr.version=" "$version_file" | cut -d= -f2)
+  if [ "$updated_version" != "$new_version" ]; then
+    version_error "Failed to update version in $version_file" $ERR_GENERAL
+    # Restore backup
+    cp "$backup_file" "$version_file"
+    return $ERR_GENERAL
+  fi
+  
   print_success "Updated version.properties"
   
   # Update last updated date
   local today=$(date +"%B %d, %Y")
-  sed -i "s/samstraumr.last.updated=.*/samstraumr.last.updated=$today/" "$version_file"
+  
+  # Check if date property line exists, add it if not
+  if grep -q "^samstraumr.last.updated=" "$version_file"; then
+    # Update existing property
+    sed -i "s/^samstraumr.last.updated=.*/samstraumr.last.updated=$today/" "$version_file"
+  else
+    # Property doesn't exist, add it
+    echo "samstraumr.last.updated=$today" >> "$version_file"
+  fi
+  
   print_success "Updated last updated date to $today"
   
   # Update all POM files including parent and all modules
@@ -182,35 +339,66 @@ function update_version_in_files() {
   )
   
   print_info "Updating version in POM files:"
+  local pom_updated=false
+  
   for pom_file in "${pom_files[@]}"; do
     if [ -f "$pom_file" ]; then
-      # Update version tags
-      sed -i "s/<version>$current_version<\/version>/<version>$new_version<\/version>/g" "$pom_file"
+      # Create a backup of the POM file
+      local pom_backup="${pom_file}.bak"
+      cp "$pom_file" "$pom_backup"
       
-      # Update properties
-      sed -i "s/<samstraumr.version>$current_version<\/samstraumr.version>/<samstraumr.version>$new_version<\/samstraumr.version>/g" "$pom_file"
-      
-      # Update parent version references if applicable
-      sed -i "s/<parent>.*<version>$current_version<\/version>/<parent>\\n    <groupId>org.samstraumr<\/groupId>\\n    <artifactId>samstraumr-modules<\/artifactId>\\n    <version>$new_version<\/version>/g" "$pom_file"
-      
-      print_info "  Updated $pom_file"
+      # Only update if current version is actually found in the file
+      if grep -q "<version>$current_version</version>" "$pom_file" || \
+         grep -q "<samstraumr.version>$current_version</samstraumr.version>" "$pom_file"; then
+        
+        # Update version tags
+        sed -i "s/<version>$current_version<\/version>/<version>$new_version<\/version>/g" "$pom_file"
+        
+        # Update properties
+        sed -i "s/<samstraumr.version>$current_version<\/samstraumr.version>/<samstraumr.version>$new_version<\/samstraumr.version>/g" "$pom_file"
+        
+        # Update parent version references if applicable
+        local parent_pattern="<parent>[^<]*<version>$current_version<\/version>"
+        if grep -q "$parent_pattern" "$pom_file"; then
+          sed -i "s|$parent_pattern|<parent>\\n    <groupId>org.samstraumr<\/groupId>\\n    <artifactId>samstraumr-modules<\/artifactId>\\n    <version>$new_version<\/version>|g" "$pom_file"
+        fi
+        
+        print_info "  Updated $pom_file"
+        pom_updated=true
+      else
+        print_warning "  Skipped $pom_file (current version not found)"
+      fi
     fi
   done
   
-  print_success "Updated all POM files to version $new_version"
+  if [ "$pom_updated" = "true" ]; then
+    print_success "Updated POM files to version $new_version"
+  else
+    print_warning "No POM files were updated (current version not found in any POM file)"
+  fi
   
   # Update README.md version and badge
   if [ -f "${PROJECT_ROOT}/README.md" ]; then
+    # Create a backup of README.md
+    local readme_backup="${PROJECT_ROOT}/README.md.bak"
+    cp "${PROJECT_ROOT}/README.md" "$readme_backup"
+    
     # Update version string
     sed -i "s/Version: .*/Version: $new_version/g" "${PROJECT_ROOT}/README.md"
     
-    # Update version badge URL
-    sed -i "s|version-[0-9.]\+-blue|version-$new_version-blue|g" "${PROJECT_ROOT}/README.md"
-    
-    print_success "Updated version and badge in README.md"
+    # Update version badge URL (only if it exists)
+    if grep -q "version-[0-9.]\+-blue" "${PROJECT_ROOT}/README.md"; then
+      sed -i "s|version-[0-9.]\+-blue|version-$new_version-blue|g" "${PROJECT_ROOT}/README.md"
+      print_success "Updated version and badge in README.md"
+    else
+      print_warning "Version badge not found in README.md, only updated version text"
+    fi
+  else
+    print_warning "README.md not found, skipping update"
   fi
   
   print_success "Version update complete"
+  return 0
 }
 
 function is_git_tag_exists() {

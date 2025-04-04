@@ -71,35 +71,62 @@ function cmd_set_version() {
   local new_version="$1"
   local no_commit="${2:-false}"
   
+  # Validate new version
   if [ -z "$new_version" ]; then
     version_error "Missing version argument" $ERR_INVALID_VERSION
     return $ERR_INVALID_VERSION
   fi
   
-  local current_version=$(get_current_version)
-  
-  if [ -z "$current_version" ]; then
-    return $ERR_GENERAL
-  fi
-  
   # Validate version format
   if ! validate_version "$new_version"; then
+    version_error "Invalid version format: $new_version (must be in format x.y.z)" $ERR_INVALID_VERSION
     return $ERR_INVALID_VERSION
   fi
   
-  # Update version file
-  sed -i "s/${VERSION_PROPERTY_NAME}=${current_version}/${VERSION_PROPERTY_NAME}=${new_version}/" "$VERSION_FILE"
+  # Get current version
+  local current_version=$(get_current_version)
   
-  if [ $? -ne 0 ]; then
-    version_error "Failed to update version in $VERSION_FILE" $ERR_GENERAL
+  if [ -z "$current_version" ]; then
+    version_error "Failed to retrieve current version" $ERR_GENERAL
     return $ERR_GENERAL
   fi
   
-  # Update last updated date
-  cmd_update_version_date
+  # Verify the version file exists
+  if [ ! -f "$VERSION_FILE" ]; then
+    version_error "Version file not found: $VERSION_FILE" $ERR_FILE_NOT_FOUND
+    return $ERR_FILE_NOT_FOUND
+  fi
   
-  version_success "Version set from $current_version to $new_version"
+  # Create a backup of the version file
+  local backup_file="${VERSION_FILE}.bak"
+  cp "$VERSION_FILE" "$backup_file"
   
+  version_info "Setting version from $current_version to $new_version"
+  version_info "Backup created: $backup_file"
+  
+  # Update version using the enhanced library function
+  if ! update_version_in_files "$current_version" "$new_version"; then
+    version_error "Failed to update version files" $ERR_GENERAL
+    version_info "Restoring backup from $backup_file"
+    cp "$backup_file" "$VERSION_FILE"
+    return $ERR_GENERAL
+  fi
+  
+  # If we're not committing, we're done
+  if [ "$no_commit" = "true" ]; then
+    version_info "Skipping commit as requested"
+    return 0
+  fi
+  
+  # Commit changes if requested
+  if type commit_version_changes &>/dev/null; then
+    if ! commit_version_changes "$new_version" "set"; then
+      version_error "Failed to commit version changes" $ERR_GIT_OPERATION
+      return $ERR_GIT_OPERATION
+    fi
+  fi
+  
+  version_success "Version successfully set to $new_version"
   return 0
 }
 
@@ -109,46 +136,64 @@ function cmd_bump_version() {
   local component="$1"
   local no_commit="${2:-false}"
   
+  # Validate input
   if [ -z "$component" ]; then
     version_error "Missing version component (major, minor, or patch)" $ERR_INVALID_VERSION
     return $ERR_INVALID_VERSION
   fi
   
-  # Get current version
-  local current_version=$(get_current_version)
-  if ! validate_version "$current_version"; then
-    version_error "Current version is not valid: $current_version" $ERR_INVALID_VERSION
+  # Validate component type
+  if [[ ! "$component" =~ ^(major|minor|patch)$ ]]; then
+    version_error "Invalid version component: $component (use major, minor, or patch)" $ERR_INVALID_VERSION
     return $ERR_INVALID_VERSION
   fi
   
-  # Calculate new version
-  local new_version=""
+  # Get current version
+  local current_version=$(get_current_version)
   
-  # Split version into components
-  IFS='.' read -r major minor patch <<< "$current_version"
+  if [ -z "$current_version" ]; then
+    version_error "Failed to retrieve current version" $ERR_GENERAL
+    return $ERR_GENERAL
+  fi
   
-  # Bump appropriate component
-  case "$component" in
-    major)
-      new_version="$((major + 1)).0.0"
-      ;;
-    minor)
-      new_version="${major}.$((minor + 1)).0"
-      ;;
-    patch)
-      new_version="${major}.${minor}.$((patch + 1))"
-      ;;
-    *)
-      version_error "Invalid version component: $component (use major, minor, or patch)" $ERR_INVALID_VERSION
-      return $ERR_INVALID_VERSION
-      ;;
-  esac
+  version_info "Current version: $current_version"
   
-  # Update version
-  cmd_set_version "$new_version" true
+  # Use the enhanced library function to calculate new version
+  local new_version=$(calculate_new_version "$component")
+  local ret_code=$?
   
-  # Update files that reference the version
-  cmd_update_version_references "$current_version" "$new_version"
+  if [ $ret_code -ne 0 ] || [ -z "$new_version" ]; then
+    version_error "Failed to calculate new version for component: $component" $ERR_INVALID_VERSION
+    return $ERR_INVALID_VERSION
+  fi
+  
+  version_info "New version: $new_version"
+  
+  # Verify that new version is different from current
+  if [ "$current_version" = "$new_version" ]; then
+    version_warning "New version is the same as current version: $current_version"
+    return 0
+  fi
+  
+  # Update version file first - this is the source of truth
+  if ! update_version_in_files "$current_version" "$new_version"; then
+    version_error "Failed to update version files" $ERR_GENERAL
+    return $ERR_GENERAL
+  fi
+  
+  # If we're not committing, we're done
+  if [ "$no_commit" = "true" ]; then
+    version_info "Skipping commit as requested"
+    return 0
+  fi
+  
+  # Commit changes if requested
+  if type commit_version_changes &>/dev/null; then
+    if ! commit_version_changes "$new_version" "$component"; then
+      version_error "Failed to commit version changes" $ERR_GIT_OPERATION
+      return $ERR_GIT_OPERATION
+    fi
+  fi
   
   return 0
 }
