@@ -7,8 +7,8 @@ import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME;
 import org.junit.platform.suite.api.ConfigurationParameter;
 import org.junit.platform.suite.api.IncludeEngines;
 import org.junit.platform.suite.api.Suite;
-import org.test.annotations.AboveTheLine;
-import org.test.annotations.OrchestrationTest;
+import org.s8r.test.annotation.ATL; // Using ATL instead of AboveTheLine for consistency
+import org.s8r.test.annotation.OrchestrationTest;
 
 /**
  * Orchestration tests are the highest level of ATL tests.
@@ -18,14 +18,18 @@ import org.test.annotations.OrchestrationTest;
  */
 @Suite
 @IncludeEngines("cucumber")
-@ConfigurationParameter(key = "cucumber.features", value = "src/test/resources/test")
+@ConfigurationParameter(
+    key = "cucumber.features",
+    value = "src/test/resources/tube/features, src/test/resources/test")
 @ConfigurationParameter(
     key = PLUGIN_PROPERTY_NAME,
     value = "pretty, html:target/cucumber-reports/orchestration-report.html")
-@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "org.test.steps")
-@ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "@Orchestration")
+@ConfigurationParameter(
+    key = GLUE_PROPERTY_NAME,
+    value = "org.samstraumr.tube.steps,org.samstraumr.tube.orchestration.steps")
+@ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "@OrchestrationTest")
 @OrchestrationTest
-@AboveTheLine
+@ATL
 public class RunOrchestrationCucumberTest {
   // This class serves as a runner for orchestration Cucumber tests
   // No additional code needed
