@@ -1,6 +1,6 @@
-name: Samstraumr Pipeline
+name: S8R
 
-run-name: Samstraumr Pipeline
+run-name: S8R
 
 on:
   push:
@@ -45,7 +45,7 @@ jobs:
           # Set the output variable
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           # Send a notice to GitHub Actions UI
-          echo "::notice::Samstraumr Pipeline v$VERSION"
+          echo "::notice::S8R v$VERSION"
           
           # Add to step summary
           echo "# Samstraumr v$VERSION" >> $GITHUB_STEP_SUMMARY
