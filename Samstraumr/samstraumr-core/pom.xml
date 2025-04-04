@@ -231,7 +231,7 @@
       </properties>
     </profile>
     
-    <!-- Component (Composite/Bundle) Tests Profile -->
+    <!-- Component (Composite) Tests Profile -->
     <profile>
       <id>composite-tests</id>
       <properties>

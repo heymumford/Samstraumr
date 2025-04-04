@@ -19,7 +19,7 @@ import io.cucumber.java.en.*;
 
 /**
  * Step definitions for testing tube composite connections. Implements the steps defined in
- * CompositeConnectionTest.feature.
+ * composite-connection-test.feature.
  *
  * <p>Uses the Composite implementation to test connections and data flow.
  */

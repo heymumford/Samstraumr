@@ -7,14 +7,14 @@ Goals:
   - Provide a template for future CTIT tests
 */
 
-@ATL @L1_Bundle @CTIT
+@ATL @L1_Composite @CTIT
 Feature: TBD Composite Tube Interaction Testing Example
   # This feature demonstrates the Composite Tube Interaction Testing (CTIT) approach
-  # to verifying how tubes interact when they come together in a bundle or composite.
+  # to verifying how tubes interact when they come together in a composite.
   # CTIT focuses on the connections and interactions between tubes, ensuring data flows
   # correctly and state changes propagate appropriately.
 
-  @ATL @L1_Bundle @CTIT @Flow @Runtime
+  @ATL @L1_Composite @CTIT @Flow @Runtime
   Scenario: Composite tube interaction - Data flow between tubes
     # Purpose: Validates that data flows correctly between connected tubes
     # This is an "Attle" (Above The Line) test that must pass for composites to work
@@ -25,7 +25,7 @@ Feature: TBD Composite Tube Interaction Testing Example
     And the transformer tube should output "TRANSFORMED_RAW_INPUT"
     And the entire flow should be logged with proper tube IDs
 
-  @ATL @L1_Bundle @CTIT @State @Runtime
+  @ATL @L1_Composite @CTIT @State @Runtime
   Scenario: Composite tube interaction - State propagation
     # Purpose: Validates that state changes propagate between connected tubes
     Given a composite of 3 connected tubes is created
@@ -34,7 +34,7 @@ Feature: TBD Composite Tube Interaction Testing Example
     And the composite should enter "DEGRADED" state
     And all state changes should be properly logged
 
-  @BTL @L1_Bundle @CTIT @Resilience @CircuitBreaker
+  @BTL @L1_Composite @CTIT @Resilience @CircuitBreaker
   Scenario: Composite tube interaction - Error isolation
     # Purpose: Validates that errors in one tube don't crash the entire composite
     # This is a "Bottle" (Below The Line) test for additional resilience
@@ -45,7 +45,7 @@ Feature: TBD Composite Tube Interaction Testing Example
     And the error should be contained within the failing tube's boundary
     And the system should attempt recovery after a cool-down period
 
-  @ATL @L1_Bundle @CTIT @Awareness @Runtime
+  @ATL @L1_Composite @CTIT @Awareness @Runtime
   Scenario: Composite tube interaction - Resource awareness
     # Purpose: Validates that tubes in a composite share resource awareness
     Given a composite of tubes sharing the same environment

@@ -27,7 +27,7 @@ Tags that identify the primary test type and corresponding testing tool, aligned
 |-----|----------|-------------|-------------|-----------|------------|
 | `@TubeTest` | Atomic Boundary Testing | ABT | Individual tube unit tests | Tube Tests | JUnit 5 |
 | `@FlowTest` | Inter-Tube Feature Testing | ITFT | Single tube data flow tests | Flow Tests | JUnit 5 |
-| `@BundleTest` | Composite Tube Interaction Testing | CTIT | Connected tubes component tests | Bundle Tests | JUnit 5 |
+| `@CompositeTest` | Composite Tube Interaction Testing | CTIT | Connected tubes component tests | Composite Tests | JUnit 5 |
 | `@StreamTest` | Composite Tube Interaction Testing (External) | CTIT | External integration tests | Stream Tests | JUnit 5 + TestContainers |
 | `@AdaptationTest` | Inter-Tube Feature Testing (Advanced) | ITFT | Property-based adaptation tests | Adaptation Tests | JUnit 5 (custom) |
 | `@L2_Machine` | Machine Construct Validation Testing | MCVT | End-to-end machine tests | Machine Tests | Cucumber |
@@ -40,8 +40,8 @@ Tests are organized in a hierarchical manner, mirroring the compositional struct
 | Tag | TBD Level | TBD Primary Test Type | Description | Example |
 |-----|-----------|----------------------|-------------|---------|
 | `@L0_Tube` | Atomic Level | ABT | Atomic tube component tests | Testing a single tube in isolation |
-| `@L1_Bundle` | Composite Level | CTIT | Bundle-level integration tests | Testing connected tubes forming a bundle |
-| `@L2_Machine` | Machine Level | MCVT | Complex machine composition tests | Testing interconnected bundles forming a machine |
+| `@L1_Composite` | Composite Level | CTIT | Composite-level integration tests | Testing connected tubes forming a composite |
+| `@L2_Machine` | Machine Level | MCVT | Complex machine composition tests | Testing interconnected composites forming a machine |
 | `@L3_System` | Acceptance Level | MCVT (User-focused) | Full system tests | Testing complete systems with multiple machines |
 
 ## Critical Path Categorization
