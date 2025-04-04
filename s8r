@@ -592,7 +592,12 @@ function handle_help_command() {
       show_test_help
       ;;
     version)
-      show_version_help
+      # Pass version help request to modular manager if available
+      if [ -f "${PROJECT_ROOT}/util/bin/version/version-manager-modular.sh" ]; then
+        "${PROJECT_ROOT}/util/bin/version/version-manager-modular.sh" help "$2"
+      else
+        show_version_help
+      fi
       ;;
     quality)
       show_quality_help

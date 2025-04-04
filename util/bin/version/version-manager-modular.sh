@@ -374,9 +374,53 @@ if [ $# -eq 0 ]; then
   exit 0
 fi
 
-# Handle help flag
+# Handle help
 if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+  # Global help
   show_help
+  exit 0
+elif [[ "$1" == "help" ]]; then
+  shift
+  command="$1"
+  
+  # Command-specific help
+  case "$command" in
+    get|export|verify|history)
+      if [[ -f "${SCRIPT_DIR}/commands/get-commands.sh" ]]; then
+        source "${SCRIPT_DIR}/commands/get-commands.sh"
+        show_help
+      else
+        show_help
+      fi
+      ;;
+    set|bump)
+      if [[ -f "${SCRIPT_DIR}/commands/set-commands.sh" ]]; then
+        source "${SCRIPT_DIR}/commands/set-commands.sh"
+        show_help
+      else
+        show_help
+      fi
+      ;;
+    fix-tag|push)
+      if [[ -f "${SCRIPT_DIR}/commands/git-commands.sh" ]]; then
+        source "${SCRIPT_DIR}/commands/git-commands.sh"
+        show_help
+      else
+        show_help
+      fi
+      ;;
+    test)
+      if [[ -f "${SCRIPT_DIR}/commands/test-commands.sh" ]]; then
+        source "${SCRIPT_DIR}/commands/test-commands.sh"
+        show_help
+      else
+        show_help
+      fi
+      ;;
+    *)
+      show_help
+      ;;
+  esac
   exit 0
 fi
 

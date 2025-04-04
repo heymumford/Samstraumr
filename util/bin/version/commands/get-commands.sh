@@ -12,6 +12,28 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../../../" && pwd)"
 source "${PROJECT_ROOT}/util/lib/version-lib.sh"
 
 #------------------------------------------------------------------------------
+# Help Functions
+#------------------------------------------------------------------------------
+
+function show_help() {
+  echo -e "${COLOR_BOLD}Version Retrieval Commands${COLOR_RESET}"
+  echo ""
+  echo -e "${COLOR_BOLD}COMMANDS:${COLOR_RESET}"
+  echo "  get                  Show current version information"
+  echo "    -v, --verbose      Show detailed information"
+  echo "  export               Output only the current version (for scripts)"
+  echo "  verify               Verify that version and tag are in sync"
+  echo "  history              Show version history"
+  echo ""
+  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  echo "  get                  # Show current version"
+  echo "  get -v               # Show detailed information"
+  echo "  export               # Output only version number"
+  echo "  verify               # Check if tag exists for current version"
+  echo "  history              # Show version history in git"
+}
+
+#------------------------------------------------------------------------------
 # Version Retrieval Commands
 #------------------------------------------------------------------------------
 

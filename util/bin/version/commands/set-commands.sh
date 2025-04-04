@@ -12,6 +12,36 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../../../" && pwd)"
 source "${PROJECT_ROOT}/util/lib/version-lib.sh"
 
 #------------------------------------------------------------------------------
+# Help Functions
+#------------------------------------------------------------------------------
+
+function show_help() {
+  echo -e "${COLOR_BOLD}Version Modification Commands${COLOR_RESET}"
+  echo ""
+  echo -e "${COLOR_BOLD}COMMANDS:${COLOR_RESET}"
+  echo "  set <version>        Set a specific version (format: x.y.z)"
+  echo "  bump <type>          Bump version (type: major, minor, patch)"
+  echo "    major              Increment major version (breaking changes)"
+  echo "    minor              Increment minor version (new features)"
+  echo "    patch              Increment patch version (bug fixes)"
+  echo ""
+  echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  echo "  --no-commit          Don't automatically commit the version change"
+  echo ""
+  echo -e "${COLOR_BOLD}FILES UPDATED:${COLOR_RESET}"
+  echo "  - version.properties (primary version source)"
+  echo "  - Maven POM files (if present)"
+  echo "  - README.md version badge (if present)"
+  echo ""
+  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  echo "  set 1.2.3            # Set specific version"
+  echo "  bump patch           # Increment patch version (1.2.3 -> 1.2.4)"
+  echo "  bump minor           # Increment minor version (1.2.3 -> 1.3.0)"
+  echo "  bump major           # Increment major version (1.2.3 -> 2.0.0)"
+  echo "  bump patch --no-commit # Bump without committing"
+}
+
+#------------------------------------------------------------------------------
 # Version Modification Commands
 #------------------------------------------------------------------------------
 

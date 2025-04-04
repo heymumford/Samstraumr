@@ -16,6 +16,37 @@ source "${SCRIPT_DIR}/set-commands.sh"
 source "${SCRIPT_DIR}/git-commands.sh"
 
 #------------------------------------------------------------------------------
+# Help Functions
+#------------------------------------------------------------------------------
+
+function show_help() {
+  echo -e "${COLOR_BOLD}Test Integration Commands${COLOR_RESET}"
+  echo ""
+  echo -e "${COLOR_BOLD}COMMANDS:${COLOR_RESET}"
+  echo "  test <type>          Bump version, run tests, then commit and tag"
+  echo "    major              Increment major version (breaking changes)"
+  echo "    minor              Increment minor version (new features)"
+  echo "    patch              Increment patch version (bug fixes)"
+  echo ""
+  echo -e "${COLOR_BOLD}OPTIONS:${COLOR_RESET}"
+  echo "  --skip-tests         Skip running tests"
+  echo "  --skip-quality       Skip quality checks during testing"
+  echo "  --push               Push changes to remote after success"
+  echo ""
+  echo -e "${COLOR_BOLD}WORKFLOW:${COLOR_RESET}"
+  echo "  1. Increments version based on component type"
+  echo "  2. Runs project tests (unless --skip-tests specified)"
+  echo "  3. If tests pass, commits changes and creates tag"
+  echo "  4. If tests fail, reverts version change"
+  echo "  5. Optionally pushes changes to remote (with --push)"
+  echo ""
+  echo -e "${COLOR_BOLD}EXAMPLES:${COLOR_RESET}"
+  echo "  test patch           # Bump patch version with tests"
+  echo "  test minor --push    # Bump minor version and push changes"
+  echo "  test major --skip-tests # Bump major without running tests"
+}
+
+#------------------------------------------------------------------------------
 # Test Integration Commands
 #------------------------------------------------------------------------------
 
