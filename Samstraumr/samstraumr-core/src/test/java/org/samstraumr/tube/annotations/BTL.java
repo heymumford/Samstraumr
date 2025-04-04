@@ -11,6 +11,9 @@ import org.junit.jupiter.api.Tag;
  * Marks a test as "Below The Line" (BTL), indicating it is an important but non-blocking test that
  * can run separately from the main build pipeline.
  *
+ * <p><strong>NOTE: BTL test implementations have been temporarily removed (v1.3.1) due to brittleness
+ * and integration issues. The BTL infrastructure is preserved for future reimplementation.</strong>
+ * 
  * <p>BTL tests have the following characteristics:
  *
  * <ul>

@@ -140,7 +140,7 @@ Test types:
 - Special test types:
   - `all` (run all tests)
   - `atl` (Above-The-Line critical tests)
-  - `btl` (Below-The-Line robustness tests)
+  - `btl` (Below-The-Line robustness tests) [DISABLED - tests removed v1.3.1]
   - `adam` (Adam tube identity tests)
 
 Options:
@@ -153,7 +153,8 @@ Examples:
 ```bash
 ./s8r test unit                # Run unit tests
 ./s8r test --both unit         # Run unit and tube tests
-./s8r test -p btl-tests flow   # Run flow tests with BTL profile
+# Note: BTL tests disabled in v1.3.1
+# ./s8r test -p btl-tests flow   # Run flow tests with BTL profile (DISABLED)
 ./s8r test atl                 # Run critical tests
 ```
 
@@ -161,7 +162,7 @@ Examples:
 
 - Critical vs Robustness Tests:
   - `mvn test -P atl-tests` (Above The Line - critical tests)
-  - `mvn test -P btl-tests` (Below The Line - robustness tests)
+  - `mvn test -P btl-tests` (Below The Line - robustness tests) [DISABLED - tests removed v1.3.1]
 - Industry Standard Test Profiles:
   - `mvn test -P smoke-tests` (basic system verification)
   - `mvn test -P unit-tests` (individual units)

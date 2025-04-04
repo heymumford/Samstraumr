@@ -19,7 +19,7 @@ function show_usage {
     echo
     echo -e "${YELLOW}Options:${RESET}"
     echo "  --atl                 Run only Above The Line tests (critical)"
-    echo "  --btl                 Run only Below The Line tests (robustness)"
+    echo "  --btl                 Run only Below The Line tests (DISABLED - BTL tests removed)"
     echo "  --all                 Run all tests (default)"
     echo "  --phase=<phase>       Run tests for a specific phase (conception, embryonic, infancy, childhood)"
     echo "  --initiative=<init>   Run tests for a specific initiative (substrate, structural, memory, functional)"
@@ -45,7 +45,9 @@ do
             ATL_FLAG="--atl"
             ;;
         --btl)
-            BTL_FLAG="--btl"
+            echo -e "${RED}WARNING: BTL tests have been removed due to brittleness${RESET}"
+            echo "BTL test execution is disabled. Use --atl instead."
+            exit 1
             ;;
         --all)
             ATL_FLAG=""

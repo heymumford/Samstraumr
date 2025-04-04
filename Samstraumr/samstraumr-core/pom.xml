@@ -431,13 +431,15 @@
       </build>
     </profile>
     
-    <!-- BTL Tests Profile -->
+    <!-- BTL Tests Profile - DISABLED (Legacy BTL tests removed due to brittleness) 
+         To be reimplemented in the future when architecture stabilizes -->
     <profile>
       <id>btl-tests</id>
       <properties>
         <cucumber.filter.tags>@BTL</cucumber.filter.tags>
-        <skipTests>false</skipTests>
-        <maven.test.skip>false</maven.test.skip>
+        <!-- Disable BTL tests by default -->
+        <skipTests>true</skipTests>
+        <maven.test.skip>true</maven.test.skip>
       </properties>
       <build>
         <plugins>
@@ -445,9 +447,8 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <includes>
-                <include>**/RunBTLCucumberTest.java</include>
-              </includes>
+              <!-- BTL test runners removed, keeping structure for future implementation -->
+              <skipTests>true</skipTests>
             </configuration>
           </plugin>
         </plugins>

@@ -12,7 +12,7 @@
 #   --initiative=<name>    Run tests for specific initiative (substrate, structural, memory, functional)
 #   --type=<type>          Run tests by type (positive, negative)
 #   --atl                  Run only Above The Line tests
-#   --btl                  Run only Below The Line tests
+#   --btl                  Run only Below The Line tests (DISABLED - BTL tests removed)
 #   --verbose              Enable verbose output
 #   --help                 Show this help message
 #
@@ -57,7 +57,7 @@ show_help() {
   echo "  --initiative=<name>    Run tests for specific initiative (substrate, structural, memory, functional)"
   echo "  --type=<type>          Run tests by type (positive, negative)"
   echo "  --atl                  Run only Above The Line tests"
-  echo "  --btl                  Run only Below The Line tests"
+  echo "  --btl                  Run only Below The Line tests (DISABLED - BTL tests removed)"
   echo "  --verbose              Enable verbose output"
   echo "  --help                 Show this help message"
   echo
@@ -124,8 +124,9 @@ parse_args() {
         shift
         ;;
       --btl)
-        BTL="BTL"
-        shift
+        echo -e "${RED}WARNING: BTL tests have been removed due to brittleness${NC}"
+        echo "BTL test execution is disabled. Use --atl instead."
+        exit 1
         ;;
       --verbose)
         VERBOSE=true

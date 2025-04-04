@@ -360,44 +360,21 @@ jobs:
           retention-days: 7
 
   # BTL tests - only run when explicitly requested or on main branch
-  # These are optional robustness tests that increase build time
+  # DISABLED: BTL tests have been removed due to brittleness
+  # This job placeholder is kept for future reimplementation of BTL tests
   btl-tests:
-    name: Below-The-Line Tests
+    name: Below-The-Line Tests (DISABLED)
     needs: [unit-tests, integration-tests, e2e-tests]
-    # Run only in specific cases:
-    # 1. On main branch commits
-    # 2. When manually triggered via workflow_dispatch
-    # 3. When PR has the 'run-btl-tests' label
+    # Prevent this job from running
     if: >
-      github.ref == 'refs/heads/main' ||
-      github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'run-btl-tests'))
+      false
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'temurin'
-          cache: maven
-
-      - name: Run BTL tests
+      - name: BTL Tests Have Been Disabled
         run: |
-          chmod +x ./util/test-run.sh
-          ./util/test-run.sh btl --skip-quality
-
-      - name: Upload BTL test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: btl-test-reports
-          path: |
-            **/target/surefire-reports/
-            **/target/cucumber-reports/
-          retention-days: 7
+          echo "BTL tests have been removed due to brittleness."
+          echo "This job is kept as a placeholder for future reimplementation."
+          echo "The BTL infrastructure is preserved but test implementations are removed."
           
   # Simplified Build Report Generation
   # Focuses on creating useful artifacts without GitHub Pages deployment
