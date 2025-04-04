@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Documentation Generation Plan
 
 This document outlines the plan to implement an automated documentation generation system for the Samstraumr project.
@@ -62,7 +66,7 @@ Currently, the README and other documentation files are maintained manually, whi
    - Link to GitHub issues/PRs
 3. ⬜ Add CI support:
    - Generate changelog preview for PRs
-   - Update CHANGELOG.md on release
+   - Update docs/reference/release/changelog.md on release
 
 ### Phase 3: README Automation
 

@@ -173,6 +173,7 @@ ValidationResult result = (ValidationResult) validator.process("user@example.com
 - [Configuration Reference](./docs/reference/configuration-reference.md)
 - [Glossary](./docs/reference/glossary.md)
 - [Version Management](./docs/reference/version-management.md)
+- [Changelog](./docs/reference/release/changelog.md)
 - [FAQ](./docs/reference/f-a-q.md)
 
 ### Development
