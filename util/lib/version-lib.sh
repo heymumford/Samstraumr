@@ -354,34 +354,82 @@ function update_version_in_files() {
       local pom_backup="${pom_file}.bak"
       cp "$pom_file" "$pom_backup"
       
-      # Only update if current version is actually found in the file
-      if grep -q "<version>$current_version</version>" "$pom_file" || \
-         grep -q "<samstraumr.version>$current_version</samstraumr.version>" "$pom_file"; then
-        
-        # Update version tags
-        sed -i "s/<version>$current_version<\/version>/<version>$new_version<\/version>/g" "$pom_file"
-        
-        # Update properties
-        sed -i "s/<samstraumr.version>$current_version<\/samstraumr.version>/<samstraumr.version>$new_version<\/samstraumr.version>/g" "$pom_file"
-        
-        # Update parent version references if applicable
-        local parent_pattern="<parent>[^<]*<version>$current_version<\/version>"
-        if grep -q "$parent_pattern" "$pom_file"; then
-          sed -i "s|$parent_pattern|<parent>\\n    <groupId>org.samstraumr<\/groupId>\\n    <artifactId>samstraumr-modules<\/artifactId>\\n    <version>$new_version<\/version>|g" "$pom_file"
-        fi
-        
-        print_info "  Updated $pom_file"
-        pom_updated=true
-      else
-        print_warning "  Skipped $pom_file (current version not found)"
+      # Extract the current version in this POM file
+      local pom_version
+      pom_version=$(grep -oP '<version>\K[0-9]+\.[0-9]+\.[0-9]+(?=</version>)' "$pom_file" | head -1)
+      
+      if [ -z "$pom_version" ]; then
+        print_warning "  Skipped $pom_file (could not extract version)"
+        continue
       fi
+      
+      print_info "  Found version $pom_version in $pom_file"
+      
+      # We need a more targeted approach to update only specific version tags
+      # Let's create a temporary file for modifications
+      local temp_file="${pom_file}.tmp"
+      
+      # Process the POM file using awk for precise targeting of versions
+      awk -v new="$new_version" '
+        # Flag for tracking position in file
+        BEGIN { 
+          in_parent = 0
+          in_dependency = 0
+          after_artifactId = 0
+          project_version_updated = 0
+        }
+        
+        # Detect parent section
+        /<parent>/ { in_parent = 1 }
+        /<\/parent>/ { in_parent = 0 }
+        
+        # Detect dependency sections
+        /<dependency>/ { in_dependency = 1 }
+        /<\/dependency>/ { in_dependency = 0 }
+        
+        # Track artifactId at project level (not in dependency)
+        !in_dependency && /<artifactId>/ { after_artifactId = 1 }
+        
+        # Replace version in parent section
+        in_parent && /<version>[0-9]+\.[0-9]+\.[0-9]+(<\/version>)/ {
+          gsub(/<version>[0-9]+\.[0-9]+\.[0-9]+<\/version>/, "<version>" new "</version>")
+        }
+        
+        # Replace project version (first version after artifactId, not in a dependency)
+        after_artifactId && !in_dependency && !project_version_updated && /<version>[0-9]+\.[0-9]+\.[0-9]+<\/version>/ {
+          gsub(/<version>[0-9]+\.[0-9]+\.[0-9]+<\/version>/, "<version>" new "</version>")
+          project_version_updated = 1
+          after_artifactId = 0
+        }
+        
+        # Replace samstraumr.version property
+        /<samstraumr\.version>[0-9]+\.[0-9]+\.[0-9]+<\/samstraumr\.version>/ {
+          gsub(/<samstraumr\.version>[0-9]+\.[0-9]+\.[0-9]+<\/samstraumr\.version>/, "<samstraumr.version>" new "</samstraumr.version>")
+        }
+        
+        # Print the line (modified or not)
+        { print }
+      ' "$pom_file" > "$temp_file"
+      
+      # Replace original with modified file if successful
+      if [ $? -eq 0 ] && [ -s "$temp_file" ]; then
+        mv "$temp_file" "$pom_file"
+      else
+        print_error "  Failed to update $pom_file properly"
+        rm -f "$temp_file" 2>/dev/null
+      fi
+      
+      print_info "  Updated $pom_file from $pom_version to $new_version"
+      pom_updated=true
+    else
+      print_warning "  POM file not found: $pom_file"
     fi
   done
   
   if [ "$pom_updated" = "true" ]; then
     print_success "Updated POM files to version $new_version"
   else
-    print_warning "No POM files were updated (current version not found in any POM file)"
+    print_warning "No POM files were updated"
   fi
   
   # Update README.md version and badge
