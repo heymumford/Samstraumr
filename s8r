@@ -46,6 +46,12 @@ if [ ! -d "${PROJECT_CONFIG_DIR}" ]; then
   mkdir -p "${PROJECT_CONFIG_DIR}/config"
 fi
 
+# Project-level user directory (not tracked in Git)
+PROJECT_USER_CONFIG_DIR="${PROJECT_CONFIG_DIR}/user"
+if [ ! -d "${PROJECT_USER_CONFIG_DIR}" ]; then
+  mkdir -p "${PROJECT_USER_CONFIG_DIR}"
+fi
+
 # Check if user config file exists, create it if not
 if [ ! -f "${USER_CONFIG_FILE}" ]; then
   # Create default config with Docmosis information

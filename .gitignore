@@ -44,7 +44,10 @@ Thumbs.db
 docmosis.properties
 
 # User config
-/home/emumford/.s8r/
+# Never track any home directory user config
+~/.s8r/
+*/.s8r/user/
+/home/*/.s8r/
 
 # Temporary files
 /temp/
