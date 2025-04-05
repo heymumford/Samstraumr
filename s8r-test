@@ -37,11 +37,21 @@ parse_args() {
   VERBOSE=false
   SKIP_QUALITY=false
   OUTPUT_FILE=""
+  PARALLEL=false
+  COVERAGE=false
   
   while [[ $# -gt 0 ]]; do
     case "$1" in
       -v|--verbose)
         VERBOSE=true
+        shift
+        ;;
+      -p|--parallel)
+        PARALLEL=true
+        shift
+        ;;
+      --coverage)
+        COVERAGE=true
         shift
         ;;
       --skip-quality)
@@ -76,6 +86,8 @@ show_help() {
   echo
   echo "Options:"
   echo "  -v, --verbose           Enable verbose output"
+  echo "  -p, --parallel          Run tests in parallel (where supported)"
+  echo "  --coverage              Run tests with code coverage analysis"
   echo "  --skip-quality          Skip quality checks"
   echo "  -o, --output <file>     Write test output to file"
   echo "  -h, --help              Show this help message"
@@ -188,6 +200,19 @@ run_tests() {
   # Add quality skip if requested
   if $SKIP_QUALITY; then
     mvn_args+=("-Dskip.quality.checks=true")
+  fi
+  
+  # Add parallel execution if requested
+  if $PARALLEL; then
+    mvn_args+=("-Dsurefire.parallel=classes")
+    mvn_args+=("-Dsurefire.threadCount=4")
+    info "Parallel test execution enabled"
+  fi
+  
+  # Add coverage if requested
+  if $COVERAGE; then
+    mvn_args+=("jacoco:prepare-agent")
+    info "Code coverage analysis enabled"
   fi
   
   # Add verbose flag if requested

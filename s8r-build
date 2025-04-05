@@ -37,6 +37,7 @@ parse_args() {
   CLEAN=false
   VERBOSE=false
   SKIP_QUALITY=false
+  PARALLEL=false
   
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -46,6 +47,10 @@ parse_args() {
         ;;
       -v|--verbose)
         VERBOSE=true
+        shift
+        ;;
+      -p|--parallel)
+        PARALLEL=true
         shift
         ;;
       --skip-quality)
@@ -77,6 +82,7 @@ show_help() {
   echo "Options:"
   echo "  -c, --clean             Clean before building"
   echo "  -v, --verbose           Enable verbose output"
+  echo "  -p, --parallel          Build in parallel where possible"
   echo "  --skip-quality          Skip quality checks"
   echo "  -h, --help              Show this help message"
   echo
@@ -150,6 +156,12 @@ build() {
       mvn_args+=("javadoc:javadoc")
       ;;
   esac
+  
+  # Add parallel flag if requested
+  if $PARALLEL; then
+    mvn_args+=("-T 1C") # Use 1 thread per core
+    info "Parallel build enabled"
+  fi
   
   # Add verbose flag if requested
   if $VERBOSE; then

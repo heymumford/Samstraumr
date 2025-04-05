@@ -2,54 +2,92 @@
 
 The Samstraumr build and test system is designed to be simple, efficient, and maintainable. It provides a straightforward interface for common build and test operations while abstracting away the complexity of the underlying Maven configuration.
 
-## Build System
+## Unified Command Interface
 
-The build system is encapsulated in the `s8r-build` script, which provides a simple interface to the Maven build system.
+Samstraumr provides a single entry point for all operations through the `s8r` script.
 
 ### Usage
 
 ```bash
-./s8r-build [options] [mode]
+./s8r <command> [options] [arguments]
+```
+
+### Core Commands
+
+- `build`: Build the project with various modes
+- `test`: Run tests of different types
+- `version`: Manage version information
+- `coverage`: Run and manage code coverage
+- `clean`: Clean build artifacts
+
+### Global Options
+
+- `--watch, -w`: Watch mode (continuous execution)
+- `--parallel, -p`: Execute in parallel where supported
+- `--help, -h`: Show help information
+
+### Command Chaining
+
+The system supports command chaining for common operations:
+
+```bash
+# Build and test in one command
+./s8r build-test unit
+```
+
+## Build System
+
+The build system is accessible through the `s8r build` command, providing a simple interface to the Maven build system.
+
+### Usage
+
+```bash
+./s8r build [options] [mode]
 ```
 
 ### Modes
 
 - `fast`: Quick compilation with tests and quality checks skipped (default)
 - `test`: Build with tests but skip quality checks
-- `quality`: Build with tests and quality checks
 - `package`: Build a JAR package with tests and quality checks
 - `install`: Install the package to local Maven repository
+- `compile`: Compile only
+- `full`: Full build including tests, quality checks, and verification
 - `docs`: Generate project documentation
 - `site`: Generate the Maven site
-- `full`: Full build including tests, quality checks, and site generation
 
 ### Options
 
 - `-c, --clean`: Perform a clean build
-- `-q, --skip-quality`: Skip quality checks (automatically included in 'fast' mode)
+- `-p, --parallel`: Build in parallel where possible
+- `-v, --verbose`: Enable verbose output
+- `--skip-quality`: Skip quality checks (automatically included in 'fast' mode)
 - `-h, --help`: Display help
 
 ### Examples
 
 ```bash
 # Quick compilation without tests
-./s8r-build
+./s8r build
 
 # Clean build with tests
-./s8r-build --clean test
+./s8r build --clean test
 
-# Full build with documentation
-./s8r-build full
+# Parallel build for faster execution
+./s8r build --parallel full
+
+# Watch mode for continuous compilation during development
+./s8r build --watch
 ```
 
 ## Test System
 
-The test system is encapsulated in the `s8r-test` script, which provides a simple interface to run different types of tests.
+The test system is accessible through the `s8r test` command, providing a simple interface to run different types of tests.
 
 ### Usage
 
 ```bash
-./s8r-test [options] [test-type]
+./s8r test [options] [test-type]
 ```
 
 ### Test Types
@@ -65,40 +103,68 @@ The test system is encapsulated in the `s8r-test` script, which provides a simpl
 - `acceptance`: Run acceptance tests
 - `atl`: Run Above-The-Line tests
 - `btl`: Run Below-The-Line tests
-- `critical`: Run critical path tests
-- `smoke`: Run smoke tests
-- `api`: Run API tests
-- `performance`: Run performance tests
+- `adam`: Run Adam Tube tests
+- `orchestration`: Run orchestration tests
 
 ### Options
 
-- `-c, --clean`: Clean before running tests
 - `-v, --verbose`: Run with verbose output
-- `-f, --failfast`: Stop at first failure
+- `-p, --parallel`: Run tests in parallel (where supported)
+- `--coverage`: Run tests with code coverage analysis
+- `--skip-quality`: Skip quality checks
+- `-o, --output <file>`: Write test output to file
 - `-h, --help`: Display help
 
 ### Examples
 
 ```bash
 # Run unit tests
-./s8r-test unit
+./s8r test unit
 
-# Run clean build with component tests
-./s8r-test --clean component
+# Run component tests in parallel
+./s8r test --parallel component
 
-# Run all tests with verbose output
-./s8r-test -v all
+# Run tests with code coverage analysis
+./s8r test --coverage all
+
+# Continuous testing with watch mode
+./s8r test --watch unit
+```
+
+## Coverage System
+
+The coverage system is accessible through the `s8r coverage` command, providing tools for code coverage analysis.
+
+### Usage
+
+```bash
+./s8r coverage <command> [options]
+```
+
+### Commands
+
+- `report`: Generate coverage report (default)
+- `run [test-type]`: Run tests with coverage enabled
+
+### Examples
+
+```bash
+# Generate coverage report
+./s8r coverage
+
+# Run unit tests with coverage
+./s8r coverage run unit
 ```
 
 ## Simplified Architecture
 
 The build and test system has been significantly simplified from the previous implementation:
 
-1. **Single Script Interface**: Each system is encapsulated in a single, well-documented script
-2. **Convention Over Configuration**: Sensible defaults reduce the need for complex configuration
-3. **Separation of Concerns**: Build and test functionality are separated
-4. **Consistent Structure**: Both scripts follow similar patterns for ease of learning
-5. **Minimal Dependencies**: Only depends on standard bash and Maven
+1. **Unified Command Interface**: Single entry point (`s8r`) for all operations
+2. **Command Composability**: Commands can be naturally combined in sequences
+3. **Convention Over Configuration**: Sensible defaults reduce the need for complex configuration
+4. **Progressive Disclosure**: Simple commands for common tasks, advanced options when needed
+5. **Modern Features**: Watch mode, parallel execution, and code coverage integration
 
 This approach follows software engineering best practices including:
 - Single Responsibility Principle
@@ -110,24 +176,35 @@ This approach follows software engineering best practices including:
 
 The new build and test system represents a significant improvement over the previous implementation:
 
-- Reduced from 2,600+ lines across 14+ files to ~412 lines in 2 files (84% reduction)
-- Simplified command interface with intuitive options
-- Improved error handling and reporting
-- Consistent output formatting with color-coded status messages
-- Better documentation and examples
-- Fixed dependency version issues in POM files
+- **Code Reduction**: Reduced from 2,600+ lines across 14+ files to ~412 lines in 2 files (84% reduction)
+- **Unified Interface**: Single `s8r` entry point for all operations
+- **Enhanced Features**:
+  - Parallel build and test execution
+  - Code coverage analysis and reporting
+  - Watch mode for continuous development
+  - Command chaining for common workflows
+- **Improved Usability**:
+  - Consistent command structure
+  - Color-coded status messages
+  - Execution timing information
+  - Better error handling and reporting
+- **Comprehensive Documentation**: Clear examples and detailed explanations
 
 ## Integration with Version Management
 
-The build system is designed to work seamlessly with the `s8r-version` script for version management:
+The system provides seamless integration between build, test, and version management:
 
 ```bash
 # Update version and build
-./s8r-version bump minor
-./s8r-build package
+./s8r version bump minor
+./s8r build package
 
 # Verify version consistency
-./s8r-version fix
+./s8r version fix
+
+# Combined operations
+./s8r build-test unit
+./s8r coverage run integration
 ```
 
-These tools together provide a comprehensive, yet simple system for building, testing, and versioning the Samstraumr project.
+These features together provide a comprehensive, yet simple system for building, testing, and versioning the Samstraumr project.
