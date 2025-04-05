@@ -127,6 +127,27 @@ find "${SCRIPT_DIR}" -path "*/.script_backups/*" -type f -name "*.sh" -print0 | 
   remove_item "$file" "no"  # No confirmation needed for backups
 done
 
+# Category 8: Duplicate test annotations
+log "${MAGENTA}=== Category 8: Duplicate Test Annotations ===${RESET}"
+# We're keeping annotations in org.s8r.test.annotation package and removing others
+find "${SCRIPT_DIR}" -path "*/src/test/java/org/*" -name "*.java" -not -path "*/src/test/java/org/s8r/test/annotation/*" | grep -E "UnitTest|ATL|BTL|CompositeTest|MachineTest|TubeTest|StreamTest|FlowTest|OrchestrationTest|AcceptanceTest|AdaptationTest|ApiTest|EndToEndTest|IntegrationTest|PropertyTest|SmokeTest|SystemTest" | while IFS= read -r file; do
+  remove_item "$file"
+done
+
+# Category 9: Duplicate test runners
+log "${MAGENTA}=== Category 9: Duplicate Test Runners ===${RESET}"
+# We're keeping runners in org.s8r.test.runner package and removing others
+find "${SCRIPT_DIR}" -path "*/src/test/java/org/*" -name "*.java" -not -path "*/src/test/java/org/s8r/test/runner/*" | grep -E "CucumberRunner|OrchestrationTestRunner|CriticalTestRunner" | while IFS= read -r file; do
+  remove_item "$file"
+done
+
+# Category 10: Redundant template files
+log "${MAGENTA}=== Category 10: Redundant Template Files ===${RESET}"
+# Keep only the template in util/config, remove others
+if [ -f "${SCRIPT_DIR}/java-header-template.txt" ]; then
+  remove_item "${SCRIPT_DIR}/java-header-template.txt"
+fi
+
 # Summary
 echo
 info "=== Cleanup Summary ==="

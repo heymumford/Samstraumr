@@ -105,7 +105,7 @@
               </importOrder>
               <!-- Add license header management -->
               <licenseHeader>
-                <file>${project.basedir}/java-standard-header-template.txt</file>
+                <file>${project.basedir}/util/config/java-standard-header-template.txt</file>
               </licenseHeader>
             </java>
             <!-- Add XML formatting -->
