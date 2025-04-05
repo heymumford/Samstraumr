@@ -130,7 +130,7 @@ public class EarlyConceptionPhaseSteps extends BaseLifecycleSteps {
     // verify it's in a ready state
     assertEquals(
         testTube.getStatus(),
-        org.samstraumr.tube.TubeStatus.READY,
+        org.s8r.tube.TubeStatus.READY,
         "Tube should be in READY status");
   }
 

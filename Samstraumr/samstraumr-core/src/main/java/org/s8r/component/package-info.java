@@ -29,9 +29,9 @@
  * <p>This package is part of the simplified structure, replacing:
  *
  * <ul>
- *   <li>org.samstraumr.tube.*
+ *   <li>org.s8r.tube.*
  *   <li>org.s8r.core.tube.*
- *   <li>org.tube.*
+ *   <li>org.s8r.tube.legacy.*
  * </ul>
  */
 package org.s8r.component;

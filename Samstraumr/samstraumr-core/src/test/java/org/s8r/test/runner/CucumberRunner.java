@@ -41,7 +41,7 @@ import org.junit.platform.suite.api.SuiteDisplayName;
 @ConfigurationParameter(
     key = GLUE_PROPERTY_NAME,
     value =
-        "org.samstraumr.tube.steps,org.samstraumr.tube.lifecycle.steps,org.s8r.test.steps,org.s8r.core.tube.test.steps")
+        "org.s8r.tube.steps,org.s8r.tube.lifecycle.steps,org.s8r.test.steps,org.s8r.core.tube.test.steps")
 @ConfigurationParameter(
     key = PLUGIN_PROPERTY_NAME,
     value =
