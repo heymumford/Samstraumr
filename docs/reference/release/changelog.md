@@ -15,12 +15,30 @@ All notable changes to this project will be documented in this file.
 - Compatibility layer for Java module system restrictions
 - Improved runtime environment detection with enhanced JVM property reporting
 - Fallback mechanism for document generation when Docmosis is unavailable
+- Maven Enforcer Plugin for build environment validation
+- Dependency convergence enforcement
+- Minimum Maven version requirement (3.8.0)
 
 ### Changed
 
 - Updated build system to use Java 21 by default
 - Enhanced reflection handling for improved compatibility with Java 21
 - Added JVM options for proper module system interaction
+- Updated dependencies to latest versions:
+  - Jackson Core and Databind: 2.0.0 → 2.18.3
+  - OSHI Core: 2.0.0 → 6.8.0
+  - SpotBugs Annotations: 2.0.0 → 4.9.3
+  - ArchUnit: 1.2.0 → 1.4.0
+  - Cucumber: 7.14.0 → 7.22.0
+  - Log4j: 2.22.0 → 2.23.1
+  - JUnit Jupiter: 5.10.1 → 5.10.2
+  - Mockito: 5.8.0 → 5.10.0
+  - Lombok: 1.18.30 → 1.18.38
+  - SLF4J: 2.0.9 → 2.0.12
+  - TestContainers: 1.19.3 → 1.20.0
+  - Checkstyle: 10.14.0 → 10.23.0
+  - PMD: 2.0.0 → 7.12.0
+  - FindSecBugs: 1.12.0 → 1.13.0
 
 ### Fixed
 

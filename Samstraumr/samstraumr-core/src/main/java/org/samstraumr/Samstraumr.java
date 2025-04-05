@@ -1,0 +1,177 @@
+/*
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
+ * Gemini Deep Research, Claude 3.7.
+ */
+
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ *
+ * Facade for the S8r framework
+ */
+
+package org.samstraumr;
+
+import java.util.List;
+
+import org.samstraumr.application.dto.ComponentDto;
+import org.samstraumr.application.dto.MachineDto;
+import org.samstraumr.application.port.LoggerPort;
+import org.samstraumr.application.service.ComponentService;
+import org.samstraumr.application.service.MachineService;
+import org.samstraumr.domain.identity.ComponentId;
+import org.samstraumr.domain.machine.MachineType;
+import org.samstraumr.infrastructure.config.Configuration;
+import org.samstraumr.infrastructure.config.DependencyContainer;
+import org.samstraumr.infrastructure.logging.LoggerFactory;
+
+/**
+ * Facade for the S8r framework.
+ *
+ * <p>This class provides a simplified interface to the framework's functionality, hiding the
+ * complexity of the underlying implementation. It follows the Facade design pattern to provide a
+ * high-level interface to the framework.
+ */
+public class Samstraumr {
+  private static final Samstraumr instance = new Samstraumr();
+  private final DependencyContainer container;
+  private final LoggerPort logger;
+
+  /** Private constructor to enforce singleton pattern. */
+  private Samstraumr() {
+    this.container = DependencyContainer.getInstance();
+    this.logger = LoggerFactory.getLogger(Samstraumr.class);
+    logger.info("Samstraumr framework initialized");
+  }
+
+  /**
+   * Gets the singleton instance.
+   *
+   * @return The Samstraumr instance
+   */
+  public static Samstraumr getInstance() {
+    return instance;
+  }
+
+  /**
+   * Gets the dependency container.
+   *
+   * @return The dependency container
+   */
+  public DependencyContainer getContainer() {
+    return container;
+  }
+
+  /**
+   * Gets the configuration.
+   *
+   * @return The configuration
+   */
+  public Configuration getConfiguration() {
+    return Configuration.getInstance();
+  }
+
+  // Component methods
+
+  /**
+   * Creates a new component.
+   *
+   * @param reason The reason for creating the component
+   * @return The ID of the created component
+   */
+  public ComponentId createComponent(String reason) {
+    ComponentService service = container.get(ComponentService.class);
+    return service.createComponent(reason);
+  }
+
+  /**
+   * Gets a component by ID.
+   *
+   * @param componentId The component ID
+   * @return The component DTO
+   */
+  public ComponentDto getComponent(ComponentId componentId) {
+    ComponentService service = container.get(ComponentService.class);
+    return ComponentDto.fromDomain(service.getComponent(componentId).orElse(null));
+  }
+
+  /**
+   * Gets all components.
+   *
+   * @return A list of component DTOs
+   */
+  public List<ComponentDto> getAllComponents() {
+    ComponentService service = container.get(ComponentService.class);
+    return service.getAllComponents().stream().map(ComponentDto::new).toList();
+  }
+
+  // Machine methods
+
+  /**
+   * Creates a new machine.
+   *
+   * @param type The machine type
+   * @param name The machine name
+   * @param description The machine description
+   * @return The created machine DTO
+   */
+  public MachineDto createMachine(MachineType type, String name, String description) {
+    MachineService service = container.get(MachineService.class);
+    return service.createMachine(
+        type, name, description, getConfiguration().get("machine.default.version", "1.0.0"));
+  }
+
+  /**
+   * Creates a machine of the specified type.
+   *
+   * @param typeName The machine type name
+   * @param name The machine name
+   * @param description The machine description
+   * @return The created machine DTO
+   */
+  public MachineDto createMachine(String typeName, String name, String description) {
+    MachineService service = container.get(MachineService.class);
+    return service.createMachineByType(typeName, name, description);
+  }
+
+  /**
+   * Gets a machine by ID.
+   *
+   * @param machineId The machine ID
+   * @return The machine DTO
+   */
+  public MachineDto getMachine(ComponentId machineId) {
+    MachineService service = container.get(MachineService.class);
+    return service.getMachine(machineId);
+  }
+
+  /**
+   * Gets all machines.
+   *
+   * @return A list of machine DTOs
+   */
+  public List<MachineDto> getAllMachines() {
+    MachineService service = container.get(MachineService.class);
+    return service.getAllMachines();
+  }
+
+  /**
+   * Starts a machine.
+   *
+   * @param machineId The machine ID
+   */
+  public void startMachine(ComponentId machineId) {
+    MachineService service = container.get(MachineService.class);
+    service.startMachine(machineId);
+  }
+
+  /**
+   * Stops a machine.
+   *
+   * @param machineId The machine ID
+   */
+  public void stopMachine(ComponentId machineId) {
+    MachineService service = container.get(MachineService.class);
+    service.stopMachine(machineId);
+  }
+}
