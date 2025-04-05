@@ -12,25 +12,32 @@ on:
 jobs:
   # Basic compilation and verification - keeping it simple for TDD development
   basic-verification:
-    name: Basic Verification
+    name: Basic Verification (${{ matrix.java }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ['21']  # Primary target is Java 21
+      fail-fast: false
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v4
         with:
-          java-version: 17
+          java-version: ${{ matrix.java }}
           distribution: 'temurin'
           cache: maven
 
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+          path: |
+            ~/.m2/repository
+            !~/.m2/repository/org/samstraumr
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
       - name: Environment awareness
         run: |
@@ -70,12 +77,35 @@ jobs:
 
       # Basic compilation check - this is the key step that ensures no orchestration or compilation errors
       - name: Verify compilation
-        run: mvn -B clean compile -DskipTests
+        run: |
+          # Add Java 21 module options required for reflection
+          export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+          mvn -B clean compile -DskipTests
 
       # Basic verification without test execution
       - name: Verify basic project structure
-        run: mvn -B verify -DskipTests -Dmaven.javadoc.skip=true -Dspotless.check.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true
+        run: |
+          # Add Java 21 module options required for reflection
+          export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+          mvn -B verify -DskipTests -Dmaven.javadoc.skip=true -Dspotless.check.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true
 
+      # Run unit tests
+      - name: Run tests
+        run: |
+          # Add Java 21 module options required for reflection
+          export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+          mvn -B test -Punit-tests -Dcucumber.filter.tags="@UnitTest or @TubeTest"
+          
+      # Publish Test Results
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: JUnit Tests
+          path: '**/target/surefire-reports/TEST-*.xml'
+          reporter: java-junit
+          fail-on-error: false
+          
       # Upload summary with basic results
       - name: Upload build summary
         if: always()
@@ -83,4 +113,4 @@ jobs:
           echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Basic compilation and verification completed for s8r v${{ steps.get_version.outputs.version }}." >> $GITHUB_STEP_SUMMARY
-          echo "This simplified pipeline only checks for compilation and basic project structure as part of TDD-based development." >> $GITHUB_STEP_SUMMARY
+          echo "This simplified pipeline checks for compilation, basic project structure, and unit tests as part of TDD-based development." >> $GITHUB_STEP_SUMMARY

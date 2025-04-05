@@ -1,0 +1,70 @@
+name: Smoke Tests
+
+on:
+  workflow_dispatch:  # Manual trigger
+  schedule:
+    - cron: '0 4 * * 1'  # Run every Monday at 4 AM UTC
+
+jobs:
+  smoke-tests:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            !~/.m2/repository/org/samstraumr
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # Get version for summary
+      - name: Get version
+        id: get_version
+        run: |
+          VERSION=$(grep "samstraumr.version=" "Samstraumr/version.properties" | cut -d= -f2 | tr -d ' \t\n\r')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "::notice::Running smoke tests for s8r v$VERSION"
+
+      # Run smoke tests (orchestration tests)
+      - name: Run Smoke Tests
+        run: |
+          # Add Java 21 module options required for reflection
+          export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+          ./s8r test orchestration
+
+      # Publish Test Results
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Smoke Tests
+          path: '**/target/surefire-reports/TEST-*.xml'
+          reporter: java-junit
+          fail-on-error: false
+
+      # Generate Summary Report
+      - name: Generate Summary
+        if: always()
+        run: |
+          echo "# 🔍 Smoke Test Results for s8r v${{ steps.get_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: ${{ steps.get_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ All smoke tests passed successfully." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Smoke tests failed. See test results for details." >> $GITHUB_STEP_SUMMARY
+          fi
