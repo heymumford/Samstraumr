@@ -8,7 +8,7 @@ This document outlines the Maven structure for the S8r project (formerly Samstra
 
 ## Overview
 
-Starting with version 1.7.0, the project is transitioning from the name "Samstraumr" to the abbreviated form "S8r" (where 8 represents the 8 letters between 'S' and 'r'). This change affects Maven coordinates, package names, and directory structures.
+Starting with version ${samstraumr.version}, the project is transitioning from the name "Samstraumr" to the abbreviated form "S8r" (where 8 represents the 8 letters between 'S' and 'r'). This change affects Maven coordinates, package names, and directory structures.
 
 ## Maven Coordinates
 
@@ -17,7 +17,7 @@ Starting with version 1.7.0, the project is transitioning from the name "Samstra
 ```xml
 <groupId>org.samstraumr</groupId>
 <artifactId>samstraumr</artifactId>
-<version>1.6.2</version>
+<version>${previous.version}</version>
 ```
 
 ### New Structure
@@ -25,7 +25,7 @@ Starting with version 1.7.0, the project is transitioning from the name "Samstra
 ```xml
 <groupId>org.s8r</groupId>
 <artifactId>s8r-parent</artifactId>
-<version>1.7.0</version>
+<version>${samstraumr.version}</version>
 ```
 
 ## Directory Structure
@@ -101,7 +101,7 @@ All references to "Samstraumr" in scripts and utilities will need to be updated:
 ## Version Changes
 
 - The version.properties file has been updated to use the s8r prefix
-- Project version will be incremented to 1.7.0 for the full migration
+- Project version will be incremented to ${samstraumr.version} for the full migration
 
 ## Migration Steps for Developers
 

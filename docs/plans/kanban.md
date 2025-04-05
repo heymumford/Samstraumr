@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Kanban
 
 This document tracks the current development tasks in a Kanban-style board. Each task is assigned to one of three columns: To Do, In Progress, or Done.

@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Compatibility Fixes
 
 This document summarizes the changes made to support the transition from the legacy `Bundle` architecture to the new `Composite` architecture.

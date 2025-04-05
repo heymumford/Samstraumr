@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Documentation Standardization Plan
 
 This document outlines the plan for standardizing all documentation in the Samstraumr project to ensure consistency, clarity, and improved maintainability.

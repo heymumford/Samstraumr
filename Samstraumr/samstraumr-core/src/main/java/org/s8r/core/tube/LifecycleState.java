@@ -1,4 +1,9 @@
 /*
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
+ * Gemini Deep Research, Claude 3.7.
+ */
+
+/*
  * Implementation of component lifecycle states based on biological development model
  *
  * This enum defines the various lifecycle states components can transition through,

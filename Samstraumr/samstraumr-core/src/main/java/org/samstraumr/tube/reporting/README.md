@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Change Management Reporting
 
 This package provides tools for generating change management reports using Docmosis.

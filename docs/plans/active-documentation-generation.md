@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Documentation Generation Plan
 
 This document outlines the plan to implement an automated documentation generation system for the Samstraumr project.

@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # TBD (Tube-Based Development) Testing Examples
 
 This directory contains example feature files demonstrating how to implement the Tube-Based Development (TBD) testing framework in Samstraumr. These examples are designed to help you understand the different types of TBD tests and how to write them effectively.

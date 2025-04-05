@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Biological Lifecycle Testing
 
 This directory contains feature files that test Tube components according to the biological lifecycle model. This approach organizes tests around the developmental phases that tubes go through, from conception to legacy.

@@ -8,20 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.7.3] - 2025-04-04
 
 ### Added
+- Unified command interface (`s8r`) with extensible design
 - New simplified build system (`s8r-build`) with multiple modes
 - New simplified test system (`s8r-test`) supporting all test types
-- Comprehensive documentation for build and test systems
+- Enhanced Docmosis integration with centralized document generation
+- Improved change report generation with change history analysis
+- Comprehensive documentation for build, test, and document generation systems
 
 ### Changed
+- Centralized Docmosis configuration and document generation
 - Streamlined build process with improved error handling
 - Enhanced test execution with proper Maven profile and tag mapping
 - Fixed compilation error in Component.java constructor
-- Updated documentation to include build and test improvements
+- Updated documentation to include build, test, and document generation improvements
+- Reorganized bash helper functions into modular library structure
 
 ### Fixed
 - Incorrect dependency versions in POM file (using project version for libraries)
 - Syntax error in Component.java ternary operator with throw statement
 - Version inconsistencies between properties file and various POM files
+- Docmosis configuration handling with more reliable detection
 
 ## [1.7.2] - 2025-04-04
 

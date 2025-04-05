@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Package Refactoring Plan
 
 This document outlines a plan to refactor the Java package structure in the S8r framework to reduce folder depth by at least 30% and consolidate similar files.

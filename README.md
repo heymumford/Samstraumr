@@ -352,7 +352,7 @@ if (result.isValid()) {
 </tr>
 </table>
 
-## Command-Line Interface & Configuration
+## Command-Line Interface & Tools
 
 <table>
 <tr>
@@ -360,27 +360,27 @@ if (result.isValid()) {
 
 ### S8r Command-Line Interface
 
-Samstraumr provides a unified CLI for all operations:
+Samstraumr provides a unified CLI for all operations through the `s8r` command:
 
 ```bash
-# Build commands
-./s8r-build [options] [mode]
+# Main command format
+./s8r <command> [options] [arguments]
 
-# Test commands
-./s8r-test [options] <test-type>
-
-# Version management
-./s8r-version <command> [options]
+# Example commands
+./s8r build fast                  # Fast build
+./s8r test unit --parallel        # Run unit tests in parallel
+./s8r version bump minor          # Bump minor version
+./s8r docs target/docs pdf        # Generate PDF documentation
 ```
 
 <table>
 <tr><th align="left">Command</th><th align="left">Description</th></tr>
-<tr><td><code>./s8r-build [mode]</code></td><td>Build project (fast, test, package, install, full)</td></tr>
-<tr><td><code>./s8r-test &lt;type&gt;</code></td><td>Run tests (unit, component, integration, all...)</td></tr>
-<tr><td><code>./s8r-version get</code></td><td>Show current version information</td></tr>
-<tr><td><code>./s8r-version bump</code></td><td>Increment version (major, minor, patch)</td></tr>
-<tr><td><code>./s8r-version set</code></td><td>Set specific version</td></tr>
-<tr><td><code>./s8r-version fix</code></td><td>Fix version inconsistencies</td></tr>
+<tr><td><code>./s8r build [mode]</code></td><td>Build project (fast, test, package, install, full)</td></tr>
+<tr><td><code>./s8r test &lt;type&gt;</code></td><td>Run tests (unit, component, integration, all...)</td></tr>
+<tr><td><code>./s8r version &lt;cmd&gt;</code></td><td>Manage versions (get, bump, set, fix)</td></tr>
+<tr><td><code>./s8r docs [dir] [fmt]</code></td><td>Generate documentation with Docmosis</td></tr>
+<tr><td><code>./s8r docmosis &lt;cmd&gt;</code></td><td>Manage Docmosis integration (setup, test, install)</td></tr>
+<tr><td><code>./s8r report &lt;from&gt; &lt;to&gt;</code></td><td>Generate change management reports</td></tr>
 </table>
 
 <div align="center" style="margin-top: 10px;">
@@ -390,28 +390,32 @@ Samstraumr provides a unified CLI for all operations:
 </td>
 <td width="40%">
 
-### Configuration System
+### Docmosis Integration
 
-Samstraumr uses a unified configuration system in the `.samstraumr` directory, providing consistency across CLI and scripts.
+Samstraumr integrates with Docmosis for professional document generation, including release notes, change reports, and documentation.
 
 ```bash
-# Source the unified configuration
-source "${PROJECT_ROOT}/.samstraumr/config.sh"
+# Set up Docmosis configuration
+./s8r docmosis setup
 
-# Use configuration variables
-echo "Core path: ${SAMSTRAUMR_CORE_MODULE}"
+# Generate documentation
+./s8r docs target/docs pdf
+
+# Generate a change report
+./s8r report 1.7.2 1.7.3
 ```
 
 <div style="background-color: #f0f7ff; padding: 10px; border-radius: 5px; margin-top: 10px;">
-<strong>What's Included:</strong><br>
-• Project paths<br>
-• Package structures<br>
-• Maven settings<br>
-• Command mappings<br>
+<strong>Document Generation Features:</strong><br>
+• PDF, DOCX, and HTML output formats<br>
+• Change management reports<br>
+• Release notes generation<br>
+• Template-based documentation<br>
+• Centralized configuration
 </div>
 
 <div align="center" style="margin-top: 10px;">
-    <a href="./docs/reference/build/index.md">🔨 <strong>Build Documentation</strong></a>
+    <a href="./docs/reference/document-generation.md">📄 <strong>Document Generation Guide</strong></a>
 </div>
 
 </td>

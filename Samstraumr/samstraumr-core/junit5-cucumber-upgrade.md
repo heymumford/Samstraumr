@@ -7,18 +7,15 @@ This document describes the changes made to upgrade, streamline, and simplify th
 1. **Removed JUnit 4 Dependencies**
    - Removed direct JUnit 4 dependency
    - Removed junit-vintage-engine to prevent JUnit 4 compatibility layer
-
 2. **Modern Test Runner Architecture**
    - Created standardized test runners using JUnit 5 Jupiter Platform
    - Implemented test runners with clear responsibility separation
    - Used `@SelectClasspathResource` instead of string paths for better resource discovery
-
 3. **Standardized Runner Structure**
    - `S8rTestRunner` - Main entry point for all S8r tests
    - `CriticalTestRunner` - Focused on ATL tests
    - `AtomicTubeTestRunner` - Specific to atomic tube tests
    - `AdamTubeTestRunner` - Specific to Adam tube tests
-
 4. **Simplified Configuration**
    - Consolidated test discovery mechanisms
    - Standardized report generation paths
@@ -49,6 +46,7 @@ This document describes the changes made to upgrade, streamline, and simplify th
 ### Test Runner Changes
 
 From:
+
 ```java
 @Suite
 @SuiteDisplayName("S8r Atomic Tube Tests")
@@ -58,6 +56,7 @@ From:
 ```
 
 To:
+
 ```java
 @Suite
 @SuiteDisplayName("S8r Atomic Tube Tests")
@@ -75,6 +74,7 @@ mvn test -Dtest=RunnerClassName -Dcucumber.filter.tags="@TagName"
 ```
 
 Examples:
+
 ```
 mvn test -Dtest=S8rTestRunner                             # Run all tests
 mvn test -Dtest=CriticalTestRunner                        # Run ATL tests

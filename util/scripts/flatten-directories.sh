@@ -63,12 +63,14 @@ done < <(find "$TARGET_DIR" -type d | sort)
 
 echo
 
-# Find deeply nested directories (5+ levels)
-echo -e "${YELLOW}Deeply nested directories (5+ levels deep):${NC}"
-echo -e "These directories may indicate excessive hierarchy."
+# Find deeply nested directories (exceeding 9 levels from repository root)
+echo -e "${YELLOW}Deeply nested directories (exceeding 9 levels):${NC}"
+echo -e "These directories exceed our maximum depth limit and must be flattened."
+echo -e "${RED}CRITICAL: These paths must be restructured according to the folder-flattening-plan.md${NC}"
 echo
 
-find "$TARGET_DIR" -type d | awk -F/ '{if (NF >= 9) print}' | sort
+# The value 14 accounts for the absolute path prefix (e.g., /home/user/project = 4 segments) plus 10 levels
+find "$TARGET_DIR" -type d | awk -F/ '{if (NF >= 14) print $0 " (" NF-4 " levels)"}' | sort
 
 echo
 
@@ -105,5 +107,57 @@ find "$TARGET_DIR" -type f -path "*/*/impl/*.java" -o -path "*/*/*/util/*.java" 
     
     echo "# mv \"$file\" \"$new_path\""
 done
+
+# Final verification section
+echo -e "\n${BLUE}Depth Verification${NC}"
+echo -e "Maximum recommended depth is 9 levels from repository root"
+
+# Count directories exceeding depth limit
+EXCESS_COUNT=$(find "$TARGET_DIR" -type d | awk -F/ '{if (NF >= 14) print}' | wc -l)
+
+if [ "$EXCESS_COUNT" -gt 0 ]; then
+    echo -e "${RED}Found $EXCESS_COUNT directories exceeding maximum depth limit${NC}"
+    echo -e "Run this script with --recommend to generate specific refactoring commands"
+    
+    # Check if --recommend flag was passed
+    if [[ "$*" == *"--recommend"* ]]; then
+        echo -e "\n${GREEN}Recommended Refactoring Commands:${NC}"
+        echo -e "# Save these commands to a file and review before executing\n"
+        
+        # Generate package refactoring recommendations for Java files
+        find "$TARGET_DIR" -path "*/org/s8r/core/tube/test/*" -name "*.java" | while read -r file; do
+            dir=$(dirname "$file")
+            filename=$(basename "$file")
+            package=$(echo "$dir" | grep -o "org/s8r/.*" | sed 's/\//./g')
+            new_package="org.s8r.test.tube.$(echo "$dir" | grep -o "/test/[^/]*$" | sed 's/\///g')"
+            new_dir=$(echo "$dir" | sed 's/core\/tube\/test/test\/tube/g')
+            
+            echo "# Refactor: $file"
+            echo "# From package: $package"
+            echo "# To package: $new_package"
+            echo "mkdir -p \"$new_dir\""
+            echo "# Update package declaration in file, then move:"
+            echo "mv \"$file\" \"$new_dir/$filename\""
+            echo ""
+        done
+        
+        # Generate feature file refactoring recommendations
+        find "$TARGET_DIR" -path "*/test/resources/*/features/*/*/*" -name "*.feature" | while read -r file; do
+            dir=$(dirname "$file")
+            filename=$(basename "$file")
+            parent_dir=$(basename "$(dirname "$dir")")
+            feature_type=$(basename "$dir")
+            new_name="${parent_dir}-${feature_type}-${filename}"
+            new_dir=$(echo "$dir" | sed -E 's/([^/]+)\/features\/[^/]+\/[^/]+/features\/\1/g')
+            
+            echo "# Refactor: $file"
+            echo "mkdir -p \"$new_dir\""
+            echo "mv \"$file\" \"$new_dir/$new_name\""
+            echo ""
+        done
+    fi
+else
+    echo -e "${GREEN}✓ All directories are within the maximum depth limit${NC}"
+fi
 
 exit 0

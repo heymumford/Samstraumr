@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # S8r Examples
 
 This document provides reference examples for using the Samstraumr CLI (`s8r`) for common operations.

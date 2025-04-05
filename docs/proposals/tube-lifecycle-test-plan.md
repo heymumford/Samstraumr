@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Tube Lifecycle Test Plan
 
 This document outlines a comprehensive test plan for the Tube Lifecycle model, based on the biological development paradigm outlined in the Tube Lifecycle Design. The tests are organized according to the TDD plan structure, providing both positive and negative test cases for each initiative and epic.

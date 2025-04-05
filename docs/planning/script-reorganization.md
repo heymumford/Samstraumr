@@ -1,17 +1,25 @@
-# Script Reorganization
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
+# Script Reorganization and Refactoring Summary
 
 ## Overview
 
-This document summarizes the reorganization of utility scripts to improve maintainability and consistency across the Samstraumr project. The reorganization involved:
+This document summarizes the reorganization and refactoring of utility scripts to improve maintainability and consistency across the Samstraumr project. It covers both the initial reorganization and subsequent enhancements.
+
+## Initial Reorganization
+
+The initial reorganization involved:
 
 1. **Flattening the directory structure** - Moving most scripts to the top-level `util/` directory
 2. **Standardizing naming conventions** - Implementing consistent kebab-case names with function-based prefixes
 3. **Clean transition approach** - Removing old script locations entirely for a clean break
 4. **Updating documentation** - Revising README files to reflect the new organization
 
-## New Directory Structure
+### New Directory Structure
 
-### Root level scripts (primary functions)
+#### Root level scripts (primary functions)
 
 ```
 util/
@@ -28,7 +36,7 @@ util/
 ├── version.sh                # Unified version management
 ```
 
-### Helper scripts (secondary functions)
+#### Helper scripts (secondary functions)
 
 ```
 util/scripts/
@@ -46,7 +54,7 @@ util/scripts/
 └── update-md-headers.sh      # Markdown header standardization
 ```
 
-## Script Mapping (Old to New)
+### Script Mapping (Old to New)
 
 The following table shows the mapping from old script locations to new ones. The old script locations have been completely removed for a clean break and to avoid ambiguity:
 
@@ -76,7 +84,7 @@ The following table shows the mapping from old script locations to new ones. The
 | `util/test/run-all-tests.sh`           | `util/test-run-all.sh`                |
 | `util/test/mapping/map-test-type.sh`   | `util/test-map-type.sh`               |
 
-## Naming Conventions
+### Naming Conventions
 
 The new naming convention follows these principles:
 
@@ -90,6 +98,57 @@ The new naming convention follows these principles:
    - `update-*` - Content updating
 3. **Consistent verb-noun order** - Action comes first (e.g., `clean-maven.sh`, not `maven-clean.sh`)
 
+## Enhanced Hierarchical Structure
+
+Following initial reorganization, scripts were further reorganized into a more structured hierarchical system:
+
+```
+/util
+├── bin/              # Consolidated executable scripts
+│   ├── build/        # Build-related scripts
+│   ├── test/         # Testing-related scripts
+│   ├── quality/      # Quality check scripts
+│   ├── version/      # Version management scripts
+│   ├── utils/        # Utility scripts
+│   └── demo/         # Demonstration scripts
+└── lib/              # Shared bash libraries and functions
+    ├── common.sh     # Common utility functions
+    ├── build-lib.sh  # Build-related functions
+    ├── test-lib.sh   # Test-related functions
+    ├── quality-lib.sh# Quality-related functions
+    └── version-lib.sh# Version-related functions
+```
+
+## Additional Demo Command Infrastructure
+
+As part of ongoing refactoring efforts, we added:
+
+1. **Demo Command Infrastructure**
+   - Created a new `demo` command in the `s8r` CLI for running demonstration scripts
+   - Added `show_demo_help()` and `handle_demo_command()` functions to handle demo operations
+   - Updated the main help to include the demo command in examples
+2. **Demo Scripts Directory**
+   - Created a new directory: `/util/bin/demo/` for demonstration scripts
+   - Moved `inspect-identity.sh` from project root to `/util/bin/demo/tube-identity-demo.sh`
+   - Renamed the script with a clearer, more descriptive name following naming conventions
+3. **Script Cleanup**
+   - Removed scripts from the project root directory
+   - Ensured all scripts are properly executable (`chmod +x`)
+   - Maintained compatibility with existing functionality
+
+### Demo Command Usage Examples
+
+```bash
+# List available demos
+./s8r demo list
+
+# Run the tube identity demo
+./s8r demo identity
+
+# Get help on demo commands
+./s8r help demo
+```
+
 ## Documentation Updates
 
 The util/README.md file has been updated to reflect the new organization, with:
@@ -99,25 +158,33 @@ The util/README.md file has been updated to reflect the new organization, with:
 3. Explanation of naming conventions
 4. Guidelines for adding new scripts
 
-## Transition Plan
+## Benefits
 
-We've opted for a clean break approach:
+1. **Improved Organization**
+   - Project root directory is now cleaner
+   - Scripts are logically organized by purpose
+   - Standardized naming makes scripts easier to find
+2. **Enhanced Maintainability**
+   - Centralized location for all scripts by type
+   - Consistent CLI interface via the `s8r` command
+   - Better separation of concerns
+   - Shared library functions reduce duplication
+3. **User Experience**
+   - Users can discover functionality via help commands
+   - Consistent interface for all operations
+   - Improved discoverability through logical organization
 
-1. **Immediate Actions**
-   - Old script locations completely removed
-   - Documentation fully updated to reference new locations
-   - CI/CD scripts updated to use new locations
-   - References in other scripts updated
-2. **Benefits of Clean Break**
-   - No ambiguity about which script to use
-   - Forces immediate updates to references
-   - Cleaner codebase without duplicated functionality
-   - Simpler maintenance without transition code
-3. **Mitigation for Disruption**
-   - Clear documentation of all renamed scripts
-   - Error messages in CI will explicitly point to missing files
-   - Comprehensive mapping table in this document
-   - README.md in util/ directory updated with new locations
-4. **Going Forward**
-   - All new scripts will follow the standardized naming conventions
-   - Scripts will be placed in appropriate locations in the flattened structure
+## Future Work
+
+1. **Additional Demos**
+   - Add more demonstration scripts for key concepts
+   - Consider adding documentation-specific demos
+   - Add demos for new features as they are developed
+2. **Demo Categories**
+   - Organize demos into categories for better discovery
+   - Add support for filtering demos by category
+   - Allow listing demos with descriptions
+3. **Integration with Documentation**
+   - Link demos to relevant documentation
+   - Add explanation comments in demo scripts
+   - Consider adding step-by-step tutorials alongside demos

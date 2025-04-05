@@ -12,7 +12,7 @@ This directory contains the unified configuration system for the Samstraumr fram
 ## Configuration Precedence
 
 1. User-specific settings (`.samstraumr/user/config.json`)
-2. Project configuration (`.samstraumr/config.json`) 
+2. Project configuration (`.samstraumr/config.json`)
 3. Default templates (`.samstraumr/templates/config.json.template`)
 
 ## Updating Configuration

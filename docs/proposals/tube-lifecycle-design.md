@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Tube Lifecycle Design
 
 This design document outlines a comprehensive refactoring of the Samstraumr Tube.java implementation based on the parallels between biological life cycles and software component lifecycles. By leveraging concepts from the "Life Cycle Stage Comparison" document, we propose a more structured, adaptive, and resilient lifecycle model for Tubes within the Samstraumr framework.

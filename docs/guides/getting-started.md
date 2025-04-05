@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Getting Started with S8r
 
 ## Table of Contents
@@ -29,7 +33,7 @@ Maven dependency:
 <dependency>
     <groupId>org.s8r</groupId>
     <artifactId>s8r-core</artifactId>
-    <version>1.7.0</version>
+    <version>${samstraumr.version}</version>
 </dependency>
 ```
 

@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Quality Check Scripts
 
 This directory contains scripts for quality checks and fixes in the Samstraumr project.

@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Clean Architecture Migration Plan
 
 *Document version: 1.0 - April 4, 2025*
@@ -183,17 +187,14 @@ The testing approach will follow the clean architecture layers:
    - Pure unit tests without mocks or external dependencies
    - Test domain entities, value objects, and domain services
    - Focus on business rules and invariants
-
 2. **Application Layer Testing**
    - Test use cases with mocked ports
    - Verify orchestration and application-level logic
    - Use in-memory implementations for repositories and services
-
 3. **Adapter Layer Testing**
    - Test adapters with real or mocked infrastructure
    - Focus on translation between domain and external systems
    - Verify proper mapping of data
-
 4. **End-to-End Testing**
    - Test full system with BDD approach using Cucumber
    - Verify that the entire system works together
@@ -215,17 +216,14 @@ To ensure continuous progress while minimizing risk:
    - Extract pure domain concept
    - Remove logging and infrastructure dependencies
    - Implement as proper value object
-
 2. **Environment → EnvironmentService (Application)**
    - Extract business rules to domain
    - Create application service for environment awareness
    - Implement infrastructure adapter for system information
-
 3. **TubeLogger → LoggerPort (Application Interface)**
    - Define logger interface in application layer
    - Implement adapter for Log4j in infrastructure
    - Inject logger through constructor
-
 4. **Composite → CompositeEntity and CompositeService**
    - Separate domain entity from orchestration logic
    - Create composite repository interface
@@ -236,15 +234,12 @@ To ensure continuous progress while minimizing risk:
 1. **Deeply embedded infrastructure dependencies**
    - Current code has pervasive logging, environment references
    - Need careful extraction and dependency inversion
-
 2. **Complex lifecycle state management**
    - Lifecycle concepts are core to the system
    - Need to preserve behavior while refactoring
-
 3. **Maintaining backward compatibility**
    - Existing code depends on current structure
    - Need adapters to bridge old and new architecture
-
 4. **Comprehensive testing**
    - Ensure refactoring doesn't break existing behavior
    - Need tests at all levels of the architecture

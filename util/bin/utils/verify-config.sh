@@ -13,7 +13,7 @@ echo "==============================================="
 if [ -f "${PROJECT_ROOT}/.samstraumr.config" ]; then
   echo "✅ Configuration file found at: ${PROJECT_ROOT}/.samstraumr.config"
   # Source the configuration file
-  source "${PROJECT_ROOT}/.samstraumr.config"
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")" source "${PROJECT_ROOT}/.samstraumr.configsource "${PROJECT_ROOT}/.samstraumr.config pwd)/../../.samstraumr/config.sh""
 else
   echo "❌ Configuration file NOT found at: ${PROJECT_ROOT}/.samstraumr.config"
   echo "Please ensure the configuration file exists and is readable."

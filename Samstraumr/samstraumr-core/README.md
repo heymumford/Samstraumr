@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # README.md (samstraumr-core)
 
 ## Overview
@@ -71,5 +75,6 @@ The POM file (`pom.xml`) defines the key configuration settings for **samstraumr
 
 ## Documentation
 
-- [What is BDD?](WhatIsBDD.md)
-- [Rationale for Using BDD in Samstraumr](RationaleOnUsingBDD.md)
+- [What is BDD?](what-is-bdd.md)
+- [Rationale for Using BDD in Samstraumr](rationale-on-using-bdd.md)
+- [JUnit 5 and Cucumber Upgrade Guide](junit5-cucumber-upgrade.md)

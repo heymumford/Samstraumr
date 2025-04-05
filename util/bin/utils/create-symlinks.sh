@@ -10,7 +10,7 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 # Source the configuration file
 if [ -f "${PROJECT_ROOT}/.samstraumr.config" ]; then
-  source "${PROJECT_ROOT}/.samstraumr.config"
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")" source "${PROJECT_ROOT}/.samstraumr.configsource "${PROJECT_ROOT}/.samstraumr.config pwd)/../../.samstraumr/config.sh""
 else
   echo "Error: Configuration file not found: ${PROJECT_ROOT}/.samstraumr.config"
   exit 1

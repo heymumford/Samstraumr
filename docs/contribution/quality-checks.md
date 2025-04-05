@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Quality Checks
 
 This document explains the quality gates and checks implemented in the Samstraumr project, both for local development and in the CI/CD pipeline.

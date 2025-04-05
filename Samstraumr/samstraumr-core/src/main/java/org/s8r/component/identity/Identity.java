@@ -207,6 +207,16 @@ public class Identity {
   }
 
   /**
+   * Gets the parent identity of this component, if any. This is an alias for getParentIdentity()
+   * for backward compatibility.
+   *
+   * @return The parent component's identity, or null for Adam components
+   */
+  public Identity getParent() {
+    return getParentIdentity();
+  }
+
+  /**
    * Gets the hierarchical address of this component in the component ecosystem.
    *
    * @return The hierarchical address string
@@ -216,12 +226,41 @@ public class Identity {
   }
 
   /**
+   * Gets the hierarchical ID of this component. This is an alias for getHierarchicalAddress() for
+   * backward compatibility.
+   *
+   * @return The hierarchical ID string
+   */
+  public String getHierarchicalId() {
+    return getHierarchicalAddress();
+  }
+
+  /**
    * Determines if this is an Adam (origin) component without a parent.
    *
    * @return true if this is an Adam component, false otherwise
    */
   public boolean isAdamComponent() {
     return isAdamComponent;
+  }
+
+  /**
+   * Determines if this is an Adam (origin) component without a parent. This is an alias for
+   * isAdamComponent() for backward compatibility.
+   *
+   * @return true if this is an Adam component, false otherwise
+   */
+  public boolean isAdam() {
+    return isAdamComponent();
+  }
+
+  /**
+   * Determines if this is a root component (same as isAdam).
+   *
+   * @return true if this is a root component, false otherwise
+   */
+  public boolean isRoot() {
+    return isAdamComponent();
   }
 
   /**
@@ -242,6 +281,60 @@ public class Identity {
     if (childIdentity != null) {
       descendants.add(childIdentity);
     }
+  }
+
+  /**
+   * Gets the siblings of this component (other components with the same parent).
+   *
+   * @return A list of sibling identities, or an empty list if no siblings or parent
+   */
+  public List<Identity> getSiblings() {
+    if (parentIdentity == null) {
+      return Collections.emptyList();
+    }
+
+    List<Identity> siblings = new ArrayList<>();
+    for (Identity descendant : parentIdentity.getDescendants()) {
+      if (descendant != this) {
+        siblings.add(descendant);
+      }
+    }
+    return siblings;
+  }
+
+  /**
+   * Determines if this component is a descendant of the specified component.
+   *
+   * @param ancestorIdentity The potential ancestor identity
+   * @return true if this component is a descendant of the specified component, false otherwise
+   */
+  public boolean isDescendantOf(Identity ancestorIdentity) {
+    if (ancestorIdentity == null || parentIdentity == null) {
+      return false;
+    }
+
+    Identity current = parentIdentity;
+    while (current != null) {
+      if (current.equals(ancestorIdentity)) {
+        return true;
+      }
+      current = current.getParentIdentity();
+    }
+    return false;
+  }
+
+  /**
+   * Determines if this component is an ancestor of the specified component.
+   *
+   * @param descendantIdentity The potential descendant identity
+   * @return true if this component is an ancestor of the specified component, false otherwise
+   */
+  public boolean isAncestorOf(Identity descendantIdentity) {
+    if (descendantIdentity == null) {
+      return false;
+    }
+
+    return descendantIdentity.isDescendantOf(this);
   }
 
   @Override

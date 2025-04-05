@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Quality Tools for Samstraumr
 
 This directory contains configuration files for various quality tools used in the Samstraumr project.

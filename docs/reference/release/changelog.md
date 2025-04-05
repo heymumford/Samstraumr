@@ -7,6 +7,38 @@ Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford
 All notable changes to this project will be documented in this file.
 
 ## [1.3.0] - 2025-04-03
+## [1.7.2] - 2025-04-04
+
+### Added
+
+- New simplified version management system (`s8r-version`)
+- Automatic changelog entry generation during version updates
+- Version inconsistency fixing with `s8r-version fix` command
+
+### Changed
+
+- Updated version management documentation to include both systems
+- Enhanced CLAUDE.md with improved version management documentation
+- Streamlined version update output with clearer status indicators
+
+### Fixed
+
+- POM file version sync issues with the original version system
+- Version inconsistencies between properties file and various POM files
+## [1.7.1] - 2025-04-04
+
+### Added
+
+- 
+
+### Changed
+
+- 
+
+### Fixed
+
+- 
+
 
 ### Added
 

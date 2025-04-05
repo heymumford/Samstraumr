@@ -1,4 +1,9 @@
 /*
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
+ * Gemini Deep Research, Claude 3.7.
+ */
+
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  *
@@ -232,6 +237,16 @@ public class Identity {
    * @return true if this is an Adam component, false otherwise
    */
   public boolean isAdamComponent() {
+    return isAdamComponent;
+  }
+
+  /**
+   * Determines if this is an Adam (origin) tube without a parent. This is an alias for
+   * isAdamComponent() for backward compatibility.
+   *
+   * @return true if this is an Adam tube, false otherwise
+   */
+  public boolean isAdamTube() {
     return isAdamComponent;
   }
 

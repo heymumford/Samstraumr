@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Samstraumr Test Tag Ontology
 
 > **⚠️ DEPRECATED**: This document has been merged into a comprehensive test tags and annotations document.

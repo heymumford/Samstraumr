@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # File Reorganization Progress
 
 This document tracks the progress of the file reorganization effort in the Samstraumr project.

@@ -2,9 +2,9 @@
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-# CLAUDE.md
+# BUILD.md - Samstraumr Build Documentation
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides comprehensive build and development documentation for the Samstraumr framework. It was previously named CLAUDE.md as it provided guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Unified CLI Command
 

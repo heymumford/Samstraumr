@@ -1,4 +1,9 @@
 /*
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
+ * Gemini Deep Research, Claude 3.7.
+ */
+
+/*
  * Implementation of the LoggerInfo concept in the S8r framework
  *
  * This class implements the core functionality for component logging in the S8r

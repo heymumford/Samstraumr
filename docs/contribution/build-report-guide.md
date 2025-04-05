@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Build Report Guide
 
 This document outlines how to generate and interpret comprehensive build reports for Samstraumr, following the project's philosophy of flow, awareness, and adaptive components.

@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Samstraumr Testing Framework
 
 This directory contains the testing framework for the Samstraumr project, organized according to systems theory principles and BDD best practices.
@@ -101,4 +105,4 @@ Tests follow the Behavior-Driven Development (BDD) approach with Cucumber:
 - Tags provide organization and selective execution
 - Step definitions implement the test logic
 
-For more information on the BDD approach, see [RationaleOnUsingBDD.md](../RationaleOnUsingBDD.md) and [WhatIsBDD.md](../WhatIsBDD.md).
+For more information on the BDD approach, see [rationale-on-using-bdd.md](../../rationale-on-using-bdd.md) and [what-is-bdd.md](../../what-is-bdd.md).

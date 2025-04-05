@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Documentation Standards
 
 This document defines the standardized approach to documentation in the Samstraumr project. Following these standards ensures consistency and improves readability across all project documentation.

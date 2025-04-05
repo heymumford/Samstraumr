@@ -275,6 +275,22 @@ public class Environment {
     }
   }
 
+  /**
+   * Adapts the environment instance to a map format. This is used to support legacy APIs that
+   * expect environment parameters as a map.
+   *
+   * @return a map of environment parameters
+   */
+  public Map<String, String> asMap() {
+    Map<String, String> result = new HashMap<>();
+    for (Map.Entry<String, Object> entry : environmentParameters.entrySet()) {
+      if (entry.getValue() != null) {
+        result.put(entry.getKey(), entry.getValue().toString());
+      }
+    }
+    return result;
+  }
+
   @Override
   public String toString() {
     return "Environment[id=" + environmentId + ", creationTime=" + creationTime + "]";

@@ -1,4 +1,9 @@
 /*
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
+ * Gemini Deep Research, Claude 3.7.
+ */
+
+/*
  * Implementation of the component status states in the S8r framework
  *
  * This class implements the core status states for components in the S8r
@@ -38,6 +43,12 @@ public enum Status {
    * currently functioning normally and is able to receive, process, and output data.
    */
   ACTIVE,
+
+  /**
+   * The component is operational. This is a general state indicating that the component is
+   * functioning normally and capable of performing its intended operations.
+   */
+  OPERATIONAL,
 
   /**
    * The component is waiting for external input or a signal to begin operation. In this state, the

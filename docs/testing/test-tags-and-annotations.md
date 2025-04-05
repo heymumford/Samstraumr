@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Test Tags and Annotations
 
 This document provides a comprehensive reference for the test tags and annotations used in S8r, combining both industry-standard and domain-specific terminology.

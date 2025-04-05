@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Unified Quality Checks Plan
 
 This document outlines the plan to implement a unified quality check system for the Samstraumr project.

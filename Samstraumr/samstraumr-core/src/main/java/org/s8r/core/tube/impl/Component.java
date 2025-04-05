@@ -1,4 +1,9 @@
 /*
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
+ * Gemini Deep Research, Claude 3.7.
+ */
+
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  *
@@ -123,6 +128,46 @@ public class Component {
 
     String uniqueId = generateUniqueId(reason, environment);
     return new Component(reason, environment, uniqueId, null);
+  }
+
+  /**
+   * Creates a new Adam (origin) component with the specified reason and environment. An Adam
+   * component is the first component created in a system, with no parent.
+   *
+   * @param reason The reason for creating this Adam component
+   * @param environment The environment in which to create the component
+   * @return A new Adam component instance
+   * @throws InitializationException if initialization fails
+   */
+  public static Component createAdam(String reason, Environment environment) {
+    if (reason == null) {
+      throw new InitializationException("Reason cannot be null");
+    }
+    if (environment == null) {
+      throw new InitializationException("Environment cannot be null");
+    }
+
+    String uniqueId = generateUniqueId(reason, environment);
+    return new Component(reason, environment, uniqueId, null);
+  }
+
+  /**
+   * Creates a new Adam (origin) component with the specified reason and environment. This method
+   * intentionally throws an exception if a parent is provided, as Adam components cannot have
+   * parents by definition.
+   *
+   * @param reason The reason for creating this Adam component
+   * @param environment The environment in which to create the component
+   * @param parent The parent component, which should be null for Adam components
+   * @return A new Adam component instance
+   * @throws IllegalArgumentException if a parent is provided
+   * @throws InitializationException if initialization fails
+   */
+  public static Component createAdam(String reason, Environment environment, Component parent) {
+    if (parent != null) {
+      throw new IllegalArgumentException("Adam tubes cannot have parents");
+    }
+    return createAdam(reason, environment);
   }
 
   /**
@@ -253,6 +298,18 @@ public class Component {
   }
 
   /**
+   * Logs a message both to memory and via the logger.
+   *
+   * @param message The message to log
+   */
+  public void log(String message) {
+    logToMemory(message);
+    if (logger != null) {
+      logger.info(message);
+    }
+  }
+
+  /**
    * Gets the unique identifier for this component.
    *
    * @return The unique identifier
@@ -303,6 +360,16 @@ public class Component {
   }
 
   /**
+   * Gets the current lifecycle state of this component. This is an alias for getLifecycleState()
+   * for backward compatibility.
+   *
+   * @return The lifecycle state
+   */
+  public LifecycleState getState() {
+    return getLifecycleState();
+  }
+
+  /**
    * Sets the lifecycle state of this component.
    *
    * @param newState The new lifecycle state to set
@@ -317,6 +384,16 @@ public class Component {
           "LIFECYCLE",
           newState.name());
     }
+  }
+
+  /**
+   * Sets the lifecycle state of this component. This is an alias for setLifecycleState() for
+   * backward compatibility.
+   *
+   * @param newState The new lifecycle state to set
+   */
+  public void setState(LifecycleState newState) {
+    setLifecycleState(newState);
   }
 
   /**
@@ -392,6 +469,16 @@ public class Component {
   }
 
   /**
+   * Gets the memory log entries for this component. This is an alias for queryMemoryLog() for
+   * backward compatibility.
+   *
+   * @return An unmodifiable view of the memory log
+   */
+  public List<String> getMemoryLog() {
+    return queryMemoryLog();
+  }
+
+  /**
    * Gets the size of the memory log.
    *
    * @return The memory log size
@@ -416,6 +503,83 @@ public class Component {
    */
   public Identity getParentIdentity() {
     return parentIdentity;
+  }
+
+  /**
+   * Gets the logger for this component.
+   *
+   * @return The component logger
+   */
+  public Logger getLogger() {
+    return logger;
+  }
+
+  /**
+   * Checks if this component is operational.
+   *
+   * @return true if this component is operational, false otherwise
+   */
+  public boolean isOperational() {
+    return status == Status.OPERATIONAL
+        || lifecycleState == LifecycleState.READY
+        || lifecycleState == LifecycleState.ACTIVE
+        || lifecycleState == LifecycleState.STABLE;
+  }
+
+  /**
+   * Checks if this component is embryonic.
+   *
+   * @return true if this component is in an embryonic state, false otherwise
+   */
+  public boolean isEmbryonic() {
+    return lifecycleState == LifecycleState.CONCEPTION
+        || lifecycleState == LifecycleState.INITIALIZING
+        || lifecycleState == LifecycleState.CONFIGURING;
+  }
+
+  /**
+   * Checks if this component is initializing.
+   *
+   * @return true if this component is initializing, false otherwise
+   */
+  public boolean isInitializing() {
+    return lifecycleState == LifecycleState.INITIALIZING;
+  }
+
+  /**
+   * Checks if this component is configuring.
+   *
+   * @return true if this component is configuring, false otherwise
+   */
+  public boolean isConfiguring() {
+    return lifecycleState == LifecycleState.CONFIGURING;
+  }
+
+  /**
+   * Checks if this component is ready.
+   *
+   * @return true if this component is ready, false otherwise
+   */
+  public boolean isReady() {
+    return lifecycleState == LifecycleState.READY;
+  }
+
+  /**
+   * Checks if this component is active.
+   *
+   * @return true if this component is active, false otherwise
+   */
+  public boolean isActive() {
+    return lifecycleState == LifecycleState.ACTIVE;
+  }
+
+  /**
+   * Checks if this component is terminated.
+   *
+   * @return true if this component is terminated, false otherwise
+   */
+  public boolean isTerminated() {
+    return lifecycleState == LifecycleState.TERMINATED;
   }
 
   /**

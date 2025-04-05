@@ -1,47 +1,42 @@
-/**
- * Copyright (c) 2025 Eric C. Mumford (@heymumford)
- *
- * <p>This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy
- * of the MPL was not distributed with this file, You can obtain one at
- * https://github.com/heymumford/Samstraumr/blob/main/LICENSE
- *
- * <p>Base exception for component-related errors in the S8r framework
+/*
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
+ * Gemini Deep Research, Claude 3.7.
  */
+
 package org.s8r.component.exception;
 
 /**
- * Base exception for component-related errors in the S8r framework.
+ * Base exception class for component-related exceptions.
  *
- * <p>This exception serves as the base class for all component-specific exceptions, providing a
- * unified approach to error handling in the component model.
+ * <p>This exception serves as the parent class for all exceptions related to component operations
+ * in the S8r framework.
  */
 public class ComponentException extends RuntimeException {
-
   private static final long serialVersionUID = 1L;
 
   /**
-   * Constructs a new ComponentException with the specified detail message.
+   * Creates a new ComponentException with the specified error message.
    *
-   * @param message the detail message
+   * @param message The error message
    */
   public ComponentException(String message) {
     super(message);
   }
 
   /**
-   * Constructs a new ComponentException with the specified detail message and cause.
+   * Creates a new ComponentException with the specified error message and cause.
    *
-   * @param message the detail message
-   * @param cause the cause of the exception
+   * @param message The error message
+   * @param cause The cause of the exception
    */
   public ComponentException(String message, Throwable cause) {
     super(message, cause);
   }
 
   /**
-   * Constructs a new ComponentException with the specified cause.
+   * Creates a new ComponentException with the specified cause.
    *
-   * @param cause the cause of the exception
+   * @param cause The cause of the exception
    */
   public ComponentException(Throwable cause) {
     super(cause);

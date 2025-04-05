@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # C I C D Guide
 
 This guide explains how to work with Samstraumr's CI/CD pipeline and verify your changes before submitting them.

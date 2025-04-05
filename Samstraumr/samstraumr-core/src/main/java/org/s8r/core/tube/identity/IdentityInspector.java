@@ -1,4 +1,13 @@
+/*
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
+ * Gemini Deep Research, Claude 3.7.
+ */
+
 package org.s8r.core.tube.identity;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A utility class for inspecting Identity instances.
@@ -11,6 +20,71 @@ package org.s8r.core.tube.identity;
  * what they contain in memory.
  */
 public class IdentityInspector {
+
+  /**
+   * Determines if the provided identity is an Adam (origin) identity.
+   *
+   * @param identity The identity to check
+   * @return true if this is an Adam identity, false otherwise
+   */
+  public boolean isAdamIdentity(Identity identity) {
+    if (identity == null) {
+      return false;
+    }
+    return identity.isAdamComponent();
+  }
+
+  /**
+   * Gets the parent identity of the provided identity.
+   *
+   * @param identity The identity to get the parent of
+   * @return The parent identity, or null if this is an Adam identity
+   */
+  public Identity getParentIdentity(Identity identity) {
+    if (identity == null) {
+      return null;
+    }
+    return identity.getParentIdentity();
+  }
+
+  /**
+   * Gets the hierarchical address of the provided identity.
+   *
+   * @param identity The identity to get the address of
+   * @return The hierarchical address string
+   */
+  public String getHierarchicalAddress(Identity identity) {
+    if (identity == null) {
+      return null;
+    }
+    return identity.getHierarchicalAddress();
+  }
+
+  /**
+   * Gets the descendants of the provided identity.
+   *
+   * @param identity The identity to get descendants of
+   * @return A list of descendant identities
+   */
+  public List<Identity> getDescendants(Identity identity) {
+    if (identity == null) {
+      return Collections.emptyList();
+    }
+    return identity.getDescendants();
+  }
+
+  /**
+   * Gets the environmental context of the provided identity.
+   *
+   * @param identity The identity to get the context of
+   * @return A map of environmental context values
+   */
+  public Map<String, String> getEnvironmentalContext(Identity identity) {
+    if (identity == null) {
+      return Collections.emptyMap();
+    }
+    return identity.getEnvironmentalContext();
+  }
 
   /**
    * Prints details about an Identity object.

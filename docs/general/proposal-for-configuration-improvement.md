@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Proposal for Configuration Improvement
 
 After reviewing utility scripts and identifying hardcoded paths that may break during refactoring, this document proposes a more maintainable approach using environment variables and project-level key-value configuration.

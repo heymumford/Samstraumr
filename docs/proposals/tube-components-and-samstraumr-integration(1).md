@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Tube Components and Samstraumr Integration(1)
 
 **Introduction: Unveiling Samstraumr and Tube-Based Development**

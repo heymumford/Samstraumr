@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Markdown Renaming
 
 This document outlines the plan for standardizing the naming of Markdown (.md) files in the Samstraumr project.

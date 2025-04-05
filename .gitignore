@@ -264,6 +264,8 @@ _site/
 # Project Specific
 #------------------------------------------------------------------------------
 # User config directories - containing sensitive data
+# Allow the .s8r/lib directory to be tracked but not user config
+!/.s8r/lib/
 */.s8r/user/
 /home/*/.s8r/
 ~/.s8r/

@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Build Status
 
 This page shows the current flow status of the Samstraumr build pipeline, similar to how Tubes monitor their processing state.

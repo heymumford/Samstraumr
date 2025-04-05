@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
+ * Gemini Deep Research, Claude 3.7.
+ */
+
 package org.samstraumr.tube.annotations;
 
 import java.lang.annotation.ElementType;
@@ -40,4 +45,3 @@ import org.junit.jupiter.api.Tag;
 @Retention(RetentionPolicy.RUNTIME)
 @Tag("BTL")
 public @interface BTL {}
-

@@ -7,11 +7,11 @@
   <parent>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-modules</artifactId>
-    <version>1.6.7</version>
+    <version>1.7.2</version>
   </parent>
 
   <artifactId>samstraumr-core</artifactId>
-  <version>1.6.7</version>
+  <version>1.7.2</version>
   <packaging>jar</packaging>
   <name>Samstraumr Core</name>
 
@@ -19,6 +19,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <cucumber.version>7.14.0</cucumber.version>
     <junit-jupiter.version>5.10.1</junit-jupiter.version>
+    <junit-platform.version>1.10.1</junit-platform.version>
     <slf4j.version>2.0.9</slf4j.version>
     <log4j2.version>2.22.0</log4j2.version>
     <lombok.version>1.18.30</lombok.version>
@@ -117,14 +118,28 @@
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-suite</artifactId>
-      <version>1.10.1</version>
+      <version>${junit-platform.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-suite-api</artifactId>
+      <version>${junit-platform.version}</version>
       <scope>test</scope>
     </dependency>
     
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-suite-engine</artifactId>
-      <version>1.10.1</version>
+      <version>${junit-platform.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-launcher</artifactId>
+      <version>${junit-platform.version}</version>
       <scope>test</scope>
     </dependency>
     
@@ -206,6 +221,29 @@
           </systemPropertyVariables>
           <!-- Explicitly enable tests -->
           <skipTests>false</skipTests>
+          <!-- Add explicit provider configuration -->
+          <properties>
+            <configurationParameters>
+              cucumber.junit-platform.naming-strategy=long
+            </configurationParameters>
+          </properties>
+          <dependencies>
+            <dependency>
+              <groupId>org.junit.platform</groupId>
+              <artifactId>junit-platform-suite</artifactId>
+              <version>${junit-platform.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.junit.platform</groupId>
+              <artifactId>junit-platform-suite-engine</artifactId>
+              <version>${junit-platform.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.junit.platform</groupId>
+              <artifactId>junit-platform-suite-api</artifactId>
+              <version>${junit-platform.version}</version>
+            </dependency>
+          </dependencies>
         </configuration>
       </plugin>
       <plugin>

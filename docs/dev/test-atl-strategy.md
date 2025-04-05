@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # A T L B T L Strategy
 
 This document outlines the Above the Line (ATL) and Below the Line (BTL) testing strategy implemented in Samstraumr, providing guidelines for categorizing tests and ensuring efficient test execution.

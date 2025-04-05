@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Samstraumr Utility Scripts
 
 This directory contains utility scripts for the Samstraumr project. We have reorganized the scripts with a flattened directory structure and consistent naming conventions.

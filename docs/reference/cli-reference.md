@@ -41,6 +41,7 @@ Options:
 - `--skip-quality`: Skip quality checks
 
 Examples:
+
 ```bash
 ./s8r build                   # Fast build
 ./s8r build test              # Run tests
@@ -58,27 +59,27 @@ Run various types of tests:
 
 Test types:
 - Industry Standard:
-  - `smoke` (basic system assembly and connectivity)
-  - `unit` (individual units in isolation)
-  - `component` (connected components working together)
-  - `integration` (interactions between different parts)
-  - `api` (public interfaces and contracts)
-  - `system` (entire system as a whole)
-  - `endtoend` (user perspective and requirements)
-  - `property` (system properties across inputs)
+- `smoke` (basic system assembly and connectivity)
+- `unit` (individual units in isolation)
+- `component` (connected components working together)
+- `integration` (interactions between different parts)
+- `api` (public interfaces and contracts)
+- `system` (entire system as a whole)
+- `endtoend` (user perspective and requirements)
+- `property` (system properties across inputs)
 - Samstraumr Terminology:
-  - `orchestration` (basic system assembly and connectivity)
-  - `tube` (individual tubes in isolation)
-  - `composite` (or `bundle` for legacy) (connected tubes)
-  - `flow` (interactions between different parts)
-  - `machine` (public interfaces and contracts)
-  - `stream` (entire system as a whole)
-  - `acceptance` (user perspective and requirements)
-  - `adaptation` (system properties across inputs)
+- `orchestration` (basic system assembly and connectivity)
+- `tube` (individual tubes in isolation)
+- `composite` (or `bundle` for legacy) (connected tubes)
+- `flow` (interactions between different parts)
+- `machine` (public interfaces and contracts)
+- `stream` (entire system as a whole)
+- `acceptance` (user perspective and requirements)
+- `adaptation` (system properties across inputs)
 - Special test types:
-  - `all` (run all tests)
-  - `atl` (Above-The-Line critical tests)
-  - `adam` (Adam tube identity tests)
+- `all` (run all tests)
+- `atl` (Above-The-Line critical tests)
+- `adam` (Adam tube identity tests)
 
 Options:
 - `-b, --both`: Include equivalent tags (e.g., run both unit and tube tests)
@@ -90,6 +91,7 @@ Options:
 - `--cyclename <name>`: Specify a name for the test cycle (for reporting)
 
 Examples:
+
 ```bash
 ./s8r test unit                # Run unit tests
 ./s8r test --both unit         # Run unit and tube tests
@@ -117,6 +119,7 @@ Commands:
 - `diagnose`: Run diagnostics to identify and fix version issues
 
 Examples:
+
 ```bash
 ./s8r version get              # Show current version
 ./s8r version bump patch       # Bump patch version (bug fixes)
@@ -145,6 +148,7 @@ Options:
 - `-f, --fix`: Fix issues automatically (where applicable)
 
 Examples:
+
 ```bash
 ./s8r quality check            # Run all quality checks
 ./s8r quality spotless -f      # Run Spotless and fix issues
@@ -169,6 +173,7 @@ Supported formats:
 - `html`: HTML format for web viewing
 
 Examples:
+
 ```bash
 ./s8r docs                         # Generate PDF docs in target/docs
 ./s8r docs ./my-docs               # Generate PDF docs in ./my-docs

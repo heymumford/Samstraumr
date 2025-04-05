@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # S8r Documentation Consolidation Plan
 
 This plan builds upon the previous consolidation efforts while focusing on the transition from Samstraumr to S8r terminology and architecture. It specifically aims to reduce documentation file count by merging similar content and updating terminology.

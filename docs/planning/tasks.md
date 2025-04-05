@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Implementation Tasks
 
 This document tracks specific implementation tasks for the S8r framework. It provides a consolidated view of what needs to be done, organized by priority.

@@ -209,7 +209,7 @@ parse_global_args() {
         show_help
         exit 0
         ;;
-      build|test|version|clean|coverage|quality|report|docs|test-docmosis|install|hooks|demo)
+      build|test|version|clean|coverage|quality|report|docs|docmosis|test-docmosis|install|hooks|demo)
         COMMAND="$1"
         shift
         break
@@ -256,6 +256,9 @@ parse_global_args() {
       ;;
     docs)
       handle_docs_command "$@"
+      ;;
+    docmosis)
+      handle_docmosis_command "$@"
       ;;
     test-docmosis)
       handle_test_docmosis_command "$@"
@@ -445,16 +448,24 @@ function handle_quality_command() {
 }
 
 function handle_report_command() {
-  # Check if Docmosis environment variable is set
-  if [ -z "${DOCMOSIS_KEY}" ]; then
-    print_error "DOCMOSIS_KEY environment variable is not set"
-    echo "Set it with: export DOCMOSIS_KEY=your-license-key"
-    return 1
+  # Check if this is a help request
+  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_report_help
+    return 0
+  fi
+
+  # Source the Docmosis library if not already sourced
+  if ! type -t generate_change_report > /dev/null; then
+    if [ ! -f "${PROJECT_ROOT}/.s8r/lib/docmosis.sh" ]; then
+      error "Docmosis library not found. Run './s8r docmosis setup' first."
+      return 1
+    fi
+    source "${PROJECT_ROOT}/.s8r/lib/docmosis.sh"
   fi
   
   # Check if from-version and to-version are provided
   if [ $# -lt 2 ]; then
-    print_error "Missing version arguments"
+    error "Missing version arguments"
     show_report_help
     return 1
   fi
@@ -464,20 +475,17 @@ function handle_report_command() {
   local to_version="$2"
   shift 2
   
-  # Check if Docmosis JARs are installed
-  if [ ! -d "${PROJECT_ROOT}/lib/com/docmosis" ]; then
-    print_warning "Docmosis JARs are not installed. Running install-docmosis.sh first."
-    "${PROJECT_ROOT}/install-docmosis.sh"
-    
-    # Check if installation was successful
-    if [ $? -ne 0 ]; then
-      print_error "Failed to install Docmosis JARs"
-      return 1
-    fi
+  # Check for output directory argument
+  local output_dir="target/reports"
+  if [ $# -gt 0 ]; then
+    output_dir="$1"
   fi
   
-  # Run generate-change-report.sh with arguments
-  "${PROJECT_ROOT}/util/bin/docs/generate-change-report.sh" "$from_version" "$to_version" "$@"
+  # Use the Docmosis library to generate change report
+  info "Generating change report from ${from_version} to ${to_version}"
+  time_exec generate_change_report "$from_version" "$to_version" "$output_dir"
+  
+  return $?
 }
 
 function handle_docs_command() {
@@ -487,45 +495,24 @@ function handle_docs_command() {
     return 0
   fi
   
-  # Verify Docmosis environment variables are set
-  if [ -z "${DOCMOSIS_KEY}" ]; then
-    print_warning "DOCMOSIS_KEY environment variable is not set"
-    
-    # Check if config file exists
-    if [ -f "${USER_CONFIG_FILE}" ]; then
-      print_info "Reading Docmosis key from config file: ${USER_CONFIG_FILE}"
-      export DOCMOSIS_KEY=$(grep -o '"key": "[^"]*"' "${USER_CONFIG_FILE}" | cut -d'"' -f4)
-      export DOCMOSIS_SITE=$(grep -o '"site": "[^"]*"' "${USER_CONFIG_FILE}" | cut -d'"' -f4)
-    else
-      print_error "Docmosis configuration not found. Please set up the config file at ${USER_CONFIG_FILE}"
+  # Source the Docmosis library if not already sourced
+  if ! type -t generate_docs > /dev/null; then
+    if [ ! -f "${PROJECT_ROOT}/.s8r/lib/docmosis.sh" ]; then
+      error "Docmosis library not found. Run './s8r docmosis setup' first."
       return 1
     fi
-    
-    # Verify we have the key now
-    if [ -z "${DOCMOSIS_KEY}" ]; then
-      print_error "Docmosis license key not found in config file"
-      return 1
-    else
-      print_success "Docmosis license key loaded from config file"
-    fi
+    source "${PROJECT_ROOT}/.s8r/lib/docmosis.sh"
   fi
   
-  print_header "Generating Documentation with Docmosis"
+  # Parse arguments
+  local output_dir="${1:-target/docs}"
+  local format="${2:-pdf}"
   
-  # Pass the environment variables to the script
-  export DOCMOSIS_KEY
-  export DOCMOSIS_SITE
+  # Use the Docmosis library to generate documentation
+  info "Generating documentation with Docmosis"
+  time_exec generate_docs "$output_dir" "$format"
   
-  # Run generate-docmosis-docs.sh with arguments
-  "${PROJECT_ROOT}/util/bin/docs/generate-docmosis-docs.sh" "$@"
-  
-  # Check result
-  if [ $? -eq 0 ]; then
-    print_success "Documentation generated successfully!"
-  else
-    print_error "Documentation generation failed"
-    return 1
-  fi
+  return $?
 }
 
 function handle_test_docmosis_command() {
@@ -535,46 +522,20 @@ function handle_test_docmosis_command() {
     return 0
   fi
   
-  # Verify Docmosis environment variables are set
-  if [ -z "${DOCMOSIS_KEY}" ]; then
-    print_warning "DOCMOSIS_KEY environment variable is not set"
-    
-    # Check if config file exists
-    if [ -f "${USER_CONFIG_FILE}" ]; then
-      print_info "Reading Docmosis key from config file: ${USER_CONFIG_FILE}"
-      export DOCMOSIS_KEY=$(grep -o '"key": "[^"]*"' "${USER_CONFIG_FILE}" | cut -d'"' -f4)
-      export DOCMOSIS_SITE=$(grep -o '"site": "[^"]*"' "${USER_CONFIG_FILE}" | cut -d'"' -f4)
-    else
-      print_error "Docmosis configuration not found. Please set up the config file at ${USER_CONFIG_FILE}"
+  # Source the Docmosis library if not already sourced
+  if ! type -t test_docmosis > /dev/null; then
+    if [ ! -f "${PROJECT_ROOT}/.s8r/lib/docmosis.sh" ]; then
+      error "Docmosis library not found. Run './s8r docmosis setup' first."
       return 1
     fi
-    
-    # Verify we have the key now
-    if [ -z "${DOCMOSIS_KEY}" ]; then
-      print_error "Docmosis license key not found in config file"
-      return 1
-    else
-      print_success "Docmosis license key loaded from config file"
-    fi
+    source "${PROJECT_ROOT}/.s8r/lib/docmosis.sh"
   fi
   
-  print_header "Running Docmosis Integration Test"
+  # Use the Docmosis library to run the test
+  info "Running Docmosis Integration Test"
+  time_exec test_docmosis
   
-  # Pass the environment variables to the script
-  export DOCMOSIS_KEY
-  export DOCMOSIS_SITE
-  
-  # Run test-docmosis.sh script
-  "${PROJECT_ROOT}/util/bin/docs/test-docmosis.sh" "$@"
-  
-  # Check result
-  if [ $? -eq 0 ]; then
-    print_success "Docmosis integration test passed!"
-    return 0
-  else
-    print_error "Docmosis integration test failed"
-    return 1
-  fi
+  return $?
 }
 
 function handle_demo_command() {
@@ -795,6 +756,75 @@ function handle_hooks_command() {
   return 0
 }
 
+function handle_docmosis_command() {
+  # Source the Docmosis library if not already sourced
+  if ! type -t load_docmosis_config > /dev/null; then
+    if [ ! -f "${PROJECT_ROOT}/.s8r/lib/docmosis.sh" ]; then
+      error "Docmosis library not found at ${PROJECT_ROOT}/.s8r/lib/docmosis.sh"
+      return 1
+    fi
+    source "${PROJECT_ROOT}/.s8r/lib/docmosis.sh"
+  fi
+  
+  # Check if this is a help request
+  if [[ "$1" == "-h" || "$1" == "--help" || -z "$1" ]]; then
+    show_docmosis_help
+    return 0
+  fi
+  
+  # Handle command
+  local command="$1"
+  shift
+  
+  case "$command" in
+    setup)
+      info "Setting up Docmosis configuration interactively"
+      time_exec setup_docmosis_config
+      ;;
+    test)
+      info "Running Docmosis integration test"
+      time_exec test_docmosis
+      ;;
+    install)
+      info "Installing Docmosis JAR files"
+      time_exec install_docmosis
+      ;;
+    status)
+      info "Checking Docmosis configuration status"
+      # Load configuration
+      if load_docmosis_config; then
+        highlight "Docmosis Configuration Status"
+        echo ""
+        echo "License Key: ${DOCMOSIS_KEY:0:8}...${DOCMOSIS_KEY:(-4)}"
+        echo "Site Name: ${DOCMOSIS_SITE:-<not set>}"
+        echo ""
+        
+        # Check installation
+        if is_docmosis_installed; then
+          success "Docmosis is installed and ready to use"
+        else
+          warn "Docmosis is not installed"
+          echo "Run './s8r docmosis install' to install Docmosis"
+        fi
+      else
+        error "No Docmosis configuration found"
+        echo "Run './s8r docmosis setup' to configure Docmosis"
+        return 1
+      fi
+      ;;
+    generate)
+      # Just an alias for docs command
+      handle_docs_command "$@"
+      ;;
+    *)
+      error "Unknown docmosis command: $command. Run './s8r docmosis --help' for usage information."
+      return 1
+      ;;
+  esac
+  
+  return $?
+}
+
 function handle_help_command() {
   local help_topic="$1"
   shift
@@ -820,6 +850,9 @@ function handle_help_command() {
       ;;
     docs)
       show_docs_help
+      ;;
+    docmosis)
+      show_docmosis_help
       ;;
     test-docmosis)
       show_test_docmosis_help
@@ -1039,6 +1072,28 @@ function show_demo_help() {
   echo -e "${BOLD}DEMO SCRIPTS:${RESET}"
   echo "  identity             Run tube identity demonstration"
   echo "  list                 List all available demos"
+}
+
+function show_docmosis_help() {
+  echo -e "${BOLD}Samstraumr Docmosis${RESET} - Manage Docmosis document generation system"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r docmosis <command> [options]"
+  echo
+  echo -e "${BOLD}COMMANDS:${RESET}"
+  echo "  setup                Configure Docmosis license and settings"
+  echo "  test                 Run Docmosis integration test"
+  echo "  install              Install Docmosis JAR files"
+  echo "  status               Show Docmosis configuration status"
+  echo "  generate <dir> <fmt> Generate documentation (alias for ./s8r docs)"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help           Display this help message"
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  ./s8r docmosis setup          # Configure Docmosis interactively"
+  echo "  ./s8r docmosis test           # Test Docmosis integration"
+  echo "  ./s8r docmosis status         # Show configuration status"
 }
 
 # Check requirements

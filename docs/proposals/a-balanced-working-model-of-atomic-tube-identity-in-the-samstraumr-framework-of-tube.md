@@ -1,3 +1,7 @@
+<!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # A Balanced Working Model of Atomic Tube Identity in the Samstraumr Framework of Tube
 
 **A Balanced Working Model of Atomic Tube Identity in the Samstraumr
