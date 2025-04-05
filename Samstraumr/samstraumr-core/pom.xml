@@ -20,7 +20,7 @@
     <cucumber.version>7.22.0</cucumber.version>
     <junit-jupiter.version>5.10.2</junit-jupiter.version>
     <junit-platform.version>1.10.2</junit-platform.version>
-    <slf4j.version>2.0.12</slf4j.version>
+    <slf4j.version>2.0.17</slf4j.version>
     <log4j2.version>2.23.1</log4j2.version>
     <lombok.version>1.18.38</lombok.version>
     <docmosis.version>22.2.03</docmosis.version>
