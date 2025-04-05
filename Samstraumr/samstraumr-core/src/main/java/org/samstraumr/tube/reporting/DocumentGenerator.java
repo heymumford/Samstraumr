@@ -105,7 +105,18 @@ public class DocumentGenerator {
     String templatesDirPath = getTemplatesDirectory();
     File templatesDir = new File(templatesDirPath);
     if (!templatesDir.exists() || !templatesDir.isDirectory()) {
-      throw new RuntimeException("Templates directory not found: " + templatesDirPath);
+      // Check if this is a test environment
+      String testTemplatesDir = System.getProperty("templates.dir");
+      if (testTemplatesDir != null && !testTemplatesDir.isEmpty()) {
+        templatesDir = new File(testTemplatesDir);
+        if (templatesDir.exists() && templatesDir.isDirectory()) {
+          LOGGER.info("Using test templates directory: " + testTemplatesDir);
+        } else {
+          throw new RuntimeException("Test templates directory not found: " + testTemplatesDir);
+        }
+      } else {
+        throw new RuntimeException("Templates directory not found: " + templatesDirPath);
+      }
     }
 
     File[] templateFiles =
@@ -121,58 +132,87 @@ public class DocumentGenerator {
       throw new RuntimeException("No template files found in: " + templatesDirPath);
     }
 
-    // Initialize Docmosis using reflection
-    Class<?> systemManagerClass = Class.forName("com.docmosis.SystemManager");
+    try {
+      // Initialize Docmosis using reflection
+      Class<?> systemManagerClass = Class.forName("com.docmosis.SystemManager");
 
-    // Initialize Docmosis
-    Method initializeMethod = systemManagerClass.getMethod("initialise");
-    initializeMethod.invoke(null);
+      // Initialize Docmosis
+      Method initializeMethod = systemManagerClass.getMethod("initialise");
+      initializeMethod.invoke(null);
 
-    // Set license key
-    Method setKeyMethod = systemManagerClass.getMethod("setKey", String.class);
-    setKeyMethod.invoke(null, docmosisKey);
+      // Set license key
+      Method setKeyMethod = systemManagerClass.getMethod("setKey", String.class);
+      setKeyMethod.invoke(null, docmosisKey);
 
-    // Set site
-    Method setSiteMethod = systemManagerClass.getMethod("setSite", String.class);
-    setSiteMethod.invoke(null, docmosisSite);
+      // Set site
+      Method setSiteMethod = systemManagerClass.getMethod("setSite", String.class);
+      setSiteMethod.invoke(null, docmosisSite);
 
-    // Get renderer
-    Method getRendererMethod = systemManagerClass.getMethod("getRenderer");
-    Object renderer = getRendererMethod.invoke(null);
-    Class<?> rendererClass = renderer.getClass();
+      // Get renderer
+      Method getRendererMethod = systemManagerClass.getMethod("getRenderer");
+      Object renderer = getRendererMethod.invoke(null);
+      Class<?> rendererClass = renderer.getClass();
+    } catch (ClassNotFoundException e) {
+      LOGGER.warning("Docmosis library not found. Using fallback mechanism for document generation.");
+      generateFallbackDocumentation(outputDir, format, templateFiles);
+      return;
+    } catch (ReflectiveOperationException e) {
+      LOGGER.warning("Error accessing Docmosis API: " + e.getMessage());
+      generateFallbackDocumentation(outputDir, format, templateFiles);
+      return;
+    }
 
     // Get current timestamp
     LocalDateTime now = LocalDateTime.now();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     String timestamp = now.format(formatter);
 
-    // Process each template
-    for (File templateFile : templateFiles) {
-      String templateName = templateFile.getName();
-      String baseName = templateName.substring(0, templateName.lastIndexOf('.'));
-
-      // Create data for template
-      Map<String, Object> data = new HashMap<>();
-      data.put("timestamp", timestamp);
-      data.put("version", getProjectVersion());
-      data.put("generationDate", now.format(DateTimeFormatter.ofPattern("MMMM d, yyyy")));
-      data.put("projectName", "Samstraumr");
-
-      // Output filename
-      String outputFileName = baseName + "." + format;
-      String outputPath = Paths.get(outputDir, outputFileName).toString();
-
-      // Render document
-      Method renderMethod =
-          rendererClass.getMethod("render", String.class, String.class, Map.class);
-      renderMethod.invoke(renderer, templateFile.getAbsolutePath(), outputPath, data);
-
-      LOGGER.info("Generated document: " + outputPath);
+    try {
+      // Process each template
+      for (File templateFile : templateFiles) {
+        String templateName = templateFile.getName();
+        String baseName = templateName.substring(0, templateName.lastIndexOf('.'));
+  
+        // Create data for template
+        Map<String, Object> data = new HashMap<>();
+        data.put("timestamp", timestamp);
+        data.put("version", getProjectVersion());
+        data.put("generationDate", now.format(DateTimeFormatter.ofPattern("MMMM d, yyyy")));
+        data.put("projectName", "Samstraumr");
+  
+        // Output filename
+        String outputFileName = baseName + "." + format;
+        String outputPath = Paths.get(outputDir, outputFileName).toString();
+  
+        try {
+          // Render document with reflection (compatible with Java 21's stronger module boundaries)
+          Class<?> systemManagerClass = Class.forName("com.docmosis.SystemManager");
+          Method getRendererMethod = systemManagerClass.getMethod("getRenderer");
+          Object renderer = getRendererMethod.invoke(null);
+          Class<?> rendererClass = renderer.getClass();
+          
+          Method renderMethod = rendererClass.getMethod("render", String.class, String.class, Map.class);
+          renderMethod.invoke(renderer, templateFile.getAbsolutePath(), outputPath, data);
+  
+          LOGGER.info("Generated document: " + outputPath);
+        } catch (ReflectiveOperationException e) {
+          LOGGER.warning("Error rendering document: " + e.getMessage());
+          throw e;
+        }
+      }
+  
+      // Shutdown Docmosis
+      try {
+        Class<?> systemManagerClass = Class.forName("com.docmosis.SystemManager");
+        Method shutdownMethod = systemManagerClass.getMethod("shutdown");
+        shutdownMethod.invoke(null);
+      } catch (ReflectiveOperationException e) {
+        LOGGER.warning("Error shutting down Docmosis: " + e.getMessage());
+      }
+    } catch (Exception e) {
+      LOGGER.warning("Error in document generation process. Falling back to simpler format.");
+      generateFallbackDocumentation(outputDir, format, templateFiles);
     }
-
-    // Shutdown Docmosis
-    Method shutdownMethod = systemManagerClass.getMethod("shutdown");
-    shutdownMethod.invoke(null);
   }
 
   /**
@@ -205,6 +245,51 @@ public class DocumentGenerator {
 
     // Default to current directory/templates
     return TEMPLATES_DIR;
+  }
+
+  /**
+   * Fallback method for document generation when Docmosis is not available.
+   * Creates simple text files with the same data.
+   *
+   * @param outputDir Output directory
+   * @param format Output format
+   * @param templateFiles Template files
+   * @throws Exception If an error occurs
+   */
+  private static void generateFallbackDocumentation(
+      String outputDir, String format, File[] templateFiles) throws Exception {
+    LOGGER.info("Using fallback document generation mechanism");
+    
+    // Get current timestamp
+    LocalDateTime now = LocalDateTime.now();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    String timestamp = now.format(formatter);
+    
+    // Process each template
+    for (File templateFile : templateFiles) {
+      String templateName = templateFile.getName();
+      String baseName = templateName.substring(0, templateName.lastIndexOf('.'));
+      
+      // Use txt format for fallback
+      String outputFileName = baseName + ".txt";
+      Path outputPath = Paths.get(outputDir, outputFileName);
+      
+      StringBuilder content = new StringBuilder();
+      content.append("DOCUMENT GENERATION FALLBACK\n");
+      content.append("==========================\n\n");
+      content.append("Template: ").append(templateName).append("\n");
+      content.append("Timestamp: ").append(timestamp).append("\n");
+      content.append("Version: ").append(getProjectVersion()).append("\n");
+      content.append("Generation Date: ").append(now.format(DateTimeFormatter.ofPattern("MMMM d, yyyy"))).append("\n");
+      content.append("Project Name: Samstraumr\n\n");
+      content.append("NOTE: This is a fallback document generated because Docmosis was not available.\n");
+      content.append("To generate proper documentation, ensure the Docmosis library is available in the classpath.\n");
+      
+      // Write to file
+      java.nio.file.Files.write(outputPath, content.toString().getBytes());
+      
+      LOGGER.info("Generated fallback document: " + outputPath);
+    }
   }
 
   /**

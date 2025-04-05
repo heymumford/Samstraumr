@@ -149,6 +149,8 @@ public class Environment {
       parameters.put("hostname", getHostname());
       parameters.put("user", System.getProperty("user.name"));
       parameters.put("javaVersion", System.getProperty("java.version"));
+      parameters.put("javaVendor", System.getProperty("java.vendor"));
+      parameters.put("javaVmName", System.getProperty("java.vm.name"));
       parameters.put("time", creationTime.toString());
 
       // Hardware info from OSHI

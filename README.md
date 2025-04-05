@@ -6,7 +6,7 @@ Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford
 
 <div align="center">
   
-[![Version](https://img.shields.io/badge/version-1.7.3-blue)](https://github.com/heymumford/Samstraumr/releases) 
+[![Version](https://img.shields.io/badge/version-2.0.0-blue)](https://github.com/heymumford/Samstraumr/releases) 
 [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) 
 [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/) 
@@ -252,7 +252,7 @@ Maven dependency:
 <dependency>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-core</artifactId>
-    <version>1.7.3</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 

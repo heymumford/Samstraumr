@@ -35,6 +35,50 @@ For building the project:
 ./s8r build package
 ```
 
+## Java Version
+
+The project is configured to use Java 21, which is now the default Java version in your environment. Java 21 includes enhanced module system security that requires special JVM options for reflection-based code. These options are automatically set when you use the Java 21 environment.
+
+You can switch between different Java versions using the `java-switch` function:
+
+```bash
+# Switch to Java 17
+java-switch 17
+
+# Switch to Java 21 (OpenJDK)
+java-switch 21
+
+# Switch to Java 21 (Oracle JDK)
+java-switch oracle21
+
+# Check current Java version
+java -version
+```
+
+If you need to temporarily use Java 21 for a single command without changing your environment, you can use the provided script:
+
+```bash
+# Run any command with Java 21
+./use-java21.sh <command>
+```
+
+### Java 21 Compatibility Notes
+
+The codebase has been updated to be compatible with Java 21's stronger module boundaries by:
+
+1. Adding JVM options to allow reflection access where needed:
+   ```
+   --add-opens java.base/java.lang=ALL-UNNAMED
+   --add-opens java.base/java.util=ALL-UNNAMED
+   --add-opens java.base/java.lang.reflect=ALL-UNNAMED
+   ```
+
+2. Adding graceful fallbacks for reflection-based code like document generation
+3. Enhancing environment detection to properly identify Java 21's runtime properties
+4. Using more robust exception handling for reflective operations
+
+If you encounter any Java 21 compatibility issues, please run tests with the appropriate JVM options or use the provided script which adds them automatically.
+
 ## Folder Organization Guidelines
 
 The project follows these folder organization principles:
@@ -101,7 +145,7 @@ Samstraumr has two version management systems:
 ./s8r version bump patch
 
 # Set a specific version
-./s8r version set 1.7.2
+./s8r version set 2.0.0
 
 # Test, bump and tag
 ./s8r version test patch
@@ -156,4 +200,4 @@ Before committing code, verify these style standards:
 
 ## Current Version
 
-The current version of Samstraumr is: 1.7.2 (as of April 04, 2025)
+The current version of Samstraumr is: 2.0.0 (as of April 04, 2025)

@@ -7,6 +7,39 @@ Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford
 All notable changes to this project will be documented in this file.
 
 ## [1.3.0] - 2025-04-03
+## [2.0.0] - 2025-04-04
+
+### Added
+
+- Java 21 support with graceful fallback mechanisms
+- Compatibility layer for Java module system restrictions
+- Improved runtime environment detection with enhanced JVM property reporting
+- Fallback mechanism for document generation when Docmosis is unavailable
+
+### Changed
+
+- Updated build system to use Java 21 by default
+- Enhanced reflection handling for improved compatibility with Java 21
+- Added JVM options for proper module system interaction
+
+### Fixed
+
+- Removed usage of deprecated Runtime.exec() API
+- Fixed compatibility issues with Java 21's stronger module boundaries
+- Improved exception handling for reflection operations
+## [1.7.3] - 2025-04-04
+
+### Added
+
+- 
+
+### Changed
+
+- 
+
+### Fixed
+
+- 
 ## [1.7.2] - 2025-04-04
 
 ### Added

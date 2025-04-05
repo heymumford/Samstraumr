@@ -54,7 +54,10 @@ public class ChangeManagementData {
                   ? "HEAD"
                   : (toVersion.startsWith("v") ? toVersion : "v" + toVersion));
 
-      Process process = Runtime.getRuntime().exec(gitCommand);
+      ProcessBuilder processBuilder = new ProcessBuilder();
+      processBuilder.command("sh", "-c", gitCommand);
+      Process process = processBuilder.start();
+      
       BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
       String line;
