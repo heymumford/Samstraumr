@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced Docmosis integration with centralized document generation
 - Improved change report generation with change history analysis
 - Comprehensive documentation for build, test, and document generation systems
+- Fallback mechanisms for document generation when Docmosis isn't available
+- Git-based change report generation as alternative to Docmosis
 
 ### Changed
 - Centralized Docmosis configuration and document generation
@@ -22,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed compilation error in Component.java constructor
 - Updated documentation to include build, test, and document generation improvements
 - Reorganized bash helper functions into modular library structure
+- Made Docmosis integration optional but fully supported
+- Improved command help documentation for document generation
 
 ### Fixed
 - Incorrect dependency versions in POM file (using project version for libraries)

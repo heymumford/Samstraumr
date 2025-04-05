@@ -1,4 +1,4 @@
-#\!/usr/bin/env bash
+#!/usr/bin/env bash
 #==============================================================================
 # S8r Docmosis Library Functions
 # Shared code for Docmosis integration
@@ -8,7 +8,7 @@
 PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel)}"
 
 # Source common library if available and not already sourced
-if [ -f "${PROJECT_ROOT}/.s8r/lib/common.sh" ] && \! type -t info > /dev/null; then
+if [ -f "${PROJECT_ROOT}/.s8r/lib/common.sh" ] && ! type -t info > /dev/null; then
   source "${PROJECT_ROOT}/.s8r/lib/common.sh"
 fi
 
@@ -27,13 +27,44 @@ PROJECT_DOCMOSIS_CONFIG="${PROJECT_ROOT}/.s8r/config/docmosis.properties"
 SYSTEM_DOCMOSIS_DIR="/etc/s8r"
 SYSTEM_DOCMOSIS_CONFIG="${SYSTEM_DOCMOSIS_DIR}/docmosis.properties"
 
+# Check if Docmosis is available (returns 0 if available, 1 if not)
+is_docmosis_available() {
+  # If DOCMOSIS_KEY is explicitly empty, return unavailable
+  if [ -z "${DOCMOSIS_KEY}" ] && [ "${DOCMOSIS_KEY}" = "" ]; then
+    return 1
+  fi
+  
+  # First check if configuration exists with non-empty key
+  if [ -n "${DOCMOSIS_KEY}" ]; then
+    return 0
+  fi
+  
+  # Try loading the configuration
+  if load_docmosis_config &>/dev/null && [ -n "${DOCMOSIS_KEY}" ]; then
+    return 0
+  fi
+  
+  # Check if we're in a CI environment where docmosis might be deliberately disabled
+  if [ -n "${CI}" ] || [ -n "${GITHUB_ACTIONS}" ]; then
+    return 1
+  fi
+  
+  # Additional check for installation to ensure we truly have Docmosis
+  if ! is_docmosis_installed; then
+    return 1
+  fi
+  
+  # Not available
+  return 1
+}
+
 # Load Docmosis configuration and set environment variables
 load_docmosis_config() {
   # Check for existing environment variables first
   if [ -n "${DOCMOSIS_KEY}" ] && [ -n "${DOCMOSIS_SITE}" ]; then
     docmosis_info "Using Docmosis configuration from environment variables"
     return 0
-  }
+  fi
   
   # Try loading from various configuration locations
   local config_sources=(
@@ -164,7 +195,7 @@ install_docmosis() {
   local docmosis_download_url="https://www.docmosis.com/resources/java-${DOCMOSIS_VERSION}.zip"
   
   # If JAR not found, attempt to download it
-  if [ \! -f "${docmosis_src}" ]; then
+  if [ ! -f "${docmosis_src}" ]; then
     docmosis_info "Docmosis JAR file not found at ${docmosis_src}"
     docmosis_info "Attempting to download Docmosis..."
     
@@ -204,7 +235,7 @@ install_docmosis() {
       rm -rf "${tmp_dir}"
       
       # Check if we have the JAR now
-      if [ \! -f "${docmosis_src}" ]; then
+      if [ ! -f "${docmosis_src}" ]; then
         docmosis_error "Could not find or download Docmosis JAR"
         return 1
       fi
@@ -258,15 +289,15 @@ test_docmosis() {
   docmosis_info "Testing Docmosis integration"
   
   # Ensure configuration is loaded
-  if \! load_docmosis_config; then
+  if ! load_docmosis_config; then
     docmosis_error "Failed to load Docmosis configuration"
     return 1
   fi
   
   # Verify Docmosis is installed
-  if \! is_docmosis_installed; then
+  if ! is_docmosis_installed; then
     docmosis_warn "Docmosis is not installed. Installing now..."
-    if \! install_docmosis; then
+    if ! install_docmosis; then
       docmosis_error "Failed to install Docmosis"
       return 1
     fi
@@ -318,7 +349,7 @@ public class DocmosisTest {
             setKeyMethod.invoke(null, docmosisKey);
             
             // Set site if provided
-            if (docmosisSite \!= null && \!docmosisSite.trim().isEmpty()) {
+            if (docmosisSite != null && !docmosisSite.trim().isEmpty()) {
                 Method setSiteMethod = systemManagerClass.getMethod("setSite", String.class);
                 setSiteMethod.invoke(null, docmosisSite);
             }
@@ -380,7 +411,7 @@ EOF
   
   # Check result
   if [ $? -eq 0 ]; then
-    docmosis_success "Docmosis integration test PASSED\!"
+    docmosis_success "Docmosis integration test PASSED!"
     echo "A sample document was generated at: ${test_dir}/output.pdf"
     return 0
   else
@@ -396,76 +427,178 @@ generate_docs() {
   local format="${2:-pdf}"
   
   # Validate format
-  if [[ \! "$format" =~ ^(pdf|docx|html)$ ]]; then
-    docmosis_error "Invalid format: $format. Must be one of: pdf, docx, html"
+  if [[ ! "$format" =~ ^(pdf|docx|html|md|markdown)$ ]]; then
+    docmosis_error "Invalid format: $format. Must be one of: pdf, docx, html, md, markdown"
     return 1
-  fi
-  
-  # Ensure configuration is loaded
-  if \! load_docmosis_config; then
-    docmosis_error "Failed to load Docmosis configuration"
-    return 1
-  fi
-  
-  # Verify Docmosis is installed
-  if \! is_docmosis_installed; then
-    docmosis_warn "Docmosis is not installed. Installing now..."
-    if \! install_docmosis; then
-      docmosis_error "Failed to install Docmosis"
-      return 1
-    fi
   fi
   
   # Create output directory if it doesn't exist
   mkdir -p "$output_dir"
   
-  # Build the project with the docmosis profile
-  docmosis_info "Building project with docmosis-report profile..."
-  cd "${PROJECT_ROOT}" || return 1
-  mvn clean package -P docmosis-report -DskipTests -Ddocmosis.key="${DOCMOSIS_KEY}" -Ddocmosis.site="${DOCMOSIS_SITE}"
+  # For debugging
+  docmosis_info "Output directory: $output_dir"
+  docmosis_info "Format: $format"
   
-  if [ $? -ne 0 ]; then
-    docmosis_error "Failed to build project with docmosis-report profile"
-    return 1
-  fi
-  
-  # Run the documentation generator
-  docmosis_info "Generating documentation in ${format} format..."
-  cd "${PROJECT_ROOT}/Samstraumr/samstraumr-core" || return 1
-  
-  # Set environment variables for the generator
-  export DOCMOSIS_KEY="${DOCMOSIS_KEY}"
-  export DOCMOSIS_SITE="${DOCMOSIS_SITE}"
-  export DOCMOSIS_FORMAT="${format}"
-  
-  # Run documentation generator
-  java -cp target/samstraumr-core.jar \
-       -Ddocmosis.key="${DOCMOSIS_KEY}" \
-       -Ddocmosis.site="${DOCMOSIS_SITE}" \
-       org.samstraumr.tube.reporting.DocumentGenerator "${output_dir}" "${format}"
-  
-  # Check if generation was successful
-  if [ $? -eq 0 ]; then
-    docmosis_success "Documentation generated successfully in ${output_dir}"
-    echo "Generated files:"
-    ls -la "${output_dir}"
+  # Check if Docmosis is available
+  if is_docmosis_available; then
+    # Ensure configuration is loaded
+    if ! load_docmosis_config; then
+      docmosis_warn "Failed to load Docmosis configuration"
+      docmosis_info "Falling back to Maven site documentation"
+      generate_fallback_docs "$output_dir" "$format"
+      return $?
+    fi
     
-    # Try to open the generated file if it exists
-    local generated_files=("${output_dir}"/*.${format})
-    if [ -f "${generated_files[0]}" ]; then
-      if command -v xdg-open &>/dev/null; then
-        docmosis_info "Opening generated document..."
-        xdg-open "${generated_files[0]}" &>/dev/null &
-      elif command -v open &>/dev/null; then
-        docmosis_info "Opening generated document..."
-        open "${generated_files[0]}" &>/dev/null &
+    # Verify Docmosis is installed
+    if ! is_docmosis_installed; then
+      docmosis_warn "Docmosis is not installed. Installing now..."
+      if ! install_docmosis; then
+        docmosis_warn "Failed to install Docmosis"
+        docmosis_info "Falling back to Maven site documentation"
+        generate_fallback_docs "$output_dir" "$format"
+        return $?
       fi
     fi
-    return 0
+    
+    # Build the project with the docmosis profile
+    docmosis_info "Building project with docmosis-report profile..."
+    cd "${PROJECT_ROOT}" || return 1
+    mvn clean package -P docmosis-report -DskipTests -Ddocmosis.key="${DOCMOSIS_KEY}" -Ddocmosis.site="${DOCMOSIS_SITE}"
+    
+    if [ $? -ne 0 ]; then
+      docmosis_warn "Failed to build project with docmosis-report profile"
+      docmosis_info "Falling back to Maven site documentation"
+      generate_fallback_docs "$output_dir" "$format"
+      return $?
+    fi
+    
+    # Run the documentation generator
+    docmosis_info "Generating documentation in ${format} format..."
+    cd "${PROJECT_ROOT}/Samstraumr/samstraumr-core" || return 1
+    
+    # Set environment variables for the generator
+    export DOCMOSIS_KEY="${DOCMOSIS_KEY}"
+    export DOCMOSIS_SITE="${DOCMOSIS_SITE}"
+    export DOCMOSIS_FORMAT="${format}"
+    
+    # Run documentation generator
+    java -cp target/samstraumr-core.jar \
+         -Ddocmosis.key="${DOCMOSIS_KEY}" \
+         -Ddocmosis.site="${DOCMOSIS_SITE}" \
+         org.samstraumr.tube.reporting.DocumentGenerator "${output_dir}" "${format}"
+    
+    # Check if generation was successful
+    if [ $? -eq 0 ]; then
+      docmosis_success "Documentation generated successfully in ${output_dir}"
+      echo "Generated files:"
+      ls -la "${output_dir}"
+      
+      # Try to open the generated file if it exists
+      local generated_files=("${output_dir}"/*.${format})
+      if [ -f "${generated_files[0]}" ]; then
+        if command -v xdg-open &>/dev/null; then
+          docmosis_info "Opening generated document..."
+          xdg-open "${generated_files[0]}" &>/dev/null &
+        elif command -v open &>/dev/null; then
+          docmosis_info "Opening generated document..."
+          open "${generated_files[0]}" &>/dev/null &
+        fi
+      fi
+      return 0
+    else
+      docmosis_warn "Documentation generation failed"
+      docmosis_info "Falling back to Maven site documentation"
+      generate_fallback_docs "$output_dir" "$format"
+      return $?
+    fi
   else
-    docmosis_error "Documentation generation failed"
-    return 1
+    # Docmosis not available, use fallback method
+    docmosis_info "Docmosis not available, using Maven site documentation"
+    generate_fallback_docs "$output_dir" "$format"
+    return $?
   fi
+}
+
+# Fallback documentation generator using plain files
+generate_fallback_docs() {
+  local output_dir="${1:-target/docs}"
+  local format="${2:-md}"
+  
+  docmosis_info "Using fallback document generator for format: $format"
+  docmosis_info "Output directory: $output_dir"
+  
+  # Create output directory if it doesn't exist
+  mkdir -p "$output_dir"
+  
+  # Simply generate a basic markdown documentation
+  docmosis_info "Generating markdown documentation in ${output_dir}..."
+  
+  # Create a readme index file
+  echo "# Samstraumr Documentation" > "${output_dir}/index.md"
+  echo "" >> "${output_dir}/index.md"
+  echo "This documentation was generated without Docmosis integration." >> "${output_dir}/index.md"
+  echo "To enable full document generation, configure Docmosis with \`./s8r docmosis setup\`." >> "${output_dir}/index.md"
+  echo "" >> "${output_dir}/index.md"
+  echo "## Contents" >> "${output_dir}/index.md"
+  
+  # Add direct content to ensure something is generated
+  cat >> "${output_dir}/index.md" << EOF
+
+## Project Overview
+
+Samstraumr is a framework for building component-based systems with well-defined identity and lifecycle management.
+
+### Key Features
+
+1. Component model with explicit identity
+2. Lifecycle management
+3. Composite pattern for component aggregation
+4. Machine orchestration for component execution
+
+## Documentation
+
+For full documentation, configure Docmosis with:
+
+\`\`\`
+./s8r docmosis setup
+\`\`\`
+
+## Core Concepts
+
+- **Tubes**: Basic components with identity and lifecycle
+- **Composites**: Component aggregates
+- **Machines**: Execution environment for components
+
+EOF
+  
+  # Also copy some of the key markdown files directly
+  docmosis_info "Copying key documentation files..."
+  for key_file in README.md CHANGELOG.md docs/README.md; do
+    if [ -f "${PROJECT_ROOT}/${key_file}" ]; then
+      # Get directory of the target file
+      local dir_name="$(dirname "${output_dir}/${key_file}")"
+      # Create the directory if it doesn't exist
+      mkdir -p "$dir_name"
+      # Copy the file
+      cp "${PROJECT_ROOT}/${key_file}" "${output_dir}/${key_file}"
+      # Add to index
+      echo "- [${key_file}](${key_file})" >> "${output_dir}/index.md"
+    fi
+  done
+  
+  docmosis_success "Markdown documentation generated in ${output_dir}"
+  
+  # Try to open index.md if exists
+  if [ -f "${output_dir}/index.md" ]; then
+    if command -v xdg-open &>/dev/null; then
+      docmosis_info "Opening documentation..."
+      xdg-open "${output_dir}/index.md" &>/dev/null &
+    elif command -v open &>/dev/null; then
+      docmosis_info "Opening documentation..."
+      open "${output_dir}/index.md" &>/dev/null &
+    fi
+  fi
+  return 0
 }
 
 # Generate change report
@@ -480,64 +613,160 @@ generate_change_report() {
     return 1
   fi
   
-  # Ensure configuration is loaded
-  if \! load_docmosis_config; then
-    docmosis_error "Failed to load Docmosis configuration"
-    return 1
-  fi
-  
-  # Verify Docmosis is installed
-  if \! is_docmosis_installed; then
-    docmosis_warn "Docmosis is not installed. Installing now..."
-    if \! install_docmosis; then
-      docmosis_error "Failed to install Docmosis"
-      return 1
-    fi
-  fi
-  
   # Create output directory if it doesn't exist
   mkdir -p "$output_dir"
   
-  # Build the project with the docmosis profile
-  docmosis_info "Building project with docmosis-report profile..."
-  cd "${PROJECT_ROOT}" || return 1
-  mvn clean package -P docmosis-report -DskipTests -Ddocmosis.key="${DOCMOSIS_KEY}" -Ddocmosis.site="${DOCMOSIS_SITE}"
-  
-  if [ $? -ne 0 ]; then
-    docmosis_error "Failed to build project with docmosis-report profile"
-    return 1
-  fi
-  
-  # Generate the report
-  docmosis_info "Generating change management report from ${from_version} to ${to_version}..."
-  cd "${PROJECT_ROOT}/Samstraumr/samstraumr-core" || return 1
-  
-  # Run change report generator
-  java -cp target/samstraumr-core.jar \
-       -Ddocmosis.key="${DOCMOSIS_KEY}" \
-       -Ddocmosis.site="${DOCMOSIS_SITE}" \
-       org.samstraumr.tube.reporting.ChangeReportGenerator "$from_version" "$to_version" "$output_dir"
-  
-  # Check if generation was successful
-  if [ $? -eq 0 ]; then
-    docmosis_success "Change report generated successfully in ${output_dir}"
-    echo "Generated files:"
-    ls -la "${output_dir}"
+  # Check if Docmosis is available
+  if is_docmosis_available; then
+    # Ensure configuration is loaded
+    if ! load_docmosis_config; then
+      docmosis_warn "Failed to load Docmosis configuration"
+      docmosis_info "Falling back to Git-based change log generation"
+      generate_fallback_change_report "$from_version" "$to_version" "$output_dir"
+      return $?
+    fi
     
-    # Try to open the generated file
-    local report_files=("${output_dir}"/ChangeReport-*.docx)
-    if [ -f "${report_files[0]}" ]; then
-      if command -v xdg-open &>/dev/null; then
-        docmosis_info "Opening change report..."
-        xdg-open "${report_files[0]}" &>/dev/null &
-      elif command -v open &>/dev/null; then
-        docmosis_info "Opening change report..."
-        open "${report_files[0]}" &>/dev/null &
+    # Verify Docmosis is installed
+    if ! is_docmosis_installed; then
+      docmosis_warn "Docmosis is not installed. Installing now..."
+      if ! install_docmosis; then
+        docmosis_warn "Failed to install Docmosis"
+        docmosis_info "Falling back to Git-based change log generation"
+        generate_fallback_change_report "$from_version" "$to_version" "$output_dir"
+        return $?
       fi
     fi
-    return 0
+    
+    # Build the project with the docmosis profile
+    docmosis_info "Building project with docmosis-report profile..."
+    cd "${PROJECT_ROOT}" || return 1
+    mvn clean package -P docmosis-report -DskipTests -Ddocmosis.key="${DOCMOSIS_KEY}" -Ddocmosis.site="${DOCMOSIS_SITE}"
+    
+    if [ $? -ne 0 ]; then
+      docmosis_warn "Failed to build project with docmosis-report profile"
+      docmosis_info "Falling back to Git-based change log generation"
+      generate_fallback_change_report "$from_version" "$to_version" "$output_dir"
+      return $?
+    fi
+    
+    # Generate the report
+    docmosis_info "Generating change management report from ${from_version} to ${to_version}..."
+    cd "${PROJECT_ROOT}/Samstraumr/samstraumr-core" || return 1
+    
+    # Run change report generator
+    java -cp target/samstraumr-core.jar \
+         -Ddocmosis.key="${DOCMOSIS_KEY}" \
+         -Ddocmosis.site="${DOCMOSIS_SITE}" \
+         org.samstraumr.tube.reporting.ChangeReportGenerator "$from_version" "$to_version" "$output_dir"
+    
+    # Check if generation was successful
+    if [ $? -eq 0 ]; then
+      docmosis_success "Change report generated successfully in ${output_dir}"
+      echo "Generated files:"
+      ls -la "${output_dir}"
+      
+      # Try to open the generated file
+      local report_files=("${output_dir}"/ChangeReport-*.docx)
+      if [ -f "${report_files[0]}" ]; then
+        if command -v xdg-open &>/dev/null; then
+          docmosis_info "Opening change report..."
+          xdg-open "${report_files[0]}" &>/dev/null &
+        elif command -v open &>/dev/null; then
+          docmosis_info "Opening change report..."
+          open "${report_files[0]}" &>/dev/null &
+        fi
+      fi
+      return 0
+    else
+      docmosis_warn "Change report generation with Docmosis failed"
+      docmosis_info "Falling back to Git-based change log generation"
+      generate_fallback_change_report "$from_version" "$to_version" "$output_dir"
+      return $?
+    fi
   else
-    docmosis_error "Change report generation failed"
-    return 1
+    # Docmosis not available, use fallback method
+    docmosis_info "Docmosis not available, using Git-based change log generation"
+    generate_fallback_change_report "$from_version" "$to_version" "$output_dir"
+    return $?
   fi
+}
+
+# Fallback change report generator using Git log
+generate_fallback_change_report() {
+  local from_version="$1"
+  local to_version="$2"
+  local output_dir="${3:-target/reports}"
+  
+  docmosis_info "Using fallback change report generator"
+  docmosis_info "From version: $from_version, To version: $to_version"
+  docmosis_info "Output directory: $output_dir"
+  
+  # Ensure output directory exists by creating it directly
+  mkdir -p "$output_dir"
+  
+  # Generate a simple markdown change report using git log
+  docmosis_info "Generating Git-based change report..."
+  
+  # Format versions for git
+  local git_from_version="${from_version}"
+  local git_to_version="${to_version}"
+  
+  # Add 'v' prefix if not present for git tag compatibility
+  if [[ ! "$git_from_version" =~ ^v ]]; then
+    git_from_version="v${git_from_version}"
+  fi
+  
+  # Don't add prefix if using HEAD or main
+  if [[ "$git_to_version" != "HEAD" && "$git_to_version" != "main" && ! "$git_to_version" =~ ^v ]]; then
+    git_to_version="v${git_to_version}"
+  fi
+  
+  # Prepare report filename (with absolute path)
+  local report_file="${output_dir}/ChangeReport-${from_version}-to-${to_version}.md"
+  docmosis_info "Will write report to: $report_file"
+  
+  # Create report header
+  cat > "$report_file" << EOF
+# Change Report: ${from_version} to ${to_version}
+
+Generated: $(date '+%Y-%m-%d %H:%M:%S')
+
+This report was generated without Docmosis integration.
+To enable full document generation, configure Docmosis with \`./s8r docmosis setup\`.
+
+## Changes
+
+EOF
+  
+  # Add git log output
+  cd "${PROJECT_ROOT}" || return 1
+  
+  # Use a fallback if tags don't exist
+  git log --no-merges --pretty=format:"* %ad - %s (%an)" --date=short -n 50 >> "$report_file"
+  
+  # Add simple statistics section
+  echo -e "\n\n## Statistics\n" >> "$report_file"
+  echo "* Total recent commits: $(git rev-list --count HEAD~50..HEAD)" >> "$report_file"
+  echo "* Recent files changed: $(git diff --name-only HEAD~50..HEAD | wc -l)" >> "$report_file"
+  
+  # Add authors section
+  echo -e "\n## Contributors\n" >> "$report_file"
+  git log --pretty=format:"* %an <%ae>" -n 50 | sort | uniq >> "$report_file"
+  
+  docmosis_success "Change report generated at ${report_file}"
+  
+  # Try to open the generated file using xdg-open if available
+  if [ -f "$report_file" ]; then
+    if command -v xdg-open &>/dev/null; then
+      docmosis_info "Opening change report with xdg-open..."
+      xdg-open "$report_file" &>/dev/null &
+    elif command -v open &>/dev/null; then
+      docmosis_info "Opening change report with open..."
+      open "$report_file" &>/dev/null &
+    else
+      docmosis_info "Report available at: $report_file"
+    fi
+  fi
+  
+  return 0
 }

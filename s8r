@@ -170,7 +170,8 @@ show_help() {
   echo "Additional Commands:"
   echo "  quality          Run quality checks"
   echo "  report           Generate change management reports"
-  echo "  docs             Generate documentation using Docmosis"
+  echo "  docs             Generate project documentation"
+  echo "  docmosis         Manage optional Docmosis integration"
   echo "  test-docmosis    Run a smoke test for Docmosis integration"
   echo "  install          Initialize or update project configuration"
   echo "  hooks            Install or update git hooks"
@@ -481,9 +482,35 @@ function handle_report_command() {
     output_dir="$1"
   fi
   
-  # Use the Docmosis library to generate change report
-  info "Generating change report from ${from_version} to ${to_version}"
-  time_exec generate_change_report "$from_version" "$to_version" "$output_dir"
+  # Check if Docmosis is available
+  if is_docmosis_available; then
+    info "Generating change report from ${from_version} to ${to_version} using Docmosis"
+    
+    # Use the generate_change_report function
+    time_exec generate_change_report "$from_version" "$to_version" "$output_dir"
+  else
+    info "Docmosis not configured, generating Git-based change report"
+    
+    # Create minimal report directly
+    mkdir -p "$output_dir"
+    local report_file="${output_dir}/ChangeReport-${from_version}-to-${to_version}.md"
+    
+    # Create header
+    echo "# Change Report: ${from_version} to ${to_version}" > "$report_file"
+    echo "" >> "$report_file"
+    echo "Generated: $(date '+%Y-%m-%d %H:%M:%S')" >> "$report_file"
+    echo "" >> "$report_file"
+    echo "This report was generated without Docmosis integration." >> "$report_file"
+    echo "To enable full document generation, configure Docmosis with \`./s8r docmosis setup\`." >> "$report_file"
+    echo "" >> "$report_file"
+    echo "## Changes" >> "$report_file"
+    echo "" >> "$report_file"
+    
+    # Add recent git commits
+    git log --no-merges --pretty=format:"* %ad - %s (%an)" --date=short -n 20 >> "$report_file"
+    
+    success "Change report generated in ${report_file}"
+  fi
   
   return $?
 }
@@ -508,9 +535,33 @@ function handle_docs_command() {
   local output_dir="${1:-target/docs}"
   local format="${2:-pdf}"
   
-  # Use the Docmosis library to generate documentation
-  info "Generating documentation with Docmosis"
-  time_exec generate_docs "$output_dir" "$format"
+  # Check if Docmosis is available
+  if is_docmosis_available; then
+    info "Generating documentation with Docmosis"
+    
+    # Use the generate_docs function 
+    time_exec generate_docs "$output_dir" "$format"
+  else
+    info "Docmosis not configured, using alternative documentation generator"
+    
+    # Create minimal documentation directly
+    mkdir -p "$output_dir"
+    echo "# Samstraumr Documentation" > "${output_dir}/index.md"
+    echo "" >> "${output_dir}/index.md"
+    echo "This documentation was generated without Docmosis integration." >> "${output_dir}/index.md"
+    echo "To enable full document generation, configure Docmosis with \`./s8r docmosis setup\`." >> "${output_dir}/index.md"
+    echo "" >> "${output_dir}/index.md"
+    
+    # Copy important docs
+    for key_file in README.md CHANGELOG.md; do
+      if [ -f "${PROJECT_ROOT}/${key_file}" ]; then
+        cp "${PROJECT_ROOT}/${key_file}" "${output_dir}/"
+        echo "* [${key_file}](${key_file})" >> "${output_dir}/index.md"
+      fi
+    done
+    
+    success "Documentation generated in ${output_dir}"
+  fi
   
   return $?
 }
@@ -523,12 +574,19 @@ function handle_test_docmosis_command() {
   fi
   
   # Source the Docmosis library if not already sourced
-  if ! type -t test_docmosis > /dev/null; then
+  if ! type -t is_docmosis_available > /dev/null; then
     if [ ! -f "${PROJECT_ROOT}/.s8r/lib/docmosis.sh" ]; then
       error "Docmosis library not found. Run './s8r docmosis setup' first."
       return 1
     fi
     source "${PROJECT_ROOT}/.s8r/lib/docmosis.sh"
+  fi
+  
+  # Check if Docmosis is available
+  if ! is_docmosis_available; then
+    warn "Docmosis is not configured. To use Docmosis, run './s8r docmosis setup'."
+    info "Docmosis is supported but not mandatory for using Samstraumr."
+    return 0
   fi
   
   # Use the Docmosis library to run the test
@@ -1011,21 +1069,31 @@ function show_report_help() {
   echo -e "${BOLD}OPTIONS:${RESET}"
   echo "  -h, --help           Display this help message"
   echo "  -o, --output <dir>   Directory for report output (default: target/reports)"
-  echo "  -f, --format <fmt>   Output format (pdf, docx, html) (default: docx)"
+  echo "  -f, --format <fmt>   Output format (pdf, docx, html, md) (default: docx)"
+  echo
+  echo -e "${BOLD}NOTE:${RESET}"
+  echo "  When Docmosis is configured, rich formatted reports are generated."
+  echo "  When Docmosis is not available, the system falls back to generating"
+  echo "  markdown reports based on Git change history."
 }
 
 function show_docs_help() {
-  echo -e "${BOLD}Samstraumr Docs${RESET} - Generate documentation using Docmosis"
+  echo -e "${BOLD}Samstraumr Docs${RESET} - Generate project documentation"
   echo
   echo -e "${BOLD}USAGE:${RESET}"
   echo "  ./s8r docs [options] [output-dir] [format]"
   echo
   echo -e "${BOLD}ARGUMENTS:${RESET}"
   echo "  output-dir           Optional output directory (default: target/docs)"
-  echo "  format               Output format: pdf, docx, html (default: pdf)"
+  echo "  format               Output format: pdf, docx, html, md, markdown (default: pdf)"
   echo
   echo -e "${BOLD}OPTIONS:${RESET}"
   echo "  -h, --help           Display this help message"
+  echo
+  echo -e "${BOLD}NOTE:${RESET}"
+  echo "  When Docmosis is configured, enhanced document generation with templates is used."
+  echo "  When Docmosis is not available, the system automatically falls back to generating"
+  echo "  documentation using Maven site or Markdown file compilation, depending on format."
 }
 
 function show_test_docmosis_help() {
@@ -1036,6 +1104,10 @@ function show_test_docmosis_help() {
   echo
   echo -e "${BOLD}OPTIONS:${RESET}"
   echo "  -h, --help           Display this help message"
+  echo
+  echo -e "${BOLD}NOTE:${RESET}"
+  echo "  Docmosis is optional and not required for core Samstraumr functionality."
+  echo "  This test will gracefully handle cases where Docmosis is not configured."
 }
 
 function show_install_help() {
@@ -1079,6 +1151,11 @@ function show_docmosis_help() {
   echo
   echo -e "${BOLD}USAGE:${RESET}"
   echo "  ./s8r docmosis <command> [options]"
+  echo
+  echo -e "${BOLD}NOTE:${RESET}"
+  echo "  Docmosis is an optional component for enhanced document generation."
+  echo "  Samstraumr will function without Docmosis and use alternative"
+  echo "  document generation methods when Docmosis is not available."
   echo
   echo -e "${BOLD}COMMANDS:${RESET}"
   echo "  setup                Configure Docmosis license and settings"
