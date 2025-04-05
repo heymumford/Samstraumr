@@ -1,40 +1,36 @@
-# Samstraumr CI/CD Workflows
+# GitHub Actions Workflows
 
-This directory contains GitHub Actions workflows for Samstraumr (s8r) continuous integration.
+This directory contains the CI/CD workflows for the Samstraumr project.
 
-## Current Workflows
+## Available Workflows
 
-### `s8r-ci` (Primary CI Pipeline)
+1. **samstraumr-pipeline.yml** - Main CI pipeline that runs on every push and PR
+   - Builds and tests on Java 21
+   - Verifies compilation and basic structure
+   - Runs unit tests
 
-A simplified CI pipeline focused on basic verification during TDD-based development. This workflow:
+2. **smoke-test.yml** - Runs smoke tests weekly
+   - Runs every Monday at 4 AM UTC
+   - Can be triggered manually
+   - Tests core functionality
 
-- Runs on push to main branch, pull requests, and manual triggering
-- Performs basic compilation and structure verification
-- Skips tests, quality checks, and detailed reports to enable rapid iteration
+3. **full-pipeline.yml** - Comprehensive testing
+   - Runs every Sunday at 2 AM UTC
+   - Can be triggered manually
+   - Tests on both Java 21 and 17
+   - Includes security dependency checks
 
-### `pages.yml`
+4. **pages.yml** - GitHub Pages deployment
+   - Builds and deploys documentation site
 
-Handles GitHub Pages deployment for documentation.
+## Java 21 Migration Notes
 
-## TDD Development Approach
-
-The current CI pipeline is intentionally simplified to support test-driven development (TDD) by:
-
-1. Only checking for compilation errors and basic project structure
-2. Not running full test suites or quality checks
-3. Providing fast feedback on basic build health
-
-This allows developers to focus on implementing tests and functionality incrementally without failing CI runs during early development stages.
-
-## Future Enhancements
-
-As the project matures, the CI pipeline will be expanded to include:
-
-- Full test suite execution (unit, integration, orchestration)
-- Code quality checks (spotless, checkstyle, spotbugs)
-- Coverage reports and SonarQube analysis
-- Comprehensive build reports
-
----
-
-**Note:** The previous comprehensive CI pipeline is preserved in the git history and can be restored when the project reaches appropriate maturity.
+- All workflows have been updated to use Java 21
+- Added necessary JVM flags for Java module system compatibility:
+  ```
+  --add-opens java.base/java.lang=ALL-UNNAMED
+  --add-opens java.base/java.util=ALL-UNNAMED
+  --add-opens java.base/java.lang.reflect=ALL-UNNAMED
+  ```
+- Full-pipeline includes testing on Java 17 for backward compatibility
+# Last workflow check: 2025-04-04 21:44:57
