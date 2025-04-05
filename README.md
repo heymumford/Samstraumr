@@ -4,134 +4,265 @@ Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford
 
 # Samstraumr: Adaptive Resilient Software Framework
 
-[![Version](https://img.shields.io/badge/version-1.6.7-blue)](https://github.com/heymumford/Samstraumr/releases) [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/) [![Maven](https://img.shields.io/badge/Maven-3.6%2B-purple)](https://maven.apache.org/)
+<div align="center">
+  
+[![Version](https://img.shields.io/badge/version-1.7.3-blue)](https://github.com/heymumford/Samstraumr/releases) 
+[![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) 
+[![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) 
+[![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/) 
+[![Maven](https://img.shields.io/badge/Maven-3.6%2B-purple)](https://maven.apache.org/)
 
-> **⚠️ CURRENT DEVELOPMENT STATUS:** This project is currently in active TDD-based development. The CI pipeline has been simplified to focus on basic compilation and structure validation. Full test suites and quality checks are temporarily disabled to enable rapid iteration during this phase.
+</div>
 
-Samstraumr (S8r) is an enterprise Java framework for building resilient, self-healing software systems with adaptive components and event-driven architecture. Inspired by natural systems' resilience, it enables applications that autonomously monitor, adapt, and recover from disruptions.
+<table>
+<tr>
+<td width="70%">
+
+**Samstraumr (S8r)** is an enterprise Java framework for building resilient, self-healing software systems with adaptive components and event-driven architecture. Inspired by natural systems' resilience, it enables applications that autonomously monitor, adapt, and recover from disruptions.
 
 > *"Samstraumr (Old Norse: 'unified flow'): A framework where components intelligently collaborate like organisms in an ecosystem, evolving to meet changing demands while maintaining system integrity."*
 
-## Table of Contents
+</td>
+<td width="30%" style="background-color: #f8f9fa; padding: 10px; border-radius: 5px;">
 
-- [What is Samstraumr?](#what-is-samstraumr)
-- [Why Use Samstraumr?](#why-use-samstraumr)
-- [Core Concepts](#core-concepts)
-- [Getting Started](#getting-started)
-- [Documentation](#documentation)
-- [CLI Reference](#command-line-interface)
-- [When Not to Use](#when-not-to-use-samstraumr)
-- [Contributing](#contributing)
-- [License](#license)
-- [Connect](#connect)
+### Development Status
+
+⚠️ **ACTIVE DEVELOPMENT**
+
+This project is currently in active TDD-based development. The CI pipeline has been simplified to focus on basic compilation and structure validation. Full test suites and quality checks are temporarily disabled to enable rapid iteration.
+
+</td>
+</tr>
+</table>
+
+<div align="center">
+  
+| [What is S8r?](#what-is-samstraumr) | [Why Use It?](#why-use-samstraumr) | [Core Concepts](#core-concepts) | [Getting Started](#getting-started) | [Documentation](#documentation) |
+|:--:|:--:|:--:|:--:|:--:|
+| [CLI Reference](#command-line-interface) | [Project Structure](#project-structure) | [Contributing](#contributing) | [License](#license) | [Connect](#connect) |
+
+</div>
 
 ## What is Samstraumr?
 
-Samstraumr is an enterprise-grade framework for building resilient, adaptive software systems using Clean Architecture principles and event-driven communication. It creates applications that:
+<table>
+<tr>
+<td width="60%">
 
-- **Self-monitor** with built-in observability and adapt to changing conditions
-- **Reconfigure under stress** by dynamically adjusting component relationships
-- **Scale precisely** where demand exists without system-wide changes
-- **Recover automatically** from component failures with graceful degradation
-- **Evolve continuously** without requiring complete system rewrites
+Samstraumr is an enterprise-grade framework for building resilient, adaptive software systems using Clean Architecture principles and event-driven communication. It implements natural systems theory in software, bringing biological resilience patterns to enterprise applications.
 
-Samstraumr implements natural systems theory in software, bringing biological resilience patterns to enterprise applications. It excels at managing complexity in distributed systems, service ecosystems, and high-reliability applications.
+The framework excels at managing complexity in distributed systems, service ecosystems, and high-reliability applications where traditional approaches fail to address constantly changing environments.
 
-Learn more:
-- [Origins and Vision](./docs/concepts/origins-and-vision.md) - The 30-year journey behind Samstraumr
-- [Systems Theory Foundation](./docs/concepts/systems-theory-foundation.md) - How natural systems inspire the architecture
-- [Core Concepts](./docs/concepts/core-concepts.md) - The key principles and building blocks
+</td>
+<td width="40%">
+
+### Key Capabilities
+
+<table>
+<tr><td>🔍 <strong>Self-monitor</strong></td><td>Built-in observability with adaptive responses</td></tr>
+<tr><td>🔄 <strong>Reconfigure</strong></td><td>Dynamic component relationship adjustment</td></tr>
+<tr><td>📊 <strong>Scale precisely</strong></td><td>Targeted scaling without system-wide changes</td></tr>
+<tr><td>🛠️ <strong>Recover automatically</strong></td><td>Component-level failure recovery</td></tr>
+<tr><td>🌱 <strong>Evolve continuously</strong></td><td>Incremental adaptation without rewrites</td></tr>
+</table>
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="center">
+
+### Learn More
+
+[📜 Origins and Vision](./docs/concepts/origins-and-vision.md) • 
+[🌿 Systems Theory Foundation](./docs/concepts/systems-theory-foundation.md) • 
+[🧩 Core Concepts](./docs/concepts/core-concepts.md)
+
+</td>
+</tr>
+</table>
 
 ## Why Use Samstraumr?
 
+<div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+<div>
+
 ### Enterprise Challenges Solved
 
-1. **Fragile System Prevention**: Samstraumr's self-monitoring components detect and respond to problems automatically, preventing cascading failures in production systems.
+<table>
+<tr>
+   <th align="left">Challenge</th>
+   <th align="left">Samstraumr Solution</th>
+</tr>
+<tr>
+   <td><strong>Fragile Systems</strong></td>
+   <td>Self-monitoring components prevent cascading failures in production</td>
+</tr>
+<tr>
+   <td><strong>Technical Debt</strong></td>
+   <td>Clean Architecture with clear boundaries prevents debt accumulation</td>
+</tr>
+<tr>
+   <td><strong>Complex Integrations</strong></td>
+   <td>Event-driven patterns create loosely coupled system interactions</td>
+</tr>
+<tr>
+   <td><strong>Operational Opacity</strong></td>
+   <td>Comprehensive observability with built-in component monitoring</td>
+</tr>
+<tr>
+   <td><strong>Inconsistent Recovery</strong></td>
+   <td>Standardized lifecycle management with predictable recovery paths</td>
+</tr>
+</table>
 
-2. **Technical Debt Reduction**: Clean Architecture principles and clear component boundaries prevent the accumulation of technical debt in long-lived enterprise applications.
+</div>
+<div>
 
-3. **Integration Simplification**: Event-driven patterns create loosely coupled integrations between disparate systems, eliminating hidden dependencies and complex integration logic.
+### Benefits for Key Stakeholders
 
-4. **Operational Transparency**: Comprehensive observability with built-in monitoring provides complete visibility into system behavior and component interactions.
+<table>
+<tr>
+   <th colspan="2" align="left">🏛️ Enterprise Architects</th>
+</tr>
+<tr>
+   <td>• Reduced technical debt through strict boundaries</td>
+   <td>• Evolution-friendly architecture adapts without rewrites</td>
+</tr>
+<tr>
+   <td>• Built-in resilience for mission-critical systems</td>
+   <td>• Structured approach to distributed complexity</td>
+</tr>
 
-5. **Standardized Recovery**: Consistent lifecycle management allows components to recover predictably from failures using standardized recovery paths.
+<tr>
+   <th colspan="2" align="left">👩‍💻 Development Teams</th>
+</tr>
+<tr>
+   <td>• Well-defined component responsibilities</td>
+   <td>• Isolated components for parallel development</td>
+</tr>
+<tr>
+   <td>• Consistent patterns across system domains</td>
+   <td>• Self-documenting architecture with clear contracts</td>
+</tr>
 
-### Key Benefits
+<tr>
+   <th colspan="2" align="left">💼 Business Stakeholders</th>
+</tr>
+<tr>
+   <td>• Lower maintenance costs via self-healing</td>
+   <td>• Improved continuity with fault-tolerance</td>
+</tr>
+<tr>
+   <td>• Targeted scaling optimizes infrastructure costs</td>
+   <td>• Future-friendly evolution with business needs</td>
+</tr>
+</table>
 
-For **Enterprise Architects**:
-- Reduced technical debt through strict boundary enforcement
-- Evolution-friendly architecture that adapts without complete rewrites
-- Built-in resilience for mission-critical systems
-- Structured approach to managing distributed system complexity
-
-For **Development Teams**:
-- Well-defined component responsibilities with explicit contracts
-- Isolated components for easier parallel development and testing
-- Consistent patterns across different system domains
-- Self-documenting architecture with clear relationships
-
-For **Business Stakeholders**:
-- Lower maintenance costs through self-healing capabilities
-- Improved business continuity with fault-tolerant design
-- Targeted scaling that optimizes infrastructure costs
-- Future-friendly investment that evolves with business needs
+</div>
+</div>
 
 ## Core Concepts
 
-Samstraumr implements a cohesive set of architectural concepts:
+<table>
+<tr>
+<td width="40%">
+<div align="center">
+  
+![Core Concepts Diagram](https://via.placeholder.com/400x300?text=Core+Concepts+Diagram)
+<br><small><i>S8r architectural layers and relationships</i></small>
 
-- **Components**: Self-contained processing units with awareness of state and context
-- **Composites**: Coordinated component collections forming processing pipelines
-- **Machines**: Orchestrated composites implementing complete subsystems
-- **Flow-Oriented Design**: Data and control moving through well-defined pathways
-- **Identity Management**: Hierarchical addressing for all system elements
-- **Event-Driven Communication**: Loose coupling through publish-subscribe patterns
-- **Clean Architecture**: Clear separation of domain, application, and infrastructure
+</div>
+</td>
+<td width="60%">
 
-[Learn more about core concepts →](./docs/concepts/core-concepts.md)
+Samstraumr implements a cohesive set of architectural concepts that work together to create resilient, adaptive systems:
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+    <div style="background-color: #f8f8f8; padding: 10px; border-radius: 5px;">
+        <strong>🧩 Components</strong><br>
+        Self-contained processing units with state awareness
+    </div>
+    <div style="background-color: #f8f8f8; padding: 10px; border-radius: 5px;">
+        <strong>🔄 Composites</strong><br>
+        Coordinated component collections forming pipelines
+    </div>
+    <div style="background-color: #f8f8f8; padding: 10px; border-radius: 5px;">
+        <strong>⚙️ Machines</strong><br>
+        Orchestrated composites implementing subsystems
+    </div>
+    <div style="background-color: #f8f8f8; padding: 10px; border-radius: 5px;">
+        <strong>➡️ Flow-Oriented</strong><br>
+        Data and control along well-defined pathways
+    </div>
+    <div style="background-color: #f8f8f8; padding: 10px; border-radius: 5px;">
+        <strong>🏷️ Identity</strong><br>
+        Hierarchical addressing for all system elements
+    </div>
+    <div style="background-color: #f8f8f8; padding: 10px; border-radius: 5px;">
+        <strong>📢 Event-Driven</strong><br>
+        Loose coupling through publish-subscribe patterns
+    </div>
+</div>
+
+<div align="center" style="margin-top: 15px;">
+    <a href="./docs/concepts/core-concepts.md">📘 <strong>Learn more about core concepts</strong></a>
+</div>
+
+</td>
+</tr>
+</table>
 
 ## Getting Started
 
+<table>
+<tr>
+<td width="33%">
+
 ### Prerequisites
 
-- Java 17 or higher
-- Maven 3.6 or higher
-- Git
+<table>
+  <tr><td><img src="https://img.shields.io/badge/Java-17%2B-orange" height="20"/></td><td>JDK 17 or higher</td></tr>
+  <tr><td><img src="https://img.shields.io/badge/Maven-3.6%2B-purple" height="20"/></td><td>Maven 3.6 or higher</td></tr>
+  <tr><td><img src="https://img.shields.io/badge/Git-latest-black" height="20"/></td><td>Git (latest version)</td></tr>
+</table>
+
+<div align="center">
+    <a href="./docs/guides/prerequisites.md">📋 <strong>Setup Guide</strong></a>
+</div>
+
+</td>
+<td width="33%">
 
 ### Installation
 
-1. Clone the repository:
+```bash
+# Clone the repository
+git clone https://github.com/heymumford/Samstraumr.git
+cd Samstraumr
 
-   ```bash
-   git clone https://github.com/heymumford/Samstraumr.git
-   cd Samstraumr
-   ```
-2. Build the project:
+# Build project
+./s8r-build
 
-   ```bash
-   ./s8r build
-   ```
-3. Run tests:
+# Run tests
+./s8r-test all
+```
 
-   ```bash
-   ./s8r test all
-   ```
-4. Maven dependency (for using in your projects):
+Maven dependency:
+```xml
+<dependency>
+    <groupId>org.samstraumr</groupId>
+    <artifactId>samstraumr-core</artifactId>
+    <version>1.7.3</version>
+</dependency>
+```
 
-   ```xml
-   <dependency>
-       <groupId>org.samstraumr</groupId>
-       <artifactId>samstraumr-core</artifactId>
-       <version>1.6.7</version>
-   </dependency>
-   ```
+</td>
+<td width="33%">
 
 ### Quick Start Example
 
-Create your first component:
-
 ```java
-// Create an environment
+// Create environment
 Environment env = new Environment.Builder("validation-env")
     .withParameter("strictMode", "true")
     .build();
@@ -140,123 +271,300 @@ Environment env = new Environment.Builder("validation-env")
 Component validator = new EmailValidatorComponent(env);
 
 // Process data
-ValidationResult result = (ValidationResult) validator.process("user@example.com");
+ValidationResult result = (ValidationResult) 
+    validator.process("user@example.com");
+
+// Check result
+if (result.isValid()) {
+    System.out.println("Email is valid!");
+}
 ```
 
-[Complete getting started guide →](./docs/guides/getting-started.md)
+<div align="center" style="margin-top: 10px;">
+    <a href="./docs/guides/getting-started.md">🚀 <strong>Complete Getting Started Guide</strong></a>
+</div>
+
+</td>
+</tr>
+</table>
 
 ## Documentation
 
-### Guides
+<table>
+<tr>
+<td width="25%" style="vertical-align: top;">
 
-- [Prerequisites](./docs/guides/prerequisites.md)
-- [Getting Started](./docs/guides/getting-started.md)
-- [Composition Strategies](./docs/guides/composition-strategies.md)
-- [Component Patterns](./docs/guides/component-patterns.md)
-- [Migration Guide](./docs/guides/migration-guide.md)
+### 📚 Guides
 
-### Architecture
+<ul style="list-style-type: none; padding-left: 5px;">
+  <li>📋 <a href="./docs/guides/prerequisites.md">Prerequisites</a></li>
+  <li>🚀 <a href="./docs/guides/getting-started.md">Getting Started</a></li>
+  <li>🔄 <a href="./docs/guides/composition-strategies.md">Composition Strategies</a></li>
+  <li>🧩 <a href="./docs/guides/component-patterns.md">Component Patterns</a></li>
+  <li>🔁 <a href="./docs/guides/migration-guide.md">Migration Guide</a></li>
+</ul>
 
-- [Architecture Overview](./docs/architecture/README.md)
-- [Clean Architecture](./docs/architecture/clean/README.md)
-- [Event-Driven Architecture](./docs/architecture/event/README.md)
-- [Integration Patterns](./docs/architecture/patterns/README.md)
-- [Monitoring & Management](./docs/architecture/monitoring/README.md)
+</td>
+<td width="25%" style="vertical-align: top;">
 
-### Core Concepts
+### 🏛️ Architecture
 
-- [Core Concepts](./docs/concepts/core-concepts.md)
-- [Systems Theory Foundation](./docs/concepts/systems-theory-foundation.md)
-- [State Management](./docs/concepts/state-management.md)
-- [Identity Addressing](./docs/concepts/identity-addressing.md)
-- [Composites & Machines](./docs/concepts/composites-and-machines.md)
+<ul style="list-style-type: none; padding-left: 5px;">
+  <li>📐 <a href="./docs/architecture/README.md">Architecture Overview</a></li>
+  <li>🧱 <a href="./docs/architecture/clean/README.md">Clean Architecture</a></li>
+  <li>📢 <a href="./docs/architecture/event/README.md">Event-Driven Design</a></li>
+  <li>🔗 <a href="./docs/architecture/patterns/README.md">Integration Patterns</a></li>
+  <li>📊 <a href="./docs/architecture/monitoring/README.md">Monitoring & Management</a></li>
+</ul>
 
-### Reference
+</td>
+<td width="25%" style="vertical-align: top;">
 
-- [Configuration Reference](./docs/reference/configuration-reference.md)
-- [Glossary](./docs/reference/glossary.md)
-- [Version Management](./docs/reference/version-management.md)
-- [Changelog](./docs/reference/release/changelog.md)
-- [FAQ](./docs/reference/f-a-q.md)
+### 🧠 Core Concepts
 
-### Development
+<ul style="list-style-type: none; padding-left: 5px;">
+  <li>🧩 <a href="./docs/concepts/core-concepts.md">Core Concepts</a></li>
+  <li>🌿 <a href="./docs/concepts/systems-theory-foundation.md">Systems Theory</a></li>
+  <li>⚙️ <a href="./docs/concepts/state-management.md">State Management</a></li>
+  <li>🏷️ <a href="./docs/concepts/identity-addressing.md">Identity Addressing</a></li>
+  <li>🔄 <a href="./docs/concepts/composites-and-machines.md">Composites & Machines</a></li>
+</ul>
 
-- [TDD Development Guide](./docs/dev/tdd-development.md) ← Current development approach
-- [Testing Strategy](./docs/dev/test-strategy.md)
-- [BDD with Cucumber](./docs/dev/test-bdd-cucumber.md)
-- [Test Annotations](./docs/dev/test-annotations.md)
+</td>
+<td width="25%" style="vertical-align: top;">
 
-## Command-Line Interface
+### 📖 Reference & Development
+
+<ul style="list-style-type: none; padding-left: 5px;">
+  <li>⚙️ <a href="./docs/reference/configuration-reference.md">Configuration</a></li>
+  <li>📘 <a href="./docs/reference/glossary.md">Glossary</a></li>
+  <li>🔖 <a href="./docs/reference/version-management.md">Version Management</a></li>
+  <li>📜 <a href="./docs/reference/release/changelog.md">Changelog</a></li>
+  <li>❓ <a href="./docs/reference/f-a-q.md">FAQ</a></li>
+</ul>
+
+<div style="margin-top: 15px; background-color: #f0f7ff; padding: 8px; border-radius: 5px;">
+  <strong>🧪 Current Development</strong><br>
+  We're using <a href="./docs/dev/tdd-development.md">Test-Driven Development</a> with <a href="./docs/dev/test-bdd-cucumber.md">BDD/Cucumber</a>
+</div>
+
+</td>
+</tr>
+</table>
+
+## Command-Line Interface & Configuration
+
+<table>
+<tr>
+<td width="60%">
+
+### S8r Command-Line Interface
 
 Samstraumr provides a unified CLI for all operations:
 
 ```bash
-./s8r <command> [options]
+# Build commands
+./s8r-build [options] [mode]
+
+# Test commands
+./s8r-test [options] <test-type>
+
+# Version management
+./s8r-version <command> [options]
 ```
 
-Common commands:
-- `./s8r build [mode]` - Build the project (fast, test, package)
-- `./s8r test <type>` - Run tests (all, component, composite, etc.)
-- `./s8r quality check` - Run quality checks
-- `./s8r version` - Show or update version information
-- `./s8r help` - Display all commands and options
+<table>
+<tr><th align="left">Command</th><th align="left">Description</th></tr>
+<tr><td><code>./s8r-build [mode]</code></td><td>Build project (fast, test, package, install, full)</td></tr>
+<tr><td><code>./s8r-test &lt;type&gt;</code></td><td>Run tests (unit, component, integration, all...)</td></tr>
+<tr><td><code>./s8r-version get</code></td><td>Show current version information</td></tr>
+<tr><td><code>./s8r-version bump</code></td><td>Increment version (major, minor, patch)</td></tr>
+<tr><td><code>./s8r-version set</code></td><td>Set specific version</td></tr>
+<tr><td><code>./s8r-version fix</code></td><td>Fix version inconsistencies</td></tr>
+</table>
 
-[Complete CLI reference →](./docs/reference/cli-reference.md)
+<div align="center" style="margin-top: 10px;">
+    <a href="./docs/reference/cli-reference.md">🖥️ <strong>Complete CLI Reference</strong></a>
+</div>
+
+</td>
+<td width="40%">
 
 ### Configuration System
 
-Samstraumr uses a unified configuration system in the `.samstraumr` directory. This provides a consistent environment for both the CLI tool and shell scripts.
-
-#### Usage in Shell Scripts
+Samstraumr uses a unified configuration system in the `.samstraumr` directory, providing consistency across CLI and scripts.
 
 ```bash
 # Source the unified configuration
 source "${PROJECT_ROOT}/.samstraumr/config.sh"
 
 # Use configuration variables
-echo "Core module path: ${SAMSTRAUMR_CORE_MODULE}"
+echo "Core path: ${SAMSTRAUMR_CORE_MODULE}"
 ```
 
-The configuration includes project paths, package structures, Maven settings, and command mappings.
+<div style="background-color: #f0f7ff; padding: 10px; border-radius: 5px; margin-top: 10px;">
+<strong>What's Included:</strong><br>
+• Project paths<br>
+• Package structures<br>
+• Maven settings<br>
+• Command mappings<br>
+</div>
 
-For comprehensive build documentation, see the [Build Guide](./docs/reference/build/index.md).
+<div align="center" style="margin-top: 10px;">
+    <a href="./docs/reference/build/index.md">🔨 <strong>Build Documentation</strong></a>
+</div>
 
-## When NOT to Use Samstraumr
+</td>
+</tr>
+</table>
 
-While Samstraumr excels at complex enterprise systems, it may not be the best choice for:
+## Project Structure
 
-- **Simple CRUD applications** with limited business logic
-- **One-off scripts** or single-purpose utilities
-- **Performance-critical systems** where every microsecond counts
-- **Resource-constrained environments** with extremely limited memory/CPU
-- **Standalone applications** with no inter-component communication needs
+<table style="width: 100%; background-color: #f8f9fa; border-radius: 5px;">
+<tr>
+<td width="55%">
 
-## Contributing
+The Samstraumr repository follows a well-organized directory structure that balances depth with discoverability:
+
+```
+Samstraumr/           # Core implementation and Maven structure
+docs/                 # Documentation and reference materials
+quality-tools/        # Code quality configurations
+util/                 # Utility scripts and tools
+src/                  # Example implementations
+```
+
+Each directory serves a specific purpose and follows consistent organization patterns. The project emphasizes **file naming conventions over deep nesting** to improve navigation and maintainability.
+
+<div align="center" style="margin-top: 10px;">
+    <a href="./FOLDERS.md">📁 <strong>Directory Structure Overview</strong></a> •
+    <a href="./docs/architecture/directory-structure.md">🏛️ <strong>Architecture Mapping</strong></a>
+</div>
+
+</td>
+<td width="45%">
+
+### Organization Principles
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+    <div style="background-color: white; padding: 10px; border-radius: 5px;">
+        <strong>🔍 Clear Purpose</strong><br>
+        Each directory has a singular, well-defined responsibility
+    </div>
+    <div style="background-color: white; padding: 10px; border-radius: 5px;">
+        <strong>📊 Critical Mass</strong><br>
+        New folders require 5+ related files
+    </div>
+    <div style="background-color: white; padding: 10px; border-radius: 5px;">
+        <strong>📄 Documented</strong><br>
+        Every directory has a README explaining its purpose
+    </div>
+    <div style="background-color: white; padding: 10px; border-radius: 5px;">
+        <strong>🏷️ Naming Focus</strong><br>
+        Prefer file naming over deep nesting
+    </div>
+</div>
+
+<div align="center" style="margin-top: 15px;">
+    <a href="./docs/contrib/folder-management-guidelines.md">📋 <strong>Folder Management Guidelines</strong></a>
+</div>
+
+</td>
+</tr>
+</table>
+
+## Contributing & Connect
+
+<table>
+<tr>
+<td width="60%">
+
+### 🤝 How to Contribute
 
 We welcome contributions from the community! Please read our [Contribution Guidelines](./docs/contribution/contributing.md) before submitting pull requests.
 
-### Development Process
+<table style="width: 100%;">
+<tr>
+<td style="text-align: center; width: 20%; padding: 10px;">
+<strong>1</strong><br>
+<span style="font-size: 24px;">🍴</span><br>
+Fork repo
+</td>
+<td style="text-align: center; width: 20%; padding: 10px;">
+<strong>2</strong><br>
+<span style="font-size: 24px;">🌿</span><br>
+Create branch
+</td>
+<td style="text-align: center; width: 20%; padding: 10px;">
+<strong>3</strong><br>
+<span style="font-size: 24px;">👩‍💻</span><br>
+Make changes
+</td>
+<td style="text-align: center; width: 20%; padding: 10px;">
+<strong>4</strong><br>
+<span style="font-size: 24px;">🧪</span><br>
+Run tests
+</td>
+<td style="text-align: center; width: 20%; padding: 10px;">
+<strong>5</strong><br>
+<span style="font-size: 24px;">📤</span><br>
+Submit PR
+</td>
+</tr>
+</table>
 
-1. Fork the repository
-2. Create a feature branch
-3. Implement your changes
-4. Run tests and quality checks
-5. Submit a pull request
+<div align="center" style="margin-top: 10px;">
+    <a href="./docs/contribution/code-standards.md">📝 <strong>Development Standards</strong></a> • 
+    <a href="./docs/contribution/git-commits.md">🔄 <strong>Commit Guidelines</strong></a> • 
+    <a href="./docs/contribution/quality-checks.md">✅ <strong>Quality Checks</strong></a>
+</div>
 
-[Development standards →](./docs/contribution/code-standards.md)
+</td>
+<td width="40%" style="vertical-align: top;">
 
-## License
+### 📄 License
 
-Samstraumr is licensed under the Mozilla Public License 2.0. See [LICENSE](./LICENSE) for details.
+<div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+<p><img src="https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg" height="20" style="vertical-align: middle;"> <strong>Mozilla Public License 2.0</strong></p>
 
-## Connect
+<small>Samstraumr is open source under the MPL 2.0 license, which allows for integration with proprietary software while ensuring that changes to Samstraumr itself remain open source.</small>
 
-- **Author:** [Eric C. Mumford](mailto:heymumford@samstraumr.org)
-- **GitHub:** [github.com/heymumford](https://github.com/heymumford)
-- **LinkedIn:** [linkedin.com/in/eric-mumford](https://www.linkedin.com/in/eric-mumford/)
+<div align="center" style="margin-top: 10px;">
+    <a href="./LICENSE">View Full License</a>
+</div>
+</div>
+
+### 🔗 Connect
+
+<table style="width: 100%;">
+<tr>
+<td><strong>Author:</strong></td>
+<td><a href="mailto:heymumford@samstraumr.org">Eric C. Mumford</a></td>
+</tr>
+<tr>
+<td><strong>GitHub:</strong></td>
+<td><a href="https://github.com/heymumford">github.com/heymumford</a></td>
+</tr>
+<tr>
+<td><strong>LinkedIn:</strong></td>
+<td><a href="https://www.linkedin.com/in/eric-mumford/">linkedin.com/in/eric-mumford</a></td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>
+
+<div align="center" style="margin-top: 30px; color: #6c757d; font-size: 0.9em;">
+    <p>Copyright © 2025 Eric C. Mumford. All rights reserved.</p>
+    <p>
+        <small>
+            <i>Samstraumr (S8r): Enterprise-grade framework for resilient, self-healing software systems with adaptive components and event-driven architecture</i>
+        </small>
+    </p>
+</div>
 
 [//]: # (SEO metadata)
-
 [//]: # (Description: Samstraumr (S8r): Enterprise-grade framework for resilient, self-healing software systems with adaptive components and event-driven architecture)
 [//]: # (Keywords: resilient systems, adaptive software, event-driven architecture, enterprise framework, self-healing systems, java framework, component-based architecture, systems theory, clean architecture)
 [//]: # (Author: Eric C. Mumford)

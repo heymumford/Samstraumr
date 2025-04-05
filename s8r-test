@@ -1,0 +1,237 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r-test: Simplified test runner for Samstraumr
+# Provides a streamlined interface for running different test types
+#==============================================================================
+set -e
+
+# Find repository root
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel)}"
+
+# Terminal colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+# Functions for prettier output
+info() { echo -e "${BLUE}$1${RESET}"; }
+success() { echo -e "${GREEN}$1${RESET}"; }
+error() { echo -e "${RED}Error: $1${RESET}" >&2; exit 1; }
+warn() { echo -e "${YELLOW}Warning: $1${RESET}" >&2; }
+
+# Determine Maven settings
+MVN_OPTS=""
+if [ -n "$MAVEN_MEMORY_OPTS" ]; then
+  MVN_OPTS="$MAVEN_MEMORY_OPTS"
+else
+  MVN_OPTS="-Xmx1g"
+fi
+export MAVEN_OPTS="$MVN_OPTS"
+
+# Parse arguments
+parse_args() {
+  TEST_TYPE="all"
+  VERBOSE=false
+  SKIP_QUALITY=false
+  OUTPUT_FILE=""
+  
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -v|--verbose)
+        VERBOSE=true
+        shift
+        ;;
+      --skip-quality)
+        SKIP_QUALITY=true
+        shift
+        ;;
+      -o|--output)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          OUTPUT_FILE="$2"
+          shift 2
+        else
+          error "Output file path missing after -o/--output"
+        fi
+        ;;
+      -h|--help)
+        show_help
+        exit 0
+        ;;
+      *)
+        TEST_TYPE="$1"
+        shift
+        ;;
+    esac
+  done
+}
+
+# Display help information
+show_help() {
+  echo -e "${BOLD}Samstraumr Test Runner${RESET}"
+  echo
+  echo "Usage: ./s8r-test [options] [test-type]"
+  echo
+  echo "Options:"
+  echo "  -v, --verbose           Enable verbose output"
+  echo "  --skip-quality          Skip quality checks"
+  echo "  -o, --output <file>     Write test output to file"
+  echo "  -h, --help              Show this help message"
+  echo
+  echo "Test Types:"
+  echo "  unit                    Run unit tests"
+  echo "  component               Run component tests"
+  echo "  integration             Run integration tests"
+  echo "  api                     Run API tests"
+  echo "  system                  Run system tests"
+  echo "  endtoend                Run end-to-end tests"
+  echo "  acceptance              Run acceptance tests"
+  echo "  all                     Run all tests (default)"
+  echo
+  echo "Samstraumr-Specific Test Types:"
+  echo "  tube                    Same as unit"
+  echo "  composite               Same as component"
+  echo "  flow                    Same as integration"
+  echo "  machine                 Same as api"
+  echo "  stream                  Same as system"
+  echo "  orchestration           Run orchestration tests"
+  echo "  atl                     Run Above-The-Line tests"
+  echo "  btl                     Run Below-The-Line tests"
+  echo "  adam                    Run Adam Tube tests"
+  echo
+  echo "Examples:"
+  echo "  ./s8r-test                      # Run all tests"
+  echo "  ./s8r-test unit                 # Run unit tests"
+  echo "  ./s8r-test atl                  # Run Above-The-Line tests"
+  echo "  ./s8r-test -v component         # Run component tests verbosely"
+}
+
+# Map test type to Maven profile and tags
+map_test_type() {
+  local test_type="$1"
+  local profile=""
+  local tags=""
+  
+  case "$test_type" in
+    unit|tube)
+      profile="unit-tests"
+      tags="@UnitTest or @TubeTest"
+      ;;
+    component|composite)
+      profile="component-tests"
+      tags="@ComponentTest or @CompositeTest"
+      ;;
+    integration|flow)
+      profile="integration-tests"
+      tags="@IntegrationTest or @FlowTest"
+      ;;
+    api|machine)
+      profile="api-tests"
+      tags="@ApiTest or @MachineTest"
+      ;;
+    system|stream)
+      profile="system-tests"
+      tags="@SystemTest or @StreamTest"
+      ;;
+    endtoend|acceptance)
+      profile="acceptance-tests"
+      tags="@EndToEndTest or @AcceptanceTest"
+      ;;
+    orchestration)
+      profile="orchestration-tests"
+      tags="@OrchestrationTest"
+      ;;
+    atl)
+      profile="atl-tests"
+      tags="@ATL"
+      ;;
+    btl) 
+      profile="btl-tests"
+      tags="@BTL"
+      ;;
+    adam)
+      profile="adam-tube-tests"
+      tags="@AdamTube"
+      ;;
+    all)
+      profile="all-tests"
+      tags="not @disabled"
+      ;;
+    *)
+      error "Unknown test type: $test_type"
+      ;;
+  esac
+  
+  echo "$profile $tags"
+}
+
+# Core test function
+run_tests() {
+  # Map test type to profile and tags
+  read -r profile tags <<< "$(map_test_type "$TEST_TYPE")"
+  
+  # Construct Maven command based on arguments
+  local mvn_args=("test")
+  
+  # Add profile if available
+  if [[ -n "$profile" ]]; then
+    mvn_args+=("-P$profile")
+  fi
+  
+  # Add cucumber tags if available
+  if [[ -n "$tags" ]]; then
+    mvn_args+=("-Dcucumber.filter.tags=\"$tags\"")
+  fi
+  
+  # Add quality skip if requested
+  if $SKIP_QUALITY; then
+    mvn_args+=("-Dskip.quality.checks=true")
+  fi
+  
+  # Add verbose flag if requested
+  if $VERBOSE; then
+    mvn_args+=("-e")
+  else
+    mvn_args+=("-q")
+  fi
+  
+  # Display test information
+  info "Running $TEST_TYPE tests..."
+  info "Profile: $profile"
+  info "Tags: $tags"
+  
+  # Handle output redirection
+  cd "$PROJECT_ROOT"
+  info "Running: mvn ${mvn_args[*]}"
+  
+  if [[ -n "$OUTPUT_FILE" ]]; then
+    info "Writing output to: $OUTPUT_FILE"
+    if mvn "${mvn_args[@]}" | tee "$OUTPUT_FILE"; then
+      success "Tests completed successfully"
+      return 0
+    else
+      error "Tests failed"
+      info "See test output in: $OUTPUT_FILE"
+      return 1
+    fi
+  else
+    if mvn "${mvn_args[@]}"; then
+      success "Tests completed successfully"
+      return 0
+    else
+      error "Tests failed"
+      return 1
+    fi
+  fi
+}
+
+# Main execution
+if [[ $# -eq 0 || "$1" == "-h" || "$1" == "--help" ]]; then
+  show_help
+  exit 0
+fi
+
+parse_args "$@"
+run_tests
