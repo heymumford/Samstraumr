@@ -6,8 +6,8 @@ Goals:
   - Test initialization error handling
   - Validate environment awareness during initialization
 Dependencies:
-  - BDD step definitions in org.samstraumr.tube.lifecycle.steps package
-  - Tube and Environment implementations in org.samstraumr.tube
+  - BDD step definitions in org.s8r.tube.lifecycle.steps package
+  - Tube and Environment implementations in org.s8r.tube
 */
 
 @ATL @L0_Tube @Lifecycle @Init

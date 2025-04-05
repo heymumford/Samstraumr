@@ -7,8 +7,8 @@ Goals:
   - Test lineage management and hierarchical addressing
   - Verify environmental context capture
 Dependencies:
-  - BDD step definitions in org.samstraumr.tube.lifecycle.steps package
-  - Tube and Environment implementations in org.samstraumr.tube
+  - BDD step definitions in org.s8r.tube.lifecycle.steps package
+  - Tube and Environment implementations in org.s8r.tube
 Assumptions:
   - Test environment provides stable resource conditions
   - Cucumber test runner is properly configured

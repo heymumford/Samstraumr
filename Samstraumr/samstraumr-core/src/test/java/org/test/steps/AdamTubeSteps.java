@@ -38,9 +38,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.samstraumr.tube.Environment;
-import org.samstraumr.tube.Tube;
-import org.samstraumr.tube.TubeIdentity;
+import org.s8r.tube.Environment;
+import org.s8r.tube.Tube;
+import org.s8r.tube.TubeIdentity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

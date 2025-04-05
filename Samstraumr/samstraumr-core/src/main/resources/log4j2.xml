@@ -37,12 +37,12 @@
             <AppenderRef ref="FileAppender"/>
         </Root>
 
-        <Logger name="org.samstraumr.tube" level="debug" additivity="false">
+        <Logger name="org.s8r.tube" level="debug" additivity="false">
             <AppenderRef ref="ConsoleAppender"/>
             <AppenderRef ref="FileAppender"/>
         </Logger>
 
-        <Logger name="org.samstraumr.tube.error" level="error" additivity="false">
+        <Logger name="org.s8r.tube.error" level="error" additivity="false">
             <AppenderRef ref="ErrorFileAppender"/>
         </Logger>
     </Loggers>

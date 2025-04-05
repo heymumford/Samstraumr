@@ -7,7 +7,7 @@ package org.s8r.adapter;
 
 import org.s8r.core.env.Environment;
 import org.s8r.core.tube.identity.Identity;
-import org.samstraumr.tube.TubeIdentity;
+import org.s8r.tube.TubeIdentity;
 
 /**
  * Adapter that bridges the new Identity class with the legacy TubeIdentity class.
@@ -61,7 +61,7 @@ public class IdentityAdapter {
    * @return A legacy TubeIdentity object with the same properties
    */
   public static TubeIdentity toLegacyIdentity(
-      Identity newIdentity, org.samstraumr.tube.Environment environment) {
+      Identity newIdentity, org.s8r.tube.Environment environment) {
     if (newIdentity == null) {
       return null;
     }
@@ -72,7 +72,7 @@ public class IdentityAdapter {
       legacyIdentity =
           TubeIdentity.createAdamIdentity(
               newIdentity.getReason(),
-              (environment != null) ? environment : new org.samstraumr.tube.Environment());
+              (environment != null) ? environment : new org.s8r.tube.Environment());
     } else {
       // For non-Adam identities, we need a parent identity
       TubeIdentity parentLegacyIdentity = null;
@@ -83,7 +83,7 @@ public class IdentityAdapter {
       legacyIdentity =
           TubeIdentity.createChildIdentity(
               newIdentity.getReason(),
-              (environment != null) ? environment : new org.samstraumr.tube.Environment(),
+              (environment != null) ? environment : new org.s8r.tube.Environment(),
               parentLegacyIdentity);
     }
 
@@ -106,12 +106,12 @@ public class IdentityAdapter {
    * @param newEnvironment The new Environment to convert
    * @return A legacy Environment with the same properties
    */
-  public static org.samstraumr.tube.Environment toLegacyEnvironment(Environment newEnvironment) {
+  public static org.s8r.tube.Environment toLegacyEnvironment(Environment newEnvironment) {
     if (newEnvironment == null) {
       return null;
     }
 
-    org.samstraumr.tube.Environment legacyEnvironment = new org.samstraumr.tube.Environment();
+    org.s8r.tube.Environment legacyEnvironment = new org.s8r.tube.Environment();
 
     // Copy over parameters - this assumes both Environment classes have compatible APIs
     for (String key : newEnvironment.getParameterKeys()) {
@@ -127,7 +127,7 @@ public class IdentityAdapter {
    * @param legacyEnvironment The legacy Environment to convert
    * @return A new Environment with the same properties
    */
-  public static Environment toNewEnvironment(org.samstraumr.tube.Environment legacyEnvironment) {
+  public static Environment toNewEnvironment(org.s8r.tube.Environment legacyEnvironment) {
     if (legacyEnvironment == null) {
       return null;
     }

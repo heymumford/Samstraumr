@@ -1,0 +1,162 @@
+/*
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
+ * Gemini Deep Research, Claude 3.7.
+ */
+
+package org.s8r.tube.machine;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.s8r.tube.Environment;
+import org.s8r.tube.composite.Composite;
+import org.s8r.tube.composite.CompositeFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Factory for creating and managing Machine instances. Provides methods to create different types
+ * of preconfigured machines.
+ */
+public class MachineFactory {
+  private static final Logger LOGGER = LoggerFactory.getLogger(MachineFactory.class);
+  private static final Map<String, Machine> MACHINE_REGISTRY = new ConcurrentHashMap<>();
+
+  private MachineFactory() {
+    // Private constructor to prevent instantiation
+  }
+
+  /**
+   * Creates a new Machine with a generated ID.
+   *
+   * @param environment The environment for the machine
+   * @return The created machine
+   */
+  public static Machine createMachine(Environment environment) {
+    String machineId = generateMachineId();
+    return createMachine(machineId, environment);
+  }
+
+  /**
+   * Creates a new Machine with the specified ID.
+   *
+   * @param machineId The ID for the machine
+   * @param environment The environment for the machine
+   * @return The created machine
+   */
+  public static Machine createMachine(String machineId, Environment environment) {
+    Machine machine = new Machine(machineId, environment);
+    MACHINE_REGISTRY.put(machineId, machine);
+    LOGGER.info("Created and registered machine: {}", machineId);
+    return machine;
+  }
+
+  /**
+   * Creates a data processing machine with input, processing, and output composites.
+   *
+   * @param environment The environment for the machine
+   * @return The created data processing machine
+   */
+  public static Machine createDataProcessingMachine(Environment environment) {
+    Machine machine = createMachine("data-processor-" + generateMachineId(), environment);
+
+    // Create and add composites
+    Composite inputComposite = CompositeFactory.createComposite("input-handler", environment);
+    Composite processingComposite = CompositeFactory.createProcessingComposite(environment);
+    Composite outputComposite = CompositeFactory.createComposite("output-handler", environment);
+
+    // Add composites to machine
+    machine
+        .addComposite("input", inputComposite)
+        .addComposite("processor", processingComposite)
+        .addComposite("output", outputComposite);
+
+    // Connect composites
+    machine.connect("input", "processor").connect("processor", "output");
+
+    LOGGER.info("Created data processing machine: {}", machine.getMachineId());
+    return machine;
+  }
+
+  /**
+   * Creates a monitoring machine for system observation.
+   *
+   * @param environment The environment for the machine
+   * @return The created monitoring machine
+   */
+  public static Machine createMonitoringMachine(Environment environment) {
+    Machine machine = createMachine("monitor-" + generateMachineId(), environment);
+
+    // Create and add composites
+    Composite observerComposite = CompositeFactory.createObserverComposite(environment);
+    Composite validationComposite = CompositeFactory.createValidationComposite(environment);
+
+    // Add composites to machine
+    machine
+        .addComposite("observer", observerComposite)
+        .addComposite("validator", validationComposite);
+
+    // Connect composites
+    machine.connect("observer", "validator");
+
+    LOGGER.info("Created monitoring machine: {}", machine.getMachineId());
+    return machine;
+  }
+
+  /**
+   * Gets a machine by its ID.
+   *
+   * @param machineId The ID of the machine to retrieve
+   * @return Optional containing the machine if found, empty otherwise
+   */
+  public static Optional<Machine> getMachine(String machineId) {
+    return Optional.ofNullable(MACHINE_REGISTRY.get(machineId));
+  }
+
+  /**
+   * Gets all registered machines.
+   *
+   * @return An unmodifiable map of machine IDs to machines
+   */
+  public static Map<String, Machine> getAllMachines() {
+    return Collections.unmodifiableMap(MACHINE_REGISTRY);
+  }
+
+  /**
+   * Removes a machine from the registry.
+   *
+   * @param machineId The ID of the machine to remove
+   * @return true if the machine was removed, false if it wasn't found
+   */
+  public static boolean removeMachine(String machineId) {
+    Machine machine = MACHINE_REGISTRY.remove(machineId);
+    if (machine != null) {
+      machine.deactivate();
+      LOGGER.info("Removed machine from registry: {}", machineId);
+      return true;
+    }
+    return false;
+  }
+
+  /** Shuts down all registered machines. */
+  public static void shutdownAllMachines() {
+    LOGGER.info("Shutting down all {} registered machines", MACHINE_REGISTRY.size());
+    for (Machine machine : MACHINE_REGISTRY.values()) {
+      machine.shutdown();
+    }
+    MACHINE_REGISTRY.clear();
+    LOGGER.info("All machines shut down and registry cleared");
+  }
+
+  /**
+   * Generates a unique machine ID.
+   *
+   * @return A unique machine ID
+   */
+  private static String generateMachineId() {
+    return UUID.randomUUID().toString().substring(0, 8);
+  }
+}

@@ -6,8 +6,8 @@ Goals:
   - Ensure that environment details are properly captured and logged
   - Ensure that tubes maintain isolation and proper error handling
 Dependencies:
-  - BDD step definitions in org.samstraumr.tube.steps package
-  - Tube and Environment implementations in org.samstraumr.tube
+  - BDD step definitions in org.s8r.tube.steps package
+  - Tube and Environment implementations in org.s8r.tube
 Assumptions:
   - Test environment provides stable resource conditions
   - Cucumber test runner is properly configured

@@ -9,12 +9,12 @@
   <!-- ====================================================================== -->
   <!--                                                                        -->
   <!-- Effective POM for project                                              -->
-  <!-- 'org.samstraumr:samstraumr-modules:pom:1.2.9'                          -->
+  <!-- 'org.s8r:samstraumr-modules:pom:1.2.9'                          -->
   <!--                                                                        -->
   <!-- ====================================================================== -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.samstraumr</groupId>
+    <groupId>org.s8r</groupId>
     <artifactId>samstraumr-modules</artifactId>
     <version>1.2.9</version>
     <packaging>pom</packaging>
@@ -490,17 +490,17 @@
   </project>
   <!-- ====================================================================== -->
   <!--                                                                        -->
-  <!-- Effective POM for project 'org.samstraumr:samstraumr-core:jar:1.2.9'   -->
+  <!-- Effective POM for project 'org.s8r:samstraumr-core:jar:1.2.9'   -->
   <!--                                                                        -->
   <!-- ====================================================================== -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-      <groupId>org.samstraumr</groupId>
+      <groupId>org.s8r</groupId>
       <artifactId>samstraumr-modules</artifactId>
       <version>1.2.9</version>
     </parent>
-    <groupId>org.samstraumr</groupId>
+    <groupId>org.s8r</groupId>
     <artifactId>samstraumr-core</artifactId>
     <version>1.2.9</version>
     <name>Samstraumr Core</name>
@@ -1660,12 +1660,12 @@
   </project>
   <!-- ====================================================================== -->
   <!--                                                                        -->
-  <!-- Effective POM for project 'org.samstraumr:samstraumr:pom:1.2.9'        -->
+  <!-- Effective POM for project 'org.s8r:samstraumr:pom:1.2.9'        -->
   <!--                                                                        -->
   <!-- ====================================================================== -->
   <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.samstraumr</groupId>
+    <groupId>org.s8r</groupId>
     <artifactId>samstraumr</artifactId>
     <version>1.2.9</version>
     <packaging>pom</packaging>
