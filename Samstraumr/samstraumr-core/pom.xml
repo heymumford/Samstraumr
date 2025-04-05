@@ -7,11 +7,11 @@
   <parent>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-modules</artifactId>
-    <version>1.7.2</version>
+    <version>1.7.3</version>
   </parent>
 
   <artifactId>samstraumr-core</artifactId>
-  <version>1.7.2</version>
+  <version>1.7.3</version>
   <packaging>jar</packaging>
   <name>Samstraumr Core</name>
 
@@ -43,26 +43,26 @@
     <dependency>
       <groupId>com.github.oshi</groupId>
       <artifactId>oshi-core</artifactId>
-      <version>6.4.8</version>
+      <version>6.4.1</version>
     </dependency>
     
     <!-- JSON Processing -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.16.1</version>
+      <version>2.15.2</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.16.1</version>
+      <version>2.15.2</version>
     </dependency>
     
     <!-- SpotBugs Annotations -->
     <dependency>
       <groupId>com.github.spotbugs</groupId>
       <artifactId>spotbugs-annotations</artifactId>
-      <version>4.8.3</version>
+      <version>4.7.3</version>
     </dependency>
     
     <!-- Logging Framework -->
@@ -312,6 +312,14 @@
       <id>orchestration-tests</id>
       <properties>
         <cucumber.filter.tags>@OrchestrationTest</cucumber.filter.tags>
+      </properties>
+    </profile>
+    
+    <!-- Unit Tests Profile -->
+    <profile>
+      <id>unit-tests</id>
+      <properties>
+        <cucumber.filter.tags>@UnitTest or @TubeTest</cucumber.filter.tags>
       </properties>
     </profile>
     
