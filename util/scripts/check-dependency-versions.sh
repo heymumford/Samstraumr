@@ -25,7 +25,7 @@ cat > target/version-check/pom.xml << 'EOF'
         <groupId>org.samstraumr</groupId>
         <artifactId>samstraumr</artifactId>
         <version>2.0.0</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <name>Version Check</name>
