@@ -7,6 +7,21 @@ Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford
 All notable changes to this project will be documented in this file.
 
 ## [1.3.0] - 2025-04-03
+## [2.0.2] - 2025-04-04
+
+### Security
+
+- Updated PMD dependencies from 2.0.1 to 7.12.0 to address security vulnerabilities
+- Updated Mockito to 5.17.0 and TestContainers to 1.20.6
+- Added explicit scope declarations to Jackson dependencies
+
+### Added
+
+- Created component duplicates cleanup plan for improved code organization
+
+### Changed
+
+- Documented migration strategy for legacy Tube implementations to Component architecture
 ## [2.0.1] - 2025-04-04
 
 ### Added

@@ -7,11 +7,11 @@
   <parent>
     <groupId>org.s8r</groupId>
     <artifactId>samstraumr-modules</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
   </parent>
 
   <artifactId>samstraumr-core</artifactId>
-  <version>2.0.1</version>
+  <version>2.0.2</version>
   <packaging>jar</packaging>
   <name>Samstraumr Core</name>
 
@@ -25,8 +25,8 @@
     <lombok.version>1.18.38</lombok.version>
     <docmosis.version>22.2.03</docmosis.version>
     <archunit.version>1.4.0</archunit.version>
-    <mockito.version>5.10.0</mockito.version>
-    <testcontainers.version>1.20.0</testcontainers.version>
+    <mockito.version>5.17.0</mockito.version>
+    <testcontainers.version>1.20.6</testcontainers.version>
     <pmd.version>7.12.0</pmd.version>
     <jackson.version>2.18.3</jackson.version>
     <oshi.version>6.8.0</oshi.version>
@@ -49,16 +49,18 @@
       <version>${oshi.version}</version>
     </dependency>
     
-    <!-- JSON Processing -->
+    <!-- JSON Processing - Currently not directly used but available for future -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
       <version>${jackson.version}</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>${jackson.version}</version>
+      <scope>compile</scope>
     </dependency>
     
     <!-- SpotBugs Annotations -->
