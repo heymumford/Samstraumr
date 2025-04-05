@@ -157,6 +157,8 @@ Examples:
 
 ### Documentation Commands
 
+#### Document Generation
+
 Generate documentation:
 
 ```bash
@@ -179,6 +181,37 @@ Examples:
 ./s8r docs ./my-docs               # Generate PDF docs in ./my-docs
 ./s8r docs ./my-docs docx          # Generate DOCX docs in ./my-docs  
 ```
+
+#### Documentation Integrity
+
+Check and maintain documentation integrity:
+
+```bash
+./s8r-docs <command>
+```
+
+Commands:
+- `check`: Run documentation integrity check (interactive)
+- `fix`: Automatically fix documentation issues
+- `report`: Generate documentation integrity report
+
+Examples:
+
+```bash
+./s8r-docs check        # Check documentation integrity
+./s8r-docs fix          # Automatically fix documentation issues
+./s8r-docs report       # Generate documentation integrity report only
+```
+
+This tool performs several checks on documentation files:
+- Verifies all links in markdown files reference existing files
+- Ensures consistency in section references
+- Validates that key sections and document structures are consistent
+- Checks for package reference consistency
+- Validates code examples use correct package names
+- Ensures consistent header format with copyright notices
+- Checks for kebab-case filenames in markdown files
+- Validates header hierarchy and conventions
 
 ## Help System
 
