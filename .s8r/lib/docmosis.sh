@@ -423,7 +423,7 @@ EOF
 
 # Generate documentation with Docmosis
 generate_docs() {
-  local output_dir="${1:-target/docs}"
+  local output_dir="${1:-${PROJECT_ROOT}/target/docs}"
   local format="${2:-pdf}"
   
   # Validate format
@@ -521,7 +521,7 @@ generate_docs() {
 
 # Fallback documentation generator using plain files
 generate_fallback_docs() {
-  local output_dir="${1:-target/docs}"
+  local output_dir="${1:-${PROJECT_ROOT}/target/docs}"
   local format="${2:-md}"
   
   docmosis_info "Using fallback document generator for format: $format"
@@ -605,7 +605,7 @@ EOF
 generate_change_report() {
   local from_version="$1"
   local to_version="$2"
-  local output_dir="${3:-target/reports}"
+  local output_dir="${3:-${PROJECT_ROOT}/target/reports}"
   
   # Validate required arguments
   if [ -z "$from_version" ] || [ -z "$to_version" ]; then
@@ -695,7 +695,7 @@ generate_change_report() {
 generate_fallback_change_report() {
   local from_version="$1"
   local to_version="$2"
-  local output_dir="${3:-target/reports}"
+  local output_dir="${3:-${PROJECT_ROOT}/target/reports}"
   
   docmosis_info "Using fallback change report generator"
   docmosis_info "From version: $from_version, To version: $to_version"

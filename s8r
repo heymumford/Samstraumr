@@ -477,7 +477,7 @@ function handle_report_command() {
   shift 2
   
   # Check for output directory argument
-  local output_dir="target/reports"
+  local output_dir="${PROJECT_ROOT}/target/reports"
   if [ $# -gt 0 ]; then
     output_dir="$1"
   fi
@@ -532,7 +532,8 @@ function handle_docs_command() {
   fi
   
   # Parse arguments
-  local output_dir="${1:-target/docs}"
+  # Default to PROJECT_ROOT/target/docs to ensure it's in the project's target directory
+  local output_dir="${1:-${PROJECT_ROOT}/target/docs}"
   local format="${2:-pdf}"
   
   # Check if Docmosis is available
