@@ -18,13 +18,11 @@ package org.s8r.app;
 import java.util.List;
 import java.util.Scanner;
 
-import org.s8r.Samstraumr;
 import org.s8r.application.dto.ComponentDto;
 import org.s8r.application.dto.MachineDto;
 import org.s8r.application.port.LoggerPort;
-import org.s8r.domain.identity.ComponentId;
-import org.s8r.domain.machine.MachineType;
-import org.s8r.infrastructure.logging.S8rLoggerFactory;
+import org.s8r.application.port.S8rFacade;
+import org.s8r.infrastructure.config.DependencyContainer;
 
 /**
  * A simple CLI application that demonstrates the S8r framework.
@@ -33,8 +31,8 @@ import org.s8r.infrastructure.logging.S8rLoggerFactory;
  * functionality, showing how to use the Samstraumr facade.
  */
 public class CliApplication {
-  private static final LoggerPort logger = S8rLoggerFactory.getInstance().getLogger(CliApplication.class);
-  private static final Samstraumr framework = Samstraumr.getInstance();
+  private static final LoggerPort logger = DependencyContainer.getInstance().get(LoggerPort.class);
+  private static final S8rFacade framework = DependencyContainer.getInstance().get(S8rFacade.class);
 
   /**
    * Main method.
@@ -108,8 +106,10 @@ public class CliApplication {
     String reason = scanner.nextLine().trim();
 
     try {
-      ComponentId id = framework.createComponent(reason);
-      System.out.println("Component created successfully: " + id.getShortId());
+      String id = framework.createComponent(reason);
+      // Display a shortened version of the ID
+      String shortId = id.length() > 8 ? id.substring(0, 8) : id;
+      System.out.println("Component created successfully: " + shortId);
     } catch (Exception e) {
       System.out.println("Error creating component: " + e.getMessage());
       logger.error("Error creating component", e);
@@ -147,9 +147,11 @@ public class CliApplication {
     String description = scanner.nextLine().trim();
 
     System.out.println("Available machine types:");
-    for (MachineType type : MachineType.values()) {
-      System.out.printf("- %s: %s%n", type.name(), type.getDescription());
-    }
+    System.out.println("- DATA_PROCESSOR: Processes data between components");
+    System.out.println("- CONNECTOR: Connects systems and components");
+    System.out.println("- CONTROL: Controls and manages other machines");
+    System.out.println("- GATEWAY: Provides an entry point to a system");
+    System.out.println("- TRANSFORMER: Transforms data between formats");
 
     System.out.print("Enter machine type: ");
     String typeStr = scanner.nextLine().trim();
@@ -191,8 +193,7 @@ public class CliApplication {
     String idStr = scanner.nextLine().trim();
 
     try {
-      ComponentId id = ComponentId.fromString(idStr, "Start");
-      framework.startMachine(id);
+      framework.startMachine(idStr);
       System.out.println("Machine started successfully");
     } catch (Exception e) {
       System.out.println("Error starting machine: " + e.getMessage());
@@ -205,8 +206,7 @@ public class CliApplication {
     String idStr = scanner.nextLine().trim();
 
     try {
-      ComponentId id = ComponentId.fromString(idStr, "Stop");
-      framework.stopMachine(id);
+      framework.stopMachine(idStr);
       System.out.println("Machine stopped successfully");
     } catch (Exception e) {
       System.out.println("Error stopping machine: " + e.getMessage());

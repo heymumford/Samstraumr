@@ -20,6 +20,7 @@ import java.util.List;
 import org.s8r.application.dto.ComponentDto;
 import org.s8r.application.dto.MachineDto;
 import org.s8r.application.port.LoggerPort;
+import org.s8r.application.port.S8rFacade;
 import org.s8r.application.service.ComponentService;
 import org.s8r.application.service.MachineService;
 import org.s8r.domain.identity.ComponentId;
@@ -35,7 +36,7 @@ import org.s8r.infrastructure.logging.S8rLoggerFactory;
  * complexity of the underlying implementation. It follows the Facade design pattern to provide a
  * high-level interface to the framework.
  */
-public class Samstraumr {
+public class Samstraumr implements S8rFacade {
   private static final Samstraumr instance = new Samstraumr();
   private final DependencyContainer container;
   private final LoggerPort logger;
@@ -78,31 +79,48 @@ public class Samstraumr {
 
   /**
    * Creates a new component.
+   * 
+   * <p>Internal method that returns the actual ComponentId.
    *
    * @param reason The reason for creating the component
    * @return The ID of the created component
    */
-  public ComponentId createComponent(String reason) {
+  private ComponentId createComponentInternal(String reason) {
     ComponentService service = container.get(ComponentService.class);
     return service.createComponent(reason);
   }
-
+  
+  @Override
+  public String createComponent(String reason) {
+    ComponentId id = createComponentInternal(reason);
+    return id.getIdString();
+  }
+  
   /**
    * Gets a component by ID.
+   * 
+   * <p>Internal method that accepts an actual ComponentId.
    *
    * @param componentId The component ID
    * @return The component DTO
    */
-  public ComponentDto getComponent(ComponentId componentId) {
+  private ComponentDto getComponentInternal(ComponentId componentId) {
     ComponentService service = container.get(ComponentService.class);
     return ComponentDto.fromDomain(service.getComponent(componentId).orElse(null));
   }
+  
+  @Override
+  public ComponentDto getComponent(String componentId) {
+    try {
+      ComponentId id = ComponentId.fromString(componentId, "Get Component");
+      return getComponentInternal(id);
+    } catch (IllegalArgumentException e) {
+      logger.error("Invalid component ID format: " + componentId, e);
+      return null;
+    }
+  }
 
-  /**
-   * Gets all components.
-   *
-   * @return A list of component DTOs
-   */
+  @Override
   public List<ComponentDto> getAllComponents() {
     ComponentService service = container.get(ComponentService.class);
     return service.getAllComponents().stream().map(ComponentDto::new).toList();
@@ -118,63 +136,83 @@ public class Samstraumr {
    * @param description The machine description
    * @return The created machine DTO
    */
-  public MachineDto createMachine(MachineType type, String name, String description) {
+  private MachineDto createMachineInternal(MachineType type, String name, String description) {
     MachineService service = container.get(MachineService.class);
     return service.createMachine(
         type, name, description, getConfiguration().get("machine.default.version", "1.0.0"));
   }
 
-  /**
-   * Creates a machine of the specified type.
-   *
-   * @param typeName The machine type name
-   * @param name The machine name
-   * @param description The machine description
-   * @return The created machine DTO
-   */
+  @Override
   public MachineDto createMachine(String typeName, String name, String description) {
     MachineService service = container.get(MachineService.class);
     return service.createMachineByType(typeName, name, description);
   }
 
   /**
-   * Gets a machine by ID.
+   * Gets a machine by ID (internal method).
    *
    * @param machineId The machine ID
    * @return The machine DTO
    */
-  public MachineDto getMachine(ComponentId machineId) {
+  private MachineDto getMachineInternal(ComponentId machineId) {
     MachineService service = container.get(MachineService.class);
     return service.getMachine(machineId);
   }
+  
+  @Override
+  public MachineDto getMachine(String machineId) {
+    try {
+      ComponentId id = ComponentId.fromString(machineId, "Get Machine");
+      return getMachineInternal(id);
+    } catch (IllegalArgumentException e) {
+      logger.error("Invalid machine ID format: " + machineId, e);
+      return null;
+    }
+  }
 
-  /**
-   * Gets all machines.
-   *
-   * @return A list of machine DTOs
-   */
+  @Override
   public List<MachineDto> getAllMachines() {
     MachineService service = container.get(MachineService.class);
     return service.getAllMachines();
   }
 
   /**
-   * Starts a machine.
+   * Starts a machine (internal method).
    *
    * @param machineId The machine ID
    */
-  public void startMachine(ComponentId machineId) {
+  private void startMachineInternal(ComponentId machineId) {
     MachineService service = container.get(MachineService.class);
     service.startMachine(machineId);
   }
+  
+  @Override
+  public void startMachine(String machineId) {
+    try {
+      ComponentId id = ComponentId.fromString(machineId, "Start Machine");
+      startMachineInternal(id);
+    } catch (IllegalArgumentException e) {
+      logger.error("Invalid machine ID format: " + machineId, e);
+    }
+  }
 
   /**
-   * Stops a machine.
+   * Stops a machine (internal method).
    *
    * @param machineId The machine ID
    */
-  public void stopMachine(ComponentId machineId) {
+  private void stopMachineInternal(ComponentId machineId) {
     MachineService service = container.get(MachineService.class);
     service.stopMachine(machineId);
+  }
+  
+  @Override
+  public void stopMachine(String machineId) {
+    try {
+      ComponentId id = ComponentId.fromString(machineId, "Stop Machine");
+      stopMachineInternal(id);
+    } catch (IllegalArgumentException e) {
+      logger.error("Invalid machine ID format: " + machineId, e);
+    }
   }
 }

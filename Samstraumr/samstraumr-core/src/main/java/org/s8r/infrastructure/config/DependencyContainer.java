@@ -19,11 +19,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.s8r.infrastructure.persistence.InMemoryComponentRepository;
+import org.s8r.Samstraumr;
 import org.s8r.application.port.ComponentRepository;
 import org.s8r.application.port.EventDispatcher;
 import org.s8r.application.port.LoggerFactory;
 import org.s8r.application.port.LoggerPort;
 import org.s8r.application.port.MachineRepository;
+import org.s8r.application.port.S8rFacade;
 import org.s8r.application.service.ComponentService;
 import org.s8r.application.service.DataFlowService;
 import org.s8r.application.service.MachineService;
@@ -161,6 +163,9 @@ public class DependencyContainer {
     // Create MonitoringFactory
     MonitoringFactory monitoringFactory = new MonitoringFactory(dataFlowService);
     register(MonitoringFactory.class, monitoringFactory);
+    
+    // Register Samstraumr as the implementation of S8rFacade
+    register(S8rFacade.class, Samstraumr.getInstance());
 
     logger.info("Initialized services");
   }
