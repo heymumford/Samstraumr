@@ -27,8 +27,13 @@ This document outlines the plan to address the quality issues identified in the 
 
 - [x] Create a package-info.java for the adapter package with explicit documentation about its temporary nature
 - [x] Document adapter exception from Clean Architecture dependency rules
-- [ ] Refactor adapter implementations to use interfaces from application layer
-- [ ] Create adapter-specific domain models to minimize direct dependencies
+- [x] Refactor adapter implementations to use interfaces from application layer
+- [x] Reduce direct dependencies on legacy code using reflection
+  - [x] Created ReflectiveEnvironmentConverter to interact with Environment classes through reflection
+  - [x] Created ReflectiveIdentityConverter to interact with Identity classes through reflection 
+  - [x] Created ReflectiveAdapterFactory to produce adapters without direct dependencies
+  - [x] Updated LegacyAdapterFactory to use reflective adapters with fallback to direct implementations
+  - [x] Updated DependencyContainer to register reflective adapters as primary implementation
 
 ### 2. Package Organization Standardization
 

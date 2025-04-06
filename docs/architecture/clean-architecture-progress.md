@@ -317,12 +317,37 @@ This refactoring demonstrates a clean separation of concerns:
 - Infrastructure layer implements how it's done (file system operations)
 - Adapter layer provides ways to invoke it (command-line interface)
 
+## Adapter Layer Refactoring (Completed April 6, 2025)
+
+The adapter layer has been successfully refactored to minimize direct dependencies on legacy code:
+
+1. **Reflective Environment Adapter**:
+   - Created `ReflectiveEnvironmentConverter` that works with any Environment implementation
+   - Uses reflection to interact with legacy Environment classes
+   - Removes direct compile-time dependencies on legacy code
+
+2. **Reflective Identity Adapter**:
+   - Created `ReflectiveIdentityConverter` that works with any Identity implementation
+   - Uses reflection to interact with legacy Identity classes
+   - Adapts between domain ComponentId and legacy identity objects
+
+3. **Adapter Factory**:
+   - Created `ReflectiveAdapterFactory` to produce adapters without direct dependencies
+   - Updated `LegacyAdapterFactory` to use reflective adapters with fallback mechanism
+   - Modified `DependencyContainer` to register reflective adapters as primary implementation
+
+This approach achieves several Clean Architecture goals:
+- Minimizes direct dependencies on legacy code
+- Isolates adapter implementation details from the domain layer
+- Provides a clean transition path as legacy code is gradually replaced
+- Improves testability by allowing mock implementations without legacy dependencies
+
 ## Next Steps
 
 1. Complete adapter layer independence from legacy code:
-   - Create domain interfaces for legacy types like TubeIdentity and Environment
-   - Use reflection or dynamic class loading to avoid direct imports
-   - Consider moving legacy code to a separate module
+   - Consider moving legacy code to a separate module or library
+   - Add more comprehensive error handling for reflection failures
+   - Create complete abstraction layers for all legacy components
 
 2. Fix event system issues:
    - ✓ Standardize event naming conventions (ComponentCreated vs ComponentCreatedEvent fixed)

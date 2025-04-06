@@ -93,17 +93,35 @@ public class DependencyContainer implements ServiceFactory {
   
   /** Sets up legacy adapters. */
   private void setupLegacyAdapters() {
+    LoggerPort logger = get(LoggerPort.class);
+    
     // Create and register the adapter resolver
     LegacyAdapterFactory adapterFactory = LegacyAdapterFactory.getInstance();
     register(LegacyAdapterResolver.class, adapterFactory);
     
-    // Register the specific converter implementations
-    register(org.s8r.domain.identity.LegacyEnvironmentConverter.class, 
-             adapterFactory.getTubeEnvironmentConverter());
-    register(org.s8r.domain.identity.LegacyIdentityConverter.class, 
-             adapterFactory.getTubeIdentityConverter());
+    // Create reflective adapter factory
+    try {
+      org.s8r.adapter.ReflectiveAdapterFactory reflectiveFactory = 
+          new org.s8r.adapter.ReflectiveAdapterFactory(logger);
+      
+      // Register reflective converters as the primary implementation
+      register(org.s8r.domain.identity.LegacyEnvironmentConverter.class, 
+               reflectiveFactory.getTubeEnvironmentConverter());
+      register(org.s8r.domain.identity.LegacyIdentityConverter.class, 
+               reflectiveFactory.getTubeIdentityConverter());
+      
+      logger.info("Initialized reflective legacy adapters");
+    } catch (Exception e) {
+      // Fall back to direct implementation if reflection fails
+      logger.warn("Failed to initialize reflective adapters, falling back to direct implementation: {}", e.getMessage());
+      
+      // Register the specific converter implementations
+      register(org.s8r.domain.identity.LegacyEnvironmentConverter.class, 
+               adapterFactory.getTubeEnvironmentConverter());
+      register(org.s8r.domain.identity.LegacyIdentityConverter.class, 
+               adapterFactory.getTubeIdentityConverter());
+    }
     
-    LoggerPort logger = get(LoggerPort.class);
     logger.info("Initialized legacy adapters");
   }
 

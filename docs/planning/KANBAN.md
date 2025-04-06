@@ -29,7 +29,7 @@ This document tracks the progress of tasks in the S8r project.
 - Implement core components in the new package structure
 - Execute TODO standardization across the codebase
 - Implement documentation CI integration (Phase 5 of documentation plan)
-- Fix Clean Architecture compliance issues (70% complete)
+- Fix Clean Architecture compliance issues (85% complete)
 - Standardize test tags and organization (tag structure defined, implementation in progress)
 
 ## Tasks Done
@@ -44,6 +44,7 @@ This document tracks the progress of tasks in the S8r project.
 - Complete research document on AI-enhanced testing strategies (see /docs/research/test-in-age-of-ai.md)
 - Complete package-info.java files for all packages (57/57 packages, 100% complete)
 - Refactor initialization package into Clean Architecture (application, infrastructure, adapter layers)
+- Refactor adapter layer to use reflection instead of direct dependencies on legacy code
 
 ## S8r Migration Roadmap
 

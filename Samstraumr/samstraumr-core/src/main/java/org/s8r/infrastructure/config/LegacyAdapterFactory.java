@@ -25,8 +25,9 @@ import org.s8r.domain.identity.LegacyIdentityConverter;
  * <p>This class provides access to adapters that convert between legacy and new
  * object representations, while maintaining clean architecture boundaries.
  * 
- * <p>Internal adapter implementations are lazy-loaded to prevent direct dependencies
- * on concrete adapter implementations from leaking into other parts of the code.
+ * <p>This implementation uses reflective adapters to avoid direct dependencies on
+ * legacy code, following Clean Architecture principles. The adapters use reflection
+ * to interact with legacy classes, removing compile-time dependencies.
  */
 public class LegacyAdapterFactory implements LegacyAdapterResolver {
     
@@ -36,6 +37,7 @@ public class LegacyAdapterFactory implements LegacyAdapterResolver {
     private LegacyEnvironmentConverter tubeEnvConverter;
     private LegacyIdentityConverter coreIdentityConverter;
     private LegacyIdentityConverter tubeIdentityConverter;
+    private org.s8r.adapter.ReflectiveAdapterFactory reflectiveFactory;
     
     private LegacyAdapterFactory() {
         // Private constructor to enforce singleton pattern
@@ -50,16 +52,42 @@ public class LegacyAdapterFactory implements LegacyAdapterResolver {
     public static LegacyAdapterFactory getInstance() {
         return INSTANCE;
     }
+    
+    /**
+     * Gets or creates the reflective adapter factory.
+     * 
+     * @return The reflective adapter factory
+     */
+    private org.s8r.adapter.ReflectiveAdapterFactory getReflectiveFactory() {
+        if (reflectiveFactory == null) {
+            try {
+                // Get the logger from the DependencyContainer
+                org.s8r.application.port.LoggerPort logger = 
+                    DependencyContainer.getInstance().getLogger(LegacyAdapterFactory.class);
+                
+                // Create the reflective factory
+                reflectiveFactory = new org.s8r.adapter.ReflectiveAdapterFactory(logger);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to create ReflectiveAdapterFactory", e);
+            }
+        }
+        return reflectiveFactory;
+    }
 
     @Override
     public LegacyEnvironmentConverter getCoreEnvironmentConverter() {
         if (coreEnvConverter == null) {
             try {
-                // Use reflection to create the adapter without direct dependency
-                Class<?> converterClass = Class.forName("org.s8r.adapter.CoreLegacyEnvironmentConverter");
-                coreEnvConverter = (LegacyEnvironmentConverter) converterClass.getDeclaredConstructor().newInstance();
+                // Try to use the reflective adapter first
+                coreEnvConverter = getReflectiveFactory().getCoreEnvironmentConverter();
             } catch (Exception e) {
-                throw new RuntimeException("Failed to create CoreLegacyEnvironmentConverter", e);
+                // Fall back to direct implementation if reflection fails
+                try {
+                    Class<?> converterClass = Class.forName("org.s8r.adapter.CoreLegacyEnvironmentConverter");
+                    coreEnvConverter = (LegacyEnvironmentConverter) converterClass.getDeclaredConstructor().newInstance();
+                } catch (Exception fallbackEx) {
+                    throw new RuntimeException("Failed to create CoreLegacyEnvironmentConverter", fallbackEx);
+                }
             }
         }
         return coreEnvConverter;
@@ -69,11 +97,16 @@ public class LegacyAdapterFactory implements LegacyAdapterResolver {
     public LegacyEnvironmentConverter getTubeEnvironmentConverter() {
         if (tubeEnvConverter == null) {
             try {
-                // Use reflection to create the adapter without direct dependency
-                Class<?> converterClass = Class.forName("org.s8r.adapter.TubeLegacyEnvironmentConverter");
-                tubeEnvConverter = (LegacyEnvironmentConverter) converterClass.getDeclaredConstructor().newInstance();
+                // Try to use the reflective adapter first
+                tubeEnvConverter = getReflectiveFactory().getTubeEnvironmentConverter();
             } catch (Exception e) {
-                throw new RuntimeException("Failed to create TubeLegacyEnvironmentConverter", e);
+                // Fall back to direct implementation if reflection fails
+                try {
+                    Class<?> converterClass = Class.forName("org.s8r.adapter.TubeLegacyEnvironmentConverter");
+                    tubeEnvConverter = (LegacyEnvironmentConverter) converterClass.getDeclaredConstructor().newInstance();
+                } catch (Exception fallbackEx) {
+                    throw new RuntimeException("Failed to create TubeLegacyEnvironmentConverter", fallbackEx);
+                }
             }
         }
         return tubeEnvConverter;
@@ -83,12 +116,17 @@ public class LegacyAdapterFactory implements LegacyAdapterResolver {
     public LegacyIdentityConverter getCoreIdentityConverter() {
         if (coreIdentityConverter == null) {
             try {
-                // Use reflection to create the adapter without direct dependency
-                Class<?> converterClass = Class.forName("org.s8r.adapter.CoreLegacyIdentityConverter");
-                coreIdentityConverter = (LegacyIdentityConverter) converterClass.getDeclaredConstructor()
-                    .newInstance(getCoreEnvironmentConverter());
+                // Try to use the reflective adapter first
+                coreIdentityConverter = getReflectiveFactory().getCoreIdentityConverter();
             } catch (Exception e) {
-                throw new RuntimeException("Failed to create CoreLegacyIdentityConverter", e);
+                // Fall back to direct implementation if reflection fails
+                try {
+                    Class<?> converterClass = Class.forName("org.s8r.adapter.CoreLegacyIdentityConverter");
+                    coreIdentityConverter = (LegacyIdentityConverter) converterClass.getDeclaredConstructor()
+                        .newInstance(getCoreEnvironmentConverter());
+                } catch (Exception fallbackEx) {
+                    throw new RuntimeException("Failed to create CoreLegacyIdentityConverter", fallbackEx);
+                }
             }
         }
         return coreIdentityConverter;
@@ -98,12 +136,17 @@ public class LegacyAdapterFactory implements LegacyAdapterResolver {
     public LegacyIdentityConverter getTubeIdentityConverter() {
         if (tubeIdentityConverter == null) {
             try {
-                // Use reflection to create the adapter without direct dependency
-                Class<?> converterClass = Class.forName("org.s8r.adapter.TubeLegacyIdentityConverter");
-                tubeIdentityConverter = (LegacyIdentityConverter) converterClass.getDeclaredConstructor()
-                    .newInstance(getTubeEnvironmentConverter());
+                // Try to use the reflective adapter first
+                tubeIdentityConverter = getReflectiveFactory().getTubeIdentityConverter();
             } catch (Exception e) {
-                throw new RuntimeException("Failed to create TubeLegacyIdentityConverter", e);
+                // Fall back to direct implementation if reflection fails
+                try {
+                    Class<?> converterClass = Class.forName("org.s8r.adapter.TubeLegacyIdentityConverter");
+                    tubeIdentityConverter = (LegacyIdentityConverter) converterClass.getDeclaredConstructor()
+                        .newInstance(getTubeEnvironmentConverter());
+                } catch (Exception fallbackEx) {
+                    throw new RuntimeException("Failed to create TubeLegacyIdentityConverter", fallbackEx);
+                }
             }
         }
         return tubeIdentityConverter;
