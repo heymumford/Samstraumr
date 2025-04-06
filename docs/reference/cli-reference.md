@@ -39,6 +39,9 @@ Options:
 - `-c, --clean`: Clean before building
 - `-p, --profile <profile>`: Use specific Maven profile
 - `--skip-quality`: Skip quality checks
+- `--ci`: Run local CI checks after build
+- `-v, --verbose`: Enable verbose output
+- `-p, --parallel`: Build in parallel where possible
 
 Examples:
 
@@ -47,6 +50,8 @@ Examples:
 ./s8r build test              # Run tests
 ./s8r build -c test           # Clean and run tests
 ./s8r build -p atl-tests test # Run tests with ATL profile
+./s8r build --ci              # Fast build with local CI check
+./s8r build -v -p test        # Run tests in parallel with verbose output
 ```
 
 ### Test Commands
@@ -153,6 +158,43 @@ Examples:
 ./s8r quality check            # Run all quality checks
 ./s8r quality spotless -f      # Run Spotless and fix issues
 ./s8r quality encoding -v      # Check encodings with verbose output
+```
+
+### CI Commands
+
+Run GitHub Actions workflows locally:
+
+```bash
+./s8r-ci [options]
+```
+
+Options:
+- `-w, --workflow FILE`: Workflow file to run (default: samstraumr-pipeline.yml)
+- `-j, --job JOB_ID`: Specific job to run (default: all jobs)
+- `-e, --event EVENT`: Event type to trigger (default: push)
+- `-d, --dry-run`: Show what would be run without executing
+- `-v, --verbose`: Enable verbose output
+
+Examples:
+
+```bash
+./s8r-ci                        # Run the default CI pipeline
+./s8r-ci -j basic-verification  # Run only the basic verification job
+./s8r-ci -w smoke-test.yml      # Run the smoke test workflow
+./s8r-ci -e pull_request        # Trigger as pull_request event
+./s8r-ci --dry-run              # Show what would be run without executing
+```
+
+The CI tool uses [nektos/act](https://github.com/nektos/act) to run GitHub Actions workflows locally. This enables you to:
+- Test CI pipelines before pushing to GitHub
+- Debug workflow issues locally
+- Validate workflow configuration changes
+- Speed up CI development cycle
+
+You can also run CI checks after building:
+
+```bash
+./s8r build fast --ci           # Fast build followed by local CI check
 ```
 
 ### Documentation Commands

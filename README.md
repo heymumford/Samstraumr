@@ -1,7 +1,7 @@
 
 # Samstraumr: Adaptive Resilient Software Framework
 
-[![Version](https://img.shields.io/badge/version-2.1.0-blue)](https://github.com/heymumford/Samstraumr/releases) 
+[![Version](https://img.shields.io/badge/version-2.2.0-blue)](https://github.com/heymumford/Samstraumr/releases) 
 [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) 
 [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/) 
@@ -109,7 +109,7 @@ Maven dependency:
 <dependency>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-core</artifactId>
-    <version>2.1.0</version>
+    <version>2.2.0</version>
 </dependency>
 ```
 
@@ -179,11 +179,12 @@ Samstraumr provides a unified CLI for all operations:
 ./s8r <command> [options] [arguments]
 
 # Example commands
-./s8r build fast                  # Fast build
-./s8r test unit --parallel        # Run unit tests in parallel
-./s8r version bump minor          # Bump minor version
-./s8r docs target/docs pdf        # Generate PDF documentation
-./s8r-docs check                  # Check documentation integrity
+./s8r build fast --ci            # Fast build with local CI check
+./s8r test unit --parallel       # Run unit tests in parallel
+./s8r version bump minor         # Bump minor version
+./s8r docs target/docs pdf       # Generate PDF documentation
+./s8r-docs check                 # Check documentation integrity
+./s8r-ci --dry-run               # Test CI pipeline locally
 ```
 
 | Command | Description |
@@ -193,6 +194,7 @@ Samstraumr provides a unified CLI for all operations:
 | `./s8r version <cmd>` | Manage versions (get, bump, set, fix) |
 | `./s8r docs [dir] [fmt]` | Generate documentation with Docmosis |
 | `./s8r-docs <cmd>` | Check documentation integrity (check, fix, report) |
+| `./s8r-ci [options]` | Run GitHub Actions workflows locally using nektos/act |
 | `./s8r docmosis <cmd>` | Manage Docmosis integration (setup, test, install) |
 | `./s8r report <from> <to>` | Generate change management reports |
 
