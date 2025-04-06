@@ -9,15 +9,11 @@ remain exclusively with the copyright holder listed above.
 Licensed under the Mozilla Public License 2.0
 -->
 
+# REDIRECT NOTICE
 
-# REDIRECTION NOTICE
+This file has been consolidated with the canonical version at:
 
-> **⚠️ This document has moved!**
->
-> This document has been moved to a new location as part of our documentation reorganization.
->
-> Please update your bookmarks to the new location:
->
-> [Documentation Standards](../reference/standards/documentation-standards.md)
->
-> Redirecting you in 3 seconds...
+[documentation-standards.md](docs/reference/standards/documentation-standards.md)
+
+Please update any links or references to use the canonical version above.
+

@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<ruleset name="Samstraumr PMD Rules"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <description>
+        Custom PMD ruleset for Samstraumr project
+    </description>
+
+    <\!-- Best Practices -->
+    <rule ref="category/java/bestpractices.xml">
+        <exclude name="GuardLogStatement"/>
+        <exclude name="JUnitTestContainsTooManyAsserts"/>
+        <exclude name="JUnitTestsShouldIncludeAssert"/> <\!-- Cucumber tests often don't have direct asserts -->
+        <exclude name="JUnitAssertionsShouldIncludeMessage"/>
+        <exclude name="AvoidUsingHardCodedIP"/>
+        <exclude name="ConstantsInInterface"/>
+    </rule>
+
+    <\!-- Code Style -->
+    <rule ref="category/java/codestyle.xml">
+        <exclude name="AtLeastOneConstructor"/>
+        <exclude name="LocalVariableCouldBeFinal"/>
+        <exclude name="MethodArgumentCouldBeFinal"/>
+        <exclude name="OnlyOneReturn"/>
+        <exclude name="ShortVariable"/>
+        <exclude name="LongVariable"/>
+        <exclude name="CommentDefaultAccessModifier"/>
+        <exclude name="DefaultPackage"/>
+        <exclude name="CallSuperInConstructor"/>
+        <exclude name="UselessParentheses"/>
+        <exclude name="FieldNamingConventions"/> <\!-- We handle naming in CheckStyle -->
+        <exclude name="MethodNamingConventions"/> <\!-- We handle naming in CheckStyle -->
+        <exclude name="ClassNamingConventions"/> <\!-- We handle naming in CheckStyle -->
+    </rule>
+
+    <\!-- Design -->
+    <rule ref="category/java/design.xml">
+        <exclude name="LawOfDemeter"/>
+        <exclude name="LoosePackageCoupling"/>
+        <exclude name="DataClass"/>
+        <exclude name="ExcessiveImports"/>
+        <exclude name="TooManyMethods"/>
+        <exclude name="TooManyFields"/>
+        <exclude name="CyclomaticComplexity"/> <\!-- We'll use JaCoCo complexity metrics instead -->
+    </rule>
+    
+    <\!-- Documentation -->
+    <rule ref="category/java/documentation.xml">
+        <exclude name="CommentSize"/>
+    </rule>
+    
+    <\!-- Error Prone -->
+    <rule ref="category/java/errorprone.xml">
+        <exclude name="BeanMembersShouldSerialize"/> <\!-- Too many false positives with modern frameworks -->
+        <exclude name="NullAssignment"/> <\!-- Sometimes explicitly assigning null is useful -->
+        <exclude name="AvoidFieldNameMatchingMethodName"/> <\!-- Too restrictive -->
+        <exclude name="AvoidDuplicateLiterals"/> <\!-- Too many false positives with test data -->
+        <exclude name="DataflowAnomalyAnalysis"/> <\!-- Too many false positives -->
+    </rule>
+    
+    <\!-- Multithreading -->
+    <rule ref="category/java/multithreading.xml">
+        <exclude name="UseConcurrentHashMap"/> <\!-- Not always appropriate -->
+        <exclude name="DoNotUseThreads"/> <\!-- We might need threads -->
+    </rule>
+    
+    <\!-- Performance -->
+    <rule ref="category/java/performance.xml">
+        <exclude name="AvoidInstantiatingObjectsInLoops"/> <\!-- Sometimes necessary -->
+        <exclude name="ConsecutiveAppendsShouldReuse"/> <\!-- Too strict -->
+    </rule>
+    
+    <\!-- Security -->
+    <rule ref="category/java/security.xml"/>
+
+    <\!-- Customize some rules -->
+    <rule ref="category/java/design.xml/CouplingBetweenObjects">
+        <properties>
+            <property name="threshold" value="25"/>
+        </properties>
+    </rule>
+    
+    <rule ref="category/java/design.xml/GodClass">
+        <properties>
+            <property name="booleanOperatorHighlightFlag" value="true"/>
+        </properties>
+    </rule>
+    
+    <rule ref="category/java/documentation.xml/CommentRequired">
+        <properties>
+            <property name="fieldCommentRequirement" value="Ignored"/>
+            <property name="protectedMethodCommentRequirement" value="Required"/>
+            <property name="publicMethodCommentRequirement" value="Required"/>
+        </properties>
+    </rule>
+</ruleset>

@@ -124,6 +124,8 @@ Develop metrics specifically for evaluating AI-generated tests:
 ### 4. Practical Implementation Plan
 
 1. **Phase 1**: Experiment with AI-generated unit tests for core components
+   - Initial implementation complete with [ATL test discovery](../testing/atl-test-discovery.md) system
+   - Automated test mapping to help identify coverage gaps
 2. **Phase 2**: Develop templates and patterns for AI to generate composite tests
 3. **Phase 3**: Create domain-specific guidance for machine orchestration test generation
 4. **Phase 4**: Integrate AI assistance into the regular development workflow

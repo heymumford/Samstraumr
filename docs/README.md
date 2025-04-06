@@ -1,116 +1,61 @@
-<!-- 
-Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+<!--
+Copyright (c) 2025 Eric C. Mumford (@heymumford)
+
+This software was developed with analytical assistance from AI tools 
+including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+which were used as paid services. All intellectual property rights 
+remain exclusively with the copyright holder listed above.
+
+Licensed under the Mozilla Public License 2.0
 -->
 
-# S8r Documentation
+# Samstraumr Documentation
 
-Welcome to the S8r framework documentation. S8r (pronounced "sater") is a component-based architecture that provides a unified approach to building software systems with self-awareness and adaptive capabilities.
+This directory contains all documentation for the Samstraumr project. The documentation is organized into a structure that follows the project's conceptual model.
 
-## About S8r
+## Documentation Structure
 
-S8r represents a fundamental shift in software architecture:
+- **reference/** - Canonical reference documentation
+  - **standards/** - Coding and documentation standards
+  - **release/** - Release notes and changelogs
+  
+- **concepts/** - Core concepts and architectural principles
+  
+- **guides/** - How-to guides and tutorials
+  - **migration/** - Migration guides for version upgrades
+  
+- **architecture/** - Architectural documentation
+  - **clean/** - Clean architecture implementation details
+  - **event/** - Event-driven architecture documentation
+  - **patterns/** - Design patterns used in the project
+  - **monitoring/** - Monitoring and observability
+  
+- **testing/** - Testing strategy and methodologies
+  
+- **plans/** - Current planning documents
+  
+- **research/** - Research documents and proposals
 
-- **Component-Based Design**: Build systems from self-contained, aware components
-- **Unified State Management**: Single state model for both lifecycle and operational status
-- **Identity & Awareness**: Components with clear identities and contextual awareness
-- **Hierarchical Composition**: Build complex systems through Composites and Machines
-- **Test-Driven Development**: Comprehensive testing framework with BDD support
+## Standards for Documentation
 
-## Documentation Map
+All documentation follows these standards:
 
-### 🚀 Getting Started
+1. Files are named using kebab-case (e.g., )
+2. Each directory has a README.md explaining its purpose
+3. Documentation follows Markdown syntax standards
+4. Code examples use appropriate syntax highlighting
+5. Documentation is kept up-to-date with code changes
 
-- [Introduction](guides/introduction.md) - Overview of S8r concepts and benefits
-- [Prerequisites](guides/prerequisites.md) - System requirements and dependencies
-- [Getting Started](guides/getting-started.md) - Setting up S8r in your environment
-- [Maven Structure](guides/MavenStructureGuide.md) - Organization and build process
+## Canonical File Locations
 
-### 🔍 Core Concepts
+To avoid duplication, these are the canonical locations for common documentation topics:
 
-- [Core Architecture](concepts/core-concepts.md) - Component model fundamentals
-- [State Management](concepts/state-management.md) - Unified lifecycle states
-- [Identity System](concepts/identity-addressing.md) - Component identity
-- [Composites & Machines](concepts/composites-and-machines.md) - Building complex structures
+- Folder Structure: `reference/folder-structure.md`
+- Maven Structure: `reference/maven-structure.md`
+- Testing Strategy: `testing/testing-strategy.md`
+- Java Standards: `reference/standards/java-naming-standards.md`
+- Documentation Standards: `reference/standards/documentation-standards.md`
+- Logging Standards: `reference/standards/logging-standards.md`
 
-### 📘 Guides
+Please update references in your files to point to these canonical locations.
 
-- [Composition Patterns](guides/composition-strategies.md) - Component composition strategies
-- [Migration from Samstraumr](guides/migration/SamstraumrToS8rMigration.md) - Upgrading to S8r
-- [Common Component Patterns](guides/component-patterns.md) - Design patterns for components
-
-### 📝 Reference
-
-- [API Reference](reference/api-reference.md) - Complete API documentation
-- [Configuration](reference/configuration-reference.md) - Configuration options
-- [Glossary](reference/glossary.md) - Terminology and definitions
-- [Examples](reference/s8r-examples.md) - Code examples and use cases
-
-### 🧪 Development
-
-- [Testing Strategy](dev/test-strategy.md) - Comprehensive testing approach
-- [BDD with Cucumber](dev/test-bdd-cucumber.md) - Behavior-driven development
-- [Contributing](contribution/contributing.md) - How to contribute to S8r
-- [Code Standards](contribution/code-standards.md) - Coding standards and style
-- [Clean Architecture](architecture/clean-architecture-migration.md) - Clean Architecture migration plan
-
-## Quick Reference
-
-### Component Creation
-
-```java
-// Create a basic component
-Environment env = new Environment.Builder("test-env")
-    .withParameter("key", "value")
-    .build();
-    
-Component component = Component.create("reason", env);
-
-// Create a child component
-Component child = Component.createChild("child-reason", env, component);
-```
-
-### State Management
-
-```java
-// Check component state
-if (component.getState() == State.READY) {
-    component.setState(State.ACTIVE);
-}
-
-// Handle termination
-component.terminate();
-```
-
-### Composite Construction
-
-```java
-// Create a composite
-Composite composite = CompositeFactory.create("validation-flow", env);
-
-// Add components
-composite.addComponent("validator", validatorComponent);
-composite.addComponent("processor", processorComponent);
-
-// Connect components
-composite.connect("validator", "processor");
-```
-
-### Machine Orchestration
-
-```java
-// Create a machine
-Machine machine = MachineFactory.create("data-pipeline", env);
-
-// Register composites
-machine.registerComposite(inputComposite);
-machine.registerComposite(processingComposite);
-machine.registerComposite(outputComposite);
-```
-
-## Key Documentation
-
-- **New to S8r**: Start with [Introduction](guides/introduction.md)
-- **Migrating from Samstraumr**: See [Migration Guide](guides/migration/SamstraumrToS8rMigration.md)
-- **Contributing**: Check [Contributing Guide](contribution/contributing.md)
-- **Architecture**: See [Core Concepts](concepts/core-concepts.md)
-- **Clean Architecture**: See [Migration Plan](architecture/clean-architecture-migration.md)

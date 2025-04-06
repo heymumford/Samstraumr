@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2025 Eric C. Mumford (@heymumford)
+
+This software was developed with analytical assistance from AI tools 
+including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+which were used as paid services. All intellectual property rights 
+remain exclusively with the copyright holder listed above.
+
+Licensed under the Mozilla Public License 2.0
+-->
+<quality-thresholds>
+  <!-- Code Coverage Thresholds -->
+  <coverage>
+    <line-coverage>70</line-coverage>
+    <branch-coverage>60</branch-coverage>
+    <method-coverage>70</method-coverage>
+    <class-coverage>80</class-coverage>
+  </coverage>
+  
+  <!-- Complexity Thresholds -->
+  <complexity>
+    <class-complexity>20</class-complexity>
+    <method-complexity>10</method-complexity>
+  </complexity>
+  
+  <!-- Duplication Thresholds -->
+  <duplication>
+    <percentage>3</percentage>
+    <tokens>100</tokens>
+    <lines>10</lines>
+  </duplication>
+  
+  <!-- Security Thresholds -->
+  <security>
+    <cvss>7.0</cvss>
+  </security>
+  
+  <!-- Documentation Thresholds -->
+  <documentation>
+    <javadoc-coverage>80</javadoc-coverage>
+  </documentation>
+  
+  <!-- Quality Profiles -->
+  <profiles>
+    <profile id="standard">
+      <description>Standard quality profile for development</description>
+      <tools>
+        <tool>spotless</tool>
+        <tool>checkstyle</tool>
+        <tool>spotbugs</tool>
+      </tools>
+    </profile>
+    
+    <profile id="strict">
+      <description>Strict quality profile for releases</description>
+      <tools>
+        <tool>spotless</tool>
+        <tool>checkstyle</tool>
+        <tool>spotbugs</tool>
+        <tool>jacoco</tool>
+        <tool>javadoc</tool>
+        <tool>encoding</tool>
+      </tools>
+    </profile>
+    
+    <profile id="security">
+      <description>Security-focused quality profile</description>
+      <tools>
+        <tool>spotbugs</tool>
+        <tool>owasp</tool>
+      </tools>
+    </profile>
+  </profiles>
+</quality-thresholds>

@@ -210,6 +210,8 @@ run_tests() {
       ;;
     atl)
       mvn_args+=("-Dtest=RunATLTests")
+      # Explicitly ensure tests run with @ATL tag
+      mvn_args+=("-Dgroups=ATL")
       ;;
     *)
       mvn_args+=("-Dtest=RunCucumberTest")

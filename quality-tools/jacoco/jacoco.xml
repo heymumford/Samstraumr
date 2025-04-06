@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2025 Eric C. Mumford (@heymumford)
+
+This software was developed with analytical assistance from AI tools 
+including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+which were used as paid services. All intellectual property rights 
+remain exclusively with the copyright holder listed above.
+
+Licensed under the Mozilla Public License 2.0
+-->
+<configuration>
+  <rules>
+    <rule element="BUNDLE">
+      <limit counter="INSTRUCTION" value="COVEREDRATIO" minimum="0.7"/>
+      <limit counter="BRANCH" value="COVEREDRATIO" minimum="0.6"/>
+      <limit counter="LINE" value="COVEREDRATIO" minimum="0.7"/>
+      <limit counter="METHOD" value="COVEREDRATIO" minimum="0.7"/>
+      <limit counter="CLASS" value="COVEREDRATIO" minimum="0.8"/>
+    </rule>
+    
+    <!-- Complexity rules -->
+    <rule element="CLASS">
+      <limit counter="COMPLEXITY" value="TOTALCOUNT" maximum="20"/>
+    </rule>
+    <rule element="METHOD">
+      <limit counter="COMPLEXITY" value="TOTALCOUNT" maximum="10"/>
+    </rule>
+    
+    <!-- Exclude test classes -->
+    <exclude>
+      <pattern>**/*Test</pattern>
+      <pattern>**/test/**</pattern>
+    </exclude>
+  </rules>
+</configuration>

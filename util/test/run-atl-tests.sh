@@ -7,26 +7,29 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
-# Source the configuration file
-if [ -f "${PROJECT_ROOT}/.samstraumr.config" ]; then
-  source "$(cd "$(dirname "${BASH_SOURCE[0]}")" source "${PROJECT_ROOT}/.samstraumr.configsource "${PROJECT_ROOT}/.samstraumr.config pwd)/../../.samstraumr/config.sh""
-else
-  echo "Configuration file not found: ${PROJECT_ROOT}/.samstraumr.config"
-  exit 1
-fi
+# Define color codes for terminal output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+RESET='\033[0m' # No Color
 
-echo -e "\033[0;34mRunning Above-The-Line (ATL) tests\033[0m"
+# Configuration variables
+CORE_MODULE="Samstraumr/samstraumr-core"
+ATL_PROFILE="atl-tests"
+CUCUMBER_REPORT="target/atl-reports/cucumber.html"
+
+echo -e "${BLUE}Running Above-The-Line (ATL) tests${RESET}"
 echo "These are the critical tests that must pass for the build to be considered valid."
 
 # Run the tests with the ATL profile
-cd "${PROJECT_ROOT}" && mvn test -f "${SAMSTRAUMR_CORE_MODULE}/pom.xml" -P "${SAMSTRAUMR_ATL_PROFILE}" ${SAMSTRAUMR_RUN_TESTS}
+cd "${PROJECT_ROOT}" && mvn test -f "${CORE_MODULE}/pom.xml" -P "${ATL_PROFILE}" -Dtest=RunATLTests -DskipTests=false
 
 # Check the result
 if [ $? -eq 0 ]; then
-  echo -e "\033[0;32mATL tests passed successfully\033[0m"
-  echo "View the Cucumber report at: ${SAMSTRAUMR_CUCUMBER_REPORT}"
+  echo -e "${GREEN}ATL tests passed successfully${RESET}"
+  echo "View the Cucumber report at: ${CUCUMBER_REPORT}"
 else
-  echo -e "\033[0;31mATL tests failed\033[0m"
+  echo -e "${RED}ATL tests failed${RESET}"
   echo "Please fix the failing tests before proceeding."
   exit 1
 fi

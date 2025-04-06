@@ -15,21 +15,36 @@
 
 package org.s8r.tube;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.Test;
+import org.junit.platform.suite.api.IncludeTags;
+import org.junit.platform.suite.api.SelectPackages;
+import org.junit.platform.suite.api.Suite;
+import org.junit.platform.suite.api.SuiteDisplayName;
 
 /**
- * Placeholder for ATL test runner.
+ * Above-The-Line (ATL) test runner for executing critical tests that must pass for every build.
  *
- * <p>This is a temporary placeholder. For a full Cucumber integration, see the instructions in
- * CUCUMBER_INTEGRATION.md.
+ * <p>This runner discovers and executes all tests annotated with @ATL across the codebase. These
+ * tests are considered critical to the functioning of the system and must pass for the build
+ * to be considered valid.
+ *
+ * <p>ATL tests have the following characteristics:
+ * <ul>
+ *   <li>Fast - They execute quickly to provide immediate feedback
+ *   <li>Reliable - They produce consistent results without flakiness
+ *   <li>Critical - They verify core functionality essential to the system
+ *   <li>High Priority - They block the build if failing
+ * </ul>
  */
+@Suite
+@SuiteDisplayName("S8r Above-The-Line Tests")
+@SelectPackages({
+    "org.s8r.tube", 
+    "org.s8r.component", 
+    "org.s8r.core.tube", 
+    "org.s8r.domain",
+    "org.s8r.test"
+})
+@IncludeTags("ATL")
 public class RunATLTests {
-
-  @Test
-  public void atlTest() {
-    System.out.println("ATL test placeholder running!");
-    assertTrue(true, "ATL test placeholder passed");
-  }
+  // This class is intentionally empty. It is used only as a holder for the annotations above.
 }
