@@ -1,0 +1,1677 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r-ai-test: AI-Enhanced Testing Framework for Samstraumr
+# Implements concepts from "AI-Enhanced Testing Integration for Samstraumr"
+#==============================================================================
+set -e
+
+# Find repository root
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel)}"
+
+# Terminal colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+# Functions for prettier output
+info() { echo -e "${BLUE}$1${RESET}"; }
+success() { echo -e "${GREEN}$1${RESET}"; }
+error() { echo -e "${RED}Error: $1${RESET}" >&2; exit 1; }
+warn() { echo -e "${YELLOW}Warning: $1${RESET}" >&2; }
+highlight() { echo -e "${PURPLE}$1${RESET}"; }
+detail() { echo -e "${CYAN}$1${RESET}"; }
+
+# Determine Maven settings
+MVN_OPTS=""
+if [ -n "$MAVEN_MEMORY_OPTS" ]; then
+  MVN_OPTS="$MAVEN_MEMORY_OPTS"
+else
+  MVN_OPTS="-Xmx1g"
+fi
+export MAVEN_OPTS="$MVN_OPTS"
+
+# Define data collection directory
+DATA_DIR="${PROJECT_ROOT}/.s8r/ai-test-data"
+
+# Parse arguments
+parse_args() {
+  MODE="analyze"
+  TEST_TYPE="all"
+  VERBOSE=false
+  COLLECT_DATA=true
+  ML_ENABLED=true
+  OUTPUT_FILE=""
+  TARGET_COMPONENT=""
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -v|--verbose)
+        VERBOSE=true
+        shift
+        ;;
+      --no-data-collection)
+        COLLECT_DATA=false
+        shift
+        ;;
+      --no-ml)
+        ML_ENABLED=false
+        shift
+        ;;
+      -o|--output)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          OUTPUT_FILE="$2"
+          shift 2
+        else
+          error "Output file path missing after -o/--output"
+        fi
+        ;;
+      -c|--component)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          TARGET_COMPONENT="$2"
+          shift 2
+        else
+          error "Component name missing after -c/--component"
+        fi
+        ;;
+      -h|--help)
+        show_help
+        exit 0
+        ;;
+      *)
+        if [[ "$1" == "analyze" || "$1" == "generate" || "$1" == "prioritize" || "$1" == "smart-run" || "$1" == "predict-failures" || "$1" == "visualize" ]]; then
+          MODE="$1"
+        else
+          TEST_TYPE="$1"
+        fi
+        shift
+        ;;
+    esac
+  done
+}
+
+# Display help information
+show_help() {
+  echo -e "${BOLD}Samstraumr AI-Enhanced Test Framework${RESET}"
+  echo
+  echo "Usage: ./s8r-ai-test [mode] [test-type] [options]"
+  echo
+  echo "Modes:"
+  echo "  analyze               Analyze test results to identify patterns (default)"
+  echo "  generate              Generate test scenarios based on component patterns"
+  echo "  prioritize            Prioritize tests based on risk analysis"
+  echo "  smart-run             Run tests with AI-driven selection"
+  echo "  predict-failures      Predict likely failure points"
+  echo "  visualize             Visualize test coverage and component relationships"
+  echo
+  echo "Test Types:"
+  echo "  Same as s8r-test (component, composite, machine, etc.)"
+  echo 
+  echo "Options:"
+  echo "  -v, --verbose           Enable verbose output"
+  echo "  --no-data-collection    Disable data collection"
+  echo "  --no-ml                 Disable machine learning features"
+  echo "  -c, --component <name>  Target specific component or composite"
+  echo "  -o, --output <file>     Write output to file"
+  echo "  -h, --help              Show this help message"
+  echo
+  echo "Examples:"
+  echo "  ./s8r-ai-test                       # Analyze all test results"
+  echo "  ./s8r-ai-test generate component    # Generate component test scenarios"
+  echo "  ./s8r-ai-test prioritize machine    # Prioritize machine tests"
+  echo "  ./s8r-ai-test -c DataProcessor      # Focus on specific component"
+}
+
+# Function to check if machine learning tools are available
+check_ml_tools() {
+  if ! command -v python3 &> /dev/null; then
+    warn "Python 3 not found, disabling ML features"
+    ML_ENABLED=false
+    return 1
+  fi
+  
+  # Check for basic analysis libraries via a simple Python command
+  if ! python3 -c "import pandas" &> /dev/null; then
+    warn "Python pandas not found, disabling ML features"
+    warn "Consider installing with: pip install pandas matplotlib scikit-learn"
+    ML_ENABLED=false
+    return 1
+  fi
+  
+  return 0
+}
+
+# Function to collect test execution data
+collect_data() {
+  local test_type="$1"
+  
+  info "Collecting test data for $test_type tests..."
+  
+  # Create data directory if it doesn't exist
+  mkdir -p "$DATA_DIR"
+  
+  # Define a unique run ID
+  RUN_ID=$(date +%Y%m%d%H%M%S)
+  
+  # Initialize collection log file
+  COLLECTION_LOG="$DATA_DIR/run_${RUN_ID}_${test_type}.log"
+  
+  # Save test metadata
+  echo "RUN_ID=$RUN_ID" > "$COLLECTION_LOG"
+  echo "TEST_TYPE=$test_type" >> "$COLLECTION_LOG"
+  echo "TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$COLLECTION_LOG"
+  
+  # Prepare Maven command to run tests with test data collection
+  local mvn_args=("test")
+  
+  # Map test type to profile
+  if [[ "$test_type" != "all" ]]; then
+    local profile=$(echo "$test_type-tests" | tr '[:upper:]' '[:lower:]')
+    mvn_args+=("-P$profile")
+  fi
+  
+  # Add data collection parameters
+  mvn_args+=("-Dsamstraumr.datacollection.enabled=true") 
+  mvn_args+=("-Dsamstraumr.datacollection.runid=$RUN_ID")
+  mvn_args+=("-Dsamstraumr.datacollection.outdir=$DATA_DIR")
+  
+  # Run tests with data collection
+  cd "$PROJECT_ROOT"
+  info "Running tests with data collection enabled..."
+  if $VERBOSE; then
+    mvn "${mvn_args[@]}"
+  else
+    mvn -q "${mvn_args[@]}"
+  fi
+  
+  # Process collected data
+  info "Processing collected data..."
+  
+  # Copy log files to data directory for analysis
+  find "$PROJECT_ROOT" -name "*.log" -type f -mtime -1 -exec cp {} "$DATA_DIR/" \;
+  
+  success "Data collection complete for run ID: $RUN_ID"
+  echo "$RUN_ID" > "$DATA_DIR/last_run_id"
+}
+
+# Function to analyze test results using Python
+analyze_test_data() {
+  local test_type="$1"
+  local run_id="$2"
+  
+  if [ -z "$run_id" ] && [ -f "$DATA_DIR/last_run_id" ]; then
+    run_id=$(cat "$DATA_DIR/last_run_id")
+  fi
+  
+  if [ -z "$run_id" ]; then
+    error "No run ID specified and no recent runs found"
+  fi
+  
+  info "Analyzing test data from run $run_id..."
+  
+  # Create Python analysis script
+  local ANALYSIS_SCRIPT="$DATA_DIR/analyze_${run_id}.py"
+  
+  cat > "$ANALYSIS_SCRIPT" << 'EOF'
+import os
+import sys
+import glob
+import re
+import json
+import pandas as pd
+import matplotlib.pyplot as plt
+from collections import defaultdict, Counter
+
+# Get run ID from arguments
+run_id = sys.argv[1]
+test_type = sys.argv[2]
+data_dir = sys.argv[3]
+target_component = sys.argv[4] if len(sys.argv) > 4 else None
+
+# Function to parse log files
+def parse_logs(run_id):
+    log_files = glob.glob(os.path.join(data_dir, f"*{run_id}*.log"))
+    
+    # Data structures
+    state_transitions = []
+    execution_times = defaultdict(list)
+    errors = []
+    components = set()
+    
+    for log_file in log_files:
+        with open(log_file, 'r') as f:
+            lines = f.readlines()
+            
+        # Process each line
+        for line in lines:
+            # Extract state transitions
+            state_match = re.search(r'State changed: (\w+) -> (\w+)', line)
+            if state_match:
+                from_state, to_state = state_match.groups()
+                component_match = re.search(r'Component\[id=([a-f0-9-]+)', line)
+                component_id = component_match.group(1) if component_match else "unknown"
+                components.add(component_id)
+                state_transitions.append({
+                    'component_id': component_id,
+                    'from_state': from_state,
+                    'to_state': to_state,
+                    'timestamp': extract_timestamp(line)
+                })
+            
+            # Extract execution times
+            time_match = re.search(r'Execution time: (\d+)ms for (\w+)', line)
+            if time_match:
+                time_ms, operation = time_match.groups()
+                execution_times[operation].append(int(time_ms))
+            
+            # Extract errors
+            if 'ERROR' in line or 'Exception' in line:
+                component_match = re.search(r'Component\[id=([a-f0-9-]+)', line)
+                component_id = component_match.group(1) if component_match else "unknown"
+                errors.append({
+                    'component_id': component_id,
+                    'error': line.strip(),
+                    'timestamp': extract_timestamp(line)
+                })
+    
+    return {
+        'state_transitions': state_transitions,
+        'execution_times': execution_times,
+        'errors': errors,
+        'components': list(components)
+    }
+
+def extract_timestamp(line):
+    timestamp_match = re.search(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}', line)
+    return timestamp_match.group(0) if timestamp_match else None
+
+# Analyze the data
+def analyze_data(data):
+    results = {
+        "summary": {},
+        "insights": [],
+        "anomalies": [],
+        "recommendations": []
+    }
+    
+    # Basic summary
+    results["summary"]["total_components"] = len(data['components'])
+    results["summary"]["total_transitions"] = len(data['state_transitions'])
+    results["summary"]["total_errors"] = len(data['errors'])
+    
+    # Analyze state transitions
+    if data['state_transitions']:
+        transition_df = pd.DataFrame(data['state_transitions'])
+        
+        # Count transitions by type
+        transition_counts = Counter()
+        for _, row in transition_df.iterrows():
+            transition_counts[(row['from_state'], row['to_state'])] += 1
+        
+        common_transitions = transition_counts.most_common(5)
+        results["summary"]["common_transitions"] = [
+            f"{from_state} -> {to_state}: {count}" 
+            for (from_state, to_state), count in common_transitions
+        ]
+        
+        # Find unusual transitions
+        if len(transition_counts) > 5:
+            unusual_transitions = transition_counts.most_common()[:-5-1:-1]
+            results["anomalies"].extend([
+                f"Unusual state transition: {from_state} -> {to_state} (only {count} occurrences)"
+                for (from_state, to_state), count in unusual_transitions if count == 1
+            ])
+    
+    # Analyze execution times
+    if data['execution_times']:
+        slow_operations = []
+        for operation, times in data['execution_times'].items():
+            if len(times) > 1:
+                avg_time = sum(times) / len(times)
+                max_time = max(times)
+                if max_time > avg_time * 2:
+                    slow_operations.append(f"{operation}: max={max_time}ms, avg={avg_time:.1f}ms")
+        
+        if slow_operations:
+            results["anomalies"].extend([
+                f"Slow operation detected: {op}" for op in slow_operations
+            ])
+    
+    # Error patterns
+    if data['errors']:
+        error_df = pd.DataFrame(data['errors'])
+        error_components = Counter(error_df['component_id'])
+        problematic_components = [comp for comp, count in error_components.items() if count > 1]
+        
+        if problematic_components:
+            results["insights"].append(
+                f"Components with multiple errors: {', '.join(problematic_components)}"
+            )
+            results["recommendations"].append(
+                f"Focus testing on components with high error rates: {', '.join(problematic_components)}"
+            )
+    
+    # Generate testing recommendations
+    if data['state_transitions']:
+        # Find components with many state transitions
+        transition_components = Counter([t['component_id'] for t in data['state_transitions']])
+        active_components = [comp for comp, count in transition_components.items() if count > 5]
+        
+        if active_components:
+            results["insights"].append(
+                f"Highly active components (many state transitions): {', '.join(active_components[:3])}"
+            )
+            results["recommendations"].append(
+                "Increase test coverage for highly active components to ensure state transitions are reliable"
+            )
+    
+    # Error clustering
+    if data['errors'] and len(data['errors']) > 3:
+        # Simple text clustering by looking for common substrings
+        error_texts = [e['error'] for e in data['errors']]
+        common_patterns = []
+        
+        for i, error in enumerate(error_texts):
+            if len(error) < 10:
+                continue
+                
+            # Look for substrings that appear in multiple errors
+            for j in range(i+1, len(error_texts)):
+                # Find the longest common substring (very simplified approach)
+                s1, s2 = error, error_texts[j]
+                match = ""
+                for k in range(len(s1)):
+                    for l in range(k+3, len(s1)+1):  # At least 3 chars
+                        if s1[k:l] in s2 and len(s1[k:l]) > len(match):
+                            match = s1[k:l]
+                
+                if len(match) > 10:  # Only consider substantial matches
+                    common_patterns.append(match)
+        
+        if common_patterns:
+            results["insights"].append(
+                f"Common error pattern detected: '{common_patterns[0]}...'"
+            )
+    
+    return results
+
+# Main execution
+data = parse_logs(run_id)
+
+# Filter by component if specified
+if target_component:
+    data['state_transitions'] = [
+        t for t in data['state_transitions'] 
+        if target_component.lower() in t['component_id'].lower()
+    ]
+    data['errors'] = [
+        e for e in data['errors'] 
+        if target_component.lower() in e['component_id'].lower()
+    ]
+    data['components'] = [
+        c for c in data['components'] 
+        if target_component.lower() in c.lower()
+    ]
+
+# Run analysis
+results = analyze_data(data)
+
+# Add a timestamp
+import datetime
+results["timestamp"] = datetime.datetime.now().isoformat()
+results["run_id"] = run_id
+results["test_type"] = test_type
+
+# Output as JSON
+print(json.dumps(results, indent=2))
+
+# Generate visualization if we have data
+try:
+    if data['state_transitions']:
+        # Create state transition graph
+        transition_df = pd.DataFrame(data['state_transitions'])
+        plt.figure(figsize=(10, 6))
+        
+        transitions = Counter()
+        for _, row in transition_df.iterrows():
+            transitions[(row['from_state'], row['to_state'])] += 1
+        
+        # Count total states for normalization
+        states = set()
+        for from_state, to_state in transitions.keys():
+            states.add(from_state)
+            states.add(to_state)
+        
+        # Create a simple visualization (this is a simplified approach)
+        states_list = sorted(list(states))
+        matrix = [[0 for _ in range(len(states_list))] for _ in range(len(states_list))]
+        
+        for (from_state, to_state), count in transitions.items():
+            if from_state in states_list and to_state in states_list:
+                i = states_list.index(from_state)
+                j = states_list.index(to_state)
+                matrix[i][j] = count
+        
+        plt.imshow(matrix, cmap='Blues')
+        plt.xticks(range(len(states_list)), states_list, rotation=90)
+        plt.yticks(range(len(states_list)), states_list)
+        plt.colorbar(label='Transition Count')
+        plt.title(f'State Transition Heatmap - Run {run_id}')
+        plt.tight_layout()
+        plt.savefig(os.path.join(data_dir, f'transitions_{run_id}.png'))
+except Exception as e:
+    print(f"Error generating visualization: {str(e)}")
+EOF
+  
+  # Run the analysis script
+  if $VERBOSE; then
+    info "Running analysis script $ANALYSIS_SCRIPT..."
+  fi
+  
+  python3 "$ANALYSIS_SCRIPT" "$run_id" "$test_type" "$DATA_DIR" "$TARGET_COMPONENT" > "$DATA_DIR/analysis_${run_id}.json"
+  
+  # Display analysis results
+  if [ -f "$DATA_DIR/analysis_${run_id}.json" ]; then
+    if [ -n "$OUTPUT_FILE" ]; then
+      cat "$DATA_DIR/analysis_${run_id}.json" > "$OUTPUT_FILE"
+      success "Analysis results saved to $OUTPUT_FILE"
+    else
+      highlight "Test Analysis Results"
+      echo 
+      
+      # Extract and display key findings
+      python3 -c "
+import json, sys
+with open('$DATA_DIR/analysis_${run_id}.json') as f:
+    data = json.load(f)
+
+# Print summary
+print(f\"Summary:\")
+for key, value in data['summary'].items():
+    if isinstance(value, list):
+        print(f\"  {key.replace('_', ' ').title()}:\")
+        for item in value[:3]:  # Show only top 3
+            print(f\"    - {item}\")
+    else:
+        print(f\"  {key.replace('_', ' ').title()}: {value}\")
+
+# Print insights
+if data['insights']:
+    print(f\"\nInsights:\")
+    for insight in data['insights']:
+        print(f\"  - {insight}\")
+
+# Print anomalies
+if data['anomalies']:
+    print(f\"\nAnomalies:\")
+    for anomaly in data['anomalies']:
+        print(f\"  - {anomaly}\")
+
+# Print recommendations  
+if data['recommendations']:
+    print(f\"\nRecommendations:\")
+    for rec in data['recommendations']:
+        print(f\"  - {rec}\")
+"
+    fi
+    
+    # Check for visualization
+    if [ -f "$DATA_DIR/transitions_${run_id}.png" ]; then
+      info "State transition visualization saved to $DATA_DIR/transitions_${run_id}.png"
+    fi
+  else
+    error "Analysis failed. No results produced."
+  fi
+}
+
+# Function to generate test scenarios based on component analysis
+generate_test_scenarios() {
+  local test_type="$1"
+  
+  info "Generating test scenarios for $test_type tests..."
+  
+  if [ ! -d "$DATA_DIR" ] || [ ! "$(ls -A "$DATA_DIR")" ]; then
+    warn "No test data available. Please run collection first."
+    info "Try: ./s8r-ai-test analyze $test_type"
+    return 1
+  fi
+  
+  # Find latest analysis file
+  local latest_analysis=$(ls -t "$DATA_DIR"/analysis_*.json 2>/dev/null | head -1)
+  
+  if [ -z "$latest_analysis" ]; then
+    warn "No analysis data found. Please run analysis first."
+    info "Try: ./s8r-ai-test analyze $test_type"
+    return 1
+  fi
+  
+  info "Generating test scenarios based on $latest_analysis..."
+  
+  # Create scenario generator script
+  local GENERATOR_SCRIPT="$DATA_DIR/generate_scenarios.py"
+  
+  cat > "$GENERATOR_SCRIPT" << 'EOF'
+import json
+import sys
+import os
+import random
+from datetime import datetime
+
+def generate_feature_file(analysis_data, test_type, output_dir, target_component=None):
+    # Extract component information
+    components = []
+    if analysis_data.get('summary', {}).get('total_components'):
+        components = ["Component" + str(i) for i in range(1, 4)]  # Placeholder
+    
+    # Extract states
+    states = set()
+    for transition in analysis_data.get('summary', {}).get('common_transitions', []):
+        parts = transition.split(' -> ')
+        if len(parts) == 2:
+            from_state, to_count = parts
+            to_state = to_count.split(':')[0].strip()
+            states.add(from_state)
+            states.add(to_state)
+    
+    states = list(states)
+    if not states:
+        states = ["CONCEPTION", "INITIALIZING", "READY", "ACTIVE", "TERMINATED"]
+    
+    # Anomalies to test
+    anomalies = analysis_data.get('anomalies', [])
+    
+    # Generate feature file content
+    test_name = test_type.lower()
+    if test_name == "all":
+        test_name = "comprehensive"
+    
+    # Determine target component
+    component_focus = target_component if target_component else "GenericComponent"
+    
+    # Feature file header
+    feature = f"""# Generated AI-Enhanced test scenario
+Feature: AI-Generated {test_name.title()} Tests
+  
+  These test scenarios are generated based on test data analysis
+  to focus on important state transitions and edge cases.
+
+"""
+
+    # Generate scenarios
+    # 1. Basic state transition test
+    feature += f"""  @AIGenerated @L0_Component
+  Scenario: {component_focus} progresses through normal lifecycle states
+    Given a new component with reason "AITest"
+    When the component is initialized
+    Then the component should transition to READY state
+    And the component should successfully move to ACTIVE state when activated
+    And the component should properly release resources on termination
+    
+"""
+
+    # 2. Generate a test for component recovery from errors
+    feature += f"""  @AIGenerated @L0_Component @Recovery
+  Scenario: {component_focus} recovers from error state
+    Given a component in ACTIVE state
+    When an error condition is triggered
+    Then the component should transition to ERROR state
+    And the component should attempt recovery
+    And log the recovery attempt
+    And either recover to ACTIVE state or report failure
+    
+"""
+
+    # 3. Generate test based on anomalies if present
+    if anomalies:
+        # Extract useful information from anomalies
+        slow_ops = [a for a in anomalies if "Slow operation" in a]
+        unusual_transitions = [a for a in anomalies if "Unusual state transition" in a]
+        
+        if unusual_transitions:
+            # Extract states from unusual transition
+            parts = unusual_transitions[0].split(': ')[1].split(' -> ')
+            if len(parts) >= 2:
+                from_state = parts[0]
+                to_state = parts[1].split(' ')[0]
+                
+                feature += f"""  @AIGenerated @L0_Component @EdgeCase
+  Scenario: {component_focus} handles unusual {from_state} to {to_state} transition
+    Given a component in {from_state} state
+    When the unusual transition to {to_state} is attempted
+    Then the component should handle the transition gracefully
+    And appropriate error logs should be generated
+    And the component should maintain data integrity
+    
+"""
+        
+        if slow_ops:
+            # Extract operation from slow operation
+            op = slow_ops[0].split(': ')[1].split(':')[0]
+            
+            feature += f"""  @AIGenerated @L0_Component @Performance
+  Scenario: {component_focus} performance under load during {op}
+    Given a component with performance monitoring enabled
+    When the {op} operation is executed under load
+    Then the operation should complete within acceptable time limits
+    And the component should remain responsive
+    And no memory leaks should occur
+    
+"""
+    
+    # 4. If it's a composite test, generate a composite test
+    if test_type.lower() in ["composite", "machine"]:
+        component_type = "Composite" if test_type.lower() == "composite" else "Machine"
+        
+        feature += f"""  @AIGenerated @L1_{component_type}
+  Scenario: Multiple components connected in a {component_type.lower()} handle data flow correctly
+    Given a {component_type.lower()} with 3 connected components
+    When data is processed through the {component_type.lower()}
+    Then each component should process the data correctly
+    And the data should flow through all components
+    And the final output should match expected results
+    
+"""
+    
+    # 5. Generate adaptation test
+    feature += f"""  @AIGenerated @Adaptation
+  Scenario: Component adapts to changing environment conditions
+    Given a component in ACTIVE state
+    When the environment condition changes to "degraded"
+    Then the component should detect the environment change
+    And the component should adapt its behavior accordingly
+    And performance metrics should be logged
+    
+"""
+
+    # Save to file
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    feature_filename = f"ai-generated-{test_type.lower()}-test-{timestamp}.feature"
+    feature_path = os.path.join(output_dir, feature_filename)
+    
+    with open(feature_path, 'w') as f:
+        f.write(feature)
+    
+    return feature_path, feature
+
+# Main execution
+analysis_file = sys.argv[1]
+test_type = sys.argv[2]
+output_dir = sys.argv[3]
+target_component = sys.argv[4] if len(sys.argv) > 4 else None
+
+with open(analysis_file, 'r') as f:
+    analysis_data = json.load(f)
+
+feature_path, feature_content = generate_feature_file(analysis_data, test_type, output_dir, target_component)
+
+print(f"FEATURE_PATH:{feature_path}")
+print(feature_content)
+EOF
+  
+  # Create output directory
+  mkdir -p "$DATA_DIR/generated"
+  
+  # Run the generator script
+  if $VERBOSE; then
+    info "Running scenario generator script..."
+  fi
+  
+  python3 "$GENERATOR_SCRIPT" "$latest_analysis" "$test_type" "$DATA_DIR/generated" "$TARGET_COMPONENT" > "$DATA_DIR/generator_output.txt"
+  
+  # Extract the feature file path and content
+  FEATURE_PATH=$(grep "FEATURE_PATH:" "$DATA_DIR/generator_output.txt" | cut -d':' -f2-)
+  
+  if [ -f "$FEATURE_PATH" ]; then
+    # Determine target feature directory
+    local TARGET_DIR="$PROJECT_ROOT/Samstraumr/samstraumr-core/src/test/resources/component/features"
+    
+    if [[ "$test_type" == "composite" ]]; then
+      TARGET_DIR="$PROJECT_ROOT/Samstraumr/samstraumr-core/src/test/resources/component/features/L1_Composite"
+    elif [[ "$test_type" == "machine" ]]; then
+      TARGET_DIR="$PROJECT_ROOT/Samstraumr/samstraumr-core/src/test/resources/component/features/L2_Machine" 
+    elif [[ "$test_type" == "orchestration" ]]; then
+      TARGET_DIR="$PROJECT_ROOT/Samstraumr/samstraumr-core/src/test/resources/component/features/L0_Orchestration"
+    else
+      TARGET_DIR="$PROJECT_ROOT/Samstraumr/samstraumr-core/src/test/resources/component/features/L0_Core"
+    fi
+    
+    # Ensure target directory exists
+    mkdir -p "$TARGET_DIR"
+    
+    # Copy the generated feature file
+    cp "$FEATURE_PATH" "$TARGET_DIR/"
+    
+    # Display success message
+    success "Generated test scenario saved to $TARGET_DIR/$(basename "$FEATURE_PATH")"
+    
+    # Display the feature content
+    if [ -z "$OUTPUT_FILE" ]; then
+      highlight "AI-Generated Test Scenario:"
+      echo
+      detail "$(cat "$FEATURE_PATH")"
+    else
+      cat "$FEATURE_PATH" > "$OUTPUT_FILE"
+      success "Generated test scenario saved to $OUTPUT_FILE"
+    fi
+  else
+    error "Failed to generate test scenario"
+  fi
+}
+
+# Function to prioritize tests based on risk analysis
+prioritize_tests() {
+  local test_type="$1"
+  
+  info "Prioritizing $test_type tests based on risk analysis..."
+  
+  if [ ! -d "$DATA_DIR" ] || [ ! "$(ls -A "$DATA_DIR")" ]; then
+    warn "No test data available. Please run collection first."
+    info "Try: ./s8r-ai-test analyze $test_type"
+    return 1
+  fi
+  
+  # Find latest analysis file
+  local latest_analysis=$(ls -t "$DATA_DIR"/analysis_*.json 2>/dev/null | head -1)
+  
+  if [ -z "$latest_analysis" ]; then
+    warn "No analysis data found. Please run analysis first."
+    info "Try: ./s8r-ai-test analyze $test_type"
+    return 1
+  }
+  
+  info "Prioritizing tests based on $latest_analysis..."
+  
+  # Create prioritization script
+  local PRIORITIZE_SCRIPT="$DATA_DIR/prioritize_tests.py"
+  
+  cat > "$PRIORITIZE_SCRIPT" << 'EOF'
+import json
+import sys
+import os
+import glob
+import re
+from datetime import datetime
+
+def find_test_files(root_dir, test_type):
+    """Find relevant test files based on test type"""
+    feature_dir = os.path.join(root_dir, "Samstraumr/samstraumr-core/src/test/resources")
+    
+    # Map test type to directory pattern
+    if test_type.lower() == "component" or test_type.lower() == "tube":
+        pattern = os.path.join(feature_dir, "**/*L0_Core*/**/*.feature")
+    elif test_type.lower() == "composite":
+        pattern = os.path.join(feature_dir, "**/*L1_Composite*/**/*.feature")
+    elif test_type.lower() == "machine":
+        pattern = os.path.join(feature_dir, "**/*L2_Machine*/**/*.feature")
+    elif test_type.lower() == "all":
+        pattern = os.path.join(feature_dir, "**/*.feature")
+    else:
+        pattern = os.path.join(feature_dir, "**/*" + test_type + "*/**/*.feature")
+    
+    return glob.glob(pattern, recursive=True)
+
+def parse_feature_file(file_path):
+    """Parse a feature file to extract scenarios and tags"""
+    with open(file_path, 'r') as f:
+        content = f.read()
+    
+    # Extract feature name
+    feature_match = re.search(r'Feature:\s*(.+?)$', content, re.MULTILINE)
+    feature_name = feature_match.group(1).strip() if feature_match else "Unknown feature"
+    
+    # Extract scenarios
+    scenarios = []
+    scenario_blocks = re.finditer(r'(?:Scenario|Scenario Outline):\s*(.+?)$.*?(?=(?:Scenario|Scenario Outline):|\Z)', 
+                                content, re.MULTILINE | re.DOTALL)
+    
+    for block in scenario_blocks:
+        scenario_text = block.group(0)
+        scenario_match = re.search(r'(?:Scenario|Scenario Outline):\s*(.+?)$', scenario_text, re.MULTILINE)
+        name = scenario_match.group(1).strip() if scenario_match else "Unknown scenario"
+        
+        # Extract tags
+        tags_match = re.search(r'((?:@\w+\s*)+)', scenario_text)
+        tags = tags_match.group(1).strip().split() if tags_match else []
+        
+        # Extract steps count
+        steps = re.findall(r'^\s*(Given|When|Then|And|But)\s+', scenario_text, re.MULTILINE)
+        
+        # Generate a simple hash for the scenario
+        scenario_hash = hash(scenario_text) % 10000
+        
+        scenarios.append({
+            'name': name,
+            'tags': tags,
+            'steps_count': len(steps),
+            'hash': scenario_hash,
+            'file_path': file_path,
+            'full_text': scenario_text.strip()
+        })
+    
+    return {
+        'file_path': file_path,
+        'feature_name': feature_name,
+        'scenarios': scenarios
+    }
+
+def calculate_risk_score(scenario, analysis_data):
+    """Calculate a risk score for a scenario based on analysis data"""
+    # Start with a base score
+    score = 50
+    
+    # Adjust based on tags
+    tags = scenario['tags']
+    if '@ATL' in tags:
+        score += 20  # ATL tests are higher priority
+    if '@AIGenerated' in tags:
+        score += 10  # AI-generated tests target important areas
+    if '@Critical' in tags:
+        score += 30  # Critical tests
+    if '@BTL' in tags:
+        score -= 10  # BTL tests are lower priority
+    
+    # Adjust based on content keywords
+    text = scenario['full_text'].lower()
+    
+    # Check for error/recovery behavior
+    if 'error' in text or 'exception' in text or 'recovery' in text:
+        score += 15  # Error handling is important
+    
+    # Check for performance-related tests
+    if 'performance' in text or 'load' in text or 'stress' in text:
+        score += 10
+    
+    # Check for state transitions
+    if 'state' in text and 'transition' in text:
+        score += 5
+    
+    # Adjust based on analysis insights
+    if 'insights' in analysis_data:
+        for insight in analysis_data['insights']:
+            for keyword in insight.lower().split():
+                if len(keyword) > 4 and keyword in text:  # Only match substantial words
+                    score += 8
+                    break
+    
+    # Adjust based on anomalies
+    if 'anomalies' in analysis_data:
+        for anomaly in analysis_data['anomalies']:
+            for keyword in anomaly.lower().split():
+                if len(keyword) > 4 and keyword in text:
+                    score += 12
+                    break
+    
+    # Ensure score is within bounds
+    return max(0, min(100, score))
+
+def prioritize_tests(test_files, analysis_data):
+    """Prioritize tests based on analysis data"""
+    all_scenarios = []
+    
+    for file_path in test_files:
+        feature_data = parse_feature_file(file_path)
+        all_scenarios.extend(feature_data['scenarios'])
+    
+    # Calculate risk scores
+    for scenario in all_scenarios:
+        scenario['risk_score'] = calculate_risk_score(scenario, analysis_data)
+    
+    # Sort by risk score (descending)
+    prioritized_scenarios = sorted(all_scenarios, key=lambda x: x['risk_score'], reverse=True)
+    
+    return prioritized_scenarios
+
+def generate_prioritized_list(prioritized_scenarios):
+    """Generate a readable prioritized test list"""
+    result = "Prioritized Test Scenarios\n"
+    result += "========================\n\n"
+    
+    for i, scenario in enumerate(prioritized_scenarios[:20]):  # Show top 20
+        tags = ' '.join(scenario['tags'])
+        filepath = os.path.basename(scenario['file_path'])
+        
+        result += f"{i+1}. [{scenario['risk_score']}] {scenario['name']}\n"
+        result += f"   File: {filepath}\n"
+        result += f"   Tags: {tags}\n\n"
+    
+    return result
+
+# Main execution
+analysis_file = sys.argv[1]
+test_type = sys.argv[2]
+project_root = sys.argv[3]
+output_dir = sys.argv[4]
+
+with open(analysis_file, 'r') as f:
+    analysis_data = json.load(f)
+
+# Find test files
+test_files = find_test_files(project_root, test_type)
+print(f"Found {len(test_files)} test files")
+
+# Prioritize tests
+prioritized_scenarios = prioritize_tests(test_files, analysis_data)
+print(f"Prioritized {len(prioritized_scenarios)} scenarios")
+
+# Generate prioritized list
+prioritized_list = generate_prioritized_list(prioritized_scenarios)
+
+# Save results
+timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+output_file = os.path.join(output_dir, f"prioritized-{test_type.lower()}-tests-{timestamp}.txt")
+
+with open(output_file, 'w') as f:
+    f.write(prioritized_list)
+
+print(f"OUTPUT_FILE:{output_file}")
+print(prioritized_list)
+
+# Also generate a JUnit tag file for running the prioritized tests
+junit_tags = []
+for scenario in prioritized_scenarios[:10]:  # Top 10 tests
+    for tag in scenario['tags']:
+        if tag.startswith('@') and tag not in junit_tags and tag not in ['@ATL', '@BTL']:
+            junit_tags.append(tag)
+
+if junit_tags:
+    tag_expression = ' or '.join([tag[1:] for tag in junit_tags])  # Remove @ symbol
+    
+    # Save tag expression
+    tag_file = os.path.join(output_dir, f"prioritized-tags-{timestamp}.txt")
+    with open(tag_file, 'w') as f:
+        f.write(tag_expression)
+    
+    print(f"TAG_FILE:{tag_file}")
+    print(f"Tag expression: {tag_expression}")
+EOF
+  
+  # Run the prioritization script
+  info "Running test prioritization..."
+  
+  python3 "$PRIORITIZE_SCRIPT" "$latest_analysis" "$test_type" "$PROJECT_ROOT" "$DATA_DIR" > "$DATA_DIR/prioritize_output.txt"
+  
+  # Extract output file path
+  OUTPUT_PATH=$(grep "OUTPUT_FILE:" "$DATA_DIR/prioritize_output.txt" | cut -d':' -f2-)
+  TAG_FILE=$(grep "TAG_FILE:" "$DATA_DIR/prioritize_output.txt" | cut -d':' -f2-)
+  
+  if [ -f "$OUTPUT_PATH" ]; then
+    if [ -n "$OUTPUT_FILE" ]; then
+      cp "$OUTPUT_PATH" "$OUTPUT_FILE"
+      success "Prioritized tests saved to $OUTPUT_FILE"
+    else
+      highlight "Test Prioritization Results:"
+      echo
+      detail "$(cat "$OUTPUT_PATH")"
+      
+      if [ -f "$TAG_FILE" ]; then
+        info "To run prioritized tests, use:"
+        detail "  ./s8r-test $test_type -Dcucumber.filter.tags=\"$(cat "$TAG_FILE")\""
+      fi
+    fi
+  else
+    error "Failed to prioritize tests"
+  fi
+}
+
+# Function to run tests with AI-driven selection
+run_smart_tests() {
+  local test_type="$1"
+  
+  info "Running $test_type tests with AI-driven selection..."
+  
+  # First prioritize the tests
+  prioritize_tests "$test_type"
+  
+  # Extract the tag file
+  local TAG_FILE=$(ls -t "$DATA_DIR"/prioritized-tags-*.txt 2>/dev/null | head -1)
+  
+  if [ -z "$TAG_FILE" ]; then
+    warn "No prioritized tags found. Running all $test_type tests instead."
+    ./s8r-test "$test_type"
+    return
+  fi
+  
+  # Run tests with the prioritized tags
+  info "Running prioritized tests with tags: $(cat "$TAG_FILE")"
+  
+  # Map test type to profile
+  local profile="$test_type-tests" 
+  
+  # Build Maven command
+  local mvn_args=("test")
+  mvn_args+=("-P$profile")
+  mvn_args+=("-Dcucumber.filter.tags=\"$(cat "$TAG_FILE")\"")
+  
+  # Run Maven test command
+  cd "$PROJECT_ROOT"
+  info "Running: mvn ${mvn_args[*]}"
+  
+  if mvn "${mvn_args[@]}"; then
+    success "Smart tests completed successfully"
+  else
+    error "Smart tests failed"
+  fi
+}
+
+# Function to predict likely failure points
+predict_failures() {
+  local test_type="$1"
+  
+  info "Predicting failure points for $test_type components..."
+  
+  if [ ! -d "$DATA_DIR" ] || [ ! "$(ls -A "$DATA_DIR")" ]; then
+    warn "No test data available. Please run collection first."
+    info "Try: ./s8r-ai-test analyze $test_type"
+    return 1
+  fi
+  
+  # Find all analysis files
+  local analysis_files=$(ls -t "$DATA_DIR"/analysis_*.json 2>/dev/null)
+  
+  if [ -z "$analysis_files" ]; then
+    warn "No analysis data found. Please run analysis first."
+    info "Try: ./s8r-ai-test analyze $test_type"
+    return 1
+  }
+  
+  info "Predicting failures based on historical analysis data..."
+  
+  # Create prediction script
+  local PREDICT_SCRIPT="$DATA_DIR/predict_failures.py"
+  
+  cat > "$PREDICT_SCRIPT" << 'EOF'
+import json
+import sys
+import os
+import glob
+import re
+from datetime import datetime
+from collections import Counter, defaultdict
+
+def load_analysis_files(data_dir):
+    """Load all analysis files"""
+    files = glob.glob(os.path.join(data_dir, "analysis_*.json"))
+    analysis_data = []
+    
+    for file in files:
+        try:
+            with open(file, 'r') as f:
+                data = json.load(f)
+                analysis_data.append(data)
+        except:
+            print(f"Error loading {file}, skipping...")
+    
+    return analysis_data
+
+def extract_error_patterns(analysis_data_list):
+    """Extract error patterns from multiple analysis runs"""
+    error_patterns = defaultdict(list)
+    
+    for analysis in analysis_data_list:
+        # Process anomalies
+        for anomaly in analysis.get('anomalies', []):
+            # Classify anomaly
+            if "state transition" in anomaly.lower():
+                error_patterns['state_transitions'].append(anomaly)
+            elif "slow operation" in anomaly.lower():
+                error_patterns['performance'].append(anomaly)
+            else:
+                error_patterns['general'].append(anomaly)
+        
+        # Process insights
+        for insight in analysis.get('insights', []):
+            if "error" in insight.lower() or "fail" in insight.lower():
+                error_patterns['errors'].append(insight)
+    
+    return error_patterns
+
+def predict_failures(error_patterns, component_focus=None):
+    """Predict likely failure points based on error patterns"""
+    predictions = []
+    confidence_levels = {}
+    
+    # Analyze state transition issues
+    if 'state_transitions' in error_patterns and error_patterns['state_transitions']:
+        # Count states that appear in unusual transitions
+        states_in_error = []
+        for anomaly in error_patterns['state_transitions']:
+            match = re.search(r'(\w+) -> (\w+)', anomaly)
+            if match:
+                states_in_error.extend([match.group(1), match.group(2)])
+        
+        state_counts = Counter(states_in_error)
+        problematic_states = [state for state, count in state_counts.items() if count > 1]
+        
+        if problematic_states:
+            for state in problematic_states:
+                prediction = f"Components may fail when transitioning to or from {state} state"
+                confidence = min(70 + (state_counts[state] * 5), 95)  # Max 95% confidence
+                predictions.append(prediction)
+                confidence_levels[prediction] = confidence
+    
+    # Analyze performance issues
+    if 'performance' in error_patterns and error_patterns['performance']:
+        ops = set()
+        for anomaly in error_patterns['performance']:
+            match = re.search(r'operation: ([a-zA-Z0-9_]+)', anomaly)
+            if match:
+                ops.add(match.group(1))
+        
+        for op in ops:
+            prediction = f"Performance degradation likely during {op} operations under load"
+            confidence = 65  # Base confidence
+            predictions.append(prediction)
+            confidence_levels[prediction] = confidence
+    
+    # Analyze error patterns
+    if 'errors' in error_patterns and error_patterns['errors']:
+        components_with_errors = set()
+        for insight in error_patterns['errors']:
+            match = re.search(r'Components with .* errors: (.*)', insight)
+            if match:
+                components = match.group(1).split(', ')
+                components_with_errors.update(components)
+        
+        # Filter for component focus if provided
+        if component_focus:
+            components_with_errors = [c for c in components_with_errors 
+                                     if component_focus.lower() in c.lower()]
+        
+        for component in components_with_errors:
+            prediction = f"Component {component} shows a pattern of recurring errors"
+            confidence = 75  # Higher confidence for observed errors
+            predictions.append(prediction)
+            confidence_levels[prediction] = confidence
+    
+    # Add general predictions
+    predictions.append("Error recovery code paths are likely underexercised in tests")
+    confidence_levels[predictions[-1]] = 60
+    
+    predictions.append("Complex state transitions may lead to unexpected behavior under load")
+    confidence_levels[predictions[-1]] = 70
+    
+    return predictions, confidence_levels
+
+def format_predictions(predictions, confidence_levels):
+    """Format predictions for output"""
+    result = "Predicted Failure Points\n"
+    result += "=======================\n\n"
+    
+    # Sort by confidence level
+    sorted_predictions = sorted(predictions, key=lambda x: confidence_levels.get(x, 0), reverse=True)
+    
+    for i, prediction in enumerate(sorted_predictions):
+        confidence = confidence_levels.get(prediction, 50)
+        result += f"{i+1}. [{confidence}%] {prediction}\n\n"
+    
+    return result
+
+def generate_test_recommendations(predictions, confidence_levels):
+    """Generate test recommendations based on predictions"""
+    result = "Test Recommendations\n"
+    result += "===================\n\n"
+    
+    # High confidence predictions first
+    high_conf = [p for p in predictions if confidence_levels.get(p, 0) >= 75]
+    medium_conf = [p for p in predictions if 60 <= confidence_levels.get(p, 0) < 75]
+    
+    # Generate recommendations for high confidence predictions
+    for prediction in high_conf:
+        if "state" in prediction.lower():
+            result += f"- Create targeted tests for {prediction.split('transitioning to or from')[1].strip()} state transitions\n"
+        elif "performance" in prediction.lower():
+            op = prediction.split('during')[1].split('operations')[0].strip()
+            result += f"- Add performance tests for {op} operations under load conditions\n"
+        elif "component" in prediction.lower():
+            component = prediction.split('Component ')[1].split(' shows')[0].strip()
+            result += f"- Increase test coverage for {component}, focusing on error conditions\n"
+    
+    # Add general recommendations
+    result += "- Implement more comprehensive error injection tests\n"
+    result += "- Add tests for concurrent state transitions\n"
+    result += "- Create long-running stability tests\n"
+    
+    return result
+
+# Main execution
+data_dir = sys.argv[1]
+test_type = sys.argv[2]
+component_focus = sys.argv[3] if len(sys.argv) > 3 else None
+
+# Load analysis data
+analysis_data_list = load_analysis_files(data_dir)
+print(f"Loaded {len(analysis_data_list)} analysis files")
+
+# Extract error patterns
+error_patterns = extract_error_patterns(analysis_data_list)
+
+# Predict failures
+predictions, confidence_levels = predict_failures(error_patterns, component_focus)
+
+# Format output
+formatted_predictions = format_predictions(predictions, confidence_levels)
+test_recommendations = generate_test_recommendations(predictions, confidence_levels)
+
+# Save results
+timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+output_file = os.path.join(data_dir, f"failure-predictions-{test_type.lower()}-{timestamp}.txt")
+
+with open(output_file, 'w') as f:
+    f.write(formatted_predictions)
+    f.write("\n\n")
+    f.write(test_recommendations)
+
+print(f"OUTPUT_FILE:{output_file}")
+print(formatted_predictions)
+print(test_recommendations)
+EOF
+  
+  # Run the prediction script
+  info "Running failure prediction..."
+  
+  python3 "$PREDICT_SCRIPT" "$DATA_DIR" "$test_type" "$TARGET_COMPONENT" > "$DATA_DIR/predict_output.txt"
+  
+  # Extract output file path
+  PREDICT_PATH=$(grep "OUTPUT_FILE:" "$DATA_DIR/predict_output.txt" | cut -d':' -f2-)
+  
+  if [ -f "$PREDICT_PATH" ]; then
+    if [ -n "$OUTPUT_FILE" ]; then
+      cp "$PREDICT_PATH" "$OUTPUT_FILE"
+      success "Failure predictions saved to $OUTPUT_FILE"
+    else
+      highlight "Failure Prediction Results:"
+      echo
+      detail "$(cat "$PREDICT_PATH")"
+    fi
+  else
+    error "Failed to generate failure predictions"
+  fi
+}
+
+# Function to visualize test coverage and component relationships
+visualize_tests() {
+  local test_type="$1"
+  
+  info "Visualizing test coverage for $test_type tests..."
+  
+  if [ ! -d "$DATA_DIR" ] || [ ! "$(ls -A "$DATA_DIR")" ]; then
+    warn "No test data available. Please run collection first."
+    info "Try: ./s8r-ai-test analyze $test_type"
+    return 1
+  fi
+  
+  # Create visualization script
+  local VIZ_SCRIPT="$DATA_DIR/visualize.py"
+  
+  cat > "$VIZ_SCRIPT" << 'EOF'
+import json
+import sys
+import os
+import glob
+import re
+import matplotlib.pyplot as plt
+import numpy as np
+from collections import Counter, defaultdict
+
+def find_test_files(root_dir, test_type):
+    """Find relevant test files based on test type"""
+    feature_dir = os.path.join(root_dir, "Samstraumr/samstraumr-core/src/test/resources")
+    
+    # Map test type to directory pattern
+    if test_type.lower() == "component" or test_type.lower() == "tube":
+        pattern = os.path.join(feature_dir, "**/*L0_Core*/**/*.feature")
+    elif test_type.lower() == "composite":
+        pattern = os.path.join(feature_dir, "**/*L1_Composite*/**/*.feature")
+    elif test_type.lower() == "machine":
+        pattern = os.path.join(feature_dir, "**/*L2_Machine*/**/*.feature")
+    elif test_type.lower() == "all":
+        pattern = os.path.join(feature_dir, "**/*.feature")
+    else:
+        pattern = os.path.join(feature_dir, "**/*" + test_type + "*/**/*.feature")
+    
+    return glob.glob(pattern, recursive=True)
+
+def parse_feature_file(file_path):
+    """Parse a feature file to extract scenarios and tags"""
+    with open(file_path, 'r') as f:
+        content = f.read()
+    
+    # Extract feature name
+    feature_match = re.search(r'Feature:\s*(.+?)$', content, re.MULTILINE)
+    feature_name = feature_match.group(1).strip() if feature_match else "Unknown feature"
+    
+    # Extract scenarios
+    scenarios = []
+    scenario_blocks = re.finditer(r'(?:Scenario|Scenario Outline):\s*(.+?)$.*?(?=(?:Scenario|Scenario Outline):|\Z)', 
+                                content, re.MULTILINE | re.DOTALL)
+    
+    for block in scenario_blocks:
+        scenario_text = block.group(0)
+        scenario_match = re.search(r'(?:Scenario|Scenario Outline):\s*(.+?)$', scenario_text, re.MULTILINE)
+        name = scenario_match.group(1).strip() if scenario_match else "Unknown scenario"
+        
+        # Extract tags
+        tags_match = re.search(r'((?:@\w+\s*)+)', scenario_text)
+        tags = tags_match.group(1).strip().split() if tags_match else []
+        
+        # Extract steps count
+        steps = re.findall(r'^\s*(Given|When|Then|And|But)\s+', scenario_text, re.MULTILINE)
+        
+        scenarios.append({
+            'name': name,
+            'tags': tags,
+            'steps_count': len(steps),
+            'file_path': file_path,
+            'text': scenario_text
+        })
+    
+    return {
+        'file_path': file_path,
+        'feature_name': feature_name,
+        'scenarios': scenarios
+    }
+
+def extract_components_from_scenarios(scenarios):
+    """Extract component names from scenarios"""
+    components = set()
+    
+    for scenario in scenarios:
+        # Look for components in scenarios
+        text = scenario['text'].lower()
+        
+        # Pattern for component mentions
+        component_matches = re.finditer(r'component\s+["\']?([a-zA-Z0-9_]+)["\']?', text)
+        for match in component_matches:
+            components.add(match.group(1))
+        
+        # Also look for composite or machine mentions
+        composite_matches = re.finditer(r'composite\s+["\']?([a-zA-Z0-9_]+)["\']?', text)
+        for match in composite_matches:
+            components.add(match.group(1))
+            
+        # Look for specific component types
+        type_matches = re.finditer(r'([a-zA-Z0-9_]+(?:Component|Composite|Machine))', text)
+        for match in type_matches:
+            components.add(match.group(1))
+    
+    return components
+
+def analyze_test_coverage(feature_files):
+    """Analyze test coverage across feature files"""
+    all_features = []
+    all_scenarios = []
+    all_tags = Counter()
+    tag_scenarios = defaultdict(list)
+    
+    for file_path in feature_files:
+        feature_data = parse_feature_file(file_path)
+        all_features.append(feature_data)
+        
+        for scenario in feature_data['scenarios']:
+            all_scenarios.append(scenario)
+            
+            for tag in scenario['tags']:
+                all_tags[tag] += 1
+                tag_scenarios[tag].append(scenario['name'])
+    
+    # Extract components
+    all_components = extract_components_from_scenarios(all_scenarios)
+    
+    return {
+        'feature_count': len(all_features),
+        'scenario_count': len(all_scenarios),
+        'tags': all_tags,
+        'components': list(all_components),
+        'tag_scenarios': tag_scenarios
+    }
+
+def create_test_coverage_visualizations(coverage_data, output_dir, test_type):
+    """Create visualizations for test coverage"""
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    
+    # 1. Tag distribution pie chart
+    plt.figure(figsize=(10, 6))
+    tags = coverage_data['tags']
+    
+    # Filter tags (show top 10)
+    top_tags = {k: v for k, v in sorted(tags.items(), key=lambda item: item[1], reverse=True)[:10]}
+    
+    # Create pie chart
+    labels = [tag[1:] for tag in top_tags.keys()]  # Remove @ from tags
+    sizes = list(top_tags.values())
+    
+    # Plot
+    plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
+    plt.axis('equal')
+    plt.title(f'Top 10 Tags in {test_type.title()} Tests')
+    
+    # Save
+    tag_chart_path = os.path.join(output_dir, f"tag-distribution-{test_type.lower()}-{timestamp}.png")
+    plt.savefig(tag_chart_path)
+    plt.close()
+    
+    # 2. Scenarios per feature
+    if coverage_data['feature_count'] > 1:
+        feature_scenario_counts = []
+        feature_names = []
+        
+        for feature in all_features:
+            feature_names.append(os.path.basename(feature['file_path']))
+            feature_scenario_counts.append(len(feature['scenarios']))
+        
+        plt.figure(figsize=(12, 6))
+        plt.bar(range(len(feature_names)), feature_scenario_counts)
+        plt.xticks(range(len(feature_names)), feature_names, rotation=90)
+        plt.title(f'Scenarios per Feature File - {test_type.title()} Tests')
+        plt.tight_layout()
+        
+        # Save
+        feature_chart_path = os.path.join(output_dir, f"scenarios-per-feature-{test_type.lower()}-{timestamp}.png")
+        plt.savefig(feature_chart_path)
+        plt.close()
+    
+    # Return paths to generated visualizations
+    return {
+        'tag_chart': tag_chart_path,
+        'feature_chart': feature_chart_path if coverage_data['feature_count'] > 1 else None
+    }
+
+def generate_coverage_report(coverage_data, test_type, visualization_paths):
+    """Generate a text report of test coverage"""
+    report = f"Test Coverage Report for {test_type.title()} Tests\n"
+    report += "="*50 + "\n\n"
+    
+    report += f"Total Features: {coverage_data['feature_count']}\n"
+    report += f"Total Scenarios: {coverage_data['scenario_count']}\n"
+    report += f"Unique Tags: {len(coverage_data['tags'])}\n"
+    report += f"Components Detected: {len(coverage_data['components'])}\n\n"
+    
+    # Show top tags
+    report += "Top 5 Tags:\n"
+    top_tags = {k: v for k, v in sorted(coverage_data['tags'].items(), key=lambda item: item[1], reverse=True)[:5]}
+    for tag, count in top_tags.items():
+        report += f"  {tag}: {count} scenarios\n"
+    
+    # Show components
+    if coverage_data['components']:
+        report += "\nDetected Components:\n"
+        for component in sorted(coverage_data['components']):
+            report += f"  - {component}\n"
+    
+    # Show visualizations
+    report += "\nVisualizations:\n"
+    for viz_type, path in visualization_paths.items():
+        if path:
+            report += f"  - {viz_type.replace('_', ' ').title()}: {os.path.basename(path)}\n"
+    
+    # Test coverage gaps
+    report += "\nPotential Coverage Gaps:\n"
+    
+    # Look for components without ATL tests
+    atl_scenarios = set(coverage_data['tag_scenarios'].get('@ATL', []))
+    
+    components_without_atl = []
+    for component in coverage_data['components']:
+        has_atl = False
+        for scenario in atl_scenarios:
+            if component.lower() in scenario.lower():
+                has_atl = True
+                break
+        
+        if not has_atl:
+            components_without_atl.append(component)
+    
+    if components_without_atl:
+        report += "  - Components possibly missing ATL tests:\n"
+        for component in components_without_atl:
+            report += f"    * {component}\n"
+    
+    # Check for error/recovery test coverage
+    has_error_tests = False
+    for tag in coverage_data['tags']:
+        if 'error' in tag.lower() or 'recovery' in tag.lower():
+            has_error_tests = True
+            break
+    
+    if not has_error_tests:
+        report += "  - May need more explicit error/recovery tests\n"
+    
+    # Check for performance test coverage
+    has_performance_tests = False
+    for tag in coverage_data['tags']:
+        if 'performance' in tag.lower() or 'load' in tag.lower():
+            has_performance_tests = True
+            break
+    
+    if not has_performance_tests:
+        report += "  - Performance and load testing may be underrepresented\n"
+    
+    return report
+
+# Main execution
+import datetime
+from datetime import datetime
+
+project_root = sys.argv[1]
+test_type = sys.argv[2]
+output_dir = sys.argv[3]
+
+# Find test files
+feature_files = find_test_files(project_root, test_type)
+print(f"Found {len(feature_files)} test files")
+
+if not feature_files:
+    print("No test files found for this test type")
+    sys.exit(1)
+
+# Parse features and extract coverage data
+all_features = []
+for file_path in feature_files:
+    feature_data = parse_feature_file(file_path)
+    all_features.append(feature_data)
+
+# Get all scenarios
+all_scenarios = []
+for feature in all_features:
+    all_scenarios.extend(feature['scenarios'])
+
+# Analyze coverage
+coverage_data = analyze_test_coverage(feature_files)
+
+# Create visualizations
+visualization_paths = create_test_coverage_visualizations(coverage_data, output_dir, test_type)
+
+# Generate report
+coverage_report = generate_coverage_report(coverage_data, test_type, visualization_paths)
+
+# Save report
+timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+report_path = os.path.join(output_dir, f"coverage-report-{test_type.lower()}-{timestamp}.txt")
+
+with open(report_path, 'w') as f:
+    f.write(coverage_report)
+
+print(f"REPORT_PATH:{report_path}")
+print(coverage_report)
+
+for viz_type, path in visualization_paths.items():
+    if path:
+        print(f"VIZ_{viz_type.upper()}:{path}")
+EOF
+  
+  # Run the visualization script
+  info "Generating test coverage visualizations..."
+  
+  python3 "$VIZ_SCRIPT" "$PROJECT_ROOT" "$test_type" "$DATA_DIR" > "$DATA_DIR/visualize_output.txt"
+  
+  # Extract output paths
+  REPORT_PATH=$(grep "REPORT_PATH:" "$DATA_DIR/visualize_output.txt" | cut -d':' -f2-)
+  TAG_CHART=$(grep "VIZ_TAG_CHART:" "$DATA_DIR/visualize_output.txt" | cut -d':' -f2-)
+  FEATURE_CHART=$(grep "VIZ_FEATURE_CHART:" "$DATA_DIR/visualize_output.txt" | cut -d':' -f2-)
+  
+  if [ -f "$REPORT_PATH" ]; then
+    if [ -n "$OUTPUT_FILE" ]; then
+      cp "$REPORT_PATH" "$OUTPUT_FILE"
+      success "Coverage report saved to $OUTPUT_FILE"
+    else
+      highlight "Test Coverage Analysis:"
+      echo
+      detail "$(cat "$REPORT_PATH")"
+      
+      # Show visualization paths
+      if [ -f "$TAG_CHART" ]; then
+        info "Tag distribution chart saved to $TAG_CHART"
+      fi
+      
+      if [ -f "$FEATURE_CHART" ]; then
+        info "Feature coverage chart saved to $FEATURE_CHART"
+      fi
+    fi
+  else
+    error "Failed to generate coverage visualization"
+  fi
+}
+
+# Main execution
+if [[ $# -eq 0 || "$1" == "-h" || "$1" == "--help" ]]; then
+  show_help
+  exit 0
+fi
+
+# Check if machine learning tools are available
+check_ml_tools
+
+# Parse arguments
+parse_args "$@"
+
+# Main logic based on selected mode
+case "$MODE" in
+  analyze)
+    if $COLLECT_DATA; then
+      collect_data "$TEST_TYPE"
+    fi
+    analyze_test_data "$TEST_TYPE"
+    ;;
+  generate)
+    generate_test_scenarios "$TEST_TYPE"
+    ;;
+  prioritize)
+    prioritize_tests "$TEST_TYPE"
+    ;;
+  smart-run)
+    run_smart_tests "$TEST_TYPE"
+    ;;
+  predict-failures)
+    predict_failures "$TEST_TYPE"
+    ;;
+  visualize)
+    visualize_tests "$TEST_TYPE"
+    ;;
+  *)
+    error "Unknown mode: $MODE"
+    ;;
+esac
