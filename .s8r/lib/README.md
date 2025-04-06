@@ -1,3 +1,7 @@
+<\!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Samstraumr Library Files
 
 This directory contains the shared library code used by the s8r command-line interface. These libraries provide common functionality used across different commands and operations.

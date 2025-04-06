@@ -1,3 +1,7 @@
+<\!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Build and Test System
 
 The Samstraumr build and test system is designed to be simple, efficient, and maintainable. It provides a straightforward interface for common build and test operations while abstracting away the complexity of the underlying Maven configuration.

@@ -1,3 +1,7 @@
+<\!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Changelog
 
 All notable changes to the Samstraumr project will be documented in this file.

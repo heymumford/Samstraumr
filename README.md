@@ -1,6 +1,3 @@
-<!-- 
-Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
--->
 
 # Samstraumr: Adaptive Resilient Software Framework
 
@@ -282,3 +279,7 @@ Copyright © 2025 Eric C. Mumford. All rights reserved.
 [//]: # (Keywords: resilient systems, adaptive software, event-driven architecture, enterprise framework, self-healing systems, java framework, component-based architecture, systems theory, clean architecture)
 [//]: # (Author: Eric C. Mumford)
 [//]: # (Canonical: https://github.com/heymumford/Samstraumr)
+
+---
+
+Documentation and code generated with support from Claude 3.7, Gemini Deep Research.

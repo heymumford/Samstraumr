@@ -1,3 +1,7 @@
+<\!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Package Mapping: Migration to `org.s8r` standard
 
 This document provides a detailed mapping for the package migration from the current mixed naming to a standardized `org.s8r` package hierarchy.

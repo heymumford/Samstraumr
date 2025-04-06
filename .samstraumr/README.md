@@ -1,3 +1,7 @@
+<\!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Samstraumr Configuration System
 
 This directory contains the unified configuration system for the Samstraumr framework.

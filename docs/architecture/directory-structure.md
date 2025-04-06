@@ -1,3 +1,7 @@
+<\!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # S8r Framework Directory Structure
 
 This document provides a visual representation of the ideal S8r Framework directory structure, focusing on clarity, discoverability, and maintainability. It serves as the authoritative reference for organizing code and documents within the repository.

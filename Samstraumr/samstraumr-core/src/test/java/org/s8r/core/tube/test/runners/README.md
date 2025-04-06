@@ -1,3 +1,7 @@
+<\!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # S8r Test Runners
 
 This package contains JUnit 5 test runners for the S8r framework, providing a modern and flexible approach to test orchestration and execution. These runners leverage JUnit 5 and the latest Cucumber version for Behavior-Driven Development (BDD) testing.

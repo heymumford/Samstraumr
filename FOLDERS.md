@@ -1,3 +1,7 @@
+<\!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # S8r Framework Directory Structure
 
 This document provides a comprehensive overview of the repository structure, the purpose of each directory, and guidelines for maintaining clean folder organization across the project.

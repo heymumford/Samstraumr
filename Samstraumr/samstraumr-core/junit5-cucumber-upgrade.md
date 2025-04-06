@@ -1,3 +1,7 @@
+<\!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # JUnit 5 and Cucumber Upgrade Guide
 
 This document describes the changes made to upgrade, streamline, and simplify the JUnit and Cucumber test orchestration in the Samstraumr/S8r framework.
@@ -26,15 +30,6 @@ This document describes the changes made to upgrade, streamline, and simplify th
 ### POM.xml Changes
 
 ```xml
-<!-- Removed JUnit 4 dependency -->
-<dependency>
-  <groupId>junit</groupId>
-  <artifactId>junit</artifactId>
-  <version>4.13.2</version>
-  <scope>test</scope>
-</dependency>
-
-<!-- Removed JUnit Vintage Engine -->
 <dependency>
   <groupId>org.junit.vintage</groupId>
   <artifactId>junit-vintage-engine</artifactId>

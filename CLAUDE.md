@@ -1,3 +1,7 @@
+<\!-- 
+Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+-->
+
 # Samstraumr Context for Claude
 
 This document serves as a reference for Claude when working with the Samstraumr repository, providing key information about project standards, commands, and organization.
