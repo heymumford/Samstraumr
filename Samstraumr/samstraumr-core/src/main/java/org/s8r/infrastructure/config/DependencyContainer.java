@@ -187,9 +187,29 @@ public class DependencyContainer implements ServiceFactory {
     MonitoringFactory monitoringFactory = new MonitoringFactory(dataFlowService);
     register(MonitoringFactory.class, monitoringFactory);
     
+    // Set up initialization services
+    setupInitializationServices();
+    
     // We'll register the S8rFacade implementation later through registerFramework()
 
     logger.info("Initialized services");
+  }
+  
+  /** Sets up project initialization services. */
+  private void setupInitializationServices() {
+    LoggerPort logger = get(LoggerPort.class);
+    
+    // Create project initialization infrastructure adapter
+    org.s8r.infrastructure.initialization.FileSystemProjectInitializer initializer = 
+        new org.s8r.infrastructure.initialization.FileSystemProjectInitializer(logger);
+    register(org.s8r.application.port.ProjectInitializationPort.class, initializer);
+    
+    // Create project initialization service
+    org.s8r.application.service.ProjectInitializationService initService = 
+        new org.s8r.application.service.ProjectInitializationService(initializer, logger);
+    register(org.s8r.application.service.ProjectInitializationService.class, initService);
+    
+    logger.info("Initialized project initialization services");
   }
 
   /** Sets up the event system. */

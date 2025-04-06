@@ -26,13 +26,21 @@ import org.slf4j.LoggerFactory;
 /**
  * Initializes a new Samstraumr repository with the necessary directory structure and configuration
  * files.
+ * 
+ * @deprecated This class is part of the legacy initialization package and has been replaced by the
+ *             Clean Architecture implementation in org.s8r.application.service.ProjectInitializationService.
+ *             Use that class instead for new code.
  */
+@Deprecated
 public class S8rInitializer {
   private static final Logger LOGGER = LoggerFactory.getLogger(S8rInitializer.class);
 
   private final String repoPath;
   private final String packageName;
   private static final String DEFAULT_PACKAGE = "org.example";
+  
+  // Delegate to the Clean Architecture implementation
+  private final org.s8r.application.service.ProjectInitializationService initService;
 
   /**
    * Creates a new initializer for the specified repository path with default package.
@@ -52,14 +60,32 @@ public class S8rInitializer {
   public S8rInitializer(String repoPath, String packageName) {
     this.repoPath = repoPath;
     this.packageName = packageName;
+    
+    // Get the Clean Architecture implementation from the ServiceLocator
+    this.initService = org.s8r.application.ServiceLocator.getServiceFactory()
+        .getService(org.s8r.application.service.ProjectInitializationService.class);
+    
+    if (this.initService == null) {
+      LOGGER.warn("Project initialization service not found in ServiceLocator. Using legacy implementation.");
+    }
   }
 
   /**
    * Initializes a Samstraumr repository.
    *
    * @return true if initialization was successful, false otherwise
+   * @deprecated Use the ProjectInitializationService in the application layer instead.
    */
+  @Deprecated
   public boolean initialize() {
+    // If the Clean Architecture implementation is available, delegate to it
+    if (initService != null) {
+      LOGGER.info("Delegating to Clean Architecture implementation");
+      return initService.initializeProject(repoPath, packageName);
+    }
+    
+    // Legacy implementation when the Clean Architecture service is not available
+    LOGGER.warn("Using legacy initialization implementation");
     try {
       System.out.println("Initializing Samstraumr repository");
 

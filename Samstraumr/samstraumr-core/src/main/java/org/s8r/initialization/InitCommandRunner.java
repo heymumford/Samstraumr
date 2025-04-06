@@ -18,7 +18,12 @@ package org.s8r.initialization;
 /**
  * Command-line runner for the S8rInitializer. This class provides a simple entry point for
  * initializing a Samstraumr repository.
+ * 
+ * @deprecated This class is part of the legacy initialization package and has been replaced by the
+ *             Clean Architecture implementation in org.s8r.adapter.in.cli.InitProjectCommand.
+ *             Use that class instead for new code.
  */
+@Deprecated
 public class InitCommandRunner {
 
   /**
@@ -28,6 +33,22 @@ public class InitCommandRunner {
    *     (optional) should be the package name.
    */
   public static void main(String[] args) {
+    System.out.println("Using legacy initialization runner (deprecated)");
+    System.out.println("Consider using org.s8r.adapter.in.cli.InitProjectCommand instead");
+    
+    // Delegate to the Clean Architecture CLI adapter
+    try {
+      Class<?> newCommandClass = Class.forName("org.s8r.adapter.in.cli.InitProjectCommand");
+      java.lang.reflect.Method mainMethod = newCommandClass.getMethod("main", String[].class);
+      
+      // The main method expects String[] but needs to be called with Object[] and cast to Object
+      mainMethod.invoke(null, (Object) args);
+      return;
+    } catch (Exception e) {
+      System.err.println("Clean Architecture implementation not available, falling back to legacy implementation");
+    }
+    
+    // Legacy implementation as fallback
     if (args.length < 1) {
       System.err.println(
           "Usage: java org.s8r.initialization.InitCommandRunner <repo-path> [package-name]");
