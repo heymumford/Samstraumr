@@ -1,12 +1,18 @@
-/**
+/*
  * Copyright (c) 2025 Eric C. Mumford (@heymumford)
  *
- * <p>This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy
- * of the MPL was not distributed with this file, You can obtain one at
- * https://github.com/heymumford/Samstraumr/blob/main/LICENSE
+ * This software was developed with analytical assistance from AI tools 
+ * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+ * which were used as paid services. All intellectual property rights 
+ * remain exclusively with the copyright holder listed above.
  *
- * <p>Exception specific to machine operations in the S8r framework
+ * Licensed under the Mozilla Public License 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.mozilla.org/en-US/MPL/2.0/
  */
+
 package org.s8r.component.machine;
 
 import org.s8r.component.exception.ComponentException;

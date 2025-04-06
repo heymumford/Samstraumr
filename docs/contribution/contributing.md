@@ -1,10 +1,26 @@
-<!-- 
-Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+<!--
+Copyright (c) 2025 Eric C. Mumford (@heymumford)
+
+This software was developed with analytical assistance from AI tools 
+including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+which were used as paid services. All intellectual property rights 
+remain exclusively with the copyright holder listed above.
+
+Licensed under the Mozilla Public License 2.0
 -->
+
 
 # Contributing
 
 Thank you for your interest in contributing to Samstraumr! This guide will help you understand the contribution process and expectations.
+
+## Intellectual Property
+
+By contributing to this project, you confirm that your contributions are your 
+own original work. If you use AI assistance tools in creating your contribution, 
+please disclose this in your pull request description. Use of such tools does not 
+affect your ownership of your contribution, but transparency helps maintain clear 
+provenance of the project's intellectual property.
 
 ## Contribution Process
 

@@ -1,6 +1,16 @@
 /*
- * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
- * Gemini Deep Research, Claude 3.7.
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford)
+ *
+ * This software was developed with analytical assistance from AI tools 
+ * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+ * which were used as paid services. All intellectual property rights 
+ * remain exclusively with the copyright holder listed above.
+ *
+ * Licensed under the Mozilla Public License 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.mozilla.org/en-US/MPL/2.0/
  */
 
 package org.s8r.tube.reporting;
@@ -153,7 +163,8 @@ public class DocumentGenerator {
       Object renderer = getRendererMethod.invoke(null);
       Class<?> rendererClass = renderer.getClass();
     } catch (ClassNotFoundException e) {
-      LOGGER.warning("Docmosis library not found. Using fallback mechanism for document generation.");
+      LOGGER.warning(
+          "Docmosis library not found. Using fallback mechanism for document generation.");
       generateFallbackDocumentation(outputDir, format, templateFiles);
       return;
     } catch (ReflectiveOperationException e) {
@@ -172,35 +183,36 @@ public class DocumentGenerator {
       for (File templateFile : templateFiles) {
         String templateName = templateFile.getName();
         String baseName = templateName.substring(0, templateName.lastIndexOf('.'));
-  
+
         // Create data for template
         Map<String, Object> data = new HashMap<>();
         data.put("timestamp", timestamp);
         data.put("version", getProjectVersion());
         data.put("generationDate", now.format(DateTimeFormatter.ofPattern("MMMM d, yyyy")));
         data.put("projectName", "Samstraumr");
-  
+
         // Output filename
         String outputFileName = baseName + "." + format;
         String outputPath = Paths.get(outputDir, outputFileName).toString();
-  
+
         try {
           // Render document with reflection (compatible with Java 21's stronger module boundaries)
           Class<?> systemManagerClass = Class.forName("com.docmosis.SystemManager");
           Method getRendererMethod = systemManagerClass.getMethod("getRenderer");
           Object renderer = getRendererMethod.invoke(null);
           Class<?> rendererClass = renderer.getClass();
-          
-          Method renderMethod = rendererClass.getMethod("render", String.class, String.class, Map.class);
+
+          Method renderMethod =
+              rendererClass.getMethod("render", String.class, String.class, Map.class);
           renderMethod.invoke(renderer, templateFile.getAbsolutePath(), outputPath, data);
-  
+
           LOGGER.info("Generated document: " + outputPath);
         } catch (ReflectiveOperationException e) {
           LOGGER.warning("Error rendering document: " + e.getMessage());
           throw e;
         }
       }
-  
+
       // Shutdown Docmosis
       try {
         Class<?> systemManagerClass = Class.forName("com.docmosis.SystemManager");
@@ -248,8 +260,8 @@ public class DocumentGenerator {
   }
 
   /**
-   * Fallback method for document generation when Docmosis is not available.
-   * Creates simple text files with the same data.
+   * Fallback method for document generation when Docmosis is not available. Creates simple text
+   * files with the same data.
    *
    * @param outputDir Output directory
    * @param format Output format
@@ -259,35 +271,40 @@ public class DocumentGenerator {
   private static void generateFallbackDocumentation(
       String outputDir, String format, File[] templateFiles) throws Exception {
     LOGGER.info("Using fallback document generation mechanism");
-    
+
     // Get current timestamp
     LocalDateTime now = LocalDateTime.now();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     String timestamp = now.format(formatter);
-    
+
     // Process each template
     for (File templateFile : templateFiles) {
       String templateName = templateFile.getName();
       String baseName = templateName.substring(0, templateName.lastIndexOf('.'));
-      
+
       // Use txt format for fallback
       String outputFileName = baseName + ".txt";
       Path outputPath = Paths.get(outputDir, outputFileName);
-      
+
       StringBuilder content = new StringBuilder();
       content.append("DOCUMENT GENERATION FALLBACK\n");
       content.append("==========================\n\n");
       content.append("Template: ").append(templateName).append("\n");
       content.append("Timestamp: ").append(timestamp).append("\n");
       content.append("Version: ").append(getProjectVersion()).append("\n");
-      content.append("Generation Date: ").append(now.format(DateTimeFormatter.ofPattern("MMMM d, yyyy"))).append("\n");
+      content
+          .append("Generation Date: ")
+          .append(now.format(DateTimeFormatter.ofPattern("MMMM d, yyyy")))
+          .append("\n");
       content.append("Project Name: Samstraumr\n\n");
-      content.append("NOTE: This is a fallback document generated because Docmosis was not available.\n");
-      content.append("To generate proper documentation, ensure the Docmosis library is available in the classpath.\n");
-      
+      content.append(
+          "NOTE: This is a fallback document generated because Docmosis was not available.\n");
+      content.append(
+          "To generate proper documentation, ensure the Docmosis library is available in the classpath.\n");
+
       // Write to file
       java.nio.file.Files.write(outputPath, content.toString().getBytes());
-      
+
       LOGGER.info("Generated fallback document: " + outputPath);
     }
   }

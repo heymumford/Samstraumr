@@ -1,29 +1,16 @@
-/**
+/*
  * Copyright (c) 2025 Eric C. Mumford (@heymumford)
  *
- * <p>This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy
- * of the MPL was not distributed with this file, You can obtain one at
- * https://github.com/heymumford/Samstraumr/blob/main/LICENSE
+ * This software was developed with analytical assistance from AI tools 
+ * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+ * which were used as paid services. All intellectual property rights 
+ * remain exclusively with the copyright holder listed above.
  *
- * <p>Core component implementation package
+ * Licensed under the Mozilla Public License 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.mozilla.org/en-US/MPL/2.0/
  */
 
-/**
- * Core implementation of the component model in the S8r framework.
- *
- * <p>This package contains the fundamental component abstractions and implementations for the S8r
- * framework. It provides the essential infrastructure for components to maintain their hierarchical
- * design, identity, and operational capabilities.
- *
- * <p>Key classes in this package:
- *
- * <ul>
- *   <li>{@link org.s8r.component.core.Component} - Base component implementation
- *   <li>{@link org.s8r.component.core.State} - Unified state enum combining operational and
- *       lifecycle states
- * </ul>
- *
- * <p>This package is part of the simplified structure, replacing the org.s8r.core.tube.impl package
- * and flattening the hierarchy for better organization.
- */
 package org.s8r.component.core;

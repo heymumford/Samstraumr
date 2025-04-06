@@ -1,27 +1,16 @@
-/**
+/*
  * Copyright (c) 2025 Eric C. Mumford (@heymumford)
  *
- * <p>This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy
- * of the MPL was not distributed with this file, You can obtain one at
- * https://github.com/heymumford/Samstraumr/blob/main/LICENSE
+ * This software was developed with analytical assistance from AI tools 
+ * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+ * which were used as paid services. All intellectual property rights 
+ * remain exclusively with the copyright holder listed above.
  *
- * <p>Exception handling for the component model in the S8r framework
+ * Licensed under the Mozilla Public License 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.mozilla.org/en-US/MPL/2.0/
  */
 
-/**
- * Provides exception handling for the component model in the S8r framework.
- *
- * <p>This package contains exceptions for handling error conditions in the component model. It
- * provides a centralized approach to error handling and reporting, following a standard exception
- * hierarchy:
- *
- * <ul>
- *   <li>{@link org.s8r.component.exception.ComponentException} - Base exception for component
- *       errors
- *   <li>Specialized exceptions for specific error conditions
- * </ul>
- *
- * <p>This package is part of the simplified structure, replacing the scattered exception classes in
- * the legacy implementation with a unified approach.
- */
 package org.s8r.component.exception;

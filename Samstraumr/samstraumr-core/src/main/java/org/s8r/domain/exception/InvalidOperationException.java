@@ -1,13 +1,16 @@
 /*
- * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
- * Gemini Deep Research, Claude 3.7.
- */
-
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford)
  *
- * Domain exception for invalid component operations in the S8r framework
+ * This software was developed with analytical assistance from AI tools 
+ * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+ * which were used as paid services. All intellectual property rights 
+ * remain exclusively with the copyright holder listed above.
+ *
+ * Licensed under the Mozilla Public License 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.mozilla.org/en-US/MPL/2.0/
  */
 
 package org.s8r.domain.exception;
@@ -24,8 +27,10 @@ public class InvalidOperationException extends ComponentException {
 
   /** Creates a new InvalidOperationException with component information. */
   public InvalidOperationException(String operation, Component component) {
-    super(String.format("Cannot perform operation '%s' on component in state: %s",
-          operation, component.getLifecycleState()));
+    super(
+        String.format(
+            "Cannot perform operation '%s' on component in state: %s",
+            operation, component.getLifecycleState()));
     this.operation = operation;
     this.lifecycleState = component.getLifecycleState();
     this.currentState = this.lifecycleState.name();
@@ -41,8 +46,10 @@ public class InvalidOperationException extends ComponentException {
 
   /** Creates a new InvalidOperationException with component ID and state string. */
   public InvalidOperationException(String operation, String componentId, String currentState) {
-    super(String.format("Cannot perform operation '%s' on component %s in state: %s",
-          operation, componentId, currentState));
+    super(
+        String.format(
+            "Cannot perform operation '%s' on component %s in state: %s",
+            operation, componentId, currentState));
     this.operation = operation;
     this.currentState = currentState;
     this.lifecycleState = null; // Not available
@@ -50,15 +57,26 @@ public class InvalidOperationException extends ComponentException {
 
   /** Creates a new InvalidOperationException with a cause. */
   public InvalidOperationException(String operation, Component component, Throwable cause) {
-    super(String.format("Cannot perform operation '%s' on component in state: %s",
-          operation, component.getLifecycleState()), cause);
+    super(
+        String.format(
+            "Cannot perform operation '%s' on component in state: %s",
+            operation, component.getLifecycleState()),
+        cause);
     this.operation = operation;
     this.lifecycleState = component.getLifecycleState();
     this.currentState = this.lifecycleState.name();
   }
 
   // Getters
-  public String getOperation() { return operation; }
-  public LifecycleState getLifecycleState() { return lifecycleState; }
-  public String getCurrentState() { return currentState; }
+  public String getOperation() {
+    return operation;
+  }
+
+  public LifecycleState getLifecycleState() {
+    return lifecycleState;
+  }
+
+  public String getCurrentState() {
+    return currentState;
+  }
 }

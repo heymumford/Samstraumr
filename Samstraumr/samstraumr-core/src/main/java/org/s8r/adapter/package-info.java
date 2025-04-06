@@ -1,33 +1,16 @@
 /*
- * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
- * Gemini Deep Research, Claude 3.7.
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford)
+ *
+ * This software was developed with analytical assistance from AI tools 
+ * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+ * which were used as paid services. All intellectual property rights 
+ * remain exclusively with the copyright holder listed above.
+ *
+ * Licensed under the Mozilla Public License 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.mozilla.org/en-US/MPL/2.0/
  */
 
-/**
- * Adapter classes to provide backward compatibility for the S8r framework.
- *
- * <p>This package contains adapter classes that bridge the legacy API with the new, simplified API
- * structure. It facilitates a smooth migration path by allowing existing code to continue using the
- * old API while gradually transitioning to the new structure.
- *
- * <p>The adapters in this package serve as bidirectional translators between the old
- * (org.samstraumr.tube.*) and new (org.s8r.core.*) package structures, enabling incremental
- * adoption of the new structure without breaking existing functionality.
- *
- * <p>Key adapter patterns implemented:
- *
- * <ul>
- *   <li>Object Adapters - Converting between corresponding legacy and new classes
- *   <li>Bidirectional Conversion - Supporting both directions of conversion
- *   <li>Compatibility Layers - Implementing interfaces compatible with both structures
- * </ul>
- *
- * <p>Use these adapters when:
- *
- * <ul>
- *   <li>You need to integrate legacy code with new code
- *   <li>You want to gradually migrate existing implementations
- *   <li>You need to maintain backward compatibility
- * </ul>
- */
 package org.s8r.adapter;

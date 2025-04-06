@@ -1,34 +1,16 @@
 /*
- * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
- * Gemini Deep Research, Claude 3.7.
- */
-
-/*
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford)
  *
- * Licensed under the MIT License (the "License");
+ * This software was developed with analytical assistance from AI tools 
+ * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+ * which were used as paid services. All intellectual property rights 
+ * remain exclusively with the copyright holder listed above.
+ *
+ * Licensed under the Mozilla Public License 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Test execution utility for Samstraumr with unified terminology support.
- *
- * This class provides a flexible test runner that bridges the gap between industry-standard
- * and Samstraumr-specific terminology. It allows tests to be run using either set of terms,
- * facilitating a more intuitive testing experience for developers familiar with standard
- * testing terminology while maintaining Samstraumr's domain-specific naming conventions.
- *
- * Key features:
- * - Support for both industry-standard and Samstraumr-specific test tags
- * - Bidirectional terminology mapping between equivalent concepts
- * - Ability to include tests from both terminologies in a single run
- * - Comprehensive test execution summary generation
- *
- * Usage example:
- * ```
- * // Run unit tests (industry-standard) and tube tests (Samstraumr equivalent)
- * RunTests.runAndPrintResults("unit", true);
- *
- * // Run only Samstraumr-specific acceptance tests
- * RunTests.runAndPrintResults("acceptance", false);
- * ```
+ *     https://www.mozilla.org/en-US/MPL/2.0/
  */
 
 package org.s8r.tube.test;

@@ -1,13 +1,16 @@
 /*
- * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
- * Gemini Deep Research, Claude 3.7.
- */
-
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford)
  *
- * Domain model for machines in the S8r framework
+ * This software was developed with analytical assistance from AI tools 
+ * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+ * which were used as paid services. All intellectual property rights 
+ * remain exclusively with the copyright holder listed above.
+ *
+ * Licensed under the Mozilla Public License 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.mozilla.org/en-US/MPL/2.0/
  */
 
 package org.s8r.domain.machine;
@@ -42,7 +45,8 @@ public class Machine {
   private MachineState state;
   private String version;
 
-  private Machine(ComponentId id, MachineType type, String name, String description, String version) {
+  private Machine(
+      ComponentId id, MachineType type, String name, String description, String version) {
     this.id = Objects.requireNonNull(id, "Machine ID cannot be null");
     this.type = Objects.requireNonNull(type, "Machine type cannot be null");
     this.name = Objects.requireNonNull(name, "Machine name cannot be null");
@@ -133,8 +137,11 @@ public class Machine {
         component.activate();
         logActivity("Activated component: " + component.getId().getShortId());
       } catch (Exception e) {
-        logActivity("Failed to activate component: " + component.getId().getShortId() + 
-                    ", reason: " + e.getMessage());
+        logActivity(
+            "Failed to activate component: "
+                + component.getId().getShortId()
+                + ", reason: "
+                + e.getMessage());
       }
     }
 
@@ -159,8 +166,11 @@ public class Machine {
         component.deactivate();
         logActivity("Deactivated component: " + component.getId().getShortId());
       } catch (Exception e) {
-        logActivity("Failed to deactivate component: " + component.getId().getShortId() + 
-                    ", reason: " + e.getMessage());
+        logActivity(
+            "Failed to deactivate component: "
+                + component.getId().getShortId()
+                + ", reason: "
+                + e.getMessage());
       }
     }
 
@@ -181,8 +191,11 @@ public class Machine {
         component.terminate();
         logActivity("Terminated component: " + component.getId().getShortId());
       } catch (Exception e) {
-        logActivity("Failed to terminate component: " + component.getId().getShortId() + 
-                    ", reason: " + e.getMessage());
+        logActivity(
+            "Failed to terminate component: "
+                + component.getId().getShortId()
+                + ", reason: "
+                + e.getMessage());
       }
     }
 
@@ -205,9 +218,9 @@ public class Machine {
 
   /** Checks if this machine is in a modifiable state. */
   private boolean isModifiable() {
-    return state == MachineState.CREATED || 
-           state == MachineState.READY || 
-           state == MachineState.STOPPED;
+    return state == MachineState.CREATED
+        || state == MachineState.READY
+        || state == MachineState.STOPPED;
   }
 
   /** Gets the current state name of this machine. */
@@ -221,19 +234,50 @@ public class Machine {
   }
 
   // Getters
-  public ComponentId getId() { return id; }
-  public MachineType getType() { return type; }
-  public String getName() { return name; }
-  public String getDescription() { return description; }
-  public String getVersion() { return version; }
-  public Instant getCreationTime() { return creationTime; }
-  public MachineState getState() { return state; }
-  public List<String> getActivityLog() { return Collections.unmodifiableList(activityLog); }
-  public List<DomainEvent> getDomainEvents() { return Collections.unmodifiableList(domainEvents); }
+  public ComponentId getId() {
+    return id;
+  }
+
+  public MachineType getType() {
+    return type;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public Instant getCreationTime() {
+    return creationTime;
+  }
+
+  public MachineState getState() {
+    return state;
+  }
+
+  public List<String> getActivityLog() {
+    return Collections.unmodifiableList(activityLog);
+  }
+
+  public List<DomainEvent> getDomainEvents() {
+    return Collections.unmodifiableList(domainEvents);
+  }
 
   // Event handling
-  public void clearEvents() { domainEvents.clear(); }
-  protected void raiseEvent(DomainEvent event) { domainEvents.add(event); }
+  public void clearEvents() {
+    domainEvents.clear();
+  }
+
+  protected void raiseEvent(DomainEvent event) {
+    domainEvents.add(event);
+  }
 
   // Object methods overrides
   @Override
@@ -244,15 +288,26 @@ public class Machine {
   }
 
   @Override
-  public int hashCode() { return Objects.hash(id); }
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 
   @Override
   public String toString() {
-    return "Machine{id=" + id.getShortId() + 
-           ", name='" + name + '\'' + 
-           ", type=" + type + 
-           ", state=" + state + 
-           ", version='" + version + '\'' + 
-           ", componentCount=" + components.size() + '}';
+    return "Machine{id="
+        + id.getShortId()
+        + ", name='"
+        + name
+        + '\''
+        + ", type="
+        + type
+        + ", state="
+        + state
+        + ", version='"
+        + version
+        + '\''
+        + ", componentCount="
+        + components.size()
+        + '}';
   }
 }

@@ -35,65 +35,18 @@
   </properties>
 
   <dependencies>
-    <!-- Core Dependencies -->
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>${lombok.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    
-    <!-- System Information -->
     <dependency>
       <groupId>com.github.oshi</groupId>
       <artifactId>oshi-core</artifactId>
       <version>${oshi.version}</version>
     </dependency>
     
-    <!-- JSON Processing - Currently not directly used but available for future -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${jackson.version}</version>
-      <scope>compile</scope>
-    </dependency>
-    
-    <!-- SpotBugs Annotations -->
     <dependency>
       <groupId>com.github.spotbugs</groupId>
       <artifactId>spotbugs-annotations</artifactId>
       <version>${spotbugs.annotations.version}</version>
     </dependency>
     
-    <!-- Logging Framework -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-slf4j2-impl</artifactId>
-      <version>${log4j2.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-api</artifactId>
-      <version>${log4j2.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core</artifactId>
-      <version>${log4j2.version}</version>
-    </dependency>
-    
-    <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
@@ -101,8 +54,6 @@
       <scope>test</scope>
     </dependency>
     
-    <!-- JUnit 4 dependency removed in favor of JUnit 5 only -->
-    <!-- Cucumber dependencies -->
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-java</artifactId>
@@ -149,9 +100,6 @@
       <scope>test</scope>
     </dependency>
     
-    <!-- JUnit Vintage Engine dependency removed to ensure exclusive use of JUnit 5 -->
-    
-    <!-- ArchUnit for architectural testing -->
     <dependency>
       <groupId>com.tngtech.archunit</groupId>
       <artifactId>archunit-junit5</artifactId>
@@ -159,22 +107,6 @@
       <scope>test</scope>
     </dependency>
     
-    <!-- Mockito for testing -->
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>${mockito.version}</version>
-      <scope>test</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-junit-jupiter</artifactId>
-      <version>${mockito.version}</version>
-      <scope>test</scope>
-    </dependency>
-    
-    <!-- TestContainers for integration testing -->
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers</artifactId>
@@ -196,15 +128,6 @@
       <scope>test</scope>
     </dependency>
     
-    <!-- Document Generation (Optional) - Commented out for testing 
-    <dependency>
-      <groupId>com.docmosis</groupId>
-      <artifactId>docmosis-core</artifactId>
-      <version>${docmosis.version}</version>
-      <optional>true</optional>
-      <scope>provided</scope>
-    </dependency>
-    -->
   </dependencies>
 
   <build>
@@ -236,11 +159,6 @@
           <systemPropertyVariables>
             <cucumber.filter.tags>${cucumber.filter.tags}</cucumber.filter.tags>
           </systemPropertyVariables>
-          <!-- Explicitly enable tests -->
-          <skipTests>false</skipTests>
-          <maven.test.skip>false</maven.test.skip>
-          <testFailureIgnore>false</testFailureIgnore>
-          <!-- Add explicit provider configuration -->
           <properties>
             <configurationParameters>
               cucumber.junit-platform.naming-strategy=long
@@ -270,49 +188,6 @@
         <artifactId>maven-resources-plugin</artifactId>
       </plugin>
       
-      <!-- Quality Checks (inherited from parent pom) -->
-      <plugin>
-        <groupId>com.diffplug.spotless</groupId>
-        <artifactId>spotless-maven-plugin</artifactId>
-        <configuration>
-          <skip>false</skip>
-          <spotlessCheck>
-            <skip>false</skip>
-          </spotlessCheck>
-          <java>
-            <googleJavaFormat>
-              <version>${spotless.google.format.version}</version>
-              <style>GOOGLE</style>
-            </googleJavaFormat>
-            <removeUnusedImports />
-            <importOrder>
-              <order>java,javax,org,com</order>
-            </importOrder>
-          </java>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>com.github.spotbugs</groupId>
-        <artifactId>spotbugs-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-    
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
-    
-    <!-- Add test resources configuration -->
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>
@@ -329,17 +204,6 @@
   </build>
   
   <profiles>
-    <!-- Standard Tests Profile -->
-    <profile>
-      <id>tests</id>
-      <properties>
-        <cucumber.filter.tags>@ATL</cucumber.filter.tags>
-        <skipTests>false</skipTests>
-        <maven.test.skip>false</maven.test.skip>
-      </properties>
-    </profile>
-    
-    <!-- Legacy ATL Profile (for backward compatibility) -->
     <profile>
       <id>atl-tests</id>
       <properties>
@@ -347,9 +211,6 @@
       </properties>
     </profile>
     
-    <!-- BTL profiles removed in test consolidation -->
-    
-    <!-- Smoke (Orchestration) Tests Profile -->
     <profile>
       <id>orchestration-tests</id>
       <properties>
@@ -357,15 +218,6 @@
       </properties>
     </profile>
     
-    <!-- Unit Tests Profile -->
-    <profile>
-      <id>unit-tests</id>
-      <properties>
-        <cucumber.filter.tags>@UnitTest or @TubeTest</cucumber.filter.tags>
-      </properties>
-    </profile>
-    
-    <!-- Unit (Tube) Tests Profile -->
     <profile>
       <id>tube-tests</id>
       <properties>
@@ -373,15 +225,6 @@
       </properties>
     </profile>
     
-    <!-- Component (Composite) Tests Profile -->
-    <profile>
-      <id>composite-tests</id>
-      <properties>
-        <cucumber.filter.tags>@CompositeTest</cucumber.filter.tags>
-      </properties>
-    </profile>
-    
-    <!-- Integration (Flow) Tests Profile -->
     <profile>
       <id>flow-tests</id>
       <properties>
@@ -389,15 +232,6 @@
       </properties>
     </profile>
     
-    <!-- API (Machine) Tests Profile -->
-    <profile>
-      <id>machine-tests</id>
-      <properties>
-        <cucumber.filter.tags>@MachineTest</cucumber.filter.tags>
-      </properties>
-    </profile>
-    
-    <!-- System (Stream) Tests Profile -->
     <profile>
       <id>stream-tests</id>
       <properties>
@@ -405,15 +239,6 @@
       </properties>
     </profile>
     
-    <!-- E2E (Acceptance) Tests Profile -->
-    <profile>
-      <id>acceptance-tests</id>
-      <properties>
-        <cucumber.filter.tags>@AcceptanceTest</cucumber.filter.tags>
-      </properties>
-    </profile>
-    
-    <!-- Property (Adaptation) Tests Profile -->
     <profile>
       <id>adaptation-tests</id>
       <properties>
@@ -421,15 +246,6 @@
       </properties>
     </profile>
     
-    <!-- Adam Tube Tests Profile -->
-    <profile>
-      <id>adam-tube-tests</id>
-      <properties>
-        <cucumber.filter.tags>@AdamTube</cucumber.filter.tags>
-      </properties>
-    </profile>
-    
-    <!-- Adam Tube ATL Tests Profile -->
     <profile>
       <id>adam-tube-atl-tests</id>
       <properties>
@@ -438,12 +254,4 @@
     </profile>
   </profiles>
   
-  <!-- Repositories temporarily commented out for testing
-  <repositories>
-    <repository>
-      <id>docmosis-repository</id>
-      <url>https://maven.docmosis.com/releases</url>
-    </repository>
-  </repositories>
-  -->
 </project>

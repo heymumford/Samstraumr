@@ -287,3 +287,4 @@ backup-legacy/
 # Additional build artifacts
 **/maven-failsafe-plugin/
 **/surefire-reports/dump*.dump*
+**/CLAUDE.local.md

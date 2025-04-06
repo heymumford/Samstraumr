@@ -1,12 +1,18 @@
-/**
+/*
  * Copyright (c) 2025 Eric C. Mumford (@heymumford)
  *
- * <p>This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy
- * of the MPL was not distributed with this file, You can obtain one at
- * https://github.com/heymumford/Samstraumr/blob/main/LICENSE
+ * This software was developed with analytical assistance from AI tools 
+ * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+ * which were used as paid services. All intellectual property rights 
+ * remain exclusively with the copyright holder listed above.
  *
- * <p>Core implementation of the Component concept in the S8r framework
+ * Licensed under the Mozilla Public License 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.mozilla.org/en-US/MPL/2.0/
  */
+
 package org.s8r.component.core;
 
 import java.security.MessageDigest;
@@ -29,8 +35,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Core implementation of the Component concept in the S8r framework.
  *
- * <p>Implements a biological-inspired lifecycle model with state transitions
- * and parent-child relationships.
+ * <p>Implements a biological-inspired lifecycle model with state transitions and parent-child
+ * relationships.
  */
 public class Component {
   private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Component.class);
@@ -52,10 +58,9 @@ public class Component {
   private State state = State.CONCEPTION;
   private Identity parentIdentity;
 
-  /**
-   * Private constructor for creating a component instance.
-   */
-  private Component(String reason, Environment environment, String uniqueId, Identity parentIdentity) {
+  /** Private constructor for creating a component instance. */
+  private Component(
+      String reason, Environment environment, String uniqueId, Identity parentIdentity) {
     this.reason = reason;
     this.uniqueId = uniqueId;
     this.conceptionTime = Instant.now();
@@ -64,7 +69,7 @@ public class Component {
     this.lineage.add(reason);
     this.memoryLog = Collections.synchronizedList(new LinkedList<>());
     if (environment == null) {
-        throw new IllegalArgumentException("Environment cannot be null");
+      throw new IllegalArgumentException("Environment cannot be null");
     }
     this.environment = environment;
     this.logger = new Logger(uniqueId);
@@ -79,7 +84,8 @@ public class Component {
     if (parentIdentity != null) {
       this.identity = Identity.createChildIdentity(reason, envParams, parentIdentity);
       logToMemory("Created with parent identity: " + parentIdentity.getUniqueId());
-      logger.info("Created with parent identity: " + parentIdentity.getUniqueId(), "IDENTITY", "CHILD");
+      logger.info(
+          "Created with parent identity: " + parentIdentity.getUniqueId(), "IDENTITY", "CHILD");
     } else {
       this.identity = Identity.createAdamIdentity(reason, envParams);
       logToMemory("Created as Adam component (no parent)");
@@ -90,9 +96,7 @@ public class Component {
     initialize();
   }
 
-  /**
-   * Converts environment parameters to a map of strings.
-   */
+  /** Converts environment parameters to a map of strings. */
   private Map<String, String> convertEnvironmentParams(Environment environment) {
     Map<String, String> result = new ConcurrentHashMap<>();
     for (String key : environment.getParameterKeys()) {
@@ -101,9 +105,7 @@ public class Component {
     return result;
   }
 
-  /**
-   * Creates a new component with the specified reason and environment.
-   */
+  /** Creates a new component with the specified reason and environment. */
   public static Component create(String reason, Environment environment) {
     if (reason == null) throw new IllegalArgumentException("Reason cannot be null");
     if (environment == null) throw new IllegalArgumentException("Environment cannot be null");
@@ -112,12 +114,11 @@ public class Component {
     return new Component(reason, environment, uniqueId, null);
   }
 
-  /**
-   * Creates a new component with environment parameter map (backward compatibility).
-   */
+  /** Creates a new component with environment parameter map (backward compatibility). */
   public static Component create(String reason, Map<String, String> environmentParams) {
     if (reason == null) throw new IllegalArgumentException("Reason cannot be null");
-    if (environmentParams == null) throw new IllegalArgumentException("Environment parameters cannot be null");
+    if (environmentParams == null)
+      throw new IllegalArgumentException("Environment parameters cannot be null");
 
     Environment env = new Environment();
     for (Map.Entry<String, String> entry : environmentParams.entrySet()) {
@@ -127,9 +128,7 @@ public class Component {
     return create(reason, env);
   }
 
-  /**
-   * Creates a child component with a parent reference.
-   */
+  /** Creates a child component with a parent reference. */
   public static Component createChild(String reason, Environment environment, Component parent) {
     if (reason == null) throw new IllegalArgumentException("Reason cannot be null");
     if (environment == null) throw new IllegalArgumentException("Environment cannot be null");
@@ -149,12 +148,12 @@ public class Component {
     return child;
   }
 
-  /**
-   * Creates a child component with environment parameter map (backward compatibility).
-   */
-  public static Component createChild(String reason, Map<String, String> environmentParams, Component parent) {
+  /** Creates a child component with environment parameter map (backward compatibility). */
+  public static Component createChild(
+      String reason, Map<String, String> environmentParams, Component parent) {
     if (reason == null) throw new IllegalArgumentException("Reason cannot be null");
-    if (environmentParams == null) throw new IllegalArgumentException("Environment parameters cannot be null");
+    if (environmentParams == null)
+      throw new IllegalArgumentException("Environment parameters cannot be null");
     if (parent == null) throw new IllegalArgumentException("Parent component cannot be null");
 
     Environment env = new Environment();
@@ -179,9 +178,7 @@ public class Component {
     logger.info("Component initialized and ready", "LIFECYCLE", "READY");
   }
 
-  /**
-   * Proceeds through the early lifecycle phases of component development.
-   */
+  /** Proceeds through the early lifecycle phases of component development. */
   public void proceedThroughEarlyLifecycle() {
     logToMemory("Beginning early lifecycle development");
     logger.info("Beginning early lifecycle development", "LIFECYCLE", "DEVELOPMENT");
@@ -200,16 +197,15 @@ public class Component {
     logger.info("Completed early lifecycle development", "LIFECYCLE", "DEVELOPMENT");
   }
 
-  /**
-   * Sets up a timer for component termination.
-   */
+  /** Sets up a timer for component termination. */
   public void setupTerminationTimer(int delaySeconds) {
     if (delaySeconds <= 0) {
       throw new IllegalArgumentException("Termination delay must be positive");
     }
 
     if (isTerminated()) {
-      throw new IllegalStateException("Cannot set termination delay: component is already terminated");
+      throw new IllegalStateException(
+          "Cannot set termination delay: component is already terminated");
     }
 
     synchronized (this) {
@@ -232,16 +228,12 @@ public class Component {
     logger.debug("Termination timer set for " + delaySeconds + " seconds", "LIFECYCLE", "TIMER");
   }
 
-  /**
-   * Sets the termination delay for this component.
-   */
+  /** Sets the termination delay for this component. */
   public void setTerminationDelay(int seconds) {
     setupTerminationTimer(seconds);
   }
 
-  /**
-   * Transitions the component to a new state.
-   */
+  /** Transitions the component to a new state. */
   private void transitionToState(State newState) {
     if (newState != this.state) {
       State oldState = this.state;
@@ -384,17 +376,49 @@ public class Component {
   }
 
   // Getter methods
-  public String getUniqueId() { return uniqueId; }
-  public String getReason() { return reason; }
-  public Identity getIdentity() { return identity; }
-  public Environment getEnvironment() { return environment; }
-  public List<String> getLineage() { return Collections.unmodifiableList(lineage); }
-  public List<String> getMemoryLog() { return Collections.unmodifiableList(memoryLog); }
-  public int getMemoryLogSize() { return memoryLog.size(); }
-  public String getEnvironmentState() { return environmentState; }
-  public Instant getConceptionTime() { return conceptionTime; }
-  public Identity getParentIdentity() { return parentIdentity; }
-  public Logger getLogger() { return logger; }
+  public String getUniqueId() {
+    return uniqueId;
+  }
+
+  public String getReason() {
+    return reason;
+  }
+
+  public Identity getIdentity() {
+    return identity;
+  }
+
+  public Environment getEnvironment() {
+    return environment;
+  }
+
+  public List<String> getLineage() {
+    return Collections.unmodifiableList(lineage);
+  }
+
+  public List<String> getMemoryLog() {
+    return Collections.unmodifiableList(memoryLog);
+  }
+
+  public int getMemoryLogSize() {
+    return memoryLog.size();
+  }
+
+  public String getEnvironmentState() {
+    return environmentState;
+  }
+
+  public Instant getConceptionTime() {
+    return conceptionTime;
+  }
+
+  public Identity getParentIdentity() {
+    return parentIdentity;
+  }
+
+  public Logger getLogger() {
+    return logger;
+  }
 
   /** Adds an entry to the component's lineage. */
   public void addToLineage(String entry) {

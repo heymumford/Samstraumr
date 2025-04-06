@@ -1,13 +1,16 @@
 /*
- * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
- * Gemini Deep Research, Claude 3.7.
- */
-
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford)
  *
- * Core domain implementation of Component in the S8r framework
+ * This software was developed with analytical assistance from AI tools 
+ * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+ * which were used as paid services. All intellectual property rights 
+ * remain exclusively with the copyright holder listed above.
+ *
+ * Licensed under the Mozilla Public License 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.mozilla.org/en-US/MPL/2.0/
  */
 
 package org.s8r.domain.component;
@@ -41,7 +44,7 @@ public class Component {
     this.id = Objects.requireNonNull(id, "Component ID cannot be null");
     this.lifecycleState = LifecycleState.CONCEPTION;
     this.lineage.add(id.getReason());
-    
+
     logActivity("Component created with reason: " + id.getReason());
     raiseEvent(new ComponentCreatedEvent(id, this.getClass().getSimpleName()));
   }
@@ -56,14 +59,14 @@ public class Component {
   /** Initialize the component, progressing through early lifecycle states. */
   private void initialize() {
     logActivity("Beginning initialization");
-    
+
     // Progress through initial lifecycle states
     transitionTo(LifecycleState.INITIALIZING);
     transitionTo(LifecycleState.CONFIGURING);
     transitionTo(LifecycleState.SPECIALIZING);
     transitionTo(LifecycleState.DEVELOPING_FEATURES);
     transitionTo(LifecycleState.READY);
-    
+
     logActivity("Initialization complete");
   }
 
@@ -84,16 +87,26 @@ public class Component {
     if (from == to) return true; // Allow self-transitions
 
     switch (from) {
-      case CONCEPTION: return to == LifecycleState.INITIALIZING;
-      case INITIALIZING: return to == LifecycleState.CONFIGURING;
-      case CONFIGURING: return to == LifecycleState.SPECIALIZING;
-      case SPECIALIZING: return to == LifecycleState.DEVELOPING_FEATURES;
-      case DEVELOPING_FEATURES: return to == LifecycleState.READY;
-      case READY: return to == LifecycleState.ACTIVE || to == LifecycleState.TERMINATING;
-      case ACTIVE: return to == LifecycleState.READY || to == LifecycleState.TERMINATING;
-      case TERMINATING: return to == LifecycleState.TERMINATED;
-      case TERMINATED: return false; // Cannot transition from terminated
-      default: return false;
+      case CONCEPTION:
+        return to == LifecycleState.INITIALIZING;
+      case INITIALIZING:
+        return to == LifecycleState.CONFIGURING;
+      case CONFIGURING:
+        return to == LifecycleState.SPECIALIZING;
+      case SPECIALIZING:
+        return to == LifecycleState.DEVELOPING_FEATURES;
+      case DEVELOPING_FEATURES:
+        return to == LifecycleState.READY;
+      case READY:
+        return to == LifecycleState.ACTIVE || to == LifecycleState.TERMINATING;
+      case ACTIVE:
+        return to == LifecycleState.READY || to == LifecycleState.TERMINATING;
+      case TERMINATING:
+        return to == LifecycleState.TERMINATED;
+      case TERMINATED:
+        return false; // Cannot transition from terminated
+      default:
+        return false;
     }
   }
 
@@ -121,10 +134,10 @@ public class Component {
 
     transitionTo(LifecycleState.TERMINATING);
     logActivity("Beginning termination process");
-    
+
     preserveKnowledge();
     releaseResources();
-    
+
     transitionTo(LifecycleState.TERMINATED);
     logActivity("Component terminated at: " + Instant.now());
   }
@@ -155,16 +168,38 @@ public class Component {
   }
 
   // Getters
-  public ComponentId getId() { return id; }
-  public LifecycleState getLifecycleState() { return lifecycleState; }
-  public List<String> getLineage() { return Collections.unmodifiableList(lineage); }
-  public List<String> getActivityLog() { return Collections.unmodifiableList(activityLog); }
-  public Instant getCreationTime() { return creationTime; }
-  public List<DomainEvent> getDomainEvents() { return Collections.unmodifiableList(domainEvents); }
+  public ComponentId getId() {
+    return id;
+  }
+
+  public LifecycleState getLifecycleState() {
+    return lifecycleState;
+  }
+
+  public List<String> getLineage() {
+    return Collections.unmodifiableList(lineage);
+  }
+
+  public List<String> getActivityLog() {
+    return Collections.unmodifiableList(activityLog);
+  }
+
+  public Instant getCreationTime() {
+    return creationTime;
+  }
+
+  public List<DomainEvent> getDomainEvents() {
+    return Collections.unmodifiableList(domainEvents);
+  }
 
   // Event handling
-  protected void raiseEvent(DomainEvent event) { domainEvents.add(event); }
-  public void clearEvents() { domainEvents.clear(); }
+  protected void raiseEvent(DomainEvent event) {
+    domainEvents.add(event);
+  }
+
+  public void clearEvents() {
+    domainEvents.clear();
+  }
 
   // Data publishing
   public void publishData(String channel, Map<String, Object> data) {
@@ -186,11 +221,18 @@ public class Component {
   }
 
   @Override
-  public int hashCode() { return Objects.hash(id); }
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 
   @Override
   public String toString() {
-    return "Component{id=" + id + ", lifecycleState=" + lifecycleState + 
-           ", creationTime=" + creationTime + '}';
+    return "Component{id="
+        + id
+        + ", lifecycleState="
+        + lifecycleState
+        + ", creationTime="
+        + creationTime
+        + '}';
   }
 }

@@ -1,6 +1,14 @@
-<!-- 
-Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
+<!--
+Copyright (c) 2025 Eric C. Mumford (@heymumford)
+
+This software was developed with analytical assistance from AI tools 
+including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+which were used as paid services. All intellectual property rights 
+remain exclusively with the copyright holder listed above.
+
+Licensed under the Mozilla Public License 2.0
 -->
+
 
 # Samstraumr Migration Guide
 
@@ -74,14 +82,6 @@ The Samstraumr project has undergone a significant refactoring to improve its ar
 Update your Maven dependencies:
 
 ```xml
-<!-- Old dependency -->
-<dependency>
-    <groupId>org.samstraumr</groupId>
-    <artifactId>samstraumr-core</artifactId>
-    <version>1.6.x</version>
-</dependency>
-
-<!-- New dependency -->
 <dependency>
     <groupId>org.s8r</groupId>
     <artifactId>s8r-core</artifactId>

@@ -1,33 +1,16 @@
 /*
- * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
- * Gemini Deep Research, Claude 3.7.
- */
-
-/*
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford)
  *
- * Licensed under the MIT License (the "License");
+ * This software was developed with analytical assistance from AI tools 
+ * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+ * which were used as paid services. All intellectual property rights 
+ * remain exclusively with the copyright holder listed above.
+ *
+ * Licensed under the Mozilla Public License 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Step definitions for the Adam Tube concept in Cucumber BDD tests.
- *
- * This class contains step definitions for testing the Adam Tube concept, which represents
- * the first tube created in a system with no parent. These tests validate the properties,
- * constraints, and behaviors of Adam Tubes as origin points in tube hierarchies.
- *
- * Key features:
- * - Validation of Adam Tube creation and identification
- * - Testing of hierarchical address format for root-level tubes
- * - Verification of parent-child relationships from origin tubes
- * - Constraint validation to prevent invalid Adam Tube configurations
- * - Descendant tracking capabilities from origin tubes
- *
- * Usage example:
- * ```
- * // In feature file:
- * Scenario: Origin tube is correctly identified as an Adam tube
- *   When an origin tube is created without a parent
- *   Then the tube should be identified as an Adam tube
- * ```
+ *     https://www.mozilla.org/en-US/MPL/2.0/
  */
 
 package org.s8r.tube.legacy.test.steps;

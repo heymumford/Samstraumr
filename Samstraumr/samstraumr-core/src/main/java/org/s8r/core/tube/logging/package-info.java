@@ -1,37 +1,16 @@
 /*
- * Copyright (c) 2025 Eric C. Mumford (@heymumford) - https://github.com/heymumford
- * Gemini Deep Research, Claude 3.7.
- */
-
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford)
+ *
+ * This software was developed with analytical assistance from AI tools 
+ * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+ * which were used as paid services. All intellectual property rights 
+ * remain exclusively with the copyright holder listed above.
+ *
+ * Licensed under the Mozilla Public License 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Package containing logging infrastructure for components in the S8r framework.
+ *     https://www.mozilla.org/en-US/MPL/2.0/
  */
 
-/**
- * Provides specialized logging functionality for components in the S8r framework.
- *
- * <p>This package is part of the simplified structure, replacing the original tube-specific logging
- * implementation. It offers enhanced logging capabilities with component-specific contextual
- * information, hierarchical awareness, and visual identification features.
- *
- * <p>Key features of this package include:
- *
- * <ul>
- *   <li>Component-aware logger with hierarchical context
- *   <li>Structured logging with component identifiers
- *   <li>Tagging capabilities for categorization
- *   <li>Visual identification for log analysis
- *   <li>Sequence tracking for operation order
- * </ul>
- *
- * <p>Example usage:
- *
- * <pre>
- * Logger logger = new Logger(component.getUniqueId());
- * logger.info("Component initialized successfully", "LIFECYCLE", "INIT");
- * </pre>
- */
 package org.s8r.core.tube.logging;

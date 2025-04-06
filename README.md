@@ -258,13 +258,20 @@ We welcome contributions from the community! Please read our [Contribution Guide
 
 [📝 **Development Standards**](./docs/contribution/code-standards.md) • [🔄 **Commit Guidelines**](./docs/contribution/git-commits.md) • [✅ **Quality Checks**](./docs/contribution/quality-checks.md)
 
-### 📄 License
+## License and Acknowledgments
 
-[![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) **Mozilla Public License 2.0**
+This project is licensed under the Mozilla Public License 2.0 - see the 
+[LICENSE](LICENSE) file for details.
 
-Samstraumr is open source under the MPL 2.0 license, which allows for integration with proprietary software while ensuring that changes to Samstraumr itself remain open source.
+### Development Tools
 
-[View Full License](./LICENSE)
+This project was developed with analytical assistance from:
+- Claude 3.7 Sonnet LLM by Anthropic
+- Claude Code executable
+- Google Gemini Deep Research LLM
+
+These AI tools were used as paid analytical services to assist in development.
+All intellectual property rights remain with Eric C. Mumford (@heymumford).
 
 ### 🔗 Connect
 
@@ -283,5 +290,3 @@ Copyright © 2025 Eric C. Mumford. All rights reserved.
 [//]: # (Canonical: https://github.com/heymumford/Samstraumr)
 
 ---
-
-Documentation and code generated with support from Claude 3.7, Gemini Deep Research.

@@ -22,24 +22,6 @@
     <maven.compiler.target>21</maven.compiler.target>
     <test.tags>@ATL</test.tags>
     <all.test.tags>@ATL</all.test.tags>
-    <skip.quality.checks>false</skip.quality.checks> <!-- Enable quality checks -->
-    <skipTests>false</skipTests>
-    <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
-    <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
-    <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
-    <properties.plugin.version>1.2.0</properties.plugin.version>
-    <spotless.plugin.version>2.40.0</spotless.plugin.version>
-    <checkstyle.plugin.version>3.3.1</checkstyle.plugin.version>
-    <spotbugs.plugin.version>4.8.2.0</spotbugs.plugin.version>
-    <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
-    <checkstyle.version>10.23.0</checkstyle.version>
-    <spotless.google.format.version>1.17.0</spotless.google.format.version>
-  </properties>
-  
-  <build>
-    <pluginManagement>
-      <plugins>
-        <!-- Core build plugins -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
@@ -66,81 +48,6 @@
           </configuration>
         </plugin>
         
-        <!-- Quality plugins -->
-        <plugin>
-          <groupId>com.diffplug.spotless</groupId>
-          <artifactId>spotless-maven-plugin</artifactId>
-          <version>${spotless.plugin.version}</version>
-          <configuration>
-            <java>
-              <googleJavaFormat>
-                <version>${spotless.google.format.version}</version>
-                <style>GOOGLE</style>
-              </googleJavaFormat>
-              <removeUnusedImports />
-              <importOrder>
-                <order>java,javax,org,com,</order>
-              </importOrder>
-            </java>
-          </configuration>
-        </plugin>
-        
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>${checkstyle.plugin.version}</version>
-          <dependencies>
-            <dependency>
-              <groupId>com.puppycrawl.tools</groupId>
-              <artifactId>checkstyle</artifactId>
-              <version>${checkstyle.version}</version>
-            </dependency>
-          </dependencies>
-          <configuration>
-            <configLocation>checkstyle.xml</configLocation>
-            <consoleOutput>true</consoleOutput>
-            <failsOnError>true</failsOnError>
-            <includeTestSourceDirectory>true</includeTestSourceDirectory>
-          </configuration>
-        </plugin>
-        
-        <plugin>
-          <groupId>com.github.spotbugs</groupId>
-          <artifactId>spotbugs-maven-plugin</artifactId>
-          <version>${spotbugs.plugin.version}</version>
-          <configuration>
-            <effort>Max</effort>
-            <threshold>Medium</threshold>
-            <xmlOutput>true</xmlOutput>
-          </configuration>
-        </plugin>
-        
-        <plugin>
-          <groupId>org.jacoco</groupId>
-          <artifactId>jacoco-maven-plugin</artifactId>
-          <version>${jacoco.plugin.version}</version>
-          <executions>
-            <execution>
-              <id>prepare-agent</id>
-              <goals>
-                <goal>prepare-agent</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>report</id>
-              <phase>test</phase>
-              <goals>
-                <goal>report</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
-  
-  <profiles>
-    <!-- Standard Tests Profile -->
     <profile>
       <id>tests</id>
       <properties>
@@ -150,65 +57,22 @@
       </properties>
     </profile>
     
-    <!-- Legacy ATL Profile (for backward compatibility) -->
-    <profile>
-      <id>atl-tests</id>
-      <properties>
-        <cucumber.filter.tags>${test.tags}</cucumber.filter.tags>
-        <skipTests>false</skipTests>
-        <maven.test.skip>false</maven.test.skip>
-      </properties>
-    </profile>
     
-    <!-- BTL profiles removed in test consolidation -->
-    
-    <!-- Skip Quality Checks Profile -->
-    <profile>
-      <id>skip-quality-checks</id>
-      <properties>
-        <spotless.check.skip>true</spotless.check.skip>
-        <checkstyle.skip>true</checkstyle.skip>
-        <spotbugs.skip>true</spotbugs.skip>
-        <jacoco.skip>true</jacoco.skip>
-      </properties>
-    </profile>
-    
-    <!-- TDD Development Profile - Active by Default -->
     <profile>
       <id>tdd-development</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <!-- Skip all quality checks to enable rapid TDD iterations -->
-        <spotless.check.skip>true</spotless.check.skip>
-        <checkstyle.skip>true</checkstyle.skip>
-        <spotbugs.skip>true</spotbugs.skip>
-        <jacoco.skip>true</jacoco.skip>
-        <maven.javadoc.skip>true</maven.javadoc.skip>
-        
-        <!-- Set lenient test coverage thresholds during TDD development -->
         <jacoco.line.coverage>0.0</jacoco.line.coverage>
         <jacoco.branch.coverage>0.0</jacoco.branch.coverage>
         
-        <!-- Enable all quality checks -->
-        <skip.quality.checks>false</skip.quality.checks>
-        <spotless.check.skip>false</spotless.check.skip>
-        <checkstyle.skip>false</checkstyle.skip>
-        <spotbugs.skip>false</spotbugs.skip>
-        <jacoco.skip>false</jacoco.skip>
-        
-        <!-- Ensure tests are never skipped -->
         <skipTests>false</skipTests>
         <maven.test.skip>false</maven.test.skip>
         <testFailureIgnore>false</testFailureIgnore>
       </properties>
     </profile>
     
-    <!-- Quality Checks Profile -->
-    <profile>
-      <id>quality-checks</id>
-      <!-- Not active by default during TDD development -->
       <build>
         <plugins>
           <plugin>
