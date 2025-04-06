@@ -6,7 +6,7 @@
 
   <groupId>org.s8r</groupId>
   <artifactId>samstraumr-modules</artifactId>
-  <version>2.0.3</version>
+  <version>2.1.0</version>
   <name>Samstraumr Modules</name>
   <packaging>pom</packaging>
 
@@ -16,7 +16,7 @@
 
   <properties>
     <version.file.path>${project.basedir}/version.properties</version.file.path>
-    <samstraumr.version>2.0.3</samstraumr.version>
+    <samstraumr.version>2.1.0</samstraumr.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>

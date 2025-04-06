@@ -149,7 +149,7 @@ Samstraumr has two version management systems:
 ./s8r version bump patch
 
 # Set a specific version
-./s8r version set 2.0.3
+./s8r version set 2.1.0
 
 # Test, bump and tag
 ./s8r version test patch
@@ -168,7 +168,7 @@ Samstraumr has two version management systems:
 ./s8r-version bump minor
 
 # Set specific version
-./s8r-version set 2.0.3
+./s8r-version set 2.1.0
 
 # Fix version inconsistencies
 ./s8r-version fix
@@ -204,4 +204,4 @@ Before committing code, verify these style standards:
 
 ## Current Version
 
-The current version of Samstraumr is: 2.0.3 (as of April 04, 2025)
+The current version of Samstraumr is: 2.1.0 (as of April 04, 2025)
