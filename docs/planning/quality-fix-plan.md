@@ -54,7 +54,9 @@ This document outlines the plan to address the quality issues identified in the 
 - [x] Create package-info.java for tube.exception package (with @deprecated)
 - [x] Create package-info.java for tube.reporting package
 - [x] Create package-info.java for initialization package (with @deprecated)
-- [ ] Complete package-info.java creation for all remaining packages (22 out of 57 completed)
+- [x] Create package-info.java for tube.legacy package hierarchy (with @deprecated)
+- [x] Create package-info.java for tube.test package hierarchy (with @deprecated)
+- [x] Complete package-info.java creation for all remaining packages (57 out of 57 completed) ✓
 - [x] Move app.CliApplication to application.ui.CliApplication
 - [ ] Refactor initialization package into appropriate Clean Architecture layer
 
