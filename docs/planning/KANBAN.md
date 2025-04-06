@@ -29,9 +29,8 @@ This document tracks the progress of tasks in the S8r project.
 - Implement core components in the new package structure
 - Execute TODO standardization across the codebase
 - Implement documentation CI integration (Phase 5 of documentation plan)
-- Fix Clean Architecture compliance issues (92% complete)
+- Fix Clean Architecture compliance issues (94% complete)
 - Standardize test tags and organization (tag structure defined, implementation in progress)
-- Update test infrastructure to work with hierarchical event propagation
 
 ## Tasks Done
 
@@ -48,6 +47,7 @@ This document tracks the progress of tasks in the S8r project.
 - Refactor adapter layer to use reflection instead of direct dependencies on legacy code
 - Implement hierarchical event propagation in InMemoryEventDispatcher
 - Fix event naming conventions and support backward compatibility during migration
+- Update test infrastructure to work with hierarchical event propagation
 
 ## S8r Migration Roadmap
 
