@@ -48,13 +48,15 @@ jobs:
           echo "Working directory: $(pwd)"
           ls -la
 
-      # Get version for summary
+      # Get version for summary using the improved version tool
       - name: Get version
         id: get_version
         run: |
-          # Check for version.properties file
-          if [ -f "Samstraumr/version.properties" ]; then
-            # Extract the version
+          # Use the s8r-version tool if available
+          if [ -f "./s8r-version" ]; then
+            VERSION=$(./s8r-version get | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
+          elif [ -f "Samstraumr/version.properties" ]; then
+            # Extract the version from properties as fallback
             VERSION=$(grep "samstraumr.version=" "Samstraumr/version.properties" | cut -d= -f2 | tr -d ' \t\n\r')
           else
             # Fallback version if we can't determine it
@@ -89,12 +91,21 @@ jobs:
           export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
           mvn -B verify -DskipTests -Dmaven.javadoc.skip=true -Dspotless.check.skip=true -Dcheckstyle.skip=true -Dspotbugs.skip=true
 
-      # Run unit tests
-      - name: Run tests
+      # Run unit tests with improved runner
+      - name: Run unit tests
         run: |
           # Add Java 21 module options required for reflection
           export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
-          mvn -B test -Punit-tests -Dcucumber.filter.tags="@UnitTest or @TubeTest"
+          # Use the enhanced test runner with our custom settings
+          ./s8r-test unit --coverage
+          
+      # Run component tests with improved runner
+      - name: Run component tests
+        run: |
+          # Add Java 21 module options required for reflection
+          export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+          # Use the enhanced test runner with our custom settings
+          ./s8r-test component
           
       # Publish Test Results
       - name: Publish Test Results
