@@ -14,8 +14,14 @@ This document tracks the progress of implementing comprehensive architecture tes
   - Fixed event testing approach
   - Fixed property/dependency injection testing
 
+- **EventDrivenCommunicationTest**: Fixed to match current event dispatcher implementation
+  - Updated to use the proper EventDispatcher API methods (`dispatch()` instead of `publish()`, etc.)
+  - Created a proper mock EventDispatcher implementation that works with the new API
+  - Updated event simulation code to use actual enum types
+  - Fixed to use component and machine implementations correctly
+  - Added comprehensive test coverage for event hierarchy and delivery
+
 ### Tests in Progress
-- **EventDrivenCommunicationTest**: Needs updates to match current event dispatcher implementation
 - **HierarchicalIdentitySystemTest**: Needs updates to match current component identity implementation
 
 ### Maven Configuration

@@ -1,16 +1,20 @@
 package org.s8r.architecture.util;
 
-import java.util.UUID;
-import java.util.Map;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.s8r.domain.component.Component;
 import org.s8r.domain.component.composite.CompositeComponent;
 import org.s8r.domain.component.composite.ComponentConnection;
 import org.s8r.domain.component.composite.ConnectionType;
+import org.s8r.domain.component.composite.CompositeType;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.lifecycle.LifecycleState;
 import org.s8r.domain.event.DomainEvent;
@@ -24,23 +28,23 @@ import org.s8r.application.port.EventDispatcher;
 public class TestComponentFactory {
 
     /**
-     * Creates a simple mock component with default behavior.
+     * Creates a simple component with default behavior.
      *
-     * @param name The local name for the component
-     * @return A mock component implementation
+     * @param name The reason for the component creation
+     * @return A component implementation
      */
     public static Component createComponent(String name) {
-        return new MockComponent(new ComponentId(name));
+        return Component.create(ComponentId.create(name));
     }
     
     /**
      * Creates a composite component that can contain other components.
      *
-     * @param name The local name for the composite component
+     * @param name The reason for the composite component creation
      * @return A mock composite component
      */
     public static CompositeComponent createCompositeComponent(String name) {
-        return new MockCompositeComponent(new ComponentId(name));
+        return CompositeComponent.create(ComponentId.create(name), CompositeType.STANDARD);
     }
     
     /**
@@ -49,150 +53,85 @@ public class TestComponentFactory {
      * @return A mock event dispatcher
      */
     public static EventDispatcher createEventDispatcher() {
-        return new MockEventDispatcher();
-    }
-    
-    /**
-     * Basic mock component implementation.
-     */
-    public static class MockComponent implements Component {
-        private final ComponentId id;
-        private LifecycleState state;
-        private final Map<String, Object> attributes = new HashMap<>();
+        // Create a test logger for the event dispatcher
+        org.s8r.infrastructure.logging.ConsoleLogger logger = 
+            new org.s8r.infrastructure.logging.ConsoleLogger("TestEventDispatcher");
         
-        public MockComponent(ComponentId id) {
-            this.id = id;
-            this.state = LifecycleState.CREATED;
-        }
-        
-        @Override
-        public ComponentId getId() {
-            return id;
-        }
-        
-        @Override
-        public LifecycleState getState() {
-            return state;
-        }
-        
-        @Override
-        public void initialize() {
-            this.state = LifecycleState.INITIALIZED;
-        }
-        
-        @Override
-        public void start() {
-            this.state = LifecycleState.RUNNING;
-        }
-        
-        @Override
-        public void stop() {
-            this.state = LifecycleState.STOPPED;
-        }
-        
-        @Override
-        public void destroy() {
-            this.state = LifecycleState.DESTROYED;
-        }
-        
-        @Override
-        public boolean isRunning() {
-            return state == LifecycleState.RUNNING;
-        }
-        
-        public void setAttribute(String key, Object value) {
-            attributes.put(key, value);
-        }
-        
-        public Object getAttribute(String key) {
-            return attributes.get(key);
-        }
-    }
-    
-    /**
-     * Mock composite component implementation.
-     */
-    public static class MockCompositeComponent extends MockComponent implements CompositeComponent {
-        private final List<Component> children = new ArrayList<>();
-        private final List<ComponentConnection> connections = new ArrayList<>();
-        
-        public MockCompositeComponent(ComponentId id) {
-            super(id);
-        }
-        
-        @Override
-        public void addComponent(Component component) {
-            children.add(component);
-        }
-        
-        @Override
-        public void removeComponent(ComponentId componentId) {
-            children.removeIf(c -> c.getId().equals(componentId));
-        }
-        
-        @Override
-        public Component getComponent(ComponentId componentId) {
-            return children.stream()
-                    .filter(c -> c.getId().equals(componentId))
-                    .findFirst()
-                    .orElse(null);
-        }
-        
-        @Override
-        public List<Component> getComponents() {
-            return new ArrayList<>(children);
-        }
-        
-        @Override
-        public void connect(ComponentId sourceId, ComponentId targetId, ConnectionType type) {
-            connections.add(new ComponentConnection(sourceId, targetId, type));
-        }
-        
-        @Override
-        public void disconnect(ComponentId sourceId, ComponentId targetId) {
-            connections.removeIf(c -> 
-                c.getSourceId().equals(sourceId) && 
-                c.getTargetId().equals(targetId));
-        }
-        
-        @Override
-        public List<ComponentConnection> getConnections() {
-            return new ArrayList<>(connections);
-        }
+        // Create and return a test-friendly event dispatcher
+        return new MockEventDispatcher(logger);
     }
     
     /**
      * Mock event dispatcher for testing event-driven communication.
+     * This implements both the EventDispatcher interface and provides 
+     * additional methods for testing and verification.
      */
     public static class MockEventDispatcher implements EventDispatcher {
         private final List<DomainEvent> publishedEvents = new ArrayList<>();
-        private final Map<Class<?>, List<Consumer<?>>> subscribers = new HashMap<>();
+        private final Map<Class<?>, List<EventHandler<?>>> handlers = new HashMap<>();
+        private final org.s8r.application.port.LoggerPort logger;
+        
+        /**
+         * Creates a new mock event dispatcher with the specified logger.
+         * 
+         * @param logger The logger to use
+         */
+        public MockEventDispatcher(org.s8r.application.port.LoggerPort logger) {
+            this.logger = logger;
+        }
         
         @Override
-        public <T extends DomainEvent> void publish(T event) {
+        public void dispatch(DomainEvent event) {
             publishedEvents.add(event);
+            logger.debug("Dispatched event: " + event.getEventType());
             
-            // Notify subscribers for this event type
-            List<Consumer<T>> eventSubscribers = getSubscribers(event.getClass());
-            for (Consumer<T> subscriber : eventSubscribers) {
-                subscriber.accept(event);
+            // Notify handlers for this event type
+            List<EventHandler<DomainEvent>> eventHandlers = getHandlers(event.getClass());
+            for (EventHandler<DomainEvent> handler : eventHandlers) {
+                try {
+                    handler.handle(event);
+                } catch (Exception e) {
+                    logger.error("Error handling event: " + e.getMessage(), e);
+                }
             }
         }
         
         @SuppressWarnings("unchecked")
-        private <T extends DomainEvent> List<Consumer<T>> getSubscribers(Class<?> eventType) {
-            return (List<Consumer<T>>) (List<?>) subscribers.getOrDefault(eventType, new ArrayList<>());
+        private <T extends DomainEvent> List<EventHandler<T>> getHandlers(Class<?> eventType) {
+            return (List<EventHandler<T>>) (List<?>) handlers.getOrDefault(eventType, new ArrayList<>());
         }
         
         @Override
-        public <T extends DomainEvent> void subscribe(Class<T> eventType, Consumer<T> subscriber) {
-            subscribers.computeIfAbsent(eventType, k -> new ArrayList<>()).add(subscriber);
+        public <T extends DomainEvent> void registerHandler(Class<T> eventType, EventHandler<T> handler) {
+            handlers.computeIfAbsent(eventType, k -> new ArrayList<>()).add(handler);
+            logger.debug("Registered handler for event type: " + eventType.getSimpleName());
         }
         
+        @Override
+        public <T extends DomainEvent> void unregisterHandler(Class<T> eventType, EventHandler<T> handler) {
+            List<EventHandler<?>> handlersForType = handlers.get(eventType);
+            if (handlersForType != null) {
+                handlersForType.remove(handler);
+                logger.debug("Unregistered handler for event type: " + eventType.getSimpleName());
+            }
+        }
+        
+        /**
+         * Gets all published events for testing and verification.
+         * 
+         * @return A list of all published events
+         */
         public List<DomainEvent> getPublishedEvents() {
             return new ArrayList<>(publishedEvents);
         }
         
+        /**
+         * Gets all published events of a specific type for testing and verification.
+         * 
+         * @param <T> The type of events to get
+         * @param eventType The class of events to get
+         * @return A list of published events of the specified type
+         */
         public <T extends DomainEvent> List<T> getPublishedEventsOfType(Class<T> eventType) {
             List<T> result = new ArrayList<>();
             for (DomainEvent event : publishedEvents) {
@@ -201,6 +140,28 @@ public class TestComponentFactory {
                 }
             }
             return result;
+        }
+        
+        /**
+         * Publishes an event for testing. This is a test-only method that simulates 
+         * publishing an event through this dispatcher.
+         * 
+         * @param event The event to publish
+         */
+        public void publish(DomainEvent event) {
+            dispatch(event);
+        }
+        
+        /**
+         * Subscribes a consumer to an event type for testing. This is useful when
+         * testing with lambdas and provides compatibility with the old API.
+         * 
+         * @param <T> The type of event to subscribe to
+         * @param eventType The class of event to subscribe to
+         * @param consumer The consumer that will handle the event
+         */
+        public <T extends DomainEvent> void subscribe(Class<T> eventType, java.util.function.Consumer<T> consumer) {
+            registerHandler(eventType, event -> consumer.accept(event));
         }
     }
 }
