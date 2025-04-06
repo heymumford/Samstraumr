@@ -20,6 +20,7 @@ This document tracks the progress of tasks in the S8r project.
 - Create comprehensive test suite in the new structure
 - Implement feedback mechanism for migration issues
 - Update documentation with component diagrams
+- Implement Clean Architecture verification in CI/CD
 
 ## Tasks In Progress
 
@@ -28,6 +29,9 @@ This document tracks the progress of tasks in the S8r project.
 - Implement core components in the new package structure
 - Execute TODO standardization across the codebase
 - Implement documentation CI integration (Phase 5 of documentation plan)
+- Fix Clean Architecture compliance issues (38% complete)
+- Complete package-info.java files for all packages (22/57 packages, 38% complete)
+- Standardize test tags and organization (tag structure defined, implementation in progress)
 
 ## Tasks Done
 
@@ -38,6 +42,7 @@ This document tracks the progress of tasks in the S8r project.
 - Implement Composite and Machine in new structure
 - Implement automated documentation generation system (Phases 1-4)
 - Implement TODO standardization tooling and standards
+- Complete research document on AI-enhanced testing strategies (see /docs/research/test-in-age-of-ai.md)
 
 ## S8r Migration Roadmap
 
