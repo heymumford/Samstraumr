@@ -46,9 +46,14 @@ Licensed under the Mozilla Public License 2.0
     <slf4j.version>2.0.9</slf4j.version>
     <log4j.version>2.22.1</log4j.version>
     <junit.version>5.10.1</junit.version>
+    <junit.platform.version>1.10.1</junit.platform.version>
     <cucumber.version>7.15.0</cucumber.version>
+    <cucumber.reporting.version>5.7.7</cucumber.reporting.version>
     <mockito.version>5.8.0</mockito.version>
     <jackson.version>2.14.2</jackson.version>
+    <oshi.version>6.4.1</oshi.version>
+    <spotbugs.annotations.version>4.7.3</spotbugs.annotations.version>
+    <itextpdf.version>5.5.13.3</itextpdf.version>
     
     <!-- Plugin versions -->
     <pmd.plugin.version>3.21.0</pmd.plugin.version>
@@ -110,7 +115,24 @@ Licensed under the Mozilla Public License 2.0
         <version>${jackson.version}</version>
       </dependency>
       
-      <!-- Testing -->
+      <!-- Utils -->
+      <dependency>
+        <groupId>com.github.oshi</groupId>
+        <artifactId>oshi-core</artifactId>
+        <version>${oshi.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-annotations</artifactId>
+        <version>${spotbugs.annotations.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.itextpdf</groupId>
+        <artifactId>itextpdf</artifactId>
+        <version>${itextpdf.version}</version>
+      </dependency>
+      
+      <!-- Testing - JUnit -->
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-api</artifactId>
@@ -124,6 +146,32 @@ Licensed under the Mozilla Public License 2.0
         <scope>test</scope>
       </dependency>
       <dependency>
+        <groupId>org.junit.vintage</groupId>
+        <artifactId>junit-vintage-engine</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.platform</groupId>
+        <artifactId>junit-platform-suite</artifactId>
+        <version>${junit.platform.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.platform</groupId>
+        <artifactId>junit-platform-suite-api</artifactId>
+        <version>${junit.platform.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.platform</groupId>
+        <artifactId>junit-platform-launcher</artifactId>
+        <version>${junit.platform.version}</version>
+        <scope>test</scope>
+      </dependency>
+      
+      <!-- Testing - Cucumber -->
+      <dependency>
         <groupId>io.cucumber</groupId>
         <artifactId>cucumber-java</artifactId>
         <version>${cucumber.version}</version>
@@ -136,8 +184,34 @@ Licensed under the Mozilla Public License 2.0
         <scope>test</scope>
       </dependency>
       <dependency>
+        <groupId>io.cucumber</groupId>
+        <artifactId>cucumber-junit-platform-engine</artifactId>
+        <version>${cucumber.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.cucumber</groupId>
+        <artifactId>cucumber-core</artifactId>
+        <version>${cucumber.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.cucumber</groupId>
+        <artifactId>cucumber-plugin</artifactId>
+        <version>${cucumber.version}</version>
+        <scope>test</scope>
+      </dependency>
+      
+      <!-- Testing - Mockito -->
+      <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-junit-jupiter</artifactId>
         <version>${mockito.version}</version>
         <scope>test</scope>
       </dependency>
