@@ -1,0 +1,137 @@
+package org.s8r.architecture.util;
+
+import java.util.*;
+import java.util.function.Supplier;
+
+import org.s8r.domain.exception.*;
+import org.s8r.domain.component.Component;
+import org.s8r.domain.identity.ComponentId;
+
+/**
+ * Utility class for testing error handling patterns and strategies.
+ * Provides helper methods for simulating errors and verifying proper error handling.
+ */
+public class ErrorHandlingTestUtils {
+
+    /**
+     * Creates a component that throws a specific exception during initialization.
+     *
+     * @param name Component name
+     * @param exceptionSupplier Supplier for the exception to throw
+     * @return A component that will throw the specified exception
+     */
+    public static Component createFailingComponent(String name, Supplier<RuntimeException> exceptionSupplier) {
+        return new FailingComponent(new ComponentId(name), exceptionSupplier);
+    }
+    
+    /**
+     * Executes an operation with retry logic and returns the result.
+     *
+     * @param <T> The type of result expected
+     * @param operation The operation to execute
+     * @param maxRetries Maximum number of retries
+     * @param retryDelay Delay between retries in milliseconds
+     * @return The result of the operation if successful
+     * @throws Exception if the operation fails after all retries
+     */
+    public static <T> T executeWithRetry(Supplier<T> operation, int maxRetries, long retryDelay) 
+            throws Exception {
+        Exception lastException = null;
+        
+        for (int attempt = 0; attempt <= maxRetries; attempt++) {
+            try {
+                return operation.get();
+            } catch (Exception e) {
+                lastException = e;
+                if (attempt < maxRetries) {
+                    Thread.sleep(retryDelay);
+                }
+            }
+        }
+        
+        throw lastException;
+    }
+    
+    /**
+     * Creates an exception hierarchy for testing error classification.
+     *
+     * @return Map of error categories to lists of exception types
+     */
+    public static Map<String, List<Class<? extends Exception>>> createErrorClassification() {
+        Map<String, List<Class<? extends Exception>>> classification = new HashMap<>();
+        
+        // Infrastructure errors
+        classification.put("infrastructure", Arrays.asList(
+            java.io.IOException.class,
+            java.net.ConnectException.class,
+            java.sql.SQLException.class
+        ));
+        
+        // Domain errors
+        classification.put("domain", Arrays.asList(
+            ComponentException.class,
+            ComponentInitializationException.class,
+            ComponentNotFoundException.class,
+            DuplicateComponentException.class,
+            InvalidOperationException.class,
+            InvalidStateTransitionException.class
+        ));
+        
+        // Application errors
+        classification.put("application", Arrays.asList(
+            IllegalArgumentException.class,
+            IllegalStateException.class,
+            UnsupportedOperationException.class
+        ));
+        
+        return classification;
+    }
+    
+    /**
+     * A component implementation that fails with a specific exception.
+     */
+    private static class FailingComponent implements Component {
+        private final ComponentId id;
+        private final Supplier<RuntimeException> exceptionSupplier;
+        
+        public FailingComponent(ComponentId id, Supplier<RuntimeException> exceptionSupplier) {
+            this.id = id;
+            this.exceptionSupplier = exceptionSupplier;
+        }
+        
+        @Override
+        public ComponentId getId() {
+            return id;
+        }
+        
+        @Override
+        public org.s8r.domain.lifecycle.LifecycleState getState() {
+            return org.s8r.domain.lifecycle.LifecycleState.CREATED;
+        }
+        
+        @Override
+        public void initialize() {
+            throw exceptionSupplier.get();
+        }
+        
+        @Override
+        public void start() {
+            throw exceptionSupplier.get();
+        }
+        
+        @Override
+        public void stop() {
+            throw exceptionSupplier.get();
+        }
+        
+        @Override
+        public void destroy() {
+            throw exceptionSupplier.get();
+        }
+        
+        @Override
+        public boolean isRunning() {
+            return false;
+        }
+    }
+}

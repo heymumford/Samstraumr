@@ -94,11 +94,59 @@ Tests serve as documentation of system behavior. With AI-generation:
 - Test descriptions and documentation become even more critical
 - Traceability between requirements and tests could be compromised
 
-## Proposed Adaptations for Samstraumr
+## Implemented Architecture Testing Framework
+
+In response to these opportunities and challenges, we have now implemented a comprehensive architecture testing framework for Samstraumr. This framework verifies that our codebase correctly implements all architectural decisions documented in our ADRs (Architecture Decision Records).
+
+### 1. Architecture Test Suites
+
+We have implemented dedicated test suites for each ADR:
+
+- **Clean Architecture Compliance (ADR-0003)** - Tests to verify proper layer separation and dependency rules
+- **Package Structure (ADR-0005)** - Tests to verify package organization follows clean architecture patterns
+- **Testing Pyramid Strategy (ADR-0006)** - Tests to verify appropriate test coverage at each level
+- **Component-Based Architecture (ADR-0007)** - Tests for component composition and interaction
+- **Hierarchical Identity System (ADR-0008)** - Tests for component identity, addressing, and hierarchy management
+- **Lifecycle State Management (ADR-0009)** - Tests for state transitions and lifecycle management
+- **Event-Driven Communication (ADR-0010)** - Tests for event publishing, subscription, and processing
+- **Standardized Error Handling (ADR-0011)** - Tests for error classification, handling, and recovery
+
+### 2. Testing Utilities
+
+To support these tests, we've created several utility classes:
+
+- **TestComponentFactory** - Creates mock components for testing component-based architecture
+- **TestMachineFactory** - Creates mock machines for testing state machines and data flow
+- **ErrorHandlingTestUtils** - Utilities for testing standardized error handling
+- **ArchitectureAnalyzer** - Static analysis tool to validate clean architecture compliance
+
+These utilities provide the infrastructure needed for effective testing of architectural decisions, making it easier to validate that our implementation matches our architectural intent.
+
+### 3. Automated Test Execution
+
+We've created a dedicated run script (`run-architecture-tests.sh`) that runs all architecture tests, making it easy to validate architectural compliance as part of our development workflow. This script includes:
+
+- Java 21 compatibility handling
+- Concise output formatting
+- Integration with our testing pyramid
+
+### 4. Test Generation Tools
+
+To facilitate ongoing maintenance and addition of architecture tests, we've created a generator script for new ADR tests:
+
+```bash
+./util/scripts/generate-adr-test.sh <ADR-NUMBER> "<ADR-TITLE>" "<AUTHOR>"
+```
+
+This script creates a new test class with appropriate structure, annotations, and test stubs, and updates the test runner to include the new ADR.
+
+## Future Testing Enhancements
+
+Building on our foundation, we're planning several further enhancements:
 
 ### 1. AI-Assisted Test Framework
 
-We propose enhancing our test framework to:
+We propose further enhancing our test framework to:
 
 - Provide interfaces for AI-assisted test generation
 - Include metadata about test intent and coverage goals
@@ -121,14 +169,24 @@ Develop metrics specifically for evaluating AI-generated tests:
 - Alignment with domain rules
 - Detection of redundant or low-value tests
 
-### 4. Practical Implementation Plan
+### 4. Practical Implementation Roadmap
 
-1. **Phase 1**: Experiment with AI-generated unit tests for core components
-   - Initial implementation complete with [ATL test discovery](../testing/atl-test-discovery.md) system
-   - Automated test mapping to help identify coverage gaps
-2. **Phase 2**: Develop templates and patterns for AI to generate composite tests
-3. **Phase 3**: Create domain-specific guidance for machine orchestration test generation
-4. **Phase 4**: Integrate AI assistance into the regular development workflow
+1. **✅ Phase 1**: Implement architecture test framework with mock utilities
+   - Complete with ADR validation tests
+   - Architecture analyzer for static validation
+   - Test generation tools
+   
+2. **Phase 2**: Enhance architecture tests with property-based testing
+   - Implement property-based tests for state transitions
+   - Add invariant checking for component composition
+   
+3. **Phase 3**: Integrate with CI/CD pipeline
+   - Add architecture test reports to CI/CD dashboards
+   - Create failure diagnostics for architectural violations
+   
+4. **Phase 4**: Implement test coverage analysis for architectural aspects
+   - Measure coverage of architectural features
+   - Identify areas needing additional tests
 
 ## Conclusion
 
