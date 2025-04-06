@@ -22,6 +22,7 @@ import org.junit.platform.suite.api.SuiteDisplayName;
  *   <li>ADR-0009: Lifecycle State Management Pattern</li>
  *   <li>ADR-0010: Event-Driven Communication Model</li>
  *   <li>ADR-0011: Standardized Error Handling Strategy</li>
+ *   <li>ADR-0012: Enforce Acyclic Dependencies</li>
  * </ul>
  * 
  * <p>The test suite also includes various architectural analysis tools and utilities
@@ -30,6 +31,18 @@ import org.junit.platform.suite.api.SuiteDisplayName;
  * <p>To run just these architecture tests, use:
  * <pre>
  * mvn test -Dtest=RunArchitectureTests
+ * </pre>
+ * 
+ * <p>For faster execution during development, you can run specific architecture tests:
+ * <pre>
+ * mvn test -Dtest=CleanArchitectureComplianceTest,AcyclicDependencyTest
+ * </pre>
+ * 
+ * <p>Or use our dedicated script with different modes:
+ * <pre>
+ * ./run-architecture-tests.sh              # Run all architecture tests
+ * ./run-architecture-tests.sh quick        # Run only critical tests (faster)
+ * ./run-architecture-tests.sh critical     # Run a subset of important tests
  * </pre>
  */
 @Suite
