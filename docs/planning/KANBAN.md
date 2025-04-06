@@ -21,6 +21,7 @@ This document tracks the progress of tasks in the S8r project.
 - Implement feedback mechanism for migration issues
 - Update documentation with component diagrams
 - Implement documentation CI integration (Phase 5 of documentation plan)
+- Execute TODO standardization across the codebase
 
 ## Tasks In Progress
 
@@ -36,6 +37,7 @@ This document tracks the progress of tasks in the S8r project.
 - Create migration guides for teams using the library
 - Implement Composite and Machine in new structure
 - Implement automated documentation generation system (Phases 1-4)
+- Implement TODO standardization tooling and standards
 
 ## S8r Migration Roadmap
 

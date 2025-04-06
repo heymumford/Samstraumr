@@ -44,6 +44,15 @@ The Samstraumr project follows these documentation standards:
 | `fix-markdown-links.sh` | Fixes broken links in markdown files |
 | `update-markdown-headers.sh` | Updates headers to follow standardized formats |
 
+### TODO Management Scripts
+
+| Script | Description |
+|--------|-------------|
+| `extract-todos.sh` | Extracts TODOs from code and generates a report |
+| `standardize-todos.sh` | Checks and standardizes TODOs in the codebase |
+| `check-todo-format.sh` | CI check for TODO format compliance |
+| `todo-to-issue.sh` | Creates GitHub issues from high-priority TODOs |
+
 ### Conversion Scripts
 
 | Script | Description |
@@ -63,6 +72,22 @@ The Samstraumr project follows these documentation standards:
 ./check-documentation-standards.sh --check headers
 ./check-documentation-standards.sh --check code_blocks
 ./check-documentation-standards.sh --check broken_links
+```
+
+### Manage TODOs
+
+```bash
+# Extract TODOs from codebase and generate a report
+./extract-todos.sh --output todo-report.md
+
+# Check TODO format compliance
+./check-todo-format.sh --verbose
+
+# Fix non-compliant TODOs
+./standardize-todos.sh --fix
+
+# Create GitHub issues from high-priority TODOs (dry run)
+./todo-to-issue.sh --priority P0,P1 --dry-run
 ```
 
 ### Update Cross-References
@@ -90,7 +115,7 @@ The Samstraumr project follows these documentation standards:
 
 ## Integration with CI/CD
 
-The documentation standards check can be integrated into the CI/CD pipeline. For example:
+These scripts can be integrated into the CI/CD pipeline. For example:
 
 ```yaml
 # In a CI/CD configuration file
@@ -100,10 +125,19 @@ documentation_check:
   artifacts:
     paths:
       - target/doc-standard-reports/
+
+todo_format_check:
+  script:
+    - docs/scripts/check-todo-format.sh --strict --high-priority
+  artifacts:
+    paths:
+      - target/todo-check-report.md
 ```
 
 ## Related Documentation
 
+- [TODO Standards](../reference/standards/todo-standards.md)
 - [Documentation Standards](../reference/standards/documentation-standards.md)
 - [File Organization Standards](../reference/standards/file-organization.md)
 - [Documentation Standardization Plan](../plans/active-documentation-standardization.md)
+- [TODO Standardization Plan](../planning/active/todo-standardization-plan.md)
