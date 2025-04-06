@@ -48,17 +48,14 @@ public class TestComponentFactory {
     }
     
     /**
-     * Creates a mock event dispatcher for testing event-driven communication.
+     * Creates a hierarchical event dispatcher for testing event-driven communication.
      *
-     * @return A mock event dispatcher
+     * @return A hierarchical event dispatcher that supports proper event propagation
      */
-    public static EventDispatcher createEventDispatcher() {
-        // Create a test logger for the event dispatcher
-        org.s8r.infrastructure.logging.ConsoleLogger logger = 
-            new org.s8r.infrastructure.logging.ConsoleLogger("TestEventDispatcher");
-        
-        // Create and return a test-friendly event dispatcher
-        return new MockEventDispatcher(logger);
+    public static HierarchicalEventDispatcher createEventDispatcher() {
+        // Create and return a hierarchical event dispatcher for testing
+        // This dispatcher properly supports event propagation through the class hierarchy
+        return new HierarchicalEventDispatcher();
     }
     
     /**

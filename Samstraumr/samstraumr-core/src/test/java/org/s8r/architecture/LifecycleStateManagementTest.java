@@ -21,6 +21,7 @@ import org.s8r.domain.exception.InvalidStateTransitionException;
 import org.s8r.application.port.EventDispatcher;
 import org.s8r.test.annotation.UnitTest;
 import org.s8r.architecture.util.TestComponentFactory;
+import org.s8r.architecture.util.HierarchicalEventDispatcher;
 
 /**
  * Tests for the Lifecycle State Management Pattern as described in ADR-0009.
@@ -156,8 +157,7 @@ public class LifecycleStateManagementTest {
             
             // Track state change events
             List<ComponentStateChangedEvent> stateEvents = new ArrayList<>();
-            TestComponentFactory.MockEventDispatcher mockDispatcher = 
-                (TestComponentFactory.MockEventDispatcher) TestComponentFactory.createEventDispatcher();
+            HierarchicalEventDispatcher mockDispatcher = TestComponentFactory.createEventDispatcher();
             
             // Perform state transitions and collect events
             component.transitionTo(LifecycleState.INITIALIZING);

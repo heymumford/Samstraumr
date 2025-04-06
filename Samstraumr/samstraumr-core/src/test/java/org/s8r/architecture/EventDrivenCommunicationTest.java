@@ -32,6 +32,7 @@ import org.s8r.application.port.EventDispatcher;
 import org.s8r.infrastructure.event.InMemoryEventDispatcher;
 import org.s8r.test.annotation.UnitTest;
 import org.s8r.architecture.util.TestComponentFactory;
+import org.s8r.architecture.util.HierarchicalEventDispatcher;
 
 /**
  * Tests for the Event-Driven Communication Model as described in ADR-0010.
@@ -50,12 +51,8 @@ public class EventDrivenCommunicationTest {
 
     @BeforeEach
     void setUp() {
-        // Create a ConsoleLogger for the EventDispatcher
-        org.s8r.infrastructure.logging.ConsoleLogger logger = 
-            new org.s8r.infrastructure.logging.ConsoleLogger("EventDispatcherTest");
-        
-        // Create InMemoryEventDispatcher with the logger
-        eventDispatcher = new InMemoryEventDispatcher(logger);
+        // Create a hierarchical event dispatcher for testing
+        eventDispatcher = TestComponentFactory.createEventDispatcher();
         sourceId = ComponentId.create("test-source");
     }
 
@@ -104,9 +101,8 @@ public class EventDrivenCommunicationTest {
         @Test
         @DisplayName("Event hierarchy should support polymorphic handling")
         void eventHierarchyShouldSupportPolymorphicHandling() {
-            // Create a mock event dispatcher
-            TestComponentFactory.MockEventDispatcher mockDispatcher = 
-                (TestComponentFactory.MockEventDispatcher) TestComponentFactory.createEventDispatcher();
+            // Create a hierarchical event dispatcher for testing
+            HierarchicalEventDispatcher mockDispatcher = TestComponentFactory.createEventDispatcher();
             
             // Create a counter for each handler type
             AtomicInteger baseHandlerCount = new AtomicInteger(0);
@@ -198,8 +194,7 @@ public class EventDrivenCommunicationTest {
                 new org.s8r.infrastructure.logging.ConsoleLogger("TestComponent");
             
             // Create an event dispatcher to capture events
-            TestComponentFactory.MockEventDispatcher mockDispatcher = 
-                (TestComponentFactory.MockEventDispatcher) TestComponentFactory.createEventDispatcher();
+            HierarchicalEventDispatcher mockDispatcher = TestComponentFactory.createEventDispatcher();
             
             // Create a component and register to the dispatcher
             Component component = TestComponentFactory.createComponent("test-component");
@@ -262,8 +257,7 @@ public class EventDrivenCommunicationTest {
         @DisplayName("Machines should propagate data flow events")
         void machinesShouldPropagateDataFlowEvents() {
             // Create an event dispatcher to monitor event flow
-            TestComponentFactory.MockEventDispatcher mockDispatcher = 
-                (TestComponentFactory.MockEventDispatcher) TestComponentFactory.createEventDispatcher();
+            HierarchicalEventDispatcher mockDispatcher = TestComponentFactory.createEventDispatcher();
             
             // For this test, we'll simulate a machine and its state changes by directly using the events
             ComponentId machineId = ComponentId.create("test-machine");
@@ -346,9 +340,8 @@ public class EventDrivenCommunicationTest {
         @Test
         @DisplayName("Direct subscription should deliver matching events")
         void directSubscriptionShouldDeliverMatchingEvents() {
-            // Create a mock event dispatcher
-            TestComponentFactory.MockEventDispatcher mockDispatcher = 
-                (TestComponentFactory.MockEventDispatcher) TestComponentFactory.createEventDispatcher();
+            // Create a hierarchical event dispatcher for testing
+            HierarchicalEventDispatcher mockDispatcher = TestComponentFactory.createEventDispatcher();
             
             // Create counters for different event types
             AtomicInteger stateEventCount = new AtomicInteger(0);
@@ -387,9 +380,8 @@ public class EventDrivenCommunicationTest {
         @Test
         @DisplayName("Hierarchical event propagation should work")
         void hierarchicalEventPropagationShouldWork() {
-            // Create a mock event dispatcher
-            TestComponentFactory.MockEventDispatcher mockDispatcher = 
-                (TestComponentFactory.MockEventDispatcher) TestComponentFactory.createEventDispatcher();
+            // Create a hierarchical event dispatcher for testing
+            HierarchicalEventDispatcher mockDispatcher = TestComponentFactory.createEventDispatcher();
             
             // Create a composite with components
             ComponentId rootId = ComponentId.create("root");
@@ -480,9 +472,8 @@ public class EventDrivenCommunicationTest {
             // Create an ordered list to capture event sequence
             List<Integer> receivedSequences = Collections.synchronizedList(new ArrayList<>());
             
-            // Create a mock event dispatcher that we'll use to simulate ordered delivery
-            TestComponentFactory.MockEventDispatcher mockDispatcher = 
-                (TestComponentFactory.MockEventDispatcher) TestComponentFactory.createEventDispatcher();
+            // Create a hierarchical event dispatcher that we'll use to simulate ordered delivery
+            HierarchicalEventDispatcher mockDispatcher = TestComponentFactory.createEventDispatcher();
             
             // Subscribe to collect events in order using registerHandler
             mockDispatcher.registerHandler(ComponentDataEvent.class, event -> {
