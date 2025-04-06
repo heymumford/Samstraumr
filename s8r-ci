@@ -1,0 +1,192 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r-ci: Local CI runner for Samstraumr using nektos/act
+# Allows running GitHub Actions workflows locally for testing
+#==============================================================================
+set -e
+
+# Terminal colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+# Functions for prettier output
+info() { echo -e "${BLUE}$1${RESET}"; }
+success() { echo -e "${GREEN}$1${RESET}"; }
+error() { echo -e "${RED}Error: $1${RESET}" >&2; exit 1; }
+warn() { echo -e "${YELLOW}Warning: $1${RESET}" >&2; }
+
+# Find repository root
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel)}"
+
+# Check if act is installed
+if ! command -v act &> /dev/null; then
+  error "act is not installed. Please install it from https://github.com/nektos/act"
+fi
+
+# Parse arguments
+parse_args() {
+  WORKFLOW="samstraumr-pipeline.yml"
+  JOB=""
+  DRY_RUN=false
+  VERBOSE=false
+  EVENT="push"
+  
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -w|--workflow)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          WORKFLOW="$2"
+          shift 2
+        else
+          error "Workflow file missing after -w/--workflow"
+        fi
+        ;;
+      -j|--job)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          JOB="$2"
+          shift 2
+        else
+          error "Job ID missing after -j/--job"
+        fi
+        ;;
+      -e|--event)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          EVENT="$2"
+          shift 2
+        else
+          error "Event type missing after -e/--event"
+        fi
+        ;;
+      -d|--dry-run)
+        DRY_RUN=true
+        shift
+        ;;
+      -v|--verbose)
+        VERBOSE=true
+        shift
+        ;;
+      -h|--help)
+        show_help
+        exit 0
+        ;;
+      *)
+        error "Unknown argument: $1"
+        ;;
+    esac
+  done
+}
+
+# Display help information
+show_help() {
+  echo -e "${BOLD}Samstraumr Local CI Runner${RESET}"
+  echo
+  echo "Usage: ./s8r-ci [options]"
+  echo
+  echo "Options:"
+  echo "  -w, --workflow FILE      Workflow file to run (default: samstraumr-pipeline.yml)"
+  echo "  -j, --job JOB_ID         Specific job to run (default: all jobs)"
+  echo "  -e, --event EVENT        Event type to trigger (default: push)"
+  echo "  -d, --dry-run            Show what would be run without actually running it"
+  echo "  -v, --verbose            Enable verbose output"
+  echo "  -h, --help               Show this help message"
+  echo
+  echo "Examples:"
+  echo "  ./s8r-ci                 # Run the default CI pipeline"
+  echo "  ./s8r-ci -j basic-verification  # Run only the basic verification job"
+  echo "  ./s8r-ci -w smoke-test.yml      # Run the smoke test workflow"
+  echo "  ./s8r-ci -e pull_request        # Trigger as pull_request event"
+  echo
+  echo "Available workflows:"
+  find "${PROJECT_ROOT}/.github/workflows" -name "*.yml" -type f | while read -r workflow; do
+    echo "  - $(basename "$workflow")"
+  done
+}
+
+# Run workflow with act
+run_workflow() {
+  # Prepare options
+  local act_args=()
+
+  # Add job filter if specified
+  if [[ -n "$JOB" ]]; then
+    act_args+=("-j" "$JOB")
+  fi
+  
+  # Create event file if it doesn't exist
+  local event_file="${PROJECT_ROOT}/${EVENT}"
+  if [[ ! -f "$event_file" ]]; then
+    echo "{}" > "$event_file"
+  fi
+  
+  # Set event type
+  act_args+=("-e" "$EVENT")
+  
+  # Add workflow file
+  if [[ "$WORKFLOW" != *".yml" ]]; then
+    WORKFLOW="${WORKFLOW}.yml"
+  fi
+  
+  # Check if workflow file exists
+  local workflow_path="${PROJECT_ROOT}/.github/workflows/${WORKFLOW}"
+  if [[ ! -f "$workflow_path" ]]; then
+    error "Workflow file not found: $workflow_path"
+  fi
+  
+  act_args+=("-W" "${PROJECT_ROOT}/.github/workflows/${WORKFLOW}")
+  
+  # Add verbosity
+  if $VERBOSE; then
+    act_args+=("-v")
+  fi
+  
+  # Dry run
+  if $DRY_RUN; then
+    act_args+=("-n")
+  fi
+  
+  # Set platform
+  act_args+=("--platform" "ubuntu-latest=catthehacker/ubuntu:act-latest")
+
+  # Display run information
+  info "Running local CI with the following configuration:"
+  info "- Workflow: ${WORKFLOW}"
+  info "- Event: ${EVENT}"
+  if [[ -n "$JOB" ]]; then
+    info "- Job: ${JOB}"
+  else
+    info "- Job: all jobs"
+  fi
+  if $DRY_RUN; then
+    info "- Mode: DRY RUN (no actual execution)"
+  fi
+  echo
+  
+  # Configure JVM options for Java 21
+  export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+
+  # Execute act with the prepared arguments
+  info "Running: act ${act_args[*]}"
+  echo "================================================================="
+  cd "$PROJECT_ROOT"
+  if act "${act_args[@]}"; then
+    echo "================================================================="
+    success "Local CI execution completed successfully!"
+  else
+    local exit_code=$?
+    echo "================================================================="
+    error "Local CI execution failed with exit code $exit_code"
+  fi
+}
+
+# Main execution
+if [[ $# -eq 0 || "$1" == "-h" || "$1" == "--help" ]]; then
+  show_help
+  exit 0
+fi
+
+parse_args "$@"
+run_workflow

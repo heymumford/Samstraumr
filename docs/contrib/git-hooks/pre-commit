@@ -1,0 +1,52 @@
+#!/bin/bash
+#
+# Samstraumr pre-commit hook to run local CI checks
+#
+
+# Terminal colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+RESET='\033[0m'
+
+# Functions for prettier output
+info() { echo -e "\n${YELLOW}$1${RESET}"; }
+success() { echo -e "${GREEN}$1${RESET}"; }
+error() { echo -e "${RED}$1${RESET}" >&2; }
+
+# Get the root of the project
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+
+# Check if s8r-ci exists
+if [ ! -f "${PROJECT_ROOT}/s8r-ci" ]; then
+  error "s8r-ci script not found. Skipping local CI checks."
+  exit 0
+fi
+
+# Check if this is an initial commit
+if git rev-parse --verify HEAD >/dev/null 2>&1; then
+  against=HEAD
+else
+  # Initial commit: diff against an empty tree object
+  against=$(git hash-object -t tree /dev/null)
+fi
+
+# Redirect output to stderr.
+exec 1>&2
+
+# Only run CI if Java files are changed (for performance)
+if git diff --cached --name-only --diff-filter=ACM | grep -q "\.java$"; then
+  info "Java files changed. Running basic CI checks..."
+  
+  # Run the most basic verification only to keep it fast
+  if ! "${PROJECT_ROOT}/s8r-ci" --job basic-verification --dry-run; then
+    error "Local CI check would fail. Fix the issues or use git commit --no-verify to bypass this check."
+    exit 1
+  fi
+  
+  success "Local CI checks passed."
+else
+  info "No Java files changed. Skipping CI checks."
+fi
+
+exit 0

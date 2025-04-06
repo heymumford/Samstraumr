@@ -6,6 +6,27 @@ Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford
 
 This document serves as a reference for Claude when working with the Samstraumr repository, providing key information about project standards, commands, and organization.
 
+## CI Commands
+
+When working with CI/CD pipelines, the following commands are available:
+
+```bash
+# Run the CI pipeline locally using act
+./s8r-ci
+
+# Run a specific job from the CI pipeline
+./s8r-ci --job basic-verification
+
+# Run the CI pipeline in dry-run mode (shows what would happen without executing)
+./s8r-ci --dry-run
+
+# Run a different workflow
+./s8r-ci --workflow smoke-test.yml
+
+# Run CI with verbose output
+./s8r-ci --verbose
+```
+
 ## Quality Check Commands
 
 When making changes to the code, the following commands should be run to ensure quality standards:
@@ -149,7 +170,7 @@ Samstraumr has two version management systems:
 ./s8r version bump patch
 
 # Set a specific version
-./s8r version set 2.1.0
+./s8r version set 2.2.0
 
 # Test, bump and tag
 ./s8r version test patch
@@ -168,7 +189,7 @@ Samstraumr has two version management systems:
 ./s8r-version bump minor
 
 # Set specific version
-./s8r-version set 2.1.0
+./s8r-version set 2.2.0
 
 # Fix version inconsistencies
 ./s8r-version fix
@@ -204,4 +225,4 @@ Before committing code, verify these style standards:
 
 ## Current Version
 
-The current version of Samstraumr is: 2.1.0 (as of April 04, 2025)
+The current version of Samstraumr is: 2.2.0 (as of April 04, 2025)
