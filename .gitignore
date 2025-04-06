@@ -276,3 +276,14 @@ _site/
 
 # Test coverage reports
 coverage/
+
+# Script backups
+.script_backups/
+
+# Migration backups
+backup-before-migration-*/
+backup-legacy/
+
+# Additional build artifacts
+**/maven-failsafe-plugin/
+**/surefire-reports/dump*.dump*
