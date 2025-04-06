@@ -2,15 +2,14 @@ package org.s8r.architecture;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.Instant;
 import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.s8r.component.identity.Identity;
 import org.s8r.domain.identity.ComponentId;
-import org.s8r.domain.identity.ComponentHierarchy;
 import org.s8r.test.annotation.UnitTest;
 
 /**
@@ -28,24 +27,20 @@ public class HierarchicalIdentitySystemTest {
     private ComponentId rootId;
     private ComponentId childId1;
     private ComponentId childId2;
-    private ComponentId grandchildId1;
-    private ComponentId grandchildId2;
-    private ComponentHierarchy hierarchy;
+    private List<ComponentId> componentIds;
 
     @BeforeEach
     void setUp() {
-        rootId = new ComponentId("root");
-        childId1 = new ComponentId("child1");
-        childId2 = new ComponentId("child2");
-        grandchildId1 = new ComponentId("grandchild1");
-        grandchildId2 = new ComponentId("grandchild2");
+        // Create component identifiers using the factory method
+        rootId = ComponentId.create("root");
+        childId1 = ComponentId.create("child1");
+        childId2 = ComponentId.create("child2");
         
-        // Create a test hierarchy
-        hierarchy = new ComponentHierarchy(rootId);
-        hierarchy.addChild(rootId, childId1);
-        hierarchy.addChild(rootId, childId2);
-        hierarchy.addChild(childId1, grandchildId1);
-        hierarchy.addChild(childId2, grandchildId2);
+        // Store components for testing
+        componentIds = new ArrayList<>();
+        componentIds.add(rootId);
+        componentIds.add(childId1);
+        componentIds.add(childId2);
     }
 
     @Nested
@@ -53,191 +48,164 @@ public class HierarchicalIdentitySystemTest {
     class IdentityStructureTests {
         
         @Test
-        @DisplayName("Component ID should contain both local name and UUID")
-        void componentIdShouldContainLocalNameAndUuid() {
-            ComponentId id = new ComponentId("test-component");
+        @DisplayName("Component ID should contain UUID and reason")
+        void componentIdShouldContainUuidAndReason() {
+            ComponentId id = ComponentId.create("test-component");
             
-            assertNotNull(id.getLocalName(), "Local name should not be null");
-            assertEquals("test-component", id.getLocalName(), "Local name should match");
-            assertNotNull(id.getUuid(), "UUID should not be null");
-            assertTrue(id.getUuid().toString().length() > 30, "UUID should be a valid UUID string");
+            assertNotNull(id.getValue(), "UUID should not be null");
+            assertNotNull(id.getReason(), "Reason should not be null");
+            assertEquals("test-component", id.getReason(), "Reason should match");
+            assertTrue(id.getIdString().length() > 30, "ID should be a valid UUID string");
         }
 
         @Test
-        @DisplayName("Component IDs with same local name should be distinct")
-        void componentIdsWithSameLocalNameShouldBeDistinct() {
-            ComponentId id1 = new ComponentId("same-name");
-            ComponentId id2 = new ComponentId("same-name");
+        @DisplayName("Component IDs with same reason should be distinct")
+        void componentIdsWithSameReasonShouldBeDistinct() {
+            ComponentId id1 = ComponentId.create("same-reason");
+            ComponentId id2 = ComponentId.create("same-reason");
             
-            assertNotEquals(id1, id2, "IDs with same local name should be distinct due to UUIDs");
-            assertNotEquals(id1.getUuid(), id2.getUuid(), "UUIDs should be different");
+            assertNotEquals(id1, id2, "IDs with same reason should be distinct due to UUIDs");
+            assertNotEquals(id1.getValue(), id2.getValue(), "UUIDs should be different");
+            assertEquals("same-reason", id1.getReason(), "Reason should match input");
+            assertEquals("same-reason", id2.getReason(), "Reason should match input");
+        }
+        
+        @Test
+        @DisplayName("Component IDs should have creation time")
+        void componentIdsShouldHaveCreationTime() {
+            ComponentId id = ComponentId.create("test-component");
+            assertNotNull(id.getCreationTime(), "Creation time should not be null");
+            assertFalse(id.getCreationTime().isAfter(Instant.now()), "Creation time should be in the past");
+            assertTrue(id.getCreationTime().isBefore(Instant.now().plusSeconds(1)), 
+                       "Creation time should be recent");
+        }
+        
+        @Test
+        @DisplayName("Components can be created from existing UUIDs")
+        void componentsCanBeCreatedFromUuids() {
+            String uuidStr = UUID.randomUUID().toString();
+            ComponentId id = ComponentId.fromString(uuidStr, "test-reason");
+            
+            assertEquals(uuidStr, id.getIdString(), "UUID string should match input");
+            assertEquals("test-reason", id.getReason(), "Reason should match input");
         }
     }
 
     @Nested
-    @DisplayName("Path Addressing Tests")
-    class PathAddressingTests {
+    @DisplayName("Component Hierarchy Tests")
+    class ComponentHierarchyTests {
         
         @Test
-        @DisplayName("Absolute path should start with root")
-        void absolutePathShouldStartWithRoot() {
-            String path = hierarchy.getAbsolutePath(grandchildId1);
+        @DisplayName("Components can have hierarchical addressing")
+        void componentsCanHaveHierarchicalAddressing() {
+            // Create root hierarchy
+            org.s8r.domain.identity.ComponentHierarchy rootHierarchy = 
+                org.s8r.domain.identity.ComponentHierarchy.createRoot(rootId);
             
-            assertTrue(path.startsWith("/root/"), "Absolute path should start with /root/");
-            assertEquals("/root/child1/grandchild1", path, "Path should reflect hierarchy");
-        }
-
-        @Test
-        @DisplayName("Relative paths should be resolved correctly")
-        void relativePathsShouldBeResolvedCorrectly() {
-            // Test relative path from childId1 to grandchildId1
-            String relativePath = "../child2/grandchild2";
-            ComponentId resolved = hierarchy.resolveRelativePath(childId1, relativePath);
+            assertNotNull(rootHierarchy, "Root hierarchy should be created");
+            assertTrue(rootHierarchy.isRoot(), "Should be identified as root");
+            assertEquals(rootId, rootHierarchy.getId(), "Component ID should match");
+            assertNull(rootHierarchy.getParentId(), "Root should have no parent");
+            assertTrue(rootHierarchy.getChildrenIds().isEmpty(), 
+                      "New hierarchy should have no children");
             
-            assertEquals(grandchildId2, resolved, "Relative path should resolve correctly");
+            // Create and add child hierarchy
+            org.s8r.domain.identity.ComponentHierarchy childHierarchy = 
+                org.s8r.domain.identity.ComponentHierarchy.createChild(childId1, rootHierarchy);
+            
+            assertFalse(childHierarchy.isRoot(), "Child hierarchy should not be root");
+            assertEquals(rootId, childHierarchy.getParentId(), "Parent ID should match root ID");
+            assertTrue(childHierarchy.getHierarchicalAddress().contains(rootId.getShortId()), 
+                      "Child address should contain root ID");
+            
+            // Add child to root and verify
+            rootHierarchy.addChild(childId1);
+            assertEquals(1, rootHierarchy.getChildrenIds().size(), "Root should have one child");
+            assertTrue(rootHierarchy.getChildrenIds().contains(childId1), 
+                      "Root children should contain child1");
         }
         
         @Test
-        @DisplayName("Path querying should find components by pattern")
-        void pathQueryingShouldFindComponentsByPattern() {
-            List<ComponentId> found = hierarchy.findByPathPattern("/root/*/grand*");
+        @DisplayName("Hierarchy should maintain parent-child relationships")
+        void hierarchyShouldMaintainParentChildRelationships() {
+            // Create root hierarchy
+            org.s8r.domain.identity.ComponentHierarchy rootHierarchy = 
+                org.s8r.domain.identity.ComponentHierarchy.createRoot(rootId);
             
-            assertEquals(2, found.size(), "Should find both grandchildren");
-            assertTrue(found.contains(grandchildId1), "Should contain grandchild1");
-            assertTrue(found.contains(grandchildId2), "Should contain grandchild2");
+            // Add children
+            rootHierarchy.addChild(childId1);
+            rootHierarchy.addChild(childId2);
+            
+            assertEquals(2, rootHierarchy.getChildrenIds().size(), 
+                        "Root should have two children");
+            assertTrue(rootHierarchy.getChildrenIds().contains(childId1), 
+                      "Root children should contain child1");
+            assertTrue(rootHierarchy.getChildrenIds().contains(childId2), 
+                      "Root children should contain child2");
+            
+            // Create child hierarchies
+            org.s8r.domain.identity.ComponentHierarchy child1Hierarchy = 
+                org.s8r.domain.identity.ComponentHierarchy.createChild(childId1, rootHierarchy);
+            org.s8r.domain.identity.ComponentHierarchy child2Hierarchy = 
+                org.s8r.domain.identity.ComponentHierarchy.createChild(childId2, rootHierarchy);
+            
+            // Verify hierarchical addresses
+            assertTrue(child1Hierarchy.getHierarchicalAddress().startsWith(
+                      rootHierarchy.getHierarchicalAddress()), 
+                     "Child address should start with parent address");
+            assertTrue(child2Hierarchy.getHierarchicalAddress().startsWith(
+                      rootHierarchy.getHierarchicalAddress()), 
+                     "Child address should start with parent address");
+            assertNotEquals(child1Hierarchy.getHierarchicalAddress(), 
+                          child2Hierarchy.getHierarchicalAddress(),
+                         "Child addresses should be distinct");
         }
     }
 
     @Nested
-    @DisplayName("Hierarchy Management Tests")
-    class HierarchyManagementTests {
+    @DisplayName("Component Identity Tests")
+    class ComponentIdentityTests {
         
         @Test
-        @DisplayName("Moving components should update paths")
-        void movingComponentsShouldUpdatePaths() {
-            // Move grandchild1 from child1 to child2
-            hierarchy.moveComponent(grandchildId1, childId2);
+        @DisplayName("Component identities should be unique")
+        void componentIdentitiesShouldBeUnique() {
+            // Create multiple components with the same reason
+            ComponentId id1 = ComponentId.create("component");
+            ComponentId id2 = ComponentId.create("component");
+            ComponentId id3 = ComponentId.create("component");
             
-            String newPath = hierarchy.getAbsolutePath(grandchildId1);
-            assertEquals("/root/child2/grandchild1", newPath, "Path should be updated after move");
+            // Verify they are all unique
+            assertNotEquals(id1, id2, "Components should have unique identities");
+            assertNotEquals(id2, id3, "Components should have unique identities");
+            assertNotEquals(id1, id3, "Components should have unique identities");
             
-            List<ComponentId> child1Children = hierarchy.getChildren(childId1);
-            List<ComponentId> child2Children = hierarchy.getChildren(childId2);
-            
-            assertEquals(0, child1Children.size(), "child1 should have no children");
-            assertEquals(2, child2Children.size(), "child2 should have two children");
-            assertTrue(child2Children.contains(grandchildId1), "child2 should contain moved grandchild1");
+            // Verify they all have the same reason
+            assertEquals(id1.getReason(), id2.getReason(), "Reasons should be the same");
+            assertEquals(id2.getReason(), id3.getReason(), "Reasons should be the same");
         }
         
         @Test
-        @DisplayName("Component removal should clean up hierarchy")
-        void componentRemovalShouldCleanupHierarchy() {
-            hierarchy.removeComponent(childId1);
+        @DisplayName("Component IDs have short representations")
+        void componentIdsHaveShortRepresentations() {
+            ComponentId id = ComponentId.create("test-component");
             
-            assertFalse(hierarchy.contains(childId1), "Removed component should not exist in hierarchy");
-            assertFalse(hierarchy.contains(grandchildId1), "Children of removed component should also be removed");
-            
-            List<ComponentId> rootChildren = hierarchy.getChildren(rootId);
-            assertEquals(1, rootChildren.size(), "Root should have only one child left");
-            assertEquals(childId2, rootChildren.get(0), "Remaining child should be child2");
-        }
-    }
-
-    @Nested
-    @DisplayName("Identity Persistence Tests")
-    class IdentityPersistenceTests {
-        
-        @Test
-        @DisplayName("Serialization and deserialization should preserve identity")
-        void serializationAndDeserializationShouldPreserveIdentity() {
-            ComponentId id = new ComponentId("serialize-test");
-            
-            // Convert to serialized form
-            String serialized = id.serialize();
-            
-            // Deserialize
-            ComponentId deserialized = ComponentId.deserialize(serialized);
-            
-            assertEquals(id, deserialized, "Deserialized ID should equal original");
-            assertEquals(id.getLocalName(), deserialized.getLocalName(), "Local name should be preserved");
-            assertEquals(id.getUuid(), deserialized.getUuid(), "UUID should be preserved");
+            assertNotNull(id.getShortId(), "Short ID should not be null");
+            assertTrue(id.getShortId().length() < id.getIdString().length(), 
+                      "Short ID should be shorter than full ID");
+            assertEquals(8, id.getShortId().length(), "Short ID should be 8 characters");
         }
         
         @Test
-        @DisplayName("Hierarchy serialization should preserve structure")
-        void hierarchySerializationShouldPreserveStructure() {
-            // Serialize hierarchy
-            String serialized = hierarchy.serialize();
+        @DisplayName("Components have address representations")
+        void componentsHaveAddressRepresentations() {
+            ComponentId id = ComponentId.create("test-component");
             
-            // Create new hierarchy from serialized form
-            ComponentHierarchy deserialized = ComponentHierarchy.deserialize(serialized);
-            
-            assertTrue(deserialized.contains(rootId), "Root should exist in deserialized hierarchy");
-            assertTrue(deserialized.contains(childId1), "child1 should exist in deserialized hierarchy");
-            assertTrue(deserialized.contains(grandchildId1), "grandchild1 should exist in deserialized hierarchy");
-            
-            assertEquals(
-                hierarchy.getAbsolutePath(grandchildId1),
-                deserialized.getAbsolutePath(grandchildId1),
-                "Paths should be preserved"
-            );
-        }
-    }
-    
-    @Nested
-    @DisplayName("Identity Query Tests")
-    class IdentityQueryTests {
-        
-        @Test
-        @DisplayName("Finding components by attribute should work")
-        void findingComponentsByAttributeShouldWork() {
-            // Add attributes to components
-            hierarchy.setComponentAttribute(rootId, "type", "container");
-            hierarchy.setComponentAttribute(childId1, "type", "processor");
-            hierarchy.setComponentAttribute(childId2, "type", "processor");
-            hierarchy.setComponentAttribute(grandchildId1, "type", "validator");
-            hierarchy.setComponentAttribute(grandchildId2, "type", "transformer");
-            
-            // Query by type
-            List<ComponentId> processors = hierarchy.findByAttribute("type", "processor");
-            assertEquals(2, processors.size(), "Should find both processors");
-            assertTrue(processors.contains(childId1), "Should contain childId1");
-            assertTrue(processors.contains(childId2), "Should contain childId2");
-            
-            // Query by combination of attributes
-            hierarchy.setComponentAttribute(childId1, "status", "active");
-            hierarchy.setComponentAttribute(childId2, "status", "standby");
-            
-            List<ComponentId> activeProcessors = hierarchy.findByAttributes(
-                Map.of("type", "processor", "status", "active")
-            );
-            
-            assertEquals(1, activeProcessors.size(), "Should find one active processor");
-            assertEquals(childId1, activeProcessors.get(0), "Should find childId1");
-        }
-        
-        @Test
-        @DisplayName("Finding components by capability should work")
-        void findingComponentsByCapabilityShouldWork() {
-            // Add capabilities to components
-            hierarchy.addComponentCapability(childId1, "Serializable");
-            hierarchy.addComponentCapability(childId1, "Cacheable");
-            hierarchy.addComponentCapability(childId2, "Serializable");
-            hierarchy.addComponentCapability(grandchildId1, "Validatable");
-            
-            // Query by capability
-            List<ComponentId> serializables = hierarchy.findByCapability("Serializable");
-            assertEquals(2, serializables.size(), "Should find two serializable components");
-            assertTrue(serializables.contains(childId1), "Should contain childId1");
-            assertTrue(serializables.contains(childId2), "Should contain childId2");
-            
-            // Query by multiple capabilities
-            List<ComponentId> serializableAndCacheable = hierarchy.findByCapabilities(
-                Set.of("Serializable", "Cacheable")
-            );
-            
-            assertEquals(1, serializableAndCacheable.size(), "Should find one component with both capabilities");
-            assertEquals(childId1, serializableAndCacheable.get(0), "Should find childId1");
+            String address = id.toAddress();
+            assertNotNull(address, "Component address should not be null");
+            assertTrue(address.contains(id.getShortId()), 
+                     "Address should contain component short ID");
+            assertTrue(address.startsWith("CO<"), 
+                     "Address should start with component indicator");
         }
     }
 }

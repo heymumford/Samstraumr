@@ -16,6 +16,9 @@
 package org.s8r.domain.identity;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -28,23 +31,57 @@ public final class ComponentId {
   private final String reason;
   private final Instant creationTime;
   private final String shortId;
+  private final List<String> lineage;
+  private UUID parentId; // Can be null for root components
 
-  private ComponentId(UUID id, String reason, Instant creationTime) {
+  private ComponentId(UUID id, String reason, Instant creationTime, List<String> lineage) {
     this.id = Objects.requireNonNull(id, "ID cannot be null");
     this.reason = Objects.requireNonNull(reason, "Reason cannot be null");
     this.creationTime = Objects.requireNonNull(creationTime, "Creation time cannot be null");
     this.shortId = id.toString().substring(0, 8);
+    this.lineage = lineage != null ? new ArrayList<>(lineage) : new ArrayList<>();
+    
+    // Extract parentId from lineage if available
+    if (!this.lineage.isEmpty()) {
+      try {
+        this.parentId = UUID.fromString(this.lineage.get(this.lineage.size() - 1));
+      } catch (IllegalArgumentException e) {
+        // Invalid UUID in lineage, leaving parentId as null
+      }
+    }
   }
 
   /** Creates a new ComponentId with a random UUID. */
   public static ComponentId create(String reason) {
-    return new ComponentId(UUID.randomUUID(), reason, Instant.now());
+    return new ComponentId(UUID.randomUUID(), reason, Instant.now(), Collections.emptyList());
+  }
+
+  /** Creates a new ComponentId with the specified lineage. */
+  public static ComponentId create(String reason, List<String> lineage) {
+    return new ComponentId(UUID.randomUUID(), reason, Instant.now(), lineage);
   }
 
   /** Creates a ComponentId from an existing UUID string. */
   public static ComponentId fromString(String id, String reason) {
     try {
-      return new ComponentId(UUID.fromString(id), reason, Instant.now());
+      return new ComponentId(UUID.fromString(id), reason, Instant.now(), Collections.emptyList());
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("Invalid UUID format: " + id, e);
+    }
+  }
+  
+  /**
+   * Creates a new ComponentId instance with the specified values.
+   * 
+   * @param id The ID as a string
+   * @param reason The reason for creation
+   * @param lineage The lineage list
+   * @return A new ComponentId
+   */
+  public static ComponentId fromValues(String id, String reason, List<String> lineage) {
+    try {
+      UUID uuid = UUID.fromString(id);
+      return new ComponentId(uuid, reason, Instant.now(), lineage);
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("Invalid UUID format: " + id, e);
     }
@@ -69,6 +106,24 @@ public final class ComponentId {
 
   public Instant getCreationTime() {
     return creationTime;
+  }
+  
+  /**
+   * Gets the component's lineage.
+   * 
+   * @return An unmodifiable view of the lineage list
+   */
+  public List<String> getLineage() {
+    return Collections.unmodifiableList(lineage);
+  }
+  
+  /**
+   * Gets the parent ID if it exists.
+   * 
+   * @return The parent ID, or null if this is a root component
+   */
+  public UUID getParentId() {
+    return parentId;
   }
 
   /** Creates a formatted address representation of this component ID. */

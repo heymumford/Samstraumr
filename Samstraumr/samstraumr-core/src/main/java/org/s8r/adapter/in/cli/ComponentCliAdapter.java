@@ -27,7 +27,7 @@ import org.s8r.domain.exception.ComponentException;
 import org.s8r.domain.exception.ComponentNotFoundException;
 import org.s8r.domain.exception.InvalidOperationException;
 import org.s8r.domain.identity.ComponentId;
-import org.s8r.infrastructure.logging.Slf4jLogger;
+import org.s8r.application.port.LoggerFactory;
 
 /**
  * Command-line interface adapter for demonstrating the Clean Architecture implementation.
@@ -44,7 +44,10 @@ public class ComponentCliAdapter {
   public ComponentCliAdapter() {
     // Create infrastructure implementations
     ComponentRepository repository = new InMemoryComponentRepository();
-    this.logger = new Slf4jLogger(ComponentCliAdapter.class);
+    // Create a LoggerFactory through dependency injection
+    // In a real application, this would be injected from outside
+    LoggerFactory loggerFactory = org.s8r.infrastructure.config.DependencyContainer.getInstance().get(LoggerFactory.class);
+    this.logger = loggerFactory.getLogger(ComponentCliAdapter.class);
 
     // Create a simple in-memory event dispatcher
     org.s8r.infrastructure.event.InMemoryEventDispatcher eventDispatcher =

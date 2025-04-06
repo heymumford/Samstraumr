@@ -18,9 +18,10 @@ package org.s8r.infrastructure.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.s8r.adapter.out.InMemoryComponentRepository;
+import org.s8r.infrastructure.persistence.InMemoryComponentRepository;
 import org.s8r.application.port.ComponentRepository;
 import org.s8r.application.port.EventDispatcher;
+import org.s8r.application.port.LoggerFactory;
 import org.s8r.application.port.LoggerPort;
 import org.s8r.application.port.MachineRepository;
 import org.s8r.application.service.ComponentService;
@@ -36,7 +37,7 @@ import org.s8r.domain.event.MachineStateChangedEvent;
 import org.s8r.infrastructure.event.DataFlowEventHandler;
 import org.s8r.infrastructure.event.InMemoryEventDispatcher;
 import org.s8r.infrastructure.event.LoggingEventHandler;
-import org.s8r.infrastructure.logging.LoggerFactory;
+import org.s8r.infrastructure.logging.S8rLoggerFactory;
 import org.s8r.infrastructure.persistence.InMemoryMachineRepository;
 
 /**
@@ -84,14 +85,21 @@ public class DependencyContainer {
   /** Sets up the logger based on configuration. */
   private void setupLogger() {
     String logImpl = config.get("log.implementation", "SLF4J");
-
+    
+    // Create and configure the logger factory
+    S8rLoggerFactory loggerFactory = S8rLoggerFactory.getInstance();
+    
     if ("CONSOLE".equalsIgnoreCase(logImpl)) {
-      LoggerFactory.setImplementation(LoggerFactory.LoggerImplementation.CONSOLE);
+      loggerFactory.setImplementation(S8rLoggerFactory.LoggerImplementation.CONSOLE);
     } else {
-      LoggerFactory.setImplementation(LoggerFactory.LoggerImplementation.SLF4J);
+      loggerFactory.setImplementation(S8rLoggerFactory.LoggerImplementation.SLF4J);
     }
+    
+    // Register the logger factory as implementation of the application port
+    register(LoggerFactory.class, loggerFactory);
 
-    LoggerPort logger = LoggerFactory.getLogger(DependencyContainer.class);
+    // Get a logger instance for this class
+    LoggerPort logger = loggerFactory.getLogger(DependencyContainer.class);
     logger.info("Initialized logger with implementation: " + logImpl);
 
     register(LoggerPort.class, logger);

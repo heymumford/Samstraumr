@@ -1,11 +1,13 @@
 package org.s8r.architecture.util;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Supplier;
 
 import org.s8r.domain.exception.*;
 import org.s8r.domain.component.Component;
 import org.s8r.domain.identity.ComponentId;
+import org.s8r.domain.lifecycle.LifecycleState;
 
 /**
  * Utility class for testing error handling patterns and strategies.
@@ -14,14 +16,18 @@ import org.s8r.domain.identity.ComponentId;
 public class ErrorHandlingTestUtils {
 
     /**
-     * Creates a component that throws a specific exception during initialization.
+     * Creates a component that throws a specific exception when activated.
      *
      * @param name Component name
      * @param exceptionSupplier Supplier for the exception to throw
-     * @return A component that will throw the specified exception
+     * @return A component that will throw the specified exception when activated
      */
     public static Component createFailingComponent(String name, Supplier<RuntimeException> exceptionSupplier) {
-        return new FailingComponent(new ComponentId(name), exceptionSupplier);
+        // Create normal component
+        Component component = Component.create(ComponentId.create(name));
+        
+        // Intercept the activation to throw an exception
+        return new ExceptionThrowingComponent(name, exceptionSupplier);
     }
     
     /**
@@ -88,50 +94,40 @@ public class ErrorHandlingTestUtils {
     }
     
     /**
-     * A component implementation that fails with a specific exception.
+     * A component implementation that throws exceptions on certain operations.
+     * We implement Component directly rather than delegating to avoid wrapper issues.
      */
-    private static class FailingComponent implements Component {
-        private final ComponentId id;
+    private static class ExceptionThrowingComponent extends Component {
         private final Supplier<RuntimeException> exceptionSupplier;
         
-        public FailingComponent(ComponentId id, Supplier<RuntimeException> exceptionSupplier) {
-            this.id = id;
+        public ExceptionThrowingComponent(String name, Supplier<RuntimeException> exceptionSupplier) {
+            super(ComponentId.create(name));
             this.exceptionSupplier = exceptionSupplier;
         }
         
         @Override
-        public ComponentId getId() {
-            return id;
-        }
-        
-        @Override
-        public org.s8r.domain.lifecycle.LifecycleState getState() {
-            return org.s8r.domain.lifecycle.LifecycleState.CREATED;
-        }
-        
-        @Override
-        public void initialize() {
+        public void activate() {
             throw exceptionSupplier.get();
         }
         
         @Override
-        public void start() {
+        public void deactivate() {
             throw exceptionSupplier.get();
         }
         
         @Override
-        public void stop() {
+        public void terminate() {
             throw exceptionSupplier.get();
         }
         
         @Override
-        public void destroy() {
+        public void publishData(String channel, Map<String, Object> data) {
             throw exceptionSupplier.get();
         }
         
         @Override
-        public boolean isRunning() {
-            return false;
+        public void publishData(String channel, String key, Object value) {
+            throw exceptionSupplier.get();
         }
     }
 }

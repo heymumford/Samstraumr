@@ -24,7 +24,7 @@ import org.s8r.application.dto.MachineDto;
 import org.s8r.application.port.LoggerPort;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.machine.MachineType;
-import org.s8r.infrastructure.logging.LoggerFactory;
+import org.s8r.infrastructure.logging.S8rLoggerFactory;
 
 /**
  * A simple CLI application that demonstrates the S8r framework.
@@ -33,7 +33,7 @@ import org.s8r.infrastructure.logging.LoggerFactory;
  * functionality, showing how to use the Samstraumr facade.
  */
 public class CliApplication {
-  private static final LoggerPort logger = LoggerFactory.getLogger(CliApplication.class);
+  private static final LoggerPort logger = S8rLoggerFactory.getInstance().getLogger(CliApplication.class);
   private static final Samstraumr framework = Samstraumr.getInstance();
 
   /**

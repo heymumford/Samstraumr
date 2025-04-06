@@ -22,8 +22,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.s8r.application.service.DataFlowService;
 import org.s8r.domain.component.Component;
+import org.s8r.domain.event.ComponentDataEvent;
 import org.s8r.domain.identity.ComponentId;
 
 /**
@@ -33,15 +33,15 @@ import org.s8r.domain.identity.ComponentId;
  * common integration patterns using the event-driven architecture.
  */
 public class PatternFactory {
-  private final DataFlowService dataFlowService;
+  private final DataFlowPort dataFlowPort;
 
   /**
    * Creates a new pattern factory.
    *
-   * @param dataFlowService The data flow service to use for component communication
+   * @param dataFlowPort The data flow port to use for component communication
    */
-  public PatternFactory(DataFlowService dataFlowService) {
-    this.dataFlowService = dataFlowService;
+  public PatternFactory(DataFlowPort dataFlowPort) {
+    this.dataFlowPort = dataFlowPort;
   }
 
   /**
@@ -58,7 +58,7 @@ public class PatternFactory {
         TransformerComponent.create(reason, inputChannel, outputChannel);
 
     // Subscribe to the input channel
-    dataFlowService.subscribe(transformer.getId(), inputChannel, transformer::processData);
+    dataFlowPort.subscribe(transformer.getId(), inputChannel, transformer::processData);
 
     return transformer;
   }
@@ -96,7 +96,7 @@ public class PatternFactory {
     FilterComponent filter = FilterComponent.create(reason, inputChannel, outputChannel);
 
     // Subscribe to the input channel
-    dataFlowService.subscribe(filter.getId(), inputChannel, filter::processData);
+    dataFlowPort.subscribe(filter.getId(), inputChannel, filter::processData);
 
     return filter;
   }
@@ -137,7 +137,7 @@ public class PatternFactory {
         AggregatorComponent.createCountBased(reason, inputChannel, outputChannel, countThreshold);
 
     // Subscribe to the input channel
-    dataFlowService.subscribe(aggregator.getId(), inputChannel, aggregator::processData);
+    dataFlowPort.subscribe(aggregator.getId(), inputChannel, aggregator::processData);
 
     return aggregator;
   }
@@ -157,7 +157,7 @@ public class PatternFactory {
         AggregatorComponent.createTimeBased(reason, inputChannel, outputChannel, timeThreshold);
 
     // Subscribe to the input channel
-    dataFlowService.subscribe(aggregator.getId(), inputChannel, aggregator::processData);
+    dataFlowPort.subscribe(aggregator.getId(), inputChannel, aggregator::processData);
 
     return aggregator;
   }
@@ -183,7 +183,7 @@ public class PatternFactory {
             reason, inputChannel, outputChannel, countThreshold, timeThreshold);
 
     // Subscribe to the input channel
-    dataFlowService.subscribe(aggregator.getId(), inputChannel, aggregator::processData);
+    dataFlowPort.subscribe(aggregator.getId(), inputChannel, aggregator::processData);
 
     return aggregator;
   }
@@ -226,7 +226,7 @@ public class PatternFactory {
     RouterComponent router = RouterComponent.create(reason, inputChannel);
 
     // Subscribe to the input channel
-    dataFlowService.subscribe(router.getId(), inputChannel, router::processData);
+    dataFlowPort.subscribe(router.getId(), inputChannel, router::processData);
 
     return router;
   }
@@ -302,10 +302,10 @@ public class PatternFactory {
       // Create publisher for current component
       Map<String, Object> initialData = new HashMap<>();
       initialData.put("pipelineInitialized", true);
-      dataFlowService.publishData(current.getId(), channelName, initialData);
+      dataFlowPort.publishData(current.getId(), channelName, initialData);
 
       // Create subscriber for next component
-      dataFlowService.subscribe(
+      dataFlowPort.subscribe(
           next.getId(),
           channelName,
           event -> {

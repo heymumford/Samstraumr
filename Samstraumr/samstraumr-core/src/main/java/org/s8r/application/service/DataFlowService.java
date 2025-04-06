@@ -20,13 +20,14 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import org.s8r.application.port.ComponentRepository;
+import org.s8r.application.port.DataFlowEventPort;
 import org.s8r.application.port.EventDispatcher;
 import org.s8r.application.port.LoggerPort;
 import org.s8r.domain.component.Component;
+import org.s8r.domain.component.pattern.DataFlowPort;
 import org.s8r.domain.event.ComponentDataEvent;
 import org.s8r.domain.exception.ComponentNotFoundException;
 import org.s8r.domain.identity.ComponentId;
-import org.s8r.infrastructure.event.DataFlowEventHandler;
 
 /**
  * Application service for managing data flow between components.
@@ -34,9 +35,9 @@ import org.s8r.infrastructure.event.DataFlowEventHandler;
  * <p>This service provides a facade for the event-driven data flow system, allowing components to
  * publish and subscribe to data channels without direct dependencies on each other.
  */
-public class DataFlowService {
+public class DataFlowService implements DataFlowPort {
   private final ComponentRepository componentRepository;
-  private final DataFlowEventHandler dataFlowHandler;
+  private final DataFlowEventPort dataFlowHandler;
   private final EventDispatcher eventDispatcher;
   private final LoggerPort logger;
 
@@ -50,7 +51,7 @@ public class DataFlowService {
    */
   public DataFlowService(
       ComponentRepository componentRepository,
-      DataFlowEventHandler dataFlowHandler,
+      DataFlowEventPort dataFlowHandler,
       EventDispatcher eventDispatcher,
       LoggerPort logger) {
     this.componentRepository = componentRepository;

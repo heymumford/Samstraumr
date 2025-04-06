@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
+import org.s8r.application.port.DataFlowEventPort;
 import org.s8r.application.port.EventDispatcher.EventHandler;
 import org.s8r.application.port.LoggerPort;
 import org.s8r.domain.event.ComponentDataEvent;
@@ -32,7 +33,7 @@ import org.s8r.domain.identity.ComponentId;
  * <p>This handler implements a publish-subscribe mechanism for component data events, allowing
  * components to communicate data without direct dependencies.
  */
-public class DataFlowEventHandler {
+public class DataFlowEventHandler implements DataFlowEventPort {
   private final LoggerPort logger;
 
   // Maps data channels to subscribers

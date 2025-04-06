@@ -26,7 +26,7 @@ import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.machine.MachineType;
 import org.s8r.infrastructure.config.Configuration;
 import org.s8r.infrastructure.config.DependencyContainer;
-import org.s8r.infrastructure.logging.LoggerFactory;
+import org.s8r.infrastructure.logging.S8rLoggerFactory;
 
 /**
  * Facade for the S8r framework.
@@ -43,7 +43,7 @@ public class Samstraumr {
   /** Private constructor to enforce singleton pattern. */
   private Samstraumr() {
     this.container = DependencyContainer.getInstance();
-    this.logger = LoggerFactory.getLogger(Samstraumr.class);
+    this.logger = S8rLoggerFactory.getInstance().getLogger(Samstraumr.class);
     logger.info("Samstraumr framework initialized");
   }
 

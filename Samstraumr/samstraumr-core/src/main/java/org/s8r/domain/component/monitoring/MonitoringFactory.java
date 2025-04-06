@@ -18,7 +18,7 @@ package org.s8r.domain.component.monitoring;
 import java.time.Duration;
 import java.util.function.Consumer;
 
-import org.s8r.application.service.DataFlowService;
+import org.s8r.domain.component.pattern.DataFlowPort;
 import org.s8r.domain.component.Component;
 import org.s8r.domain.event.ComponentDataEvent;
 
@@ -29,15 +29,15 @@ import org.s8r.domain.event.ComponentDataEvent;
  * collectors and health monitors.
  */
 public class MonitoringFactory {
-  private final DataFlowService dataFlowService;
+  private final DataFlowPort dataFlowPort;
 
   /**
    * Creates a new monitoring factory.
    *
-   * @param dataFlowService The data flow service to use for component communication
+   * @param dataFlowPort The data flow port to use for component communication
    */
-  public MonitoringFactory(DataFlowService dataFlowService) {
-    this.dataFlowService = dataFlowService;
+  public MonitoringFactory(DataFlowPort dataFlowPort) {
+    this.dataFlowPort = dataFlowPort;
   }
 
   /**
@@ -51,7 +51,7 @@ public class MonitoringFactory {
     MetricsCollector collector = MetricsCollector.create(reason, publishInterval);
 
     // Subscribe to metrics channel to receive metrics from other components
-    dataFlowService.subscribe(
+    dataFlowPort.subscribe(
         collector.getId(),
         MetricsCollector.getMetricsChannel(),
         event -> {
@@ -74,7 +74,7 @@ public class MonitoringFactory {
     HealthMonitor monitor = HealthMonitor.create(reason, publishInterval, timeoutThreshold);
 
     // Subscribe to health channel to receive health updates from other components
-    dataFlowService.subscribe(
+    dataFlowPort.subscribe(
         monitor.getId(),
         HealthMonitor.getHealthChannel(),
         event -> {
@@ -82,7 +82,7 @@ public class MonitoringFactory {
         });
 
     // Subscribe to alert channel to receive alerts from other components
-    dataFlowService.subscribe(
+    dataFlowPort.subscribe(
         monitor.getId(),
         HealthMonitor.getAlertChannel(),
         event -> {
@@ -163,7 +163,7 @@ public class MonitoringFactory {
         metricsCollector.createMetricsConsumer(channelName, component.getId(), healthConsumer);
 
     // Subscribe the wrapped component to the channel
-    dataFlowService.subscribe(component.getId(), channelName, metricsConsumer);
+    dataFlowPort.subscribe(component.getId(), channelName, metricsConsumer);
 
     return metricsConsumer;
   }

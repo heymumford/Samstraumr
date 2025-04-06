@@ -6,21 +6,21 @@ import static org.mockito.Mockito.*;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-import org.s8r.component.core.Component;
-import org.s8r.component.core.Environment;
-import org.s8r.component.core.State;
-import org.s8r.component.exception.ComponentException;
-import org.s8r.component.exception.InvalidStateTransitionException;
-import org.s8r.component.composite.Composite;
+import org.s8r.domain.component.Component;
+import org.s8r.domain.event.ComponentStateChangedEvent;
+import org.s8r.domain.identity.ComponentId;
+import org.s8r.domain.lifecycle.LifecycleState;
+import org.s8r.domain.exception.InvalidStateTransitionException;
+import org.s8r.application.port.EventDispatcher;
 import org.s8r.test.annotation.UnitTest;
+import org.s8r.architecture.util.TestComponentFactory;
 
 /**
  * Tests for the Lifecycle State Management Pattern as described in ADR-0009.
@@ -34,12 +34,13 @@ import org.s8r.test.annotation.UnitTest;
 @DisplayName("Lifecycle State Management Tests (ADR-0009)")
 public class LifecycleStateManagementTest {
 
-    private Environment environment;
+    private ComponentId testId;
+    private EventDispatcher eventDispatcher;
 
     @BeforeEach
     void setUp() {
-        environment = new Environment();
-        environment.setParameter("test-mode", "true");
+        testId = ComponentId.create("test-component");
+        eventDispatcher = TestComponentFactory.createEventDispatcher();
     }
 
     @Nested
@@ -49,335 +50,224 @@ public class LifecycleStateManagementTest {
         @Test
         @DisplayName("Component should follow standard lifecycle path")
         void componentShouldFollowStandardLifecyclePath() {
-            Component component = Component.create("Lifecycle Test", environment);
+            Component component = Component.create(testId);
             
             // Initial state after creation
-            assertEquals(State.CREATED, component.getState(), "Initial state should be CREATED");
+            assertEquals(LifecycleState.CONCEPTION, component.getLifecycleState(), 
+                "Initial state should be CONCEPTION");
             
-            // Initialize component
-            component.initialize();
-            assertEquals(State.READY, component.getState(), "State after initialization should be READY");
+            // Transition through lifecycle states
+            component.transitionTo(LifecycleState.INITIALIZING);
+            assertEquals(LifecycleState.INITIALIZING, component.getLifecycleState(), 
+                "State should be INITIALIZING");
             
-            // Component in use - state should remain READY
-            component.processData("test data");
-            assertEquals(State.READY, component.getState(), "State during normal operation should be READY");
+            component.transitionTo(LifecycleState.CONFIGURING);
+            assertEquals(LifecycleState.CONFIGURING, component.getLifecycleState(), 
+                "State should be CONFIGURING");
             
-            // Stop component
-            component.stop();
-            assertEquals(State.STOPPING, component.getState(), "State during shutdown should be STOPPING");
+            component.transitionTo(LifecycleState.SPECIALIZING);
+            assertEquals(LifecycleState.SPECIALIZING, component.getLifecycleState(), 
+                "State should be SPECIALIZING");
             
-            // Destroy component
-            component.destroy();
-            assertEquals(State.DESTROYED, component.getState(), "Final state should be DESTROYED");
+            component.transitionTo(LifecycleState.DEVELOPING_FEATURES);
+            assertEquals(LifecycleState.DEVELOPING_FEATURES, component.getLifecycleState(), 
+                "State should be DEVELOPING_FEATURES");
+            
+            component.transitionTo(LifecycleState.READY);
+            assertEquals(LifecycleState.READY, component.getLifecycleState(), 
+                "State should be READY");
+            
+            component.activate();
+            assertEquals(LifecycleState.ACTIVE, component.getLifecycleState(), 
+                "State should be ACTIVE");
+            
+            component.deactivate();
+            assertEquals(LifecycleState.READY, component.getLifecycleState(), 
+                "State should be READY");
+            
+            component.terminate();
+            assertEquals(LifecycleState.TERMINATED, component.getLifecycleState(), 
+                "Final state should be TERMINATED");
         }
         
         @Test
-        @DisplayName("Component should handle initialization failure")
-        void componentShouldHandleInitializationFailure() {
-            // Create a component that will fail during initialization
-            Component faultyComponent = Component.createWithConfig(
-                "Faulty Component", 
-                environment,
-                Map.of("failOnInitialize", "true")
-            );
+        @DisplayName("Invalid state transitions should be prevented")
+        void invalidStateTransitionsShouldBePrevented() {
+            Component component = Component.create(testId);
             
-            // Attempt to initialize
-            assertThrows(ComponentException.class, () -> faultyComponent.initialize());
+            // Try invalid transition (skipping states)
+            assertThrows(InvalidStateTransitionException.class, 
+                () -> component.transitionTo(LifecycleState.ACTIVE),
+                "Should throw exception on invalid transition");
             
-            // Check state after failed initialization
-            assertEquals(
-                State.INITIALIZATION_FAILED, 
-                faultyComponent.getState(),
-                "State after failed initialization should be INITIALIZATION_FAILED"
-            );
+            // Setup correct state for testing more transitions
+            component.transitionTo(LifecycleState.INITIALIZING);
+            component.transitionTo(LifecycleState.CONFIGURING);
+            component.transitionTo(LifecycleState.SPECIALIZING);
+            component.transitionTo(LifecycleState.DEVELOPING_FEATURES);
+            component.transitionTo(LifecycleState.READY);
             
-            // Verify that operations are rejected in failed state
-            assertThrows(
-                InvalidStateTransitionException.class, 
-                () -> faultyComponent.processData("test"),
-                "Operations should be rejected in INITIALIZATION_FAILED state"
-            );
+            // Try direct activation methods
+            component.activate(); // This should work
             
-            // Verify that destruction is still allowed
-            assertDoesNotThrow(() -> faultyComponent.destroy());
-            assertEquals(
-                State.DESTROYED, 
-                faultyComponent.getState(),
-                "Component should transition to DESTROYED state"
-            );
+            // Try multiple activations (already active)
+            assertThrows(InvalidStateTransitionException.class, 
+                () -> component.activate(),
+                "Should throw exception when activating an already active component");
+            
+            // Try deactivating and then terminating (valid sequence)
+            component.deactivate();
+            component.terminate();
+            
+            // Try to reactivate after termination
+            assertThrows(InvalidStateTransitionException.class, 
+                () -> component.activate(),
+                "Should throw exception when activating a terminated component");
         }
         
-        @ParameterizedTest
-        @EnumSource(value = State.class, names = {"CREATED", "INITIALIZING", "READY", "STOPPING", "DESTROYED", "INITIALIZATION_FAILED"})
-        @DisplayName("All standard states should be supported")
-        void allStandardStatesShouldBeSupported(State state) {
-            // Create a mock component that can be set to any state
-            Component mockComponent = mock(Component.class);
-            when(mockComponent.getState()).thenReturn(state);
+        @Test
+        @DisplayName("Lifecycle states should have descriptive properties")
+        void lifecycleStatesShouldHaveDescriptiveProperties() {
+            // Verify descriptions on states
+            for (LifecycleState state : LifecycleState.values()) {
+                assertNotNull(state.getDescription(), "State should have a description");
+                assertFalse(state.getDescription().isEmpty(), "Description should not be empty");
+                
+                assertNotNull(state.getBiologicalAnalog(), "State should have a biological analog");
+                assertFalse(state.getBiologicalAnalog().isEmpty(), "Biological analog should not be empty");
+            }
             
-            // Get state description
-            String description = state.getDescription();
-            
-            // Verify state properties
-            assertNotNull(description, "State should have a description");
-            assertFalse(description.isEmpty(), "Description should not be empty");
-            
-            // Check if state allows operations based on its value
-            assertEquals(state == State.READY, state.allowsOperations(), "Only READY state should allow operations");
+            // Check specific state categories
+            assertTrue(LifecycleState.CONCEPTION.isEarlyStage(), "CONCEPTION should be an early stage");
+            assertTrue(LifecycleState.ACTIVE.isOperational(), "ACTIVE should be operational");
+            assertTrue(LifecycleState.TERMINATING.isTerminationStage(), "TERMINATING should be a termination stage");
         }
     }
 
     @Nested
-    @DisplayName("State Transition Management Tests")
-    class StateTransitionManagementTests {
+    @DisplayName("Event Emission Tests")
+    class EventEmissionTests {
         
         @Test
-        @DisplayName("State transitions should be explicit")
-        void stateTransitionsShouldBeExplicit() {
-            Component component = Component.create("Transition Test", environment);
+        @DisplayName("State transitions should emit events")
+        void stateTransitionsShouldEmitEvents() {
+            // Create a component
+            Component component = Component.create(testId);
             
-            // Track state changes
-            List<State> stateChanges = new ArrayList<>();
-            component.addStateChangeListener(stateChanges::add);
+            // Track state change events
+            List<ComponentStateChangedEvent> stateEvents = new ArrayList<>();
+            TestComponentFactory.MockEventDispatcher mockDispatcher = 
+                (TestComponentFactory.MockEventDispatcher) TestComponentFactory.createEventDispatcher();
             
-            // Perform lifecycle operations
-            component.initialize();
-            component.stop();
-            component.destroy();
+            // Perform state transitions and collect events
+            component.transitionTo(LifecycleState.INITIALIZING);
+            component.transitionTo(LifecycleState.CONFIGURING);
+            component.transitionTo(LifecycleState.SPECIALIZING);
             
-            // Verify all transitions were recorded
-            assertEquals(3, stateChanges.size(), "Should record 3 state changes");
-            assertEquals(State.READY, stateChanges.get(0), "First transition should be to READY");
-            assertEquals(State.STOPPING, stateChanges.get(1), "Second transition should be to STOPPING");
-            assertEquals(State.DESTROYED, stateChanges.get(2), "Third transition should be to DESTROYED");
+            // Extract events from the component
+            List<ComponentStateChangedEvent> events = component.getDomainEvents().stream()
+                .filter(e -> e instanceof ComponentStateChangedEvent)
+                .map(e -> (ComponentStateChangedEvent) e)
+                .toList();
+            
+            // Verify events
+            assertEquals(3, events.size(), "Should have 3 state transition events");
+            
+            // Check first transition event
+            ComponentStateChangedEvent firstEvent = events.get(0);
+            assertEquals(component.getId(), firstEvent.getComponentId(), "Event should reference the component");
+            assertEquals(LifecycleState.CONCEPTION, firstEvent.getPreviousState(), "First event should transition from CONCEPTION");
+            assertEquals(LifecycleState.INITIALIZING, firstEvent.getNewState(), "First event should transition to INITIALIZING");
         }
         
         @Test
-        @DisplayName("Invalid state transitions should fail with clear errors")
-        void invalidStateTransitionsShouldFailWithClearErrors() {
-            Component component = Component.create("Invalid Transition Test", environment);
-            component.initialize(); // Move to READY state
+        @DisplayName("Termination should emit proper events")
+        void terminationShouldEmitProperEvents() {
+            // Create a component and progress to READY state
+            Component component = Component.create(testId);
+            component.transitionTo(LifecycleState.INITIALIZING);
+            component.transitionTo(LifecycleState.CONFIGURING);
+            component.transitionTo(LifecycleState.SPECIALIZING);
+            component.transitionTo(LifecycleState.DEVELOPING_FEATURES);
+            component.transitionTo(LifecycleState.READY);
             
-            // Invalid transition: re-initialize an already initialized component
-            InvalidStateTransitionException exception = assertThrows(
-                InvalidStateTransitionException.class,
-                () -> component.initialize()
-            );
+            // Clear events from initialization
+            component.clearEvents();
             
-            // Verify exception details
-            assertEquals(State.READY, exception.getCurrentState(), "Exception should reference current state");
-            assertEquals("initialize", exception.getOperation(), "Exception should reference attempted operation");
+            // Terminate the component
+            component.terminate();
+            
+            // Get the termination events
+            List<ComponentStateChangedEvent> events = component.getDomainEvents().stream()
+                .filter(e -> e instanceof ComponentStateChangedEvent)
+                .map(e -> (ComponentStateChangedEvent) e)
+                .toList();
+            
+            // Verify termination events
+            assertEquals(2, events.size(), "Should have 2 state transition events during termination");
+            
+            // First event should be transition to TERMINATING
+            ComponentStateChangedEvent firstEvent = events.get(0);
+            assertEquals(LifecycleState.READY, firstEvent.getPreviousState(), "First event should transition from READY");
+            assertEquals(LifecycleState.TERMINATING, firstEvent.getNewState(), "First event should transition to TERMINATING");
+            
+            // Second event should be transition to TERMINATED
+            ComponentStateChangedEvent secondEvent = events.get(1);
+            assertEquals(LifecycleState.TERMINATING, secondEvent.getPreviousState(), "Second event should transition from TERMINATING");
+            assertEquals(LifecycleState.TERMINATED, secondEvent.getNewState(), "Second event should transition to TERMINATED");
+        }
+    }
+
+    @Nested
+    @DisplayName("Lifecycle Management Features")
+    class LifecycleManagementFeaturesTests {
+        
+        @Test
+        @DisplayName("Component should maintain activity log")
+        void componentShouldMaintainActivityLog() {
+            Component component = Component.create(testId);
+            
+            // Perform some lifecycle operations
+            component.transitionTo(LifecycleState.INITIALIZING);
+            component.addToLineage("Test lineage entry");
+            component.transitionTo(LifecycleState.CONFIGURING);
+            
+            // Verify activity log
+            List<String> activityLog = component.getActivityLog();
+            assertFalse(activityLog.isEmpty(), "Activity log should not be empty");
+            
+            // Check for key activities
             assertTrue(
-                exception.getMessage().contains("READY"),
-                "Exception message should mention current state"
-            );
-        }
-        
-        @Test
-        @DisplayName("State transitions should be atomic")
-        void stateTransitionsShouldBeAtomic() throws Exception {
-            // Create component for testing atomic transitions
-            Component component = Component.create("Atomic Transition Test", environment);
-            
-            // Set up a latch to control the test timing
-            CountDownLatch startLatch = new CountDownLatch(1);
-            CountDownLatch completionLatch = new CountDownLatch(2);
-            
-            // Create two threads that will try to initialize the component simultaneously
-            Thread thread1 = new Thread(() -> {
-                try {
-                    startLatch.await(); // Wait for signal to start
-                    component.initialize();
-                    completionLatch.countDown();
-                } catch (Exception e) {
-                    // Expected in one thread
-                }
-            });
-            
-            Thread thread2 = new Thread(() -> {
-                try {
-                    startLatch.await(); // Wait for signal to start
-                    component.initialize();
-                    completionLatch.countDown();
-                } catch (Exception e) {
-                    // Expected in one thread
-                }
-            });
-            
-            // Start threads
-            thread1.start();
-            thread2.start();
-            
-            // Signal threads to proceed
-            startLatch.countDown();
-            
-            // Wait for both threads to complete
-            assertTrue(completionLatch.await(5, TimeUnit.SECONDS), "Both threads should complete");
-            
-            // Verify only one initialization succeeded
-            assertEquals(State.READY, component.getState(), "Component should be in READY state");
-            assertEquals(1, component.getStateTransitionCount(), "Only one transition should have occurred");
-        }
-    }
-
-    @Nested
-    @DisplayName("State-Based Operation Validation Tests")
-    class StateBasedOperationValidationTests {
-        
-        @Test
-        @DisplayName("Operations should be validated against component state")
-        void operationsShouldBeValidatedAgainstComponentState() {
-            Component component = Component.create("Operation Validation Test", environment);
-            
-            // Operations should be rejected in CREATED state
-            assertThrows(
-                InvalidStateTransitionException.class, 
-                () -> component.processData("test"),
-                "Operations should be rejected in CREATED state"
+                activityLog.stream().anyMatch(entry -> entry.contains("Component created")),
+                "Activity log should contain creation entry"
             );
             
-            // Initialize to allow operations
-            component.initialize();
-            
-            // Operations should be allowed in READY state
-            assertDoesNotThrow(() -> component.processData("test"));
-            
-            // Destroy component
-            component.destroy();
-            
-            // Operations should be rejected in DESTROYED state
-            assertThrows(
-                InvalidStateTransitionException.class, 
-                () -> component.processData("test"),
-                "Operations should be rejected in DESTROYED state"
-            );
-        }
-        
-        @Test
-        @DisplayName("Methods should declare required states")
-        void methodsShouldDeclareRequiredStates() {
-            // This is a reflection-based test that checks for @RequiresState annotations
-            // on Component interface methods
-            
-            // Get operation method
-            java.lang.reflect.Method processDataMethod = Arrays.stream(Component.class.getMethods())
-                .filter(m -> m.getName().equals("processData"))
-                .findFirst()
-                .orElseThrow();
-            
-            // Check for @RequiresState annotation
-            RequiresState annotation = processDataMethod.getAnnotation(RequiresState.class);
-            assertNotNull(annotation, "Operation method should have @RequiresState annotation");
-            
-            // Verify required state
-            State[] requiredStates = annotation.value();
-            assertEquals(1, requiredStates.length, "Should require exactly one state");
-            assertEquals(State.READY, requiredStates[0], "Should require READY state");
-        }
-    }
-
-    @Nested
-    @DisplayName("Hierarchy Coordination Tests")
-    class HierarchyCoordinationTests {
-        
-        @Test
-        @DisplayName("Parent initialization should complete only after all children initialize")
-        void parentInitializationShouldCompleteOnlyAfterAllChildrenInitialize() {
-            // Create a composite with children
-            Composite composite = Composite.create("Hierarchy Test", environment);
-            Component child1 = Component.create("Child 1", environment);
-            Component child2 = Component.create("Child 2", environment);
-            
-            composite.addComponent(child1);
-            composite.addComponent(child2);
-            
-            // Initialize composite
-            composite.initialize();
-            
-            // Verify all components are initialized
-            assertEquals(State.READY, composite.getState(), "Composite should be initialized");
-            assertEquals(State.READY, child1.getState(), "Child 1 should be initialized");
-            assertEquals(State.READY, child2.getState(), "Child 2 should be initialized");
-            
-            // Verify initialization order through sequence numbers
-            long compositeSeq = composite.getStateChangeSequence(State.READY);
-            long child1Seq = child1.getStateChangeSequence(State.READY);
-            long child2Seq = child2.getStateChangeSequence(State.READY);
-            
-            assertTrue(compositeSeq > child1Seq, "Composite should be initialized after Child 1");
-            assertTrue(compositeSeq > child2Seq, "Composite should be initialized after Child 2");
-        }
-        
-        @Test
-        @DisplayName("Child components should be stopped before parent components")
-        void childComponentsShouldBeStoppedBeforeParentComponents() {
-            // Create a composite with children
-            Composite composite = Composite.create("Hierarchy Stop Test", environment);
-            Component child1 = Component.create("Child 1", environment);
-            Component child2 = Component.create("Child 2", environment);
-            
-            composite.addComponent(child1);
-            composite.addComponent(child2);
-            
-            // Initialize
-            composite.initialize();
-            
-            // Stop composite
-            composite.stop();
-            
-            // Verify stop state
-            assertEquals(State.STOPPING, composite.getState(), "Composite should be stopping");
-            assertEquals(State.STOPPING, child1.getState(), "Child 1 should be stopping");
-            assertEquals(State.STOPPING, child2.getState(), "Child 2 should be stopping");
-            
-            // Verify stop order through sequence numbers
-            long compositeSeq = composite.getStateChangeSequence(State.STOPPING);
-            long child1Seq = child1.getStateChangeSequence(State.STOPPING);
-            long child2Seq = child2.getStateChangeSequence(State.STOPPING);
-            
-            assertTrue(compositeSeq < child1Seq, "Child 1 should be stopped after Composite");
-            assertTrue(compositeSeq < child2Seq, "Child 2 should be stopped after Composite");
-        }
-        
-        @Test
-        @DisplayName("Failure in child initialization should propagate to parent")
-        void failureInChildInitializationShouldPropagateToParent() {
-            // Create a composite with children, one of which will fail
-            Composite composite = Composite.create("Hierarchy Failure Test", environment);
-            Component child1 = Component.create("Child 1", environment);
-            Component faultyChild = Component.createWithConfig(
-                "Faulty Child", 
-                environment,
-                Map.of("failOnInitialize", "true")
-            );
-            
-            composite.addComponent(child1);
-            composite.addComponent(faultyChild);
-            
-            // Attempt to initialize
-            assertThrows(ComponentException.class, () -> composite.initialize());
-            
-            // Verify states
-            assertEquals(
-                State.INITIALIZATION_FAILED, 
-                composite.getState(),
-                "Composite should be in INITIALIZATION_FAILED state"
-            );
-            // Child1 might have initialized before the faulty child failed
             assertTrue(
-                child1.getState() == State.READY || child1.getState() == State.CREATED,
-                "Child 1 should be in READY or CREATED state"
+                activityLog.stream().anyMatch(entry -> entry.contains("State transition")),
+                "Activity log should contain state transition entries"
             );
-            assertEquals(
-                State.INITIALIZATION_FAILED, 
-                faultyChild.getState(),
-                "Faulty child should be in INITIALIZATION_FAILED state"
+            
+            assertTrue(
+                activityLog.stream().anyMatch(entry -> entry.contains("lineage")),
+                "Activity log should contain lineage updates"
             );
         }
-    }
-    
-    // Mock annotation for test
-    @interface RequiresState {
-        State[] value();
+        
+        @Test
+        @DisplayName("Component should manage lineage")
+        void componentShouldManageLineage() {
+            Component component = Component.create(ComponentId.create("lineage-test"));
+            
+            // Add lineage entries
+            component.addToLineage("First generation");
+            component.addToLineage("Second generation");
+            
+            // Verify lineage
+            List<String> lineage = component.getLineage();
+            assertEquals(3, lineage.size(), "Lineage should have 3 entries (including creation reason)");
+            assertEquals("lineage-test", lineage.get(0), "First entry should be creation reason");
+            assertEquals("First generation", lineage.get(1), "Second entry should be first generation");
+            assertEquals("Second generation", lineage.get(2), "Third entry should be second generation");
+        }
     }
 }

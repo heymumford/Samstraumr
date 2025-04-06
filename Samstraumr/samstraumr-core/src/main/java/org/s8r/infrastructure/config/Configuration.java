@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.s8r.application.port.LoggerPort;
-import org.s8r.infrastructure.logging.LoggerFactory;
+import org.s8r.infrastructure.logging.S8rLoggerFactory;
 
 /**
  * Configuration system for the S8r framework.
@@ -36,7 +36,7 @@ import org.s8r.infrastructure.logging.LoggerFactory;
  */
 public class Configuration {
   private static final String DEFAULT_CONFIG_FILE = "samstraumr.properties";
-  private static final LoggerPort logger = LoggerFactory.getLogger(Configuration.class);
+  private static final LoggerPort logger = S8rLoggerFactory.getInstance().getLogger(Configuration.class);
 
   private final Map<String, String> configValues = new HashMap<>();
   private static final Configuration instance = new Configuration();

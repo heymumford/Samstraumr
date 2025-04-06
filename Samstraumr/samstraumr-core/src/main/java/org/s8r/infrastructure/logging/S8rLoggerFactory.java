@@ -16,21 +16,35 @@
 package org.s8r.infrastructure.logging;
 
 import org.s8r.application.port.LoggerPort;
+import org.s8r.application.port.LoggerFactory;
 
 /**
- * Factory for creating LoggerPort implementations.
+ * Implementation of the LoggerFactory interface for the S8r framework.
  *
  * <p>This factory allows the system to switch between different logger implementations while
- * maintaining Clean Architecture principles by returning the application layer's LoggerPort
+ * maintaining Clean Architecture principles by implementing the application layer's LoggerFactory
  * interface.
  */
-public class LoggerFactory {
+public class S8rLoggerFactory implements LoggerFactory {
   private static LoggerImplementation implementation = LoggerImplementation.SLF4J;
+  private static final S8rLoggerFactory INSTANCE = new S8rLoggerFactory();
 
   /** Available logger implementations. */
   public enum LoggerImplementation {
     SLF4J,
     CONSOLE
+  }
+  
+  /** Private constructor to enforce singleton pattern. */
+  private S8rLoggerFactory() {}
+  
+  /**
+   * Gets the singleton instance.
+   * 
+   * @return The S8rLoggerFactory instance
+   */
+  public static S8rLoggerFactory getInstance() {
+    return INSTANCE;
   }
 
   /**
@@ -38,8 +52,8 @@ public class LoggerFactory {
    *
    * @param implementation The implementation to use
    */
-  public static void setImplementation(LoggerImplementation implementation) {
-    LoggerFactory.implementation = implementation;
+  public void setImplementation(LoggerImplementation implementation) {
+    S8rLoggerFactory.implementation = implementation;
   }
 
   /**
@@ -47,17 +61,12 @@ public class LoggerFactory {
    *
    * @return The current logger implementation
    */
-  public static LoggerImplementation getImplementation() {
+  public LoggerImplementation getImplementation() {
     return implementation;
   }
 
-  /**
-   * Gets a logger for the specified class.
-   *
-   * @param clazz The class to get a logger for
-   * @return A LoggerPort implementation
-   */
-  public static LoggerPort getLogger(Class<?> clazz) {
+  @Override
+  public LoggerPort getLogger(Class<?> clazz) {
     switch (implementation) {
       case SLF4J:
         return Slf4jLogger.getLogger(clazz);
@@ -68,13 +77,8 @@ public class LoggerFactory {
     }
   }
 
-  /**
-   * Gets a logger with the specified name.
-   *
-   * @param name The logger name
-   * @return A LoggerPort implementation
-   */
-  public static LoggerPort getLogger(String name) {
+  @Override
+  public LoggerPort getLogger(String name) {
     switch (implementation) {
       case SLF4J:
         return Slf4jLogger.getLogger(name);

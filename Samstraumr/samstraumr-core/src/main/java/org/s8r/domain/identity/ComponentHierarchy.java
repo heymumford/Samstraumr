@@ -92,6 +92,33 @@ public class ComponentHierarchy {
   public ComponentId getParentId() {
     return parentId;
   }
+  
+  /**
+   * Gets the parent ID of a component.
+   *
+   * @param componentId The component ID to get the parent for
+   * @return The parent component ID, or null if not found
+   */
+  public static ComponentId getParentId(ComponentId componentId) {
+    if (componentId == null || componentId.getParentId() == null) {
+      return null;
+    }
+    
+    // Use the parent ID directly from the component ID
+    List<String> lineage = componentId.getLineage();
+    if (lineage.isEmpty()) {
+      return null;
+    }
+    
+    // Get the last entry in the lineage as the parent ID
+    String parentIdStr = lineage.get(lineage.size() - 1);
+    try {
+      return ComponentId.fromString(parentIdStr, "Parent of " + componentId.getShortId());
+    } catch (IllegalArgumentException e) {
+      // Invalid UUID in lineage
+      return null;
+    }
+  }
 
   /**
    * Gets the hierarchical address of this component.

@@ -288,11 +288,12 @@ public class CleanArchitectureComplianceTest {
                 String interfaceName = interfaceFile.getFileName().toString();
                 interfaceName = interfaceName.substring(0, interfaceName.length() - 5); // Remove .java
                 
+                final String finalInterfaceName = interfaceName;
                 boolean hasImplementation = infrastructureFiles.stream()
                     .anyMatch(p -> {
                         try {
                             String content = Files.readString(p);
-                            return content.contains("implements " + interfaceName);
+                            return content.contains("implements " + finalInterfaceName);
                         } catch (IOException e) {
                             return false;
                         }
@@ -346,7 +347,7 @@ public class CleanArchitectureComplianceTest {
                         // Convert Path to package name
                         String relativePath = SRC_DIR.relativize(dir).toString();
                         if (!relativePath.isEmpty()) {
-                            String packageName = "org.s8r." + relativePath.replace(File.separator, ".");
+                            String packageName = "org.s8r." + relativePath.replace("/", ".");
                             packagesWithoutInfo.add(packageName);
                         }
                     }
