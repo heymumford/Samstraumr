@@ -7,6 +7,32 @@ Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford
 All notable changes to this project will be documented in this file.
 
 ## [1.3.0] - 2025-04-03
+## [2.2.0] - 2025-04-06
+
+### Added
+
+- Comprehensive repository cleanup plan in `cleanup-plan.md`
+- Consolidated script libraries for header and test management
+- New research document on testing in the age of AI
+- Improved documentation for Cucumber integration
+- Enhanced testing infrastructure with dedicated test runners
+- Java 21 compatibility adjustments for reflection operations
+
+### Changed
+
+- Simplified repository structure by removing redundant backup directories
+- Improved code organization with cleaner package structure
+- Consolidated duplicate scripts into shared libraries
+- Enhanced .gitignore to prevent buildup of temporary files
+- Standardized build and test scripts for consistency
+
+### Fixed
+
+- Test execution issues when running different test types
+- Maven profile misalignment in test scripts
+- Build system test skipping problems
+- JaCoCo coverage integration issues
+- Cucumber test discovery mechanism
 ## [2.1.0] - 2025-04-06
 
 ### Added
