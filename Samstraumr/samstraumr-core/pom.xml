@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2025 Eric C. Mumford (@heymumford)
+
+This software was developed with analytical assistance from AI tools 
+including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+which were used as paid services. All intellectual property rights 
+remain exclusively with the copyright holder listed above.
+
+Licensed under the Mozilla Public License 2.0
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" 
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -11,49 +21,76 @@
   </parent>
 
   <artifactId>samstraumr-core</artifactId>
-  <version>2.4.0</version>
-  <packaging>jar</packaging>
   <name>Samstraumr Core</name>
+  <description>Core framework components for the Samstraumr project</description>
 
   <properties>
+    <java.version>21</java.version>
+    <cucumber.version>7.15.0</cucumber.version>
+    <cucumber.reporting.version>5.7.7</cucumber.reporting.version>
+    <junit.version>5.10.1</junit.version>
+    <slf4j.version>2.0.9</slf4j.version>
+    <log4j.version>2.22.1</log4j.version>
+    <mockito.version>5.8.0</mockito.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <cucumber.version>7.22.0</cucumber.version>
-    <junit-jupiter.version>5.10.2</junit-jupiter.version>
-    <junit-platform.version>1.10.2</junit-platform.version>
-    <slf4j.version>2.0.12</slf4j.version>
-    <log4j2.version>2.23.1</log4j2.version>
-    <lombok.version>1.18.38</lombok.version>
-    <docmosis.version>22.2.03</docmosis.version>
-    <archunit.version>1.4.0</archunit.version>
-    <mockito.version>5.17.0</mockito.version>
-    <testcontainers.version>1.20.6</testcontainers.version>
-    <pmd.version>7.12.0</pmd.version>
-    <jackson.version>2.18.3</jackson.version>
-    <oshi.version>6.8.0</oshi.version>
-    <spotbugs.annotations.version>4.9.3</spotbugs.annotations.version>
-    <cucumber.version>7.22.0</cucumber.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <exec.mainClass>org.s8r.app.CliApplication</exec.mainClass>
   </properties>
 
   <dependencies>
+    <!-- Core dependencies -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j2-impl</artifactId>
+      <version>${log4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>${log4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j.version}</version>
+    </dependency>
+
+    <!-- Document generation -->
+    <dependency>
+      <groupId>com.itextpdf</groupId>
+      <artifactId>itextpdf</artifactId>
+      <version>5.5.13.3</version>
+    </dependency>
+    
+    <!-- Additional dependencies -->
     <dependency>
       <groupId>com.github.oshi</groupId>
       <artifactId>oshi-core</artifactId>
-      <version>${oshi.version}</version>
+      <version>6.4.6</version>
     </dependency>
-    
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.16.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.16.1</version>
+    </dependency>
     <dependency>
       <groupId>com.github.spotbugs</groupId>
       <artifactId>spotbugs-annotations</artifactId>
-      <version>${spotbugs.annotations.version}</version>
+      <version>4.8.3</version>
     </dependency>
-    
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <version>${junit-jupiter.version}</version>
-      <scope>test</scope>
-    </dependency>
-    
+
+    <!-- Testing dependencies -->
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-java</artifactId>
@@ -68,66 +105,52 @@
     </dependency>
     <dependency>
       <groupId>io.cucumber</groupId>
-      <artifactId>cucumber-picocontainer</artifactId>
+      <artifactId>cucumber-core</artifactId>
       <version>${cucumber.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-suite</artifactId>
-      <version>${junit-platform.version}</version>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-plugin</artifactId>
+      <version>${cucumber.version}</version>
       <scope>test</scope>
     </dependency>
-    
     <dependency>
-      <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-suite-api</artifactId>
-      <version>${junit-platform.version}</version>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-junit</artifactId>
+      <version>${cucumber.version}</version>
       <scope>test</scope>
     </dependency>
-    
     <dependency>
-      <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-suite-engine</artifactId>
-      <version>${junit-platform.version}</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
-    
     <dependency>
-      <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-launcher</artifactId>
-      <version>${junit-platform.version}</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
-    
     <dependency>
-      <groupId>com.tngtech.archunit</groupId>
-      <artifactId>archunit-junit5</artifactId>
-      <version>${archunit.version}</version>
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
-    
     <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>testcontainers</artifactId>
-      <version>${testcontainers.version}</version>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito.version}</version>
       <scope>test</scope>
     </dependency>
-    
     <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>${testcontainers.version}</version>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>${mockito.version}</version>
       <scope>test</scope>
     </dependency>
-    
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <version>${testcontainers.version}</version>
-      <scope>test</scope>
-    </dependency>
-    
   </dependencies>
 
   <build>
@@ -138,120 +161,85 @@
         <configuration>
           <source>${maven.compiler.source}</source>
           <target>${maven.compiler.target}</target>
-          <encoding>${project.build.sourceEncoding}</encoding>
           <compilerArgs>
-            <arg>-parameters</arg>
+            <arg>--add-opens</arg>
+            <arg>java.base/java.lang=ALL-UNNAMED</arg>
+            <arg>--add-opens</arg>
+            <arg>java.base/java.util=ALL-UNNAMED</arg>
+            <arg>--add-opens</arg>
+            <arg>java.base/java.lang.reflect=ALL-UNNAMED</arg>
           </compilerArgs>
-          <testCompilerArgument>-parameters</testCompilerArgument>
-          <testSource>${maven.compiler.source}</testSource>
-          <testTarget>${maven.compiler.target}</testTarget>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <includes>
-            <include>**/*Test.java</include>
-            <include>**/*Tests.java</include>
-            <include>**/*TestSuite.java</include>
-          </includes>
+          <argLine>
+            --add-opens java.base/java.lang=ALL-UNNAMED
+            --add-opens java.base/java.util=ALL-UNNAMED
+            --add-opens java.base/java.lang.reflect=ALL-UNNAMED
+          </argLine>
           <systemPropertyVariables>
-            <cucumber.filter.tags>${cucumber.filter.tags}</cucumber.filter.tags>
+            <junit.jupiter.extensions.autodetection.enabled>true</junit.jupiter.extensions.autodetection.enabled>
           </systemPropertyVariables>
-          <properties>
-            <configurationParameters>
-              cucumber.junit-platform.naming-strategy=long
-            </configurationParameters>
-          </properties>
-          <dependencies>
-            <dependency>
-              <groupId>org.junit.platform</groupId>
-              <artifactId>junit-platform-suite</artifactId>
-              <version>${junit-platform.version}</version>
-            </dependency>
-            <dependency>
-              <groupId>org.junit.platform</groupId>
-              <artifactId>junit-platform-suite-engine</artifactId>
-              <version>${junit-platform.version}</version>
-            </dependency>
-            <dependency>
-              <groupId>org.junit.platform</groupId>
-              <artifactId>junit-platform-suite-api</artifactId>
-              <version>${junit-platform.version}</version>
-            </dependency>
-          </dependencies>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
       </plugin>
-      
+    </plugins>
+    
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>
         <filtering>true</filtering>
         <includes>
           <include>**/*.properties</include>
-          <include>**/*.feature</include>
           <include>**/*.xml</include>
-          <include>**/*.md</include>
-          <include>**/*.sql</include>
+          <include>**/*.feature</include>
         </includes>
       </testResource>
     </testResources>
   </build>
-  
+
   <profiles>
+    <profile>
+      <id>unit-tests</id>
+      <properties>
+        <cucumber.filter.tags>@UnitTest or @TubeTest</cucumber.filter.tags>
+      </properties>
+    </profile>
+    <profile>
+      <id>component-tests</id>
+      <properties>
+        <cucumber.filter.tags>@ComponentTest</cucumber.filter.tags>
+      </properties>
+    </profile>
     <profile>
       <id>atl-tests</id>
       <properties>
         <cucumber.filter.tags>@ATL</cucumber.filter.tags>
       </properties>
     </profile>
-    
+    <profile>
+      <id>btl-tests</id>
+      <properties>
+        <cucumber.filter.tags>@BTL</cucumber.filter.tags>
+      </properties>
+    </profile>
     <profile>
       <id>orchestration-tests</id>
       <properties>
         <cucumber.filter.tags>@OrchestrationTest</cucumber.filter.tags>
       </properties>
     </profile>
-    
     <profile>
-      <id>tube-tests</id>
+      <id>all-tests</id>
       <properties>
-        <cucumber.filter.tags>@TubeTest</cucumber.filter.tags>
-      </properties>
-    </profile>
-    
-    <profile>
-      <id>flow-tests</id>
-      <properties>
-        <cucumber.filter.tags>@FlowTest</cucumber.filter.tags>
-      </properties>
-    </profile>
-    
-    <profile>
-      <id>stream-tests</id>
-      <properties>
-        <cucumber.filter.tags>@StreamTest</cucumber.filter.tags>
-      </properties>
-    </profile>
-    
-    <profile>
-      <id>adaptation-tests</id>
-      <properties>
-        <cucumber.filter.tags>@AdaptationTest</cucumber.filter.tags>
-      </properties>
-    </profile>
-    
-    <profile>
-      <id>adam-tube-atl-tests</id>
-      <properties>
-        <cucumber.filter.tags>@AdamTube and @ATL</cucumber.filter.tags>
+        <cucumber.filter.tags>not @disabled</cucumber.filter.tags>
       </properties>
     </profile>
   </profiles>
-  
 </project>

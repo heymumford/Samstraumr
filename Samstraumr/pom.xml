@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2025 Eric C. Mumford (@heymumford)
+
+This software was developed with analytical assistance from AI tools 
+including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+which were used as paid services. All intellectual property rights 
+remain exclusively with the copyright holder listed above.
+
+Licensed under the Mozilla Public License 2.0
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" 
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -22,6 +32,24 @@
     <maven.compiler.target>21</maven.compiler.target>
     <test.tags>@ATL</test.tags>
     <all.test.tags>@ATL</all.test.tags>
+    <maven.compiler.plugin.version>3.12.1</maven.compiler.plugin.version>
+    <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
+    <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
+    <spotless.plugin.version>2.40.0</spotless.plugin.version>
+    <spotless.google.format.version>1.19.2</spotless.google.format.version>
+    <checkstyle.plugin.version>3.3.1</checkstyle.plugin.version>
+    <checkstyle.version>10.14.0</checkstyle.version>
+    <spotbugs.plugin.version>4.8.3.0</spotbugs.plugin.version>
+    <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
+    <jacoco.line.coverage>0.75</jacoco.line.coverage>
+    <jacoco.branch.coverage>0.75</jacoco.branch.coverage>
+    <maven.site.plugin.version>4.0.0-M13</maven.site.plugin.version>
+    <maven.project.info.reports.plugin.version>3.5.0</maven.project.info.reports.plugin.version>
+  </properties>
+
+  <build>
+    <pluginManagement>
+      <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
@@ -47,7 +75,11 @@
             <encoding>${project.build.sourceEncoding}</encoding>
           </configuration>
         </plugin>
-        
+      </plugins>
+    </pluginManagement>
+  </build>
+  
+  <profiles>
     <profile>
       <id>tests</id>
       <properties>
@@ -56,7 +88,6 @@
         <maven.test.skip>false</maven.test.skip>
       </properties>
     </profile>
-    
     
     <profile>
       <id>tdd-development</id>
@@ -71,55 +102,6 @@
         <maven.test.skip>false</maven.test.skip>
         <testFailureIgnore>false</testFailureIgnore>
       </properties>
-    </profile>
-    
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.diffplug.spotless</groupId>
-            <artifactId>spotless-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>validate</phase>
-                <goals>
-                  <goal>check</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>validate</phase>
-                <goals>
-                  <goal>check</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          
-          <plugin>
-            <groupId>com.github.spotbugs</groupId>
-            <artifactId>spotbugs-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>verify</phase>
-                <goals>
-                  <goal>check</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          
-          <plugin>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
 </project>
