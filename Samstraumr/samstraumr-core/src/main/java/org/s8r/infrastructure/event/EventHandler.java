@@ -13,26 +13,27 @@
  *     https://www.mozilla.org/en-US/MPL/2.0/
  */
 
-package org.s8r.domain.event;
+package org.s8r.infrastructure.event;
 
-import org.s8r.domain.identity.ComponentId;
+import org.s8r.domain.event.DomainEvent;
 
-/** Event raised when a new component is created. */
-public class ComponentCreatedEvent extends ComponentEvent {
-  private final String componentType;
-
-  /** Creates a new component created event. */
-  public ComponentCreatedEvent(ComponentId componentId, String componentType) {
-    super(componentId);
-    this.componentType = componentType;
-  }
+/**
+ * Functional interface for event handlers in infrastructure layer.
+ * <p>
+ * This interface provides a consistent handler pattern for domain events 
+ * in the infrastructure layer. It's implemented by classes that need to
+ * react to specific domain events.
+ * </p>
+ *
+ * @param <T> The type of domain event this handler can process
+ */
+@FunctionalInterface
+public interface EventHandler<T extends DomainEvent> {
 
   /**
-   * Gets the type of the component that was created.
+   * Handles a domain event.
    *
-   * @return The component type
+   * @param event The event to handle
    */
-  public String getComponentType() {
-    return componentType;
-  }
+  void handle(T event);
 }

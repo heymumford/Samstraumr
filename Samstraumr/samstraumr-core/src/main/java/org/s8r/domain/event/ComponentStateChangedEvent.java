@@ -19,8 +19,7 @@ import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.lifecycle.LifecycleState;
 
 /** Event raised when a component's lifecycle state changes. */
-public class ComponentStateChangedEvent extends DomainEvent {
-  private final ComponentId componentId;
+public class ComponentStateChangedEvent extends ComponentEvent {
   private final LifecycleState previousState;
   private final LifecycleState newState;
   private final String transitionReason;
@@ -31,25 +30,35 @@ public class ComponentStateChangedEvent extends DomainEvent {
       LifecycleState previousState,
       LifecycleState newState,
       String transitionReason) {
-    this.componentId = componentId;
+    super(componentId);
     this.previousState = previousState;
     this.newState = newState;
     this.transitionReason = transitionReason;
   }
 
-  // Getters
-  public ComponentId getComponentId() {
-    return componentId;
-  }
-
+  /**
+   * Gets the previous state of the component.
+   * 
+   * @return The previous lifecycle state
+   */
   public LifecycleState getPreviousState() {
     return previousState;
   }
 
+  /**
+   * Gets the new state of the component.
+   * 
+   * @return The new lifecycle state
+   */
   public LifecycleState getNewState() {
     return newState;
   }
 
+  /**
+   * Gets the reason for the state transition.
+   * 
+   * @return The transition reason
+   */
   public String getTransitionReason() {
     return transitionReason;
   }

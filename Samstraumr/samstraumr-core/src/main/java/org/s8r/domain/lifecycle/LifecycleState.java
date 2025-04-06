@@ -28,8 +28,10 @@ public enum LifecycleState {
   DEVELOPING_FEATURES("Building specific capabilities", "Organogenesis"),
 
   // Operational (Post-Embryonic)
+  INITIALIZED("Initialization complete", "Birth"),
   READY("Prepared but not active", "Juvenile"),
   ACTIVE("Fully operational", "Active Growth"),
+  RUNNING("In normal operation", "Mature Function"),
   WAITING("Temporarily inactive but responsive", "Dormancy"),
   ADAPTING("Adjusting to environmental changes", "Environmental Adaptation"),
   TRANSFORMING("Undergoing major changes", "Metamorphosis"),
@@ -75,8 +77,10 @@ public enum LifecycleState {
 
   /** Checks if this state is an operational state. */
   public boolean isOperational() {
-    return this == READY
+    return this == INITIALIZED
+        || this == READY
         || this == ACTIVE
+        || this == RUNNING
         || this == WAITING
         || this == ADAPTING
         || this == TRANSFORMING;
