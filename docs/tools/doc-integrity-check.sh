@@ -17,22 +17,31 @@ if [[ "$1" == "--source-only" ]]; then
   return 0
 fi
 
-# Terminal colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
 # Find repository root
 PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 cd "$PROJECT_ROOT"
 
-# Functions for prettier output
-info() { echo -e "${BLUE}$1${NC}"; }
-success() { echo -e "${GREEN}$1${NC}"; }
-error() { echo -e "${RED}Error: $1${NC}" >&2; }
-warning() { echo -e "${YELLOW}Warning: $1${NC}" >&2; }
+# Source the doc-lib library that contains the shared documentation utilities
+if [ -f "${PROJECT_ROOT}/util/lib/doc-lib.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/doc-lib.sh"
+  USING_LIB=true
+else
+  echo "Warning: Documentation library not found. Using fallback functions."
+  USING_LIB=false
+  
+  # Terminal colors
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  YELLOW='\033[0;33m'
+  BLUE='\033[0;34m'
+  NC='\033[0m' # No Color
+
+  # Functions for prettier output
+  info() { echo -e "${BLUE}$1${NC}"; }
+  success() { echo -e "${GREEN}$1${NC}"; }
+  error() { echo -e "${RED}Error: $1${NC}" >&2; }
+  warning() { echo -e "${YELLOW}Warning: $1${NC}" >&2; }
+fi
 
 # Only show the startup message if not sourced
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
@@ -43,6 +52,10 @@ fi
 ERRORS=0
 WARNINGS=0
 
+# Create reports directory if it doesn't exist yet
+REPORT_DIR="${PROJECT_ROOT}/target/doc-reports"
+mkdir -p "$REPORT_DIR"
+
 # 1. Check for broken internal markdown links
 check_internal_links() {
   info "Checking for broken internal markdown links..."
@@ -51,34 +64,48 @@ check_internal_links() {
   local md_files=($(find . -type f -name "*.md" -not -path "*/\.*" -not -path "*/target/*" -not -path "*/node_modules/*"))
   
   for file in "${md_files[@]}"; do
-    # Extract links with the form [text](path.md) or [text](path/to/file.md)
-    local links=($(grep -oP '\[.*?\]\(\K[^)]+(?=\))' "$file" | grep '\.md'))
-    
-    for link in "${links[@]}"; do
-      # Skip external links
-      if [[ "$link" =~ ^https?:// ]]; then
-        continue
-      fi
+    # Use library function if available
+    if [[ "$USING_LIB" == true ]] && type find_broken_links &>/dev/null; then
+      local broken_links=$(find_broken_links "$file")
       
-      # Handle relative links
-      local target_file
-      if [[ "$link" = /* ]]; then
-        # Absolute path within the repository
-        target_file="${PROJECT_ROOT}${link}"
-      else
-        # Relative path
-        target_file="$(dirname "$file")/$link"
+      if [ -n "$broken_links" ]; then
+        # Process each broken link found by the library function
+        echo "$broken_links" | while read -r link_info; do
+          error "Broken link in $file: $link_info"
+          ERRORS=$((ERRORS + 1))
+        done
       fi
+    else
+      # Fall back to original implementation
+      # Extract links with the form [text](path.md) or [text](path/to/file.md)
+      local links=($(grep -oP '\[.*?\]\(\K[^)]+(?=\))' "$file" | grep '\.md'))
       
-      # Normalize path to handle ../ references
-      target_file=$(realpath --relative-to="$PROJECT_ROOT" "$target_file" 2>/dev/null || echo "invalid_path")
-      
-      # Check if the file exists
-      if [[ ! -f "$target_file" && "$target_file" != "invalid_path" ]]; then
-        error "Broken link in $file: $link -> $target_file (file not found)"
-        ERRORS=$((ERRORS + 1))
-      fi
-    done
+      for link in "${links[@]}"; do
+        # Skip external links
+        if [[ "$link" =~ ^https?:// ]]; then
+          continue
+        fi
+        
+        # Handle relative links
+        local target_file
+        if [[ "$link" = /* ]]; then
+          # Absolute path within the repository
+          target_file="${PROJECT_ROOT}${link}"
+        else
+          # Relative path
+          target_file="$(dirname "$file")/$link"
+        fi
+        
+        # Normalize path to handle ../ references
+        target_file=$(realpath --relative-to="$PROJECT_ROOT" "$target_file" 2>/dev/null || echo "invalid_path")
+        
+        # Check if the file exists
+        if [[ ! -f "$target_file" && "$target_file" != "invalid_path" ]]; then
+          error "Broken link in $file: $link -> $target_file (file not found)"
+          ERRORS=$((ERRORS + 1))
+        fi
+      done
+    fi
   done
 }
 
@@ -111,14 +138,39 @@ check_section_references() {
 check_readme_structure() {
   info "Checking README structure consistency..."
   
-  # Find all README.md files
-  local readme_files=($(find . -type f -name "README.md" -not -path "*/\.*" -not -path "*/target/*" -not -path "*/node_modules/*"))
+  local readme_files
+  
+  # Use library function if available
+  if [[ "$USING_LIB" == true ]] && type find_readme_files &>/dev/null; then
+    # Get README files using the library function
+    readme_files=($(find_readme_files))
+    
+    # Also check for missing README files in directories
+    if type find_missing_readmes &>/dev/null; then
+      local missing_readmes=($(find_missing_readmes))
+      for dir in "${missing_readmes[@]}"; do
+        warning "Directory missing README.md: $dir"
+        WARNINGS=$((WARNINGS + 1))
+      done
+    fi
+  else
+    # Fall back to original implementation
+    readme_files=($(find . -type f -name "README.md" -not -path "*/\.*" -not -path "*/target/*" -not -path "*/node_modules/*"))
+  fi
   
   for file in "${readme_files[@]}"; do
     # Check if file contains required sections
-    if ! grep -q "^# " "$file"; then
-      warning "Missing title in $file"
-      WARNINGS=$((WARNINGS + 1))
+    if [[ "$USING_LIB" == true ]] && type has_level1_header &>/dev/null; then
+      if ! has_level1_header "$file"; then
+        warning "Missing title in $file"
+        WARNINGS=$((WARNINGS + 1))
+      fi
+    else
+      # Fallback implementation
+      if ! grep -q "^# " "$file"; then
+        warning "Missing title in $file"
+        WARNINGS=$((WARNINGS + 1))
+      fi
     fi
     
     if [[ "$file" =~ docs/.*/README.md ]]; then
@@ -189,31 +241,60 @@ check_header_format() {
 check_filename_format() {
   info "Checking markdown filename format (kebab-case)..."
   
-  # Find all markdown files
-  local md_files=($(find . -type f -name "*.md" -not -path "*/\.*" -not -path "*/target/*" -not -path "*/node_modules/*"))
-  
-  for file in "${md_files[@]}"; do
-    # Get just the filename without path
-    local filename=$(basename "$file")
+  # Use library function if available
+  if [[ "$USING_LIB" == true ]] && type find_non_kebab_case_files &>/dev/null; then
+    # Find non-kebab-case files using the library function
+    local non_kebab_files=$(find_non_kebab_case_files "${PROJECT_ROOT}")
     
-    # Skip README.md and CHANGELOG.md (conventional uppercase names)
-    if [[ "$filename" == "README.md" || "$filename" == "CHANGELOG.md" ]]; then
-      continue
+    if [ -n "$non_kebab_files" ]; then
+      echo "$non_kebab_files" | while read -r file; do
+        warning "Non-kebab-case filename: $file"
+        WARNINGS=$((WARNINGS + 1))
+      done
     fi
+  else
+    # Find all markdown files
+    local md_files=($(find . -type f -name "*.md" -not -path "*/\.*" -not -path "*/target/*" -not -path "*/node_modules/*"))
     
-    # Check if filename is kebab-case
-    if [[ ! "$filename" =~ ^[a-z0-9]+(-[a-z0-9]+)*\.md$ ]]; then
-      warning "Non-kebab-case filename: $file"
-      WARNINGS=$((WARNINGS + 1))
-    fi
-  done
+    for file in "${md_files[@]}"; do
+      # Get just the filename without path
+      local filename=$(basename "$file")
+      
+      # Skip README.md and CHANGELOG.md (conventional uppercase names)
+      if [[ "$filename" == "README.md" || "$filename" == "CHANGELOG.md" ]]; then
+        continue
+      fi
+      
+      # Check if filename is kebab-case
+      if [[ ! "$filename" =~ ^[a-z0-9]+(-[a-z0-9]+)*\.md$ ]]; then
+        warning "Non-kebab-case filename: $file"
+        WARNINGS=$((WARNINGS + 1))
+      fi
+    done
+  fi
 }
 
 # 8. Check for header conventions
 check_header_conventions() {
   info "Checking header conventions..."
   
-  # Find all markdown files
+  # Generate a header report if the library is available
+  if [[ "$USING_LIB" == true ]] && type generate_header_report &>/dev/null; then
+    local report_file="${REPORT_DIR}/header-standards-report.md"
+    
+    # Generate header report and get violation count
+    if generate_header_report "$report_file"; then
+      info "Header report generated at $report_file (no violations found)"
+    else
+      warning "Header report generated at $report_file (violations found)"
+      # Violations are already counted by the library function
+    fi
+    
+    # Return early as library function already did the checks
+    return
+  fi
+  
+  # Fall back to original implementation
   local md_files=($(find . -type f -name "*.md" -not -path "*/\.*" -not -path "*/target/*" -not -path "*/node_modules/*"))
   
   for file in "${md_files[@]}"; do
@@ -303,6 +384,19 @@ EOF
 fix_common_issues() {
   info "Attempting to fix common documentation issues..."
   
+  # Use library function if available
+  if [[ "$USING_LIB" == true ]] && type fix_common_issues &>/dev/null; then
+    # Use library function for fixing common issues
+    if fix_common_issues "${PROJECT_ROOT}/docs" "all"; then
+      success "Fixed common documentation issues using library function"
+    else
+      warning "Some issues could not be fixed automatically"
+    fi
+    
+    return
+  fi
+  
+  # Fall back to original implementation
   # 1. Replace old package references in markdown files
   find docs -type f -name "*.md" -exec sed -i 's/org\.samstraumr/org.s8r/g' {} \;
   find docs -type f -name "*.md" -exec sed -i 's/org\.tube/org.s8r.tube.legacy/g' {} \;

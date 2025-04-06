@@ -1,40 +1,37 @@
 #!/bin/bash
+#==============================================================================
 # extract-todos.sh
 #
 # Script to extract TODOs and FIXMEs from the codebase and generate a report
+#==============================================================================
 
-# Set colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-NC='\033[0m' # No Color
-
-# Function to print a header
-print_header() {
-  echo -e "\n${YELLOW}==== $1 ====${NC}"
-}
-
-# Function to print success message
-print_success() {
-  echo -e "${GREEN}✓ $1${NC}"
-}
-
-# Function to print error message
-print_error() {
-  echo -e "${RED}✗ $1${NC}"
-}
-
-# Function to print info message
-print_info() {
-  echo -e "${BLUE}→ $1${NC}"
-}
-
-# Store the project root directory
+# Find project root directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 cd "$PROJECT_ROOT"
+
+# Source the doc-lib library that contains the shared documentation utilities
+if [ -f "${PROJECT_ROOT}/util/lib/doc-lib.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/doc-lib.sh"
+  USING_LIB=true
+else
+  echo "Warning: Documentation library not found. Using fallback functions."
+  USING_LIB=false
+  
+  # Fallback implementations of required functions
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  YELLOW='\033[0;33m'
+  BLUE='\033[0;34m'
+  CYAN='\033[0;36m'
+  NC='\033[0m' # No Color
+  
+  # Fallback output functions
+  print_header() { echo -e "\n${YELLOW}==== $1 ====${NC}"; }
+  print_success() { echo -e "${GREEN}✓ $1${NC}"; }
+  print_error() { echo -e "${RED}✗ $1${NC}"; }
+  print_info() { echo -e "${BLUE}→ $1${NC}"; }
+fi
 
 # Default output file
 OUTPUT_FILE="todo-report.md"
@@ -138,6 +135,39 @@ fi
 
 # Create temporary file for raw output
 TMP_FILE=$(mktemp)
+
+# If using library, use the extract_todos function
+if [[ "$USING_LIB" == true ]] && type extract_todos &>/dev/null; then
+  print_info "Using doc-lib.sh extract_todos function"
+  
+  # Call the library function
+  TOTAL_COUNT=$(extract_todos "$OUTPUT_FILE" "$PRIORITY_FILTER")
+  
+  print_success "TODO report generated using library function"
+  
+  # No need to continue with the rest of the script
+  if [[ -f "$OUTPUT_FILE" ]]; then
+    # Extract the counts for summary display
+    P0_COUNT=$(grep -c "^| P0 |" "$OUTPUT_FILE" || echo 0)
+    P1_COUNT=$(grep -c "^| P1 |" "$OUTPUT_FILE" || echo 0)
+    P2_COUNT=$(grep -c "^| P2 |" "$OUTPUT_FILE" || echo 0)
+    P3_COUNT=$(grep -c "^| P3 |" "$OUTPUT_FILE" || echo 0)
+    UNSPECIFIED_COUNT=$((TOTAL_COUNT - P0_COUNT - P1_COUNT - P2_COUNT - P3_COUNT))
+    
+    print_success "TODO report generated: $OUTPUT_FILE"
+    echo "Found $TOTAL_COUNT TODOs (P0: $P0_COUNT, P1: $P1_COUNT, P2: $P2_COUNT, P3: $P3_COUNT, Unspecified: $UNSPECIFIED_COUNT)"
+    
+    # Clean up and exit
+    rm -f "$TMP_FILE"
+    exit 0
+  fi
+  
+  # If we get here, something went wrong with the library function
+  print_warning "Library function failed, falling back to native implementation"
+fi
+
+# Legacy implementation (fallback)
+print_info "Using legacy TODO extraction method"
 
 # Find TODOs and FIXMEs in the codebase
 find "$TARGET_DIR" -type f \

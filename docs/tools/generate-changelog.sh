@@ -6,23 +6,32 @@
 
 set -e
 
-# Terminal colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-# Functions for prettier output
-info() { echo -e "${BLUE}$1${NC}"; }
-success() { echo -e "${GREEN}$1${NC}"; }
-error() { echo -e "${RED}Error: $1${NC}" >&2; }
-warning() { echo -e "${YELLOW}Warning: $1${NC}" >&2; }
-
 # Find repository root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 cd "$PROJECT_ROOT"
+
+# Source the doc-lib library that contains the shared documentation utilities
+if [ -f "${PROJECT_ROOT}/util/lib/doc-lib.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/doc-lib.sh"
+  USING_LIB=true
+else
+  echo "Warning: Documentation library not found. Using fallback functions."
+  USING_LIB=false
+  
+  # Terminal colors
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  YELLOW='\033[0;33m'
+  BLUE='\033[0;34m'
+  NC='\033[0m' # No Color
+
+  # Functions for prettier output
+  info() { echo -e "${BLUE}$1${NC}"; }
+  success() { echo -e "${GREEN}$1${NC}"; }
+  error() { echo -e "${RED}Error: $1${NC}" >&2; }
+  warning() { echo -e "${YELLOW}Warning: $1${NC}" >&2; }
+fi
 
 # Default output file
 OUTPUT_FILE="${PROJECT_ROOT}/CHANGELOG.md"
@@ -37,19 +46,42 @@ TO_TAG="HEAD"
 
 # Override defaults with command line arguments
 show_help() {
-  echo "Usage: $(basename "$0") [options]"
-  echo
-  echo "Options:"
-  echo "  -f, --from TAG       Start tag or commit (default: latest tag)"
-  echo "  -t, --to TAG         End tag or commit (default: HEAD)"
-  echo "  -o, --output FILE    Output file (default: CHANGELOG.md)"
-  echo "  -u, --update         Update existing changelog instead of overwriting"
-  echo "  -h, --help           Show this help message"
-  echo
-  echo "Examples:"
-  echo "  $(basename "$0") --from v1.0.0 --to v2.0.0"
-  echo "  $(basename "$0") --from 0c7d3a1 --to HEAD"
-  echo "  $(basename "$0") --output docs/CHANGELOG.md"
+  if [[ "$USING_LIB" == true ]] && type print_header &>/dev/null && type print_info &>/dev/null; then
+    print_header "Changelog Generator Help"
+    print_info "Generates a structured changelog from git commit history"
+    echo
+    
+    print_bold "Usage: $(basename "$0") [options]"
+    echo
+    
+    print_bold "Options:"
+    echo "  -f, --from TAG       Start tag or commit (default: latest tag)"
+    echo "  -t, --to TAG         End tag or commit (default: HEAD)"
+    echo "  -o, --output FILE    Output file (default: CHANGELOG.md)"
+    echo "  -u, --update         Update existing changelog instead of overwriting"
+    echo "  -h, --help           Show this help message"
+    echo
+    
+    print_bold "Examples:"
+    echo "  $(basename "$0") --from v1.0.0 --to v2.0.0"
+    echo "  $(basename "$0") --from 0c7d3a1 --to HEAD"
+    echo "  $(basename "$0") --output docs/CHANGELOG.md"
+  else
+    # Fallback to original implementation
+    echo "Usage: $(basename "$0") [options]"
+    echo
+    echo "Options:"
+    echo "  -f, --from TAG       Start tag or commit (default: latest tag)"
+    echo "  -t, --to TAG         End tag or commit (default: HEAD)"
+    echo "  -o, --output FILE    Output file (default: CHANGELOG.md)"
+    echo "  -u, --update         Update existing changelog instead of overwriting"
+    echo "  -h, --help           Show this help message"
+    echo
+    echo "Examples:"
+    echo "  $(basename "$0") --from v1.0.0 --to v2.0.0"
+    echo "  $(basename "$0") --from 0c7d3a1 --to HEAD"
+    echo "  $(basename "$0") --output docs/CHANGELOG.md"
+  fi
 }
 
 while [[ $# -gt 0 ]]; do
@@ -86,12 +118,31 @@ info "Generating changelog from ${FROM_TAG} to ${TO_TAG}"
 
 # Get the current project version
 get_project_version() {
-  # Try to get version from version.properties
-  if [ -f "${PROJECT_ROOT}/Samstraumr/version.properties" ]; then
-    grep "version=" "${PROJECT_ROOT}/Samstraumr/version.properties" | cut -d= -f2
+  # Use the common library function if available
+  if [[ "$USING_LIB" == true ]] && type get_maven_property &>/dev/null; then
+    # Attempt to use the unified library function
+    local version
+    
+    # First try the version.properties file
+    if [ -f "${PROJECT_ROOT}/Samstraumr/version.properties" ]; then
+      version=$(grep "version=" "${PROJECT_ROOT}/Samstraumr/version.properties" | cut -d= -f2)
+    fi
+    
+    # If not found, try to get from pom.xml using the library function
+    if [ -z "$version" ] && [ -f "${PROJECT_ROOT}/pom.xml" ]; then
+      version=$(get_maven_property "${PROJECT_ROOT}/pom.xml" "project.version")
+    fi
+    
+    echo "$version"
   else
-    # Fall back to extracting from pom.xml
-    grep -m 1 "<version>" "${PROJECT_ROOT}/pom.xml" | sed 's/.*<version>\(.*\)<\/version>.*/\1/'
+    # Fall back to original implementation
+    # Try to get version from version.properties
+    if [ -f "${PROJECT_ROOT}/Samstraumr/version.properties" ]; then
+      grep "version=" "${PROJECT_ROOT}/Samstraumr/version.properties" | cut -d= -f2
+    else
+      # Fall back to extracting from pom.xml
+      grep -m 1 "<version>" "${PROJECT_ROOT}/pom.xml" | sed 's/.*<version>\(.*\)<\/version>.*/\1/'
+    fi
   fi
 }
 
@@ -218,6 +269,11 @@ parse_commits() {
 # Generate new changelog content
 parse_commits "$FROM_TAG" "$TO_TAG" "$TEMP_FILE"
 
+# Create the reports directory if it doesn't exist
+if [[ "$USING_LIB" == true ]] && [ ! -d "$REPORT_DIR" ]; then
+  mkdir -p "$REPORT_DIR"
+fi
+
 # Handle update mode if specified
 if [ "$UPDATE_MODE" = true ] && [ -f "$OUTPUT_FILE" ]; then
   info "Updating existing changelog at ${OUTPUT_FILE}"
@@ -242,5 +298,13 @@ fi
 
 # Move the temp file to the output location
 mv "$TEMP_FILE" "$OUTPUT_FILE"
+
+# Also save a copy in the reports directory if we're using the library
+if [[ "$USING_LIB" == true ]] && [ -d "$REPORT_DIR" ]; then
+  cp "$OUTPUT_FILE" "${REPORT_DIR}/changelog-$(date +%Y%m%d).md"
+  if [[ "$USING_LIB" == true ]] && type print_success &>/dev/null; then
+    print_success "Changelog also saved to ${REPORT_DIR}/changelog-$(date +%Y%m%d).md"
+  fi
+fi
 
 success "Changelog successfully generated at ${OUTPUT_FILE}"

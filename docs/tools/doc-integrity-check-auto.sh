@@ -1,32 +1,28 @@
 #!/usr/bin/env bash
+#==============================================================================
 # doc-integrity-check-auto.sh - Non-interactive version of doc-integrity-check.sh for CI/CD
 # 
 # This script performs the same checks as doc-integrity-check.sh but automatically
 # fixes common issues without prompting and is suitable for automation pipelines.
+#==============================================================================
 
 set -e
 
-# Terminal colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
 # Find repository root
-PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
-# Functions for prettier output
-info() { echo -e "${BLUE}$1${NC}"; }
-success() { echo -e "${GREEN}$1${NC}"; }
-error() { echo -e "${RED}Error: $1${NC}" >&2; }
-warning() { echo -e "${YELLOW}Warning: $1${NC}" >&2; }
+# Source the doc-lib shared library
+if [ -f "${PROJECT_ROOT}/util/lib/doc-lib.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/doc-lib.sh"
+else
+  echo "Error: doc-lib.sh not found. Falling back to legacy method."
+  # Source the functions from the main script as fallback
+  source "$PROJECT_ROOT/docs/tools/doc-integrity-check.sh" --source-only
+fi
 
-info "Starting automated documentation integrity check..."
-
-# Source the functions from the main script
-source "$PROJECT_ROOT/docs/tools/doc-integrity-check.sh" --source-only
+print_info "Starting automated documentation integrity check..."
 
 if [[ "$1" != "--source-only" ]]; then
   # Run checks

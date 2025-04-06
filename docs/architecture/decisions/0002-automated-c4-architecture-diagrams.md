@@ -33,25 +33,28 @@ The C4 model (Context, Containers, Components, Code) provides four levels of inc
 - Container diagrams show high-level technical components (applications, data stores, etc.)
 - Component diagrams show how containers are composed of components
 - Code diagrams show how components are implemented as code
+- Clean Architecture diagrams show the architectural layers and dependencies
 
 Implementation details:
-1. We will use the Python diagrams library to generate C4 model diagrams
-2. Diagrams will be automatically generated during the Maven build process
-3. Diagram generation will run asynchronously by default to avoid slowing down builds
-4. Diagrams will be stored in the `docs/diagrams` directory as SVG files
-5. A dedicated documentation page will be generated with the diagrams
-6. A Maven profile `diagrams` will allow explicit diagram regeneration
-7. Diagram generation will be integrated into the build system
+1. We use the Python diagrams library to generate C4 model diagrams
+2. Diagrams are automatically generated during the Maven build process
+3. Diagram generation runs asynchronously by default to avoid slowing down builds
+4. Diagrams are stored in the `docs/diagrams` directory as SVG files
+5. A dedicated documentation page is generated with the diagrams
+6. A Maven profile `diagrams` allows explicit diagram regeneration
+7. Diagram generation is integrated into the build system
+8. The generation script uses our unified common library for consistent UX
 
 ## Consequences
 
 Positive consequences:
-1. Architecture documentation will stay in sync with the codebase
+1. Architecture documentation stays in sync with the codebase
 2. Developers don't need to manually create and update diagrams
 3. All team members have access to consistent, up-to-date architecture documentation
 4. Multiple levels of abstraction help different stakeholders understand the system
 5. SVG format ensures high-quality diagrams can be viewed directly in browsers and documentation
 6. Diagrams become a natural part of the development process
+7. Using the unified common library ensures consistent UX with other scripts
 
 Challenges and mitigations:
 1. Automated diagrams may not capture all nuances of the architecture
@@ -67,9 +70,17 @@ Challenges and mitigations:
 
 Key implementation details:
 - `bin/generate-diagrams.sh` script handles diagram generation with options for synchronous/async modes
-- A Maven profile will be added for explicit diagram generation
+- A Maven profile is added for explicit diagram generation
 - Default builds include asynchronous diagram generation
 - Diagrams are documented in the architecture documentation with links
 - The script creates a basic Python diagram generator if one doesn't exist
+- Diagrams include Context, Container, Component, Code, and Clean Architecture views
 
-The diagrams will be automatically updated when the architecture changes, ensuring that the documentation accurately reflects the current system structure.
+Recent updates:
+- The diagram generator now uses the unified common library
+- Improved help formatting and error handling
+- Added standardized output and progress reporting
+- Enhanced documentation generation
+- Better environment detection and graceful degradation
+
+The diagrams are automatically updated when the architecture changes, ensuring that the documentation accurately reflects the current system structure.

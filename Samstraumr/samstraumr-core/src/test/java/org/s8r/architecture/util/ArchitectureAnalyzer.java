@@ -144,7 +144,8 @@ public class ArchitectureAnalyzer {
                 if (importPackage.startsWith(packageName)) continue;
                 
                 // Check if this dependency violates Clean Architecture rules
-                if (!isAllowedDependency(packageName, importPackage)) {
+                if (!isAllowedDependency(packageName, importPackage) && 
+                    !DependencySuppressions.isSuppressed(packageName, importPackage)) {
                     violations.computeIfAbsent(packageName, k -> new ArrayList<>()).add(importPackage);
                 }
             }

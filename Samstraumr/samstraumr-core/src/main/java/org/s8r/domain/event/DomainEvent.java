@@ -25,7 +25,7 @@ import java.util.UUID;
 public abstract class DomainEvent {
   private final String eventId = UUID.randomUUID().toString();
   private final Instant occurredOn = Instant.now();
-  private final String eventType = this.getClass().getSimpleName();
+  private final String eventType = this.getClass().getSimpleName().replaceAll("Event$", "");
 
   // Getters
   public String getEventId() {

@@ -6,40 +6,70 @@
 
 set -e
 
-# Terminal colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-# Functions for prettier output
-info() { echo -e "${BLUE}$1${NC}"; }
-success() { echo -e "${GREEN}$1${NC}"; }
-error() { echo -e "${RED}Error: $1${NC}" >&2; }
-warning() { echo -e "${YELLOW}Warning: $1${NC}" >&2; }
-
 # Find repository root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 cd "$PROJECT_ROOT"
+
+# Source the doc-lib library that contains the shared documentation utilities
+if [ -f "${PROJECT_ROOT}/util/lib/doc-lib.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/doc-lib.sh"
+  USING_LIB=true
+else
+  echo "Warning: Documentation library not found. Using fallback functions."
+  USING_LIB=false
+  
+  # Terminal colors
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  YELLOW='\033[0;33m'
+  BLUE='\033[0;34m'
+  NC='\033[0m' # No Color
+
+  # Functions for prettier output
+  info() { echo -e "${BLUE}$1${NC}"; }
+  success() { echo -e "${GREEN}$1${NC}"; }
+  error() { echo -e "${RED}Error: $1${NC}" >&2; }
+  warning() { echo -e "${YELLOW}Warning: $1${NC}" >&2; }
+fi
 
 # Default README.md
 README_FILE="${PROJECT_ROOT}/README.md"
 
 # Parameter handling
 show_help() {
-  echo "Usage: $(basename "$0") [options]"
-  echo
-  echo "Options:"
-  echo "  -r, --readme FILE    Path to README file (default: ./README.md)"
-  echo "  -t, --template FILE  Path to README template file"
-  echo "  -s, --sections LIST  Comma-separated list of sections to update (version,badges,usage,all)"
-  echo "  -h, --help           Show this help message"
-  echo
-  echo "Examples:"
-  echo "  $(basename "$0") --sections version,badges"
-  echo "  $(basename "$0") --template docs/templates/README-template.md"
+  if [[ "$USING_LIB" == true ]] && type print_header &>/dev/null && type print_info &>/dev/null; then
+    print_header "README Updater Help"
+    print_info "Updates the README.md file with the latest project info"
+    echo
+    
+    print_bold "Usage: $(basename "$0") [options]"
+    echo
+    
+    print_bold "Options:"
+    echo "  -r, --readme FILE    Path to README file (default: ./README.md)"
+    echo "  -t, --template FILE  Path to README template file"
+    echo "  -s, --sections LIST  Comma-separated list of sections to update (version,badges,usage,all)"
+    echo "  -h, --help           Show this help message"
+    echo
+    
+    print_bold "Examples:"
+    echo "  $(basename "$0") --sections version,badges"
+    echo "  $(basename "$0") --template docs/templates/README-template.md"
+  else
+    # Fallback to original implementation
+    echo "Usage: $(basename "$0") [options]"
+    echo
+    echo "Options:"
+    echo "  -r, --readme FILE    Path to README file (default: ./README.md)"
+    echo "  -t, --template FILE  Path to README template file"
+    echo "  -s, --sections LIST  Comma-separated list of sections to update (version,badges,usage,all)"
+    echo "  -h, --help           Show this help message"
+    echo
+    echo "Examples:"
+    echo "  $(basename "$0") --sections version,badges"
+    echo "  $(basename "$0") --template docs/templates/README-template.md"
+  fi
 }
 
 # Default settings
@@ -81,19 +111,44 @@ info "Created backup at ${BACKUP_FILE}"
 
 # Get current project version
 get_project_version() {
-  # Try to get version from version.properties
-  if [ -f "${PROJECT_ROOT}/Samstraumr/version.properties" ]; then
-    grep "version=" "${PROJECT_ROOT}/Samstraumr/version.properties" | cut -d= -f2
+  # Use the common library function if available
+  if [[ "$USING_LIB" == true ]] && type get_maven_property &>/dev/null; then
+    # Attempt to use the unified library function
+    local version
+    
+    # First try the version.properties file
+    if [ -f "${PROJECT_ROOT}/Samstraumr/version.properties" ]; then
+      version=$(grep "version=" "${PROJECT_ROOT}/Samstraumr/version.properties" | cut -d= -f2)
+    fi
+    
+    # If not found, try to get from pom.xml using the library function
+    if [ -z "$version" ] && [ -f "${PROJECT_ROOT}/pom.xml" ]; then
+      version=$(get_maven_property "${PROJECT_ROOT}/pom.xml" "project.version")
+    fi
+    
+    echo "$version"
   else
-    # Fall back to extracting from pom.xml
-    grep -m 1 "<version>" "${PROJECT_ROOT}/pom.xml" | sed 's/.*<version>\(.*\)<\/version>.*/\1/'
+    # Fall back to original implementation
+    # Try to get version from version.properties
+    if [ -f "${PROJECT_ROOT}/Samstraumr/version.properties" ]; then
+      grep "version=" "${PROJECT_ROOT}/Samstraumr/version.properties" | cut -d= -f2
+    else
+      # Fall back to extracting from pom.xml
+      grep -m 1 "<version>" "${PROJECT_ROOT}/pom.xml" | sed 's/.*<version>\(.*\)<\/version>.*/\1/'
+    fi
   fi
 }
 
 # Get project name
 get_project_name() {
-  # Extract name from root pom.xml
-  grep -m 1 "<n>" "${PROJECT_ROOT}/pom.xml" | sed 's/.*<n>\(.*\)<\/n>.*/\1/'
+  # Use the common library function if available
+  if [[ "$USING_LIB" == true ]] && type get_maven_property &>/dev/null; then
+    # Try to extract project name using the library function
+    get_maven_property "${PROJECT_ROOT}/pom.xml" "project.name"
+  else
+    # Extract name from root pom.xml
+    grep -m 1 "<n>" "${PROJECT_ROOT}/pom.xml" | sed 's/.*<n>\(.*\)<\/n>.*/\1/'
+  fi
 }
 
 # Update version references in README

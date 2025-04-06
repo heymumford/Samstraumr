@@ -7,25 +7,34 @@
 
 set -e
 
-# Terminal colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-RESET='\033[0m' # No Color
-BOLD='\033[1m'
-
-# Functions for prettier output
-info() { echo -e "${BLUE}$1${RESET}"; }
-success() { echo -e "${GREEN}$1${RESET}"; }
-error() { echo -e "${RED}Error: $1${RESET}" >&2; }
-warn() { echo -e "${YELLOW}Warning: $1${RESET}" >&2; }
-header() { echo -e "\n${BOLD}${YELLOW}$1${RESET}\n"; }
-
-# Find repository root
+# Find project root directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 cd "$PROJECT_ROOT"
+
+# Source the doc-lib library that contains the shared documentation utilities
+if [ -f "${PROJECT_ROOT}/util/lib/doc-lib.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/doc-lib.sh"
+  USING_LIB=true
+else
+  echo "Warning: Documentation library not found. Using fallback functions."
+  USING_LIB=false
+  
+  # Terminal colors
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  YELLOW='\033[0;33m'
+  BLUE='\033[0;34m'
+  RESET='\033[0m' # No Color
+  BOLD='\033[1m'
+  
+  # Fallback output functions
+  info() { echo -e "${BLUE}$1${RESET}"; }
+  success() { echo -e "${GREEN}$1${RESET}"; }
+  error() { echo -e "${RED}Error: $1${RESET}" >&2; }
+  warn() { echo -e "${YELLOW}Warning: $1${RESET}" >&2; }
+  header() { echo -e "\n${BOLD}${YELLOW}$1${RESET}\n"; }
+fi
 
 # Directory mapping (old to new paths)
 declare -A DIR_MAPPING=(
@@ -58,20 +67,30 @@ create_file_mapping() {
   header "Creating file mapping database"
   
   local mapping_file="${REPORT_DIR}/file-mapping.txt"
-  > "$mapping_file"  # Clear the file
   
-  # Find all markdown files
-  find "${PROJECT_ROOT}/docs" -type f -name "*.md" | while read -r file; do
-    local rel_path="${file#${PROJECT_ROOT}/}"
-    local dir_name=$(dirname "$rel_path")
-    local file_name=$(basename "$file")
+  # If using library, use the create_file_mapping function
+  if [[ "$USING_LIB" == true ]] && type create_file_mapping &>/dev/null; then
+    # Call the library function
+    create_file_mapping "$mapping_file"
+    success "Created file mapping with $(wc -l < "$mapping_file") entries (using library)"
+    return 0
+  else
+    # Legacy implementation
+    > "$mapping_file"  # Clear the file
     
-    # Store in the mapping file
-    echo "$rel_path" >> "$mapping_file"
-  done
-  
-  success "Created file mapping with $(wc -l < "$mapping_file") entries"
-  return 0
+    # Find all markdown files
+    find "${PROJECT_ROOT}/docs" -type f -name "*.md" | while read -r file; do
+      local rel_path="${file#${PROJECT_ROOT}/}"
+      local dir_name=$(dirname "$rel_path")
+      local file_name=$(basename "$file")
+      
+      # Store in the mapping file
+      echo "$rel_path" >> "$mapping_file"
+    done
+    
+    success "Created file mapping with $(wc -l < "$mapping_file") entries"
+    return 0
+  fi
 }
 
 # Find potential broken links
@@ -95,50 +114,70 @@ check_links() {
     local file_links=0
     local broken_file_links=0
     
-    # Extract markdown links from the file
-    grep -o -E '\[[^]]+\]\([^)]+\)' "$file" | while read -r link; do
-      # Extract just the URL part
-      local url=$(echo "$link" | sed -E 's/\[.+\]\((.+)\)/\1/')
+    # If using library, use extract_links and is_valid_link functions
+    if [[ "$USING_LIB" == true ]] && type extract_links &>/dev/null && type is_valid_link &>/dev/null; then
+      # Get links using library function (internal links only)
+      local links=$(extract_links "$file" "true")
       
-      # Skip external links, anchors, and absolute paths
-      if [[ "$url" == "http"* || "$url" == "#"* || "$url" == "/"* ]]; then
-        continue
-      fi
-      
-      file_links=$((file_links + 1))
-      
-      # Normalize the URL
-      # Remove trailing spaces, anchors, and ensure .md extension
-      local normalized_url=$(echo "$url" | sed -E 's/#.*$//' | sed -E 's/ +$//')
-      if [[ "$normalized_url" != *.md && "$normalized_url" != "" ]]; then
-        normalized_url="${normalized_url}.md"
-      fi
-      
-      # Skip empty URLs
-      if [[ -z "$normalized_url" ]]; then
-        continue
-      fi
-      
-      # Resolve the link relative to the file's directory
-      local file_dir=$(dirname "$file")
-      local target_path
-      
-      if [[ "$normalized_url" == *"../"* ]]; then
-        # It's a relative path with parent directory references
-        target_path=$(realpath --relative-to="$PROJECT_ROOT" "$file_dir/$normalized_url")
-      else
-        # It's a relative path in the same directory
-        target_path=$(realpath --relative-to="$PROJECT_ROOT" "$file_dir/$normalized_url")
-      fi
-      
-      # Check if the target file exists
-      if [[ ! -f "${PROJECT_ROOT}/$target_path" ]]; then
-        broken_file_links=$((broken_file_links + 1))
-        broken_links=$((broken_links + 1))
+      # Check each link
+      for url in $links; do
+        file_links=$((file_links + 1))
         
-        echo "- In \`$rel_path\`: Link to \`$url\` (resolved to \`$target_path\`)" >> "$report_file"
-      fi
-    done
+        # Check if the link is valid using library function
+        if ! is_valid_link "$file" "$url"; then
+          broken_file_links=$((broken_file_links + 1))
+          broken_links=$((broken_links + 1))
+          
+          echo "- In \`$rel_path\`: Link to \`$url\`" >> "$report_file"
+        fi
+      done
+    else
+      # Legacy implementation
+      # Extract markdown links from the file
+      grep -o -E '\[[^]]+\]\([^)]+\)' "$file" | while read -r link; do
+        # Extract just the URL part
+        local url=$(echo "$link" | sed -E 's/\[.+\]\((.+)\)/\1/')
+        
+        # Skip external links, anchors, and absolute paths
+        if [[ "$url" == "http"* || "$url" == "#"* || "$url" == "/"* ]]; then
+          continue
+        fi
+        
+        file_links=$((file_links + 1))
+        
+        # Normalize the URL
+        # Remove trailing spaces, anchors, and ensure .md extension
+        local normalized_url=$(echo "$url" | sed -E 's/#.*$//' | sed -E 's/ +$//')
+        if [[ "$normalized_url" != *.md && "$normalized_url" != "" ]]; then
+          normalized_url="${normalized_url}.md"
+        fi
+        
+        # Skip empty URLs
+        if [[ -z "$normalized_url" ]]; then
+          continue
+        fi
+        
+        # Resolve the link relative to the file's directory
+        local file_dir=$(dirname "$file")
+        local target_path
+        
+        if [[ "$normalized_url" == *"../"* ]]; then
+          # It's a relative path with parent directory references
+          target_path=$(realpath --relative-to="$PROJECT_ROOT" "$file_dir/$normalized_url")
+        else
+          # It's a relative path in the same directory
+          target_path=$(realpath --relative-to="$PROJECT_ROOT" "$file_dir/$normalized_url")
+        fi
+        
+        # Check if the target file exists
+        if [[ ! -f "${PROJECT_ROOT}/$target_path" ]]; then
+          broken_file_links=$((broken_file_links + 1))
+          broken_links=$((broken_links + 1))
+          
+          echo "- In \`$rel_path\`: Link to \`$url\` (resolved to \`$target_path\`)" >> "$report_file"
+        fi
+      done
+    fi
     
     if [ "$broken_file_links" -gt 0 ]; then
       warn "Found $broken_file_links broken links in $rel_path"
@@ -157,7 +196,7 @@ check_links() {
 update_file_links() {
   local file="$1"
   local dry_run="${2:-false}"
-  local changes=0
+  local mapping_file="${3:-}"
   
   # Skip files in certain directories
   local rel_path="${file#${PROJECT_ROOT}/}"
@@ -167,80 +206,99 @@ update_file_links() {
   
   info "Processing: $rel_path"
   
-  # Create a temporary file
-  local temp_file=$(mktemp)
-  
-  # Process the file line by line
-  while IFS= read -r line; do
-    local updated_line="$line"
+  # If using library, use the update_cross_references function
+  if [[ "$USING_LIB" == true ]] && type update_cross_references &>/dev/null; then
+    # Call the library function
+    local changes
+    changes=$(update_cross_references "$file" "$mapping_file")
     
-    # Find markdown links
-    if echo "$line" | grep -q -E '\[[^]]+\]\([^)]+\)'; then
-      # Process each link in the line
-      while read -r link; do
-        # Skip if no links found
-        [ -z "$link" ] && continue
-        
-        # Extract just the URL part
-        local url=$(echo "$link" | sed -E 's/\[.+\]\((.+)\)/\1/')
-        
-        # Skip external links, anchors, and absolute URLs that aren't to /docs
-        if [[ "$url" == "http"* || "$url" == "#"* ]]; then
-          continue
-        fi
-        
-        # Handle absolute paths to docs
-        if [[ "$url" == "/docs/"* ]]; then
-          local new_url="${url#/docs/}"
-          # Now treat as a relative path from docs directory
-          updated_line=${updated_line//"$url"/"../$new_url"}
-          changes=$((changes + 1))
-          continue
-        fi
-        
-        # Skip URLs that don't point to directories we're mapping
-        local match_found=false
-        for old_dir in "${!DIR_MAPPING[@]}"; do
-          # Check if the URL contains the old directory path
-          if [[ "$url" == "$old_dir"* || "$url" == *"$old_dir"* ]]; then
-            local new_dir="${DIR_MAPPING[$old_dir]}"
-            
-            # Replace the old directory with the new directory
-            local new_url="${url/$old_dir/$new_dir}"
-            updated_line=${updated_line//"$url"/"$new_url"}
-            changes=$((changes + 1))
-            match_found=true
-            break
-          fi
-        done
-        
-        # Try to fix missing .md extensions
-        if [[ "$url" != *.md && "$url" != "" && "$url" != *"/"$ ]]; then
-          if [[ "$updated_line" == *"($url)"* ]]; then
-            updated_line=${updated_line//"($url)"/"($url.md)"}
-            changes=$((changes + 1))
-          fi
-        fi
-        
-      done < <(echo "$line" | grep -o -E '\[[^]]+\]\([^)]+\)')
+    # If changes were made and not in dry-run mode, report them
+    if [[ $changes -gt 0 && "$dry_run" == "false" ]]; then
+      success "Updated $changes links in: $rel_path (using library)"
+    elif [[ $changes -gt 0 ]]; then
+      info "Would update $changes links in: $rel_path (dry run, using library)"
     fi
     
-    # Write the updated line to the temporary file
-    echo "$updated_line" >> "$temp_file"
-  done < "$file"
-  
-  # If changes were made and not in dry-run mode, update the file
-  if [[ $changes -gt 0 && "$dry_run" == "false" ]]; then
-    mv "$temp_file" "$file"
-    success "Updated $changes links in: $rel_path"
+    return $changes
   else
-    rm "$temp_file"
-    if [[ $changes -gt 0 ]]; then
-      info "Would update $changes links in: $rel_path (dry run)"
+    # Legacy implementation
+    local changes=0
+    
+    # Create a temporary file
+    local temp_file=$(mktemp)
+    
+    # Process the file line by line
+    while IFS= read -r line; do
+      local updated_line="$line"
+      
+      # Find markdown links
+      if echo "$line" | grep -q -E '\[[^]]+\]\([^)]+\)'; then
+        # Process each link in the line
+        while read -r link; do
+          # Skip if no links found
+          [ -z "$link" ] && continue
+          
+          # Extract just the URL part
+          local url=$(echo "$link" | sed -E 's/\[.+\]\((.+)\)/\1/')
+          
+          # Skip external links, anchors, and absolute URLs that aren't to /docs
+          if [[ "$url" == "http"* || "$url" == "#"* ]]; then
+            continue
+          fi
+          
+          # Handle absolute paths to docs
+          if [[ "$url" == "/docs/"* ]]; then
+            local new_url="${url#/docs/}"
+            # Now treat as a relative path from docs directory
+            updated_line=${updated_line//"$url"/"../$new_url"}
+            changes=$((changes + 1))
+            continue
+          fi
+          
+          # Skip URLs that don't point to directories we're mapping
+          local match_found=false
+          for old_dir in "${!DIR_MAPPING[@]}"; do
+            # Check if the URL contains the old directory path
+            if [[ "$url" == "$old_dir"* || "$url" == *"$old_dir"* ]]; then
+              local new_dir="${DIR_MAPPING[$old_dir]}"
+              
+              # Replace the old directory with the new directory
+              local new_url="${url/$old_dir/$new_dir}"
+              updated_line=${updated_line//"$url"/"$new_url"}
+              changes=$((changes + 1))
+              match_found=true
+              break
+            fi
+          done
+          
+          # Try to fix missing .md extensions
+          if [[ "$url" != *.md && "$url" != "" && "$url" != *"/"$ ]]; then
+            if [[ "$updated_line" == *"($url)"* ]]; then
+              updated_line=${updated_line//"($url)"/"($url.md)"}
+              changes=$((changes + 1))
+            fi
+          fi
+          
+        done < <(echo "$line" | grep -o -E '\[[^]]+\]\([^)]+\)')
+      fi
+      
+      # Write the updated line to the temporary file
+      echo "$updated_line" >> "$temp_file"
+    done < "$file"
+    
+    # If changes were made and not in dry-run mode, update the file
+    if [[ $changes -gt 0 && "$dry_run" == "false" ]]; then
+      mv "$temp_file" "$file"
+      success "Updated $changes links in: $rel_path"
+    else
+      rm "$temp_file"
+      if [[ $changes -gt 0 ]]; then
+        info "Would update $changes links in: $rel_path (dry run)"
+      fi
     fi
+    
+    return $changes
   fi
-  
-  return $changes
 }
 
 # Update links in all markdown files in a directory

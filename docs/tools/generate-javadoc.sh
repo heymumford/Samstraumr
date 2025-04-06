@@ -6,44 +6,100 @@
 
 set -e
 
-# Terminal colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-# Functions for prettier output
-info() { echo -e "${BLUE}$1${NC}"; }
-success() { echo -e "${GREEN}$1${NC}"; }
-error() { echo -e "${RED}Error: $1${NC}" >&2; }
-warning() { echo -e "${YELLOW}Warning: $1${NC}" >&2; }
-
 # Find repository root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
+# Source the doc-lib library that contains the shared documentation utilities
+if [ -f "${PROJECT_ROOT}/util/lib/doc-lib.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/doc-lib.sh"
+  USING_LIB=true
+else
+  echo "Warning: Documentation library not found. Using fallback functions."
+  USING_LIB=false
+  
+  # Terminal colors
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  YELLOW='\033[0;33m'
+  BLUE='\033[0;34m'
+  NC='\033[0m' # No Color
+
+  # Functions for prettier output
+  info() { echo -e "${BLUE}$1${NC}"; }
+  success() { echo -e "${GREEN}$1${NC}"; }
+  error() { echo -e "${RED}Error: $1${NC}" >&2; }
+  warning() { echo -e "${YELLOW}Warning: $1${NC}" >&2; }
+fi
+
 # Default output directory
 OUTPUT_DIR="${PROJECT_ROOT}/target/site/apidocs"
 TEMPLATE_DIR="${PROJECT_ROOT}/docs/assets/templates"
-VERSION=$(grep "version=" "${PROJECT_ROOT}/Samstraumr/version.properties" 2>/dev/null | cut -d= -f2 || grep -m 1 "<version>" "${PROJECT_ROOT}/pom.xml" | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+
+# Get the current project version using the library if available
+if [[ "$USING_LIB" == true ]] && type get_maven_property &>/dev/null; then
+  # Attempt to use the unified library function
+  VERSION=""
+  
+  # First try the version.properties file
+  if [ -f "${PROJECT_ROOT}/Samstraumr/version.properties" ]; then
+    VERSION=$(grep "version=" "${PROJECT_ROOT}/Samstraumr/version.properties" | cut -d= -f2)
+  fi
+  
+  # If not found, try to get from pom.xml using the library function
+  if [ -z "$VERSION" ] && [ -f "${PROJECT_ROOT}/pom.xml" ]; then
+    VERSION=$(get_maven_property "${PROJECT_ROOT}/pom.xml" "project.version")
+  fi
+else
+  # Fall back to original implementation
+  VERSION=$(grep "version=" "${PROJECT_ROOT}/Samstraumr/version.properties" 2>/dev/null | cut -d= -f2 || grep -m 1 "<version>" "${PROJECT_ROOT}/pom.xml" | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+fi
+
+# Also ensure REPORT_DIR is set if we're using the library
+if [[ "$USING_LIB" == true ]] && [ -z "$REPORT_DIR" ]; then
+  REPORT_DIR="${PROJECT_ROOT}/target/doc-reports"
+  mkdir -p "$REPORT_DIR"
+fi
 
 # Parameter handling
 show_help() {
-  echo "Usage: $(basename "$0") [options]"
-  echo
-  echo "Options:"
-  echo "  -o, --output DIR      Output directory (default: target/site/apidocs)"
-  echo "  -t, --template DIR    Template directory (default: docs/assets/templates)"
-  echo "  -p, --packages LIST   Comma-separated list of packages to document"
-  echo "  -l, --links           Generate links to GitHub source"
-  echo "  -m, --markdown        Include Markdown documentation"
-  echo "  -h, --help            Show this help message"
-  echo
-  echo "Examples:"
-  echo "  $(basename "$0") --packages org.s8r.component,org.s8r.domain"
-  echo "  $(basename "$0") --output docs/api --links --markdown"
+  if [[ "$USING_LIB" == true ]] && type print_header &>/dev/null && type print_info &>/dev/null; then
+    print_header "JavaDoc Generator Help"
+    print_info "Generates JavaDoc API documentation with customizations"
+    echo
+    
+    print_bold "Usage: $(basename "$0") [options]"
+    echo
+    
+    print_bold "Options:"
+    echo "  -o, --output DIR      Output directory (default: target/site/apidocs)"
+    echo "  -t, --template DIR    Template directory (default: docs/assets/templates)"
+    echo "  -p, --packages LIST   Comma-separated list of packages to document"
+    echo "  -l, --links           Generate links to GitHub source"
+    echo "  -m, --markdown        Include Markdown documentation"
+    echo "  -h, --help            Show this help message"
+    echo
+    
+    print_bold "Examples:"
+    echo "  $(basename "$0") --packages org.s8r.component,org.s8r.domain"
+    echo "  $(basename "$0") --output docs/api --links --markdown"
+  else
+    # Fallback to original implementation
+    echo "Usage: $(basename "$0") [options]"
+    echo
+    echo "Options:"
+    echo "  -o, --output DIR      Output directory (default: target/site/apidocs)"
+    echo "  -t, --template DIR    Template directory (default: docs/assets/templates)"
+    echo "  -p, --packages LIST   Comma-separated list of packages to document"
+    echo "  -l, --links           Generate links to GitHub source"
+    echo "  -m, --markdown        Include Markdown documentation"
+    echo "  -h, --help            Show this help message"
+    echo
+    echo "Examples:"
+    echo "  $(basename "$0") --packages org.s8r.component,org.s8r.domain"
+    echo "  $(basename "$0") --output docs/api --links --markdown"
+  fi
 }
 
 # Default settings
@@ -224,8 +280,42 @@ if [ "$INCLUDE_MARKDOWN" = true ]; then
   MARKDOWN_DIR="${OUTPUT_DIR}/markdown"
   mkdir -p "${MARKDOWN_DIR}"
   
+  # Use documentation library functions if available
+  if [[ "$USING_LIB" == true ]] && type find_readme_files &>/dev/null; then
+    # Let the user know we're using library functions
+    if type print_success &>/dev/null; then
+      print_success "Using documentation library functions for Markdown processing"
+    fi
+    
+    # Get a list of markdown files to process
+    local md_files=()
+    
+    # Start with README files
+    if type find_readme_files &>/dev/null; then
+      for file in $(find_readme_files); do
+        # Skip files from certain directories
+        if [[ "$file" == *"/planning/"* || "$file" == *"/tools/"* ]]; then
+          continue
+        fi
+        md_files+=("$file")
+      done
+    fi
+    
+    # Add other markdown files
+    for file in $(find "${PROJECT_ROOT}/docs" -type f -name "*.md" -not -name "README.md" -not -path "*/\.*"); do
+      # Skip files from certain directories
+      if [[ "$file" == *"/planning/"* || "$file" == *"/tools/"* ]]; then
+        continue
+      fi
+      md_files+=("$file")
+    done
+  else
+    # Fall back to original implementation
+    md_files=($(find "${PROJECT_ROOT}/docs" -name "*.md" -not -path "*/\.*"))
+  fi
+  
   # Convert Markdown to HTML
-  for md_file in $(find "${PROJECT_ROOT}/docs" -name "*.md" -not -path "*/\.*"); do
+  for md_file in "${md_files[@]}"; do
     # Skip files from certain directories
     if [[ "$md_file" == *"/planning/"* || "$md_file" == *"/tools/"* ]]; then
       continue
@@ -238,7 +328,16 @@ if [ "$INCLUDE_MARKDOWN" = true ]; then
     
     # Convert to HTML
     html_file="${MARKDOWN_DIR}/${rel_path%.md}.html"
-    title=$(head -n 1 "$md_file" | sed 's/^#\s*//')
+    
+    # Use library function to get the title if available
+    if [[ "$USING_LIB" == true ]] && type get_level1_header &>/dev/null; then
+      title=$(get_level1_header "$md_file")
+      if [ -z "$title" ]; then
+        title=$(basename "$md_file" .md)
+      fi
+    else
+      title=$(head -n 1 "$md_file" | sed 's/^#\s*//')
+    fi
     
     info "Converting ${rel_path} to HTML"
     
@@ -333,12 +432,22 @@ touch "${ERROR_LOG}"
 
 # Execute javadoc command
 if javadoc "${JAVADOC_OPTS[@]}" 2> "${ERROR_LOG}"; then
-  success "JavaDoc generated successfully in ${OUTPUT_DIR}"
+  # Use library functions if available
+  if [[ "$USING_LIB" == true ]] && type print_success &>/dev/null; then
+    print_success "JavaDoc generated successfully in ${OUTPUT_DIR}"
+  else
+    success "JavaDoc generated successfully in ${OUTPUT_DIR}"
+  fi
   
   # Check if there were any warnings
   if [ -s "${ERROR_LOG}" ]; then
-    warning "JavaDoc completed with warnings:"
-    cat "${ERROR_LOG}"
+    if [[ "$USING_LIB" == true ]] && type print_warning &>/dev/null; then
+      print_warning "JavaDoc completed with warnings:"
+      cat "${ERROR_LOG}"
+    else
+      warning "JavaDoc completed with warnings:"
+      cat "${ERROR_LOG}"
+    fi
   else
     rm "${ERROR_LOG}"
   fi
@@ -347,22 +456,51 @@ if javadoc "${JAVADOC_OPTS[@]}" 2> "${ERROR_LOG}"; then
   if [ "$INCLUDE_MARKDOWN" = true ]; then
     cp "${OUTPUT_DIR}/documentation.html" "${OUTPUT_DIR}/index.html"
     mv "${OUTPUT_DIR}/index.html" "${OUTPUT_DIR}/api-index.html"
-    success "Created combined documentation index"
+    
+    if [[ "$USING_LIB" == true ]] && type print_success &>/dev/null; then
+      print_success "Created combined documentation index"
+    else
+      success "Created combined documentation index"
+    fi
+    
+    # Copy documentation to reports directory if using library
+    if [[ "$USING_LIB" == true ]] && [ -d "$REPORT_DIR" ]; then
+      local date_stamp=$(date +%Y%m%d)
+      cp -r "${OUTPUT_DIR}" "${REPORT_DIR}/javadoc-${date_stamp}"
+      print_info "Documentation backup created at ${REPORT_DIR}/javadoc-${date_stamp}"
+    fi
   fi
   
   echo
-  info "To view the documentation, open the following file in your browser:"
-  echo "file://${OUTPUT_DIR}/index.html"
+  if [[ "$USING_LIB" == true ]] && type print_info &>/dev/null; then
+    print_info "To view the documentation, open the following file in your browser:"
+    print_bold "file://${OUTPUT_DIR}/index.html"
+  else
+    info "To view the documentation, open the following file in your browser:"
+    echo "file://${OUTPUT_DIR}/index.html"
+  fi
 else
-  error "JavaDoc generation failed with errors:"
-  cat "${ERROR_LOG}"
+  if [[ "$USING_LIB" == true ]] && type print_error &>/dev/null; then
+    print_error "JavaDoc generation failed with errors:"
+    cat "${ERROR_LOG}"
+  else
+    error "JavaDoc generation failed with errors:"
+    cat "${ERROR_LOG}"
+  fi
   exit 1
 fi
 
 # Integration with the s8r CLI
 if [ -f "${PROJECT_ROOT}/s8r" ]; then
-  info "To regenerate the documentation in the future, you can use:"
-  echo "  ./s8r docs api"
-  echo "  ./s8r docs markdown"
-  echo "  ./s8r docs all"
+  if [[ "$USING_LIB" == true ]] && type print_info &>/dev/null; then
+    print_info "To regenerate the documentation in the future, you can use:"
+    print_bold "  ./s8r docs api"
+    print_bold "  ./s8r docs markdown"
+    print_bold "  ./s8r docs all"
+  else
+    info "To regenerate the documentation in the future, you can use:"
+    echo "  ./s8r docs api"
+    echo "  ./s8r docs markdown"
+    echo "  ./s8r docs all"
+  fi
 fi

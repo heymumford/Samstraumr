@@ -7,30 +7,58 @@
 # - Other documentation files use PascalCase
 # - Acronyms like FAQ, TBD remain in UPPERCASE
 
-# Set colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-NC='\033[0m' # No Color
-
-# Function to print a header
-print_header() {
-  echo -e "\n${YELLOW}==== $1 ====${NC}"
-}
-
-# Function to print success message
-print_success() {
-  echo -e "${GREEN}✓ $1${NC}"
-}
-
-# Function to print error message
-print_error() {
-  echo -e "${RED}✗ $1${NC}"
-}
-
 # Store the project root directory
-PROJECT_ROOT=$(pwd)
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 cd "$PROJECT_ROOT"
+
+# Source the doc-lib library that contains the shared documentation utilities
+if [ -f "${PROJECT_ROOT}/util/lib/doc-lib.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/doc-lib.sh"
+  USING_LIB=true
+else
+  echo "Warning: Documentation library not found. Using fallback functions."
+  USING_LIB=false
+  
+  # Set colors for output
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  YELLOW='\033[0;33m'
+  NC='\033[0m' # No Color
+
+  # Function to print a header
+  print_header() {
+    echo -e "\n${YELLOW}==== $1 ====${NC}"
+  }
+
+  # Function to print success message
+  print_success() {
+    echo -e "${GREEN}✓ $1${NC}"
+  }
+
+  # Function to print error message
+  print_error() {
+    echo -e "${RED}✗ $1${NC}"
+  }
+fi
+
+# Function to convert filename to PascalCase (used for markdown files)
+to_pascal_case() {
+  local filename="$1"
+  local basename="${filename%.*}"  # Remove extension
+  local extension="${filename##*.}"  # Keep extension
+  
+  # Special case for README.md, CLAUDE.md and recognized acronyms
+  if [[ "$basename" == "README" || "$basename" == "CLAUDE" || "$basename" =~ ^[A-Z]{2,}$ ]]; then
+    echo "$filename"
+    return
+  fi
+  
+  # Convert kebab-case or snake_case to PascalCase
+  local pascal_case=$(echo "$basename" | sed -E 's/(^|[-_])([a-z])/\U\2/g')
+  
+  # Return result with extension
+  echo "${pascal_case}.${extension}"
+}
 
 print_header "Standardizing Markdown Filenames"
 echo "Following naming conventions:"
@@ -256,31 +284,121 @@ fi
 # Check if there are any remaining non-PascalCase files that aren't README.md or CLAUDE.md
 print_header "Checking for any remaining files that don't follow conventions"
 
-# This improved pattern detects files that:
-# 1. Have lowercase first letter (not PascalCase) for the filename (not path)
-# 2. Have underscores or hyphens in the filename (not path)
-# 3. Are not README.md, CLAUDE.md, or recognized acronyms like FAQ.md, TBD.md, etc.
-# 4. Special cases for version-template.md
-remaining_files=$(find . -name "*.md" | grep -v "/README\.md$" | grep -v "/CLAUDE\.md$" | 
-  grep -v "/PULL_REQUEST_TEMPLATE\.md$" | 
-  awk -F/ '{print $NF}' | 
-  grep -E '^[a-z]|[-_]' | 
-  grep -v '^version-template\.md$' |
-  grep -v '^[A-Z][A-Z0-9]*\.md$')
-
-if [ -n "$remaining_files" ]; then
-  # Now search for the actual paths for reporting
-  print_error "The following files still need to be renamed:"
-  for file in $remaining_files; do
-    find . -name "$file" | grep -v "node_modules" | grep -v "target" | sort
+# Use library function if available for basic checks
+if [[ "$USING_LIB" == true ]] && type find_non_kebab_case_files &>/dev/null; then
+  if [[ "$USING_LIB" == true ]] && type print_info &>/dev/null; then
+    print_info "Using doc-lib.sh to help with file checking"
+  fi
+  
+  # For PascalCase we need a custom approach, but can use the library to find all markdown files
+  remaining_files=""
+  
+  # Find all markdown files (excluding special cases)
+  find "${PROJECT_ROOT}" -type f -name "*.md" | grep -v "/README\.md$" | grep -v "/CLAUDE\.md$" | 
+    grep -v "/PULL_REQUEST_TEMPLATE\.md$" | sort | while read -r file; do
+    
+    filename=$(basename "$file")
+    
+    # Skip acronyms (all uppercase filenames)
+    if [[ "$filename" =~ ^[A-Z][A-Z0-9]*\.md$ ]]; then
+      continue
+    fi
+    
+    # Skip version template (special case)
+    if [[ "$filename" == "VersionTemplate.md" ]]; then
+      continue
+    fi
+    
+    # Check if filename doesn't follow PascalCase
+    if [[ "$filename" =~ ^[a-z] || "$filename" =~ [-_] ]]; then
+      # This file doesn't follow PascalCase convention
+      remaining_files+="$file"$'\n'
+    fi
   done
 else
-  print_success "All Markdown files follow the naming conventions!"
+  # This improved pattern detects files that:
+  # 1. Have lowercase first letter (not PascalCase) for the filename (not path)
+  # 2. Have underscores or hyphens in the filename (not path)
+  # 3. Are not README.md, CLAUDE.md, or recognized acronyms like FAQ.md, TBD.md, etc.
+  # 4. Special cases for version-template.md
+  remaining_files=$(find . -name "*.md" | grep -v "/README\.md$" | grep -v "/CLAUDE\.md$" | 
+    grep -v "/PULL_REQUEST_TEMPLATE\.md$" | 
+    awk -F/ '{print $NF}' | 
+    grep -E '^[a-z]|[-_]' | 
+    grep -v '^version-template\.md$' |
+    grep -v '^[A-Z][A-Z0-9]*\.md$')
+    
+  # Now search for the actual paths for reporting
+  if [ -n "$remaining_files" ]; then
+    tmp_files=""
+    for file in $remaining_files; do
+      tmp_files+=$(find . -name "$file" | grep -v "node_modules" | grep -v "target" | sort)
+      tmp_files+=$'\n'
+    done
+    remaining_files="$tmp_files"
+  fi
 fi
 
-print_header "Standardization Complete"
+if [ -n "$remaining_files" ]; then
+  if [[ "$USING_LIB" == true ]] && type print_error &>/dev/null; then
+    print_error "The following files still need to be renamed:"
+    echo "$remaining_files"
+  else
+    print_error "The following files still need to be renamed:"
+    echo "$remaining_files"
+  fi
+else
+  if [[ "$USING_LIB" == true ]] && type print_success &>/dev/null; then
+    print_success "All Markdown files follow the naming conventions!"
+  else
+    print_success "All Markdown files follow the naming conventions!"
+  fi
+fi
+
+if [[ "$USING_LIB" == true ]] && type print_header &>/dev/null; then
+  print_header "Standardization Complete"
+else
+  print_header "Standardization Complete"
+fi
+
 echo "All Markdown files have been standardized according to the naming conventions:"
 echo "- README.md files remain in UPPER_CASE"
-echo "- CLAUDE.md remains in UPPER_CASE"
+echo "- CLAUDE.md remains in UPPER_CASE" 
 echo "- Acronyms (like FAQ.md, TBD.md) remain in UPPERCASE"
 echo "- Other documentation files use PascalCase"
+
+# Create a report if using the library
+if [[ "$USING_LIB" == true ]] && [ -d "$REPORT_DIR" ]; then
+  date_stamp=$(date +%Y%m%d)
+  report_file="${REPORT_DIR}/markdown-standardization-${date_stamp}.md"
+  
+  # Create a report
+  {
+    echo "# Markdown Filename Standardization Report"
+    echo "Generated: $(date)"
+    echo
+    echo "## Naming Conventions"
+    echo "- README.md files remain in UPPER_CASE"
+    echo "- CLAUDE.md remains in UPPER_CASE"
+    echo "- Acronyms (like FAQ.md, TBD.md) remain in UPPERCASE"
+    echo "- Other documentation files use PascalCase"
+    echo
+    echo "## Results"
+    
+    if [ -n "$remaining_files" ]; then
+      echo "### Files Still Needing Standardization"
+      echo
+      echo "$remaining_files" | while read -r file; do
+        if [ -n "$file" ]; then
+          echo "- \`$file\`"
+        fi
+      done
+    else
+      echo "All markdown files follow the naming conventions!"
+    fi
+  } > "$report_file"
+  
+  if [[ "$USING_LIB" == true ]] && type print_success &>/dev/null; then
+    print_success "Standardization report created at ${report_file}"
+  fi
+fi

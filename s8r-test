@@ -39,6 +39,7 @@ parse_args() {
   OUTPUT_FILE=""
   PARALLEL=false
   COVERAGE=false
+  CUSTOM_TAGS=""
   
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -66,6 +67,14 @@ parse_args() {
           error "Output file path missing after -o/--output"
         fi
         ;;
+      --tags)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          CUSTOM_TAGS="$2"
+          shift 2
+        else
+          error "Tag expression missing after --tags"
+        fi
+        ;;
       -h|--help)
         show_help
         exit 0
@@ -90,107 +99,137 @@ show_help() {
   echo "  --coverage              Run tests with code coverage analysis"
   echo "  --skip-quality          Skip quality checks"
   echo "  -o, --output <file>     Write test output to file"
+  echo "  --tags <expression>     Run tests with specific tags (e.g. \"@Functional and @Identity\")"
   echo "  -h, --help              Show this help message"
   echo
-  echo "Test Types:"
-  echo "  unit                    Run unit tests"
-  echo "  component               Run component tests"
-  echo "  integration             Run integration tests"
-  echo "  api                     Run API tests"
-  echo "  system                  Run system tests"
-  echo "  endtoend                Run end-to-end tests"
-  echo "  acceptance              Run acceptance tests"
+  echo "Standard Test Types:"
+  echo "  unit                    Run unit (L0) tests"
+  echo "  component               Run component (L1) tests"
+  echo "  integration             Run integration (L2) tests"
+  echo "  system                  Run system (L3) tests"
   echo "  all                     Run all tests (default)"
   echo
-  echo "Samstraumr-Specific Test Types:"
-  echo "  tube                    Run tube tests"
-  echo "  composite               Run composite tests"
-  echo "  flow                    Run flow tests"
-  echo "  machine                 Run machine tests"
-  echo "  stream                  Run stream tests"
-  echo "  orchestration           Run orchestration tests"
-  echo "  atl                     Run Above-The-Line tests"
-  echo "  btl                     Run Below-The-Line tests"
-  echo "  adam                    Run Adam Tube tests"
+  echo "Functionality Test Types:"
+  echo "  functional              Run core functionality tests (former ATL)"
+  echo "  error-handling          Run error handling tests (former BTL)"
+  echo "  dataflow                Run data flow tests"
+  echo "  state                   Run state management tests"
+  echo "  identity                Run identity-related tests"
+  echo "  monitoring              Run monitoring/observability tests"
+  echo "  lifecycle               Run lifecycle tests"
+  echo "  resilience              Run resilience tests"
+  echo
+  echo "Legacy Test Types (backwards compatibility):"
+  echo "  tube                    Run tube tests (maps to unit)"
+  echo "  composite               Run composite tests (maps to component)"
+  echo "  flow                    Run flow tests (maps to dataflow)"
+  echo "  machine                 Run machine tests (maps to integration)"
+  echo "  atl                     Run Above-The-Line tests (maps to functional)"
+  echo "  btl                     Run Below-The-Line tests (maps to error-handling)"
+  echo "  adam                    Run Adam tube tests (specific test case)"
   echo
   echo "Examples:"
-  echo "  ./s8r-test                      # Run all tests"
-  echo "  ./s8r-test unit                 # Run unit tests"
-  echo "  ./s8r-test atl                  # Run Above-The-Line tests"
-  echo "  ./s8r-test -v component         # Run component tests verbosely"
+  echo "  ./s8r-test                                # Run all tests"
+  echo "  ./s8r-test unit                           # Run unit tests"
+  echo "  ./s8r-test functional                     # Run core functionality tests"
+  echo "  ./s8r-test --tags \"@L1_Component and @DataFlow\"  # Run component data flow tests"
+  echo "  ./s8r-test -v component                   # Run component tests verbosely"
 }
 
-# Map test type to Maven profile and tags
+# Map test type to appropriate tag expressions
 map_test_type() {
   local test_type="$1"
-  local profile=""
   local tags=""
   
+  # Handle custom tags first
+  if [[ -n "$CUSTOM_TAGS" ]]; then
+    tags="$CUSTOM_TAGS"
+    return 0
+  fi
+  
+  # Otherwise map the test type to tags
   case "$test_type" in
-    unit|tube)
-      profile="unit-tests"
-      tags="@UnitTest or @TubeTest"
+    # Standard test types (pyramid levels)
+    unit)
+      tags="@L0_Unit or @L0_Tube"
       ;;
-    component|composite)
-      profile="composite-tests"
-      tags="@L1_Composite"
+    component)
+      tags="@L1_Component or @L1_Composite"
       ;;
-    integration|flow)
-      profile="flow-tests"
-      tags="@Flow"
+    integration)
+      tags="@L2_Integration or @L2_Machine"
       ;;
-    api|machine)
-      profile="machine-tests"
-      tags="@Machine"
+    system)
+      tags="@L3_System"
       ;;
-    system|stream)
-      profile="stream-tests"
-      tags="@Stream"
+      
+    # Test types by functionality
+    functional)
+      tags="@Functional or @ATL"
       ;;
-    endtoend|acceptance)
-      profile="acceptance-tests"
-      tags="@AcceptanceTest"
+    error-handling)
+      tags="@ErrorHandling or @BTL"
       ;;
-    orchestration)
-      profile="orchestration-tests"
-      tags="@OrchestrationTest"
+    dataflow)
+      tags="@DataFlow or @Flow"
+      ;;
+    state)
+      tags="@State"
+      ;;
+    identity)
+      tags="@Identity"
+      ;;
+    monitoring)
+      tags="@Monitoring or @Awareness"
+      ;;
+    lifecycle)
+      tags="@Lifecycle or @Init or @Runtime or @Termination"
+      ;;
+    resilience)
+      tags="@Resilience or @CircuitBreaker"
+      ;;
+      
+    # Legacy test types (backward compatibility)
+    tube)
+      tags="@L0_Unit or @L0_Tube or @TubeTest"
+      ;;
+    composite)
+      tags="@L1_Component or @L1_Composite or @CompositeTest"
+      ;;
+    flow)
+      tags="@DataFlow or @Flow"
+      ;;
+    machine)
+      tags="@L2_Integration or @L2_Machine or @MachineTest"
       ;;
     atl)
-      profile="atl-tests"
-      tags="@ATL"
+      tags="@Functional or @ATL"
       ;;
-    btl) 
-      profile="btl-tests"
-      tags="@BTL"
+    btl)
+      tags="@ErrorHandling or @BTL"
       ;;
     adam)
-      profile="adam-tube-tests"
       tags="@AdamTube"
       ;;
     all)
-      profile="tests"
       tags="not @disabled"
       ;;
     *)
-      error "Unknown test type: $test_type"
+      warn "Unknown test type: $test_type. Using it as a tag."
+      tags="@$test_type"
       ;;
   esac
   
-  echo "$profile $tags"
+  echo "$tags"
 }
 
 # Core test function
 run_tests() {
-  # Map test type to profile and tags
-  read -r profile tags <<< "$(map_test_type "$TEST_TYPE")"
+  # Map test type to tags
+  local tags=$(map_test_type "$TEST_TYPE")
   
   # Construct Maven command based on arguments
   local mvn_args=("test")
-  
-  # Add profile if available
-  if [[ -n "$profile" ]]; then
-    mvn_args+=("-P$profile")
-  fi
   
   # Add cucumber tags if available
   if [[ -n "$tags" ]]; then
@@ -205,13 +244,8 @@ run_tests() {
     unit|tube)
       mvn_args+=("-Dtest=RunTubeTests")
       ;;
-    api|machine)
+    integration|machine)
       mvn_args+=("-Dtest=RunMachineTests")
-      ;;
-    atl)
-      mvn_args+=("-Dtest=RunATLTests")
-      # Explicitly ensure tests run with @ATL tag
-      mvn_args+=("-Dgroups=ATL")
       ;;
     *)
       mvn_args+=("-Dtest=RunCucumberTest")
@@ -249,7 +283,6 @@ run_tests() {
   
   # Display test information
   info "Running $TEST_TYPE tests..."
-  info "Profile: $profile"
   info "Tags: $tags"
   
   # Handle output redirection

@@ -23,7 +23,7 @@ header() { echo -e "\n${BOLD}${YELLOW}$1${RESET}\n"; }
 
 # Find repository root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
+PROJECT_ROOT="$SCRIPT_DIR"
 QUALITY_DIR="${PROJECT_ROOT}/quality-tools"
 REPORT_DIR="${PROJECT_ROOT}/target/quality-reports"
 
@@ -109,7 +109,7 @@ fi
 # Load tool modules
 load_tool_module() {
   local tool="$1"
-  local module_path="${SCRIPT_DIR}/modules/${tool}.sh"
+  local module_path="${PROJECT_ROOT}/util/quality/modules/${tool}.sh"
   
   if [ -f "$module_path" ]; then
     source "$module_path"
@@ -266,7 +266,7 @@ header "Unified Quality Checker"
 info "Profile: $PROFILE"
 
 # Create module directories
-mkdir -p "${SCRIPT_DIR}/modules"
+mkdir -p "${PROJECT_ROOT}/util/quality/modules"
 
 # Load base modules
 source "${PROJECT_ROOT}/util/lib/quality-lib.sh"

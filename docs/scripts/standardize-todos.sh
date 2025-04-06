@@ -6,27 +6,36 @@
 
 set -e
 
-# Terminal colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-MAGENTA='\033[0;35m'
-NC='\033[0m' # No Color
-
-# Find repository root
+# Find project root directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
-# Functions for prettier output
-info() { echo -e "${BLUE}$1${NC}"; }
-success() { echo -e "${GREEN}$1${NC}"; }
-warning() { echo -e "${YELLOW}Warning: $1${NC}" >&2; }
-error() { echo -e "${RED}Error: $1${NC}" >&2; }
-header() { echo -e "\n${MAGENTA}=== $1 ===${NC}"; }
-subheader() { echo -e "\n${CYAN}--- $1 ---${NC}"; }
+# Source the doc-lib library that contains the shared documentation utilities
+if [ -f "${PROJECT_ROOT}/util/lib/doc-lib.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/doc-lib.sh"
+  USING_LIB=true
+else
+  echo "Warning: Documentation library not found. Using fallback functions."
+  USING_LIB=false
+  
+  # Terminal colors
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  YELLOW='\033[0;33m'
+  BLUE='\033[0;34m'
+  CYAN='\033[0;36m'
+  MAGENTA='\033[0;35m'
+  NC='\033[0m' # No Color
+  
+  # Fallback output functions
+  info() { echo -e "${BLUE}$1${NC}"; }
+  success() { echo -e "${GREEN}$1${NC}"; }
+  warning() { echo -e "${YELLOW}Warning: $1${NC}" >&2; }
+  error() { echo -e "${RED}Error: $1${NC}" >&2; }
+  header() { echo -e "\n${MAGENTA}=== $1 ===${NC}"; }
+  subheader() { echo -e "\n${CYAN}--- $1 ---${NC}"; }
+}
 
 # Default settings
 DRY_RUN=true
@@ -151,15 +160,34 @@ FIXABLE_TMP=$(mktemp)
 guess_priority() {
   local content="$1"
   
-  # Try to guess priority based on content
-  if [[ "$content" =~ (urgent|critical|immediately|asap|crash|security|vulnerability) ]]; then
-    echo "P0"
-  elif [[ "$content" =~ (important|soon|should|high|leak|issue|bug) ]]; then
-    echo "P1"
-  elif [[ "$content" =~ (later|refactor|improve|enhancement|clean) ]]; then
-    echo "P2"
+  # Use library function if available
+  if [[ "$USING_LIB" == true ]]; then
+    # The library doesn't have a direct guess_priority function, but we can use TODO parsing
+    # functions in a creative way - by creating a temporary TODO and parsing it
+    
+    # For now, fallback to the local implementation
+    # Try to guess priority based on content
+    if [[ "$content" =~ (urgent|critical|immediately|asap|crash|security|vulnerability) ]]; then
+      echo "P0"
+    elif [[ "$content" =~ (important|soon|should|high|leak|issue|bug) ]]; then
+      echo "P1"
+    elif [[ "$content" =~ (later|refactor|improve|enhancement|clean) ]]; then
+      echo "P2"
+    else
+      echo "P3"
+    fi
   else
-    echo "P3"
+    # Legacy implementation
+    # Try to guess priority based on content
+    if [[ "$content" =~ (urgent|critical|immediately|asap|crash|security|vulnerability) ]]; then
+      echo "P0"
+    elif [[ "$content" =~ (important|soon|should|high|leak|issue|bug) ]]; then
+      echo "P1"
+    elif [[ "$content" =~ (later|refactor|improve|enhancement|clean) ]]; then
+      echo "P2"
+    else
+      echo "P3"
+    fi
   fi
 }
 
@@ -167,26 +195,56 @@ guess_priority() {
 guess_category() {
   local content="$1"
   
-  # Try to guess category based on content
-  if [[ "$content" =~ (bug|fix|issue|error|exception|crash|problem) ]]; then
-    echo "BUG"
-  elif [[ "$content" =~ (feature|add|implement|create|start|design|provide) ]]; then
-    echo "FEAT"
-  elif [[ "$content" =~ (refactor|clean|rename|move|improve|simplify|extract) ]]; then
-    echo "REFACTOR"
-  elif [[ "$content" =~ (performance|speed|memory|optimize|slow) ]]; then
-    echo "PERF"
-  elif [[ "$content" =~ (documentation|document|explain|clarify|comment) ]]; then
-    echo "DOC"
-  elif [[ "$content" =~ (test|verify|validate|assert|check|unit|integration) ]]; then
-    echo "TEST"
-  elif [[ "$content" =~ (infrastructure|build|deploy|ci|cd|pipeline|tooling) ]]; then
-    echo "INFRA"
-  elif [[ "$content" =~ (security|auth|safety|secure|protect|encryption) ]]; then
-    echo "SECURITY"
+  # Use library function if available
+  if [[ "$USING_LIB" == true ]]; then
+    # Similar to guess_priority, we don't have a direct function for this yet,
+    # but we could create one in the library in the future
+    
+    # For now, fallback to the local implementation
+    # Try to guess category based on content
+    if [[ "$content" =~ (bug|fix|issue|error|exception|crash|problem) ]]; then
+      echo "BUG"
+    elif [[ "$content" =~ (feature|add|implement|create|start|design|provide) ]]; then
+      echo "FEAT"
+    elif [[ "$content" =~ (refactor|clean|rename|move|improve|simplify|extract) ]]; then
+      echo "REFACTOR"
+    elif [[ "$content" =~ (performance|speed|memory|optimize|slow) ]]; then
+      echo "PERF"
+    elif [[ "$content" =~ (documentation|document|explain|clarify|comment) ]]; then
+      echo "DOC"
+    elif [[ "$content" =~ (test|verify|validate|assert|check|unit|integration) ]]; then
+      echo "TEST"
+    elif [[ "$content" =~ (infrastructure|build|deploy|ci|cd|pipeline|tooling) ]]; then
+      echo "INFRA"
+    elif [[ "$content" =~ (security|auth|safety|secure|protect|encryption) ]]; then
+      echo "SECURITY"
+    else
+      # Default to TASK if we can't guess
+      echo "TASK"
+    fi
   else
-    # Default to TASK if we can't guess
-    echo "TASK"
+    # Legacy implementation
+    # Try to guess category based on content
+    if [[ "$content" =~ (bug|fix|issue|error|exception|crash|problem) ]]; then
+      echo "BUG"
+    elif [[ "$content" =~ (feature|add|implement|create|start|design|provide) ]]; then
+      echo "FEAT"
+    elif [[ "$content" =~ (refactor|clean|rename|move|improve|simplify|extract) ]]; then
+      echo "REFACTOR"
+    elif [[ "$content" =~ (performance|speed|memory|optimize|slow) ]]; then
+      echo "PERF"
+    elif [[ "$content" =~ (documentation|document|explain|clarify|comment) ]]; then
+      echo "DOC"
+    elif [[ "$content" =~ (test|verify|validate|assert|check|unit|integration) ]]; then
+      echo "TEST"
+    elif [[ "$content" =~ (infrastructure|build|deploy|ci|cd|pipeline|tooling) ]]; then
+      echo "INFRA"
+    elif [[ "$content" =~ (security|auth|safety|secure|protect|encryption) ]]; then
+      echo "SECURITY"
+    else
+      # Default to TASK if we can't guess
+      echo "TASK"
+    fi
   fi
 }
 
@@ -246,8 +304,22 @@ for file in $TODO_FILES; do
     # Increment total TODOs counter
     ((TOTAL_TODOS++))
     
-    # Check if TODO follows the standard format
-    if [[ "$line_content" =~ $TODO_FORMAT_REGEX ]]; then
+    # Check if TODO follows the standard format - use library if available
+    local is_compliant=false
+    
+    if [[ "$USING_LIB" == true ]] && type is_standard_todo &>/dev/null; then
+      # Use library function to check if the TODO follows the standard format
+      if is_standard_todo "$line_content"; then
+        is_compliant=true
+      fi
+    else
+      # Legacy implementation - use regex
+      if [[ "$line_content" =~ $TODO_FORMAT_REGEX ]]; then
+        is_compliant=true
+      fi
+    fi
+    
+    if [[ "$is_compliant" == true ]]; then
       # TODO already complies with the standard format
       ((COMPLIANT_TODOS++))
       echo "${file}:${line_num}:${line_content}" >> "$TODO_TMP"
@@ -361,8 +433,13 @@ if [[ -n "$REPORT_FILE" ]]; then
   subheader "Generating report"
   info "Report file: $REPORT_FILE"
   
-  # Check if extract-todos.sh exists and use it
-  if [[ -x "$SCRIPT_DIR/extract-todos.sh" ]]; then
+  # Use the library function if available
+  if [[ "$USING_LIB" == true ]] && type extract_todos &>/dev/null; then
+    # Call the library function to generate the report
+    extract_todos "$REPORT_FILE"
+    success "Report generated using library function: $REPORT_FILE"
+  elif [[ -x "$SCRIPT_DIR/extract-todos.sh" ]]; then
+    # Use the extract-todos.sh script if available
     "$SCRIPT_DIR/extract-todos.sh" --output "$REPORT_FILE"
   else
     # Basic report if extract-todos.sh is not available

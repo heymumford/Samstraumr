@@ -6,23 +6,32 @@
 
 set -e
 
-# Terminal colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-# Find repository root
+# Find project root directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
-# Functions for prettier output
-info() { echo -e "${BLUE}$1${NC}"; }
-success() { echo -e "${GREEN}$1${NC}"; }
-warning() { echo -e "${YELLOW}Warning: $1${NC}" >&2; }
-error() { echo -e "${RED}Error: $1${NC}" >&2; }
+# Source the doc-lib library that contains the shared documentation utilities
+if [ -f "${PROJECT_ROOT}/util/lib/doc-lib.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/doc-lib.sh"
+  USING_LIB=true
+else
+  echo "Warning: Documentation library not found. Using fallback functions."
+  USING_LIB=false
+  
+  # Terminal colors
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  YELLOW='\033[0;33m'
+  BLUE='\033[0;34m'
+  NC='\033[0m' # No Color
+  
+  # Fallback output functions
+  info() { echo -e "${BLUE}$1${NC}"; }
+  success() { echo -e "${GREEN}$1${NC}"; }
+  warning() { echo -e "${YELLOW}Warning: $1${NC}" >&2; }
+  error() { echo -e "${RED}Error: $1${NC}" >&2; }
+}
 
 # Default settings
 STRICT=false
@@ -141,29 +150,66 @@ for file in $FILES_WITH_TODOS; do
     # Increment total TODOs counter
     ((TOTAL_TODOS++))
     
-    # Check if TODO follows the standard format
-    if [[ "$line_content" =~ $TODO_FORMAT_REGEX ]]; then
+    # Use the library function if available, otherwise use regex matching
+    local is_compliant=false
+    local priority=""
+    
+    if [[ "$USING_LIB" == true ]] && type is_standard_todo &>/dev/null; then
+      # Use library function to check if the TODO follows the standard format
+      if is_standard_todo "$line_content"; then
+        is_compliant=true
+        # Get priority using library function
+        if type get_todo_priority &>/dev/null; then
+          priority=$(get_todo_priority "$line_content")
+          # Remove P prefix if present
+          priority="${priority#P}"
+        fi
+      fi
+    else
+      # Legacy implementation - use regex
+      if [[ "$line_content" =~ $TODO_FORMAT_REGEX ]]; then
+        is_compliant=true
+        # Extract priority using regex
+        if [[ "$line_content" =~ \[P([0-3])\] ]]; then
+          priority="${BASH_REMATCH[1]}"
+        fi
+      fi
+    fi
+    
+    # Process compliant TODOs
+    if [[ "$is_compliant" == true ]]; then
       # TODO complies with the standard format
       ((COMPLIANT_TODOS++))
       
-      # Extract priority for high-priority checks
-      if [[ "$line_content" =~ \[P([0-3])\] ]]; then
-        priority="${BASH_REMATCH[1]}"
+      # Check if high-priority TODOs have GitHub issues
+      if [[ "$CHECK_GITHUB_ISSUES" == true && "$priority" =~ [01] ]]; then
+        # Use library function if available to check for GitHub issues
+        local has_issue=false
+        local issue_num=""
         
-        # Check if high-priority TODOs have GitHub issues
-        if [[ "$CHECK_GITHUB_ISSUES" == true && "$priority" =~ [01] ]]; then
-          if ! [[ "$line_content" =~ \(#[0-9]+\) ]]; then
-            ((MISSING_ISSUES++))
-            echo "${file}:${line_num}: High-priority TODO (P${priority}) without GitHub issue: ${line_content}" >> "$NONCOMPLIANT_TMP"
-          elif [[ "$line_content" =~ \(#([0-9]+)\) ]]; then
+        if [[ "$USING_LIB" == true ]] && type get_todo_description &>/dev/null; then
+          # Check if the line contains a GitHub issue reference
+          if [[ "$line_content" =~ \(#([0-9]+)\) ]]; then
+            has_issue=true
             issue_num="${BASH_REMATCH[1]}"
-            
-            # Verify the issue exists on GitHub (if requested)
-            if [[ "$CHECK_GITHUB_ISSUES" == true ]]; then
-              if ! gh issue view "$issue_num" &> /dev/null; then
-                ((MISSING_ISSUES++))
-                echo "${file}:${line_num}: High-priority TODO references non-existent GitHub issue #${issue_num}: ${line_content}" >> "$NONCOMPLIANT_TMP"
-              fi
+          fi
+        else
+          # Legacy implementation
+          if [[ "$line_content" =~ \(#([0-9]+)\) ]]; then
+            has_issue=true
+            issue_num="${BASH_REMATCH[1]}"
+          fi
+        fi
+        
+        if [[ "$has_issue" == false ]]; then
+          ((MISSING_ISSUES++))
+          echo "${file}:${line_num}: High-priority TODO (P${priority}) without GitHub issue: ${line_content}" >> "$NONCOMPLIANT_TMP"
+        elif [[ -n "$issue_num" ]]; then
+          # Verify the issue exists on GitHub (if requested)
+          if [[ "$CHECK_GITHUB_ISSUES" == true ]]; then
+            if ! gh issue view "$issue_num" &> /dev/null; then
+              ((MISSING_ISSUES++))
+              echo "${file}:${line_num}: High-priority TODO references non-existent GitHub issue #${issue_num}: ${line_content}" >> "$NONCOMPLIANT_TMP"
             fi
           fi
         fi

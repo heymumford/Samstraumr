@@ -13,7 +13,7 @@
  *     https://www.mozilla.org/en-US/MPL/2.0/
  */
 
-package org.s8r.app;
+package org.s8r.application.ui;
 
 import java.util.List;
 import java.util.Scanner;

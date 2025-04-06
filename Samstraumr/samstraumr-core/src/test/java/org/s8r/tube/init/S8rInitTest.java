@@ -16,6 +16,7 @@
 package org.s8r.tube.init;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,7 +28,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.s8r.initialization.S8rInitializer;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.s8r.application.port.LoggerPort;
+import org.s8r.application.port.ProjectInitializationPort;
+import org.s8r.application.service.ProjectInitializationService;
 import org.s8r.test.annotation.UnitTest;
 
 /** Tests for the Samstraumr repository initialization command. */
@@ -40,17 +45,31 @@ public class S8rInitTest {
   private final PrintStream originalErr = System.err;
 
   @TempDir Path tempDir;
+  
+  @Mock
+  private LoggerPort mockLogger;
+  
+  @Mock
+  private ProjectInitializationPort mockInitPort;
+  
+  private ProjectInitializationService initService;
+  
+  private AutoCloseable mockCloseable;
 
   @BeforeEach
-  public void setUpStreams() {
+  public void setUp() {
+    mockCloseable = MockitoAnnotations.openMocks(this);
+    initService = new ProjectInitializationService(mockInitPort, mockLogger);
+    
     System.setOut(new PrintStream(outContent));
     System.setErr(new PrintStream(errContent));
   }
 
   @AfterEach
-  public void restoreStreams() {
+  public void tearDown() throws Exception {
     System.setOut(originalOut);
     System.setErr(originalErr);
+    mockCloseable.close();
   }
 
   @Test
@@ -61,46 +80,28 @@ public class S8rInitTest {
 
     // Create a git repo in the temp directory
     createGitRepo(repoPath);
-
+    
+    // Configure mock
+    when(mockInitPort.isValidRepository(repoPath.toString())).thenReturn(true);
+    when(mockInitPort.isExistingProject(repoPath.toString())).thenReturn(false);
+    
     // Act
-    S8rInitializer initializer = new S8rInitializer(repoPath.toString());
-    boolean result = initializer.initialize();
+    boolean result = initService.initializeProject(repoPath.toString(), "org.example");
 
     // Assert
     assertTrue(result, "Initialization should complete successfully");
-
-    // Check expected directories exist
-    assertTrue(
-        Files.exists(repoPath.resolve("src/main/java/org/example/component")),
-        "Component directory should exist");
-    assertTrue(
-        Files.exists(repoPath.resolve("src/main/java/org/example/tube")),
-        "Tube directory should exist");
-    assertTrue(
-        Files.exists(repoPath.resolve("src/main/java/org/example/machine")),
-        "Machine directory should exist");
-    assertTrue(
-        Files.exists(repoPath.resolve("src/test/java/org/example/component")),
-        "Component test directory should exist");
-
-    // Check Adam tube was created
-    assertTrue(
-        Files.exists(repoPath.resolve("src/main/java/org/example/tube/AdamTube.java")),
-        "Adam tube should be created");
-
-    // Check s8r configuration files exist
-    assertTrue(Files.exists(repoPath.resolve(".s8r/config.json")), "Config file should exist");
-
-    // Verify appropriate messages were printed
-    String output = outContent.toString();
-    assertTrue(
-        output.contains("Initializing Samstraumr repository"),
-        "Should show initialization message");
-    assertTrue(
-        output.contains("Creating directory structure"), "Should show directory creation message");
-    assertTrue(output.contains("Creating Adam tube"), "Should show Adam tube creation message");
-    assertTrue(
-        output.contains("Samstraumr initialization complete"), "Should show completion message");
+    
+    // Verify the correct methods were called on the port
+    verify(mockInitPort).createDirectoryStructure(repoPath.toString(), "org.example");
+    verify(mockInitPort).createAdamComponent(repoPath.toString(), "org.example");
+    verify(mockInitPort).createConfigurationFiles(repoPath.toString(), "org.example");
+    
+    // Verify logging
+    verify(mockLogger).info("Initializing Samstraumr project at {}", repoPath.toString());
+    verify(mockLogger).info("Creating directory structure");
+    verify(mockLogger).info("Creating Adam component");
+    verify(mockLogger).info("Creating configuration files");
+    verify(mockLogger).info("Samstraumr project initialization completed successfully");
   }
 
   @Test
@@ -112,18 +113,23 @@ public class S8rInitTest {
     } catch (IOException e) {
       fail("Failed to create test directory: " + e.getMessage());
     }
+    
+    // Configure mock for invalid repository
+    when(mockInitPort.isValidRepository(repoPath.toString())).thenReturn(false);
 
     // Act
-    S8rInitializer initializer = new S8rInitializer(repoPath.toString());
-    boolean result = initializer.initialize();
+    boolean result = initService.initializeProject(repoPath.toString(), "org.example");
 
     // Assert
     assertFalse(result, "Initialization should fail in non-git repository");
-
-    String errorOutput = errContent.toString();
-    assertTrue(
-        errorOutput.contains("Not a git repository"),
-        "Should show error message about non-git repository");
+    
+    // Verify error was logged
+    verify(mockLogger).error("Not a valid repository for initialization. Please ensure it's a git repository.");
+    
+    // Verify no other interactions with port
+    verify(mockInitPort, never()).createDirectoryStructure(anyString(), anyString());
+    verify(mockInitPort, never()).createAdamComponent(anyString(), anyString());
+    verify(mockInitPort, never()).createConfigurationFiles(anyString(), anyString());
   }
 
   @Test
@@ -137,18 +143,24 @@ public class S8rInitTest {
 
     // Create .s8r directory to simulate existing repo
     Files.createDirectory(repoPath.resolve(".s8r"));
+    
+    // Configure mocks
+    when(mockInitPort.isValidRepository(repoPath.toString())).thenReturn(true);
+    when(mockInitPort.isExistingProject(repoPath.toString())).thenReturn(true);
 
     // Act
-    S8rInitializer initializer = new S8rInitializer(repoPath.toString());
-    boolean result = initializer.initialize();
+    boolean result = initService.initializeProject(repoPath.toString(), "org.example");
 
     // Assert
     assertFalse(result, "Initialization should fail in existing Samstraumr repository");
-
-    String errorOutput = errContent.toString();
-    assertTrue(
-        errorOutput.contains("Samstraumr repository already exists"),
-        "Should show error message about existing repository");
+    
+    // Verify error message logged
+    verify(mockLogger).error("Samstraumr project already exists at this location.");
+    
+    // Verify no other interactions with port
+    verify(mockInitPort, never()).createDirectoryStructure(anyString(), anyString());
+    verify(mockInitPort, never()).createAdamComponent(anyString(), anyString());
+    verify(mockInitPort, never()).createConfigurationFiles(anyString(), anyString());
   }
 
   @Test
@@ -157,28 +169,21 @@ public class S8rInitTest {
     Path repoPath = tempDir.resolve("package-test-repo");
     Files.createDirectory(repoPath);
     createGitRepo(repoPath);
+    
+    // Configure mocks
+    when(mockInitPort.isValidRepository(repoPath.toString())).thenReturn(true);
+    when(mockInitPort.isExistingProject(repoPath.toString())).thenReturn(false);
 
     // Act
-    S8rInitializer initializer = new S8rInitializer(repoPath.toString(), "com.mycompany.project");
-    boolean result = initializer.initialize();
+    boolean result = initService.initializeProject(repoPath.toString(), "com.mycompany.project");
 
     // Assert
     assertTrue(result, "Initialization with custom package should succeed");
-
-    // Check custom package structure exists
-    assertTrue(
-        Files.exists(repoPath.resolve("src/main/java/com/mycompany/project/component")),
-        "Component directory with custom package should exist");
-    assertTrue(
-        Files.exists(repoPath.resolve("src/main/java/com/mycompany/project/tube/AdamTube.java")),
-        "Adam tube with custom package should exist");
-
-    // Verify the package statement in Adam tube
-    Path adamTubePath = repoPath.resolve("src/main/java/com/mycompany/project/tube/AdamTube.java");
-    String adamTubeContent = new String(Files.readAllBytes(adamTubePath));
-    assertTrue(
-        adamTubeContent.contains("package com.mycompany.project.tube;"),
-        "Adam tube should have correct package declaration");
+    
+    // Verify with custom package name
+    verify(mockInitPort).createDirectoryStructure(repoPath.toString(), "com.mycompany.project");
+    verify(mockInitPort).createAdamComponent(repoPath.toString(), "com.mycompany.project");
+    verify(mockInitPort).createConfigurationFiles(repoPath.toString(), "com.mycompany.project");
   }
 
   /** Helper method to create a git repository in the specified directory */

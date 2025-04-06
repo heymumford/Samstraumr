@@ -1,4 +1,4 @@
-@L2_Machine @MachineTest @ATL @Flow @Runtime
+@L2_Integration @DataFlow @Functional
 Feature: Machine Data Flow
   As a system integrator
   I want to verify data flows correctly through connected bundles forming a machine
@@ -11,14 +11,14 @@ Feature: Machine Data Flow
     And a transformation bundle "processor" is added to the machine
     And a sink bundle "output-writer" is added to the machine
 
-  @Identity @Flow
+  @Identity @Functional
   Scenario: Machine components should initialize with valid identifiers
     When I query the machine structure
     Then all machine components should have valid identifiers
     And the machine should contain exactly 3 bundles
     And the bundles should be properly connected in sequence
 
-  @Flow @Transformer
+  @DataFlow @Transformer
   Scenario: Data should flow through the machine without loss
     Given the source bundle generates 10 data elements
     And the transformation bundle converts all text to uppercase
@@ -26,7 +26,7 @@ Feature: Machine Data Flow
     Then the sink bundle should receive exactly 10 data elements
     And all output data should be uppercase
 
-  @State @Resilience @CircuitBreaker
+  @State @Resilience @ErrorHandling
   Scenario: Machine should handle bundle failures gracefully
     Given the source bundle generates 5 data elements
     And the transformation bundle is configured to fail on the 3rd element
@@ -37,7 +37,7 @@ Feature: Machine Data Flow
     And the failure should be properly isolated to the transformation bundle
     And the circuit breaker should be in open state for the transformation bundle
 
-  @Flow @Performance
+  @DataFlow @Performance
   Scenario Outline: Machine should process data within acceptable time limits
     Given the source bundle generates <count> data elements
     And the transformation bundle converts all text to uppercase
@@ -51,7 +51,7 @@ Feature: Machine Data Flow
       | 100   | 1000     |
       | 1000  | 5000     |
 
-  @State @Awareness
+  @State @Monitoring
   Scenario: Machine should track processing state and metadata
     Given the source bundle generates 5 data elements
     And each data element has unique metadata attached

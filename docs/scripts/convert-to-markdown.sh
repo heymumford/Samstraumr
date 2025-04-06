@@ -8,11 +8,26 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
-# Source common utilities if available
-if [ -f "${PROJECT_ROOT}/util/lib/common.sh" ]; then
+# Define variable to track library availability
+USING_LIB=false
+
+# Source the doc-lib library that contains the shared documentation utilities
+if [ -f "${PROJECT_ROOT}/util/lib/doc-lib.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/doc-lib.sh"
+  USING_LIB=true
+  
+  # Create a reports directory for any generated reports
+  if [[ "$USING_LIB" == true ]] && type ensure_reports_directory &>/dev/null; then
+    ensure_reports_directory
+  fi
+elif [ -f "${PROJECT_ROOT}/util/lib/unified-common.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/unified-common.sh"
+  USING_LIB=false
+elif [ -f "${PROJECT_ROOT}/util/lib/common.sh" ]; then
   source "${PROJECT_ROOT}/util/lib/common.sh"
+  USING_LIB=false
 else
-  # Define minimal color codes if common.sh not available
+  # Define minimal color codes if libraries are not available
   COLOR_RED='\033[0;31m'
   COLOR_GREEN='\033[0;32m'
   COLOR_YELLOW='\033[0;33m'
@@ -43,8 +58,16 @@ else
 fi
 
 # Function to check if a command is available
+# Falls back to library implementation if available
 function command_exists() {
-  command -v "$1" &> /dev/null
+  # Use the library version if available, otherwise use local implementation
+  if [[ "$USING_LIB" == true ]] && type command_exists &>/dev/null; then
+    command_exists "$@"
+    return $?
+  else
+    command -v "$1" &> /dev/null
+    return $?
+  fi
 }
 
 # Check for required tools
@@ -221,6 +244,11 @@ function convert_to_markdown() {
   local dry_run="${2:-false}"
   local keep_original="${3:-false}"
   
+  # Log conversion attempt if library functions available
+  if [[ "$USING_LIB" == true ]] && type add_to_conversion_report &>/dev/null; then
+    add_to_conversion_report "Attempting conversion: $input_file ($extension)"
+  fi
+  
   # Skip files that are already markdown
   if [[ "$extension" == "md" ]]; then
     if [[ "$verbose" == "true" ]]; then
@@ -232,6 +260,9 @@ function convert_to_markdown() {
   # Skip files with extensions we don't handle
   if [[ "$extension" != "rtf" && "$extension" != "docx" && "$extension" != "txt" ]]; then
     print_warning "Unsupported file type ($extension): $input_file"
+    if [[ "$USING_LIB" == true ]] && type add_to_conversion_report &>/dev/null; then
+      add_to_conversion_report "SKIPPED: Unsupported file type ($extension): $input_file"
+    fi
     return 1
   fi
   
@@ -265,6 +296,21 @@ function convert_to_markdown() {
   if [[ $result -eq 0 && "$keep_original" == "false" ]]; then
     print_info "Removing original file: $input_file"
     rm "$input_file"
+    
+    # Log successful conversion
+    if [[ "$USING_LIB" == true ]] && type add_to_conversion_report &>/dev/null; then
+      add_to_conversion_report "CONVERTED: $input_file → ${input_file%.*}.md"
+    fi
+  elif [[ $result -eq 0 ]]; then
+    # Log successful conversion (kept original)
+    if [[ "$USING_LIB" == true ]] && type add_to_conversion_report &>/dev/null; then
+      add_to_conversion_report "CONVERTED (kept original): $input_file → ${input_file%.*}.md"
+    fi
+  else
+    # Log failed conversion
+    if [[ "$USING_LIB" == true ]] && type add_to_conversion_report &>/dev/null; then
+      add_to_conversion_report "FAILED: Could not convert $input_file"
+    fi
   fi
   
   return $result
@@ -282,8 +328,18 @@ function process_directory() {
   local skipped_count=0
   local error_count=0
   
+  # Use library function to get nice report formatting if available
+  if [[ "$USING_LIB" == true ]] && type start_directory_processing &>/dev/null; then
+    start_directory_processing "$dir"
+  fi
+  
   if [[ "$verbose" == "true" ]]; then
     print_info "Processing directory: $dir"
+  fi
+  
+  # Log directory processing if report functions available
+  if [[ "$USING_LIB" == true ]] && type add_to_conversion_report &>/dev/null; then
+    add_to_conversion_report "Processing directory: $dir"
   fi
   
   # Process files in the directory
@@ -311,6 +367,12 @@ function process_directory() {
         if [[ "$verbose" == "true" ]]; then
           print_warning "Unsupported file type ($extension): $(basename "$filepath")"
         fi
+        
+        # Log skipped file if report functions available
+        if [[ "$USING_LIB" == true ]] && type add_to_conversion_report &>/dev/null; then
+          add_to_conversion_report "SKIPPED: Unsupported file type ($extension): $(basename "$filepath")"
+        fi
+        
         skipped_count=$((skipped_count + 1))
       fi
     elif [ -d "$filepath" ] && [ "$recursive" = "true" ]; then
@@ -327,6 +389,11 @@ function process_directory() {
     fi
   done
   
+  # Use library function to finalize report if available
+  if [[ "$USING_LIB" == true ]] && type end_directory_processing &>/dev/null; then
+    end_directory_processing "$dir" "$converted_count" "$skipped_count" "$error_count"
+  fi
+  
   # Return the count of converted files
   echo $converted_count
 }
@@ -338,33 +405,64 @@ function main() {
   local verbose=false
   local recursive=true
   local target_dir="${PROJECT_ROOT}/docs"
+  local report_dir="${PROJECT_ROOT}/reports/conversions"
+  
+  # Initialize report if library functions available
+  if [[ "$USING_LIB" == true ]] && type initialize_conversion_report &>/dev/null; then
+    initialize_conversion_report "markdown-conversion"
+  fi
   
   # Parse command-line arguments
   while [[ $# -gt 0 ]]; do
     case "$1" in
       -h|--help)
-        print_header "Document to Markdown Converter"
-        echo ""
-        echo "Converts various document formats to Markdown"
-        echo ""
-        echo "USAGE:"
-        echo "  $(basename "$0") [options] [directory]"
-        echo ""
-        echo "OPTIONS:"
-        echo "  -h, --help           Show this help message"
-        echo "  -d, --dry-run        Show what would be converted without making changes"
-        echo "  -k, --keep-original  Keep original files after conversion"
-        echo "  -v, --verbose        Show detailed information during conversion"
-        echo "  -n, --no-recursive   Do not process subdirectories"
-        echo ""
-        echo "SUPPORTED FORMATS:"
-        echo "  .rtf, .docx, .txt"
-        echo ""
-        echo "EXAMPLES:"
-        echo "  $(basename "$0")                # Convert all docs in repo"
-        echo "  $(basename "$0") docs/proposals # Convert only proposal docs"
-        echo "  $(basename "$0") --dry-run      # See what would be converted"
-        echo "  $(basename "$0") --keep-original # Keep original files"
+        # Use library's help formatting if available
+        if [[ "$USING_LIB" == true ]] && type show_help_template &>/dev/null; then
+          local script_name="$(basename "$0")"
+          local description="Converts various document formats to Markdown"
+          local options=$(cat <<EOF
+  -h, --help           Show this help message
+  -d, --dry-run        Show what would be converted without making changes
+  -k, --keep-original  Keep original files after conversion
+  -v, --verbose        Show detailed information during conversion
+  -n, --no-recursive   Do not process subdirectories
+EOF
+)
+          local examples=$(cat <<EOF
+  $(basename "$0")                # Convert all docs in repo
+  $(basename "$0") docs/proposals # Convert only proposal docs
+  $(basename "$0") --dry-run      # See what would be converted
+  $(basename "$0") --keep-original # Keep original files
+EOF
+)
+          show_help_template "$0" "$description" "$options" "$examples"
+          echo ""
+          echo "SUPPORTED FORMATS:"
+          echo "  .rtf, .docx, .txt"
+        else
+          print_header "Document to Markdown Converter"
+          echo ""
+          echo "Converts various document formats to Markdown"
+          echo ""
+          echo "USAGE:"
+          echo "  $(basename "$0") [options] [directory]"
+          echo ""
+          echo "OPTIONS:"
+          echo "  -h, --help           Show this help message"
+          echo "  -d, --dry-run        Show what would be converted without making changes"
+          echo "  -k, --keep-original  Keep original files after conversion"
+          echo "  -v, --verbose        Show detailed information during conversion"
+          echo "  -n, --no-recursive   Do not process subdirectories"
+          echo ""
+          echo "SUPPORTED FORMATS:"
+          echo "  .rtf, .docx, .txt"
+          echo ""
+          echo "EXAMPLES:"
+          echo "  $(basename "$0")                # Convert all docs in repo"
+          echo "  $(basename "$0") docs/proposals # Convert only proposal docs"
+          echo "  $(basename "$0") --dry-run      # See what would be converted"
+          echo "  $(basename "$0") --keep-original # Keep original files"
+        fi
         echo ""
         exit 0
         ;;
@@ -397,19 +495,40 @@ function main() {
     esac
   done
   
-  print_header "Document to Markdown Converter"
+  # Use section formatting from library if available
+  if [[ "$USING_LIB" == true ]] && type print_section &>/dev/null; then
+    print_section "Document to Markdown Converter"
+  else
+    print_header "Document to Markdown Converter"
+  fi
   
   if [ "$dry_run" = "true" ]; then
     print_info "Running in dry-run mode (no changes will be made)"
+    
+    # Log to report if library functions available
+    if [[ "$USING_LIB" == true ]] && type add_to_conversion_report &>/dev/null; then
+      add_to_conversion_report "DRY RUN MODE - No files will be modified"
+    fi
   fi
   
   if [ "$keep_original" = "true" ]; then
     print_info "Will keep original files after conversion"
+    
+    # Log to report if library functions available
+    if [[ "$USING_LIB" == true ]] && type add_to_conversion_report &>/dev/null; then
+      add_to_conversion_report "KEEP ORIGINAL MODE - Original files will be preserved"
+    fi
   fi
   
   # Check if target directory exists
   if [ ! -d "$target_dir" ]; then
     print_error "Target directory not found: $target_dir"
+    
+    # Log error to report if library functions available
+    if [[ "$USING_LIB" == true ]] && type add_to_conversion_report &>/dev/null; then
+      add_to_conversion_report "ERROR: Target directory not found: $target_dir"
+    fi
+    
     exit 1
   fi
   
@@ -422,6 +541,12 @@ function main() {
   print_info "Found $potential_files non-Markdown files in $target_dir"
   print_info "Starting conversion process..."
   
+  # Log to report if library functions available
+  if [[ "$USING_LIB" == true ]] && type add_to_conversion_report &>/dev/null; then
+    add_to_conversion_report "Found $potential_files non-Markdown files in $target_dir"
+    add_to_conversion_report "Starting conversion process..."
+  fi
+  
   # Convert files in the target directory
   converted_count=$(process_directory "$target_dir" "$dry_run" "$keep_original" "$recursive" "$verbose")
   
@@ -430,6 +555,20 @@ function main() {
     print_info "Dry run completed. Would convert $converted_count files."
   else
     print_success "Conversion completed. Converted $converted_count files."
+  fi
+  
+  # Finalize report if library functions available
+  if [[ "$USING_LIB" == true ]] && type finalize_conversion_report &>/dev/null; then
+    if [ "$dry_run" = "true" ]; then
+      add_to_conversion_report "DRY RUN SUMMARY: Would convert $converted_count files."
+    else
+      add_to_conversion_report "CONVERSION SUMMARY: Successfully converted $converted_count files."
+    fi
+    
+    local report_path=$(finalize_conversion_report)
+    if [ -n "$report_path" ]; then
+      print_info "Conversion report saved to: $report_path"
+    fi
   fi
   
   exit 0

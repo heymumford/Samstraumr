@@ -15,6 +15,19 @@ Licensed under the Mozilla Public License 2.0
 All notable changes to this project will be documented in this file.
 
 ## [1.3.0] - 2025-04-03
+## [2.4.4] - 2025-04-06
+
+### Added
+
+- 
+
+### Changed
+
+- 
+
+### Fixed
+
+- 
 ## [2.4.3] - 2025-04-06
 
 ### Added

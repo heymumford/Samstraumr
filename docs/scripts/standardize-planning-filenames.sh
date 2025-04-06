@@ -9,38 +9,48 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
-# Source common utilities if available
-if [ -f "${PROJECT_ROOT}/util/lib/common.sh" ]; then
-  source "${PROJECT_ROOT}/util/lib/common.sh"
+# Source the doc-lib library that contains the shared documentation utilities
+if [ -f "${PROJECT_ROOT}/util/lib/doc-lib.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/doc-lib.sh"
+  USING_LIB=true
 else
-  # Define minimal color codes if common.sh not available
-  COLOR_RED='\033[0;31m'
-  COLOR_GREEN='\033[0;32m'
-  COLOR_YELLOW='\033[0;33m'
-  COLOR_BLUE='\033[0;34m'
-  COLOR_RESET='\033[0m'
-  COLOR_BOLD='\033[1m'
-  
-  function print_header() {
-    echo -e "${COLOR_BOLD}$1${COLOR_RESET}"
-    echo -e "${COLOR_BOLD}$(printf '=%.0s' $(seq 1 ${#1}))${COLOR_RESET}"
-  }
-  
-  function print_success() {
-    echo -e "${COLOR_GREEN}✓ $1${COLOR_RESET}"
-  }
-  
-  function print_error() {
-    echo -e "${COLOR_RED}✗ $1${COLOR_RESET}" >&2
-  }
-  
-  function print_warning() {
-    echo -e "${COLOR_YELLOW}! $1${COLOR_RESET}"
-  }
-  
-  function print_info() {
-    echo -e "${COLOR_BLUE}→ $1${COLOR_RESET}"
-  }
+  # Try the common utilities if doc-lib is not available
+  if [ -f "${PROJECT_ROOT}/util/lib/common.sh" ]; then
+    source "${PROJECT_ROOT}/util/lib/common.sh"
+    USING_LIB=false
+  else
+    echo "Warning: Documentation library not found. Using fallback functions."
+    USING_LIB=false
+    
+    # Define minimal color codes if common.sh not available
+    COLOR_RED='\033[0;31m'
+    COLOR_GREEN='\033[0;32m'
+    COLOR_YELLOW='\033[0;33m'
+    COLOR_BLUE='\033[0;34m'
+    COLOR_RESET='\033[0m'
+    COLOR_BOLD='\033[1m'
+    
+    function print_header() {
+      echo -e "${COLOR_BOLD}$1${COLOR_RESET}"
+      echo -e "${COLOR_BOLD}$(printf '=%.0s' $(seq 1 ${#1}))${COLOR_RESET}"
+    }
+    
+    function print_success() {
+      echo -e "${COLOR_GREEN}✓ $1${COLOR_RESET}"
+    }
+    
+    function print_error() {
+      echo -e "${COLOR_RED}✗ $1${COLOR_RESET}" >&2
+    }
+    
+    function print_warning() {
+      echo -e "${COLOR_YELLOW}! $1${COLOR_RESET}"
+    }
+    
+    function print_info() {
+      echo -e "${COLOR_BLUE}→ $1${COLOR_RESET}"
+    }
+  fi
 fi
 
 # Planning directory to process
@@ -89,21 +99,16 @@ function standardize_directory() {
   
   print_info "Processing directory: $dir"
   
-  # Process files in the directory
-  for filepath in "$dir"/*; do
-    if [ -f "$filepath" ]; then
-      local filename=$(basename "$filepath")
-      local extension="${filename##*.}"
-      
-      # Skip the KANBAN.md special file
-      if [[ "$filename" == "KANBAN.md" ]]; then
-        print_info "Skipping special file: $filename"
-        continue
-      fi
-      
-      # Skip README.md files
-      if [[ "$filename" == "README.md"* ]]; then
-        print_info "Skipping README file: $filename"
+  # Use the library's functions if available
+  if [[ "$USING_LIB" == true ]] && type to_kebab_case &>/dev/null; then
+    print_info "Using documentation library for standardization"
+    
+    # Handle special cases before processing other files
+    
+    # Handle the case of README.md.new files
+    for filepath in "$dir"/*; do
+      if [ -f "$filepath" ]; then
+        local filename=$(basename "$filepath")
         
         # Handle README.md.new -> move to README.md
         if [[ "$filename" == "README.md.new" ]]; then
@@ -124,42 +129,160 @@ function standardize_directory() {
             fi
           fi
         fi
-        continue
       fi
-      
-      # Only process Markdown files
-      if [[ "$extension" == "md" ]]; then
-        local standardized_name=$(to_pascal_case "$filename")
+    done
+    
+    # Now process other files using PascalCase conversion
+    for filepath in "$dir"/*; do
+      if [ -f "$filepath" ]; then
+        local filename=$(basename "$filepath")
+        local extension="${filename##*.}"
         
-        # If the filename needs to be changed
-        if [[ "$filename" != "$standardized_name" ]]; then
-          local new_path="${dir}/${standardized_name}"
+        # Skip the KANBAN.md special file and README files
+        if [[ "$filename" == "KANBAN.md" || "$filename" == "README.md"* ]]; then
+          print_info "Skipping special file: $filename"
+          continue
+        fi
+        
+        # Only process Markdown files
+        if [[ "$extension" == "md" ]]; then
+          local standardized_name=$(to_pascal_case "$filename")
           
-          # Check if the target file already exists
-          if [ -f "$new_path" ]; then
-            print_warning "Cannot rename $filename - $standardized_name already exists"
-            continue
-          fi
-          
-          if [ "$dry_run" = "true" ]; then
-            print_info "Would rename: $filename -> $standardized_name"
-          else
-            if mv "$filepath" "$new_path"; then
-              print_success "Renamed: $filename -> $standardized_name"
-              renamed_count=$((renamed_count + 1))
-            else
-              print_error "Failed to rename: $filename -> $standardized_name"
-              errors=$((errors + 1))
+          # If the filename needs to be changed
+          if [[ "$filename" != "$standardized_name" ]]; then
+            local new_path="${dir}/${standardized_name}"
+            
+            # Check if the target file already exists
+            if [ -f "$new_path" ]; then
+              print_warning "Cannot rename $filename - $standardized_name already exists"
+              continue
             fi
+            
+            if [ "$dry_run" = "true" ]; then
+              print_info "Would rename: $filename -> $standardized_name"
+            else
+              if mv "$filepath" "$new_path"; then
+                print_success "Renamed: $filename -> $standardized_name"
+                renamed_count=$((renamed_count + 1))
+              else
+                print_error "Failed to rename: $filename -> $standardized_name"
+                errors=$((errors + 1))
+              fi
+            fi
+          else
+            unchanged_count=$((unchanged_count + 1))
           fi
         else
-          unchanged_count=$((unchanged_count + 1))
+          print_warning "Skipping non-Markdown file: $filename"
         fi
-      else
-        print_warning "Skipping non-Markdown file: $filename"
       fi
-    fi
-  done
+    done
+  else
+    # Fall back to original implementation
+    # Process files in the directory
+    for filepath in "$dir"/*; do
+      if [ -f "$filepath" ]; then
+        local filename=$(basename "$filepath")
+        local extension="${filename##*.}"
+        
+        # Skip the KANBAN.md special file
+        if [[ "$filename" == "KANBAN.md" ]]; then
+          print_info "Skipping special file: $filename"
+          continue
+        fi
+        
+        # Skip README.md files
+        if [[ "$filename" == "README.md"* ]]; then
+          print_info "Skipping README file: $filename"
+          
+          # Handle README.md.new -> move to README.md
+          if [[ "$filename" == "README.md.new" ]]; then
+            local new_path="${dir}/README.md"
+            if [ -f "$new_path" ]; then
+              print_warning "Cannot rename $filename - README.md already exists"
+            else
+              if [ "$dry_run" = "true" ]; then
+                print_info "Would rename: $filename -> README.md"
+              else
+                if mv "$filepath" "$new_path"; then
+                  print_success "Renamed: $filename -> README.md"
+                  renamed_count=$((renamed_count + 1))
+                else
+                  print_error "Failed to rename: $filename -> README.md"
+                  errors=$((errors + 1))
+                fi
+              fi
+            fi
+          fi
+          continue
+        fi
+        
+        # Only process Markdown files
+        if [[ "$extension" == "md" ]]; then
+          local standardized_name=$(to_pascal_case "$filename")
+          
+          # If the filename needs to be changed
+          if [[ "$filename" != "$standardized_name" ]]; then
+            local new_path="${dir}/${standardized_name}"
+            
+            # Check if the target file already exists
+            if [ -f "$new_path" ]; then
+              print_warning "Cannot rename $filename - $standardized_name already exists"
+              continue
+            fi
+            
+            if [ "$dry_run" = "true" ]; then
+              print_info "Would rename: $filename -> $standardized_name"
+            else
+              if mv "$filepath" "$new_path"; then
+                print_success "Renamed: $filename -> $standardized_name"
+                renamed_count=$((renamed_count + 1))
+              else
+                print_error "Failed to rename: $filename -> $standardized_name"
+                errors=$((errors + 1))
+              fi
+            fi
+          else
+            unchanged_count=$((unchanged_count + 1))
+          fi
+        else
+          print_warning "Skipping non-Markdown file: $filename"
+        fi
+      fi
+    done
+  fi
+  
+  # Create a report if using the library
+  if [[ "$USING_LIB" == true ]] && [ -d "$REPORT_DIR" ]; then
+    date_stamp=$(date +%Y%m%d)
+    report_file="${REPORT_DIR}/planning-standardization-${date_stamp}.md"
+    
+    # Create a report
+    {
+      echo "# Planning Document Filename Standardization Report"
+      echo "Generated: $(date)"
+      echo
+      echo "## Naming Conventions"
+      echo "- README.md files remain in UPPER_CASE"
+      echo "- KANBAN.md remains in UPPER_CASE"
+      echo "- Other markdown files use PascalCase"
+      echo
+      echo "## Results"
+      echo
+      echo "* **Files Renamed**: $renamed_count"
+      echo "* **Files Already Correct**: $unchanged_count"
+      echo "* **Errors Encountered**: $errors"
+      
+      if [ $renamed_count -gt 0 ]; then
+        echo
+        echo "### Renamed Files"
+        echo
+        echo "Files were renamed to follow PascalCase convention."
+      fi
+    } > "$report_file"
+    
+    print_success "Standardization report created at ${report_file}"
+  fi
   
   # Print summary
   if [ "$dry_run" = "true" ]; then
@@ -184,22 +307,41 @@ function main() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
       -h|--help)
-        print_header "Planning Document Filename Standardization"
-        echo ""
-        echo "Standardizes filenames in the planning directory to follow project naming conventions."
-        echo ""
-        echo "USAGE:"
-        echo "  $(basename "$0") [options]"
-        echo ""
-        echo "OPTIONS:"
-        echo "  -h, --help    Show this help message"
-        echo "  -d, --dry-run Show what would be renamed without making changes"
-        echo ""
-        echo "DESCRIPTION:"
-        echo "  This script standardizes filenames in the planning directory to follow"
-        echo "  the project's naming conventions (PascalCase for documentation files)."
-        echo "  For example, 'refactoring-summary.md' becomes 'RefactoringSummary.md'."
-        echo ""
+        if [[ "$USING_LIB" == true ]] && type print_header &>/dev/null; then
+          print_header "Planning Document Filename Standardization"
+          echo ""
+          print_info "Standardizes filenames in the planning directory to follow project naming conventions."
+          echo ""
+          print_bold "USAGE:"
+          echo "  $(basename "$0") [options]"
+          echo ""
+          print_bold "OPTIONS:"
+          echo "  -h, --help    Show this help message"
+          echo "  -d, --dry-run Show what would be renamed without making changes"
+          echo ""
+          print_bold "DESCRIPTION:"
+          echo "  This script standardizes filenames in the planning directory to follow"
+          echo "  the project's naming conventions (PascalCase for documentation files)."
+          echo "  For example, 'refactoring-summary.md' becomes 'RefactoringSummary.md'."
+          echo ""
+        else
+          print_header "Planning Document Filename Standardization"
+          echo ""
+          echo "Standardizes filenames in the planning directory to follow project naming conventions."
+          echo ""
+          echo "USAGE:"
+          echo "  $(basename "$0") [options]"
+          echo ""
+          echo "OPTIONS:"
+          echo "  -h, --help    Show this help message"
+          echo "  -d, --dry-run Show what would be renamed without making changes"
+          echo ""
+          echo "DESCRIPTION:"
+          echo "  This script standardizes filenames in the planning directory to follow"
+          echo "  the project's naming conventions (PascalCase for documentation files)."
+          echo "  For example, 'refactoring-summary.md' becomes 'RefactoringSummary.md'."
+          echo ""
+        fi
         exit 0
         ;;
       -d|--dry-run)
@@ -224,6 +366,11 @@ function main() {
   if [ ! -d "$PLANNING_DIR" ]; then
     print_error "Planning directory not found: $PLANNING_DIR"
     exit 1
+  fi
+  
+  # Create reports directory if using the library
+  if [[ "$USING_LIB" == true ]] && [ ! -d "$REPORT_DIR" ]; then
+    mkdir -p "$REPORT_DIR"
   fi
   
   # Run standardization
