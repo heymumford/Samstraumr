@@ -8,12 +8,58 @@ This document tracks the progress of implementing Clean Architecture principles 
 - ✅ Fixed domain layer dependency on application layer by creating appropriate interfaces
 - ✅ Fixed infrastructure layer dependency on adapter layer by moving repository implementation
 - ✅ Created application layer interfaces for LoggerFactory
-- ⬜ Fix app package dependencies on domain and infrastructure
-- ⬜ Fix adapter package dependency on core and tube
+- ✅ Created application layer S8rFacade to abstract framework usage
+- ⬜ Fix remaining circular dependencies (infrastructure <-> app layer)
+- ✅ Fixed adapter package dependency on core and tube using the Adapter and Factory patterns
 - ⬜ Add package-info.java files to all packages
 - ⬜ Fix event naming conventions and event propagation
 
 ## Completed Fixes
+
+### 4. Adapter Layer Dependencies on Legacy Code
+
+Problem: The adapter layer had direct dependencies on legacy code in the core and tube packages, violating Clean Architecture principles.
+
+Solution:
+1. Created interfaces in the domain layer to define operations needed for identity and environment conversion:
+   ```java
+   public interface LegacyEnvironmentConverter {
+       Object createLegacyEnvironment(Map<String, String> parameters);
+       Map<String, String> extractParametersFromLegacyEnvironment(Object legacyEnvironment);
+       String getLegacyEnvironmentClassName(Object legacyEnvironment);
+   }
+
+   public interface LegacyIdentityConverter extends IdentityConverter {
+       Object createLegacyAdamIdentity(String reason, Object legacyEnvironment);
+       Object createLegacyChildIdentity(String reason, Object legacyEnvironment, Object parentLegacyIdentity);
+       // Additional methods...
+   }
+   ```
+
+2. Implemented these interfaces in the adapter layer with specific adapters for each legacy type:
+   - `CoreLegacyEnvironmentConverter` for `org.s8r.core.env.Environment`
+   - `TubeLegacyEnvironmentConverter` for `org.s8r.tube.Environment`
+   - `CoreLegacyIdentityConverter` for `org.s8r.core.tube.identity.Identity`
+   - `TubeLegacyIdentityConverter` for `org.s8r.tube.TubeIdentity`
+
+3. Created a factory in the infrastructure layer to provide these adapters:
+   ```java
+   public class LegacyAdapterFactory {
+       private static final CoreLegacyEnvironmentConverter CORE_ENV_CONVERTER = 
+           new CoreLegacyEnvironmentConverter();
+       private static final TubeLegacyEnvironmentConverter TUBE_ENV_CONVERTER = 
+           new TubeLegacyEnvironmentConverter();
+       
+       public static LegacyEnvironmentConverter getCoreEnvironmentConverter() {
+           return CORE_ENV_CONVERTER;
+       }
+       // Additional methods...
+   }
+   ```
+
+4. Registered these adapters in the dependency container for injection.
+
+This approach applied the Adapter and Factory patterns to encapsulate legacy code dependencies while maintaining Clean Architecture principles. The domain layer can now define conversion operations without depending on specific legacy implementations.
 
 ### 1. Domain to Application Layer Dependency
 

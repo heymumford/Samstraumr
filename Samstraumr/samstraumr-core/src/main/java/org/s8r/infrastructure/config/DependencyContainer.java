@@ -84,8 +84,23 @@ public class DependencyContainer implements ServiceFactory {
     // Create repositories
     setupRepositories();
 
+    // Set up legacy adapters
+    setupLegacyAdapters();
+
     // Create services
     setupServices();
+  }
+  
+  /** Sets up legacy adapters. */
+  private void setupLegacyAdapters() {
+    // Register legacy adapters
+    register(org.s8r.domain.identity.LegacyEnvironmentConverter.class, 
+             LegacyAdapterFactory.getTubeEnvironmentConverter());
+    register(org.s8r.domain.identity.LegacyIdentityConverter.class, 
+             LegacyAdapterFactory.getTubeIdentityConverter());
+    
+    LoggerPort logger = get(LoggerPort.class);
+    logger.info("Initialized legacy adapters");
   }
 
   /** Sets up the logger based on configuration. */
