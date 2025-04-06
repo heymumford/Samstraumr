@@ -6,7 +6,7 @@
 
   <groupId>org.s8r</groupId>
   <artifactId>samstraumr-modules</artifactId>
-  <version>2.1.0</version>
+  <version>2.4.0</version>
   <name>Samstraumr Modules</name>
   <packaging>pom</packaging>
 
@@ -16,13 +16,13 @@
 
   <properties>
     <version.file.path>${project.basedir}/version.properties</version.file.path>
-    <samstraumr.version>2.1.0</samstraumr.version>
+    <samstraumr.version>2.4.0</samstraumr.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
     <test.tags>@ATL</test.tags>
     <all.test.tags>@ATL</all.test.tags>
-    <skip.quality.checks>true</skip.quality.checks> <!-- Default to skipping quality checks for TDD development -->
+    <skip.quality.checks>false</skip.quality.checks> <!-- Enable quality checks -->
     <skipTests>false</skipTests>
     <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
     <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
@@ -33,7 +33,7 @@
     <spotbugs.plugin.version>4.8.2.0</spotbugs.plugin.version>
     <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
     <checkstyle.version>10.23.0</checkstyle.version>
-    <spotless.google.format.version>1.19.0</spotless.google.format.version>
+    <spotless.google.format.version>1.17.0</spotless.google.format.version>
   </properties>
   
   <build>
@@ -191,8 +191,17 @@
         <jacoco.line.coverage>0.0</jacoco.line.coverage>
         <jacoco.branch.coverage>0.0</jacoco.branch.coverage>
         
-        <!-- Only preserve basic compiler checks -->
-        <skip.quality.checks>true</skip.quality.checks>
+        <!-- Enable all quality checks -->
+        <skip.quality.checks>false</skip.quality.checks>
+        <spotless.check.skip>false</spotless.check.skip>
+        <checkstyle.skip>false</checkstyle.skip>
+        <spotbugs.skip>false</spotbugs.skip>
+        <jacoco.skip>false</jacoco.skip>
+        
+        <!-- Ensure tests are never skipped -->
+        <skipTests>false</skipTests>
+        <maven.test.skip>false</maven.test.skip>
+        <testFailureIgnore>false</testFailureIgnore>
       </properties>
     </profile>
     

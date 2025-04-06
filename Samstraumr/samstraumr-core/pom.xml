@@ -7,11 +7,11 @@
   <parent>
     <groupId>org.s8r</groupId>
     <artifactId>samstraumr-modules</artifactId>
-    <version>2.1.0</version>
+    <version>2.4.0</version>
   </parent>
 
   <artifactId>samstraumr-core</artifactId>
-  <version>2.1.0</version>
+  <version>2.4.0</version>
   <packaging>jar</packaging>
   <name>Samstraumr Core</name>
 
@@ -212,6 +212,17 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
+          <encoding>${project.build.sourceEncoding}</encoding>
+          <compilerArgs>
+            <arg>-parameters</arg>
+          </compilerArgs>
+          <testCompilerArgument>-parameters</testCompilerArgument>
+          <testSource>${maven.compiler.source}</testSource>
+          <testTarget>${maven.compiler.target}</testTarget>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -227,6 +238,8 @@
           </systemPropertyVariables>
           <!-- Explicitly enable tests -->
           <skipTests>false</skipTests>
+          <maven.test.skip>false</maven.test.skip>
+          <testFailureIgnore>false</testFailureIgnore>
           <!-- Add explicit provider configuration -->
           <properties>
             <configurationParameters>
@@ -261,6 +274,22 @@
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
+        <configuration>
+          <skip>false</skip>
+          <spotlessCheck>
+            <skip>false</skip>
+          </spotlessCheck>
+          <java>
+            <googleJavaFormat>
+              <version>${spotless.google.format.version}</version>
+              <style>GOOGLE</style>
+            </googleJavaFormat>
+            <removeUnusedImports />
+            <importOrder>
+              <order>java,javax,org,com</order>
+            </importOrder>
+          </java>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -288,6 +317,13 @@
       <testResource>
         <directory>src/test/resources</directory>
         <filtering>true</filtering>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.feature</include>
+          <include>**/*.xml</include>
+          <include>**/*.md</include>
+          <include>**/*.sql</include>
+        </includes>
       </testResource>
     </testResources>
   </build>

@@ -7,6 +7,19 @@ Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford
 All notable changes to this project will be documented in this file.
 
 ## [1.3.0] - 2025-04-03
+## [2.4.0] - 2025-04-06
+
+### Added
+
+- 
+
+### Changed
+
+- 
+
+### Fixed
+
+- 
 ## [2.3.0] - 2025-04-06
 
 ### Added

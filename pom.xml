@@ -6,7 +6,7 @@
 
   <groupId>org.s8r</groupId>
   <artifactId>samstraumr</artifactId>
-  <version>2.1.0</version>
+  <version>2.4.0</version>
   <name>Samstraumr</name>
   <packaging>pom</packaging>
   <description>
@@ -22,7 +22,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
-    <samstraumr.version>2.1.0</samstraumr.version>
+    <samstraumr.version>2.4.0</samstraumr.version>
     <version.file.path>${project.basedir}/Samstraumr/version.properties</version.file.path>
     <all.test.tags>@ATL</all.test.tags>
     <test.tags>@ATL</test.tags>
@@ -298,22 +298,22 @@
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-core</artifactId>
-              <version>2.1.0</version>
+              <version>2.4.0</version>
             </dependency>
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-java</artifactId>
-              <version>2.1.0</version>
+              <version>2.4.0</version>
             </dependency>
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-javascript</artifactId>
-              <version>2.1.0</version>
+              <version>2.4.0</version>
             </dependency>
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-jsp</artifactId>
-              <version>2.1.0</version>
+              <version>2.4.0</version>
             </dependency>
           </dependencies>
         </plugin>
