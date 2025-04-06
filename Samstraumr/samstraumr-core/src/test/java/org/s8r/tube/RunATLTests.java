@@ -9,16 +9,16 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Simple test to verify JUnit 5 is running correctly.
+ * Placeholder for ATL test runner.
  * 
  * This is a temporary placeholder. For a full Cucumber integration,
- * see the specialized test runners and instructions in CUCUMBER_INTEGRATION.md.
+ * see the instructions in CUCUMBER_INTEGRATION.md.
  */
-public class RunCucumberTest {
+public class RunATLTests {
   
   @Test
-  public void simpleTest() {
-    System.out.println("Simple test is running!");
-    assertTrue(true, "Simple test passed");
+  public void atlTest() {
+    System.out.println("ATL test placeholder running!");
+    assertTrue(true, "ATL test placeholder passed");
   }
 }

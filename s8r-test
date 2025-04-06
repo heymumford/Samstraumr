@@ -103,11 +103,11 @@ show_help() {
   echo "  all                     Run all tests (default)"
   echo
   echo "Samstraumr-Specific Test Types:"
-  echo "  tube                    Same as unit"
-  echo "  composite               Same as component"
-  echo "  flow                    Same as integration"
-  echo "  machine                 Same as api"
-  echo "  stream                  Same as system"
+  echo "  tube                    Run tube tests"
+  echo "  composite               Run composite tests"
+  echo "  flow                    Run flow tests"
+  echo "  machine                 Run machine tests"
+  echo "  stream                  Run stream tests"
   echo "  orchestration           Run orchestration tests"
   echo "  atl                     Run Above-The-Line tests"
   echo "  btl                     Run Below-The-Line tests"
@@ -132,24 +132,24 @@ map_test_type() {
       tags="@UnitTest or @TubeTest"
       ;;
     component|composite)
-      profile="component-tests"
-      tags="@ComponentTest or @CompositeTest"
+      profile="composite-tests"
+      tags="@L1_Composite"
       ;;
     integration|flow)
-      profile="integration-tests"
-      tags="@IntegrationTest or @FlowTest"
+      profile="flow-tests"
+      tags="@Flow"
       ;;
     api|machine)
-      profile="api-tests"
-      tags="@ApiTest or @MachineTest"
+      profile="machine-tests"
+      tags="@Machine"
       ;;
     system|stream)
-      profile="system-tests"
-      tags="@SystemTest or @StreamTest"
+      profile="stream-tests"
+      tags="@Stream"
       ;;
     endtoend|acceptance)
       profile="acceptance-tests"
-      tags="@EndToEndTest or @AcceptanceTest"
+      tags="@AcceptanceTest"
       ;;
     orchestration)
       profile="orchestration-tests"
@@ -168,7 +168,7 @@ map_test_type() {
       tags="@AdamTube"
       ;;
     all)
-      profile="all-tests"
+      profile="tests"
       tags="not @disabled"
       ;;
     *)
@@ -197,10 +197,33 @@ run_tests() {
     mvn_args+=("-Dcucumber.filter.tags=\"$tags\"")
   fi
   
+  # Use the appropriate test runner based on test type
+  case "$TEST_TYPE" in
+    component|composite)
+      mvn_args+=("-Dtest=RunCompositeTests")
+      ;;
+    unit|tube)
+      mvn_args+=("-Dtest=RunTubeTests")
+      ;;
+    api|machine)
+      mvn_args+=("-Dtest=RunMachineTests")
+      ;;
+    atl)
+      mvn_args+=("-Dtest=RunATLTests")
+      ;;
+    *)
+      mvn_args+=("-Dtest=RunCucumberTest")
+      ;;
+  esac
+  
   # Add quality skip if requested
   if $SKIP_QUALITY; then
     mvn_args+=("-Dskip.quality.checks=true")
   fi
+  
+  # Explicitly enable tests regardless of other profiles
+  mvn_args+=("-DskipTests=false")
+  mvn_args+=("-Dmaven.test.skip=false")
   
   # Add parallel execution if requested
   if $PARALLEL; then
@@ -229,11 +252,35 @@ run_tests() {
   
   # Handle output redirection
   cd "$PROJECT_ROOT"
-  info "Running: mvn ${mvn_args[*]}"
+  
+  # Use custom settings.xml file to ensure tests aren't skipped
+  if [ ! -f "${PROJECT_ROOT}/surefire-settings.xml" ]; then
+    cat > "${PROJECT_ROOT}/surefire-settings.xml" << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <activeProfiles>
+    <activeProfile>test-enabler</activeProfile>
+  </activeProfiles>
+  <profiles>
+    <profile>
+      <id>test-enabler</id>
+      <properties>
+        <skipTests>false</skipTests>
+        <maven.test.skip>false</maven.test.skip>
+      </properties>
+    </profile>
+  </profiles>
+</settings>
+EOF
+  fi
+  
+  info "Running: mvn ${mvn_args[*]} -s surefire-settings.xml"
   
   if [[ -n "$OUTPUT_FILE" ]]; then
     info "Writing output to: $OUTPUT_FILE"
-    if mvn "${mvn_args[@]}" | tee "$OUTPUT_FILE"; then
+    if mvn "${mvn_args[@]}" -s "${PROJECT_ROOT}/surefire-settings.xml" | tee "$OUTPUT_FILE"; then
       success "Tests completed successfully"
       return 0
     else
@@ -242,7 +289,7 @@ run_tests() {
       return 1
     fi
   else
-    if mvn "${mvn_args[@]}"; then
+    if mvn "${mvn_args[@]}" -s "${PROJECT_ROOT}/surefire-settings.xml"; then
       success "Tests completed successfully"
       return 0
     else

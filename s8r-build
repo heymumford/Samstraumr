@@ -117,9 +117,9 @@ build() {
     fast)
       mvn_args+=("compile")
       mvn_args+=("-DskipTests")
-      if $SKIP_QUALITY || true; then
-        mvn_args+=("-Dskip.quality.checks=true")
-      fi
+      # Always skip quality checks in fast mode
+      mvn_args+=("-Dskip.quality.checks=true")
+      # Don't add -P fast since this causes test skipping
       ;;
     compile)
       mvn_args+=("compile")
