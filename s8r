@@ -44,6 +44,10 @@ error() { echo -e "${RED}Error: $1${RESET}" >&2; exit 1; }
 warn() { echo -e "${YELLOW}Warning: $1${RESET}" >&2; }
 highlight() { echo -e "${CYAN}$1${RESET}"; }
 important() { echo -e "${MAGENTA}$1${RESET}"; }
+print_header() { echo -e "${BOLD}$1${RESET}"; }
+print_success() { echo -e "${GREEN}$1${RESET}"; }
+print_error() { echo -e "${RED}$1${RESET}" >&2; }
+print_warning() { echo -e "${YELLOW}$1${RESET}" >&2; }
 
 # Determine Maven settings
 setup_maven_opts() {
@@ -161,6 +165,7 @@ show_help() {
   echo "Usage: ./s8r <command> [options] [arguments]"
   echo
   echo "Core Commands:"
+  echo "  init             Initialize a new Samstraumr repository"
   echo "  build            Build the project (fast, test, package, install, full)"
   echo "  test             Run tests (unit, component, integration, all...)"
   echo "  version          Manage version information"
@@ -211,7 +216,7 @@ parse_global_args() {
         show_help
         exit 0
         ;;
-      build|test|version|clean|coverage|quality|report|docs|docmosis|test-docmosis|script-test|install|hooks|demo)
+      init|build|test|version|clean|coverage|quality|report|docs|docmosis|test-docmosis|script-test|install|hooks|demo)
         COMMAND="$1"
         shift
         break
@@ -235,6 +240,9 @@ parse_global_args() {
   
   # Execute appropriate command with remaining arguments
   case "$COMMAND" in
+    init)
+      exec_init "$@"
+      ;;
     build)
       exec_build "$@"
       ;;
@@ -287,6 +295,11 @@ parse_global_args() {
       error "Implementation error: Command '$COMMAND' not handled."
       ;;
   esac
+}
+
+# Execute init command
+exec_init() {
+  time_exec "${SCRIPT_DIR}/s8r-init" "$@"
 }
 
 # Execute build command
@@ -932,6 +945,9 @@ function handle_help_command() {
   shift
   
   case "$help_topic" in
+    init)
+      show_init_help
+      ;;
     build)
       show_build_help
       ;;
@@ -980,6 +996,33 @@ function handle_help_command() {
 #------------------------------------------------------------------------------
 # Help Functions For Commands
 #------------------------------------------------------------------------------
+
+function show_init_help() {
+  echo -e "${BOLD}Samstraumr Init${RESET} - Initialize a new Samstraumr repository"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r init [options] [target-directory]"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help                Display this help message"
+  echo "  -v, --verbose             Enable verbose output"
+  echo "  -p, --package <name>      Specify a custom package name (default: org.example)"
+  echo "  -d, --debug               Enable debug output (additional details)"
+  echo
+  echo -e "${BOLD}ARGUMENTS:${RESET}"
+  echo "  target-directory          Directory to initialize (default: current directory)"
+  echo
+  echo -e "${BOLD}DESCRIPTION:${RESET}"
+  echo "  The init command initializes a new Samstraumr repository in the specified directory."
+  echo "  It creates the necessary directory structure, an Adam tube, and configuration files."
+  echo "  It requires a git repository to work, and will create one if necessary."
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  ./s8r init                                # Initialize in current directory"
+  echo "  ./s8r init ~/new-project                  # Initialize in ~/new-project"
+  echo "  ./s8r init -p com.mycompany.project       # Use custom package name"
+  echo "  ./s8r init -v                             # Initialize with verbose output"
+}
 
 function show_build_help() {
   echo -e "${BOLD}Samstraumr Build${RESET} - Build the project with optimized settings"
