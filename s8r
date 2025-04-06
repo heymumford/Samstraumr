@@ -418,51 +418,59 @@ function handle_quality_command() {
   # Set a variable to indicate we're calling from s8r
   export SAMSTRAUMR_CLI="s8r"
   
-  local command="$1"
-  shift
-  
-  case "$command" in
-    check)
-      # Run all quality checks
-      print_header "Running All Quality Checks"
-      "${PROJECT_ROOT}/util/bin/quality/check-encoding.sh" "$@"
-      # Run Maven quality checks
-      cd "${PROJECT_ROOT}" && mvn verify
-      ;;
-    spotless)
-      # Run Spotless formatting check
-      print_header "Running Spotless Formatting Check"
-      local spotless_cmd="check"
-      if [[ "$*" == *"-f"* || "$*" == *"--fix"* ]]; then
-        spotless_cmd="apply"
-      fi
-      cd "${PROJECT_ROOT}" && mvn spotless:${spotless_cmd}
-      ;;
-    checkstyle)
-      # Run CheckStyle code style check
-      print_header "Running CheckStyle Code Style Check"
-      cd "${PROJECT_ROOT}" && mvn checkstyle:check
-      ;;
-    spotbugs)
-      # Run SpotBugs bug detection
-      print_header "Running SpotBugs Bug Detection"
-      cd "${PROJECT_ROOT}" && mvn spotbugs:check
-      ;;
-    jacoco)
-      # Run JaCoCo code coverage analysis
-      print_header "Running JaCoCo Code Coverage Analysis"
-      cd "${PROJECT_ROOT}" && mvn test jacoco:report
-      ;;
-    encoding)
-      # Check file encodings and line endings
-      "${PROJECT_ROOT}/util/bin/quality/check-encoding.sh" "$@"
-      ;;
-    *)
-      print_error "Unknown quality command: $command"
-      show_quality_help
-      return 1
-      ;;
-  esac
+  # Check if we should use the old command handler or the new unified script
+  if [ -x "${PROJECT_ROOT}/s8r-quality" ]; then
+    # Use the new unified quality checker
+    time_exec "${PROJECT_ROOT}/s8r-quality" "$@"
+    return $?
+  else
+    # Fall back to the old command handler
+    local command="$1"
+    shift
+    
+    case "$command" in
+      check)
+        # Run all quality checks
+        print_header "Running All Quality Checks"
+        "${PROJECT_ROOT}/util/bin/quality/check-encoding.sh" "$@"
+        # Run Maven quality checks
+        cd "${PROJECT_ROOT}" && mvn verify
+        ;;
+      spotless)
+        # Run Spotless formatting check
+        print_header "Running Spotless Formatting Check"
+        local spotless_cmd="check"
+        if [[ "$*" == *"-f"* || "$*" == *"--fix"* ]]; then
+          spotless_cmd="apply"
+        fi
+        cd "${PROJECT_ROOT}" && mvn spotless:${spotless_cmd}
+        ;;
+      checkstyle)
+        # Run CheckStyle code style check
+        print_header "Running CheckStyle Code Style Check"
+        cd "${PROJECT_ROOT}" && mvn checkstyle:check
+        ;;
+      spotbugs)
+        # Run SpotBugs bug detection
+        print_header "Running SpotBugs Bug Detection"
+        cd "${PROJECT_ROOT}" && mvn spotbugs:check
+        ;;
+      jacoco)
+        # Run JaCoCo code coverage analysis
+        print_header "Running JaCoCo Code Coverage Analysis"
+        cd "${PROJECT_ROOT}" && mvn test jacoco:report
+        ;;
+      encoding)
+        # Check file encodings and line endings
+        "${PROJECT_ROOT}/util/bin/quality/check-encoding.sh" "$@"
+        ;;
+      *)
+        print_error "Unknown quality command: $command"
+        show_quality_help
+        return 1
+        ;;
+    esac
+  fi
 }
 
 function handle_report_command() {
@@ -538,6 +546,15 @@ function handle_docs_command() {
     show_docs_help
     return 0
   fi
+  
+  # Check if we should use the new unified documentation tool
+  if [ -x "${PROJECT_ROOT}/s8r-docs" ]; then
+    # Use the new unified documentation tool
+    time_exec "${PROJECT_ROOT}/s8r-docs" "$@"
+    return $?
+  fi
+  
+  # If we reach here, fall back to the old Docmosis-based approach
   
   # Source the Docmosis library if not already sourced
   if ! type -t generate_docs > /dev/null; then
@@ -1125,25 +1142,60 @@ function show_quality_help() {
   echo -e "${BOLD}Samstraumr Quality${RESET} - Run quality checks"
   echo
   echo -e "${BOLD}USAGE:${RESET}"
-  echo "  ./s8r quality <command> [options]"
+  echo "  ./s8r quality [options]"
   echo
-  echo -e "${BOLD}COMMANDS:${RESET}"
-  echo "  check                Run all quality checks"
-  echo "  spotless             Run Spotless formatting check"
-  echo "  checkstyle           Run CheckStyle code style check"
-  echo "  spotbugs             Run SpotBugs bug detection"
-  echo "  jacoco               Run JaCoCo code coverage analysis"
-  echo "  encoding             Check file encodings and line endings"
-  echo
-  echo -e "${BOLD}OPTIONS:${RESET}"
-  echo "  -h, --help           Display this help message"
-  echo "  -v, --verbose        Enable verbose output"
-  echo "  -f, --fix            Fix issues automatically (where applicable)"
-  echo
-  echo -e "${BOLD}EXAMPLES:${RESET}"
-  echo "  ./s8r quality check               # Run all quality checks"
-  echo "  ./s8r quality spotless -f         # Run Spotless and fix issues"
-  echo "  ./s8r quality encoding -v         # Check encodings with verbose output"
+  if [ -x "${PROJECT_ROOT}/s8r-quality" ]; then
+    # Show help for the new unified quality checker
+    echo -e "${BOLD}PROFILES:${RESET}"
+    echo "  -p, --profile PROFILE  Use a specific quality profile:"
+    echo "                         - standard: Basic quality checks for development"
+    echo "                         - strict: Thorough checks for releases"
+    echo "                         - security: Focused on security issues"
+    echo
+    echo -e "${BOLD}TOOLS:${RESET}"
+    echo "  -t, --tool TOOL        Run a specific tool (can be specified multiple times):"
+    echo "                         - spotless: Code formatting"
+    echo "                         - checkstyle: Code style checking"
+    echo "                         - spotbugs: Bug detection"
+    echo "                         - pmd: Static analysis"
+    echo "                         - jacoco: Code coverage analysis"
+    echo "                         - owasp: Security vulnerability checking"
+    echo "                         - javadoc: Documentation quality"
+    echo "                         - encoding: File encoding checks"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  -h, --help             Display this help message"
+    echo "  -f, --fix              Fix issues automatically where possible"
+    echo "  -r, --report-only      Only generate reports, don't fail on issues"
+    echo "  -s, --skip TOOL        Skip a specific tool"
+    echo "  -v, --verbose          Enable verbose output"
+    echo
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  ./s8r quality                       # Run standard quality profile"
+    echo "  ./s8r quality -p strict             # Run strict quality profile"
+    echo "  ./s8r quality -t spotless -t pmd    # Run only Spotless and PMD"
+    echo "  ./s8r quality -f                    # Fix issues where possible"
+    echo "  ./s8r quality -s jacoco             # Run all tools except JaCoCo"
+  else
+    # Show help for the old command handler
+    echo -e "${BOLD}COMMANDS:${RESET}"
+    echo "  check                Run all quality checks"
+    echo "  spotless             Run Spotless formatting check"
+    echo "  checkstyle           Run CheckStyle code style check"
+    echo "  spotbugs             Run SpotBugs bug detection"
+    echo "  jacoco               Run JaCoCo code coverage analysis"
+    echo "  encoding             Check file encodings and line endings"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  -h, --help           Display this help message"
+    echo "  -v, --verbose        Enable verbose output"
+    echo "  -f, --fix            Fix issues automatically (where applicable)"
+    echo
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  ./s8r quality check               # Run all quality checks"
+    echo "  ./s8r quality spotless -f         # Run Spotless and fix issues"
+    echo "  ./s8r quality encoding -v         # Check encodings with verbose output"
+  fi
 }
 
 function show_report_help() {
@@ -1171,19 +1223,29 @@ function show_docs_help() {
   echo -e "${BOLD}Samstraumr Docs${RESET} - Generate project documentation"
   echo
   echo -e "${BOLD}USAGE:${RESET}"
-  echo "  ./s8r docs [options] [output-dir] [format]"
+  echo "  ./s8r docs <command> [options]"
   echo
-  echo -e "${BOLD}ARGUMENTS:${RESET}"
-  echo "  output-dir           Optional output directory (default: target/docs)"
-  echo "  format               Output format: pdf, docx, html, md, markdown (default: pdf)"
+  echo -e "${BOLD}COMMANDS:${RESET}"
+  echo "  changelog           Generate or update changelog"
+  echo "  readme              Update README.md"
+  echo "  api                 Generate API documentation"
+  echo "  markdown            Convert Markdown to HTML"
+  echo "  all                 Generate all documentation"
+  echo "  check               Check documentation integrity"
   echo
   echo -e "${BOLD}OPTIONS:${RESET}"
-  echo "  -h, --help           Display this help message"
+  echo "  -h, --help          Display this help message"
+  echo "  --output DIR        Output directory (default: target/site/docs)"
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  ./s8r docs changelog             # Generate changelog"
+  echo "  ./s8r docs api --packages org.s8r.component  # Generate API docs for specific packages"
+  echo "  ./s8r docs all --output docs/site # Generate all documentation in specific directory"
   echo
   echo -e "${BOLD}NOTE:${RESET}"
-  echo "  When Docmosis is configured, enhanced document generation with templates is used."
-  echo "  When Docmosis is not available, the system automatically falls back to generating"
-  echo "  documentation using Maven site or Markdown file compilation, depending on format."
+  echo "  The new documentation system provides enhanced capabilities for generating"
+  echo "  comprehensive documentation. When legacy Docmosis is configured, it can also"
+  echo "  be used with './s8r docmosis generate' for document template processing."
 }
 
 function show_test_docmosis_help() {
