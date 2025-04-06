@@ -7,6 +7,27 @@ Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford
 All notable changes to this project will be documented in this file.
 
 ## [1.3.0] - 2025-04-03
+## [2.3.0] - 2025-04-06
+
+### Added
+
+- Local CI workflow compatible with Docker containers
+- Pre-commit hooks for CI validation
+- Integrated Git hooks installation
+- Build system support for CI validation
+
+### Changed
+
+- CI pipeline now supports local testing via nektos/act
+- Pre-commit hooks respect Java file changes
+- More robust test runners with improved reliability
+
+### Fixed
+
+- Docker compatibility issues with CI tests
+- Maven dependency issues in container environments
+- Test discovery and execution in CI pipeline
+- Coverage reporting for component tests
 ## [2.2.0] - 2025-04-06
 
 ### Added
