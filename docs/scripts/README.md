@@ -140,4 +140,4 @@ todo_format_check:
 - [Documentation Standards](../reference/standards/documentation-standards.md)
 - [File Organization Standards](../reference/standards/file-organization.md)
 - [Documentation Standardization Plan](../plans/active-documentation-standardization.md)
-- [TODO Standardization Plan](../planning/active/todo-standardization-plan.md)
+- [TODO Standardization Plan](../plans/active-todo-standardization.md)

@@ -91,13 +91,13 @@ Each planning document should include:
 Technical debt and future improvements in code should be tracked using a standardized TODO format:
 
 ```java
-// TODO [Priority] (#Issue): Description
+// TODO [Priority] (Category) (#Issue): Description
 ```
 
 Example:
 
 ```java
-// TODO [P2] (#123): Implement error handling for network failures
+// TODO [P2] (FEAT) (#123): Implement error handling for network failures
 ```
 
 ### Priority Levels
