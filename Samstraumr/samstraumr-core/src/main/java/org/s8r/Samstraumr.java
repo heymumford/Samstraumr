@@ -51,6 +51,10 @@ public class Samstraumr implements S8rFacade {
     // This breaks the circular dependency by using the Service Locator pattern
     ServiceLocator.setServiceFactory(container);
     
+    // Register this instance as the S8rFacade implementation
+    // This is done after ServiceLocator is initialized to prevent circular dependencies
+    container.registerFramework(this);
+    
     logger.info("Samstraumr framework initialized");
   }
 

@@ -100,7 +100,7 @@ public class TubeLegacyIdentityConverter implements LegacyIdentityConverter {
         result.put("reason", identity.getReason());
         result.put("lineage", identity.getLineage());
         result.put("environmentContext", identity.getEnvironmentContext());
-        result.put("isAdam", identity.isAdamComponent());
+        result.put("isAdam", identity.isAdamTube());
         
         return result;
     }
@@ -179,6 +179,6 @@ public class TubeLegacyIdentityConverter implements LegacyIdentityConverter {
         }
         
         TubeIdentity identity = (TubeIdentity) legacyIdentity;
-        return identity.isAdamComponent();
+        return identity.isAdamTube();
     }
 }

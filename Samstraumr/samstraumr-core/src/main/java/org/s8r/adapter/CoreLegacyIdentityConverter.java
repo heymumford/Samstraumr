@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.s8r.core.env.Environment;
 import org.s8r.core.tube.identity.Identity;
@@ -65,7 +66,8 @@ public class CoreLegacyIdentityConverter implements LegacyIdentityConverter {
                     (legacyEnvironment != null ? legacyEnvironment.getClass().getName() : "null"));
         }
         
-        Identity identity = new Identity(reason);
+        String uniqueId = UUID.randomUUID().toString();
+        Identity identity = new Identity(uniqueId, reason);
         
         // Copy environment parameters
         Environment env = (Environment) legacyEnvironment;
@@ -89,7 +91,8 @@ public class CoreLegacyIdentityConverter implements LegacyIdentityConverter {
         }
         
         Identity parent = (Identity) parentLegacyIdentity;
-        Identity identity = new Identity(reason);
+        String uniqueId = UUID.randomUUID().toString();
+        Identity identity = new Identity(uniqueId, reason);
         
         // Copy parent lineage
         for (String entry : parent.getLineage()) {

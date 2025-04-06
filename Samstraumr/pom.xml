@@ -14,71 +14,30 @@ Licensed under the Mozilla Public License 2.0
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.s8r</groupId>
-  <artifactId>samstraumr-modules</artifactId>
-  <version>2.4.2</version>
-  <name>Samstraumr Modules</name>
+  <parent>
+    <groupId>org.s8r</groupId>
+    <artifactId>samstraumr-parent</artifactId>
+    <version>2.4.2</version>
+    <relativePath>..</relativePath>
+  </parent>
+
+  <artifactId>samstraumr</artifactId>
+  <name>Samstraumr</name>
   <packaging>pom</packaging>
+  <description>
+    Module container for Samstraumr framework components.
+  </description>
 
   <modules>
     <module>samstraumr-core</module>
   </modules>
 
   <properties>
+    <!-- Version management -->
     <version.file.path>${project.basedir}/version.properties</version.file.path>
-    <samstraumr.version>2.4.2</samstraumr.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>21</maven.compiler.source>
-    <maven.compiler.target>21</maven.compiler.target>
-    <test.tags>@ATL</test.tags>
-    <all.test.tags>@ATL</all.test.tags>
-    <maven.compiler.plugin.version>3.12.1</maven.compiler.plugin.version>
-    <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
-    <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
-    <spotless.plugin.version>2.40.0</spotless.plugin.version>
-    <spotless.google.format.version>1.19.2</spotless.google.format.version>
-    <checkstyle.plugin.version>3.3.1</checkstyle.plugin.version>
-    <checkstyle.version>10.14.0</checkstyle.version>
-    <spotbugs.plugin.version>4.8.3.0</spotbugs.plugin.version>
-    <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
-    <jacoco.line.coverage>0.75</jacoco.line.coverage>
-    <jacoco.branch.coverage>0.75</jacoco.branch.coverage>
-    <maven.site.plugin.version>4.0.0-M13</maven.site.plugin.version>
-    <maven.project.info.reports.plugin.version>3.5.0</maven.project.info.reports.plugin.version>
-    <dependency-check.version>9.0.7</dependency-check.version>
   </properties>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>${maven.compiler.plugin.version}</version>
-          <configuration>
-            <source>${maven.compiler.source}</source>
-            <target>${maven.compiler.target}</target>
-            <encoding>${project.build.sourceEncoding}</encoding>
-          </configuration>
-        </plugin>
-        
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>${maven.surefire.plugin.version}</version>
-        </plugin>
-        
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>${maven.resources.plugin.version}</version>
-          <configuration>
-            <encoding>${project.build.sourceEncoding}</encoding>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
+  <!-- No need to duplicate other properties, plugins, or profiles here as they're inherited from parent -->
   
   <profiles>
     <profile>

@@ -9,10 +9,11 @@ This document tracks the progress of implementing Clean Architecture principles 
 - ✅ Fixed infrastructure layer dependency on adapter layer by moving repository implementation
 - ✅ Created application layer interfaces for LoggerFactory
 - ✅ Created application layer S8rFacade to abstract framework usage
-- ⬜ Fix remaining circular dependencies (infrastructure <-> app layer)
+- ✅ Partially fixed circular dependencies (infrastructure <-> app layer) using Service Locator pattern
 - ✅ Fixed adapter package dependency on core and tube using the Adapter and Factory patterns
 - ✅ Added package-info.java files to key packages
 - ⬜ Fix event naming conventions and event propagation
+- ⬜ Complete adapter independence from legacy code by using reflection or further abstractions
 
 ## Completed Fixes
 
@@ -186,24 +187,99 @@ Solution:
    - Event hierarchy polymorphic handling not working
    - Hierarchical event propagation not working
 
+### 6. Breaking Circular Dependencies
+
+Problem: We identified a circular dependency between:
+- `org.s8r.app` package depending on `org.s8r.infrastructure.config.DependencyContainer`
+- `org.s8r.infrastructure.config` package depending on `org.s8r.Samstraumr`
+
+Solution:
+1. Created a `ServiceFactory` interface in the application layer:
+   ```java
+   public interface ServiceFactory {
+       <T> T getService(Class<T> serviceType);
+       S8rFacade getFramework();
+       LoggerPort getLogger(Class<?> clazz);
+   }
+   ```
+
+2. Created a `ServiceLocator` class in the application layer:
+   ```java
+   public final class ServiceLocator {
+       private static ServiceFactory serviceFactory;
+       
+       public static ServiceFactory getServiceFactory() {
+           if (serviceFactory == null) {
+               throw new IllegalStateException("ServiceFactory has not been initialized");
+           }
+           return serviceFactory;
+       }
+       
+       public static void setServiceFactory(ServiceFactory factory) {
+           serviceFactory = factory;
+       }
+   }
+   ```
+
+3. Modified `DependencyContainer` to implement `ServiceFactory` and removed direct dependency on Samstraumr:
+   ```java
+   public class DependencyContainer implements ServiceFactory {
+       // Implementation of ServiceFactory methods
+       
+       // New method to register framework without direct import
+       public void registerFramework(S8rFacade framework) {
+           if (framework != null) {
+               register(S8rFacade.class, framework);
+           }
+       }
+   }
+   ```
+
+4. Updated `Samstraumr` to register itself with the container after ServiceLocator initialization:
+   ```java
+   private Samstraumr() {
+       this.container = DependencyContainer.getInstance();
+       this.logger = S8rLoggerFactory.getInstance().getLogger(Samstraumr.class);
+       
+       // Initialize the ServiceLocator
+       ServiceLocator.setServiceFactory(container);
+       
+       // Register this instance as the S8rFacade implementation
+       container.registerFramework(this);
+   }
+   ```
+
+5. Created a `LegacyAdapterResolver` interface in the application layer:
+   ```java
+   public interface LegacyAdapterResolver {
+       LegacyEnvironmentConverter getCoreEnvironmentConverter();
+       LegacyEnvironmentConverter getTubeEnvironmentConverter();
+       LegacyIdentityConverter getCoreIdentityConverter();
+       LegacyIdentityConverter getTubeIdentityConverter();
+   }
+   ```
+
+6. Implemented this interface in `LegacyAdapterFactory` using reflection to avoid direct dependencies on adapter classes
+
+This approach successfully broke the circular dependency between application and infrastructure layers, applying the Service Locator pattern and Dependency Inversion Principle. However, there are still issues with the adapter layer directly depending on legacy code that need to be addressed.
+
 ## Next Steps
 
-1. Fix adapter layer dependencies on core and tube:
-   - Apply Dependency Inversion Principle to create abstractions in the domain layer
-   - Move legacy conversion logic to a separate adapter structure
-   - Implement a proper dependency injection system
+1. Complete adapter layer independence from legacy code:
+   - Create domain interfaces for legacy types like TubeIdentity and Environment
+   - Use reflection or dynamic class loading to avoid direct imports
+   - Consider moving legacy code to a separate module
 
-2. Fix app package dependencies:
-   - Move to proper clean architecture layer (infrastructure or application)
-   - Create appropriate facade in the application layer
-   - Rewrite to follow dependency rules
+2. Fix event system issues:
+   - Standardize event naming conventions
+   - Implement event hierarchies that support polymorphic handling
+   - Ensure proper event propagation
 
 3. Add missing package-info.java files:
    - Start with the most important packages
    - Document package purpose and relationships
    - Ensure consistent style and format
 
-4. Fix event system issues:
-   - Standardize event naming conventions
-   - Implement event hierarchies that support polymorphic handling
-   - Ensure proper event propagation
+4. Reorganize top-level packages:
+   - Move app package contents to appropriate clean architecture layers
+   - Standardize package structure according to clean architecture principles

@@ -18,10 +18,10 @@ package org.s8r.infrastructure.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.s8r.Samstraumr;
 import org.s8r.infrastructure.persistence.InMemoryComponentRepository;
 import org.s8r.application.port.ComponentRepository;
 import org.s8r.application.port.EventDispatcher;
+import org.s8r.application.port.LegacyAdapterResolver;
 import org.s8r.application.port.LoggerFactory;
 import org.s8r.application.port.LoggerPort;
 import org.s8r.application.port.MachineRepository;
@@ -93,11 +93,15 @@ public class DependencyContainer implements ServiceFactory {
   
   /** Sets up legacy adapters. */
   private void setupLegacyAdapters() {
-    // Register legacy adapters
+    // Create and register the adapter resolver
+    LegacyAdapterFactory adapterFactory = LegacyAdapterFactory.getInstance();
+    register(LegacyAdapterResolver.class, adapterFactory);
+    
+    // Register the specific converter implementations
     register(org.s8r.domain.identity.LegacyEnvironmentConverter.class, 
-             LegacyAdapterFactory.getTubeEnvironmentConverter());
+             adapterFactory.getTubeEnvironmentConverter());
     register(org.s8r.domain.identity.LegacyIdentityConverter.class, 
-             LegacyAdapterFactory.getTubeIdentityConverter());
+             adapterFactory.getTubeIdentityConverter());
     
     LoggerPort logger = get(LoggerPort.class);
     logger.info("Initialized legacy adapters");
@@ -183,8 +187,7 @@ public class DependencyContainer implements ServiceFactory {
     MonitoringFactory monitoringFactory = new MonitoringFactory(dataFlowService);
     register(MonitoringFactory.class, monitoringFactory);
     
-    // Register Samstraumr as the implementation of S8rFacade
-    register(S8rFacade.class, Samstraumr.getInstance());
+    // We'll register the S8rFacade implementation later through registerFramework()
 
     logger.info("Initialized services");
   }
@@ -272,6 +275,20 @@ public class DependencyContainer implements ServiceFactory {
   public LoggerPort getLogger(Class<?> clazz) {
     LoggerFactory loggerFactory = get(LoggerFactory.class);
     return loggerFactory.getLogger(clazz);
+  }
+
+  /**
+   * Registers the framework facade implementation.
+   * This is called from the framework itself to avoid circular dependencies.
+   *
+   * @param framework The framework facade implementation
+   */
+  public void registerFramework(S8rFacade framework) {
+    if (framework != null) {
+      register(S8rFacade.class, framework);
+      LoggerPort logger = get(LoggerPort.class);
+      logger.info("Framework facade registered");
+    }
   }
 
   /** Resets the container, clearing all registered instances. */
