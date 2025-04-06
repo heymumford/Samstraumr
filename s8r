@@ -173,6 +173,7 @@ show_help() {
   echo "  docs             Generate project documentation"
   echo "  docmosis         Manage optional Docmosis integration"
   echo "  test-docmosis    Run a smoke test for Docmosis integration"
+  echo "  script-test      Test the build and test scripts themselves"
   echo "  install          Initialize or update project configuration"
   echo "  hooks            Install or update git hooks"
   echo "  demo             Run demonstration scripts"
@@ -210,7 +211,7 @@ parse_global_args() {
         show_help
         exit 0
         ;;
-      build|test|version|clean|coverage|quality|report|docs|docmosis|test-docmosis|install|hooks|demo)
+      build|test|version|clean|coverage|quality|report|docs|docmosis|test-docmosis|script-test|install|hooks|demo)
         COMMAND="$1"
         shift
         break
@@ -263,6 +264,9 @@ parse_global_args() {
       ;;
     test-docmosis)
       handle_test_docmosis_command "$@"
+      ;;
+    script-test)
+      handle_script_test_command "$@"
       ;;
     install)
       handle_install_command "$@"
@@ -884,6 +888,45 @@ function handle_docmosis_command() {
   return $?
 }
 
+function handle_script_test_command() {
+  # Check if this is a help request
+  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_script_test_help
+    return 0
+  fi
+  
+  # Run the script test
+  info "Running script tests..."
+  "${PROJECT_ROOT}/util/scripts/test-scripts.sh" "$@"
+}
+
+function show_script_test_help() {
+  echo -e "${BOLD}Samstraumr Script Tests${RESET} - Test the build and test scripts"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r script-test [options] [test_name]"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  --verbose, -v       Enable verbose output"
+  echo "  --help, -h          Display this help message"
+  echo
+  echo -e "${BOLD}AVAILABLE TESTS:${RESET}"
+  echo "  main                Test s8r main script"
+  echo "  version             Test s8r-version script"
+  echo "  test                Test s8r-test script"
+  echo "  build               Test s8r-build script"
+  echo "  ai-test             Test s8r-ai-test script"
+  echo "  performance         Test script performance"
+  echo "  dependencies        Test script dependencies"
+  echo "  integration         Test s8r integration"
+  echo "  all                 Run all tests (default)"
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  ./s8r script-test                # Run all script tests"
+  echo "  ./s8r script-test performance    # Test script performance only"
+  echo "  ./s8r script-test -v             # Run all tests with verbose output"
+}
+
 function handle_help_command() {
   local help_topic="$1"
   shift
@@ -915,6 +958,9 @@ function handle_help_command() {
       ;;
     test-docmosis)
       show_test_docmosis_help
+      ;;
+    script-test)
+      show_script_test_help
       ;;
     install)
       show_install_help
