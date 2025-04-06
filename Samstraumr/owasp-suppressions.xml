@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2025 Eric C. Mumford (@heymumford)
+
+This software was developed with analytical assistance from AI tools 
+including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+which were used as paid services. All intellectual property rights 
+remain exclusively with the copyright holder listed above.
+
+Licensed under the Mozilla Public License 2.0
+-->
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+   <!-- Example suppression -->
+   <!--
+   <suppress>
+      <notes>
+        <![CDATA[
+          False positive for CVE-XXXX-YYYY. We're using version z.y.z which has been patched.
+        ]]>
+      </notes>
+      <packageUrl regex="true">^pkg:maven/group\.name/artifact\.name@.*$</packageUrl>
+      <cve>CVE-XXXX-YYYY</cve>
+   </suppress>
+   -->
+   
+   <!-- Add specific suppressions here as needed -->
+</suppressions>
