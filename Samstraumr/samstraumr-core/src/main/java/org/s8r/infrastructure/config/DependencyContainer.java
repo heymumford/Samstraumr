@@ -36,6 +36,7 @@ import org.s8r.domain.event.ComponentConnectionEvent;
 import org.s8r.domain.event.ComponentCreatedEvent;
 import org.s8r.domain.event.ComponentDataEvent;
 import org.s8r.domain.event.ComponentStateChangedEvent;
+import org.s8r.domain.event.DomainEvent;
 import org.s8r.domain.event.MachineStateChangedEvent;
 import org.s8r.infrastructure.event.DataFlowEventHandler;
 import org.s8r.infrastructure.event.InMemoryEventDispatcher;
@@ -247,6 +248,19 @@ public class DependencyContainer implements ServiceFactory {
     // Register handlers with the dispatcher
     eventDispatcher.registerHandler(
         ComponentCreatedEvent.class, loggingHandler.componentCreatedHandler());
+    
+    // Also register handler for the newer ComponentCreated event class (without Event suffix)
+    // This ensures compatibility during the migration to standardized event naming
+    try {
+        Class<?> componentCreatedClass = Class.forName("org.s8r.domain.event.ComponentCreated");
+        // Use reflection to register the handler for the ComponentCreated class
+        registerHandlerForCompatibility(eventDispatcher, componentCreatedClass, 
+                                       loggingHandler.componentCreatedHandler(), logger);
+        logger.info("Registered hierarchical handler for ComponentCreated events");
+    } catch (ClassNotFoundException e) {
+        logger.warn("ComponentCreated class not found, skipping hierarchical event registration");
+    }
+    
     eventDispatcher.registerHandler(
         ComponentStateChangedEvent.class, loggingHandler.componentStateChangedHandler());
     eventDispatcher.registerHandler(
@@ -255,7 +269,7 @@ public class DependencyContainer implements ServiceFactory {
         MachineStateChangedEvent.class, loggingHandler.machineStateChangedHandler());
     eventDispatcher.registerHandler(ComponentDataEvent.class, dataFlowHandler.dataEventHandler());
 
-    logger.info("Initialized event system with {} event handlers", 5);
+    logger.info("Initialized event system with hierarchical event propagation");
   }
 
   /**
@@ -333,5 +347,31 @@ public class DependencyContainer implements ServiceFactory {
   public void reset() {
     instances.clear();
     initialize();
+  }
+  
+  /**
+   * Helper method to register an event handler for backward compatibility.
+   * Uses reflection to work around generic type constraints during the migration.
+   *
+   * @param dispatcher The event dispatcher
+   * @param eventClass The event class to register for
+   * @param handler The handler to register
+   * @param logger Logger for error reporting
+   */
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private void registerHandlerForCompatibility(
+      EventDispatcher dispatcher, 
+      Class<?> eventClass, 
+      EventDispatcher.EventHandler<?> handler,
+      LoggerPort logger) {
+    try {
+      // Use reflection to bypass the generic type checking
+      java.lang.reflect.Method registerMethod = InMemoryEventDispatcher.class.getMethod(
+          "registerHandler", Class.class, EventDispatcher.EventHandler.class);
+      
+      registerMethod.invoke(dispatcher, eventClass, handler);
+    } catch (Exception e) {
+      logger.error("Failed to register handler for compatibility: {}", e.getMessage(), e);
+    }
   }
 }

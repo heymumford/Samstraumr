@@ -60,6 +60,31 @@ public class ComponentInitializationException extends ComponentException {
     this.componentId = componentId;
     this.details = new HashMap<>();
   }
+  
+  /**
+   * Creates a new ComponentInitializationException with the specified error message.
+   * This constructor is used for general initialization errors not tied to a specific component.
+   *
+   * @param message The error message
+   */
+  public ComponentInitializationException(String message) {
+    super(message);
+    this.componentId = null;
+    this.details = new HashMap<>();
+  }
+
+  /**
+   * Creates a new ComponentInitializationException with the specified error message and cause.
+   * This constructor is used for general initialization errors not tied to a specific component.
+   *
+   * @param message The error message
+   * @param cause The cause of the exception
+   */
+  public ComponentInitializationException(String message, Throwable cause) {
+    super(message, cause);
+    this.componentId = null;
+    this.details = new HashMap<>();
+  }
 
   /**
    * Adds a detail to this exception to provide more context about the initialization failure.

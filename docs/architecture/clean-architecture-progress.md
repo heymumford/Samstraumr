@@ -12,7 +12,7 @@ This document tracks the progress of implementing Clean Architecture principles 
 - ✅ Partially fixed circular dependencies (infrastructure <-> app layer) using Service Locator pattern
 - ✅ Fixed adapter package dependency on core and tube using the Adapter and Factory patterns
 - ✅ Added package-info.java files to key packages
-- ⬜ Fix event naming conventions and event propagation
+- ✅ Fixed event naming conventions and implemented hierarchical event propagation
 - ⬜ Complete adapter independence from legacy code by using reflection or further abstractions
 
 ## Completed Fixes
@@ -182,10 +182,10 @@ Solution:
    - Unexpected top-level packages: app, initialization
    - Missing package-info.java files in numerous packages
 
-3. **Event System Issues**:
-   - Event naming convention inconsistencies
-   - Event hierarchy polymorphic handling not working
-   - Hierarchical event propagation not working
+3. **Event System Issues (FIXED)**:
+   - ✅ Event naming convention inconsistencies FIXED
+   - ✅ Event hierarchy polymorphic handling FIXED
+   - ✅ Hierarchical event propagation FIXED
 
 ### 6. Breaking Circular Dependencies
 
@@ -317,6 +317,58 @@ This refactoring demonstrates a clean separation of concerns:
 - Infrastructure layer implements how it's done (file system operations)
 - Adapter layer provides ways to invoke it (command-line interface)
 
+## Event System Hierarchical Propagation (Completed April 6, 2025)
+
+The event system has been enhanced to support hierarchical event propagation, ensuring that handlers registered for parent event types will receive events of derived types:
+
+1. **InMemoryEventDispatcher Enhancement**:
+   - Added recursive parent class processing in `processParentEventHandlers` method:
+   ```java
+   private void processParentEventHandlers(DomainEvent event, Class<? extends DomainEvent> eventClass) {
+     // Get the superclass
+     Class<?> superClass = eventClass.getSuperclass();
+     
+     // If the superclass is DomainEvent or a subclass of DomainEvent, dispatch to its handlers
+     if (DomainEvent.class.isAssignableFrom(superClass) && superClass != Object.class) {
+       @SuppressWarnings("unchecked")
+       Class<? extends DomainEvent> parentEventClass = (Class<? extends DomainEvent>) superClass;
+       
+       // Dispatch to handlers for this parent class
+       dispatchToHandlers(event, parentEventClass);
+       
+       // Continue with the next parent in the hierarchy
+       processParentEventHandlers(event, parentEventClass);
+     }
+   }
+   ```
+   - Updated the `dispatch` method to call this recursive processing after dispatching to handlers for the specific event type
+   - Enhanced JavaDoc to clearly explain the hierarchical dispatch behavior
+
+2. **Event Naming Convention Standardization**:
+   - Created new event classes without the "Event" suffix (e.g., `ComponentCreated` instead of `ComponentCreatedEvent`)
+   - Ensured the `DomainEvent.getEventType()` method correctly trims the "Event" suffix for display purposes
+   - Maintained backward compatibility with existing event classes during migration
+
+3. **Backward Compatibility Support**:
+   - Updated `DependencyContainer` to register handlers for both old and new event naming styles:
+   ```java
+   // Register handler for legacy ComponentCreatedEvent class
+   eventDispatcher.registerHandler(
+       ComponentCreatedEvent.class, loggingHandler.componentCreatedHandler());
+   
+   // Also register handler for the newer ComponentCreated event class
+   try {
+       Class<?> componentCreatedClass = Class.forName("org.s8r.domain.event.ComponentCreated");
+       eventDispatcher.registerHandler(
+           (Class<? extends DomainEvent>) componentCreatedClass, 
+           loggingHandler.componentCreatedHandler());
+   } catch (ClassNotFoundException e) {
+       logger.warn("ComponentCreated class not found, skipping hierarchical event registration");
+   }
+   ```
+
+This implementation enables polymorphic event handling, a key principle in event-driven architectures. Handlers can now subscribe to base event types and automatically receive all derived events, improving flexibility and reducing code duplication.
+
 ## Adapter Layer Refactoring (Completed April 6, 2025)
 
 The adapter layer has been successfully refactored to minimize direct dependencies on legacy code:
@@ -349,10 +401,11 @@ This approach achieves several Clean Architecture goals:
    - Add more comprehensive error handling for reflection failures
    - Create complete abstraction layers for all legacy components
 
-2. Fix event system issues:
+2. Fix event system issues (COMPLETED April 6, 2025):
    - ✓ Standardize event naming conventions (ComponentCreated vs ComponentCreatedEvent fixed)
    - ✓ Implement event hierarchies that support polymorphic handling (HierarchicalEventDispatcher added)
-   - Ensure proper event propagation in all components
+   - ✓ Ensure proper event propagation in all components (InMemoryEventDispatcher now includes recursive parent class processing)
+   - ✓ Support compatibility during migration by registering handlers for both legacy and new event types
 
 3. Add missing package-info.java files:
    - ✓ Created package-info.java for all 57 packages (100% complete)

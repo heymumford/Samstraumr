@@ -77,7 +77,9 @@ This document outlines the plan to address the quality issues identified in the 
 - [x] Create ComponentCreated class (renamed from ComponentCreatedEvent)
 - [x] Create HierarchicalEventDispatcher for tests
 - [x] Update TestComponentFactory to use HierarchicalEventDispatcher
-- [ ] Refactor event handlers to properly handle hierarchical events
+- [x] Implement hierarchical event propagation in InMemoryEventDispatcher
+- [x] Add support for registering handlers for both legacy and new event types
+- [x] Update DependencyContainer to register handlers for both ComponentCreatedEvent and ComponentCreated
 
 ### 4. Test Standardization
 
