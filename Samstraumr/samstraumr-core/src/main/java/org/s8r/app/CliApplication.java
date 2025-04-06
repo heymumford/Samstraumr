@@ -18,11 +18,12 @@ package org.s8r.app;
 import java.util.List;
 import java.util.Scanner;
 
+import org.s8r.application.ServiceLocator;
 import org.s8r.application.dto.ComponentDto;
 import org.s8r.application.dto.MachineDto;
 import org.s8r.application.port.LoggerPort;
 import org.s8r.application.port.S8rFacade;
-import org.s8r.infrastructure.config.DependencyContainer;
+import org.s8r.application.port.ServiceFactory;
 
 /**
  * A simple CLI application that demonstrates the S8r framework.
@@ -31,8 +32,17 @@ import org.s8r.infrastructure.config.DependencyContainer;
  * functionality, showing how to use the Samstraumr facade.
  */
 public class CliApplication {
-  private static final LoggerPort logger = DependencyContainer.getInstance().get(LoggerPort.class);
-  private static final S8rFacade framework = DependencyContainer.getInstance().get(S8rFacade.class);
+  private static ServiceFactory serviceFactory;
+  private static LoggerPort logger;
+  private static S8rFacade framework;
+  
+  static {
+    // Use service locator pattern to get the service factory
+    // This avoids direct dependency on the implementation class
+    serviceFactory = ServiceLocator.getServiceFactory();
+    logger = serviceFactory.getLogger(CliApplication.class);
+    framework = serviceFactory.getFramework();
+  }
 
   /**
    * Main method.

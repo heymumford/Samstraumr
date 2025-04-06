@@ -18,14 +18,15 @@ package org.s8r.infrastructure.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.s8r.infrastructure.persistence.InMemoryComponentRepository;
 import org.s8r.Samstraumr;
+import org.s8r.infrastructure.persistence.InMemoryComponentRepository;
 import org.s8r.application.port.ComponentRepository;
 import org.s8r.application.port.EventDispatcher;
 import org.s8r.application.port.LoggerFactory;
 import org.s8r.application.port.LoggerPort;
 import org.s8r.application.port.MachineRepository;
 import org.s8r.application.port.S8rFacade;
+import org.s8r.application.port.ServiceFactory;
 import org.s8r.application.service.ComponentService;
 import org.s8r.application.service.DataFlowService;
 import org.s8r.application.service.MachineService;
@@ -48,8 +49,11 @@ import org.s8r.infrastructure.persistence.InMemoryMachineRepository;
  * <p>This class provides a simple dependency injection container that creates and manages instances
  * of framework components, ensuring proper wiring between layers according to Clean Architecture
  * principles.
+ * 
+ * <p>It implements the ServiceFactory interface to provide a clean abstraction for client code,
+ * allowing access to services without direct dependency on this infrastructure component.
  */
-public class DependencyContainer {
+public class DependencyContainer implements ServiceFactory {
   private final Map<Class<?>, Object> instances = new HashMap<>();
   private final Configuration config;
   private static final DependencyContainer instance = new DependencyContainer();
@@ -219,6 +223,40 @@ public class DependencyContainer {
   @SuppressWarnings("unchecked")
   public <T> T get(Class<T> type) {
     return (T) instances.get(type);
+  }
+  
+  /**
+   * Implementation of ServiceFactory.getService.
+   *
+   * @param <T> The service type
+   * @param serviceType The class of the service type
+   * @return The service instance
+   */
+  @Override
+  public <T> T getService(Class<T> serviceType) {
+    return get(serviceType);
+  }
+  
+  /**
+   * Implementation of ServiceFactory.getFramework.
+   *
+   * @return The framework facade
+   */
+  @Override
+  public S8rFacade getFramework() {
+    return get(S8rFacade.class);
+  }
+  
+  /**
+   * Implementation of ServiceFactory.getLogger.
+   *
+   * @param clazz The class requesting the logger
+   * @return The logger
+   */
+  @Override
+  public LoggerPort getLogger(Class<?> clazz) {
+    LoggerFactory loggerFactory = get(LoggerFactory.class);
+    return loggerFactory.getLogger(clazz);
   }
 
   /** Resets the container, clearing all registered instances. */

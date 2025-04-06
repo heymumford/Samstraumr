@@ -17,6 +17,7 @@ package org.s8r;
 
 import java.util.List;
 
+import org.s8r.application.ServiceLocator;
 import org.s8r.application.dto.ComponentDto;
 import org.s8r.application.dto.MachineDto;
 import org.s8r.application.port.LoggerPort;
@@ -45,6 +46,11 @@ public class Samstraumr implements S8rFacade {
   private Samstraumr() {
     this.container = DependencyContainer.getInstance();
     this.logger = S8rLoggerFactory.getInstance().getLogger(Samstraumr.class);
+    
+    // Initialize the ServiceLocator with the DependencyContainer
+    // This breaks the circular dependency by using the Service Locator pattern
+    ServiceLocator.setServiceFactory(container);
+    
     logger.info("Samstraumr framework initialized");
   }
 
