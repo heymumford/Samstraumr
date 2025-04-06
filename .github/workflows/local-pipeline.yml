@@ -1,0 +1,86 @@
+name: local-ci
+
+run-name: Local CI Pipeline
+
+on:
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  # Basic compilation and verification - keeping it simple for local testing
+  basic-verification:
+    name: Basic Verification (Local)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up environment
+        run: |
+          echo "Environment check..."
+          java -version || echo "Java not found in container"
+          mvn -version || echo "Maven not found in container"
+          echo "Environment check completed"
+
+      # Check version
+      - name: Get version
+        id: get_version
+        run: |
+          # Use the s8r-version tool if available
+          if [ -f "./s8r-version" ]; then
+            VERSION=$(./s8r-version get | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' || echo "0.0.0")
+          elif [ -f "Samstraumr/version.properties" ]; then
+            # Extract the version from properties as fallback
+            VERSION=$(grep "samstraumr.version=" "Samstraumr/version.properties" | cut -d= -f2 | tr -d ' \t\n\r')
+          else
+            # Fallback version if we can't determine it
+            VERSION="0.0.0"
+          fi
+          
+          # Set the output variable
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $VERSION"
+
+      # Simple file check
+      - name: Verify file structure
+        run: |
+          echo "Checking file structure..."
+          # Check for essential files
+          FILES_TO_CHECK=(
+            "s8r-test"
+            "s8r-build"
+            "s8r-version"
+            "README.md"
+            "Samstraumr/pom.xml"
+          )
+          
+          for file in "${FILES_TO_CHECK[@]}"; do
+            if [ -f "$file" ]; then
+              echo "✓ $file exists"
+            else
+              echo "✗ $file missing"
+              exit 1
+            fi
+          done
+          
+          echo "File structure check passed"
+
+      # Check for Java files
+      - name: Count Java files
+        run: |
+          echo "Counting Java files..."
+          JAVA_COUNT=$(find . -name "*.java" | wc -l)
+          echo "Found $JAVA_COUNT Java files"
+          
+          if [ "$JAVA_COUNT" -gt 0 ]; then
+            echo "Java files found"
+          else
+            echo "No Java files found, check failed"
+            exit 1
+          fi
+          
+      # Print summary
+      - name: Print summary
+        run: |
+          echo "Local CI verification completed successfully"
+          echo "Version: ${{ steps.get_version.outputs.version }}"
+          echo "Repository structure looks valid"

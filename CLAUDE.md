@@ -11,7 +11,7 @@ This document serves as a reference for Claude when working with the Samstraumr 
 When working with CI/CD pipelines, the following commands are available:
 
 ```bash
-# Run the CI pipeline locally using act
+# Run the local CI pipeline using act (safest option)
 ./s8r-ci
 
 # Run a specific job from the CI pipeline
@@ -20,11 +20,14 @@ When working with CI/CD pipelines, the following commands are available:
 # Run the CI pipeline in dry-run mode (shows what would happen without executing)
 ./s8r-ci --dry-run
 
-# Run a different workflow
-./s8r-ci --workflow smoke-test.yml
+# Run the full CI workflow (requires Docker image with Maven)
+./s8r-ci --workflow samstraumr-pipeline.yml
 
 # Run CI with verbose output
 ./s8r-ci --verbose
+
+# Run CI as part of the build
+./s8r-build fast --ci
 ```
 
 ## Quality Check Commands

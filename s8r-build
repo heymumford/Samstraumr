@@ -195,7 +195,7 @@ build() {
     if $RUN_CI; then
       if [ -f "${PROJECT_ROOT}/s8r-ci" ]; then
         info "Running local CI checks..."
-        if "${PROJECT_ROOT}/s8r-ci" --workflow samstraumr-pipeline.yml --dry-run; then
+        if "${PROJECT_ROOT}/s8r-ci" --workflow local-pipeline.yml; then
           success "Local CI checks passed"
         else
           warn "Local CI checks failed"

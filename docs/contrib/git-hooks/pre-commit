@@ -39,7 +39,7 @@ if git diff --cached --name-only --diff-filter=ACM | grep -q "\.java$"; then
   info "Java files changed. Running basic CI checks..."
   
   # Run the most basic verification only to keep it fast
-  if ! "${PROJECT_ROOT}/s8r-ci" --job basic-verification --dry-run; then
+  if ! "${PROJECT_ROOT}/s8r-ci" --workflow local-pipeline.yml --job basic-verification --dry-run; then
     error "Local CI check would fail. Fix the issues or use git commit --no-verify to bypass this check."
     exit 1
   fi

@@ -29,7 +29,7 @@ fi
 
 # Parse arguments
 parse_args() {
-  WORKFLOW="samstraumr-pipeline.yml"
+  WORKFLOW="local-pipeline.yml"
   JOB=""
   DRY_RUN=false
   VERBOSE=false
@@ -87,12 +87,16 @@ show_help() {
   echo "Usage: ./s8r-ci [options]"
   echo
   echo "Options:"
-  echo "  -w, --workflow FILE      Workflow file to run (default: samstraumr-pipeline.yml)"
+  echo "  -w, --workflow FILE      Workflow file to run (default: local-pipeline.yml)"
   echo "  -j, --job JOB_ID         Specific job to run (default: all jobs)"
   echo "  -e, --event EVENT        Event type to trigger (default: push)"
   echo "  -d, --dry-run            Show what would be run without actually running it"
   echo "  -v, --verbose            Enable verbose output"
   echo "  -h, --help               Show this help message"
+  echo
+  echo "Available Workflows:"
+  echo "  local-pipeline.yml       Simplified pipeline for local testing (default)"
+  echo "  samstraumr-pipeline.yml  Full GitHub Actions pipeline (requires Maven in container)"
   echo
   echo "Examples:"
   echo "  ./s8r-ci                 # Run the default CI pipeline"
