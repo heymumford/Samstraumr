@@ -25,6 +25,9 @@ Port interfaces are a core concept in hexagonal architecture (also known as "por
 | `EventPublisherPort` | Secondary | org.s8r.application.port | Interface for publishing domain events |
 | `DataFlowEventPort` | Secondary | org.s8r.application.port | Interface for component data flow |
 | `LoggerPort` | Secondary | org.s8r.application.port | Interface for logging |
+| `ConfigurationPort` | Secondary | org.s8r.application.port | Interface for configuration access |
+| `ValidationPort` | Secondary | org.s8r.application.port | Interface for data validation |
+| `NotificationPort` | Secondary | org.s8r.application.port | Interface for sending notifications |
 
 ## Implementations and Adapters
 
@@ -39,6 +42,9 @@ Port interfaces are a core concept in hexagonal architecture (also known as "por
 | `EventPublisherAdapter` | Infrastructure | EventPublisherPort | Implements event publishing |
 | `DataFlowEventHandler` | Infrastructure | DataFlowEventPort | Handles data flow events |
 | `DataFlowComponentAdapter` | Infrastructure | DataFlowComponentPort | Adapts component data flow operations |
+| `ConfigurationAdapter` | Infrastructure | ConfigurationPort | Adapts configuration access |
+| `ValidationAdapter` | Infrastructure | ValidationPort | Adapts validation operations |
+| `NotificationAdapter` | Infrastructure | NotificationPort | Adapts notification operations |
 | `ComponentCliAdapter` | Primary | N/A | CLI adapter for component operations |
 
 ## Clean Architecture Implementation

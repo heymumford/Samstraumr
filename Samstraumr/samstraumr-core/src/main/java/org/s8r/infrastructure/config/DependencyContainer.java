@@ -33,6 +33,7 @@ import org.s8r.application.service.MachineService;
 import org.s8r.domain.component.monitoring.MonitoringFactory;
 import org.s8r.domain.component.pattern.PatternFactory;
 import org.s8r.domain.event.ComponentConnectionEvent;
+import org.s8r.domain.event.ComponentCreated;
 import org.s8r.domain.event.ComponentCreatedEvent;
 import org.s8r.domain.event.ComponentDataEvent;
 import org.s8r.domain.event.ComponentStateChangedEvent;
@@ -76,8 +77,17 @@ public class DependencyContainer implements ServiceFactory {
 
   /** Initializes the container with standard dependencies. */
   private void initialize() {
-    // Set up logger first
+    // Set up configuration port first
+    setupConfiguration();
+    
+    // Set up logger next
     setupLogger();
+    
+    // Set up validation port
+    setupValidation();
+    
+    // Set up notification port
+    setupNotification();
 
     // Set up event system
     setupEventSystem();
@@ -90,6 +100,45 @@ public class DependencyContainer implements ServiceFactory {
 
     // Create services
     setupServices();
+  }
+  
+  /** Sets up the configuration port. */
+  private void setupConfiguration() {
+    // Create the configuration adapter
+    ConfigurationAdapter configurationAdapter = new ConfigurationAdapter();
+    
+    // Register it as implementation of the port interface
+    register(org.s8r.application.port.ConfigurationPort.class, configurationAdapter);
+  }
+  
+  /** Sets up the validation port. */
+  private void setupValidation() {
+    LoggerPort logger = get(LoggerPort.class);
+    
+    // Create the validation adapter
+    org.s8r.infrastructure.validation.ValidationAdapter validationAdapter = 
+        new org.s8r.infrastructure.validation.ValidationAdapter(logger);
+    
+    // Register it as implementation of the port interface
+    register(org.s8r.application.port.ValidationPort.class, validationAdapter);
+    
+    logger.debug("Validation port initialized");
+  }
+  
+  /** Sets up the notification port. */
+  private void setupNotification() {
+    LoggerPort logger = get(LoggerPort.class);
+    org.s8r.application.port.ConfigurationPort configurationPort = 
+        get(org.s8r.application.port.ConfigurationPort.class);
+    
+    // Create the notification adapter
+    org.s8r.infrastructure.notification.NotificationAdapter notificationAdapter = 
+        new org.s8r.infrastructure.notification.NotificationAdapter(logger, configurationPort);
+    
+    // Register it as implementation of the port interface
+    register(org.s8r.application.port.NotificationPort.class, notificationAdapter);
+    
+    logger.debug("Notification port initialized");
   }
   
   /** Sets up legacy adapters. */
@@ -128,7 +177,11 @@ public class DependencyContainer implements ServiceFactory {
 
   /** Sets up the logger based on configuration. */
   private void setupLogger() {
-    String logImpl = config.get("log.implementation", "SLF4J");
+    // Get the ConfigurationPort from the container
+    org.s8r.application.port.ConfigurationPort configurationPort = 
+        get(org.s8r.application.port.ConfigurationPort.class);
+    
+    String logImpl = configurationPort.getString("log.implementation", "SLF4J");
     
     // Create and configure the logger factory
     S8rLoggerFactory loggerFactory = S8rLoggerFactory.getInstance();
@@ -151,25 +204,37 @@ public class DependencyContainer implements ServiceFactory {
 
   /** Sets up repositories based on configuration. */
   private void setupRepositories() {
-    String repoImpl = config.get("repository.implementation", "IN_MEMORY");
+    // Get the ConfigurationPort from the container
+    org.s8r.application.port.ConfigurationPort configurationPort = 
+        get(org.s8r.application.port.ConfigurationPort.class);
+    
+    String repoImpl = configurationPort.getString("repository.implementation", "IN_MEMORY");
     LoggerPort logger = get(LoggerPort.class);
 
     if ("IN_MEMORY".equalsIgnoreCase(repoImpl)) {
-      // Create in-memory repositories
-      InMemoryComponentRepository componentRepository = new InMemoryComponentRepository();
-      InMemoryMachineRepository machineRepository = new InMemoryMachineRepository();
+      // Create in-memory repositories with port interface support
+      InMemoryComponentRepository componentRepository = new InMemoryComponentRepository(logger);
+      InMemoryMachineRepository machineRepository = new InMemoryMachineRepository(logger);
 
       register(ComponentRepository.class, componentRepository);
       register(MachineRepository.class, machineRepository);
 
-      logger.info("Initialized repositories with IN_MEMORY implementation");
+      // Create and register the port adapter factory
+      PortAdapterFactory portAdapterFactory = new PortAdapterFactory(logger);
+      register(PortAdapterFactory.class, portAdapterFactory);
+
+      logger.info("Initialized repositories with IN_MEMORY implementation and port adapters");
     } else {
       // Default to in-memory if not recognized
-      InMemoryComponentRepository componentRepository = new InMemoryComponentRepository();
-      InMemoryMachineRepository machineRepository = new InMemoryMachineRepository();
+      InMemoryComponentRepository componentRepository = new InMemoryComponentRepository(logger);
+      InMemoryMachineRepository machineRepository = new InMemoryMachineRepository(logger);
 
       register(ComponentRepository.class, componentRepository);
       register(MachineRepository.class, machineRepository);
+
+      // Create and register the port adapter factory
+      PortAdapterFactory portAdapterFactory = new PortAdapterFactory(logger);
+      register(PortAdapterFactory.class, portAdapterFactory);
 
       logger.warn("Unknown repository implementation: " + repoImpl + ", using IN_MEMORY instead");
     }
@@ -182,6 +247,27 @@ public class DependencyContainer implements ServiceFactory {
     MachineRepository machineRepository = get(MachineRepository.class);
     EventDispatcher eventDispatcher = get(EventDispatcher.class);
     DataFlowEventHandler dataFlowHandler = get(DataFlowEventHandler.class);
+    org.s8r.application.port.ConfigurationPort configurationPort = 
+        get(org.s8r.application.port.ConfigurationPort.class);
+    org.s8r.application.port.ValidationPort validationPort = 
+        get(org.s8r.application.port.ValidationPort.class);
+    org.s8r.application.port.NotificationPort notificationPort = 
+        get(org.s8r.application.port.NotificationPort.class);
+
+    // Create ConfigurationService
+    org.s8r.application.service.ConfigurationService configurationService =
+        new org.s8r.application.service.ConfigurationService(configurationPort, logger);
+    register(org.s8r.application.service.ConfigurationService.class, configurationService);
+    
+    // Create ValidationService
+    org.s8r.application.service.ValidationService validationService =
+        new org.s8r.application.service.ValidationService(validationPort, logger);
+    register(org.s8r.application.service.ValidationService.class, validationService);
+    
+    // Create NotificationService
+    org.s8r.application.service.NotificationService notificationService =
+        new org.s8r.application.service.NotificationService(notificationPort, logger);
+    register(org.s8r.application.service.NotificationService.class, notificationService);
 
     // Create ComponentService
     ComponentService componentService =
@@ -249,17 +335,11 @@ public class DependencyContainer implements ServiceFactory {
     eventDispatcher.registerHandler(
         ComponentCreatedEvent.class, loggingHandler.componentCreatedHandler());
     
-    // Also register handler for the newer ComponentCreated event class (without Event suffix)
-    // This ensures compatibility during the migration to standardized event naming
-    try {
-        Class<?> componentCreatedClass = Class.forName("org.s8r.domain.event.ComponentCreated");
-        // Use reflection to register the handler for the ComponentCreated class
-        registerHandlerForCompatibility(eventDispatcher, componentCreatedClass, 
-                                       loggingHandler.componentCreatedHandler(), logger);
-        logger.info("Registered hierarchical handler for ComponentCreated events");
-    } catch (ClassNotFoundException e) {
-        logger.warn("ComponentCreated class not found, skipping hierarchical event registration");
-    }
+    // Register the new-style ComponentCreated event handler (without Event suffix)
+    // This supports the new Clean Architecture event model
+    eventDispatcher.registerHandler(
+        ComponentCreated.class, loggingHandler.componentCreatedHandlerNew());
+    logger.info("Registered handler for new-style ComponentCreated events");
     
     eventDispatcher.registerHandler(
         ComponentStateChangedEvent.class, loggingHandler.componentStateChangedHandler());
