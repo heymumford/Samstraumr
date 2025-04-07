@@ -19,7 +19,7 @@ This document provides a status overview of all planning documents in the Samstr
 |                                     Document                                     |                          Description                          |     Status     | Last Updated |
 |----------------------------------------------------------------------------------|---------------------------------------------------------------|----------------|--------------|
 | [documentation-standardization-plan.md](./documentation-standardization-plan.md) | Plan for standardizing documentation formats and organization | 🔄 In Progress | 2025-04-04   |
-| [kanban.md](./k-a-n-b-a-n.md)                                                    | Kanban board tracking all current tasks                       | 🔄 Active      | 2025-04-04   |
+| [kanban.md](./KANBAN.md)                                                    | Kanban board tracking all current tasks                       | 🔄 Active      | 2025-04-07   |
 
 ## Completed Plans
 
@@ -29,6 +29,7 @@ This document provides a status overview of all planning documents in the Samstr
 | [test-refactoring-summary.md](./test-refactoring-summary.md)         | Summary of test system refactoring        | 2025-04-04      | ✅ Implemented unified test runner               |
 | [file-reorganization-progress.md](./file-reorganization-progress.md) | Status of file reorganization efforts     | 2025-04-03      | ✅ Completed major file reorganization           |
 | [script-reorganization.md](./script-reorganization.md)               | Plan for reorganizing scripts             | 2025-04-03      | ✅ Simplified script structure                   |
+| [completed-port-bdd-test-implementation.md](./completed-port-bdd-test-implementation.md) | ComponentRepository BDD test implementation | 2025-04-07 | ✅ Implemented BDD tests for ComponentRepository |
 
 ## Archived Plans
 
@@ -36,7 +37,7 @@ These plans have been completed, superseded, or are no longer relevant, but are 
 
 |                           Document                           |  Original Name   | Archival Date |                   Reason                    |
 |--------------------------------------------------------------|------------------|---------------|---------------------------------------------|
-| [archived-temp-reorg-plan.md](./archived-temp-reorg-plan.md) | TempReorgPlan.md | 2025-04-04    | Superseded by completed file reorganization |
+| [archived-temp-reorg-plan.md](./archived/archived-temp-reorg-plan.md) | TempReorgPlan.md | 2025-04-04    | Superseded by completed file reorganization |
 
 ## Obsolete Plans (to Be Removed)
 
