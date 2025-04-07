@@ -20,7 +20,6 @@ This document tracks the progress of tasks in the S8r project.
 - Implement feedback mechanism for migration issues
 - Update documentation with component diagrams
 - Implement Clean Architecture verification in CI/CD
-- Implement remaining port interfaces according to TDD plan (ValidationPort, PersistencePort)
 
 ## Tasks In Progress
 
@@ -31,6 +30,7 @@ This document tracks the progress of tasks in the S8r project.
 - Finalize documentation for the migration utilities
 - Implement integration test suite for port interfaces working together
 - Create BDD tests for remaining port interfaces
+- Implement remaining port interfaces according to TDD plan (ValidationPort, PersistencePort)
 
 ## Tasks Done
 
