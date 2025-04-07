@@ -2,7 +2,7 @@
 #==============================================================================
 # Filename: standardize-planning-filenames.sh
 # Description: Standardizes filenames in the planning directory to follow 
-#              project naming conventions (PascalCase for documentation)
+#              project naming conventions (kebab-case for documentation)
 #==============================================================================
 
 # Determine script paths
@@ -56,37 +56,46 @@ fi
 # Planning directory to process
 PLANNING_DIR="${PROJECT_ROOT}/docs/planning"
 
-# Function to convert filename to PascalCase
-# Converts: kebab-case, snake_case, or space separated names
-function to_pascal_case() {
+# Function to convert filename to kebab-case
+# Converts: PascalCase, camelCase, snake_case, or space separated names
+function to_kebab_case() {
   local filename="$1"
   local basename="${filename%.*}"  # Remove extension
   local extension="${filename##*.}"  # Keep extension
   
-  # Special case for uppercase files like README.md or KANBAN.md
-  if [[ "$basename" =~ ^[A-Z]+$ ]]; then
+  # Special cases 
+  # 1. Files that should remain uppercase (README.md, KANBAN.md)
+  if [[ "$basename" == "README" || "$basename" == "KANBAN" ]]; then
     echo "$filename"
     return
   fi
   
-  # Replace hyphens and underscores with spaces
-  local spaced="${basename//-/ }"
-  spaced="${spaced//_/ }"
+  # 2. UPPERCASE files with hyphens like VALIDATION-TODOS
+  if [[ "$basename" =~ ^[A-Z-]+$ ]]; then
+    # Convert to lowercase keeping hyphens
+    local lowercase=$(echo "$basename" | tr '[:upper:]' '[:lower:]')
+    echo "${lowercase}.${extension}"
+    return
+  fi
   
-  # Capitalize each word and remove spaces
-  local pascal_case=""
-  for word in $spaced; do
-    # Keep existing capitalization for acronyms (like ATL, BTL, TDD)
-    if [[ "$word" =~ ^[A-Z]{2,}$ ]]; then
-      pascal_case="${pascal_case}${word}"
-    else
-      # Capitalize first letter, keep rest as is
-      pascal_case="${pascal_case}${word^}"
-    fi
-  done
+  # Convert PascalCase or camelCase to kebab-case
+  # First, add a hyphen before each capital letter and lowercase everything
+  local kebab=$(echo "$basename" | sed -E 's/([A-Z])/-\L\1/g')
+  
+  # Replace underscores with hyphens
+  kebab="${kebab//_/-}"
+  
+  # Replace spaces with hyphens
+  kebab="${kebab// /-}"
+  
+  # Remove leading hyphen if it exists
+  kebab="${kebab#-}"
+  
+  # Replace multiple consecutive hyphens with a single one
+  kebab=$(echo "$kebab" | sed -E 's/-+/-/g')
   
   # Return result with extension
-  echo "${pascal_case}.${extension}"
+  echo "${kebab}.${extension}"
 }
 
 # Function to apply standardization to a specific directory
@@ -146,7 +155,7 @@ function standardize_directory() {
         
         # Only process Markdown files
         if [[ "$extension" == "md" ]]; then
-          local standardized_name=$(to_pascal_case "$filename")
+          local standardized_name=$(to_kebab_case "$filename")
           
           # If the filename needs to be changed
           if [[ "$filename" != "$standardized_name" ]]; then
@@ -219,7 +228,7 @@ function standardize_directory() {
         
         # Only process Markdown files
         if [[ "$extension" == "md" ]]; then
-          local standardized_name=$(to_pascal_case "$filename")
+          local standardized_name=$(to_kebab_case "$filename")
           
           # If the filename needs to be changed
           if [[ "$filename" != "$standardized_name" ]]; then
@@ -265,7 +274,7 @@ function standardize_directory() {
       echo "## Naming Conventions"
       echo "- README.md files remain in UPPER_CASE"
       echo "- KANBAN.md remains in UPPER_CASE"
-      echo "- Other markdown files use PascalCase"
+      echo "- Other markdown files use kebab-case"
       echo
       echo "## Results"
       echo
@@ -277,7 +286,7 @@ function standardize_directory() {
         echo
         echo "### Renamed Files"
         echo
-        echo "Files were renamed to follow PascalCase convention."
+        echo "Files were renamed to follow kebab-case convention."
       fi
     } > "$report_file"
     
@@ -321,8 +330,8 @@ function main() {
           echo ""
           print_bold "DESCRIPTION:"
           echo "  This script standardizes filenames in the planning directory to follow"
-          echo "  the project's naming conventions (PascalCase for documentation files)."
-          echo "  For example, 'refactoring-summary.md' becomes 'RefactoringSummary.md'."
+          echo "  the project's naming conventions (kebab-case for documentation files)."
+          echo "  For example, 'RefactoringSummary.md' becomes 'refactoring-summary.md'."
           echo ""
         else
           print_header "Planning Document Filename Standardization"
@@ -338,8 +347,8 @@ function main() {
           echo ""
           echo "DESCRIPTION:"
           echo "  This script standardizes filenames in the planning directory to follow"
-          echo "  the project's naming conventions (PascalCase for documentation files)."
-          echo "  For example, 'refactoring-summary.md' becomes 'RefactoringSummary.md'."
+          echo "  the project's naming conventions (kebab-case for documentation files)."
+          echo "  For example, 'RefactoringSummary.md' becomes 'refactoring-summary.md'."
           echo ""
         fi
         exit 0
@@ -369,13 +378,26 @@ function main() {
   fi
   
   # Create reports directory if using the library
-  if [[ "$USING_LIB" == true ]] && [ ! -d "$REPORT_DIR" ]; then
-    mkdir -p "$REPORT_DIR"
+  if [[ "$USING_LIB" == true ]]; then
+    REPORT_DIR="${PROJECT_ROOT}/reports/docs"
+    if [ ! -d "$REPORT_DIR" ]; then
+      mkdir -p "$REPORT_DIR"
+    fi
   fi
   
-  # Run standardization
+  # Run standardization on main directory and all subdirectories
   standardize_directory "$PLANNING_DIR" "$dry_run"
-  exit $?
+  local main_result=$?
+  
+  # Process subdirectories if they exist
+  for subdir in "$PLANNING_DIR"/*; do
+    if [ -d "$subdir" ]; then
+      print_info "Processing subdirectory: $subdir"
+      standardize_directory "$subdir" "$dry_run"
+    fi
+  done
+  
+  exit $main_result
 }
 
 # Run the main function

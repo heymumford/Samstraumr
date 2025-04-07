@@ -67,18 +67,18 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
    - Ensure consistent tab/space usage
    - Standardize emphasis formatting (bold/italic)
 
-### Phase 4: planning document cleanup
+### Phase 4: planning document cleanup (in progress)
 
-1. ⬜ Review and update current planning documents:
-   - Archive completed plans with "ARCHIVED-" prefix
+1. ✅ Review and update current planning documents:
+   - Archive completed plans with "archived-" prefix
    - Update ongoing plans to reflect current status
    - Remove obsolete plans that no longer apply
    - Consolidate duplicate planning information
-2. ⬜ Ensure all planning documents follow the new standards:
-   - Rename to kebab-case
-   - Update headers to follow conventions
-   - Fix cross-references
-   - Standardize formatting
+2. 🔄 Ensure all planning documents follow the new standards:
+   - Rename to kebab-case (completed)
+   - Update headers to follow conventions (in progress)
+   - Fix cross-references (in progress)
+   - Standardize formatting (in progress)
 
 ### Phase 5: automation and verification
 
@@ -98,8 +98,8 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
 | 1     | Inventory and Analysis       | 2025-04-03 | 2025-04-04        | ✅ Complete     |
 | 2     | File Naming and Organization | 2025-04-04 | 2025-04-06        | 🔄 In Progress |
 | 3     | Content Standardization      | 2025-04-06 | 2025-04-07        | ✅ Complete     |
-| 4     | Planning Document Cleanup    | 2025-04-07 | 2025-04-09        | 🔄 In Progress |
-| 5     | Automation and Verification  | 2025-04-09 | 2025-04-10        | ⬜ Not Started  |
+| 4     | Planning Document Cleanup    | 2025-04-07 | 2025-04-08        | 🔄 In Progress |
+| 5     | Automation and Verification  | 2025-04-08 | 2025-04-10        | ⬜ Not Started  |
 
 ## Future Considerations
 
