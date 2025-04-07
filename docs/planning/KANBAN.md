@@ -22,16 +22,15 @@ This document tracks the progress of tasks in the S8r project.
 - Implement Clean Architecture verification in CI/CD
 - Implement remaining port interfaces according to TDD plan (ValidationPort, PersistencePort)
 - Create BDD tests for remaining port interfaces
-- Implement integration test suite for port interfaces working together
 
 ## Tasks In Progress
-
-- Finalize documentation for the migration utilities
-- Enhance NotificationPort with additional notification channels and testing
 
 ## Tasks In Review
 
 - Implement TDD-driven port interface tests
+- Enhance NotificationPort with additional notification channels and testing
+- Finalize documentation for the migration utilities
+- Implement integration test suite for port interfaces working together
 
 ## Tasks Done
 
