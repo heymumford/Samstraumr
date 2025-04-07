@@ -10,11 +10,24 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Samstraumr Changelog
+# Changelog
 
 All notable changes to this project will be documented in this file.
 
 ## [1.3.0] - 2025-04-03
+## [2.7.0] - 2025-04-07
+
+### Added
+
+- 
+
+### Changed
+
+- 
+
+### Fixed
+
+- 
 ## [2.5.0] - 2025-04-07
 
 ### Added
@@ -325,7 +338,7 @@ All notable changes to this project will be documented in this file.
 - Various small bugs and inconsistencies
 - Fixed code formatting and added missing classes
 
-## [1.2.9] and earlier
+## [1.2.9] and Earlier
 
 - Initial development and foundational work
 - See Git history for details
