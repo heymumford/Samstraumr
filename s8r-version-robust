@@ -1,291 +1,235 @@
 #!/usr/bin/env bash
 #==============================================================================
-# s8r-version-robust: Enhanced version management for Samstraumr
-# More robust, context-aware search and replace to avoid incorrect replacements
+# s8r-version-robust: Precise version management for Samstraumr
+# A consolidated, self-monitoring version update system with precise version
+# tracking and enhanced error detection/recovery
 #==============================================================================
-set -e
 
-# Find repository root
-PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel)}"
-VERSION_FILE="${PROJECT_ROOT}/Samstraumr/version.properties"
+# Strict error handling
+set -o pipefail
 
-# Terminal colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[0;33m'
-BOLD='\033[1m'
-RESET='\033[0m'
+# Configuration - version file paths and patterns
+VERSION_FILE="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/Samstraumr/version.properties"
+VERSION_PATTERN='[0-9]+\.[0-9]+\.[0-9]+'
 
-# Debug mode flag
-DEBUG=false
+# Known files that should contain version information
+declare -A VERSION_LOCATIONS=(
+  ["$VERSION_FILE"]="samstraumr.version="
+  ["${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/pom.xml"]="<version>VERSION</version>\|<samstraumr.version>VERSION</samstraumr.version>"
+  ["${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/Samstraumr/pom.xml"]="<version>VERSION</version>\|<samstraumr.version>VERSION</samstraumr.version>"
+  ["${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/Samstraumr/samstraumr-core/pom.xml"]="<version>VERSION</version>\|<samstraumr.version>VERSION</samstraumr.version>"
+  ["${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/README.md"]="version-VERSION-blue\|<version>VERSION</version>"
+  ["${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/CLAUDE.md"]="version of Samstraumr is: VERSION"
+)
 
-# Functions for output
-info() { echo -e "${BLUE}$1${RESET}"; }
-success() { echo -e "${GREEN}✓ $1${RESET}"; }
-warn() { echo -e "${YELLOW}Warning: $1${RESET}" >&2; }
-error() { echo -e "${RED}Error: $1${RESET}" >&2; exit 1; }
-debug() { 
-  if [[ "$DEBUG" == "true" ]]; then 
-    echo -e "${YELLOW}Debug: $1${RESET}" >&2
+# Validation flag
+VALIDATION_FAILED=0
+
+# Logging functions - simple, no colors
+log_info() { echo "[INFO] $1"; }
+log_success() { echo "[SUCCESS] $1"; }
+log_warning() { echo "[WARNING] $1" >&2; }
+log_error() { echo "[ERROR] $1" >&2; }
+log_detail() { echo "         $1"; }
+
+# Exit with error message and status code
+fail() {
+  log_error "$1"
+  exit "${2:-1}"
+}
+
+# Self-monitoring check: Verify script is properly installed
+check_installation() {
+  # Check if running from correct location
+  local script_path="$(realpath "$0")"
+  local expected_dir="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+  
+  if [[ ! "$script_path" == "$expected_dir"/* ]]; then
+    log_warning "Script not running from expected project directory"
+    log_warning "Found: $script_path"
+    log_warning "Expected: $expected_dir/s8r-version-robust"
+    # Continue anyway - this might be a copy or symlink
+  fi
+  
+  # Check for required files
+  if [[ ! -f "$VERSION_FILE" ]]; then
+    log_error "Version properties file not found: $VERSION_FILE"
+    log_info "Attempting to recover by searching for version.properties..."
+    
+    # Attempt recovery by searching for version.properties
+    local found_version_file=$(find "${PROJECT_ROOT:-$(pwd)}" -name "version.properties" -type f | head -n 1)
+    
+    if [[ -n "$found_version_file" ]]; then
+      VERSION_FILE="$found_version_file"
+      log_success "Found alternative version file: $VERSION_FILE"
+      VERSION_LOCATIONS["$VERSION_FILE"]="samstraumr.version="
+    else
+      fail "Could not locate version.properties file in project. Please verify project structure."
+    fi
   fi
 }
 
 # Get current version from source of truth
 get_version() {
   if [[ ! -f "$VERSION_FILE" ]]; then
-    error "Version file not found: $VERSION_FILE"
-  fi
-  grep "samstraumr.version=" "$VERSION_FILE" | cut -d= -f2
-}
-
-# Update version in a POM file
-update_pom() {
-  local file="$1"
-  local old_version="$2"
-  local new_version="$3"
-  local count=0
-  
-  debug "Updating POM file: $file"
-  
-  # Update project version
-  if grep -q "<version>$old_version</version>" "$file"; then
-    # Modify only the project version, not dependencies
-    # Look for version tags that are children of parent or project tags
-    sed -i "/<project>/,/<\/project>/ s|<version>$old_version</version>|<version>$new_version</version>|g" "$file"
-    sed -i "/<parent>/,/<\/parent>/ s|<version>$old_version</version>|<version>$new_version</version>|g" "$file"
-    ((count++))
+    fail "Version file not found: $VERSION_FILE" 2
   fi
   
-  # Update samstraumr.version property
-  if grep -q "<samstraumr.version>$old_version</samstraumr.version>" "$file"; then
-    sed -i "s|<samstraumr.version>$old_version</samstraumr.version>|<samstraumr.version>$new_version</samstraumr.version>|g" "$file"
-    ((count++))
-  fi
+  local version=$(grep "samstraumr.version=" "$VERSION_FILE" | cut -d= -f2)
   
-  if [[ $count -gt 0 ]]; then
-    success "Updated POM file: $file"
-    return 0
-  else
-    debug "No changes needed in POM file: $file"
-    return 0
-  fi
-}
-
-# Update README.md
-update_readme() {
-  local file="$1"
-  local old_version="$2"
-  local new_version="$3"
-  local count=0
-  
-  debug "Updating README file: $file"
-  
-  # Update version badge
-  if grep -q "version-$old_version-blue" "$file"; then
-    sed -i "s|version-$old_version-blue|version-$new_version-blue|g" "$file"
-    ((count++))
-  fi
-  
-  # Update dependency example
-  if grep -q "<version>$old_version</version>" "$file"; then
-    # Only replace in the dependency example section
-    local start_line=$(grep -n "<dependency>" "$file" | cut -d: -f1)
-    local end_line=$(grep -n "</dependency>" "$file" | cut -d: -f1)
+  if [[ -z "$version" ]]; then
+    log_error "Failed to extract version from $VERSION_FILE"
+    log_info "Attempting to recover by searching file content..."
     
-    if [[ -n "$start_line" && -n "$end_line" ]]; then
-      debug "Found dependency section at lines $start_line-$end_line"
-      sed -i "${start_line},${end_line} s|<version>$old_version</version>|<version>$new_version</version>|g" "$file"
-      ((count++))
+    # Attempt recovery by searching for version pattern
+    version=$(grep -o "$VERSION_PATTERN" "$VERSION_FILE" | head -n 1)
+    
+    if [[ -z "$version" ]]; then
+      fail "Could not extract version information from $VERSION_FILE" 3
     else
-      # Fall back to simple replacement if we can't find the dependency block
-      debug "Dependency section not found, using global replacement in README"
-      sed -i "s|<version>$old_version</version>|<version>$new_version</version>|g" "$file"
-      ((count++))
+      log_success "Recovered version: $version"
     fi
   fi
   
-  if [[ $count -gt 0 ]]; then
-    success "Updated README file: $file"
-    return 0
-  else
-    debug "No changes needed in README file: $file"
-    return 0
+  # Validate version format
+  if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    fail "Invalid version format: $version (must be in format x.y.z)" 4
   fi
+  
+  echo "$version"
 }
 
-# Update CLAUDE.md with caution
-update_claude_md() {
-  local file="$1"
-  local old_version="$2"
-  local new_version="$3"
-  local count=0
+# Check for version inconsistencies across files
+check_version_consistency() {
+  local reference_version="$1"
+  local inconsistencies=0
+  local absent_files=0
   
-  debug "Updating CLAUDE.md file: $file"
+  log_info "Checking version consistency across all known files..."
   
-  # Make a backup before changes
-  local backup_file="${file}.bak"
-  cp "$file" "$backup_file"
-  debug "Created backup of CLAUDE.md at $backup_file"
-  
-  # Only update the current version line
-  if grep -q "The current version of Samstraumr is: $old_version" "$file"; then
-    debug "Updating current version line"
-    sed -i "s|The current version of Samstraumr is: $old_version|The current version of Samstraumr is: $new_version|g" "$file"
-    ((count++))
-  fi
-  
-  # Update examples that explicitly show version in code blocks
-  if grep -q "s8r version set $old_version" "$file"; then
-    debug "Updating s8r version set example"
-    sed -i "s|s8r version set $old_version|s8r version set $new_version|g" "$file"
-    ((count++))
-  fi
-  
-  # Update examples that explicitly show version in s8r-version
-  if grep -q "s8r-version set $old_version" "$file"; then
-    debug "Updating s8r-version set example"
-    sed -i "s|s8r-version set $old_version|s8r-version set $new_version|g" "$file"
-    ((count++))
-  fi
-  
-  # Compare with backup to verify changes were as expected
-  if diff -q "$file" "$backup_file" >/dev/null; then
-    debug "No changes were made to CLAUDE.md"
-    # Remove backup if no changes
-    rm "$backup_file"
-    return 0
-  else
-    # Show diff if in debug mode
-    if [[ "$DEBUG" == "true" ]]; then
-      debug "Changes made to CLAUDE.md:"
-      diff -u "$backup_file" "$file" | grep -E "^\+|\-" | grep -v "^---" | grep -v "^\+\+\+" >&2
+  for file in "${!VERSION_LOCATIONS[@]}"; do
+    if [[ ! -f "$file" ]]; then
+      log_warning "Version file not found: $file"
+      ((absent_files++))
+      continue
     fi
     
-    if [[ $count -gt 0 ]]; then
-      success "Updated CLAUDE.md file: $file with $count changes"
-      # Keep backup for safety
-      debug "Backup saved at $backup_file"
-      return 0
-    else
-      # This means changes were made but not counted
-      warn "Unexpected changes in CLAUDE.md. Restoring from backup."
-      cp "$backup_file" "$file"
-      rm "$backup_file"
-      return 1
+    local pattern="${VERSION_LOCATIONS[$file]}"
+    # Replace VERSION placeholder with actual version for search
+    pattern="${pattern//VERSION/$reference_version}"
+    
+    if ! grep -q "$pattern" "$file"; then
+      log_warning "Version inconsistency in $file"
+      log_detail "Expected to find: $pattern"
+      ((inconsistencies++))
     fi
+  done
+  
+  # Return results
+  if [[ $inconsistencies -gt 0 || $absent_files -gt 0 ]]; then
+    log_warning "Found $inconsistencies inconsistencies and $absent_files missing files"
+    return 1
+  else
+    log_success "All files contain consistent version information"
+    return 0
   fi
 }
 
-# Update test files with version references
-update_test_files() {
+# Update a specific file with new version
+update_file_version() {
+  local file="$1"
+  local old_version="$2"
+  local new_version="$3"
+  local pattern="${VERSION_LOCATIONS[$file]}"
+  local updated=0
+  
+  # Skip if file doesn't exist
+  if [[ ! -f "$file" ]]; then
+    log_warning "Cannot update $file: File not found"
+    return 1
+  fi
+  
+  # Make backup of file
+  cp "$file" "${file}.bak"
+  
+  # Handle special cases by file type
+  if [[ "$file" == *"version.properties" ]]; then
+    # Update version property
+    sed -i "s/^samstraumr.version=.*/samstraumr.version=$new_version/" "$file"
+    
+    # Update last updated date
+    sed -i "s/^samstraumr.last.updated=.*/samstraumr.last.updated=$(date +'%B %d, %Y')/" "$file"
+    
+    updated=1
+  elif [[ "$file" == *"pom.xml" ]]; then
+    # Update project version
+    if grep -q "<version>[0-9].*</version>" "$file"; then
+      sed -i "s|<version>[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*</version>|<version>$new_version</version>|g" "$file"
+      updated=1
+    fi
+    
+    # Update samstraumr.version property
+    if grep -q "<samstraumr.version>" "$file"; then
+      sed -i "s|<samstraumr.version>[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*</samstraumr.version>|<samstraumr.version>$new_version</samstraumr.version>|g" "$file"
+      updated=1
+    fi
+    
+    # Update parent version
+    if grep -q "<parent>" "$file"; then
+      sed -i "/<parent>/,/<\/parent>/s|<version>[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*</version>|<version>$new_version</version>|g" "$file"
+      updated=1
+    fi
+  elif [[ "$file" == *"README.md" ]]; then
+    # Update badge
+    if grep -q "version-.*-blue" "$file"; then
+      sed -i "s|version-[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*-blue|version-$new_version-blue|g" "$file"
+      updated=1
+    fi
+    
+    # Update dependency example
+    if grep -q "<version>[0-9]" "$file"; then
+      sed -i "s|<version>[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*</version>|<version>$new_version</version>|g" "$file"
+      updated=1
+    fi
+  elif [[ "$file" == *"CLAUDE.md" ]]; then
+    # Match specific pattern to avoid unwanted replacements
+    if grep -q "version of Samstraumr is: " "$file"; then
+      sed -i "s|version of Samstraumr is: [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*|version of Samstraumr is: $new_version|g" "$file"
+      updated=1
+    fi
+  fi
+  
+  # Verify update was successful
+  if grep -q "${pattern//VERSION/$new_version}" "$file"; then
+    log_success "Updated $file"
+    # Remove backup if successful
+    rm "${file}.bak"
+    return 0
+  else
+    log_error "Failed to update $file correctly"
+    log_info "Restoring backup..."
+    
+    # Restore from backup
+    mv "${file}.bak" "$file"
+    VALIDATION_FAILED=1
+    return 1
+  fi
+}
+
+# Handles changelog updates for new versions
+update_changelog() {
   local old_version="$1"
   local new_version="$2"
-  local count=0
-  local updated_count=0
+  local today="$(date +"%Y-%m-%d")"
+  local changelog="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/docs/reference/release/changelog.md"
   
-  debug "Looking for test files with version $old_version references"
-  
-  # Find Java files in test directory that have samstraumr-core-VERSION.jar references
-  # Use find first, then grep to avoid errors if no files match
-  local test_dir_pattern="*/test/*"
-  local test_files=$(find "$PROJECT_ROOT" -name "*.java" -path "$test_dir_pattern" -type f 2>/dev/null | xargs grep -l "samstraumr-core-$old_version.jar" 2>/dev/null || echo "")
-  
-  if [[ -z "$test_files" ]]; then
-    debug "No test files found with samstraumr-core-$old_version.jar references"
-  else
-    for file in $test_files; do
-      debug "Found version reference in test file: $file"
-      
-      # Create backup
-      local backup_file="${file}.bak"
-      cp "$file" "$backup_file"
-      
-      # Update the file
-      debug "Updating $file"
-      sed -i "s|samstraumr-core-$old_version.jar|samstraumr-core-$new_version.jar|g" "$file"
-      
-      # Verify changes
-      if diff -q "$file" "$backup_file" >/dev/null; then
-        debug "No changes were made to $file, removing backup"
-        rm "$backup_file"
-      else
-        # Show diff if in debug mode
-        if [[ "$DEBUG" == "true" ]]; then
-          debug "Changes made to $file:"
-          diff -u "$backup_file" "$file" | grep -E "^\+|\-" | grep -v "^---" | grep -v "^\+\+\+" >&2
-        fi
-        
-        # Count the actual replacements made
-        local replacements=$(diff -u "$backup_file" "$file" | grep -c "samstraumr-core-$new_version.jar")
-        debug "Made $replacements replacements in $file"
-        
-        ((count++))
-        ((updated_count+=replacements))
-        # Keep backup for safety with timestamp
-        mv "$backup_file" "${file}.bak.$(date +%s)"
-      fi
-    done
+  # Skip if changelog doesn't exist
+  if [[ ! -f "$changelog" ]]; then
+    log_warning "Changelog not found: $changelog"
+    return 1
   fi
   
-  # Also look for feature files or other types of files with version references
-  local other_test_files=$(find "$PROJECT_ROOT" -name "*.feature" -o -name "*.md" -path "$test_dir_pattern" 2>/dev/null | xargs grep -l "$old_version" 2>/dev/null || echo "")
-  
-  if [[ -n "$other_test_files" ]]; then
-    debug "Found other test files with potential version references:"
-    for file in $other_test_files; do
-      debug "Checking $file for context-appropriate version references"
-      
-      # Create backup
-      local backup_file="${file}.bak"
-      cp "$file" "$backup_file"
-      
-      # Only update when the version appears in specific contexts
-      # 1. In jar file references
-      sed -i "s|samstraumr-core-$old_version.jar|samstraumr-core-$new_version.jar|g" "$file"
-      # 2. In version attribute references
-      sed -i "s|version=\"$old_version\"|version=\"$new_version\"|g" "$file"
-      sed -i "s|version='$old_version'|version='$new_version'|g" "$file"
-      # 3. In dependency version declarations
-      sed -i "s|<version>$old_version</version>|<version>$new_version</version>|g" "$file"
-      
-      # Verify changes
-      if diff -q "$file" "$backup_file" >/dev/null; then
-        debug "No changes were made to $file, removing backup"
-        rm "$backup_file"
-      else
-        # Show diff if in debug mode
-        if [[ "$DEBUG" == "true" ]]; then
-          debug "Changes made to $file:"
-          diff -u "$backup_file" "$file" | grep -E "^\+|\-" | grep -v "^---" | grep -v "^\+\+\+" >&2
-        fi
-        
-        ((count++))
-        debug "Updated non-Java test file: $file"
-        # Keep backup for safety with timestamp
-        mv "$backup_file" "${file}.bak.$(date +%s)"
-      fi
-    done
-  fi
-  
-  if [[ $count -gt 0 ]]; then
-    success "Updated $count test files with $updated_count version references"
-    return 0
-  else
-    debug "No test files needed updating"
-    return 0
-  fi
-}
-
-# Add new version entry to changelog
-update_changelog() {
-  local file="$1"
-  local new_version="$2"
-  local today=$(date +"%Y-%m-%d")
-  
-  debug "Updating changelog: $file"
-  
-  # Create new entry template
+  # Generate new entry template
   local template=$(cat <<EOF
 ## [$new_version] - $today
 
@@ -304,348 +248,142 @@ update_changelog() {
 EOF
 )
   
-  # Find header line and insert new entry after it
-  local header_line=$(grep -n "All notable changes to this project will be documented in this file." "$file" | cut -d: -f1)
+  # Find header line to insert after
+  local header_line=$(grep -n "All notable changes to this project will be documented in this file." "$changelog" | cut -d: -f1)
+  
   if [[ -n "$header_line" ]]; then
-    header_line=$((header_line + 2)) # Skip to the blank line after header
+    # Skip to blank line after header
+    header_line=$((header_line + 2))
+    
+    # Create backup
+    cp "$changelog" "${changelog}.bak"
     
     # Create temporary file with new content
-    { head -n $header_line "$file"; echo -e "$template"; tail -n +$((header_line+1)) "$file"; } > "$file.new"
-    mv "$file.new" "$file"
+    { head -n $header_line "$changelog"; echo -e "$template"; tail -n +$((header_line+1)) "$changelog"; } > "${changelog}.new"
     
-    success "Updated changelog.md with new version entry"
-    return 0
+    if [[ $? -eq 0 ]]; then
+      mv "${changelog}.new" "$changelog"
+      log_success "Updated changelog.md with new version entry"
+      rm "${changelog}.bak"
+      return 0
+    else
+      log_error "Failed to update changelog"
+      log_info "Restoring from backup..."
+      mv "${changelog}.bak" "$changelog"
+      return 1
+    fi
   else
-    warn "Could not locate changelog header line in $file"
+    log_warning "Could not locate changelog header line"
+    log_detail "Header pattern 'All notable changes...' not found"
     return 1
   fi
 }
 
-# Update all files with new version
+# Main function to update all version references
 update_version() {
   local old_version="$1"
   local new_version="$2"
   local files_updated=0
   local files_failed=0
-  local changes_made=0
   
   # Validate version format
   if ! [[ "$new_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    error "Invalid version format: $new_version (must be in format x.y.z)"
+    fail "Invalid version format: $new_version (must be in format x.y.z)" 4
   fi
   
-  info "Updating version from $old_version to $new_version"
+  log_info "Updating version from $old_version to $new_version"
   
-  # Update version.properties (source of truth)
-  if [[ -f "$VERSION_FILE" ]]; then
-    debug "Updating version.properties: $VERSION_FILE"
-    
-    # Check if version.properties needs updating
-    if grep -q "^samstraumr.version=$old_version" "$VERSION_FILE"; then
-      debug "Found version $old_version in version.properties, updating to $new_version"
-      sed -i "s/^samstraumr.version=.*/samstraumr.version=$new_version/" "$VERSION_FILE"
-      sed -i "s/^samstraumr.last.updated=.*/samstraumr.last.updated=$(date +'%B %d, %Y')/" "$VERSION_FILE"
-      ((files_updated++))
-      ((changes_made++))
-      success "Updated version.properties file"
-    else
-      debug "Version in version.properties is already $new_version, no change needed"
+  # First, update version properties file (source of truth)
+  update_file_version "$VERSION_FILE" "$old_version" "$new_version"
+  local result=$?
+  
+  if [[ $result -ne 0 ]]; then
+    fail "Failed to update primary version file. Aborting." 5
+  fi
+  
+  # Then update all other known files
+  for file in "${!VERSION_LOCATIONS[@]}"; do
+    # Skip version.properties as it's already done
+    if [[ "$file" == "$VERSION_FILE" ]]; then
+      continue
     fi
-  else
-    error "Version properties file not found: $VERSION_FILE"
-  fi
-  
-  # Update POM files
-  for pom in "$PROJECT_ROOT/pom.xml" "$PROJECT_ROOT/Samstraumr/pom.xml" "$PROJECT_ROOT/Samstraumr/samstraumr-core/pom.xml"; do
-    if [[ -f "$pom" ]]; then
-      debug "Checking POM file: $pom"
-      
-      # Grep before updating to see if changes are needed
-      if grep -q "<version>$old_version</version>" "$pom" || grep -q "<samstraumr.version>$old_version</samstraumr.version>" "$pom"; then
-        debug "Found version $old_version in $pom, will update"
-        if update_pom "$pom" "$old_version" "$new_version"; then
-          ((files_updated++))
-          ((changes_made++))
-        else
-          ((files_failed++))
-          warn "Failed to update POM file: $pom"
-        fi
-      else
-        debug "No version $old_version found in $pom, skipping"
-      fi
+    
+    update_file_version "$file" "$old_version" "$new_version"
+    result=$?
+    
+    if [[ $result -eq 0 ]]; then
+      ((files_updated++))
     else
-      debug "POM file not found, skipping: $pom"
+      ((files_failed++))
     fi
   done
   
-  # Update README.md
-  if [[ -f "$PROJECT_ROOT/README.md" ]]; then
-    debug "Checking README.md"
-    
-    # Grep before updating to see if changes are needed
-    if grep -q "version-$old_version-blue" "$PROJECT_ROOT/README.md" || 
-       grep -q "<version>$old_version</version>" "$PROJECT_ROOT/README.md"; then
-      debug "Found version $old_version in README.md, will update"
-      if update_readme "$PROJECT_ROOT/README.md" "$old_version" "$new_version"; then
-        ((files_updated++))
-        ((changes_made++))
-      else
-        ((files_failed++))
-        warn "Failed to update README.md"
-      fi
-    else
-      debug "No version $old_version found in README.md, skipping"
-    fi
-  fi
-  
-  # Update CLAUDE.md if it exists
-  if [[ -f "$PROJECT_ROOT/CLAUDE.md" ]]; then
-    debug "Checking CLAUDE.md"
-    
-    # Grep before updating to see if changes are needed
-    if grep -q "The current version of Samstraumr is: $old_version" "$PROJECT_ROOT/CLAUDE.md" || 
-       grep -q "s8r.*version.*set.*$old_version" "$PROJECT_ROOT/CLAUDE.md"; then
-      debug "Found version $old_version in CLAUDE.md, will update"
-      if update_claude_md "$PROJECT_ROOT/CLAUDE.md" "$old_version" "$new_version"; then
-        ((files_updated++))
-        ((changes_made++))
-      else
-        ((files_failed++))
-        warn "Failed to update CLAUDE.md"
-      fi
-    else
-      debug "No version $old_version found in CLAUDE.md, skipping"
-    fi
-  fi
-  
-  # Update test files that reference version
-  debug "Checking Java test files for version references"
-  local test_files_count=$(grep -l "samstraumr-core-$old_version.jar" $(find "$PROJECT_ROOT" -name "*.java" -path "*/test/*" 2>/dev/null) | wc -l)
-  
-  if [[ $test_files_count -gt 0 ]]; then
-    debug "Found $test_files_count test files with version $old_version"
-    update_test_files "$old_version" "$new_version"
-    ((changes_made++))
-  else
-    debug "No test files found with version $old_version"
-  fi
-  
   # Update changelog
-  local changelog="$PROJECT_ROOT/docs/reference/release/changelog.md"
-  if [[ -f "$changelog" ]]; then
-    debug "Checking changelog.md"
-    if ! grep -q "\[$new_version\]" "$changelog"; then
-      debug "Adding new version entry to changelog for $new_version"
-      if update_changelog "$changelog" "$new_version"; then
-        ((files_updated++))
-        ((changes_made++))
-      else
-        ((files_failed++))
-        warn "Failed to update changelog.md"
-      fi
-    else
-      debug "Changelog already has an entry for version $new_version"
-    fi
-  fi
+  update_changelog "$old_version" "$new_version"
   
-  echo
-  if [[ $changes_made -gt 0 ]]; then
-    info "Successfully updated $files_updated files to version $new_version"
+  # Verify consistency
+  log_info "Verifying version consistency after update..."
+  check_version_consistency "$new_version"
+  local consistency_check=$?
+  
+  # Report results
+  if [[ $VALIDATION_FAILED -eq 0 && $consistency_check -eq 0 ]]; then
+    log_success "Version successfully updated from $old_version to $new_version"
+    log_detail "Updated $((files_updated + 1)) files successfully"
+    return 0
   else
-    info "No changes were necessary, all files already use version $new_version"
-  fi
-  
-  if [[ $files_failed -gt 0 ]]; then
-    warn "$files_failed files failed to update properly"
+    log_warning "Version update completed with warnings"
+    log_detail "Successfully updated: $((files_updated + 1)) files"
+    
+    if [[ $files_failed -gt 0 ]]; then
+      log_detail "Failed to update: $files_failed files"
+    fi
+    
+    if [[ $consistency_check -ne 0 ]]; then
+      log_detail "Some files may still have inconsistent version information"
+      log_detail "Run '$0 verify' to check all files or '$0 fix' to attempt repair"
+    fi
+    
     return 1
   fi
+}
+
+# Verify version consistency across all files
+verify_version() {
+  local current=$(get_version)
   
-  success "Version successfully updated to $new_version"
+  log_info "Current version: $current"
+  check_version_consistency "$current"
+  
+  local result=$?
+  if [[ $result -ne 0 ]]; then
+    log_info "To fix inconsistencies, run: $0 fix"
+    return 1
+  fi
   return 0
 }
 
-# List all version references in the codebase
-list_version_references() {
-  local current=$(get_version)
-  local search_version=${1:-$current}
-  
-  info "Searching for references to version $search_version in the codebase..."
-  
-  # List files with direct version references
-  local files=$(grep -r --include="*.java" --include="*.xml" --include="*.md" --include="*.properties" "$search_version" "$PROJECT_ROOT" 2>/dev/null)
-  
-  # Print results
-  if [[ -n "$files" ]]; then
-    echo -e "${BLUE}Files containing version $search_version:${RESET}"
-    echo "$files"
-  else
-    echo -e "${YELLOW}No files found containing version $search_version${RESET}"
-  fi
-}
+# Command line parsing
+command="$1"
+shift || true
 
-# Find inconsistent version references
-find_inconsistencies() {
-  local current=$(get_version)
-  local inconsistencies=0
-  
-  info "Checking for version inconsistencies in the codebase..."
-  info "Current version from source of truth: $current"
-  
-  # List of files that should have the current Samstraumr version
-  local key_files=(
-    # Primary source of truth
-    "$PROJECT_ROOT/Samstraumr/version.properties"
-    
-    # POM files
-    "$PROJECT_ROOT/pom.xml"
-    "$PROJECT_ROOT/Samstraumr/pom.xml"
-    "$PROJECT_ROOT/Samstraumr/samstraumr-core/pom.xml"
-    
-    # Documentation with version references
-    "$PROJECT_ROOT/README.md"
-    "$PROJECT_ROOT/CLAUDE.md"
-    
-    # Test files that might reference the specific version
-    "$PROJECT_ROOT/Samstraumr/samstraumr-core/src/test/java/org/s8r/test/steps/orchestration/BuildProcessSteps.java"
-  )
-  
-  echo -e "${BLUE}Checking key files for correct version references:${RESET}"
-  
-  # Check each key file
-  for file in "${key_files[@]}"; do
-    if [[ -f "$file" ]]; then
-      debug "Checking key file: $file"
-      
-      case "$file" in
-        # Special handling for version.properties
-        *version.properties)
-          if ! grep -q "^samstraumr.version=$current" "$file"; then
-            echo -e "${YELLOW}Version inconsistency in $file: $(grep "^samstraumr.version=" "$file" | cut -d= -f2) (should be $current)${RESET}"
-            ((inconsistencies++))
-          else
-            debug "Version in $file is correct"
-          fi
-          ;;
-        
-        # Special handling for POM files
-        *.xml)
-          debug "Checking POM file version fields..."
-          # Check for project/parent version tags
-          if grep -q "<artifactId>samstraumr" "$file" && grep -q "<version>" "$file"; then
-            if ! grep -q "<version>$current</version>" "$file"; then
-              local pom_version=$(grep -A1 "<artifactId>samstraumr" "$file" | grep "<version>" | sed -e 's/.*<version>\(.*\)<\/version>.*/\1/')
-              if [[ -n "$pom_version" && "$pom_version" != "$current" ]]; then
-                echo -e "${YELLOW}Version inconsistency in $file: $pom_version (should be $current)${RESET}"
-                ((inconsistencies++))
-              fi
-            fi
-          fi
-          # Check for samstraumr.version property
-          if grep -q "<samstraumr.version>" "$file"; then
-            if ! grep -q "<samstraumr.version>$current</samstraumr.version>" "$file"; then
-              local prop_version=$(grep "<samstraumr.version>" "$file" | sed -e 's/.*<samstraumr.version>\(.*\)<\/samstraumr.version>.*/\1/')
-              echo -e "${YELLOW}Property inconsistency in $file: samstraumr.version=$prop_version (should be $current)${RESET}"
-              ((inconsistencies++))
-            fi
-          fi
-          ;;
-        
-        # Special handling for CLAUDE.md
-        *CLAUDE.md)
-          if grep -q "The current version of Samstraumr is:" "$file"; then
-            local claude_version=$(grep "The current version of Samstraumr is:" "$file" | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+")
-            if [[ "$claude_version" != "$current" ]]; then
-              echo -e "${YELLOW}Version inconsistency in $file: $claude_version (should be $current)${RESET}"
-              ((inconsistencies++))
-            else
-              debug "Version in $file is correct"
-            fi
-          fi
-          
-          # Check for s8r-version set examples
-          if grep -q "s8r-version set" "$file"; then
-            local example_version=$(grep "s8r-version set" "$file" | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+")
-            if [[ "$example_version" != "$current" ]]; then
-              echo -e "${YELLOW}Example inconsistency in $file: s8r-version set $example_version (should be $current)${RESET}"
-              ((inconsistencies++))
-            fi
-          fi
-          ;;
-        
-        # Special handling for README.md
-        *README.md)
-          if grep -q "version-[0-9]" "$file"; then
-            local badge_version=$(grep "version-[0-9]" "$file" | grep -o "version-[0-9]\+\.[0-9]\+\.[0-9]\+" | cut -d- -f2)
-            if [[ "$badge_version" != "$current" ]]; then
-              echo -e "${YELLOW}Badge inconsistency in $file: $badge_version (should be $current)${RESET}"
-              ((inconsistencies++))
-            else
-              debug "Badge version in $file is correct"
-            fi
-          fi
-          
-          # Check for Maven example
-          if grep -q "<artifactId>samstraumr" "$file" && grep -q "<version>" "$file"; then
-            local example_version=$(grep -A3 "<artifactId>samstraumr" "$file" | grep "<version>" | head -1 | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+")
-            if [[ -n "$example_version" && "$example_version" != "$current" ]]; then
-              echo -e "${YELLOW}Example inconsistency in $file: <version>$example_version</version> (should be $current)${RESET}"
-              ((inconsistencies++))
-            fi
-          fi
-          ;;
-          
-        # Special handling for Java test files
-        *.java)
-          if grep -q "samstraumr-core-[0-9]" "$file"; then
-            local jar_references=$(grep -n "samstraumr-core-[0-9]" "$file" | wc -l)
-            local correct_jar_refs=$(grep -n "samstraumr-core-$current" "$file" | wc -l)
-            
-            if [[ "$jar_references" != "$correct_jar_refs" ]]; then
-              local wrong_version=$(grep "samstraumr-core-[0-9]" "$file" | grep -v "samstraumr-core-$current" | head -1 | grep -o "samstraumr-core-[0-9]\+\.[0-9]\+\.[0-9]\+" | cut -d- -f3)
-              echo -e "${YELLOW}JAR reference inconsistency in $file: found version $wrong_version (should be $current)${RESET}"
-              ((inconsistencies++))
-            else
-              debug "All JAR versions in $file are correct: $correct_jar_refs references"
-            fi
-          fi
-          ;;
-      esac
-    else
-      debug "File not found: $file"
-    fi
-  done
-  
-  # Return results
-  if [[ $inconsistencies -eq 0 ]]; then
-    success "No version inconsistencies found!"
-    return 0
-  else
-    warn "Found $inconsistencies version inconsistencies"
-    echo -e "${BLUE}Use '${BOLD}./s8r-version-robust fix${RESET}${BLUE}' to fix all inconsistencies${RESET}"
-    return 1
-  fi
-}
-
-
-# Parse command
-command=$1
-shift
+# Initial self-check
+check_installation
 
 case "$command" in
   get)
     # Get current version
     current=$(get_version)
-    echo -e "${BLUE}${BOLD}Samstraumr Version:${RESET} $current"
-    ;;
-  
-  export)
-    # Simply output the version (useful for scripts)
-    get_version
+    log_info "Samstraumr Version: $current"
+    # Optional verification
+    if [[ "$1" == "--verify" ]]; then
+      verify_version
+    fi
     ;;
     
   bump)
     # Bump version
-    type=${1:-patch}
+    type="${1:-patch}"
     current=$(get_version)
     
     # Parse version components
@@ -656,7 +394,7 @@ case "$command" in
       major) new="$((major+1)).0.0" ;;
       minor) new="${major}.$((minor+1)).0" ;;
       patch) new="${major}.${minor}.$((patch+1))" ;;
-      *)     error "Invalid bump type: $type (use major, minor, or patch)" ;;
+      *)     fail "Invalid bump type: $type (use major, minor, or patch)" 6 ;;
     esac
     
     update_version "$current" "$new"
@@ -664,9 +402,9 @@ case "$command" in
     
   set)
     # Set version to specific value
-    new=$1
+    new="$1"
     if [[ -z "$new" ]]; then
-      error "Version must be specified (format: x.y.z)"
+      fail "Version must be specified (format: x.y.z)" 7
     fi
     
     current=$(get_version)
@@ -676,60 +414,35 @@ case "$command" in
   fix)
     # Fix version inconsistencies
     current=$(get_version)
-    info "Fixing version inconsistencies - forcing all files to use $current"
+    log_info "Fixing version inconsistencies - forcing all files to use $current"
     update_version "$current" "$current"
     ;;
-  
-  check)
-    # Check for version inconsistencies
-    find_inconsistencies
-    ;;
-  
-  list-refs)
-    # List all references to the current version
-    list_version_references
-    ;;
     
-  find)
-    # Find specific version references
-    version=$1
-    if [[ -z "$version" ]]; then
-      error "Version must be specified for find command (format: x.y.z)"
-    fi
-    list_version_references "$version"
-    ;;
-  
-  --debug)
-    # Enable debug mode and execute the real command
-    DEBUG=true
-    exec "$0" "$@"
+  verify)
+    # Verify version consistency
+    verify_version
+    exit $?
     ;;
     
   *)
     # Help message
-    echo -e "${BLUE}${BOLD}Samstraumr Robust Version Manager${RESET}"
+    echo "Samstraumr Version Manager"
     echo
     echo "Usage: $0 <command> [options]"
     echo
     echo "Commands:"
-    echo "  get                 Show current version"
-    echo "  export              Output only the version string (for scripts)"
-    echo "  bump [type]         Bump version (type: major, minor, or patch)"
+    echo "  get [--verify]      Show current version (--verify also checks consistency)"
+    echo "  bump [type]         Bump version (type: major, minor, patch)"
     echo "  set <version>       Set specific version (format: x.y.z)"
     echo "  fix                 Fix version inconsistencies across files"
-    echo "  check               Check for version inconsistencies in the codebase"
-    echo "  list-refs           List all references to current version in the codebase"
-    echo "  find <version>      Find references to a specific version"
-    echo "  --debug <command>   Run any command in debug mode with verbose output"
+    echo "  verify              Verify version consistency across all files"
     echo
     echo "Examples:"
-    echo "  $0 get              # Show current version"
-    echo "  $0 bump patch       # Increment patch version"
-    echo "  $0 bump minor       # Increment minor version"
-    echo "  $0 set 2.0.0        # Set version to 2.0.0"
-    echo "  $0 check            # Check for version inconsistencies"
-    echo "  $0 find 2.4.6       # Find references to version 2.4.6"
-    echo "  $0 --debug bump minor # Run bump with debug output"
+    echo "  $0 get              Show current version"
+    echo "  $0 bump patch       Increment patch version"
+    echo "  $0 bump minor       Increment minor version"
+    echo "  $0 set 2.0.0        Set version to 2.0.0"
+    echo "  $0 verify           Check for version inconsistencies"
     exit 1
     ;;
 esac
