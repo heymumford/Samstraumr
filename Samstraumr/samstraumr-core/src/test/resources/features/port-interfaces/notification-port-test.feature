@@ -81,3 +81,86 @@ Feature: Notification Port Interface
     When I send a notification and record its ID
     Then I should be able to query the notification status using the ID
     And I should be able to retrieve the notification metadata using the ID
+    
+  Scenario: SMS notification delivery
+    When I send an SMS notification to phone number "555-123-4567"
+    Then the SMS notification should be successfully delivered
+    And the notification status should be "DELIVERED"
+    And the notification channel should be "SMS"
+    
+  Scenario Outline: SMS notifications with different types
+    When I send an SMS notification with type "<smsType>" to phone number "555-987-6543"
+    Then the SMS should be handled according to its type
+    And the notification channel should be "SMS"
+    
+    Examples:
+      | smsType  |
+      | STANDARD |
+      | EXTENDED |
+      | BINARY   |
+      | FLASH    |
+      
+  Scenario: SMS batch notification delivery
+    When I send a batch SMS notification to multiple phone numbers:
+      | 555-111-2222 |
+      | 555-333-4444 |
+      | 555-555-6666 |
+    Then all valid SMS notifications should be delivered
+    And I should receive delivery status for each phone number
+    
+  Scenario: Scheduling a notification for future delivery
+    When I schedule a notification for delivery at "2025-05-01T09:00:00Z"
+    Then the notification should be marked as "SCHEDULED"
+    And the scheduled time should be stored in the notification metadata
+    
+  Scenario: Sending a notification via a specific channel
+    When I send a notification via channel "WEBHOOK" to recipient "webhook-user"
+    Then the notification should be delivered via the specified channel
+    And the notification channel in the result should be "WEBHOOK"
+    
+  Scenario Outline: Sending notifications to messaging platforms
+    When I send a "<platform>" notification to channel "<channel>"
+    Then the notification should be delivered via the "<platform>" channel
+    And the notification content should be properly formatted for the platform
+    
+    Examples:
+      | platform | channel    |
+      | SLACK    | #general   |
+      | TEAMS    | General    |
+      | DISCORD  | #announcements |
+      
+  Scenario Outline: Sending formatted notifications with different content types
+    When I send a notification with content format "<format>"
+    Then the notification should be properly rendered in the "<format>" format
+    And the notification should maintain proper formatting
+    
+    Examples:
+      | format      |
+      | PLAIN_TEXT  |
+      | HTML        |
+      | MARKDOWN    |
+      | RICH_TEXT   |
+      | JSON        |
+      
+  Scenario: Sending templated notifications
+    When I send a templated notification with the following variables:
+      | name         | John Doe        |
+      | action       | password reset  |
+      | serviceUrl   | /account/reset  |
+    Then the notification should have the variables substituted in the template
+    And the notification should be properly formatted according to the template
+    
+  Scenario Outline: Registering recipients for different channels
+    When I register a recipient for "<channel>" notifications with proper credentials
+    Then the recipient should be registered successfully for "<channel>" channel
+    And I should be able to send "<channel>" notifications to this recipient
+    
+    Examples:
+      | channel  |
+      | SLACK    |
+      | TEAMS    |
+      | DISCORD  |
+      | EMAIL    |
+      | SMS      |
+      | PUSH     |
+      | WEBHOOK  |

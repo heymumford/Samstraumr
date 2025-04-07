@@ -40,6 +40,15 @@ public interface EventDispatcher {
    * @param handler The handler that will process events of this type
    */
   <T extends DomainEvent> void registerHandler(Class<T> eventType, EventHandler<T> handler);
+  
+  /**
+   * Registers a consumer function as a handler for a specific event type.
+   *
+   * @param <T> The type of domain event
+   * @param eventType The class of the event type
+   * @param handler The consumer function that will process events of this type
+   */
+  <T extends DomainEvent> void registerHandler(Class<T> eventType, java.util.function.Consumer<T> handler);
 
   /**
    * Unregisters a handler for a specific event type.

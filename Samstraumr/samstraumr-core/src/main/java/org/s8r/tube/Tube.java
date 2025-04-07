@@ -52,6 +52,8 @@ public class Tube {
   private final TubeIdentity identity;
   private final Instant conceptionTime;
   private TubeIdentity parentIdentity;
+  private String name;
+  private boolean adapted = false;
 
   private Tube(
       String reason, Environment environment, String uniqueId, TubeIdentity parentIdentity) {
@@ -472,6 +474,75 @@ public class Tube {
    */
   public String getEnvironmentState() {
     return environmentState;
+  }
+  
+  /**
+   * Gets the name of this tube.
+   *
+   * @return the tube's name, or null if not set
+   */
+  public String getName() {
+    return name;
+  }
+  
+  /**
+   * Sets the name of this tube.
+   *
+   * @param name the name to set
+   */
+  public void setName(String name) {
+    this.name = name;
+    logToMimir("Name set to: " + name);
+  }
+  
+  /**
+   * Creates a new tube with the specified reason.
+   *
+   * @param reason the reason for creating the tube
+   * @return a new tube instance
+   */
+  public Tube(String reason) {
+    this(reason, new Environment(), generateSHA256UniqueId(reason + System.currentTimeMillis()), null);
+  }
+  
+  /**
+   * Creates a new tube with a parent tube.
+   *
+   * @param reason the reason for creating the tube
+   * @param parentTube the parent tube
+   * @return a new child tube instance
+   */
+  public Tube(String reason, Tube parentTube) {
+    this(reason, new Environment(), generateSHA256UniqueId(reason + parentTube.getUniqueId() + System.currentTimeMillis()), parentTube.getIdentity());
+    if (parentTube != null) {
+      parentTube.registerChild(this);
+    }
+  }
+  
+  /**
+   * Checks if this tube has adapted its behavior.
+   *
+   * @return true if the tube has adapted, false otherwise
+   */
+  public boolean isAdapted() {
+    return adapted;
+  }
+  
+  /**
+   * Flags this tube as having adapted its behavior.
+   */
+  public void setAdapted() {
+    this.adapted = true;
+    logToMimir("Tube has adapted its behavior");
+  }
+  
+  /**
+   * Gets the current lifecycle state of this tube.
+   *
+   * @return the current lifecycle state
+   */
+  public TubeLifecycleState getState() {
+    return lifecycleState;
   }
 
   /** Task for handling automatic termination of tubes after a delay. */

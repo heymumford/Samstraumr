@@ -117,6 +117,31 @@ public interface CachePort {
     }
 
     /**
+     * Storage type for cache operations.
+     */
+    enum StorageType {
+        /**
+         * In-memory storage (e.g., HashMap)
+         */
+        MEMORY,
+        
+        /**
+         * Local disk storage (e.g., file-based)
+         */
+        LOCAL_DISK,
+        
+        /**
+         * Distributed cache (e.g., Redis, Memcached)
+         */
+        DISTRIBUTED,
+        
+        /**
+         * Database storage (e.g., SQL, NoSQL)
+         */
+        DATABASE
+    }
+    
+    /**
      * Cache region/namespace to use for segmenting the cache.
      */
     enum CacheRegion {
@@ -271,4 +296,11 @@ public interface CachePort {
      * @return A CacheResult indicating success or failure
      */
     CacheResult shutdown();
+    
+    /**
+     * Gets the storage type used by this cache implementation.
+     *
+     * @return The storage type
+     */
+    StorageType getStorageType();
 }

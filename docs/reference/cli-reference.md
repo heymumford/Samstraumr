@@ -23,7 +23,7 @@ The S8r command-line interface provides a unified way to interact with the Samst
 Or use the longer form:
 
 ```bash
-./util/samstraumr <command> [options]
+./util/scripts/samstraumr <command> [options]
 ```
 
 ## Available Commands

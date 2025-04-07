@@ -51,4 +51,13 @@ public interface EventPublisherPort {
    * @return The number of events published
    */
   int publishPendingEvents(ComponentId componentId);
+  
+  /**
+   * Registers a handler for a specific event type.
+   *
+   * @param eventType the event type to handle
+   * @param handler the handler to call when an event of the specified type is published
+   * @param <T> the event type
+   */
+  <T extends DomainEvent> void registerHandler(Class<T> eventType, java.util.function.Consumer<T> handler);
 }

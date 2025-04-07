@@ -57,7 +57,8 @@ import org.junit.platform.suite.api.SuiteDisplayName;
     EventDrivenCommunicationTest.class,
     HierarchicalIdentitySystemTest.class,
     CleanArchitectureComplianceTest.class,
-    StandardizedErrorHandlingTest.class
+    StandardizedErrorHandlingTest.class,
+    MavenStructureTest.class
 })
 public class RunArchitectureTests {
     // This class serves as a test suite runner for all architecture-related tests

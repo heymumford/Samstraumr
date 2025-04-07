@@ -133,6 +133,18 @@ public class InMemoryEventDispatcher implements EventDispatcher {
         handler.getClass().getSimpleName(),
         eventType.getSimpleName());
   }
+  
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T extends DomainEvent> void registerHandler(Class<T> eventType, java.util.function.Consumer<T> handler) {
+    // Create an adapter from the consumer to the EventHandler interface
+    EventHandler<T> handlerAdapter = event -> handler.accept(event);
+    
+    registerHandler(eventType, handlerAdapter);
+    logger.debug(
+        "Registered consumer handler for event type: {}",
+        eventType.getSimpleName());
+  }
 
   @Override
   @SuppressWarnings("unchecked")

@@ -142,7 +142,7 @@ At the heart of Samstraumr lies a simple but powerful metaphor: software as a ne
 
 ## License
 
-Samstraumr is licensed under the Mozilla Public License 2.0. See [l-i-c-e-n-s-e](./l-i-c-e-n-s-e.md) for details.
+Samstraumr is licensed under the Mozilla Public License 2.0. See [LICENSE](../../LICENSE) for details.
 
 ## Connect
 

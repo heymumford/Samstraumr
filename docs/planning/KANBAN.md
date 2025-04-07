@@ -16,21 +16,32 @@ This document tracks the progress of tasks in the S8r project.
 
 ## Tasks In Backlog
 
-- Set up CI/CD for S8r structure
-- Implement feedback mechanism for migration issues
-- Update documentation with component diagrams
-- Implement Clean Architecture verification in CI/CD
+- Implement TDD acceptance tests for Atomic Tube Identity after S8r framework stabilization
 
 ## Tasks In Progress
 
+
+## Tasks Completed Today
+
+- Scan root directory for non-README .md files that may contain tests we want to add or update to our test pyramid
+- Reorganize scripts from root directory to appropriate utility directories
+- Implement test scenarios from markdown files into the test pyramid
+- Test build process with comprehensive BDD tests
+
 ## Tasks In Review
+
+- Implement BDD integration tests for ports
 
 - Implement TDD-driven port interface tests
 - Enhance NotificationPort with additional notification channels and testing
 - Finalize documentation for the migration utilities
-- Implement integration test suite for port interfaces working together
+- Implement integration test suite for port interfaces working together (partial)
 - Create BDD tests for remaining port interfaces
 - Implement remaining port interfaces according to TDD plan (ValidationPort, PersistencePort)
+- Implement Clean Architecture verification in CI/CD
+- Set up CI/CD for S8r structure
+- Implement feedback mechanism for migration issues
+- Update documentation with component diagrams
 
 ## Tasks Done
 
@@ -98,8 +109,8 @@ This document tracks the progress of tasks in the S8r project.
 - ✅ Implement port interfaces with TDD approach
 - ✅ Create service layer for port interfaces
 - ✅ Implement unit and service-level tests for ports
-- 🔄 Implement BDD integration tests for ports
-- 🔄 Test build process
+- ✅ Implement BDD integration tests for ports
+- ✅ Test build process
 - 🔄 Migrate tests
 - 🔄 Finalize documentation
 

@@ -19,6 +19,82 @@ import java.util.Set;
  * to remain independent of specific security implementations.
  */
 public interface SecurityPort {
+    
+    /**
+     * Enumeration of standard permission types for security operations.
+     */
+    enum Permission {
+        READ,
+        WRITE,
+        CREATE,
+        DELETE,
+        LIST,
+        EXECUTE,
+        ADMIN,
+        ALL
+    }
+    
+    /**
+     * Exception thrown when access to a resource is denied due to security restrictions.
+     */
+    class AccessDeniedException extends RuntimeException {
+        private final String resource;
+        private final Permission permission;
+        
+        public AccessDeniedException(String message) {
+            super(message);
+            this.resource = null;
+            this.permission = null;
+        }
+        
+        public AccessDeniedException(String message, String resource, Permission permission) {
+            super(message);
+            this.resource = resource;
+            this.permission = permission;
+        }
+        
+        public String getResource() {
+            return resource;
+        }
+        
+        public Permission getPermission() {
+            return permission;
+        }
+    }
+    
+    /**
+     * Interface representing a security context for a user or component.
+     */
+    interface SecurityContext {
+        /**
+         * Gets the identifier for this security context.
+         * 
+         * @return The identifier (e.g., username, component ID)
+         */
+        String getIdentifier();
+        
+        /**
+         * Checks if this security context has a specific role.
+         * 
+         * @param roleName The role name to check
+         * @return true if the role is present, false otherwise
+         */
+        boolean hasRole(String roleName);
+        
+        /**
+         * Gets all roles associated with this security context.
+         * 
+         * @return List of role names
+         */
+        List<String> getRoles();
+        
+        /**
+         * Gets additional attributes associated with this security context.
+         * 
+         * @return Map of attributes
+         */
+        Map<String, Object> getAttributes();
+    }
 
     /**
      * Represents the outcome of a security operation with detailed information.
@@ -367,6 +443,61 @@ public interface SecurityPort {
      * @return A map containing the security configuration
      */
     Map<String, Object> getSecurityConfig(String componentId);
+    
+    /**
+     * Checks if a security context has permission to access a resource.
+     *
+     * @param context    The security context
+     * @param resource   The resource being accessed
+     * @param permission The permission required
+     * @return true if access is allowed, false otherwise
+     */
+    boolean hasPermission(SecurityContext context, String resource, Permission permission);
+    
+    /**
+     * Grants permission to a security context for a resource.
+     *
+     * @param context    The security context
+     * @param resource   The resource to grant access to
+     * @param permission The permission to grant
+     */
+    void grantPermission(SecurityContext context, String resource, Permission permission);
+    
+    /**
+     * Revokes permission from a security context for a resource.
+     *
+     * @param context    The security context
+     * @param resource   The resource to revoke access from
+     * @param permission The permission to revoke
+     */
+    void revokePermission(SecurityContext context, String resource, Permission permission);
+    
+    /**
+     * Logs an access attempt.
+     *
+     * @param context    The security context
+     * @param resource   The resource being accessed
+     * @param operation  The operation being performed
+     * @param success    Whether the access was successful
+     * @param details    Additional details about the access
+     */
+    void logAccess(SecurityContext context, String resource, String operation, boolean success, String details);
+    
+    /**
+     * Gets the audit log for a specific resource.
+     *
+     * @param context  The security context requesting the log
+     * @param resource The resource to get the audit log for
+     * @return List of audit log entries
+     */
+    List<String> getAuditLog(SecurityContext context, String resource);
+    
+    /**
+     * Checks if the security port is initialized.
+     *
+     * @return true if initialized, false otherwise
+     */
+    boolean isInitialized();
 
     /**
      * Registers a new user in the system.

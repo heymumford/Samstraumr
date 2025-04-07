@@ -24,6 +24,9 @@ import org.s8r.domain.component.port.ComponentPort;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.identity.LegacyComponentAdapterPort;
 import org.s8r.domain.lifecycle.LifecycleState;
+import org.s8r.migration.feedback.IssueType;
+import org.s8r.migration.feedback.MigrationIssueLogger;
+import org.s8r.migration.feedback.Severity;
 import org.s8r.tube.Environment;
 import org.s8r.tube.Tube;
 import org.s8r.tube.TubeIdentity;
@@ -49,6 +52,7 @@ public class TubeComponentAdapter implements LegacyComponentAdapterPort {
     private final LoggerPort logger;
     private final TubeLegacyIdentityConverter identityConverter;
     private final TubeLegacyEnvironmentConverter environmentConverter;
+    private final MigrationIssueLogger migrationLogger;
     
     /**
      * Creates a new TubeComponentAdapter.
@@ -64,14 +68,16 @@ public class TubeComponentAdapter implements LegacyComponentAdapterPort {
         this.logger = logger;
         this.identityConverter = identityConverter;
         this.environmentConverter = environmentConverter;
+        this.migrationLogger = MigrationIssueLogger.forCategory("TubeComponentAdapter");
         logger.debug("TubeComponentAdapter initialized");
     }
     
     @Override
     public ComponentPort wrapLegacyComponent(Object legacyComponent) {
         if (!(legacyComponent instanceof Tube)) {
-            throw new IllegalArgumentException("Expected Tube object, got: " + 
-                    (legacyComponent != null ? legacyComponent.getClass().getName() : "null"));
+            String actualType = legacyComponent != null ? legacyComponent.getClass().getName() : "null";
+            migrationLogger.reportTypeMismatch("legacyComponent", actualType, "org.s8r.tube.Tube");
+            throw new IllegalArgumentException("Expected Tube object, got: " + actualType);
         }
         
         Tube tube = (Tube) legacyComponent;
@@ -85,6 +91,13 @@ public class TubeComponentAdapter implements LegacyComponentAdapterPort {
         
         // Map the tube state to component lifecycle state
         String tubeStateString = getTubeStateString(tube);
+        
+        // Log the state mapping for migration feedback
+        migrationLogger.reportCustomIssue(
+                IssueType.STATE_TRANSITION, 
+                Severity.INFO, 
+                String.format("Mapped Tube state %s to Component state %s", 
+                        tube.getStatus(), tubeStateString));
         
         // Create wrapper component
         TubeComponentWrapper wrapper = new TubeComponentWrapper(
@@ -116,11 +129,13 @@ public class TubeComponentAdapter implements LegacyComponentAdapterPort {
     @Override
     public void setLegacyComponentState(Object legacyComponent, String state) {
         if (!(legacyComponent instanceof Tube)) {
-            throw new IllegalArgumentException("Expected Tube object, got: " + 
-                    (legacyComponent != null ? legacyComponent.getClass().getName() : "null"));
+            String actualType = legacyComponent != null ? legacyComponent.getClass().getName() : "null";
+            migrationLogger.reportTypeMismatch("legacyComponent", actualType, "org.s8r.tube.Tube");
+            throw new IllegalArgumentException("Expected Tube object, got: " + actualType);
         }
         
         Tube tube = (Tube) legacyComponent;
+        String currentState = getTubeStateString(tube);
         
         // Map the component state to tube status and lifecycle state
         try {
@@ -128,36 +143,89 @@ public class TubeComponentAdapter implements LegacyComponentAdapterPort {
             TubeStatus tubeStatus = mapLifecycleStateToTubeStatus(lifecycleState);
             TubeLifecycleState tubeLifecycleState = mapLifecycleStateToTubeLifecycleState(lifecycleState);
             
+            // Check for potentially invalid state transitions
+            if (isInvalidStateTransition(tube.getStatus(), tubeStatus)) {
+                migrationLogger.reportStateTransitionIssue(
+                        tube.getStatus().name(),
+                        tubeStatus.name(),
+                        "Potentially invalid state transition in Tube component");
+            }
+            
             // Set both states on the tube
             tube.setStatus(tubeStatus);
+            
+            // Log successful state transition
+            migrationLogger.reportCustomIssue(
+                    IssueType.STATE_TRANSITION,
+                    Severity.INFO,
+                    String.format("State transition: %s -> %s (TubeStatus: %s -> %s)",
+                            currentState, state, tube.getStatus(), tubeStatus));
             
             logger.debug("Set Tube state: status={}, lifecycleState={}", tubeStatus, tubeLifecycleState);
         } catch (IllegalArgumentException e) {
             logger.error("Invalid lifecycle state: {}", state);
+            migrationLogger.reportCustomIssue(
+                    IssueType.STATE_TRANSITION,
+                    Severity.ERROR,
+                    String.format("Invalid lifecycle state: %s", state));
             throw new IllegalArgumentException("Invalid lifecycle state: " + state, e);
         }
+    }
+    
+    /**
+     * Checks if a state transition may be invalid based on the tube lifecycle model.
+     * 
+     * @param fromStatus The current tube status
+     * @param toStatus The target tube status
+     * @return true if the transition might be invalid
+     */
+    private boolean isInvalidStateTransition(TubeStatus fromStatus, TubeStatus toStatus) {
+        // Direct transition from ACTIVE to TERMINATED is invalid (should go through DEACTIVATING)
+        if (fromStatus == TubeStatus.ACTIVE && toStatus == TubeStatus.TERMINATED) {
+            return true;
+        }
+        
+        // Other invalid transitions could be added here
+        return false;
     }
     
     @Override
     public String getLegacyComponentState(Object legacyComponent) {
         if (!(legacyComponent instanceof Tube)) {
-            throw new IllegalArgumentException("Expected Tube object, got: " + 
-                    (legacyComponent != null ? legacyComponent.getClass().getName() : "null"));
+            String actualType = legacyComponent != null ? legacyComponent.getClass().getName() : "null";
+            migrationLogger.reportTypeMismatch("legacyComponent", actualType, "org.s8r.tube.Tube");
+            throw new IllegalArgumentException("Expected Tube object, got: " + actualType);
         }
         
         Tube tube = (Tube) legacyComponent;
-        return getTubeStateString(tube);
+        String state = getTubeStateString(tube);
+        
+        // Record state mapping
+        migrationLogger.reportCustomIssue(
+                IssueType.STATE_TRANSITION,
+                Severity.DEBUG,
+                String.format("Read component state: %s from tube status: %s", 
+                        state, tube.getStatus()));
+        
+        return state;
     }
     
     @Override
     public void initializeLegacyComponent(Object legacyComponent) {
         if (!(legacyComponent instanceof Tube)) {
-            throw new IllegalArgumentException("Expected Tube object, got: " + 
-                    (legacyComponent != null ? legacyComponent.getClass().getName() : "null"));
+            String actualType = legacyComponent != null ? legacyComponent.getClass().getName() : "null";
+            migrationLogger.reportTypeMismatch("legacyComponent", actualType, "org.s8r.tube.Tube");
+            throw new IllegalArgumentException("Expected Tube object, got: " + actualType);
         }
         
         // Tubes are already initialized during creation, so this is a no-op
         logger.debug("No explicit initialization needed for Tube components");
+        
+        // Note the lifecycle difference
+        migrationLogger.reportCustomIssue(
+                IssueType.LIFECYCLE,
+                Severity.INFO,
+                "Tube components don't require explicit initialization unlike S8r components");
     }
     
     /**

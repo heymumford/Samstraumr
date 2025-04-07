@@ -92,6 +92,17 @@ public class EventPublisherAdapter implements EventPublisherPort {
         });
   }
   
+  @Override
+  public <T extends DomainEvent> void registerHandler(Class<T> eventType, java.util.function.Consumer<T> handler) {
+    if (eventType == null || handler == null) {
+      logger.warn("Attempted to register handler with null event type or handler");
+      return;
+    }
+    
+    logger.debug("Registering handler for event type: {}", eventType.getSimpleName());
+    eventDispatcher.registerHandler(eventType, handler);
+  }
+  
   /**
    * Publishes all events from a component and clears them.
    *

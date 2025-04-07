@@ -460,6 +460,11 @@ public class InMemoryCacheAdapter implements CachePort {
             return CacheResult.failure("Error during cache shutdown", e.getMessage());
         }
     }
+    
+    @Override
+    public StorageType getStorageType() {
+        return StorageType.MEMORY;
+    }
 
     /**
      * Cleans up expired entries from all cache regions.

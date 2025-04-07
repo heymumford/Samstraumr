@@ -15,7 +15,7 @@ Licensed under the Mozilla Public License 2.0
 > **⚠️ DEPRECATED**: This document has been merged into a comprehensive BDD documentation document.
 >
 > Please refer to the consolidated document for the most up-to-date information:
-> [BDD Documentation](/docs/testing/BddDocumentation.md)
+> [BDD Documentation](/docs/testing/bdd-documentation.md)
 
 Synthesized by Eric Mumford from experience and several sources.
 

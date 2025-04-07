@@ -1146,4 +1146,14 @@ public class StandardFileSystemAdapter implements FileSystemPort {
             return FileResult.failure("Could not shut down file system adapter", e.getMessage());
         }
     }
+    
+    @Override
+    public StorageType getStorageType() {
+        return StorageType.LOCAL_DISK;
+    }
+    
+    @Override
+    public Optional<String> getRootPath() {
+        return Optional.of(workingDirectory.toString());
+    }
 }

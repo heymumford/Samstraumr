@@ -65,7 +65,7 @@ Use the dedicated test runner script to execute biological lifecycle tests:
 ./util/test-bio-lifecycle.sh --help
 ```
 
-For more information about the testing strategy, see the [Test Tags and Annotations](/docs/testing/TestTagsAndAnnotations.md) documentation.
+For more information about the testing strategy, see the [Test Tags and Annotations](/docs/testing/test-tags-and-annotations.md) documentation.
 
 ## Implementation Status
 

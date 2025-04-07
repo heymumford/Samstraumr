@@ -25,6 +25,17 @@ import java.util.stream.Stream;
 public interface FileSystemPort {
 
     /**
+     * Storage type for file operations.
+     */
+    enum StorageType {
+        LOCAL_DISK,
+        NETWORK_SHARE,
+        OBJECT_STORAGE,
+        MEMORY,
+        DATABASE
+    }
+
+    /**
      * Represents the outcome of a file system operation with detailed information.
      */
     final class FileResult {
@@ -619,4 +630,18 @@ public interface FileSystemPort {
      * @return A FileResult indicating success or failure
      */
     FileResult shutdown();
+    
+    /**
+     * Gets the storage type used by this file system port.
+     *
+     * @return The storage type
+     */
+    StorageType getStorageType();
+    
+    /**
+     * Gets the root path for this file system.
+     *
+     * @return The root path, or empty if not applicable
+     */
+    Optional<String> getRootPath();
 }

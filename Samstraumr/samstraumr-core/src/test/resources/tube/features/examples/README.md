@@ -93,4 +93,4 @@ When migrating existing tests to the TBD framework:
 3. Enhance tests to include adaptation and dual state testing where missing
 4. Keep existing tags (@L0_Tube, @ATL, etc.) alongside new TBD tags for compatibility
 
-For more information, refer to the full [Testing-Strategy-TBD.md](/docs/Testing-Strategy-TBD.md) document.
+For more information, refer to the full [testing strategy](/docs/testing/testing-strategy.md) document.

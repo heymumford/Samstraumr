@@ -110,7 +110,7 @@ This document tracks specific implementation tasks for the S8r framework. It pro
    - Streamlined documentation structure
    - Status: Complete
    - Completed on: 2025-04-04
-   - Related: [Architecture documentation](../architecture/.md)
+   - Related: [Architecture documentation](../architecture/README.md)
 
 ## Task Dependencies
 

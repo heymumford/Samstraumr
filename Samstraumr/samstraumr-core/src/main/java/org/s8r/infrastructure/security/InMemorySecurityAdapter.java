@@ -34,6 +34,11 @@ public class InMemorySecurityAdapter implements SecurityPort {
     private final Map<String, TokenEntry> tokens = new ConcurrentHashMap<>();
     private final Map<String, Map<String, Set<String>>> componentAccess = new ConcurrentHashMap<>();
     private final List<Map<String, Object>> securityAuditLog = new CopyOnWriteArrayList<>();
+    
+    // Map for storing resource permissions by security context
+    private final Map<String, Map<String, Set<Permission>>> resourcePermissions = new ConcurrentHashMap<>();
+    // List for storing audit log entries
+    private final List<String> accessAuditLog = new CopyOnWriteArrayList<>();
 
     private final ThreadLocal<AuthenticationContext> currentAuthContext = new ThreadLocal<>();
     private final LoggerPort logger;
@@ -827,5 +832,133 @@ public class InMemorySecurityAdapter implements SecurityPort {
         ));
 
         return SecurityResult.success("Security system shut down");
+    }
+    
+    @Override
+    public boolean hasPermission(SecurityContext context, String resource, Permission permission) {
+        if (context == null) {
+            logger.error("Security context is null for permission check");
+            return false;
+        }
+        
+        String contextId = context.getIdentifier();
+        Map<String, Set<Permission>> contextPermissions = resourcePermissions.getOrDefault(contextId, new HashMap<>());
+        Set<Permission> resourcePerms = contextPermissions.getOrDefault(resource, new HashSet<>());
+        
+        // Check for ALL permission
+        if (resourcePerms.contains(Permission.ALL)) {
+            return true;
+        }
+        
+        // Check for specific permission
+        boolean hasPermission = resourcePerms.contains(permission);
+        
+        // Log this check
+        String logMessage = String.format(
+            "Permission check: context=%s, resource=%s, permission=%s, result=%s",
+            contextId, resource, permission, hasPermission ? "GRANTED" : "DENIED"
+        );
+        logger.debug(logMessage);
+        
+        return hasPermission;
+    }
+    
+    @Override
+    public void grantPermission(SecurityContext context, String resource, Permission permission) {
+        if (context == null) {
+            logger.error("Security context is null for permission grant");
+            return;
+        }
+        
+        String contextId = context.getIdentifier();
+        Map<String, Set<Permission>> contextPermissions = resourcePermissions.computeIfAbsent(
+            contextId, k -> new ConcurrentHashMap<>()
+        );
+        
+        Set<Permission> resourcePerms = contextPermissions.computeIfAbsent(
+            resource, k -> new HashSet<>()
+        );
+        
+        resourcePerms.add(permission);
+        
+        String logMessage = String.format(
+            "Permission granted: context=%s, resource=%s, permission=%s",
+            contextId, resource, permission
+        );
+        logger.debug(logMessage);
+    }
+    
+    @Override
+    public void revokePermission(SecurityContext context, String resource, Permission permission) {
+        if (context == null) {
+            logger.error("Security context is null for permission revocation");
+            return;
+        }
+        
+        String contextId = context.getIdentifier();
+        Map<String, Set<Permission>> contextPermissions = resourcePermissions.get(contextId);
+        if (contextPermissions == null) {
+            return;
+        }
+        
+        Set<Permission> resourcePerms = contextPermissions.get(resource);
+        if (resourcePerms == null) {
+            return;
+        }
+        
+        resourcePerms.remove(permission);
+        
+        String logMessage = String.format(
+            "Permission revoked: context=%s, resource=%s, permission=%s",
+            contextId, resource, permission
+        );
+        logger.debug(logMessage);
+    }
+    
+    @Override
+    public void logAccess(SecurityContext context, String resource, String operation, boolean success, String details) {
+        if (context == null) {
+            logger.error("Security context is null for access logging");
+            return;
+        }
+        
+        String contextId = context.getIdentifier();
+        String logEntry = String.format(
+            "[%s] %s %s for resource '%s' by context '%s': %s",
+            success ? "SUCCESS" : "VIOLATION",
+            operation,
+            success ? "granted" : "denied",
+            resource,
+            contextId,
+            details
+        );
+        
+        // Add to audit log
+        accessAuditLog.add(logEntry);
+        
+        // Log to system logger
+        if (success) {
+            logger.info(logEntry);
+        } else {
+            logger.warn(logEntry);
+        }
+    }
+    
+    @Override
+    public List<String> getAuditLog(SecurityContext context, String resource) {
+        if (context == null) {
+            logger.error("Security context is null for audit log request");
+            return List.of();
+        }
+        
+        // Filter log entries for the specified resource
+        return accessAuditLog.stream()
+            .filter(entry -> entry.contains(resource))
+            .collect(Collectors.toList());
+    }
+    
+    @Override
+    public boolean isInitialized() {
+        return initialized;
     }
 }

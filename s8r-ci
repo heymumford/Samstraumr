@@ -19,6 +19,14 @@ success() { echo -e "${GREEN}$1${RESET}"; }
 error() { echo -e "${RED}Error: $1${RESET}" >&2; exit 1; }
 warn() { echo -e "${YELLOW}Warning: $1${RESET}" >&2; }
 
+# Check if file exists (helper function)
+check_file_exists() {
+  if [ ! -f "$1" ]; then
+    return 1
+  fi
+  return 0
+}
+
 # Find repository root
 PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel)}"
 
@@ -34,6 +42,8 @@ parse_args() {
   DRY_RUN=false
   VERBOSE=false
   EVENT="push"
+  ARCH_VERIFY=false
+  S8R_VERIFY=false
   
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -69,6 +79,14 @@ parse_args() {
         VERBOSE=true
         shift
         ;;
+      --arch|--architecture)
+        ARCH_VERIFY=true
+        shift
+        ;;
+      --s8r|--structure)
+        S8R_VERIFY=true
+        shift
+        ;;
       -h|--help)
         show_help
         exit 0
@@ -92,17 +110,21 @@ show_help() {
   echo "  -e, --event EVENT        Event type to trigger (default: push)"
   echo "  -d, --dry-run            Show what would be run without actually running it"
   echo "  -v, --verbose            Enable verbose output"
+  echo "  --arch, --architecture   Run architecture verification directly (without workflow)"
+  echo "  --s8r, --structure       Run S8r structure verification directly (without workflow)"
   echo "  -h, --help               Show this help message"
   echo
   echo "Available Workflows:"
   echo "  local-pipeline.yml       Simplified pipeline for local testing (default)"
   echo "  samstraumr-pipeline.yml  Full GitHub Actions pipeline (requires Maven in container)"
+  echo "  s8r-structure-pipeline.yml  S8r structure verification pipeline"
   echo
   echo "Examples:"
   echo "  ./s8r-ci                 # Run the default CI pipeline"
   echo "  ./s8r-ci -j basic-verification  # Run only the basic verification job"
   echo "  ./s8r-ci -w smoke-test.yml      # Run the smoke test workflow"
   echo "  ./s8r-ci -e pull_request        # Trigger as pull_request event"
+  echo "  ./s8r-ci --s8r            # Run S8r structure verification directly"
   echo
   echo "Available workflows:"
   find "${PROJECT_ROOT}/.github/workflows" -name "*.yml" -type f | while read -r workflow; do
@@ -170,7 +192,10 @@ run_workflow() {
   echo
   
   # Configure JVM options for Java 21
-  export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+  if command -v java -version 2>&1 | grep -q "version \"21"; then
+    export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+    export MAVEN_OPTS="$JAVA_OPTS"
+  fi
 
   # Execute act with the prepared arguments
   info "Running: act ${act_args[*]}"
@@ -186,6 +211,70 @@ run_workflow() {
   fi
 }
 
+# Run architecture verification directly
+run_architecture_verification() {
+  info "Running Clean Architecture verification..."
+  
+  ARCH_VERIFY_SCRIPT="${PROJECT_ROOT}/s8r-architecture-verify"
+  
+  if ! check_file_exists "$ARCH_VERIFY_SCRIPT"; then
+    error "Architecture verification script not found at: $ARCH_VERIFY_SCRIPT"
+  fi
+  
+  # Set up Java options for reflection if using Java 21
+  if command -v java -version 2>&1 | grep -q "version \"21"; then
+    export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+    export MAVEN_OPTS="$JAVA_OPTS"
+  fi
+  
+  # Run with appropriate verbosity
+  if $VERBOSE; then
+    "$ARCH_VERIFY_SCRIPT" --verbose
+  else
+    "$ARCH_VERIFY_SCRIPT"
+  fi
+  
+  if [ $? -eq 0 ]; then
+    success "Clean Architecture verification passed!"
+    return 0
+  else
+    error "Clean Architecture verification failed!"
+    return 1
+  fi
+}
+
+# Run S8r structure verification directly
+run_s8r_structure_verification() {
+  info "Running S8r structure verification..."
+  
+  S8R_VERIFY_SCRIPT="${PROJECT_ROOT}/s8r-structure-verify"
+  
+  if ! check_file_exists "$S8R_VERIFY_SCRIPT"; then
+    error "S8r structure verification script not found at: $S8R_VERIFY_SCRIPT"
+  fi
+  
+  # Set up Java options for reflection if using Java 21
+  if command -v java -version 2>&1 | grep -q "version \"21"; then
+    export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+    export MAVEN_OPTS="$JAVA_OPTS"
+  fi
+  
+  # Run with appropriate verbosity
+  if $VERBOSE; then
+    "$S8R_VERIFY_SCRIPT" --verbose
+  else
+    "$S8R_VERIFY_SCRIPT"
+  fi
+  
+  if [ $? -eq 0 ]; then
+    success "S8r structure verification passed!"
+    return 0
+  else
+    error "S8r structure verification failed!"
+    return 1
+  fi
+}
+
 # Main execution
 if [[ $# -eq 0 || "$1" == "-h" || "$1" == "--help" ]]; then
   show_help
@@ -193,4 +282,13 @@ if [[ $# -eq 0 || "$1" == "-h" || "$1" == "--help" ]]; then
 fi
 
 parse_args "$@"
-run_workflow
+
+# Run the appropriate verification or workflow
+if $ARCH_VERIFY; then
+  run_architecture_verification
+elif $S8R_VERIFY; then
+  run_s8r_structure_verification
+else
+  # Otherwise run the CI workflow
+  run_workflow
+fi

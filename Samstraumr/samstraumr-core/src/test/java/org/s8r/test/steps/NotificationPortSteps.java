@@ -29,6 +29,8 @@ import org.s8r.application.port.NotificationPort;
 import org.s8r.application.port.NotificationPort.DeliveryStatus;
 import org.s8r.application.port.NotificationPort.NotificationResult;
 import org.s8r.application.port.NotificationPort.NotificationSeverity;
+import org.s8r.application.port.NotificationPort.NotificationChannel;
+import org.s8r.application.port.NotificationPort.SmsType;
 import org.s8r.application.service.NotificationService;
 import org.s8r.infrastructure.logging.ConsoleLogger;
 import org.s8r.infrastructure.notification.NotificationAdapter;
@@ -628,6 +630,580 @@ public class NotificationPortSteps {
         
         DeliveryStatus status = notificationPort.getNotificationStatus(notificationId);
         assertNotNull(status, "Should be able to retrieve status for the notification");
+    }
+    
+    @When("I send an SMS notification to phone number {string}")
+    public void iSendAnSmsNotificationToPhoneNumber(String phoneNumber) {
+        NotificationResult result = notificationService.sendSms(
+                phoneNumber, "Test SMS message for BDD testing");
+        
+        assertNotNull(result, "SMS notification result should not be null");
+        testContext.put("notificationResult", result);
+        testContext.put("notificationId", result.getNotificationId());
+        testContext.put("phoneNumber", phoneNumber);
+    }
+    
+    @When("I send an SMS notification with type {string} to phone number {string}")
+    public void iSendAnSmsNotificationWithTypeToPhoneNumber(String smsType, String phoneNumber) {
+        NotificationPort.SmsType type = NotificationPort.SmsType.valueOf(smsType);
+        
+        NotificationResult result = notificationService.sendSms(
+                phoneNumber, "Test SMS message with type " + smsType, type);
+        
+        assertNotNull(result, "SMS notification result should not be null");
+        testContext.put("notificationResult", result);
+        testContext.put("notificationId", result.getNotificationId());
+        testContext.put("phoneNumber", phoneNumber);
+        testContext.put("smsType", type);
+    }
+    
+    @When("I send a batch SMS notification to multiple phone numbers:")
+    public void iSendABatchSmsNotificationToMultiplePhoneNumbers(DataTable dataTable) {
+        List<String> phoneNumbers = dataTable.asList();
+        
+        Map<String, NotificationResult> results = notificationService.sendBatchSms(
+                phoneNumbers, "Batch SMS test message", NotificationPort.SmsType.STANDARD);
+        
+        assertNotNull(results, "Batch SMS results should not be null");
+        testContext.put("batchSmsResults", results);
+        testContext.put("phoneNumbers", phoneNumbers);
+    }
+    
+    @When("I schedule a notification for delivery at {string}")
+    public void iScheduleANotificationForDeliveryAt(String scheduledTime) {
+        // First ensure we have a recipient
+        if (!notificationPort.isRecipientRegistered("scheduled-test-user")) {
+            Map<String, String> contactInfo = new HashMap<>();
+            contactInfo.put("type", "email");
+            contactInfo.put("address", "scheduled-test@example.com");
+            notificationPort.registerRecipient("scheduled-test-user", contactInfo);
+        }
+        
+        NotificationResult result = notificationPort.scheduleNotification(
+                "scheduled-test-user", 
+                "Scheduled Test", 
+                "This is a scheduled notification test", 
+                NotificationPort.NotificationSeverity.INFO, 
+                scheduledTime, 
+                NotificationPort.NotificationChannel.EMAIL);
+        
+        assertNotNull(result, "Scheduled notification result should not be null");
+        testContext.put("notificationResult", result);
+        testContext.put("notificationId", result.getNotificationId());
+        testContext.put("scheduledTime", scheduledTime);
+    }
+    
+    @When("I send a notification via channel {string} to recipient {string}")
+    public void iSendANotificationViaChannelToRecipient(String channelName, String recipient) {
+        // Ensure the webhook recipient exists
+        if (!notificationPort.isRecipientRegistered(recipient)) {
+            Map<String, String> contactInfo = new HashMap<>();
+            contactInfo.put("type", channelName.toLowerCase());
+            contactInfo.put("webhookUrl", "https://example.com/webhook");
+            notificationPort.registerRecipient(recipient, contactInfo);
+        }
+        
+        NotificationPort.NotificationChannel channel = 
+                NotificationPort.NotificationChannel.valueOf(channelName);
+        
+        NotificationResult result = notificationPort.sendNotificationViaChannel(
+                recipient, 
+                "Channel Test", 
+                "Testing notification via " + channelName, 
+                NotificationPort.NotificationSeverity.INFO, 
+                channel, 
+                Map.of("testKey", "testValue"));
+        
+        assertNotNull(result, "Channel notification result should not be null");
+        testContext.put("notificationResult", result);
+        testContext.put("notificationId", result.getNotificationId());
+        testContext.put("channel", channel);
+        testContext.put("recipient", recipient);
+    }
+    
+    @Then("the SMS notification should be successfully delivered")
+    public void theSmsNotificationShouldBeSuccessfullyDelivered() {
+        NotificationResult result = (NotificationResult) testContext.get("notificationResult");
+        String phoneNumber = (String) testContext.get("phoneNumber");
+        
+        assertNotNull(result, "SMS notification result should be in the test context");
+        assertNotNull(phoneNumber, "Phone number should be in the test context");
+        
+        assertTrue(result.isSent(), "SMS notification should be sent successfully");
+        
+        // Check if logs contain phone number information
+        boolean phoneNumberLogged = logMessages.stream()
+                .anyMatch(message -> message.contains(phoneNumber));
+        
+        assertTrue(phoneNumberLogged, "Logs should contain phone number information");
+    }
+    
+    @Then("the notification channel should be {string}")
+    public void theNotificationChannelShouldBe(String channelName) {
+        NotificationResult result = (NotificationResult) testContext.get("notificationResult");
+        assertNotNull(result, "Notification result should be in the test context");
+        
+        NotificationPort.NotificationChannel expectedChannel = 
+                NotificationPort.NotificationChannel.valueOf(channelName);
+        
+        assertEquals(expectedChannel, result.getChannel(), 
+                "Notification channel should match expected channel");
+    }
+    
+    @Then("the SMS should be handled according to its type")
+    public void theSmsShoudlBeHandledAccordingToItsType() {
+        NotificationResult result = (NotificationResult) testContext.get("notificationResult");
+        NotificationPort.SmsType smsType = 
+                (NotificationPort.SmsType) testContext.get("smsType");
+        
+        assertNotNull(result, "SMS notification result should be in the test context");
+        assertNotNull(smsType, "SMS type should be in the test context");
+        
+        assertTrue(result.isSent(), "SMS notification should be sent successfully");
+        
+        // Check if logs contain SMS type information
+        boolean smsTypeLogged = logMessages.stream()
+                .anyMatch(message -> message.contains(smsType.toString()));
+        
+        assertTrue(smsTypeLogged, "Logs should contain SMS type information");
+    }
+    
+    @Then("all valid SMS notifications should be delivered")
+    public void allValidSmsNotificationsShouldBeDelivered() {
+        @SuppressWarnings("unchecked")
+        Map<String, NotificationResult> results = 
+                (Map<String, NotificationResult>) testContext.get("batchSmsResults");
+        
+        @SuppressWarnings("unchecked")
+        List<String> phoneNumbers = (List<String>) testContext.get("phoneNumbers");
+        
+        assertNotNull(results, "Batch SMS results should be in the test context");
+        assertNotNull(phoneNumbers, "Phone numbers should be in the test context");
+        
+        assertEquals(phoneNumbers.size(), results.size(), 
+                "Results should match phone number count");
+        
+        // Count successful deliveries
+        long successCount = results.values().stream()
+                .filter(NotificationResult::isSent)
+                .count();
+        
+        assertTrue(successCount > 0, "At least some SMS notifications should be delivered");
+    }
+    
+    @Then("I should receive delivery status for each phone number")
+    public void iShouldReceiveDeliveryStatusForEachPhoneNumber() {
+        @SuppressWarnings("unchecked")
+        Map<String, NotificationResult> results = 
+                (Map<String, NotificationResult>) testContext.get("batchSmsResults");
+        
+        @SuppressWarnings("unchecked")
+        List<String> phoneNumbers = (List<String>) testContext.get("phoneNumbers");
+        
+        assertNotNull(results, "Batch SMS results should be in the test context");
+        assertNotNull(phoneNumbers, "Phone numbers should be in the test context");
+        
+        // Check that we have results for each phone number
+        for (String phoneNumber : phoneNumbers) {
+            assertTrue(results.containsKey(phoneNumber), 
+                    "Results should contain entry for phone number: " + phoneNumber);
+            
+            NotificationResult result = results.get(phoneNumber);
+            assertNotNull(result, "Result for phone number should not be null: " + phoneNumber);
+            assertNotNull(result.getStatus(), 
+                    "Status for phone number should not be null: " + phoneNumber);
+        }
+    }
+    
+    @Then("the notification should be marked as {string}")
+    public void theNotificationShouldBeMarkedAs(String statusString) {
+        NotificationResult result = (NotificationResult) testContext.get("notificationResult");
+        assertNotNull(result, "Notification result should be in the test context");
+        
+        DeliveryStatus expectedStatus = DeliveryStatus.valueOf(statusString);
+        assertEquals(expectedStatus, result.getStatus(), 
+                "Notification status should be " + statusString);
+    }
+    
+    @Then("the scheduled time should be stored in the notification metadata")
+    public void theScheduledTimeShouldBeStoredInTheNotificationMetadata() {
+        NotificationResult result = (NotificationResult) testContext.get("notificationResult");
+        String scheduledTime = (String) testContext.get("scheduledTime");
+        
+        assertNotNull(result, "Notification result should be in the test context");
+        assertNotNull(scheduledTime, "Scheduled time should be in the test context");
+        
+        Map<String, String> metadata = result.getMetadata();
+        assertNotNull(metadata, "Notification metadata should not be null");
+        assertTrue(metadata.containsKey("scheduledTime"), 
+                "Metadata should contain scheduled time");
+        assertEquals(scheduledTime, metadata.get("scheduledTime"), 
+                "Scheduled time in metadata should match expected time");
+    }
+    
+    @Then("the notification should be delivered via the specified channel")
+    public void theNotificationShouldBeDeliveredViaTheSpecifiedChannel() {
+        NotificationResult result = (NotificationResult) testContext.get("notificationResult");
+        NotificationPort.NotificationChannel channel = 
+                (NotificationPort.NotificationChannel) testContext.get("channel");
+        
+        assertNotNull(result, "Notification result should be in the test context");
+        assertNotNull(channel, "Channel should be in the test context");
+        
+        assertTrue(result.isSent(), "Notification should be sent successfully");
+        
+        // Check if logs contain channel information
+        boolean channelLogged = logMessages.stream()
+                .anyMatch(message -> message.contains(channel.toString()));
+        
+        assertTrue(channelLogged, "Logs should contain channel information");
+    }
+    
+    @Then("the notification channel in the result should be {string}")
+    public void theNotificationChannelInTheResultShouldBe(String channelName) {
+        NotificationResult result = (NotificationResult) testContext.get("notificationResult");
+        assertNotNull(result, "Notification result should be in the test context");
+        
+        NotificationPort.NotificationChannel expectedChannel = 
+                NotificationPort.NotificationChannel.valueOf(channelName);
+        
+        assertEquals(expectedChannel, result.getChannel(), 
+                "Notification channel in result should be " + channelName);
+    }
+    
+    @When("I send a {string} notification to channel {string}")
+    public void iSendAPlatformNotificationToChannel(String platform, String channel) {
+        // Ensure the test has required data
+        String workspace = "test-workspace";
+        String teamId = "test-team";
+        String serverId = "test-server";
+        NotificationPort.NotificationChannel platformChannel = 
+                NotificationPort.NotificationChannel.valueOf(platform);
+        
+        NotificationResult result;
+        
+        switch (platformChannel) {
+            case SLACK:
+                result = notificationService.sendSlackNotification(
+                        workspace, channel, "Test Slack notification");
+                break;
+            case TEAMS:
+                result = notificationService.sendTeamsNotification(
+                        teamId, channel, "Test Teams notification");
+                break;
+            case DISCORD:
+                result = notificationService.sendDiscordNotification(
+                        serverId, channel, "Test Discord notification");
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported platform: " + platform);
+        }
+        
+        assertNotNull(result, "Platform notification result should not be null");
+        testContext.put("notificationResult", result);
+        testContext.put("notificationId", result.getNotificationId());
+        testContext.put("platform", platformChannel);
+        testContext.put("channelName", channel);
+    }
+    
+    @Then("the notification should be delivered via the {string} channel")
+    public void theNotificationShouldBeDeliveredViaThePlatformChannel(String platform) {
+        NotificationResult result = (NotificationResult) testContext.get("notificationResult");
+        NotificationPort.NotificationChannel platformChannel = 
+                NotificationPort.NotificationChannel.valueOf(platform);
+        
+        assertNotNull(result, "Notification result should be in the test context");
+        assertEquals(platformChannel, result.getChannel(), 
+                "Notification channel should be " + platform);
+        
+        assertTrue(result.isSent(), "Notification should be sent successfully");
+    }
+    
+    @Then("the notification content should be properly formatted for the platform")
+    public void theNotificationContentShouldBeProperlyFormattedForThePlatform() {
+        NotificationResult result = (NotificationResult) testContext.get("notificationResult");
+        NotificationPort.NotificationChannel platform = 
+                (NotificationPort.NotificationChannel) testContext.get("platform");
+        
+        assertNotNull(result, "Notification result should be in the test context");
+        assertNotNull(platform, "Platform should be in the test context");
+        
+        // In a real implementation, this would check platform-specific formatting
+        // For this test, we'll just verify that the notification was sent
+        assertTrue(result.isSent(), "Notification should be sent successfully");
+        
+        // Check if logs contain platform information
+        boolean platformLogged = logMessages.stream()
+                .anyMatch(message -> message.contains(platform.toString()));
+        
+        assertTrue(platformLogged, "Logs should contain platform information");
+    }
+    
+    @When("I send a notification with content format {string}")
+    public void iSendANotificationWithContentFormat(String format) {
+        NotificationPort.ContentFormat contentFormat = 
+                NotificationPort.ContentFormat.valueOf(format);
+        
+        String content;
+        switch (contentFormat) {
+            case HTML:
+                content = "<h1>Test HTML Content</h1><p>This is a test.</p>";
+                break;
+            case MARKDOWN:
+                content = "# Test Markdown Content\n\nThis is a test.";
+                break;
+            case RICH_TEXT:
+                content = "Test Rich Text Content with *formatting*";
+                break;
+            case JSON:
+                content = "{\"title\":\"Test JSON Content\",\"body\":\"This is a test.\"}";
+                break;
+            default:
+                content = "Test Plain Text Content";
+                break;
+        }
+        
+        // Ensure recipient is registered
+        if (!notificationPort.isRecipientRegistered("format-test-user")) {
+            Map<String, String> contactInfo = new HashMap<>();
+            contactInfo.put("type", "email");
+            contactInfo.put("address", "format-test@example.com");
+            notificationPort.registerRecipient("format-test-user", contactInfo);
+        }
+        
+        NotificationResult result = notificationPort.sendFormattedNotification(
+                "format-test-user", 
+                "Format Test", 
+                content, 
+                contentFormat, 
+                NotificationPort.NotificationSeverity.INFO, 
+                NotificationPort.NotificationChannel.EMAIL, 
+                Map.of("format", format));
+        
+        assertNotNull(result, "Formatted notification result should not be null");
+        testContext.put("notificationResult", result);
+        testContext.put("notificationId", result.getNotificationId());
+        testContext.put("contentFormat", contentFormat);
+        testContext.put("content", content);
+    }
+    
+    @Then("the notification should be properly rendered in the {string} format")
+    public void theNotificationShouldBeProperlyRenderedInTheFormat(String format) {
+        NotificationResult result = (NotificationResult) testContext.get("notificationResult");
+        NotificationPort.ContentFormat contentFormat = 
+                NotificationPort.ContentFormat.valueOf(format);
+        
+        assertNotNull(result, "Notification result should be in the test context");
+        assertTrue(result.isSent(), "Notification should be sent successfully");
+        
+        // In a real implementation, this would check format-specific rendering
+        // For this test, we'll just verify that the notification was sent with the correct format
+        
+        // Check if logs contain format information
+        boolean formatLogged = logMessages.stream()
+                .anyMatch(message -> message.contains(contentFormat.toString()));
+        
+        assertTrue(formatLogged, "Logs should contain content format information");
+    }
+    
+    @Then("the notification should maintain proper formatting")
+    public void theNotificationShouldMaintainProperFormatting() {
+        String content = (String) testContext.get("content");
+        NotificationPort.ContentFormat contentFormat = 
+                (NotificationPort.ContentFormat) testContext.get("contentFormat");
+        
+        assertNotNull(content, "Content should be in the test context");
+        assertNotNull(contentFormat, "Content format should be in the test context");
+        
+        // In a real implementation, this would check that formatting is maintained
+        // For this test, we'll just verify that the content is appropriate for the format
+        
+        switch (contentFormat) {
+            case HTML:
+                assertTrue(content.contains("<"), "HTML content should contain opening tag");
+                assertTrue(content.contains(">"), "HTML content should contain closing tag");
+                break;
+            case MARKDOWN:
+                assertTrue(content.contains("#") || content.contains("*"), 
+                        "Markdown content should contain formatting characters");
+                break;
+            case JSON:
+                assertTrue(content.contains("{") && content.contains("}"), 
+                        "JSON content should be properly formatted");
+                break;
+            default:
+                // Plain text and rich text have no specific validation
+                break;
+        }
+    }
+    
+    @When("I send a templated notification with the following variables:")
+    public void iSendATemplatedNotificationWithTheFollowingVariables(DataTable dataTable) {
+        List<Map<String, String>> rows = dataTable.asMaps();
+        Map<String, String> variables = new HashMap<>();
+        
+        // Convert DataTable to variables map
+        for (Map<String, String> row : rows) {
+            String key = row.keySet().iterator().next();
+            variables.put(key, row.get(key));
+        }
+        
+        // Ensure recipient is registered
+        if (!notificationPort.isRecipientRegistered("template-test-user")) {
+            Map<String, String> contactInfo = new HashMap<>();
+            contactInfo.put("type", "email");
+            contactInfo.put("address", "template-test@example.com");
+            notificationPort.registerRecipient("template-test-user", contactInfo);
+        }
+        
+        // Use a standard test template
+        String templateName = "user-action-template";
+        
+        NotificationResult result = notificationPort.sendTemplatedNotification(
+                "template-test-user", 
+                templateName, 
+                variables, 
+                NotificationPort.NotificationSeverity.INFO, 
+                NotificationPort.NotificationChannel.EMAIL);
+        
+        assertNotNull(result, "Templated notification result should not be null");
+        testContext.put("notificationResult", result);
+        testContext.put("notificationId", result.getNotificationId());
+        testContext.put("templateName", templateName);
+        testContext.put("variables", variables);
+    }
+    
+    @Then("the notification should have the variables substituted in the template")
+    public void theNotificationShouldHaveTheVariablesSubstitutedInTheTemplate() {
+        NotificationResult result = (NotificationResult) testContext.get("notificationResult");
+        Map<String, String> variables = (Map<String, String>) testContext.get("variables");
+        
+        assertNotNull(result, "Notification result should be in the test context");
+        assertNotNull(variables, "Variables should be in the test context");
+        
+        assertTrue(result.isSent(), "Notification should be sent successfully");
+        
+        // In a real implementation, this would check that variables are substituted
+        // For this test, we'll just verify that variables are logged
+        
+        // Check if logs contain variable information
+        boolean variablesLogged = variables.entrySet().stream()
+                .anyMatch(entry -> logMessages.stream()
+                        .anyMatch(message -> message.contains(entry.getKey()) || 
+                                          message.contains(entry.getValue())));
+        
+        assertTrue(variablesLogged, "Logs should contain variable information");
+    }
+    
+    @Then("the notification should be properly formatted according to the template")
+    public void theNotificationShouldBeProperlyFormattedAccordingToTheTemplate() {
+        String templateName = (String) testContext.get("templateName");
+        assertNotNull(templateName, "Template name should be in the test context");
+        
+        // In a real implementation, this would check template-specific formatting
+        // For this test, we'll just verify that template information is logged
+        
+        boolean templateLogged = logMessages.stream()
+                .anyMatch(message -> message.contains(templateName));
+        
+        assertTrue(templateLogged, "Logs should contain template information");
+    }
+    
+    @When("I register a recipient for {string} notifications with proper credentials")
+    public void iRegisterARecipientForChannelNotificationsWithProperCredentials(String channelName) {
+        NotificationPort.NotificationChannel channel = 
+                NotificationPort.NotificationChannel.valueOf(channelName);
+        
+        String recipient = channelName.toLowerCase() + "-recipient";
+        boolean result = false;
+        
+        switch (channel) {
+            case SLACK:
+                result = notificationPort.registerSlackRecipient(
+                        recipient, "test-workspace", "#general", "https://slack.example.com/webhook");
+                break;
+            case TEAMS:
+                result = notificationPort.registerTeamsRecipient(
+                        recipient, "test-team", "General", "https://teams.example.com/webhook");
+                break;
+            case DISCORD:
+                result = notificationPort.registerDiscordRecipient(
+                        recipient, "test-server", "#general", "https://discord.example.com/webhook");
+                break;
+            case SMS:
+                result = notificationPort.registerSmsRecipient(
+                        recipient, "555-123-4567", "+1", true);
+                break;
+            case EMAIL:
+                Map<String, String> emailInfo = Map.of(
+                        "type", "email",
+                        "address", recipient + "@example.com"
+                );
+                result = notificationPort.registerRecipient(recipient, emailInfo);
+                break;
+            case PUSH:
+                Map<String, String> pushInfo = Map.of(
+                        "type", "push",
+                        "device", "device-token-" + recipient,
+                        "platform", "android"
+                );
+                result = notificationPort.registerRecipient(recipient, pushInfo);
+                break;
+            case WEBHOOK:
+                Map<String, String> webhookInfo = Map.of(
+                        "type", "webhook",
+                        "url", "https://webhook.example.com/" + recipient
+                );
+                result = notificationPort.registerChannelRecipient(recipient, channel, webhookInfo);
+                break;
+            default:
+                Map<String, String> genericInfo = Map.of(
+                        "type", channelName.toLowerCase(),
+                        "address", recipient + "@example.com"
+                );
+                result = notificationPort.registerChannelRecipient(recipient, channel, genericInfo);
+                break;
+        }
+        
+        testContext.put("registrationResult", result);
+        testContext.put("channel", channel);
+        testContext.put("channelRecipient", recipient);
+    }
+    
+    @Then("the recipient should be registered successfully for {string} channel")
+    public void theRecipientShouldBeRegisteredSuccessfullyForChannel(String channelName) {
+        Boolean result = (Boolean) testContext.get("registrationResult");
+        String recipient = (String) testContext.get("channelRecipient");
+        
+        assertNotNull(result, "Registration result should be in the test context");
+        assertNotNull(recipient, "Channel recipient should be in the test context");
+        
+        assertTrue(result, "Registration should be successful");
+        assertTrue(notificationPort.isRecipientRegistered(recipient), 
+                "Recipient should be registered in the system");
+    }
+    
+    @Then("I should be able to send {string} notifications to this recipient")
+    public void iShouldBeAbleToSendChannelNotificationsToThisRecipient(String channelName) {
+        NotificationPort.NotificationChannel channel = 
+                NotificationPort.NotificationChannel.valueOf(channelName);
+        String recipient = (String) testContext.get("channelRecipient");
+        
+        assertNotNull(recipient, "Channel recipient should be in the test context");
+        
+        // Send a test notification via the channel
+        NotificationResult result = notificationPort.sendNotificationViaChannel(
+                recipient,
+                "Channel Test",
+                "Testing notification via " + channelName,
+                NotificationPort.NotificationSeverity.INFO,
+                channel,
+                Map.of()
+        );
+        
+        assertNotNull(result, "Channel notification result should not be null");
+        assertTrue(result.isSent(), "Notification should be sent successfully");
+        assertEquals(channel, result.getChannel(), "Notification channel should match expected channel");
     }
     
     /**

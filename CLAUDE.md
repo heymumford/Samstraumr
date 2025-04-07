@@ -98,7 +98,7 @@ If you need to temporarily use Java 21 for a single command without changing you
 
 ```bash
 # Run any command with Java 21
-./use-java21.sh <command>
+./use-java21.sh <command>  # Symlink to util/scripts/java/use-java21.sh
 ```
 
 ### Java 21 Compatibility Notes
@@ -184,7 +184,7 @@ Samstraumr has two version management systems:
 ./s8r version bump patch
 
 # Set a specific version
-./s8r version set 2.4.6
+./s8r version set 2.5.1
 
 # Test, bump and tag
 ./s8r version test patch
@@ -203,7 +203,7 @@ Samstraumr has two version management systems:
 ./s8r-version bump minor
 
 # Set specific version
-./s8r-version set 2.4.6
+./s8r-version set 2.5.1
 
 # Fix version inconsistencies
 ./s8r-version fix
@@ -239,4 +239,4 @@ Before committing code, verify these style standards:
 
 ## Current Version
 
-The current version of Samstraumr is: 2.4.6 (as of April 04, 2025)
+The current version of Samstraumr is: 2.5.1 (as of April 07, 2025)

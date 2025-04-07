@@ -15,13 +15,13 @@ Licensed under the Mozilla Public License 2.0
 > **⚠️ DEPRECATED**: This document has been merged into a comprehensive test tags and annotations document.
 >
 > Please refer to the consolidated document for the most up-to-date information:
-> [Test Tags and Annotations](/docs/testing/TestTagsAndAnnotations.md)
+> [Test Tags and Annotations](/docs/testing/test-tags-and-annotations.md)
 >
 > **⚠️ ENHANCEMENT**: We've implemented a comprehensive biological lifecycle tagging system
 > that organizes tests by development phases, initiatives, and epics. The new tagging structure
 > provides more granular control over test execution.
 >
-> Visit the [Test Tags and Annotations](/docs/testing/TestTagsAndAnnotations.md) document for
+> Visit the [Test Tags and Annotations](/docs/testing/test-tags-and-annotations.md) document for
 > comprehensive information on using tags for:
 > - Biological lifecycle phases (@Conception, @Embryonic, @Infancy, @Childhood, etc.)
 > - Initiatives (@SubstrateIdentity, @StructuralIdentity, @MemoryIdentity, @FunctionalIdentity, etc.)

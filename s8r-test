@@ -120,6 +120,8 @@ show_help() {
   echo "  monitoring              Run monitoring/observability tests"
   echo "  lifecycle               Run lifecycle tests"
   echo "  resilience              Run resilience tests"
+  echo "  maven-structure         Run Maven structure tests"
+  echo "  architecture            Run architecture tests"
   echo
   echo "Legacy Test Types (backwards compatibility):"
   echo "  tube                    Run tube tests (maps to unit)"
@@ -190,6 +192,12 @@ map_test_type() {
     resilience)
       tags="@Resilience or @CircuitBreaker"
       ;;
+    maven-structure|mvn-structure)
+      tags="@MavenTest"
+      ;;
+    architecture)
+      tags="@Architecture"
+      ;;
       
     # Legacy test types (backward compatibility)
     tube)
@@ -248,6 +256,15 @@ run_tests() {
       ;;
     integration|machine)
       mvn_args+=("-Dtest=RunMachineTests")
+      ;;
+    maven-structure|mvn-structure)
+      # Special case: use our shell script instead of Maven
+      info "Running Maven structure tests using ./test-maven-structure.sh"
+      ./test-maven-structure.sh
+      return $?
+      ;;
+    architecture)
+      mvn_args+=("-Dtest=RunArchitectureTests")
       ;;
     *)
       mvn_args+=("-Dtest=RunCucumberTest")

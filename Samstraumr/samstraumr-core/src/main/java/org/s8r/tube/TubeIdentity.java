@@ -41,6 +41,15 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *
  * <p>Once created, the core identity properties are immutable, ensuring a stable foundation for a
  * tube's existence throughout its lifecycle.
+ *
+ * <p>The TubeIdentity also includes environmental information such as:
+ * <ul>
+ *   <li>CPU architecture
+ *   <li>Operating system information
+ *   <li>Memory statistics
+ *   <li>Network configuration
+ *   <li>Runtime environment details
+ * </ul>
  */
 public class TubeIdentity {
   private final String uniqueId;
@@ -256,6 +265,52 @@ public class TubeIdentity {
     if (childIdentity != null) {
       descendants.add(childIdentity);
     }
+  }
+  
+  /**
+   * Gets the environment property value for the specified key.
+   *
+   * @param key The environment property key
+   * @return The environment property value, or null if not found
+   */
+  public String getEnvironmentProperty(String key) {
+    return environmentContext.get(key);
+  }
+  
+  /**
+   * Gets the unique identifier for this tube. Alias for getUniqueId().
+   *
+   * @return The unique identifier
+   */
+  public String getId() {
+    return getUniqueId();
+  }
+  
+  /**
+   * Checks if this identity has the specified ancestor in its lineage.
+   *
+   * @param ancestorId The ancestor ID to check
+   * @return true if the ancestor is in the lineage, false otherwise
+   */
+  public boolean hasAncestor(String ancestorId) {
+    if (parentIdentity == null) {
+      return false;
+    }
+    
+    if (parentIdentity.getUniqueId().equals(ancestorId)) {
+      return true;
+    }
+    
+    return parentIdentity.hasAncestor(ancestorId);
+  }
+  
+  /**
+   * Gets the notation used to represent this identity in hierarchical systems.
+   *
+   * @return The identity notation
+   */
+  public String getNotation() {
+    return hierarchicalAddress;
   }
 
   @Override
