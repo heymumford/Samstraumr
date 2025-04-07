@@ -26,10 +26,12 @@ This document tracks the progress of tasks in the S8r project.
 
 ## Tasks In Progress
 
-- Test the new Maven structure end-to-end
 - Finalize documentation for the migration utilities
-- Implement TDD-driven port interface tests
 - Enhance NotificationPort with additional notification channels and testing
+
+## Tasks In Review
+
+- Implement TDD-driven port interface tests
 
 ## Tasks Done
 
@@ -44,6 +46,7 @@ This document tracks the progress of tasks in the S8r project.
 - Create comprehensive BDD tests for the S8r framework
 - Implement automated documentation generation system (Phases 1-5 complete)
 - Implement documentation CI integration with pre-release checks
+- Test the new Maven structure end-to-end with validation scripts
 - Implement TODO standardization tooling and standards
 - Execute TODO standardization across the codebase
 - Implement directory flattening to improve organization (Phases 1-5 complete)
