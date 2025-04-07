@@ -34,7 +34,7 @@ else
 fi
 
 # Default output file
-OUTPUT_FILE="${PROJECT_ROOT}/CHANGELOG.md"
+OUTPUT_FILE="${PROJECT_ROOT}/docs/reference/release/changelog.md"
 
 # Default range: compare current with previous version
 FROM_TAG="$(git describe --abbrev=0 --tags 2>/dev/null || echo "")"
@@ -57,7 +57,7 @@ show_help() {
     print_bold "Options:"
     echo "  -f, --from TAG       Start tag or commit (default: latest tag)"
     echo "  -t, --to TAG         End tag or commit (default: HEAD)"
-    echo "  -o, --output FILE    Output file (default: CHANGELOG.md)"
+    echo "  -o, --output FILE    Output file (default: docs/reference/release/changelog.md)"
     echo "  -u, --update         Update existing changelog instead of overwriting"
     echo "  -h, --help           Show this help message"
     echo
@@ -65,7 +65,7 @@ show_help() {
     print_bold "Examples:"
     echo "  $(basename "$0") --from v1.0.0 --to v2.0.0"
     echo "  $(basename "$0") --from 0c7d3a1 --to HEAD"
-    echo "  $(basename "$0") --output docs/CHANGELOG.md"
+    echo "  $(basename "$0") --output custom/path/changelog.md"
   else
     # Fallback to original implementation
     echo "Usage: $(basename "$0") [options]"
@@ -73,14 +73,14 @@ show_help() {
     echo "Options:"
     echo "  -f, --from TAG       Start tag or commit (default: latest tag)"
     echo "  -t, --to TAG         End tag or commit (default: HEAD)"
-    echo "  -o, --output FILE    Output file (default: CHANGELOG.md)"
+    echo "  -o, --output FILE    Output file (default: docs/reference/release/changelog.md)"
     echo "  -u, --update         Update existing changelog instead of overwriting"
     echo "  -h, --help           Show this help message"
     echo
     echo "Examples:"
     echo "  $(basename "$0") --from v1.0.0 --to v2.0.0"
     echo "  $(basename "$0") --from 0c7d3a1 --to HEAD"
-    echo "  $(basename "$0") --output docs/CHANGELOG.md"
+    echo "  $(basename "$0") --output custom/path/changelog.md"
   fi
 }
 

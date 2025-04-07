@@ -573,7 +573,7 @@ EOF
   
   # Also copy some of the key markdown files directly
   docmosis_info "Copying key documentation files..."
-  for key_file in README.md CHANGELOG.md docs/README.md; do
+  for key_file in README.md docs/reference/release/changelog.md docs/README.md; do
     if [ -f "${PROJECT_ROOT}/${key_file}" ]; then
       # Get directory of the target file
       local dir_name="$(dirname "${output_dir}/${key_file}")"
