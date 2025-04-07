@@ -73,7 +73,7 @@ Licensed under the Mozilla Public License 2.0
     <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
     <jacoco.line.coverage>0.75</jacoco.line.coverage>
     <jacoco.branch.coverage>0.75</jacoco.branch.coverage>
-    <maven.site.plugin.version>4.0.0-M13</maven.site.plugin.version>
+    <maven.site.plugin.version>4.0.0-M16</maven.site.plugin.version>
     <maven.project.info.reports.plugin.version>3.5.0</maven.project.info.reports.plugin.version>
     <dependency-check.version>9.0.7</dependency-check.version>
   </properties>
