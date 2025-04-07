@@ -16,6 +16,8 @@ Port interfaces are a core concept in hexagonal architecture (also known as "por
 | `ComponentPort` | Domain | org.s8r.domain.component.port | Interface for components in the domain |
 | `CompositeComponentPort` | Domain | org.s8r.domain.component.port | Interface for composite components |
 | `MachinePort` | Domain | org.s8r.domain.component.port | Interface for machines |
+| `DataFlowComponentPort` | Domain | org.s8r.domain.component.pattern | Interface for component data flow operations |
+| `DataFlowPort` | Domain | org.s8r.domain.component.pattern | Interface for data flow operations |
 | `ComponentRepository` | Secondary | org.s8r.application.port | Interface for component persistence |
 | `MachineRepository` | Secondary | org.s8r.application.port | Interface for machine persistence |
 | `EventDispatcher` | Secondary | org.s8r.application.port | Interface for dispatching events |
@@ -33,6 +35,7 @@ Port interfaces are a core concept in hexagonal architecture (also known as "por
 | `InMemoryEventDispatcher` | Infrastructure | EventDispatcher | In-memory event dispatcher |
 | `EventPublisherAdapter` | Infrastructure | EventPublisherPort | Implements event publishing |
 | `DataFlowEventHandler` | Infrastructure | DataFlowEventPort | Handles data flow events |
+| `DataFlowComponentAdapter` | Infrastructure | DataFlowComponentPort | Adapts component data flow operations |
 | `ComponentCliAdapter` | Primary | N/A | CLI adapter for component operations |
 
 ## Clean Architecture Implementation

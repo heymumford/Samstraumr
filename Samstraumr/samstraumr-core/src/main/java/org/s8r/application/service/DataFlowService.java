@@ -15,17 +15,19 @@
 
 package org.s8r.application.service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
 import org.s8r.application.port.ComponentRepository;
 import org.s8r.application.port.DataFlowEventPort;
-import org.s8r.application.port.EventDispatcher;
+import org.s8r.application.port.EventPublisherPort;
 import org.s8r.application.port.LoggerPort;
-import org.s8r.domain.component.Component;
 import org.s8r.domain.component.pattern.DataFlowPort;
+import org.s8r.domain.component.port.ComponentPort;
 import org.s8r.domain.event.ComponentDataEvent;
+import org.s8r.domain.event.DomainEvent;
 import org.s8r.domain.exception.ComponentNotFoundException;
 import org.s8r.domain.identity.ComponentId;
 
@@ -38,7 +40,7 @@ import org.s8r.domain.identity.ComponentId;
 public class DataFlowService implements DataFlowPort {
   private final ComponentRepository componentRepository;
   private final DataFlowEventPort dataFlowHandler;
-  private final EventDispatcher eventDispatcher;
+  private final EventPublisherPort eventPublisher;
   private final LoggerPort logger;
 
   /**
@@ -46,17 +48,17 @@ public class DataFlowService implements DataFlowPort {
    *
    * @param componentRepository The component repository
    * @param dataFlowHandler The data flow event handler
-   * @param eventDispatcher The event dispatcher
+   * @param eventPublisher The event publisher
    * @param logger The logger
    */
   public DataFlowService(
       ComponentRepository componentRepository,
       DataFlowEventPort dataFlowHandler,
-      EventDispatcher eventDispatcher,
+      EventPublisherPort eventPublisher,
       LoggerPort logger) {
     this.componentRepository = componentRepository;
     this.dataFlowHandler = dataFlowHandler;
-    this.eventDispatcher = eventDispatcher;
+    this.eventPublisher = eventPublisher;
     this.logger = logger;
   }
 
@@ -72,16 +74,16 @@ public class DataFlowService implements DataFlowPort {
     logger.debug(
         "Component [{}] publishing data to channel [{}]", componentId.getShortId(), channel);
 
-    Component component =
+    // Use ComponentPort interface instead of concrete Component class
+    ComponentPort componentPort =
         componentRepository
             .findById(componentId)
             .orElseThrow(() -> new ComponentNotFoundException(componentId));
 
-    component.publishData(channel, data);
+    componentPort.publishData(channel, data);
 
     // Process and dispatch events
-    component.getDomainEvents().forEach(eventDispatcher::dispatch);
-    component.clearEvents();
+    dispatchDomainEvents(componentPort);
   }
 
   /**
@@ -100,16 +102,32 @@ public class DataFlowService implements DataFlowPort {
         channel,
         key);
 
-    Component component =
+    // Use ComponentPort interface instead of concrete Component class
+    ComponentPort componentPort =
         componentRepository
             .findById(componentId)
             .orElseThrow(() -> new ComponentNotFoundException(componentId));
 
-    component.publishData(channel, key, value);
+    componentPort.publishData(channel, key, value);
 
     // Process and dispatch events
-    component.getDomainEvents().forEach(eventDispatcher::dispatch);
-    component.clearEvents();
+    dispatchDomainEvents(componentPort);
+  }
+  
+  /**
+   * Dispatches all domain events from a component port and clears them.
+   *
+   * @param componentPort The component port with events to dispatch
+   */
+  private void dispatchDomainEvents(ComponentPort componentPort) {
+    List<DomainEvent> events = componentPort.getDomainEvents();
+    
+    if (!events.isEmpty()) {
+      logger.debug("Publishing {} events from component {}", 
+          events.size(), componentPort.getId().getIdString());
+      eventPublisher.publishEvents(events);
+      componentPort.clearEvents();
+    }
   }
 
   /**
@@ -122,7 +140,7 @@ public class DataFlowService implements DataFlowPort {
    */
   public void subscribe(
       ComponentId componentId, String channel, Consumer<ComponentDataEvent> handler) {
-    // Verify component exists
+    // Verify component exists using ComponentPort interface
     if (!componentRepository.findById(componentId).isPresent()) {
       throw new ComponentNotFoundException(componentId);
     }
@@ -141,7 +159,7 @@ public class DataFlowService implements DataFlowPort {
    */
   public void subscribeSimple(
       ComponentId componentId, String channel, BiConsumer<String, Object> callback) {
-    // Verify component exists
+    // Verify component exists using ComponentPort interface
     if (!componentRepository.findById(componentId).isPresent()) {
       throw new ComponentNotFoundException(componentId);
     }
