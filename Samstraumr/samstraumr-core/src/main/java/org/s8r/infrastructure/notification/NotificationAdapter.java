@@ -49,11 +49,27 @@ public class NotificationAdapter implements NotificationPort {
     private final Map<String, NotificationRecord> notifications;
     private final String defaultRecipient;
     
+    // Map of internal channel names to NotificationChannel enum values
+    private static final Map<String, NotificationChannel> CHANNEL_MAP = Map.of(
+        "email", NotificationChannel.EMAIL,
+        "sms", NotificationChannel.SMS,
+        "push", NotificationChannel.PUSH,
+        "system", NotificationChannel.SYSTEM,
+        "webhook", NotificationChannel.WEBHOOK,
+        "discord", NotificationChannel.DISCORD,
+        "slack", NotificationChannel.SLACK,
+        "teams", NotificationChannel.TEAMS
+    );
+    
     // Channel types supported by this adapter
     private static final String CHANNEL_EMAIL = "email";
     private static final String CHANNEL_SMS = "sms";
     private static final String CHANNEL_PUSH = "push";
     private static final String CHANNEL_SYSTEM = "system";
+    private static final String CHANNEL_WEBHOOK = "webhook";
+    private static final String CHANNEL_DISCORD = "discord";
+    private static final String CHANNEL_SLACK = "slack";
+    private static final String CHANNEL_TEAMS = "teams";
     
     /**
      * Record class to store notification information.
@@ -392,6 +408,184 @@ public class NotificationAdapter implements NotificationPort {
         return true;
     }
     
+    @Override
+    public NotificationResult sendNotificationViaChannel(
+            String recipient, 
+            String subject, 
+            String content, 
+            NotificationSeverity severity, 
+            NotificationChannel channel, 
+            Map<String, String> metadata) {
+        logger.debug("Sending notification via channel {} to recipient: {}", channel, recipient);
+        
+        // Validate recipient
+        if (!isRecipientRegistered(recipient)) {
+            logger.warn("Recipient not registered: {}", recipient);
+            return NotificationResult.failure("N/A", "Recipient not registered: " + recipient, channel);
+        }
+        
+        // Generate notification ID
+        String notificationId = generateNotificationId();
+        
+        // Prepare metadata
+        Map<String, String> notificationMetadata = metadata != null 
+            ? new HashMap<>(metadata) 
+            : new HashMap<>();
+        
+        // Add standard metadata
+        notificationMetadata.put("timestamp", LocalDateTime.now().toString());
+        notificationMetadata.put("severity", severity.toString());
+        notificationMetadata.put("channel", channel.toString());
+        
+        // Add channel-specific metadata
+        switch (channel) {
+            case SMS:
+                notificationMetadata.put("smsType", 
+                    notificationMetadata.getOrDefault("smsType", SmsType.STANDARD.toString()));
+                break;
+            case PUSH:
+                notificationMetadata.put("pushType", 
+                    notificationMetadata.getOrDefault("pushType", "default"));
+                break;
+            default:
+                // No additional metadata needed
+                break;
+        }
+        
+        // Create and store notification record
+        NotificationRecord record = new NotificationRecord(
+                notificationId, subject, content, recipient, severity, notificationMetadata);
+        
+        // Set channel-specific attributes
+        record.channel = getChannelString(channel);
+        notifications.put(notificationId, record);
+        
+        try {
+            // Deliver notification via the specified channel
+            deliverNotificationViaChannel(record, channel);
+            
+            logger.info("Notification sent successfully via {}: {}", channel, notificationId);
+            record.setStatus(DeliveryStatus.SENT, "Notification sent successfully via " + channel);
+            return NotificationResult.success(notificationId, channel, notificationMetadata);
+        } catch (Exception e) {
+            logger.error("Failed to send notification via {}: {}", channel, e.getMessage(), e);
+            record.setStatus(DeliveryStatus.FAILED, "Failed to send notification: " + e.getMessage());
+            return NotificationResult.failure(notificationId, "Failed to send notification: " + e.getMessage(), channel);
+        }
+    }
+    
+    @Override
+    public NotificationResult sendSmsNotification(
+            String phoneNumber, 
+            String message, 
+            SmsType smsType, 
+            Map<String, String> metadata) {
+        logger.debug("Sending SMS notification to: {}", phoneNumber);
+        
+        // Generate notification ID
+        String notificationId = generateNotificationId();
+        
+        // Prepare metadata
+        Map<String, String> smsMetadata = metadata != null 
+            ? new HashMap<>(metadata) 
+            : new HashMap<>();
+        
+        // Add SMS-specific metadata
+        smsMetadata.put("phoneNumber", phoneNumber);
+        smsMetadata.put("smsType", smsType.toString());
+        smsMetadata.put("timestamp", LocalDateTime.now().toString());
+        
+        try {
+            // Check for a registered SMS recipient
+            String recipientId = null;
+            for (Map.Entry<String, Map<String, String>> entry : recipients.entrySet()) {
+                Map<String, String> contactInfo = entry.getValue();
+                if (CHANNEL_SMS.equals(contactInfo.get("type")) && 
+                    phoneNumber.equals(contactInfo.get("phone"))) {
+                    recipientId = entry.getKey();
+                    break;
+                }
+            }
+            
+            // If no registered recipient, register the phone number
+            if (recipientId == null) {
+                recipientId = "sms-" + phoneNumber.replaceAll("[^0-9]", "");
+                Map<String, String> contactInfo = new HashMap<>();
+                contactInfo.put("type", CHANNEL_SMS);
+                contactInfo.put("phone", phoneNumber);
+                contactInfo.put("optIn", "true");
+                registerRecipient(recipientId, contactInfo);
+            }
+            
+            // Create and store notification record
+            NotificationRecord record = new NotificationRecord(
+                    notificationId, "SMS Notification", message, recipientId, NotificationSeverity.INFO, smsMetadata);
+            record.channel = CHANNEL_SMS;
+            notifications.put(notificationId, record);
+            
+            // Simulate SMS delivery
+            boolean delivered = simulateSmsDelivery(record, recipients.get(recipientId), smsType);
+            
+            if (delivered) {
+                logger.info("SMS sent successfully to {}: {}", phoneNumber, notificationId);
+                record.setStatus(DeliveryStatus.SENT, "SMS sent successfully");
+                return NotificationResult.success(notificationId, NotificationChannel.SMS, smsMetadata);
+            } else {
+                logger.warn("Failed to deliver SMS to {}", phoneNumber);
+                record.setStatus(DeliveryStatus.FAILED, "Failed to deliver SMS");
+                return NotificationResult.failure(notificationId, "Failed to deliver SMS", NotificationChannel.SMS);
+            }
+        } catch (Exception e) {
+            logger.error("Error sending SMS to {}: {}", phoneNumber, e.getMessage(), e);
+            return NotificationResult.failure(notificationId, "Error sending SMS: " + e.getMessage(), NotificationChannel.SMS);
+        }
+    }
+    
+    @Override
+    public NotificationResult scheduleNotification(
+            String recipient, 
+            String subject, 
+            String content, 
+            NotificationSeverity severity, 
+            String scheduledTime, 
+            NotificationChannel channel) {
+        logger.debug("Scheduling notification for recipient {} via {} at {}", 
+                recipient, channel, scheduledTime);
+        
+        // Validate recipient
+        if (!isRecipientRegistered(recipient)) {
+            logger.warn("Recipient not registered: {}", recipient);
+            return NotificationResult.failure("N/A", "Recipient not registered: " + recipient, channel);
+        }
+        
+        // Generate notification ID
+        String notificationId = generateNotificationId();
+        
+        // Prepare metadata
+        Map<String, String> notificationMetadata = new HashMap<>();
+        notificationMetadata.put("scheduledTime", scheduledTime);
+        notificationMetadata.put("channel", channel.toString());
+        notificationMetadata.put("severity", severity.toString());
+        
+        // Create and store notification record
+        NotificationRecord record = new NotificationRecord(
+                notificationId, subject, content, recipient, severity, notificationMetadata);
+        record.channel = getChannelString(channel);
+        record.status = DeliveryStatus.SCHEDULED;
+        record.statusMessage = "Notification scheduled for delivery at " + scheduledTime;
+        notifications.put(notificationId, record);
+        
+        logger.info("Notification scheduled successfully: {}", notificationId);
+        
+        // In a real implementation, this would add the notification to a scheduling system
+        // For this demo, we'll just log it
+        logger.info("SCHEDULED NOTIFICATION [{}]: {} for {} at {}", 
+                channel, subject, recipient, scheduledTime);
+        
+        // Return the scheduled result
+        return NotificationResult.scheduled(notificationId, scheduledTime);
+    }
+    
     /**
      * Generates a unique notification ID.
      *
@@ -421,40 +615,86 @@ public class NotificationAdapter implements NotificationPort {
         logger.debug("Severity: {}", record.severity);
         logger.debug("Channel: {}", record.channel);
         
+        // Convert recipient type to NotificationChannel enum
+        NotificationChannel channel = CHANNEL_MAP.getOrDefault(recipientType, NotificationChannel.EMAIL);
+        
+        // Deliver using the channel-specific method
+        deliverNotificationViaChannel(record, channel);
+    }
+    
+    /**
+     * Delivers a notification via a specific channel.
+     *
+     * @param record The notification record
+     * @param channel The notification channel to use
+     */
+    private void deliverNotificationViaChannel(NotificationRecord record, NotificationChannel channel) {
+        Map<String, String> recipientInfo = recipients.get(record.recipient);
+        
+        if (recipientInfo == null) {
+            logger.error("Recipient information not found for: {}", record.recipient);
+            record.setStatus(DeliveryStatus.FAILED, "Recipient information not found");
+            return;
+        }
+        
         // In a real implementation, we would use different delivery methods
-        // based on the recipient type and preferences
+        // based on the notification channel
         boolean deliverySuccess = false;
         
         try {
-            switch (recipientType) {
-                case CHANNEL_EMAIL:
+            switch (channel) {
+                case EMAIL:
                     // Send email notification
                     deliverySuccess = simulateEmailDelivery(record, recipientInfo);
                     break;
-                case CHANNEL_SMS:
+                    
+                case SMS:
+                    // Extract SMS type from metadata if available
+                    SmsType smsType = SmsType.STANDARD;
+                    if (record.metadata.containsKey("smsType")) {
+                        try {
+                            smsType = SmsType.valueOf(record.metadata.get("smsType"));
+                        } catch (IllegalArgumentException e) {
+                            logger.warn("Invalid SMS type: {}, using STANDARD", 
+                                       record.metadata.get("smsType"));
+                        }
+                    }
+                    
                     // Send SMS notification
-                    deliverySuccess = simulateSmsDelivery(record, recipientInfo);
+                    deliverySuccess = simulateSmsDelivery(record, recipientInfo, smsType);
                     break;
-                case CHANNEL_PUSH:
+                    
+                case PUSH:
                     // Send push notification
                     deliverySuccess = simulatePushDelivery(record, recipientInfo);
                     break;
-                case CHANNEL_SYSTEM:
+                    
+                case SYSTEM:
                     // Log system notification
                     logger.info("SYSTEM NOTIFICATION: {} - {}", record.subject, record.content);
                     deliverySuccess = true;
                     break;
+                    
+                case WEBHOOK:
+                    // Send webhook notification
+                    String webhookUrl = recipientInfo.getOrDefault("webhookUrl", "unknown");
+                    logger.info("WEBHOOK to {}: {} - {}", 
+                              webhookUrl, record.subject, record.content);
+                    deliverySuccess = true;
+                    break;
+                    
                 default:
                     // Default to logging
                     logger.info("NOTIFICATION [{}]: {} - {}", 
-                            recipientType, record.subject, record.content);
+                            channel, record.subject, record.content);
                     deliverySuccess = true;
                     break;
             }
             
             // Update status based on delivery result
             if (deliverySuccess) {
-                record.setStatus(DeliveryStatus.DELIVERED, "Notification delivered successfully");
+                record.setStatus(DeliveryStatus.DELIVERED, 
+                               "Notification delivered successfully via " + channel);
             } else if (record.incrementRetry()) {
                 record.setStatus(DeliveryStatus.PENDING, 
                         "Delivery failed, will retry (attempt " + record.retryCount + ")");
@@ -467,9 +707,30 @@ public class NotificationAdapter implements NotificationPort {
             }
             
         } catch (Exception e) {
-            logger.error("Error delivering notification: {}", e.getMessage(), e);
+            logger.error("Error delivering notification via {}: {}", 
+                       channel, e.getMessage(), e);
             record.setStatus(DeliveryStatus.FAILED, "Delivery error: " + e.getMessage());
         }
+    }
+    
+    /**
+     * Converts a NotificationChannel enum to the internal channel string.
+     *
+     * @param channel The NotificationChannel enum
+     * @return The internal channel string
+     */
+    private String getChannelString(NotificationChannel channel) {
+        return switch (channel) {
+            case EMAIL -> CHANNEL_EMAIL;
+            case SMS -> CHANNEL_SMS;
+            case PUSH -> CHANNEL_PUSH;
+            case SYSTEM -> CHANNEL_SYSTEM;
+            case WEBHOOK -> CHANNEL_WEBHOOK;
+            case DISCORD -> CHANNEL_DISCORD;
+            case SLACK -> CHANNEL_SLACK;
+            case TEAMS -> CHANNEL_TEAMS;
+            default -> CHANNEL_EMAIL;
+        };
     }
     
     /**
@@ -507,23 +768,76 @@ public class NotificationAdapter implements NotificationPort {
      * @param recipientInfo The recipient information
      * @return true if delivery was successful, false otherwise
      */
-    private boolean simulateSmsDelivery(NotificationRecord record, Map<String, String> recipientInfo) {
+    private boolean simulateSmsDelivery(NotificationRecord record, Map<String, String> recipientInfo, SmsType smsType) {
         String phoneNumber = recipientInfo.getOrDefault("phone", "unknown");
-        logger.info("SMS to {}: {}", phoneNumber, record.content);
+        logger.info("SMS to {} (type: {}): {}", phoneNumber, smsType, record.content);
         
-        // SMS messages are typically shorter, so truncate if needed
+        // Process SMS based on type
         String smsContent = record.content;
-        if (smsContent.length() > 160) {
-            smsContent = smsContent.substring(0, 157) + "...";
+        int maxLength = 160;
+        boolean needsSpecialHandling = false;
+        
+        switch (smsType) {
+            case STANDARD:
+                // Standard SMS messages are limited to 160 characters
+                if (smsContent.length() > maxLength) {
+                    smsContent = smsContent.substring(0, maxLength - 3) + "...";
+                    logger.debug("SMS content truncated to fit standard SMS length");
+                }
+                break;
+                
+            case EXTENDED:
+                // Extended SMS can be longer but gets split into multiple messages
+                int numParts = (int) Math.ceil(smsContent.length() / (double) maxLength);
+                logger.debug("Extended SMS will be sent in {} parts", numParts);
+                break;
+                
+            case BINARY:
+                // Binary SMS would contain non-text data
+                logger.debug("Binary SMS payload size: {} bytes", smsContent.getBytes().length);
+                needsSpecialHandling = true;
+                break;
+                
+            case FLASH:
+                // Flash SMS appears directly on screen
+                logger.debug("Flash SMS will display immediately on recipient device");
+                if (smsContent.length() > maxLength) {
+                    smsContent = smsContent.substring(0, maxLength - 3) + "...";
+                }
+                break;
+                
+            default:
+                logger.warn("Unknown SMS type: {}, treating as STANDARD", smsType);
+                if (smsContent.length() > maxLength) {
+                    smsContent = smsContent.substring(0, maxLength - 3) + "...";
+                }
+                break;
         }
         
         // Simulate delivery delay
         try {
-            Thread.sleep(100);
+            // Different SMS types might have different delivery times
+            long delayMs = switch (smsType) {
+                case FLASH -> 50;    // Flash messages are faster
+                case BINARY -> 150;  // Binary messages take longer
+                case EXTENDED -> 200; // Extended messages take longest
+                default -> 100;     // Standard delay
+            };
             
-            // Simulate occasional delivery failures (15% chance)
-            if (Math.random() < 0.15) {
-                logger.warn("Simulated SMS delivery failure to: {}", phoneNumber);
+            Thread.sleep(delayMs);
+            
+            // Simulate different failure rates for different SMS types
+            double failureRate = switch (smsType) {
+                case STANDARD -> 0.10;  // 10% failure rate
+                case EXTENDED -> 0.20;  // 20% failure rate (more parts = more chance of failure)
+                case BINARY -> 0.25;    // 25% failure rate (binary is less reliable)
+                case FLASH -> 0.15;     // 15% failure rate
+                default -> 0.15;       // Default failure rate
+            };
+            
+            // Simulate failure
+            if (Math.random() < failureRate) {
+                logger.warn("Simulated SMS delivery failure to: {} (type: {})", phoneNumber, smsType);
                 return false;
             }
             
@@ -532,6 +846,11 @@ public class NotificationAdapter implements NotificationPort {
             Thread.currentThread().interrupt();
             return false;
         }
+    }
+    
+    private boolean simulateSmsDelivery(NotificationRecord record, Map<String, String> recipientInfo) {
+        // For backwards compatibility
+        return simulateSmsDelivery(record, recipientInfo, SmsType.STANDARD);
     }
     
     /**
@@ -602,5 +921,379 @@ public class NotificationAdapter implements NotificationPort {
      */
     public Map<String, Map<String, String>> getAllRecipients() {
         return new HashMap<>(recipients);
+    }
+    
+    @Override
+    public boolean registerChannelRecipient(String recipient, NotificationChannel channel, Map<String, String> channelSpecificInfo) {
+        logger.debug("Registering recipient {} for channel {}", recipient, channel);
+        
+        if (recipient == null || recipient.trim().isEmpty()) {
+            logger.warn("Invalid recipient ID");
+            return false;
+        }
+        
+        if (channelSpecificInfo == null) {
+            logger.warn("Channel specific information cannot be null");
+            return false;
+        }
+        
+        // Create contact info with channel-specific data
+        Map<String, String> contactInfo = new HashMap<>(channelSpecificInfo);
+        
+        // Add channel type
+        contactInfo.put("type", getChannelString(channel));
+        
+        // Add registration timestamp
+        contactInfo.put("registeredAt", String.valueOf(System.currentTimeMillis()));
+        
+        // Store recipient information
+        recipients.put(recipient, contactInfo);
+        logger.info("Recipient registered for channel {}: {}", channel, recipient);
+        return true;
+    }
+    
+    @Override
+    public NotificationResult sendDiscordNotification(
+            String serverId,
+            String channel,
+            String message,
+            ContentFormat contentFormat,
+            Map<String, String> metadata) {
+        logger.debug("Sending Discord notification to server {} channel {}", serverId, channel);
+        
+        if (serverId == null || serverId.trim().isEmpty()) {
+            logger.warn("Invalid Discord server ID");
+            return NotificationResult.failure("N/A", "Invalid Discord server ID", NotificationChannel.DISCORD);
+        }
+        
+        if (channel == null || channel.trim().isEmpty()) {
+            logger.warn("Invalid Discord channel");
+            return NotificationResult.failure("N/A", "Invalid Discord channel", NotificationChannel.DISCORD);
+        }
+        
+        // Generate notification ID
+        String notificationId = generateNotificationId();
+        
+        // Prepare metadata
+        Map<String, String> notificationMetadata = metadata != null 
+            ? new HashMap<>(metadata) 
+            : new HashMap<>();
+            
+        // Add Discord-specific metadata
+        notificationMetadata.put("serverId", serverId);
+        notificationMetadata.put("channel", channel);
+        notificationMetadata.put("contentFormat", contentFormat.toString());
+        notificationMetadata.put("timestamp", LocalDateTime.now().toString());
+        
+        // Format message if needed
+        String formattedMessage = message;
+        if (contentFormat == ContentFormat.MARKDOWN) {
+            // In a real implementation, this would convert Markdown to Discord's format
+            // For this demo, we'll just note that it's Markdown
+            logger.debug("Converting Markdown content for Discord");
+        }
+        
+        try {
+            // Create and store notification record
+            NotificationRecord record = new NotificationRecord(
+                    notificationId, "Discord Notification", formattedMessage, serverId, 
+                    NotificationSeverity.INFO, notificationMetadata);
+            record.channel = CHANNEL_DISCORD;
+            notifications.put(notificationId, record);
+            
+            // Log the Discord notification
+            logger.info("DISCORD to server {} channel {}: {}", serverId, channel, 
+                      contentFormat == ContentFormat.MARKDOWN ? "[Markdown content]" : message);
+            
+            record.setStatus(DeliveryStatus.SENT, "Discord notification sent successfully");
+            return NotificationResult.success(notificationId, NotificationChannel.DISCORD, notificationMetadata);
+        } catch (Exception e) {
+            logger.error("Failed to send Discord notification: {}", e.getMessage(), e);
+            return NotificationResult.failure(notificationId, 
+                    "Failed to send Discord notification: " + e.getMessage(), NotificationChannel.DISCORD);
+        }
+    }
+    
+    @Override
+    public NotificationResult sendDiscordNotification(String serverId, String channel, String message) {
+        // Use the more detailed method with default values
+        return sendDiscordNotification(serverId, channel, message, 
+                ContentFormat.PLAIN_TEXT, new HashMap<>());
+    }
+    
+    @Override
+    public NotificationResult sendTeamsNotification(
+            String teamId,
+            String channel,
+            String message,
+            ContentFormat contentFormat,
+            Map<String, String> metadata) {
+        logger.debug("Sending Teams notification to team {} channel {}", teamId, channel);
+        
+        if (teamId == null || teamId.trim().isEmpty()) {
+            logger.warn("Invalid Teams ID");
+            return NotificationResult.failure("N/A", "Invalid Teams ID", NotificationChannel.TEAMS);
+        }
+        
+        if (channel == null || channel.trim().isEmpty()) {
+            logger.warn("Invalid Teams channel");
+            return NotificationResult.failure("N/A", "Invalid Teams channel", NotificationChannel.TEAMS);
+        }
+        
+        // Generate notification ID
+        String notificationId = generateNotificationId();
+        
+        // Prepare metadata
+        Map<String, String> notificationMetadata = metadata != null 
+            ? new HashMap<>(metadata) 
+            : new HashMap<>();
+            
+        // Add Teams-specific metadata
+        notificationMetadata.put("teamId", teamId);
+        notificationMetadata.put("channel", channel);
+        notificationMetadata.put("contentFormat", contentFormat.toString());
+        notificationMetadata.put("timestamp", LocalDateTime.now().toString());
+        
+        // Format message if needed
+        String formattedMessage = message;
+        if (contentFormat == ContentFormat.MARKDOWN) {
+            // In a real implementation, this would convert Markdown to Teams' format
+            // For this demo, we'll just note that it's Markdown
+            logger.debug("Converting Markdown content for Teams");
+        }
+        
+        try {
+            // Create and store notification record
+            NotificationRecord record = new NotificationRecord(
+                    notificationId, "Teams Notification", formattedMessage, teamId, 
+                    NotificationSeverity.INFO, notificationMetadata);
+            record.channel = CHANNEL_TEAMS;
+            notifications.put(notificationId, record);
+            
+            // Log the Teams notification
+            logger.info("TEAMS to team {} channel {}: {}", teamId, channel, 
+                      contentFormat == ContentFormat.MARKDOWN ? "[Markdown content]" : message);
+            
+            record.setStatus(DeliveryStatus.SENT, "Teams notification sent successfully");
+            return NotificationResult.success(notificationId, NotificationChannel.TEAMS, notificationMetadata);
+        } catch (Exception e) {
+            logger.error("Failed to send Teams notification: {}", e.getMessage(), e);
+            return NotificationResult.failure(notificationId, 
+                    "Failed to send Teams notification: " + e.getMessage(), NotificationChannel.TEAMS);
+        }
+    }
+    
+    @Override
+    public NotificationResult sendTeamsNotification(String teamId, String channel, String message) {
+        // Use the more detailed method with default values
+        return sendTeamsNotification(teamId, channel, message, 
+                ContentFormat.PLAIN_TEXT, new HashMap<>());
+    }
+    
+    @Override
+    public NotificationResult sendSlackNotification(
+            String workspace,
+            String channel,
+            String message,
+            ContentFormat contentFormat,
+            Map<String, String> metadata) {
+        logger.debug("Sending Slack notification to workspace {} channel {}", workspace, channel);
+        
+        if (workspace == null || workspace.trim().isEmpty()) {
+            logger.warn("Invalid Slack workspace");
+            return NotificationResult.failure("N/A", "Invalid Slack workspace", NotificationChannel.SLACK);
+        }
+        
+        if (channel == null || channel.trim().isEmpty()) {
+            logger.warn("Invalid Slack channel");
+            return NotificationResult.failure("N/A", "Invalid Slack channel", NotificationChannel.SLACK);
+        }
+        
+        // Generate notification ID
+        String notificationId = generateNotificationId();
+        
+        // Prepare metadata
+        Map<String, String> notificationMetadata = metadata != null 
+            ? new HashMap<>(metadata) 
+            : new HashMap<>();
+            
+        // Add Slack-specific metadata
+        notificationMetadata.put("workspace", workspace);
+        notificationMetadata.put("channel", channel);
+        notificationMetadata.put("contentFormat", contentFormat.toString());
+        notificationMetadata.put("timestamp", LocalDateTime.now().toString());
+        
+        // Format message if needed
+        String formattedMessage = message;
+        if (contentFormat == ContentFormat.MARKDOWN) {
+            // In a real implementation, this would convert Markdown to Slack's format
+            // For this demo, we'll just note that it's Markdown
+            logger.debug("Converting Markdown content for Slack");
+        }
+        
+        try {
+            // Check if there's a webhook URL in the metadata
+            String webhookUrl = notificationMetadata.getOrDefault("webhookUrl", null);
+            if (webhookUrl != null) {
+                logger.debug("Slack notification will use webhook URL: {}", webhookUrl);
+            }
+            
+            // Create and store notification record
+            NotificationRecord record = new NotificationRecord(
+                    notificationId, "Slack Notification", formattedMessage, workspace, 
+                    NotificationSeverity.INFO, notificationMetadata);
+            record.channel = CHANNEL_SLACK;
+            notifications.put(notificationId, record);
+            
+            // Log the Slack notification
+            logger.info("SLACK to workspace {} channel {}: {}", workspace, channel, 
+                      contentFormat == ContentFormat.MARKDOWN ? "[Markdown content]" : message);
+            
+            record.setStatus(DeliveryStatus.SENT, "Slack notification sent successfully");
+            return NotificationResult.success(notificationId, NotificationChannel.SLACK, notificationMetadata);
+        } catch (Exception e) {
+            logger.error("Failed to send Slack notification: {}", e.getMessage(), e);
+            return NotificationResult.failure(notificationId, 
+                    "Failed to send Slack notification: " + e.getMessage(), NotificationChannel.SLACK);
+        }
+    }
+    
+    @Override
+    public NotificationResult sendSlackNotification(String workspace, String channel, String message) {
+        // Use the more detailed method with default values
+        return sendSlackNotification(workspace, channel, message, 
+                ContentFormat.PLAIN_TEXT, new HashMap<>());
+    }
+    
+    @Override
+    public NotificationResult sendFormattedNotification(
+            String recipient,
+            String subject,
+            String content,
+            ContentFormat contentFormat,
+            NotificationSeverity severity,
+            NotificationChannel channel,
+            Map<String, String> metadata) {
+        logger.debug("Sending formatted notification to {} via {}", recipient, channel);
+        
+        if (recipient == null || recipient.trim().isEmpty()) {
+            logger.warn("Invalid recipient ID");
+            return NotificationResult.failure("N/A", "Invalid recipient ID", channel);
+        }
+        
+        if (!isRecipientRegistered(recipient)) {
+            logger.warn("Recipient not registered: {}", recipient);
+            return NotificationResult.failure("N/A", "Recipient not registered: " + recipient, channel);
+        }
+        
+        // Generate notification ID
+        String notificationId = generateNotificationId();
+        
+        // Prepare metadata
+        Map<String, String> notificationMetadata = metadata != null 
+            ? new HashMap<>(metadata) 
+            : new HashMap<>();
+            
+        // Add common metadata
+        notificationMetadata.put("contentFormat", contentFormat.toString());
+        notificationMetadata.put("timestamp", LocalDateTime.now().toString());
+        notificationMetadata.put("channel", channel.toString());
+        
+        // Format content if needed
+        String formattedContent = content;
+        switch (contentFormat) {
+            case MARKDOWN:
+                logger.debug("Processing Markdown content for {}", channel);
+                // In a real implementation, this would convert Markdown to the appropriate format
+                break;
+            case HTML:
+                logger.debug("Processing HTML content for {}", channel);
+                // In a real implementation, this would convert HTML to the appropriate format
+                break;
+            case RICH_TEXT:
+                logger.debug("Processing Rich Text content for {}", channel);
+                // In a real implementation, this would convert Rich Text to the appropriate format
+                break;
+            case PLAIN_TEXT:
+            default:
+                // No formatting needed for plain text
+                break;
+        }
+        
+        try {
+            // Create and store notification record
+            NotificationRecord record = new NotificationRecord(
+                    notificationId, subject, formattedContent, recipient, 
+                    severity, notificationMetadata);
+            record.channel = getChannelString(channel);
+            notifications.put(notificationId, record);
+            
+            // Log the notification
+            logger.info("FORMATTED NOTIFICATION via {} to {}: {} - {}", 
+                    channel, recipient, subject, 
+                    (contentFormat != ContentFormat.PLAIN_TEXT) ? 
+                        "[" + contentFormat + " content]" : content);
+            
+            record.setStatus(DeliveryStatus.SENT, "Notification sent successfully via " + channel);
+            return NotificationResult.success(notificationId, channel, notificationMetadata);
+        } catch (Exception e) {
+            logger.error("Failed to send notification: {}", e.getMessage(), e);
+            return NotificationResult.failure(notificationId, 
+                    "Failed to send notification: " + e.getMessage(), channel);
+        }
+    }
+    
+    @Override
+    public NotificationResult sendTemplatedNotification(
+            String recipient,
+            String templateName,
+            Map<String, String> variables,
+            NotificationSeverity severity,
+            NotificationChannel channel) {
+        logger.debug("Sending templated notification '{}' to recipient {} via {}",
+                templateName, recipient, channel);
+                
+        if (recipient == null || recipient.trim().isEmpty()) {
+            logger.warn("Invalid recipient ID");
+            return NotificationResult.failure("N/A", "Invalid recipient ID", channel);
+        }
+        
+        if (templateName == null || templateName.trim().isEmpty()) {
+            logger.warn("Invalid template name");
+            return NotificationResult.failure("N/A", "Invalid template name", channel);
+        }
+        
+        if (!isRecipientRegistered(recipient)) {
+            logger.warn("Recipient not registered: {}", recipient);
+            return NotificationResult.failure("N/A", "Recipient not registered: " + recipient, channel);
+        }
+        
+        // Get template from configuration
+        String template = configurationPort.getString("notification.template." + templateName, null);
+        
+        if (template == null) {
+            logger.warn("Template not found: {}", templateName);
+            return NotificationResult.failure("N/A", "Template not found: " + templateName, channel);
+        }
+        
+        // Apply variable substitution
+        String content = template;
+        String subject = templateName;
+        
+        if (variables != null) {
+            // Extract subject from variables if provided
+            if (variables.containsKey("subject")) {
+                subject = variables.get("subject");
+            }
+            
+            // Replace variables in template
+            for (Map.Entry<String, String> entry : variables.entrySet()) {
+                String placeholder = "{{" + entry.getKey() + "}}";
+                content = content.replace(placeholder, entry.getValue());
+            }
+        }
+        
+        // Send notification using the processed template content
+        return sendNotificationViaChannel(recipient, subject, content, severity, channel, variables);
     }
 }
