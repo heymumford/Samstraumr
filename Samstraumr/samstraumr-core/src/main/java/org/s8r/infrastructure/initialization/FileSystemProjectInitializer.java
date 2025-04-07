@@ -144,8 +144,8 @@ public class FileSystemProjectInitializer implements ProjectInitializationPort {
         
         builder.append("import java.util.HashMap;\n");
         builder.append("import java.util.Map;\n");
-        builder.append("import org.s8r.component.core.Component;\n");
-        builder.append("import org.s8r.component.core.Environment;\n\n");
+        builder.append("import org.s8r.component.Component;\n");
+        builder.append("import org.s8r.component.Environment;\n\n");
         
         builder.append("/**\n");
         builder.append(" * Adam Component implementation - the first component in this Samstraumr repository.\n");

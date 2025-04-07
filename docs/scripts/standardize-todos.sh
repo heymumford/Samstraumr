@@ -29,13 +29,13 @@ else
   NC='\033[0m' # No Color
   
   # Fallback output functions
-  info() { echo -e "${BLUE}$1${NC}"; }
-  success() { echo -e "${GREEN}$1${NC}"; }
-  warning() { echo -e "${YELLOW}Warning: $1${NC}" >&2; }
-  error() { echo -e "${RED}Error: $1${NC}" >&2; }
+  print_info() { echo -e "${BLUE}$1${NC}"; }
+  print_success() { echo -e "${GREEN}$1${NC}"; }
+  print_warning() { echo -e "${YELLOW}Warning: $1${NC}" >&2; }
+  print_error() { echo -e "${RED}Error: $1${NC}" >&2; }
   header() { echo -e "\n${MAGENTA}=== $1 ===${NC}"; }
   subheader() { echo -e "\n${CYAN}--- $1 ---${NC}"; }
-}
+fi
 
 # Default settings
 DRY_RUN=true
@@ -127,7 +127,7 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     *)
-      error "Unknown option: $1"
+  print_error "Unknown option: $1"
       show_help
       exit 1
       ;;
@@ -136,14 +136,14 @@ done
 
 # Validate that target directory exists
 if [[ ! -d "$TARGET_DIR" ]]; then
-  error "Target directory does not exist: $TARGET_DIR"
+  print_error "Target directory does not exist: $TARGET_DIR"
   exit 1
 fi
 
 # Convert target directory to absolute path
 TARGET_DIR="$(cd "$TARGET_DIR" && pwd)"
 
-header "Scanning for TODOs in ${TARGET_DIR#$PROJECT_ROOT/}"
+print_header "Scanning for TODOs in ${TARGET_DIR#$PROJECT_ROOT/}"
 
 # Build exclude pattern for find command
 EXCLUDE_PATTERN=""
@@ -253,7 +253,7 @@ info "Finding files with TODOs..."
 TODO_FILES=$(eval "find \"$TARGET_DIR\" -type f $EXCLUDE_PATTERN -name \"*.java\" -o -name \"*.sh\" -o -name \"*.js\" -o -name \"*.ts\" -o -name \"*.md\" -o -name \"*.html\" -o -name \"*.xml\" | xargs grep -l \"TODO\" 2>/dev/null" || echo "")
 
 if [[ -z "$TODO_FILES" ]]; then
-  warning "No files with TODOs found"
+  print_warning "No files with TODOs found"
   exit 0
 fi
 
@@ -266,7 +266,7 @@ FIXED_TODOS=0
 # Loop through the files and check TODOs
 for file in $TODO_FILES; do
   if [[ "$VERBOSE" == true ]]; then
-    info "Checking file: ${file#$PROJECT_ROOT/}"
+  print_info "Checking file: ${file#$PROJECT_ROOT/}"
   fi
 
   # Get file extension
@@ -379,7 +379,7 @@ done
 
 # Fix TODOs if requested
 if [[ "$AUTO_FIX" == true && -s "$FIXABLE_TMP" ]]; then
-  subheader "Fixing non-compliant TODOs"
+  print_info "Fixing non-compliant TODOs"
   
   while IFS= read -r fix_info; do
     file=$(echo "$fix_info" | cut -d: -f1)
@@ -388,7 +388,7 @@ if [[ "$AUTO_FIX" == true && -s "$FIXABLE_TMP" ]]; then
     new_line=$(echo "$fix_info" | cut -d: -f4-)
     
     if [[ "$VERBOSE" == true ]]; then
-      info "Fixing TODO in ${file#$PROJECT_ROOT/}:${line_num}"
+  print_info "Fixing TODO in ${file#$PROJECT_ROOT/}:${line_num}"
       echo "  Old: $old_line"
       echo "  New: $new_line"
     fi
@@ -405,18 +405,18 @@ if [[ "$AUTO_FIX" == true && -s "$FIXABLE_TMP" ]]; then
       cp "$temp_file" "$file"
       ((FIXED_TODOS++))
     else
-      warning "Failed to fix TODO in ${file#$PROJECT_ROOT/}:${line_num}"
+  print_warning "Failed to fix TODO in ${file#$PROJECT_ROOT/}:${line_num}"
     fi
     
     # Clean up
     rm "$temp_file"
   done < "$FIXABLE_TMP"
   
-  success "Fixed $FIXED_TODOS TODOs"
+  print_success "Fixed $FIXED_TODOS TODOs"
 fi
 
 # Print summary
-header "TODO Standardization Summary"
+print_header "TODO Standardization Summary"
 echo "Total TODOs: $TOTAL_TODOS"
 echo "Compliant TODOs: $COMPLIANT_TODOS"
 echo "Non-compliant TODOs: $NONCOMPLIANT_TODOS"
@@ -430,14 +430,14 @@ fi
 
 # Generate report if needed
 if [[ -n "$REPORT_FILE" ]]; then
-  subheader "Generating report"
-  info "Report file: $REPORT_FILE"
+  print_info "Generating report"
+  print_info "Report file: $REPORT_FILE"
   
   # Use the library function if available
   if [[ "$USING_LIB" == true ]] && type extract_todos &>/dev/null; then
     # Call the library function to generate the report
     extract_todos "$REPORT_FILE"
-    success "Report generated using library function: $REPORT_FILE"
+  print_success "Report generated using library function: $REPORT_FILE"
   elif [[ -x "$SCRIPT_DIR/extract-todos.sh" ]]; then
     # Use the extract-todos.sh script if available
     "$SCRIPT_DIR/extract-todos.sh" --output "$REPORT_FILE"
@@ -498,16 +498,16 @@ Example:
 EOF
   fi
   
-  success "Report generated: $REPORT_FILE"
+  print_success "Report generated: $REPORT_FILE"
 fi
 
 # Clean up
 rm "$TODO_TMP" "$NONCOMPLIANT_TMP" "$FIXABLE_TMP"
 
 if [[ "$NONCOMPLIANT_TODOS" -eq 0 ]]; then
-  success "All TODOs follow the standard format!"
+  print_success "All TODOs follow the standard format!"
 elif [[ "$AUTO_FIX" == true && "$FIXED_TODOS" -eq "$NONCOMPLIANT_TODOS" ]]; then
-  success "All non-compliant TODOs have been fixed!"
+  print_success "All non-compliant TODOs have been fixed!"
 fi
 
 exit 0

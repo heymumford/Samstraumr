@@ -18,6 +18,6 @@ Licensed under the Mozilla Public License 2.0
 >
 > Please update your bookmarks to the new consolidated location:
 >
-> [Identity Addressing](/docs/concepts/identity-addressing.md)
+> [Identity Addressing](../concepts/identity-addressing.md)
 >
 > Redirecting you in 3 seconds...

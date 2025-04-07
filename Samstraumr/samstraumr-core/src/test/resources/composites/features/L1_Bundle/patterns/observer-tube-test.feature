@@ -5,7 +5,7 @@
 # which monitors signals or operations without altering them.
 # ---------------------------------------------------------------------------------------
 
-@ATL @L1_Bundle @Awareness @Observer
+@L1_Component @Functional @Monitoring
 Feature: Observer Tube - Signal Monitoring
   # This feature verifies that Observer tubes correctly monitor signals without modifying them
 
@@ -24,7 +24,7 @@ Feature: Observer Tube - Signal Monitoring
       | medium          | 50               |
       | low             | 20               |
 
-  @BTL @L1_Bundle @Runtime @Awareness @Observer @Performance
+@ErrorHandling  @L1_Bundle @Runtime @Monitoring @Observer @Performance
   Scenario: Observer tube maintains minimal overhead during monitoring
     # Purpose: Ensure observer tubes don't impact system performance
     Given a system with active data processing is operational
@@ -33,7 +33,7 @@ Feature: Observer Tube - Signal Monitoring
     Then the observer's overhead should be less than 30% of total processing time
     And all signals should be accurately observed and recorded
 
-  @BTL @L1_Bundle @Runtime @Awareness @Observer @Resilience
+@ErrorHandling  @L1_Bundle @Runtime @Monitoring @Observer @Resilience
   Scenario: Observer tube recovers from observation interruptions
     # Purpose: Test observer tubes' ability to handle monitoring disruptions
     Given an observer tube is monitoring a continuous process

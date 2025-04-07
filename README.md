@@ -1,7 +1,7 @@
 
 # Samstraumr: Adaptive Resilient Software Framework
 
-[![Version](https://img.shields.io/badge/version-2.4.4-blue)](https://github.com/heymumford/Samstraumr/releases) 
+[![Version](https://img.shields.io/badge/version-2.4.5-blue)](https://github.com/heymumford/Samstraumr/releases) 
 [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) 
 [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/) 
@@ -109,7 +109,7 @@ Maven dependency:
 <dependency>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-core</artifactId>
-    <version>2.4.4</version>
+    <version>2.4.5</version>
 </dependency>
 ```
 
@@ -256,7 +256,7 @@ We welcome contributions from the community! Please read our [Contribution Guide
 4. 🧪 **Run tests**
 5. 📤 **Submit PR**
 
-[📝 **Development Standards**](./docs/contribution/code-standards.md) • [🔄 **Commit Guidelines**](./docs/contribution/git-commits.md) • [✅ **Quality Checks**](./docs/contribution/quality-checks.md)
+[📝 **Development Standards**](./docs/contribution/code-standards.md) • [🔄 **Commit Guidelines**](./docs/contribution/git-commits.md) • [✅ **Quality Checks**](./docs/contribution/quality-checks.md) • [📋 **TODO Guidelines**](./docs/reference/standards/todo-review-process.md)
 
 ## License and Acknowledgments
 

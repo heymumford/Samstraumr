@@ -18,6 +18,6 @@ Licensed under the Mozilla Public License 2.0
 >
 > Please update your bookmarks to the new consolidated location:
 >
-> [Test Tags and Annotations](/docs/testing/test-tags-and-annotations.md)
+> [Test Tags and Annotations](../testing/test-tags-and-annotations.md)
 >
 > Redirecting you in 3 seconds...

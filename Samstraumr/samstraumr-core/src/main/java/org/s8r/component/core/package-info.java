@@ -13,4 +13,25 @@
  *     https://www.mozilla.org/en-US/MPL/2.0/
  */
 
+/**
+ * Core component abstractions that form the foundation of the Samstraumr framework.
+ * 
+ * <p>This package contains the fundamental interfaces and classes that define what
+ * a component is and how it behaves within the system. The core classes here are used
+ * throughout the codebase.</p>
+ * 
+ * <h2>Key Classes</h2>
+ * <ul>
+ *   <li>{@link org.s8r.component.core.Component} - The fundamental component interface</li>
+ *   <li>{@link org.s8r.component.core.Environment} - Environment configuration for components</li>
+ *   <li>{@link org.s8r.component.core.State} - Component state management</li>
+ * </ul>
+ * 
+ * <h2>Related Packages</h2>
+ * <ul>
+ *   <li>{@link org.s8r.component.composite} - Composite component implementation</li>
+ *   <li>{@link org.s8r.component.identity} - Component identity management</li>
+ *   <li>{@link org.s8r.component.machine} - Machine component implementation</li>
+ * </ul>
+ */
 package org.s8r.component.core;

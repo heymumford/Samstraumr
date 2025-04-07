@@ -39,7 +39,9 @@ map_level_tag() {
     local tag=$1
     case $tag in
         "@L0_Tube") echo "@L0_Unit";;
+        "@L0_Core") echo "@L0_Unit";;
         "@L1_Composite") echo "@L1_Component";;
+        "@L1_Bundle") echo "@L1_Component";;
         "@L2_Machine") echo "@L2_Integration";;
         "@L3_System") echo "@L3_System";; # No change needed
         *) echo "$tag";;
@@ -62,6 +64,8 @@ map_capability_tag() {
         "@State") echo "@State";; # No change needed
         "@Identity") echo "@Identity";; # No change needed
         "@Awareness") echo "@Monitoring";;
+        "@Init") echo "@Lifecycle";;
+        "@Lifecycle") echo "@Lifecycle";; # No change needed
         *) echo "$tag";;
     esac
 }
@@ -76,10 +80,18 @@ standardize_file_tags() {
     # Create backup of original file
     cp "$file" "$BACKUP_DIR/$(basename "$file")"
     
-    # Extract feature tag line
-    local feature_tag_line=$(grep -n "^@.*Feature:" "$file" | cut -d: -f1)
+    # Extract feature tag line - look for lines that start with @
+    local feature_tag_line=$(grep -n "^@" "$file" | head -1 | cut -d: -f1)
     if [[ -z "$feature_tag_line" ]]; then
         echo "  No feature tag line found, skipping"
+        return
+    fi
+    
+    # Check if this is really a feature tag line (followed by a Feature: line)
+    local next_line=$((feature_tag_line + 1))
+    local next_line_content=$(sed -n "${next_line}p" "$file")
+    if [[ ! "$next_line_content" =~ Feature: ]]; then
+        echo "  Tag line not followed by Feature line, skipping"
         return
     fi
     
@@ -132,24 +144,52 @@ standardize_file_tags() {
     
     # Replace the feature tag line
     local current_line=$(sed -n "${feature_tag_line}p" "$file")
-    local new_line="${current_line//@*Feature:/$new_tags Feature:}"
+    local next_line=$(sed -n "${next_line}p" "$file")
     
-    if [[ "$current_line" != "$new_line" ]]; then
-        sed -i "${feature_tag_line}s/.*/$new_line/" "$file"
-        changes=$((changes + 1))
+    # Check if "Feature:" is on the same line or the next line
+    if [[ "$current_line" =~ Feature: ]]; then
+        # Tags and Feature: on same line
+        local new_line="${current_line//@*Feature:/$new_tags Feature:}"
         
-        # Log the change
-        echo "### $basename" >> "$LOG_FILE"
-        echo "Original: \`$current_line\`" >> "$LOG_FILE"
-        echo "New:      \`$new_line\`" >> "$LOG_FILE"
-        echo "" >> "$LOG_FILE"
+        if [[ "$current_line" != "$new_line" ]]; then
+            sed -i "${feature_tag_line}s/.*/$new_line/" "$file"
+            changes=$((changes + 1))
+            
+            # Log the change
+            echo "### $basename" >> "$LOG_FILE"
+            echo "Original: \`$current_line\`" >> "$LOG_FILE"
+            echo "New:      \`$new_line\`" >> "$LOG_FILE"
+            echo "" >> "$LOG_FILE"
+        fi
+    else
+        # Tags and Feature: on separate lines
+        local new_line="$new_tags"
+        
+        if [[ "$current_line" != "$new_line" ]]; then
+            sed -i "${feature_tag_line}s/.*/$new_line/" "$file"
+            changes=$((changes + 1))
+            
+            # Log the change
+            echo "### $basename" >> "$LOG_FILE"
+            echo "Original: \`$current_line\`" >> "$LOG_FILE"
+            echo "New:      \`$new_line\`" >> "$LOG_FILE"
+            echo "" >> "$LOG_FILE"
+        fi
     fi
     
-    # Now process scenario tags
-    local scenario_lines=$(grep -n "^[[:space:]]*@.*Scenario:" "$file" | cut -d: -f1)
+    # Now process scenario tags - look for lines starting with @
+    local scenario_lines=$(grep -n "^[[:space:]]*@" "$file" | grep -v "^${feature_tag_line}:" | cut -d: -f1)
     
     for line in $scenario_lines; do
         local current_scenario_line=$(sed -n "${line}p" "$file")
+        local next_scenario_line=$((line + 1))
+        local next_line_content=$(sed -n "${next_scenario_line}p" "$file")
+        
+        # Check if this is really a scenario tag line (followed by a Scenario: line)
+        if [[ ! "$current_scenario_line" =~ Scenario: && ! "$next_line_content" =~ Scenario: ]]; then
+            continue
+        fi
+        
         local current_scenario_tags=$(echo "$current_scenario_line" | grep -o '@[A-Za-z0-9_]\+')
         
         # Map scenario tags
@@ -197,18 +237,35 @@ standardize_file_tags() {
         # Trim leading/trailing spaces
         new_scenario_tags=$(echo "$new_scenario_tags" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
         
-        # Replace the scenario tag line
-        local new_scenario_line="${current_scenario_line//@*Scenario:/$new_scenario_tags Scenario:}"
-        
-        if [[ "$current_scenario_line" != "$new_scenario_line" ]]; then
-            sed -i "${line}s/.*/$new_scenario_line/" "$file"
-            changes=$((changes + 1))
+        # Check if this is a single-line or multi-line scenario
+        if [[ "$current_scenario_line" =~ Scenario: ]]; then
+            # Single line: Tags and Scenario: on the same line
+            local new_scenario_line="${current_scenario_line//@*Scenario:/$new_scenario_tags Scenario:}"
             
-            # Log the change
-            echo "#### Scenario tag in $basename line $line" >> "$LOG_FILE"
-            echo "Original: \`$current_scenario_line\`" >> "$LOG_FILE"
-            echo "New:      \`$new_scenario_line\`" >> "$LOG_FILE"
-            echo "" >> "$LOG_FILE"
+            if [[ "$current_scenario_line" != "$new_scenario_line" ]]; then
+                sed -i "${line}s/.*/$new_scenario_line/" "$file"
+                changes=$((changes + 1))
+                
+                # Log the change
+                echo "#### Scenario tag in $basename line $line" >> "$LOG_FILE"
+                echo "Original: \`$current_scenario_line\`" >> "$LOG_FILE"
+                echo "New:      \`$new_scenario_line\`" >> "$LOG_FILE"
+                echo "" >> "$LOG_FILE"
+            fi
+        else
+            # Multi-line: Tags and Scenario: on separate lines
+            local new_scenario_line="$new_scenario_tags"
+            
+            if [[ "$current_scenario_line" != "$new_scenario_line" ]]; then
+                sed -i "${line}s/.*/$new_scenario_line/" "$file"
+                changes=$((changes + 1))
+                
+                # Log the change
+                echo "#### Scenario tag in $basename line $line" >> "$LOG_FILE"
+                echo "Original: \`$current_scenario_line\`" >> "$LOG_FILE"
+                echo "New:      \`$new_scenario_line\`" >> "$LOG_FILE"
+                echo "" >> "$LOG_FILE"
+            fi
         fi
     done
     

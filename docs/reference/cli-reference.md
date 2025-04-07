@@ -292,4 +292,4 @@ The CLI uses configuration files from multiple locations:
 
 ## Return to Main Documentation
 
-For a complete overview of the Samstraumr framework, see the [Main README](../../README.md).
+For a complete overview of the Samstraumr framework, see the [Main README](../../readme.md).

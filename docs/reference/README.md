@@ -18,11 +18,11 @@ This directory contains reference documentation for the Samstraumr project.
 
 ## Standards
 
-- [File Naming Conventions](standards/FileNamingConventions.md)
-- [File Organization](standards/FileOrganization.md)
-- [Header Standards](standards/HeaderStandards.md)
-- [Java Naming Standards](standards/JavaNamingStandards.md)
-- [Logging Standards](standards/LoggingStandards.md)
+- [File Naming Conventions](standards/file-naming-conventions.md)
+- [File Organization](standards/file-organization.md)
+- [Header Standards](standards/header-standards.md)
+- [Java Naming Standards](standards/java-naming-standards.md)
+- [Logging Standards](standards/logging-standards.md)
 - [Documentation Standards](standards/documentation-standards.md)
 
 ## Examples

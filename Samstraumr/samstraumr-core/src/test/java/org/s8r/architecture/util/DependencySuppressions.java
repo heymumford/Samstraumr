@@ -9,7 +9,14 @@ import java.util.Set;
  * <p>
  * This class maintains a list of dependencies that are known to be in violation
  * but are temporarily allowed for practical reasons, such as when migrating
- * legacy code to a cleaner architecture.
+ * legacy code to a cleaner architecture. The goal is to eventually eliminate 
+ * all suppressed dependencies through proper abstraction or replacement.
+ * </p>
+ * <p>
+ * The primary approach for dealing with legacy code dependencies is through
+ * reflection-based adapters, which eliminates direct compile-time dependencies
+ * while maintaining runtime compatibility. Most direct imports of legacy
+ * code should be replaced with these reflection-based approaches.
  * </p>
  */
 public class DependencySuppressions {

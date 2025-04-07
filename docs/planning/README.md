@@ -13,7 +13,7 @@ This directory contains planning documents for the S8r framework.
 
 ## Strategic Documents
 
-For high-level strategy, see the [Architecture Documentation](../architecture/):
+For high-level strategy, see the [Architecture Documentation](../architecture/.md):
 
 - [Strategy](../architecture/strategy.md) - Strategic goals and architectural principles
 - [Implementation](../architecture/implementation.md) - Implementation details and code structure

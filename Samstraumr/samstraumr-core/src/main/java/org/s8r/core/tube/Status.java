@@ -84,6 +84,13 @@ public enum Status {
    * either cannot proceed with its current task due and will log the failure.
    */
   ERROR,
+  
+  /**
+   * The component is functioning but with reduced capabilities or performance.
+   * In this state, the component can still perform its essential functions but
+   * may be operating with limited features or at reduced efficiency.
+   */
+  DEGRADED,
 
   /**
    * The component has encountered an issue and is attempting to recover. This state indicates that

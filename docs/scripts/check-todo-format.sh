@@ -31,7 +31,7 @@ else
   success() { echo -e "${GREEN}$1${NC}"; }
   warning() { echo -e "${YELLOW}Warning: $1${NC}" >&2; }
   error() { echo -e "${RED}Error: $1${NC}" >&2; }
-}
+fi
 
 # Default settings
 STRICT=false

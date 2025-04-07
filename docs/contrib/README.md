@@ -16,10 +16,10 @@ This directory contains guidelines and standards for contributing to the Samstra
 
 ## Git Hooks
 
-The [git-hooks](./git-hooks/) directory contains hooks for Git that enforce commit message standards and other quality controls:
+The [git-hooks](./git-hooks/.md) directory contains hooks for Git that enforce commit message standards and other quality controls:
 
-- [install-hooks.sh](./git-hooks/install-hooks.sh): Script to install the git hooks
-- [prepare-commit-msg](./git-hooks/prepare-commit-msg): Hook to enforce commit message standards
+- [install-hooks.sh](./git-hooks/install-hooks.sh.md): Script to install the git hooks
+- [prepare-commit-msg](./git-hooks/prepare-commit-msg.md): Hook to enforce commit message standards
 
 ## Getting Started with Contributions
 
@@ -27,5 +27,5 @@ New contributors should:
 
 1. Read the [Contribution Guide](./contrib-guide.md) first
 2. Familiarize yourself with the [Code Standards](./contrib-code-standards.md)
-3. Install the [Git hooks](./git-hooks/install-hooks.sh)
+3. Install the [Git hooks](./git-hooks/install-hooks.sh.md)
 4. Review the [Git Commit Guidelines](./contrib-git-commits.md) before making commits

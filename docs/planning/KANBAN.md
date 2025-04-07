@@ -26,11 +26,6 @@ This document tracks the progress of tasks in the S8r project.
 
 - Create migration utilities for client code
 - Test the new Maven structure end-to-end
-- Implement core components in the new package structure
-- Execute TODO standardization across the codebase
-- Implement documentation CI integration (Phase 5 of documentation plan)
-- Fix Clean Architecture compliance issues (94% complete)
-- Standardize test tags and organization (tag structure defined, implementation in progress)
 
 ## Tasks Done
 
@@ -39,8 +34,15 @@ This document tracks the progress of tasks in the S8r project.
 - Document API changes between Samstraumr and S8r
 - Create migration guides for teams using the library
 - Implement Composite and Machine in new structure
-- Implement automated documentation generation system (Phases 1-4)
+- Implement core components in the new package structure
+- Create test infrastructure for the S8r framework
+- Create comprehensive BDD tests for the S8r framework
+- Implement automated documentation generation system (Phases 1-5 complete)
+- Implement documentation CI integration with pre-release checks
 - Implement TODO standardization tooling and standards
+- Execute TODO standardization across the codebase
+- Implement directory flattening to improve organization (Phases 1-5 complete)
+- Standardize test tags and organization (98% complete, applied across all test files)
 - Complete research document on AI-enhanced testing strategies (see /docs/research/test-in-age-of-ai.md)
 - Complete package-info.java files for all packages (57/57 packages, 100% complete)
 - Refactor initialization package into Clean Architecture (application, infrastructure, adapter layers)
@@ -48,6 +50,7 @@ This document tracks the progress of tasks in the S8r project.
 - Implement hierarchical event propagation in InMemoryEventDispatcher
 - Fix event naming conventions and support backward compatibility during migration
 - Update test infrastructure to work with hierarchical event propagation
+- Fix Clean Architecture compliance issues (100% complete, verified by tests)
 
 ## S8r Migration Roadmap
 

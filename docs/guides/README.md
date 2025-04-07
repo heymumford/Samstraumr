@@ -25,6 +25,6 @@ This directory contains guides for using and developing with Samstraumr.
 ## Migration
 
 - [Migration Guide](migration.md) - Migrating to new Samstraumr versions
-- [Bundle to Composite Refactoring](migration/BundleToCompositeRefactoring.md) - Bundle migration
-- [Samstraumr to S8r Migration](migration/SamstraumrToS8rMigration.md) - Package migration
-- [Tube to Component Migration](migration/TubeToComponentMigration.md) - Model migration
+- [Bundle to Composite Refactoring](migration/bundle-to-composite-refactoring.md) - Bundle migration
+- [Samstraumr to S8r Migration](migration/samstraumr-to-s8r-migration.md) - Package migration
+- [Tube to Component Migration](migration/tube-to-component-migration.md) - Model migration

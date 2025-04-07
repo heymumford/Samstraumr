@@ -5,7 +5,7 @@
 # which validates input data according to predefined rules.
 # ---------------------------------------------------------------------------------------
 
-@ATL @L1_Bundle @Flow @Validator
+@L1_Component @Functional @DataFlow
 Feature: Validator Tube - Input Validation and Routing
   # This feature verifies that Validator tubes correctly validate input data against rules
 
@@ -26,7 +26,7 @@ Feature: Validator Tube - Input Validation and Routing
       | invalidData   | rule2          | error message       |
       | partialData   | rule3          | routed with notice  |
 
-  @BTL @L1_Bundle @Runtime @Flow @Validator @CircuitBreaker
+@ErrorHandling  @L1_Bundle @Runtime @DataFlow @Validator @CircuitBreaker
   Scenario: Validator tube prevents invalid data propagation
     # Purpose: Ensure validators act as circuit breakers for invalid data
     Given a validator tube is configured with strict validation rules

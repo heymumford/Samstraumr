@@ -16,6 +16,8 @@ on:
       - 'Samstraumr/samstraumr-core/src/main/java/**/*.java'
       - '.github/workflows/documentation-ci.yml'
   workflow_dispatch:  # Manual trigger
+  release:
+    types: [published, prereleased]  # Run on release publication
 
 jobs:
   check-documentation:
@@ -78,6 +80,62 @@ jobs:
           path: |
             documentation-check-report.md
             todo-report.md
+
+  pre-release-checks:
+    name: Pre-Release Documentation Checks
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Set Java module options
+        run: |
+          echo "JAVA_OPTS=--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED" >> $GITHUB_ENV
+
+      - name: Build project for tests
+        run: ./s8r-build fast
+        continue-on-error: true
+
+      - name: Check Documentation Completeness
+        id: check_completeness
+        run: |
+          if [ -f "./docs/tools/check-doc-completeness.sh" ]; then
+            ./docs/tools/check-doc-completeness.sh
+            echo "completeness_check_result=$?" >> $GITHUB_OUTPUT
+          else
+            echo "Documentation completeness check script not found, skipping"
+            echo "completeness_check_result=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate Documentation Examples
+        id: validate_examples
+        run: |
+          if [ -f "./docs/tools/validate-examples.sh" ]; then
+            ./docs/tools/validate-examples.sh
+            echo "examples_check_result=$?" >> $GITHUB_OUTPUT
+          else
+            echo "Examples validation script not found, skipping"
+            echo "examples_check_result=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload Pre-Release Check Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pre-release-check-reports
+          path: |
+            target/doc-completeness-reports/
+            target/example-validation/reports/
 
   generate-documentation:
     name: Generate Documentation
@@ -183,7 +241,7 @@ jobs:
   report:
     name: Documentation CI Report
     if: always()
-    needs: [check-documentation, generate-documentation, deploy-to-pages]
+    needs: [check-documentation, pre-release-checks, generate-documentation, deploy-to-pages]
     runs-on: ubuntu-latest
     steps:
       - name: Generate Summary
@@ -198,6 +256,19 @@ jobs:
             echo "## ❌ Documentation Checks: Failed" >> $GITHUB_STEP_SUMMARY
           else
             echo "## ⚠️ Documentation Checks: Skipped or Cancelled" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Check pre-release checks job status
+          if [ "${{ github.event_name }}" == "release" ] || [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            if [ "${{ needs.pre-release-checks.result }}" == "success" ]; then
+              echo "## ✅ Pre-Release Documentation Checks: Passed" >> $GITHUB_STEP_SUMMARY
+            elif [ "${{ needs.pre-release-checks.result }}" == "failure" ]; then
+              echo "## ❌ Pre-Release Documentation Checks: Failed" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "## ⚠️ Pre-Release Documentation Checks: Skipped or Cancelled" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "## ℹ️ Pre-Release Documentation Checks: Skipped (only runs on release or manual trigger)" >> $GITHUB_STEP_SUMMARY
           fi
           
           # Check documentation generation job status

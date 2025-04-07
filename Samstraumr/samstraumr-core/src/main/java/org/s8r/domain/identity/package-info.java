@@ -14,35 +14,24 @@
  */
 
 /**
- * Domain identity management for components.
+ * Identity domain model in the Samstraumr framework.
  * 
- * <p>This package contains classes for managing component identity in the Samstraumr framework.
- * Identity is a core concept in the framework, providing unique identification and lineage
- * tracking for components.
+ * <p>This package contains the domain model for identity management,
+ * which provides unique identification and addressing for components
+ * and other entities in the system.</p>
  * 
- * <p>Key responsibilities of identity management:
+ * <h2>Key Classes</h2>
  * <ul>
- *   <li>Generating and managing unique identifiers for components</li>
- *   <li>Tracking component lineage (parent-child relationships)</li>
- *   <li>Supporting hierarchical component relationships</li>
- *   <li>Converting between different identity representations</li>
+ *   <li>{@link org.s8r.domain.identity.ComponentId} - Component identity value object</li>
+ *   <li>{@link org.s8r.domain.identity.ComponentHierarchy} - Component hierarchy management</li>
+ *   <li>{@link org.s8r.domain.identity.IdentityConverter} - Converts between identity formats</li>
+ *   <li>{@link org.s8r.domain.identity.LegacyIdentityConverter} - Conversion for legacy identity formats</li>
  * </ul>
  * 
- * <p>Key classes:
+ * <h2>Related Packages</h2>
  * <ul>
- *   <li>{@link org.s8r.domain.identity.ComponentId} - Value object representing a component's identity</li>
- *   <li>{@link org.s8r.domain.identity.ComponentHierarchy} - Utility for managing hierarchical relationships</li>
- *   <li>{@link org.s8r.domain.identity.IdentityConverter} - Interface for converting to/from legacy identity formats</li>
- *   <li>{@link org.s8r.domain.identity.LegacyIdentityConverter} - Extended interface for legacy identity conversion</li>
- *   <li>{@link org.s8r.domain.identity.LegacyEnvironmentConverter} - Interface for legacy environment conversion</li>
- * </ul>
- * 
- * <p>Identity in the framework follows the principles of:
- * <ul>
- *   <li>Immutability - Component IDs are immutable value objects</li>
- *   <li>Uniqueness - Each component has a globally unique identifier</li>
- *   <li>Traceability - Lineage information tracks component relationships</li>
- *   <li>Hierarchical structure - Components can form parent-child relationships</li>
+ *   <li>{@link org.s8r.domain.component} - Component domain model that uses identities</li>
+ *   <li>{@link org.s8r.component.identity} - Identity abstraction layer</li>
  * </ul>
  */
 package org.s8r.domain.identity;

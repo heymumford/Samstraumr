@@ -15,6 +15,7 @@
 
 package org.s8r.application.port;
 
+import org.s8r.domain.identity.LegacyComponentAdapterPort;
 import org.s8r.domain.identity.LegacyEnvironmentConverter;
 import org.s8r.domain.identity.LegacyIdentityConverter;
 
@@ -54,4 +55,18 @@ public interface LegacyAdapterResolver {
      * @return The tube identity converter
      */
     LegacyIdentityConverter getTubeIdentityConverter();
+    
+    /**
+     * Gets an adapter for core components.
+     * 
+     * @return The core component adapter
+     */
+    LegacyComponentAdapterPort getCoreComponentAdapter();
+    
+    /**
+     * Gets an adapter for tube components.
+     * 
+     * @return The tube component adapter
+     */
+    LegacyComponentAdapterPort getTubeComponentAdapter();
 }

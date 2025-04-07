@@ -13,4 +13,21 @@
  *     https://www.mozilla.org/en-US/MPL/2.0/
  */
 
+/**
+ * Component logging interfaces and implementations.
+ * 
+ * <p>This package contains logging interfaces and implementations
+ * specific to component operations.</p>
+ * 
+ * <h2>Key Classes</h2>
+ * <ul>
+ *   <li>{@link org.s8r.component.logging.Logger} - Component logging interface</li>
+ * </ul>
+ * 
+ * <h2>Related Packages</h2>
+ * <ul>
+ *   <li>{@link org.s8r.component.core} - Core component abstractions</li>
+ *   <li>{@link org.s8r.infrastructure.logging} - Infrastructure logging implementations</li>
+ * </ul>
+ */
 package org.s8r.component.logging;

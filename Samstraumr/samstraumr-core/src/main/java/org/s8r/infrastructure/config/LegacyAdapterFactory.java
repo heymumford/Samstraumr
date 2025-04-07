@@ -16,6 +16,7 @@
 package org.s8r.infrastructure.config;
 
 import org.s8r.application.port.LegacyAdapterResolver;
+import org.s8r.domain.identity.LegacyComponentAdapterPort;
 import org.s8r.domain.identity.LegacyEnvironmentConverter;
 import org.s8r.domain.identity.LegacyIdentityConverter;
 
@@ -37,6 +38,8 @@ public class LegacyAdapterFactory implements LegacyAdapterResolver {
     private LegacyEnvironmentConverter tubeEnvConverter;
     private LegacyIdentityConverter coreIdentityConverter;
     private LegacyIdentityConverter tubeIdentityConverter;
+    private LegacyComponentAdapterPort coreComponentAdapter;
+    private LegacyComponentAdapterPort tubeComponentAdapter;
     private org.s8r.adapter.ReflectiveAdapterFactory reflectiveFactory;
     
     private LegacyAdapterFactory() {
@@ -150,5 +153,49 @@ public class LegacyAdapterFactory implements LegacyAdapterResolver {
             }
         }
         return tubeIdentityConverter;
+    }
+    
+    @Override
+    public LegacyComponentAdapterPort getCoreComponentAdapter() {
+        if (coreComponentAdapter == null) {
+            try {
+                // Use the reflective factory to create the component adapter
+                coreComponentAdapter = getReflectiveFactory().getCoreComponentAdapter();
+            } catch (Exception e) {
+                // Get the required dependencies
+                org.s8r.application.port.LoggerPort logger = 
+                    DependencyContainer.getInstance().getLogger(LegacyAdapterFactory.class);
+                    
+                // Create the adapter directly
+                coreComponentAdapter = new org.s8r.adapter.LegacyComponentAdapter(
+                    "org.s8r.core.tube.Tube", 
+                    getCoreIdentityConverter(),
+                    getCoreEnvironmentConverter(),
+                    logger);
+            }
+        }
+        return coreComponentAdapter;
+    }
+    
+    @Override
+    public LegacyComponentAdapterPort getTubeComponentAdapter() {
+        if (tubeComponentAdapter == null) {
+            try {
+                // Use the reflective factory to create the component adapter
+                tubeComponentAdapter = getReflectiveFactory().getTubeComponentAdapter();
+            } catch (Exception e) {
+                // Get the required dependencies
+                org.s8r.application.port.LoggerPort logger = 
+                    DependencyContainer.getInstance().getLogger(LegacyAdapterFactory.class);
+                    
+                // Create the adapter directly
+                tubeComponentAdapter = new org.s8r.adapter.LegacyComponentAdapter(
+                    "org.s8r.tube.Tube", 
+                    getTubeIdentityConverter(),
+                    getTubeEnvironmentConverter(),
+                    logger);
+            }
+        }
+        return tubeComponentAdapter;
     }
 }

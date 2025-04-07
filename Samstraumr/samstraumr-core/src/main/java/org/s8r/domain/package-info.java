@@ -14,32 +14,40 @@
  */
 
 /**
- * Domain layer for the Samstraumr framework.
+ * Domain layer of the Samstraumr framework following Clean Architecture principles.
  * 
- * <p>This package contains the core business entities, business rules, and domain logic of the
- * Samstraumr framework. As the innermost layer of the Clean Architecture, it has no dependencies
- * on other layers.
+ * <p>This package and its subpackages contain the domain model that forms
+ * the core business logic of the S8r framework. The domain layer is independent
+ * of external frameworks, databases, and user interfaces.</p>
  * 
- * <p>Key responsibilities of the domain layer:
+ * <h2>Subpackages</h2>
  * <ul>
- *   <li>Define core business entities (Component, Machine, etc.)</li>
- *   <li>Implement domain-specific business rules</li>
- *   <li>Define interfaces that will be implemented by outer layers</li>
- *   <li>Establish domain events and their propagation rules</li>
+ *   <li>{@link org.s8r.domain.component} - Component domain model</li>
+ *   <li>{@link org.s8r.domain.event} - Domain events</li>
+ *   <li>{@link org.s8r.domain.identity} - Identity domain model</li>
+ *   <li>{@link org.s8r.domain.machine} - Machine domain model</li>
+ *   <li>{@link org.s8r.domain.lifecycle} - Lifecycle management</li>
+ *   <li>{@link org.s8r.domain.exception} - Domain exceptions</li>
  * </ul>
  * 
- * <p>The domain layer is organized into several subpackages:
+ * <h2>Clean Architecture</h2>
+ * <p>This layer follows Clean Architecture principles:</p>
  * <ul>
- *   <li>component - Core component entities and related classes</li>
- *   <li>event - Domain events and event types</li>
- *   <li>exception - Domain-specific exceptions</li>
- *   <li>identity - Component identification and hierarchy management</li>
- *   <li>lifecycle - Lifecycle state management</li>
- *   <li>machine - Machine definition and orchestration</li>
+ *   <li>Framework Independence: No dependencies on external frameworks</li>
+ *   <li>Testability: Business rules can be tested without UI, database, etc.</li>
+ *   <li>UI Independence: UI can change without changing business rules</li>
+ *   <li>Database Independence: Business rules not bound to a specific database</li>
+ *   <li>Independence from External Agencies: Business rules don't know about interfaces to the outside world</li>
  * </ul>
  * 
- * <p>This layer follows the Dependency Inversion Principle: high-level modules (like domain)
- * don't depend on low-level modules, but both depend on abstractions. Abstractions are
- * defined in this layer and implemented by outer layers.
+ * <h2>Related Packages</h2>
+ * <ul>
+ *   <li>{@link org.s8r.application.service} - Application services that use domain model</li>
+ *   <li>{@link org.s8r.application.port} - Ports to interact with the domain model</li>
+ *   <li>{@link org.s8r.infrastructure.persistence} - Repository implementations</li>
+ * </ul>
+ * 
+ * <p>For detailed information about the domain layer organization and design principles,
+ * see the README.md file in this package directory.</p>
  */
 package org.s8r.domain;

@@ -123,9 +123,9 @@ The easiest way to get started with S8r is to:
 
 1. Check out the [Prerequisites](prerequisites.md) to ensure your environment is set up
 2. Follow the [Getting Started](getting-started.md) guide to create your first component
-3. Explore the [Maven Structure](MavenStructureGuide.md) to understand the project organization
+3. Explore the [Maven Structure](maven-structure-guide.md) to understand the project organization
 
-If you're migrating from Samstraumr, see the [S8r Migration Guide](migration/SamstraumrToS8rMigration.md) for detailed instructions.
+If you're migrating from Samstraumr, see the [S8r Migration Guide](migration/samstraumr-to-s8r-migration.md) for detailed instructions.
 
 ## Why Migrate to S8r?
 

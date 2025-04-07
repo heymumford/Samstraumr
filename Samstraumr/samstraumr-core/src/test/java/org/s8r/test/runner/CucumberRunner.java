@@ -47,11 +47,11 @@ import org.junit.platform.suite.api.SuiteDisplayName;
 @ConfigurationParameter(
     key = "cucumber.features",
     value =
-        "src/test/resources/tube/features, src/test/resources/composites/features, src/test/resources/test")
+        "src/test/resources/features, src/test/resources/features/lifecycle-unified, src/test/resources/features/patterns-unified, src/test/resources/tube/features, src/test/resources/composites/features, src/test/resources/test")
 @ConfigurationParameter(
     key = GLUE_PROPERTY_NAME,
     value =
-        "org.s8r.tube.steps,org.s8r.tube.lifecycle.steps,org.s8r.test.steps,org.s8r.core.tube.test.steps")
+        "org.s8r.tube.steps,org.s8r.tube.lifecycle.steps,org.s8r.test.steps,org.s8r.test.tube,org.s8r.test.tube.lifecycle,org.s8r.test.component,org.s8r.test.legacy,org.s8r.core.tube.test.steps")
 @ConfigurationParameter(
     key = PLUGIN_PROPERTY_NAME,
     value =

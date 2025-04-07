@@ -18,6 +18,6 @@ Licensed under the Mozilla Public License 2.0
 >
 > Please update your bookmarks to the new consolidated location:
 >
-> [Testing Strategy](/docs/testing/testing-strategy.md)
+> [Testing Strategy](../testing/testing-strategy.md)
 >
 > Redirecting you in 3 seconds...

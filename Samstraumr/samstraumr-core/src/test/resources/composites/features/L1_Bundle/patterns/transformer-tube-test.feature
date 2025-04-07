@@ -5,7 +5,7 @@
 # which transforms input data according to specified rules.
 # ---------------------------------------------------------------------------------------
 
-@ATL @L1_Bundle @Flow @Transformer
+@L1_Component @Functional @DataFlow
 Feature: Transformer Tube - Data Transformation with Conditional Logic
   # This feature verifies that Transformer tubes correctly apply transformation rules to input data
 
@@ -39,7 +39,7 @@ Feature: Transformer Tube - Data Transformation with Conditional Logic
       | complex formula | 500        | 750       |
       | conditional     | 2000       | 1000      |
 
-  @BTL @L1_Bundle @Runtime @Flow @Transformer @Resilience
+@ErrorHandling  @L1_Bundle @Runtime @DataFlow @Transformer @Resilience
   Scenario: Transformer tube handles invalid input data gracefully
     # Purpose: Verify transformer tubes properly handle malformed input data
     Given a transformer tube is configured for string transformation

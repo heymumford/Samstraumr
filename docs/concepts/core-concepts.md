@@ -146,10 +146,10 @@ public void assessHealth() {
 
 ## Related Documentation
 
-- [Main Documentation](../../README.md) - Return to main Samstraumr documentation
+- [Main Documentation](../../readme.md) - Return to main Samstraumr documentation
 - [Origins and Vision](./origins-and-vision.md) - The 30-year journey behind Samstraumr
 - [Systems Theory Foundation](./systems-theory-foundation.md) - The natural foundations
-- [Architecture Overview](../architecture/README.md) - Technical architecture details
+- [Architecture Overview](../architecture/readme.md) - Technical architecture details
 - [Getting Started Guide](../guides/getting-started.md) - Practical implementation of concepts
 - [State Management](./state-management.md) - Detailed view of component state
 - [Identity Addressing](./identity-addressing.md) - Component identity principles

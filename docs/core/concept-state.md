@@ -18,6 +18,6 @@ Licensed under the Mozilla Public License 2.0
 >
 > Please update your bookmarks to the new consolidated location:
 >
-> [State Management](/docs/concepts/state-management.md)
+> [State Management](../concepts/state-management.md)
 >
 > Redirecting you in 3 seconds...
