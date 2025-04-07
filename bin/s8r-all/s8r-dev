@@ -1,0 +1,259 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r-dev: Development command dispatcher for Samstraumr internal development
+# Single entry point for all build, test, and version management operations
+#==============================================================================
+set -e
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${SCRIPT_DIR}"
+
+# Create the library directory if it doesn't exist
+if [ ! -d "${PROJECT_ROOT}/.s8r/lib" ]; then
+  mkdir -p "${PROJECT_ROOT}/.s8r/lib"
+fi
+
+# Source the common library from s8r script
+if [ -f "${PROJECT_ROOT}/.s8r/lib/common.sh" ]; then
+  source "${PROJECT_ROOT}/.s8r/lib/common.sh"
+else
+  # Forward to the main s8r script to ensure common library is created
+  "${PROJECT_ROOT}/s8r" --help > /dev/null
+  source "${PROJECT_ROOT}/.s8r/lib/common.sh"
+fi
+
+# Initialize variables
+COMMAND=""
+WATCH_MODE=false
+PARALLEL=false
+COVERAGE=false
+COVERAGE_REPORT=false
+
+# Display main development help information
+show_help() {
+  echo -e "${BOLD}Samstraumr (S8r) Development Tools${RESET}"
+  echo
+  echo "Usage: ./s8r-dev <command> [options] [arguments]"
+  echo
+  echo "Core Development Commands:"
+  echo "  build            Build the project (fast, test, package, install, full)"
+  echo "  test             Run tests (unit, component, integration, all...)"
+  echo "  version          Manage version information"
+  echo "  clean            Clean build artifacts"
+  echo "  quality          Run quality checks"
+  echo
+  echo "Additional Development Commands:"
+  echo "  coverage         Run and manage code coverage"
+  echo "  report           Generate change management reports"
+  echo "  docs             Generate project documentation"
+  echo "  docmosis         Manage optional Docmosis integration"
+  echo "  test-docmosis    Run a smoke test for Docmosis integration"
+  echo "  script-test      Test the build and test scripts themselves"
+  echo "  install          Initialize or update project configuration"
+  echo "  hooks            Install or update git hooks"
+  echo "  demo             Run demonstration scripts"
+  echo "  help             Show help for a command"
+  echo
+  echo "Global Options:"
+  echo "  --watch, -w      Watch mode (continuous execution)"
+  echo "  --parallel, -p   Execute in parallel where supported"
+  echo "  --help, -h       Show this help information"
+  echo
+  echo "Examples:"
+  echo "  ./s8r-dev build fast                  # Fast build"
+  echo "  ./s8r-dev test unit --parallel        # Run unit tests in parallel"
+  echo "  ./s8r-dev build-test                  # Build and test in one command"
+  echo "  ./s8r-dev coverage report             # Generate coverage report"
+  echo "  ./s8r-dev version bump minor          # Bump minor version"
+  echo
+  echo -e "${YELLOW}Note:${RESET} For end-user functionality, use the ./s8r command instead"
+  echo
+  echo "For command-specific help, run:"
+  echo "  ./s8r-dev <command> --help"
+}
+
+# Function to show help for the help command
+function show_help_help() {
+  echo -e "${BOLD}S8r-dev Help Command${RESET} - Get help for S8r development commands"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r-dev help [command]"
+  echo
+  echo -e "${BOLD}ARGUMENTS:${RESET}"
+  echo "  command    The development command to get help for"
+  echo
+  echo -e "${BOLD}DESCRIPTION:${RESET}"
+  echo "  The help command displays detailed information about a specific development command,"
+  echo "  including its usage, options, and examples. If no command is specified,"
+  echo "  general help information is displayed."
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  ./s8r-dev help                # Display general help"
+  echo "  ./s8r-dev help build          # Display help for the build command"
+  echo "  ./s8r-dev help test           # Display help for test commands"
+}
+
+# Function to handle the help command
+function handle_help_command() {
+  local help_topic="$1"
+  shift
+  
+  # If no help topic is provided or explicit help is requested for the help command
+  if [[ -z "$help_topic" || "$help_topic" == "help" ]]; then
+    show_help_help
+    return
+  fi
+  
+  # Security: Sanitize input to prevent command injection and path traversal
+  # Remove any potentially dangerous characters
+  local sanitized_topic
+  sanitized_topic=$(echo "$help_topic" | tr -cd 'a-zA-Z0-9_-')
+  
+  # If sanitized topic differs from original, show general help
+  if [[ "$sanitized_topic" != "$help_topic" ]]; then
+    echo -e "${YELLOW}Warning: Invalid characters in help topic.${RESET}" >&2
+    show_help
+    return
+  fi
+  
+  # Forward the help request to the main s8r script which has all the help functions
+  "${PROJECT_ROOT}/s8r" help "$sanitized_topic"
+}
+
+# Parse global arguments
+parse_global_args() {
+  # Trim all arguments to check for empty or whitespace-only arguments
+  local trimmed_args=""
+  for arg in "$@"; do
+    trimmed_args+="${arg// /}"
+  done
+  
+  # If no arguments provided or just whitespace, show help
+  if [[ $# -eq 0 || -z "$trimmed_args" ]]; then
+    show_help
+    exit 0
+  fi
+
+  while [[ $# -gt 0 ]]; do
+    # Convert argument to lowercase for case-insensitive matching
+    local arg_lower=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+    
+    case "$arg_lower" in
+      --watch|-w)
+        WATCH_MODE=true
+        shift
+        ;;
+      --parallel|-p)
+        PARALLEL=true
+        shift
+        ;;
+      --help|-h|-help|help|--h|-?|/h|/?)
+        show_help
+        exit 0
+        ;;
+      help)
+        # Handle help command directly
+        COMMAND="help"
+        shift
+        
+        # Show help for specific command
+        if [ $# -gt 0 ]; then
+          dev_command="$1"
+          # Check if this is a development command
+          if [[ "$dev_command" =~ ^(build|test|version|clean|coverage|quality|report|docs|docmosis|test-docmosis|script-test|install|hooks|demo)$ ]]; then
+            # Special case for build command
+            if [ "$dev_command" = "build" ]; then
+              echo -e "${BOLD}Samstraumr Build${RESET} - Build the project with optimized settings"
+              echo
+              echo -e "${BOLD}USAGE:${RESET}"
+              echo "  ./s8r-dev build [options] [mode]"
+              echo
+              echo -e "${BOLD}OPTIONS:${RESET}"
+              echo "  -h, --help                Display this help message"
+              echo "  -v, --verbose             Enable verbose output"
+              echo "  -c, --clean               Clean before building"
+              echo "  -p, --parallel            Build in parallel where possible"
+              echo "  --skip-quality            Skip quality checks"
+              echo
+              echo -e "${BOLD}MODES:${RESET}"
+              echo "  fast                      Fast build with quality checks skipped (default)"
+              echo "  compile                   Compile only"
+              echo "  test                      Compile and run tests"
+              echo "  package                   Create JAR package"
+              echo "  install                   Install to local repository"
+              echo "  full                      Full build including tests and verification"
+              echo "  docs                      Generate project documentation"
+              echo "  site                      Generate the Maven site"
+              echo
+              echo -e "${BOLD}EXAMPLES:${RESET}"
+              echo "  ./s8r-dev build                     # Fast build"
+              echo "  ./s8r-dev build test                # Run tests"
+              echo "  ./s8r-dev build -c test             # Clean and run tests"
+              echo "  ./s8r-dev build --parallel full     # Run full build in parallel"
+            else
+              # Generic help for other development commands
+              echo -e "${BOLD}S8r-dev ${dev_command} Command${RESET}"
+              echo
+              echo -e "${BOLD}USAGE:${RESET}"
+              echo "  ./s8r-dev $dev_command [options]"
+              echo
+              echo -e "${BOLD}OPTIONS:${RESET}"
+              echo "  Run ./s8r-dev $dev_command --help for command-specific options"
+              echo
+              echo -e "${BOLD}For more options and examples, use:${RESET}"
+              echo "  ./s8r-dev $dev_command --help"
+            fi
+          else
+            # If it's not a development command, refer to s8r
+            echo -e "${YELLOW}Note:${RESET} '$dev_command' is an end-user command."
+            echo "Please use: ./s8r help $dev_command"
+          fi
+        else
+          # No command specified, show general help
+          show_help
+        fi
+        exit 0
+        ;;
+        
+      build|test|version|clean|coverage|quality|report|docs|docmosis|test-docmosis|script-test|install|hooks|demo)
+        COMMAND="$1"
+        shift
+        break
+        ;;
+      build-test|build-test-package)
+        COMMAND="build-test"
+        shift
+        break
+        ;;
+      # Handle user commands with a message to use s8r
+      init|list|component|composite|machine)
+        echo -e "${YELLOW}Note:${RESET} '$1' is an end-user command."
+        echo "Please use: ./s8r $1"
+        exit 1
+        ;;
+      *)
+        error "Unknown development command: $1. Run './s8r-dev --help' for usage information."
+        ;;
+    esac
+  done
+  
+  # Process command
+  if [ -z "$COMMAND" ]; then
+    # This is a fallback in case we somehow get here without a command
+    show_help
+    exit 0
+  fi
+  
+  # Help command is now handled directly in the case statement
+  
+  # Forward all other commands to the s8r script
+  # This utilizes the existing implementations in s8r
+  "${PROJECT_ROOT}/s8r" "$COMMAND" "$@"
+}
+
+# Main entry point: Parse arguments and execute command
+parse_global_args "$@"
+
+# Exit with the status of the last command
+exit $?

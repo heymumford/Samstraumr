@@ -1,0 +1,315 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r-tube: Tube management for Samstraumr
+# Command to manage tubes in the S8r model
+#==============================================================================
+set -e
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${SCRIPT_DIR}"
+
+# Source common library
+if [ -f "${PROJECT_ROOT}/.s8r/lib/common.sh" ]; then
+  source "${PROJECT_ROOT}/.s8r/lib/common.sh"
+else
+  # Forward to the main s8r script to ensure common library is created
+  "${PROJECT_ROOT}/s8r" --help > /dev/null
+  source "${PROJECT_ROOT}/.s8r/lib/common.sh"
+fi
+
+# Display help information
+show_help() {
+  echo -e "${BOLD}S8r Tube Commands${RESET} - Manage tubes in your S8r model"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  s8r tube <subcommand> [arguments]"
+  echo
+  echo -e "${BOLD}SUBCOMMANDS:${RESET}"
+  echo "  create    Create a new tube"
+  echo "  list      List all tubes"
+  echo "  info      Show details about a tube"
+  echo "  delete    Delete a tube"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help                Display this help message"
+  echo "  -v, --verbose             Enable verbose output"
+  echo "  --type <type>             Tube type: transformer, validator, observer, etc."
+  echo "  --format <format>         Output format: text, json (default: text)"
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  s8r tube create --type transformer DataProcessor"
+  echo "  s8r tube list --format json"
+  echo "  s8r tube info DataProcessor"
+  echo "  s8r tube delete DataProcessor"
+}
+
+# Create tube handler
+handle_create() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Create Tube${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r tube create [options] <tube-name>"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --type <type>      Tube type: transformer, validator, observer (default: transformer)"
+    echo "  --verbose, -v      Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r tube create DataProcessor"
+    echo "  s8r tube create --type validator DataValidator"
+    return 0
+  fi
+
+  local tube_type="transformer"
+  local verbose=false
+  local tube_name=""
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --type)
+        tube_type="$2"
+        shift 2
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+    return 1
+        ;;
+      *)
+        tube_name="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # Validate tube name
+  if [ -z "$tube_name" ]; then
+    echo -e "${RED}Error: Tube name is required${RESET}" >&2
+    return 1
+  fi
+
+  info "Creating tube '$tube_name' of type '$tube_type'"
+  
+  # Call the Java API to create the tube
+  # For now, simulate the behavior
+  echo "Tube '$tube_name' created successfully."
+  echo "Type: $tube_type"
+}
+
+# List tubes handler
+handle_list() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}List Tubes${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r tube list [options]"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --format <format>  Output format: text, json (default: text)"
+    echo "  --verbose, -v      Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r tube list"
+    echo "  s8r tube list --format json"
+    return 0
+  fi
+  
+  local format="text"
+  local verbose=false
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --format)
+        format="$2"
+        shift 2
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+    return 1
+        ;;
+      *)
+        shift
+        ;;
+    esac
+  done
+
+  info "Listing tubes in $format format"
+  
+  # Call the Java API to list tubes
+  # For now, simulate the behavior
+  echo "Available tubes:"
+  echo "- DataProcessor (transformer)"
+  echo "- DataValidator (validator)"
+  echo "- EventObserver (observer)"
+}
+
+# Tube info handler
+handle_info() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Tube Information${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r tube info [options] <tube-name>"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --format <format>  Output format: text, json (default: text)"
+    echo "  --verbose, -v      Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r tube info DataProcessor"
+    echo "  s8r tube info --format json DataValidator"
+    return 0
+  fi
+  
+  local format="text"
+  local verbose=false
+  local tube_name=""
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --format)
+        format="$2"
+        shift 2
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+    return 1
+        ;;
+      *)
+        tube_name="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # Validate tube name
+  if [ -z "$tube_name" ]; then
+    echo -e "${RED}Error: Tube name is required${RESET}" >&2
+    return 1
+  fi
+
+  info "Displaying information for tube '$tube_name'"
+  
+  # Call the Java API to get tube info
+  # For now, simulate the behavior
+  echo "Tube: $tube_name"
+  echo "Type: transformer"
+  echo "Status: active"
+  echo "LifecycleState: CHILDHOOD" 
+  echo "Created: 2025-04-06"
+}
+
+# Delete tube handler
+handle_delete() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Delete Tube${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r tube delete [options] <tube-name>"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --force, -f        Force deletion without confirmation"
+    echo "  --verbose, -v      Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r tube delete DataProcessor"
+    echo "  s8r tube delete --force DataValidator"
+    return 0
+  fi
+  
+  local force=false
+  local verbose=false
+  local tube_name=""
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -f|--force)
+        force=true
+        shift
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+    return 1
+        ;;
+      *)
+        tube_name="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # Validate tube name
+  if [ -z "$tube_name" ]; then
+    echo -e "${RED}Error: Tube name is required${RESET}" >&2
+    return 1
+  fi
+
+  # Confirm deletion if not forced
+  if [ "$force" != true ]; then
+    read -p "Are you sure you want to delete tube '$tube_name'? (y/N) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      echo "Deletion cancelled."
+      return 1
+    fi
+  fi
+
+  info "Deleting tube '$tube_name'"
+  
+  # Call the Java API to delete the tube
+  # For now, simulate the behavior
+  echo "Tube '$tube_name' deleted successfully."
+}
+
+# Main command handler
+if [ $# -eq 0 ] || [[ "$1" == "--help" || "$1" == "-h" ]]; then
+  show_help
+  exit 0
+fi
+
+# Get subcommand
+SUBCOMMAND="$1"
+shift
+
+# Execute appropriate handler
+case "$SUBCOMMAND" in
+  create)
+    handle_create "$@"
+    ;;
+  list)
+    handle_list "$@"
+    ;;
+  info)
+    handle_info "$@"
+    ;;
+  delete)
+    handle_delete "$@"
+    ;;
+  *)
+    echo -e "${RED}Error: Unknown subcommand: $SUBCOMMAND. Run 's8r tube --help' for usage.${RESET}" >&2
+    exit 1
+    ;;
+esac
+
+exit $?

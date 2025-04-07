@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Help file for component command
+
+# Terminal colors
+BOLD='\033[1m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+RESET='\033[0m'
+
+echo -e "${BOLD}S8r Component Commands${RESET} - Manage components in your S8r model"
+echo
+echo -e "${BOLD}USAGE:${RESET}"
+echo "  s8r component <subcommand> [arguments]"
+echo
+echo -e "${BOLD}SUBCOMMANDS:${RESET}"
+echo "  create    Create a new component"
+echo "  list      List all components"
+echo "  info      Show details about a component"
+echo "  delete    Delete a component"
+echo
+echo -e "${BOLD}EXAMPLES:${RESET}"
+echo "  s8r component create --type transformer DataProcessor"
+echo "  s8r component list --format json"

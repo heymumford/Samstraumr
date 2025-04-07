@@ -1,1 +1,0 @@
-util/scripts/test/maven-profile-test.sh

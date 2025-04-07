@@ -395,71 +395,92 @@ Starting from version 2.7.1, the CLI scripts are organized into a proper bin dir
 
 ### Bin Directory Organization
 
-All executables are organized by category in the `bin` directory:
+All executables are organized by functionality in the `bin` directory:
 
 ```bash
 bin/
-   core/           # Core framework executables (s8r, s8r-init, s8r-list)
-   build/          # Build-related executables (s8r-build, s8r-ci)
-   test/           # Testing executables (s8r-test, s8r-test-cli)
-   component/      # Component-related executables (s8r-component, s8r-composite)
-   dev/            # Development executables (s8r-dev)
-   migration/      # Migration tools (s8r-migration-monitor, s8r-architecture-verify)
-   help/           # Help executables (s8r-help)
-   utils/          # Utility executables (s8r-docs, s8r-quality, s8r-version)
-   setup-path.sh   # Script to add bin directory to PATH
-   remove-root-scripts.sh # Script to safely remove root directory scripts
+   core/           # Core framework executables (s8r, s8r-init, s8r-list)
+   build/          # Build-related executables (s8r-build, s8r-ci)
+   test/           # Testing executables (s8r-test, s8r-test-cli)
+   component/      # Component-related executables (s8r-component, s8r-composite, s8r-machine, s8r-tube)
+   dev/            # Development executables (s8r-dev, s8r-dev-help-build)
+   migration/      # Migration tools (s8r-migration-monitor, s8r-architecture-verify)
+   help/           # Help executables (s8r-help, s8r-help-build, s8r-help-component)
+   utils/          # Utility executables (s8r-docs, s8r-quality, s8r-version)
+   ai/             # AI-related executables (s8r-ai-test)
+   setup-path.sh   # Script to add bin directory to PATH
+   create-aliases.sh # Script to create shell aliases for executables
+   remove-root-scripts.sh # Script to safely remove root directory scripts
+   setup-bin-directory.sh # Script to set up the bin directory structure
+   s8r-scripts-version # Script to manage script versions (original vs. new)
+   README.md       # Documentation for bin directory structure and usage
 ```
 
-### Setting Up Your PATH
+These are the canonical executables for the project. They are not symlinks or copies of files in the root directory - they ARE the primary executables that should be used for all operations.
 
-To properly use the Samstraumr executables, add the bin directory to your PATH:
+### Setting Up Your Environment
+
+You have three options for using the Samstraumr executables:
+
+#### Option 1: Add the bin directory to your PATH (Recommended)
 
 ```bash
 # Run the setup script
 ./bin/setup-path.sh
 
-# This will add the bin directory to your shell configuration
-# and provide instructions for activating it in your current session
+# Then activate in current session
+source ~/.bashrc   # or ~/.zshrc, etc. depending on your shell
 ```
 
-After adding the bin directory to your PATH, you can run any executable directly:
+This will add the bin directory to your shell configuration and provide instructions for activating it in your current session.
+
+#### Option 2: Create shell aliases
 
 ```bash
-s8r-build                # Run build command
-s8r-test component       # Run component tests
-s8r-version get          # Get version information
+# Run the aliases script
+./bin/create-aliases.sh
+
+# Then activate in current session
+source ~/.bashrc   # or ~/.zshrc, etc. depending on your shell
 ```
 
-This is preferred over using the deprecated scripts in the root directory.
+This will create aliases for all scripts in your shell configuration, making them accessible from anywhere.
+
+#### Option 3: Use full paths
+
+```bash
+# You can always use the full path to run a script
+/path/to/Samstraumr/bin/core/s8r
+/path/to/Samstraumr/bin/build/s8r-build
+```
 
 ### Removing Root Directory Scripts
 
-For a cleaner repository structure, you can remove the deprecated scripts from the root directory:
+For a cleaner repository structure, after setting up your PATH or aliases, you should remove the deprecated scripts from the root directory:
 
 ```bash
-# Run the removal script (after setting up your PATH)
+# Run the removal script
 bin/remove-root-scripts.sh
 ```
 
 The script will:
-1. Verify that the bin directory is in your PATH
+1. Verify that the bin directory is in your PATH or aliases are set up
 2. Check that all scripts have corresponding executables in the bin directory
 3. Safely remove the root directory scripts
 
-### Script Variants
+### Script Version Management
 
-Some scripts have both original and new versions. To manage these versions, use:
+Some scripts have both original and new versions (e.g., s8r-build and s8r-build-new). To manage these versions, use:
 
 ```bash
 # List available script versions
-s8r-scripts-version list
+bin/s8r-scripts-version list
 
 # Switch to new versions of scripts
-s8r-scripts-version use-new
+bin/s8r-scripts-version use-new
 
 # Switch back to original versions
-s8r-scripts-version use-old
+bin/s8r-scripts-version use-old
 ```
 
 ### Utility Scripts
@@ -468,15 +489,31 @@ Development-specific utility scripts are located in the `util/scripts` directory
 
 ```bash
 util/scripts/
-   ci/             # CI-related scripts
-   java/           # Java-related scripts
-   test/           # Test utility scripts
-   other utility scripts
+   archived/       # Archived scripts that are no longer actively used
+   docs/           # Documentation about scripts
+   ...other utility scripts
 ```
+
+### Bin Directory Setup
+
+If you need to recreate or update the bin directory structure:
+
+```bash
+# Setup or update the bin directory structure
+bin/setup-bin-directory.sh
+```
+
+This script:
+1. Creates all necessary subdirectories
+2. Copies scripts from the root directory to appropriate subdirectories
+3. Creates management scripts (setup-path.sh, create-aliases.sh, etc.)
+4. Updates the bin directory README
 
 ### Legacy Script Support (Deprecated)
 
 The scripts previously located in the root directory are deprecated and will be removed in a future version. Please update your workflows to use the bin directory executables instead.
+
+All documentation, CI/CD pipelines, and personal workflows should be updated to reference the bin directory executables rather than the root directory scripts.
 
 ## Return to Main Documentation
 

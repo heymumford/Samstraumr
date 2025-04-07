@@ -1,0 +1,1404 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r: Unified command dispatcher for Samstraumr
+# Single entry point for all build, test, and version management operations
+#==============================================================================
+set -e
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${SCRIPT_DIR}"
+
+# Create the library directory if it doesn't exist
+if [ ! -d "${PROJECT_ROOT}/.s8r/lib" ]; then
+  mkdir -p "${PROJECT_ROOT}/.s8r/lib"
+fi
+
+# Source common library
+if [ ! -f "${PROJECT_ROOT}/.s8r/lib/common.sh" ]; then
+  # Create it if it doesn't exist
+  cat > "${PROJECT_ROOT}/.s8r/lib/common.sh" << 'EOF'
+#!/usr/bin/env bash
+#==============================================================================
+# S8r Common Library Functions
+# Shared code for the Samstraumr build system
+#==============================================================================
+
+# Find repository root
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel)}"
+
+# Terminal colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+# Functions for prettier output
+info() { echo -e "${BLUE}$1${RESET}"; }
+success() { echo -e "${GREEN}$1${RESET}"; }
+error() { echo -e "${RED}Error: $1${RESET}" >&2; exit 1; }
+warn() { echo -e "${YELLOW}Warning: $1${RESET}" >&2; }
+highlight() { echo -e "${CYAN}$1${RESET}"; }
+important() { echo -e "${MAGENTA}$1${RESET}"; }
+print_header() { echo -e "${BOLD}$1${RESET}"; }
+print_success() { echo -e "${GREEN}$1${RESET}"; }
+print_error() { echo -e "${RED}$1${RESET}" >&2; }
+print_warning() { echo -e "${YELLOW}$1${RESET}" >&2; }
+
+# Determine Maven settings
+setup_maven_opts() {
+  MVN_OPTS=""
+  if [ -n "$MAVEN_MEMORY_OPTS" ]; then
+    MVN_OPTS="$MAVEN_MEMORY_OPTS"
+  else
+    MVN_OPTS="-Xmx1g"
+  fi
+  export MAVEN_OPTS="$MVN_OPTS"
+}
+
+# Execute with timing information
+time_exec() {
+  local start_time=$(date +%s)
+  "$@"
+  local exit_code=$?
+  local end_time=$(date +%s)
+  local duration=$((end_time - start_time))
+  
+  if [ $duration -gt 60 ]; then
+    local minutes=$((duration / 60))
+    local seconds=$((duration % 60))
+    echo -e "${YELLOW}Execution time: ${minutes}m ${seconds}s${RESET}"
+  else
+    echo -e "${YELLOW}Execution time: ${duration}s${RESET}"
+  fi
+  
+  return $exit_code
+}
+
+# Check if a command exists
+command_exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+# Check for required tools
+check_requirements() {
+  local missing=0
+  
+  for cmd in "$@"; do
+    if ! command_exists "$cmd"; then
+      echo -e "${RED}Required command not found: ${cmd}${RESET}" >&2
+      missing=1
+    fi
+  done
+  
+  if [ $missing -eq 1 ]; then
+    echo -e "${RED}Please install the missing requirements and try again.${RESET}" >&2
+    exit 1
+  fi
+}
+
+# Run Maven command with appropriate arguments
+run_maven() {
+  local cmd=("mvn")
+  
+  # Add arguments
+  for arg in "$@"; do
+    cmd+=("$arg")
+  done
+  
+  # Display command
+  echo -e "${BLUE}Running: ${cmd[*]}${RESET}"
+  
+  # Execute command
+  if "${cmd[@]}"; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# Initialize common settings
+setup_maven_opts
+EOF
+  chmod +x "${PROJECT_ROOT}/.s8r/lib/common.sh"
+fi
+
+source "${PROJECT_ROOT}/.s8r/lib/common.sh"
+
+# Define user config directory
+USER_CONFIG_DIR="${HOME}/.s8r"
+USER_CONFIG_FILE="${USER_CONFIG_DIR}/config.json"
+
+# Setup configuration directories
+# User config in home directory
+if [ ! -d "${USER_CONFIG_DIR}" ]; then
+  mkdir -p "${USER_CONFIG_DIR}"
+fi
+
+# Project-level .s8r directory
+PROJECT_CONFIG_DIR="${PROJECT_ROOT}/.s8r"
+if [ ! -d "${PROJECT_CONFIG_DIR}" ]; then
+  mkdir -p "${PROJECT_CONFIG_DIR}/config"
+fi
+
+# Project-level user directory (not tracked in Git)
+PROJECT_USER_CONFIG_DIR="${PROJECT_CONFIG_DIR}/user"
+if [ ! -d "${PROJECT_USER_CONFIG_DIR}" ]; then
+  mkdir -p "${PROJECT_USER_CONFIG_DIR}"
+fi
+
+# Initialize variables
+COMMAND=""
+WATCH_MODE=false
+PARALLEL=false
+COVERAGE=false
+COVERAGE_REPORT=false
+
+# Display main help information
+show_help() {
+  echo -e "${BOLD}Samstraumr (S8r) Command Interface${RESET}"
+  echo
+  echo "Usage: ./s8r <command> [options] [arguments]"
+  echo
+  echo "User Commands:"
+  echo "  init             Initialize a new Samstraumr repository"
+  echo "  list             Display ASCII visualization of S8r models"
+  echo "  tube             Manage tubes in your S8r model (primary building block)"
+  echo "  component        Manage components in your S8r model (alternative to tube)"
+  echo "  composite        Manage composites in your S8r model"
+  echo "  machine          Manage machines in your S8r model"
+  echo "  help             Show help for a specific command"
+  echo
+  echo "Global Options:"
+  echo "  --help, -h       Show this help information"
+  echo
+  echo "Examples:"
+  echo "  ./s8r init                        # Initialize a new S8r repository"
+  echo "  ./s8r list                        # Visualize your S8r model"
+  echo "  ./s8r tube create DataNode        # Create a new tube (primary approach)"
+  echo "  ./s8r component create Validator  # Create a new component (alternative)"
+  echo "  ./s8r composite list              # List all composites"
+  echo "  ./s8r machine create Pipeline     # Create a new machine"
+  echo
+  echo -e "${YELLOW}Note:${RESET} For development commands like build, test, and version management,"
+  echo "use the ./s8r-dev command instead."
+  echo
+  echo "For command-specific help, run:"
+  echo "  ./s8r <command> --help"
+}
+
+# Parse global arguments
+parse_global_args() {
+  # Trim all arguments to check for empty or whitespace-only arguments
+  local trimmed_args=""
+  for arg in "$@"; do
+    trimmed_args+="${arg// /}"
+  done
+  
+  # If no arguments provided or just whitespace, show help
+  if [[ $# -eq 0 || -z "$trimmed_args" ]]; then
+    show_help
+    exit 0
+  fi
+
+  while [[ $# -gt 0 ]]; do
+    # Convert argument to lowercase for case-insensitive matching
+    local arg_lower=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+    
+    case "$arg_lower" in
+      --help|-h|-help|help|--h|-?|/h|/?)
+        show_help
+        exit 0
+        ;;
+      # End-user commands
+      help)
+        echo "DEBUG: Recognized help command in parse_global_args" >&2
+        COMMAND="help"
+        shift
+        echo "DEBUG: Remaining args: $@" >&2
+        break
+        ;;
+      init|list|tube|component|composite|machine)
+        COMMAND="$1"
+        shift
+        break
+        ;;
+      # Handle development commands with a message to use s8r-dev
+      build|test|version|clean|coverage|quality|report|docs|docmosis|test-docmosis|script-test|install|hooks|demo|build-test|build-test-package)
+        echo -e "${YELLOW}Note:${RESET} '$1' is a development command."
+        echo "Please use: ./s8r-dev $1"
+        # Ensure we return a non-zero exit code to indicate this is not a normal operation
+        exit 1
+        ;;
+      *)
+        echo -e "${RED}Error: Unknown command: $1. Run './s8r --help' for usage information.${RESET}" >&2
+        exit 1
+        ;;
+    esac
+  done
+  
+  # Process command
+  if [ -z "$COMMAND" ]; then
+    # This is a fallback in case we somehow get here without a command
+    show_help
+    exit 0
+  fi
+  
+  # Special handling now integrated into the help command case statement
+  
+  # Execute appropriate command with remaining arguments
+  case "$COMMAND" in
+    init)
+      # Use the new init script if available
+      if [ -x "${PROJECT_ROOT}/s8r-init-new" ]; then
+        "${PROJECT_ROOT}/s8r-init-new" "$@"
+      else
+        exec_init "$@"
+      fi
+      ;;
+    list)
+      # Use the new list script
+      if [ -x "${PROJECT_ROOT}/s8r-list" ]; then
+        "${PROJECT_ROOT}/s8r-list" "$@"
+      else
+        error "s8r-list command not found. Please ensure the script is installed."
+      fi
+      ;;
+    build)
+      exec_build "$@"
+      ;;
+    test)
+      exec_test "$@"
+      ;;
+    version)
+      exec_version "$@"
+      ;;
+    clean)
+      exec_clean "$@"
+      ;;
+    coverage)
+      exec_coverage "$@"
+      ;;
+    quality)
+      handle_quality_command "$@"
+      ;;
+    report)
+      handle_report_command "$@"
+      ;;
+    docs)
+      handle_docs_command "$@"
+      ;;
+    docmosis)
+      handle_docmosis_command "$@"
+      ;;
+    test-docmosis)
+      handle_test_docmosis_command "$@"
+      ;;
+    script-test)
+      handle_script_test_command "$@"
+      ;;
+    install)
+      handle_install_command "$@"
+      ;;
+    hooks)
+      handle_hooks_command "$@"
+      ;;
+    demo)
+      handle_demo_command "$@"
+      ;;
+    help)
+      # Handle help command
+      if [ $# -eq 0 ]; then
+        # No arguments, show general help
+        show_help
+      else
+        # Look for a help script for this topic
+        help_script="${PROJECT_ROOT}/s8r-help-$1"
+        if [ -x "$help_script" ]; then
+          # Execute the help script
+          "$help_script"
+        else
+          # No specific help found, show general help
+          show_help
+        fi
+      fi
+      ;;
+    build-test)
+      exec_build_test "$@"
+      ;;
+    tube)
+      # Use the tube script
+      if [ -x "${PROJECT_ROOT}/s8r-tube" ]; then
+        "${PROJECT_ROOT}/s8r-tube" "$@"
+      else
+        error "s8r-tube command not found. Please ensure the script is installed."
+      fi
+      ;;
+    component)
+      # Use the new component script
+      if [ -x "${PROJECT_ROOT}/s8r-component" ]; then
+        "${PROJECT_ROOT}/s8r-component" "$@"
+      else
+        error "s8r-component command not found. Please ensure the script is installed."
+      fi
+      ;;
+    composite)
+      # Use the new composite script
+      if [ -x "${PROJECT_ROOT}/s8r-composite" ]; then
+        "${PROJECT_ROOT}/s8r-composite" "$@"
+      else
+        error "s8r-composite command not found. Please ensure the script is installed."
+      fi
+      ;;
+    machine)
+      # Use the new machine script
+      if [ -x "${PROJECT_ROOT}/s8r-machine" ]; then
+        "${PROJECT_ROOT}/s8r-machine" "$@"
+      else
+        error "s8r-machine command not found. Please ensure the script is installed."
+      fi
+      ;;
+    *)
+      error "Implementation error: Command '$COMMAND' not handled."
+      ;;
+  esac
+}
+
+# Execute init command
+exec_init() {
+  time_exec "${SCRIPT_DIR}/s8r-init" "$@"
+}
+
+# Execute build command
+exec_build() {
+  if [ "$WATCH_MODE" = true ]; then
+    if ! command_exists "entr"; then
+      error "Watch mode requires 'entr'. Please install it and try again."
+    fi
+    
+    info "Starting build in watch mode. Press Ctrl+C to stop."
+    find "${PROJECT_ROOT}" -name "*.java" | entr -c "${SCRIPT_DIR}/s8r-build" "$@"
+  elif [ "$PARALLEL" = true ]; then
+    info "Running parallel build"
+    "${SCRIPT_DIR}/s8r-build" --parallel "$@"
+  else
+    time_exec "${SCRIPT_DIR}/s8r-build" "$@"
+  fi
+}
+
+# Execute test command
+exec_test() {
+  local test_args=("$@")
+  
+  if [ "$PARALLEL" = true ]; then
+    test_args+=("--parallel")
+  fi
+  
+  if [ "$COVERAGE" = true ]; then
+    test_args+=("--coverage")
+  fi
+  
+  if [ "$WATCH_MODE" = true ]; then
+    if ! command_exists "entr"; then
+      error "Watch mode requires 'entr'. Please install it and try again."
+    fi
+    
+    info "Starting tests in watch mode. Press Ctrl+C to stop."
+    find "${PROJECT_ROOT}" -name "*.java" | entr -c "${SCRIPT_DIR}/s8r-test" "${test_args[@]}"
+  else
+    time_exec "${SCRIPT_DIR}/s8r-test" "${test_args[@]}"
+  fi
+}
+
+# Execute version command
+exec_version() {
+  time_exec "${SCRIPT_DIR}/s8r-version" "$@"
+}
+
+# Execute clean command
+exec_clean() {
+  info "Cleaning build artifacts"
+  run_maven clean
+  success "Clean completed"
+}
+
+# Execute combined build and test command
+exec_build_test() {
+  info "Running build followed by tests"
+  # First build
+  if ! exec_build "fast"; then
+    error "Build failed - aborting test phase"
+  fi
+  
+  # Then test
+  exec_test "$@"
+}
+
+# Execute coverage command
+exec_coverage() {
+  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_coverage_help
+    return 0
+  fi
+
+  local coverage_cmd="${1:-report}"
+  shift || true
+  
+  case "$coverage_cmd" in
+    report)
+      info "Generating code coverage report"
+      run_maven test jacoco:report
+      
+      # Open report if generated successfully
+      local report_path="${PROJECT_ROOT}/Samstraumr/samstraumr-core/target/site/jacoco/index.html"
+      if [ -f "$report_path" ]; then
+        success "Coverage report generated at: $report_path"
+        
+        # Try to open in browser if available
+        if command_exists "xdg-open"; then
+          xdg-open "$report_path"
+        elif command_exists "open"; then
+          open "$report_path"
+        else
+          info "Open the report manually at: $report_path"
+        fi
+      else
+        error "Failed to generate coverage report"
+      fi
+      ;;
+    run)
+      # Run tests with coverage enabled
+      COVERAGE=true
+      exec_test "$@"
+      ;;
+    *)
+      error "Unknown coverage command: $coverage_cmd. Valid commands: report, run"
+      ;;
+  esac
+}
+
+#------------------------------------------------------------------------------
+# Retained Command Handlers from original s8r script
+#------------------------------------------------------------------------------
+
+function handle_quality_command() {
+  # Set a variable to indicate we're calling from s8r
+  export SAMSTRAUMR_CLI="s8r"
+  
+  # Check if we should use the old command handler or the new unified script
+  if [ -x "${PROJECT_ROOT}/s8r-quality" ]; then
+    # Use the new unified quality checker
+    time_exec "${PROJECT_ROOT}/s8r-quality" "$@"
+    return $?
+  else
+    # Fall back to the old command handler
+    local command="$1"
+    shift
+    
+    case "$command" in
+      check)
+        # Run all quality checks
+        print_header "Running All Quality Checks"
+        "${PROJECT_ROOT}/util/bin/quality/check-encoding.sh" "$@"
+        # Run Maven quality checks
+        cd "${PROJECT_ROOT}" && mvn verify
+        ;;
+      spotless)
+        # Run Spotless formatting check
+        print_header "Running Spotless Formatting Check"
+        local spotless_cmd="check"
+        if [[ "$*" == *"-f"* || "$*" == *"--fix"* ]]; then
+          spotless_cmd="apply"
+        fi
+        cd "${PROJECT_ROOT}" && mvn spotless:${spotless_cmd}
+        ;;
+      checkstyle)
+        # Run CheckStyle code style check
+        print_header "Running CheckStyle Code Style Check"
+        cd "${PROJECT_ROOT}" && mvn checkstyle:check
+        ;;
+      spotbugs)
+        # Run SpotBugs bug detection
+        print_header "Running SpotBugs Bug Detection"
+        cd "${PROJECT_ROOT}" && mvn spotbugs:check
+        ;;
+      jacoco)
+        # Run JaCoCo code coverage analysis
+        print_header "Running JaCoCo Code Coverage Analysis"
+        cd "${PROJECT_ROOT}" && mvn test jacoco:report
+        ;;
+      encoding)
+        # Check file encodings and line endings
+        "${PROJECT_ROOT}/util/bin/quality/check-encoding.sh" "$@"
+        ;;
+      *)
+        print_error "Unknown quality command: $command"
+        show_quality_help
+        return 1
+        ;;
+    esac
+  fi
+}
+
+function handle_report_command() {
+  # Check if this is a help request
+  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_report_help
+    return 0
+  fi
+
+  # Source the Docmosis library if not already sourced
+  if ! type -t generate_change_report > /dev/null; then
+    if [ ! -f "${PROJECT_ROOT}/.s8r/lib/docmosis.sh" ]; then
+      error "Docmosis library not found. Run './s8r docmosis setup' first."
+      return 1
+    fi
+    source "${PROJECT_ROOT}/.s8r/lib/docmosis.sh"
+  fi
+  
+  # Check if from-version and to-version are provided
+  if [ $# -lt 2 ]; then
+    error "Missing version arguments"
+    show_report_help
+    return 1
+  fi
+  
+  # Get from-version and to-version
+  local from_version="$1"
+  local to_version="$2"
+  shift 2
+  
+  # Check for output directory argument
+  local output_dir="${PROJECT_ROOT}/target/reports"
+  if [ $# -gt 0 ]; then
+    output_dir="$1"
+  fi
+  
+  # Check if Docmosis is available
+  if is_docmosis_available; then
+    info "Generating change report from ${from_version} to ${to_version} using Docmosis"
+    
+    # Use the generate_change_report function
+    time_exec generate_change_report "$from_version" "$to_version" "$output_dir"
+  else
+    info "Docmosis not configured, generating Git-based change report"
+    
+    # Create minimal report directly
+    mkdir -p "$output_dir"
+    local report_file="${output_dir}/ChangeReport-${from_version}-to-${to_version}.md"
+    
+    # Create header
+    echo "# Change Report: ${from_version} to ${to_version}" > "$report_file"
+    echo "" >> "$report_file"
+    echo "Generated: $(date '+%Y-%m-%d %H:%M:%S')" >> "$report_file"
+    echo "" >> "$report_file"
+    echo "This report was generated without Docmosis integration." >> "$report_file"
+    echo "To enable full document generation, configure Docmosis with \`./s8r docmosis setup\`." >> "$report_file"
+    echo "" >> "$report_file"
+    echo "## Changes" >> "$report_file"
+    echo "" >> "$report_file"
+    
+    # Add recent git commits
+    git log --no-merges --pretty=format:"* %ad - %s (%an)" --date=short -n 20 >> "$report_file"
+    
+    success "Change report generated in ${report_file}"
+  fi
+  
+  return $?
+}
+
+function handle_docs_command() {
+  # Check if this is a help request
+  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_docs_help
+    return 0
+  fi
+  
+  # Check if we should use the new unified documentation tool
+  if [ -x "${PROJECT_ROOT}/s8r-docs" ]; then
+    # Use the new unified documentation tool
+    time_exec "${PROJECT_ROOT}/s8r-docs" "$@"
+    return $?
+  fi
+  
+  # If we reach here, fall back to the old Docmosis-based approach
+  
+  # Source the Docmosis library if not already sourced
+  if ! type -t generate_docs > /dev/null; then
+    if [ ! -f "${PROJECT_ROOT}/.s8r/lib/docmosis.sh" ]; then
+      error "Docmosis library not found. Run './s8r docmosis setup' first."
+      return 1
+    fi
+    source "${PROJECT_ROOT}/.s8r/lib/docmosis.sh"
+  fi
+  
+  # Parse arguments
+  # Default to PROJECT_ROOT/target/docs to ensure it's in the project's target directory
+  local output_dir="${1:-${PROJECT_ROOT}/target/docs}"
+  local format="${2:-pdf}"
+  
+  # Check if Docmosis is available
+  if is_docmosis_available; then
+    info "Generating documentation with Docmosis"
+    
+    # Use the generate_docs function 
+    time_exec generate_docs "$output_dir" "$format"
+  else
+    info "Docmosis not configured, using alternative documentation generator"
+    
+    # Create minimal documentation directly
+    mkdir -p "$output_dir"
+    echo "# Samstraumr Documentation" > "${output_dir}/index.md"
+    echo "" >> "${output_dir}/index.md"
+    echo "This documentation was generated without Docmosis integration." >> "${output_dir}/index.md"
+    echo "To enable full document generation, configure Docmosis with \`./s8r docmosis setup\`." >> "${output_dir}/index.md"
+    echo "" >> "${output_dir}/index.md"
+    
+    # Copy important docs
+    for key_file in README.md CHANGELOG.md; do
+      if [ -f "${PROJECT_ROOT}/${key_file}" ]; then
+        cp "${PROJECT_ROOT}/${key_file}" "${output_dir}/"
+        echo "* [${key_file}](${key_file})" >> "${output_dir}/index.md"
+      fi
+    done
+    
+    success "Documentation generated in ${output_dir}"
+  fi
+  
+  return $?
+}
+
+function handle_test_docmosis_command() {
+  # Check if this is a help request
+  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_test_docmosis_help
+    return 0
+  fi
+  
+  # Source the Docmosis library if not already sourced
+  if ! type -t is_docmosis_available > /dev/null; then
+    if [ ! -f "${PROJECT_ROOT}/.s8r/lib/docmosis.sh" ]; then
+      error "Docmosis library not found. Run './s8r docmosis setup' first."
+      return 1
+    fi
+    source "${PROJECT_ROOT}/.s8r/lib/docmosis.sh"
+  fi
+  
+  # Check if Docmosis is available
+  if ! is_docmosis_available; then
+    warn "Docmosis is not configured. To use Docmosis, run './s8r docmosis setup'."
+    info "Docmosis is supported but not mandatory for using Samstraumr."
+    return 0
+  fi
+  
+  # Use the Docmosis library to run the test
+  info "Running Docmosis Integration Test"
+  time_exec test_docmosis
+  
+  return $?
+}
+
+function handle_demo_command() {
+  # Check if this is a help request
+  if [[ "$1" == "-h" || "$1" == "--help" || -z "$1" ]]; then
+    show_demo_help
+    return 0
+  fi
+  
+  local demo_name="$1"
+  shift
+  
+  case "$demo_name" in
+    identity)
+      print_header "Running Tube Identity Demonstration"
+      "${PROJECT_ROOT}/util/bin/demo/tube-identity-demo.sh" "$@"
+      ;;
+    list)
+      print_header "Available Demonstrations"
+      echo "- identity: Tube identity concepts demonstration"
+      ;;
+    *)
+      print_error "Unknown demo: $demo_name"
+      show_demo_help
+      return 1
+      ;;
+  esac
+  
+  return 0
+}
+
+function handle_install_command() {
+  # Check if this is a help request
+  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_install_help
+    return 0
+  fi
+  
+  # Determine if we should suppress the output header (avoid redundancy)
+  # Check if verbose mode is enabled
+  local is_verbose=false
+  for arg in "$@"; do
+    if [[ "$arg" == "-v" || "$arg" == "--verbose" ]]; then
+      is_verbose=true
+      break
+    fi
+  done
+  
+  # Only show our header if not in verbose mode
+  if ! $is_verbose; then
+    print_header "Running Configuration Installation"
+  fi
+  
+  # Capture any important environment variables before running the script
+  # This ensures that the environment doesn't get modified between runs
+  local saved_docmosis_key="${DOCMOSIS_KEY}"
+  local saved_docmosis_site="${DOCMOSIS_SITE}"
+  
+  # Prepare for the command execution
+  local install_result=0
+  
+  # Run install-config.sh with all arguments
+  if $is_verbose; then
+    # In verbose mode, show all output
+    "${PROJECT_ROOT}/util/bin/config/install-config.sh" "$@"
+    install_result=$?
+  else
+    # In normal mode, filter noise but keep exit status
+    set -o pipefail
+    # Capture output to variable to avoid redundancy
+    local output
+    output=$(${PROJECT_ROOT}/util/bin/config/install-config.sh "$@" 2>&1)
+    install_result=$?
+    # If successful, filter and display the output
+    if [ $install_result -eq 0 ]; then
+      # Filter the output to remove common noise and duplication
+      echo "$output" | grep -v "^$" | \
+                       grep -v "===" | \
+                       grep -v "config installed successfully" | \
+                       grep -v "Installing Samstraumr Configuration" | \
+                       grep -v "Directory already exists" | \
+                       awk '!seen[$0]++' | \
+                       sort
+    else
+      # Show full output in case of error
+      echo "$output" | awk '!seen[$0]++'
+    fi
+    set +o pipefail
+  fi
+  
+  # Restore environment if it was modified by the script
+  if [ -n "${saved_docmosis_key}" ]; then
+    export DOCMOSIS_KEY="${saved_docmosis_key}"
+  fi
+  if [ -n "${saved_docmosis_site}" ]; then
+    export DOCMOSIS_SITE="${saved_docmosis_site}"
+  fi
+  
+  # Check result
+  if [ $install_result -eq 0 ]; then
+    # Add consistent success message
+    print_success "Samstraumr configuration installed successfully!"
+    return 0
+  else
+    print_error "Samstraumr configuration installation failed"
+    return 1
+  fi
+}
+
+function handle_hooks_command() {
+  # Check if this is a help request
+  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_hooks_help
+    return 0
+  fi
+  
+  # Parse options
+  local force=false
+  local verbose=false
+  local list_only=false
+  
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -f|--force)
+        force=true
+        shift
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      --list)
+        list_only=true
+        shift
+        ;;
+      *)
+        print_error "Unknown option: $1"
+        show_hooks_help
+        return 1
+        ;;
+    esac
+  done
+  
+  # Source directory for hooks
+  local hooks_dir="${PROJECT_ROOT}/docs/contribution/git-hooks"
+  local git_hooks_dir="${PROJECT_ROOT}/.git/hooks"
+  
+  print_header "Samstraumr Git Hooks"
+  
+  # Check if hooks directory exists
+  if [ ! -d "$hooks_dir" ]; then
+    print_error "Hooks directory not found: $hooks_dir"
+    return 1
+  fi
+  
+  # Just list hooks if requested
+  if $list_only; then
+    echo -e "${BOLD}Available Hooks:${RESET}"
+    for hook in "$hooks_dir"/*; do
+      if [ -f "$hook" ]; then
+        hook_name=$(basename "$hook")
+        echo "  - $hook_name"
+        
+        # Show a brief description if verbose
+        if $verbose; then
+          description=$(grep -m 1 "Purpose:" "$hook" | cut -d ":" -f 2- | sed 's/^ *//')
+          if [ -n "$description" ]; then
+            echo "      $description"
+          fi
+        fi
+      fi
+    done
+    return 0
+  fi
+  
+  # Create git hooks directory if it doesn't exist
+  if [ ! -d "$git_hooks_dir" ]; then
+    mkdir -p "$git_hooks_dir"
+  fi
+  
+  # Install hooks
+  local installed_count=0
+  for hook in "$hooks_dir"/*; do
+    if [ -f "$hook" ]; then
+      hook_name=$(basename "$hook")
+      target="$git_hooks_dir/$hook_name"
+      
+      # Check if hook already exists and we're not forcing
+      if [ -f "$target" ] && ! $force; then
+        if $verbose; then
+          print_warning "Hook already exists: $hook_name (use --force to overwrite)"
+        fi
+        continue
+      fi
+      
+      # Copy the hook and make it executable
+      cp "$hook" "$target"
+      chmod +x "$target"
+      installed_count=$((installed_count + 1))
+      
+      if $verbose; then
+        print_success "Installed hook: $hook_name"
+      fi
+    fi
+  done
+  
+  if [ $installed_count -eq 0 ]; then
+    print_warning "No hooks were installed. Use --force to overwrite existing hooks."
+  else
+    print_success "Installed $installed_count git hooks"
+  fi
+  
+  # Show a brief message about what the hooks do
+  echo ""
+  echo -e "${BOLD}Hooks installed:${RESET}"
+  echo "- prepare-commit-msg: Prevents AI assistant signatures in commit messages"
+  
+  return 0
+}
+
+function handle_docmosis_command() {
+  # Source the Docmosis library if not already sourced
+  if ! type -t load_docmosis_config > /dev/null; then
+    if [ ! -f "${PROJECT_ROOT}/.s8r/lib/docmosis.sh" ]; then
+      error "Docmosis library not found at ${PROJECT_ROOT}/.s8r/lib/docmosis.sh"
+      return 1
+    fi
+    source "${PROJECT_ROOT}/.s8r/lib/docmosis.sh"
+  fi
+  
+  # Check if this is a help request
+  if [[ "$1" == "-h" || "$1" == "--help" || -z "$1" ]]; then
+    show_docmosis_help
+    return 0
+  fi
+  
+  # Handle command
+  local command="$1"
+  shift
+  
+  case "$command" in
+    setup)
+      info "Setting up Docmosis configuration interactively"
+      time_exec setup_docmosis_config
+      ;;
+    test)
+      info "Running Docmosis integration test"
+      time_exec test_docmosis
+      ;;
+    install)
+      info "Installing Docmosis JAR files"
+      time_exec install_docmosis
+      ;;
+    status)
+      info "Checking Docmosis configuration status"
+      # Load configuration
+      if load_docmosis_config; then
+        highlight "Docmosis Configuration Status"
+        echo ""
+        echo "License Key: ${DOCMOSIS_KEY:0:8}...${DOCMOSIS_KEY:(-4)}"
+        echo "Site Name: ${DOCMOSIS_SITE:-<not set>}"
+        echo ""
+        
+        # Check installation
+        if is_docmosis_installed; then
+          success "Docmosis is installed and ready to use"
+        else
+          warn "Docmosis is not installed"
+          echo "Run './s8r docmosis install' to install Docmosis"
+        fi
+      else
+        error "No Docmosis configuration found"
+        echo "Run './s8r docmosis setup' to configure Docmosis"
+        return 1
+      fi
+      ;;
+    generate)
+      # Just an alias for docs command
+      handle_docs_command "$@"
+      ;;
+    *)
+      error "Unknown docmosis command: $command. Run './s8r docmosis --help' for usage information."
+      return 1
+      ;;
+  esac
+  
+  return $?
+}
+
+function handle_script_test_command() {
+  # Check if this is a help request
+  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    show_script_test_help
+    return 0
+  fi
+  
+  # Run the script test
+  info "Running script tests..."
+  "${PROJECT_ROOT}/util/scripts/test-scripts.sh" "$@"
+}
+
+function show_script_test_help() {
+  echo -e "${BOLD}Samstraumr Script Tests${RESET} - Test the build and test scripts"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r script-test [options] [test_name]"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  --verbose, -v       Enable verbose output"
+  echo "  --help, -h          Display this help message"
+  echo
+  echo -e "${BOLD}AVAILABLE TESTS:${RESET}"
+  echo "  main                Test s8r main script"
+  echo "  version             Test s8r-version script"
+  echo "  test                Test s8r-test script"
+  echo "  build               Test s8r-build script"
+  echo "  ai-test             Test s8r-ai-test script"
+  echo "  performance         Test script performance"
+  echo "  dependencies        Test script dependencies"
+  echo "  integration         Test s8r integration"
+  echo "  all                 Run all tests (default)"
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  ./s8r script-test                # Run all script tests"
+  echo "  ./s8r script-test performance    # Test script performance only"
+  echo "  ./s8r script-test -v             # Run all tests with verbose output"
+}
+
+function show_help_help() {
+  echo -e "${BOLD}S8r Help Command${RESET} - Get help for S8r commands"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r help [command]"
+  echo
+  echo -e "${BOLD}ARGUMENTS:${RESET}"
+  echo "  command    The command to get help for"
+  echo
+  echo -e "${BOLD}DESCRIPTION:${RESET}"
+  echo "  The help command displays detailed information about a specific command,"
+  echo "  including its usage, options, and examples. If no command is specified,"
+  echo "  general help information is displayed."
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  ./s8r help                 # Display general help"
+  echo "  ./s8r help init            # Display help for the init command"
+  echo "  ./s8r help component       # Display help for component commands"
+  echo
+  echo -e "${YELLOW}Note:${RESET} For help with development commands like build, test, and version,"
+  echo "use ./s8r-dev help [command] instead."
+}
+
+# Command-specific help is now handled directly in the case statement
+
+#------------------------------------------------------------------------------
+# Help Functions For Commands
+#------------------------------------------------------------------------------
+
+function show_list_help() {
+  echo -e "${BOLD}S8r List${RESET} - Display ASCII visualization of S8r models"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r list [options] [directory]"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help                Display this help message"
+  echo "  -v, --verbose             Enable verbose output"
+  echo "  -f, --format <format>     Output format: ascii, tree, json (default: ascii)"
+  echo "  -d, --detailed            Show detailed component information"
+  echo
+  echo -e "${BOLD}ARGUMENTS:${RESET}"
+  echo "  directory                 S8r model directory (default: current directory)"
+  echo
+  echo -e "${BOLD}DESCRIPTION:${RESET}"
+  echo "  The list command displays a graphical representation of your S8r model,"
+  echo "  showing machines, composites, components, and their relationships."
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  ./s8r list                  # List model in current directory"
+  echo "  ./s8r list ~/my-model       # List model in specified directory"
+  echo "  ./s8r list -f tree          # Display as tree structure"
+  echo "  ./s8r list -d               # Show detailed information"
+}
+
+function show_init_help() {
+  echo -e "${BOLD}Samstraumr Init${RESET} - Initialize a new Samstraumr repository"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r init [options] [target-directory]"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help                Display this help message"
+  echo "  -v, --verbose             Enable verbose output"
+  echo "  -p, --package <name>      Specify a custom package name (default: org.example)"
+  echo "  -d, --debug               Enable debug output (additional details)"
+  echo
+  echo -e "${BOLD}ARGUMENTS:${RESET}"
+  echo "  target-directory          Directory to initialize (default: current directory)"
+  echo
+  echo -e "${BOLD}DESCRIPTION:${RESET}"
+  echo "  The init command initializes a new Samstraumr repository in the specified directory."
+  echo "  It creates the necessary directory structure, an Adam tube, and configuration files."
+  echo "  It requires a git repository to work, and will create one if necessary."
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  ./s8r init                                # Initialize in current directory"
+  echo "  ./s8r init ~/new-project                  # Initialize in ~/new-project"
+  echo "  ./s8r init -p com.mycompany.project       # Use custom package name"
+  echo "  ./s8r init -v                             # Initialize with verbose output"
+}
+
+function show_build_help() {
+  echo -e "${BOLD}Samstraumr Build${RESET} - Build the project with optimized settings"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r build [options] [mode]"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help                Display this help message"
+  echo "  -v, --verbose             Enable verbose output"
+  echo "  -c, --clean               Clean before building"
+  echo "  -p, --parallel            Build in parallel where possible"
+  echo "  --skip-quality            Skip quality checks"
+  echo
+  echo -e "${BOLD}MODES:${RESET}"
+  echo "  fast                      Fast build with quality checks skipped (default)"
+  echo "  compile                   Compile only"
+  echo "  test                      Compile and run tests"
+  echo "  package                   Create JAR package"
+  echo "  install                   Install to local repository"
+  echo "  full                      Full build including tests and verification"
+  echo "  docs                      Generate project documentation"
+  echo "  site                      Generate the Maven site"
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  ./s8r build                     # Fast build"
+  echo "  ./s8r build test                # Run tests"
+  echo "  ./s8r build -c test             # Clean and run tests"
+  echo "  ./s8r build --parallel full     # Run full build in parallel"
+}
+
+function show_test_help() {
+  echo -e "${BOLD}Samstraumr Test${RESET} - Run tests with support for different test types"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r test [options] <test-type>"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help                    Display this help message"
+  echo "  -v, --verbose                 Enable verbose output with test status reporting"
+  echo "  -p, --parallel                Run tests in parallel (where supported)"
+  echo "  --coverage                    Run tests with coverage analysis"
+  echo "  -o, --output <file>           Write test output to file"
+  echo
+  echo -e "${BOLD}TEST TYPES:${RESET}"
+  echo "  Industry Standard       |  Samstraumr Equivalent"
+  echo "  --------------------    |  ----------------------"
+  echo "  unit                    |  tube"
+  echo "  component               |  composite"
+  echo "  integration             |  flow"
+  echo "  api                     |  machine"
+  echo "  system                  |  stream"
+  echo "  endtoend                |  acceptance"
+  echo
+  echo "  Special test types: all, atl, btl, adam"
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  ./s8r test unit                     # Run unit tests only"
+  echo "  ./s8r test --parallel component     # Run component tests in parallel"
+  echo "  ./s8r test --coverage tube          # Run tube tests with coverage analysis"
+  echo "  ./s8r test all                      # Run all tests"
+}
+
+function show_version_help() {
+  echo -e "${BOLD}Samstraumr Version${RESET} - Manage project version"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r version <command> [options]"
+  echo
+  echo -e "${BOLD}COMMANDS:${RESET}"
+  echo "  get                  Show current version information"
+  echo "  bump <type>          Bump version (type: major, minor, patch)"
+  echo "  set <version>        Set a specific version (format: x.y.z)"
+  echo "  fix                  Fix version inconsistencies across project files"
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  ./s8r version get                 # Show current version"
+  echo "  ./s8r version bump patch          # Bump patch version"
+  echo "  ./s8r version set 1.2.3           # Set version to 1.2.3"
+  echo "  ./s8r version fix                 # Fix version inconsistencies"
+}
+
+function show_coverage_help() {
+  echo -e "${BOLD}Samstraumr Coverage${RESET} - Run and manage code coverage"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r coverage <command> [options]"
+  echo
+  echo -e "${BOLD}COMMANDS:${RESET}"
+  echo "  report               Generate coverage report (default)"
+  echo "  run [test-type]      Run tests with coverage enabled"
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  ./s8r coverage                 # Generate coverage report"
+  echo "  ./s8r coverage report          # Generate coverage report"
+  echo "  ./s8r coverage run unit        # Run unit tests with coverage"
+}
+
+function show_quality_help() {
+  echo -e "${BOLD}Samstraumr Quality${RESET} - Run quality checks"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r quality [options]"
+  echo
+  if [ -x "${PROJECT_ROOT}/s8r-quality" ]; then
+    # Show help for the new unified quality checker
+    echo -e "${BOLD}PROFILES:${RESET}"
+    echo "  -p, --profile PROFILE  Use a specific quality profile:"
+    echo "                         - standard: Basic quality checks for development"
+    echo "                         - strict: Thorough checks for releases"
+    echo "                         - security: Focused on security issues"
+    echo
+    echo -e "${BOLD}TOOLS:${RESET}"
+    echo "  -t, --tool TOOL        Run a specific tool (can be specified multiple times):"
+    echo "                         - spotless: Code formatting"
+    echo "                         - checkstyle: Code style checking"
+    echo "                         - spotbugs: Bug detection"
+    echo "                         - pmd: Static analysis"
+    echo "                         - jacoco: Code coverage analysis"
+    echo "                         - owasp: Security vulnerability checking"
+    echo "                         - javadoc: Documentation quality"
+    echo "                         - encoding: File encoding checks"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  -h, --help             Display this help message"
+    echo "  -f, --fix              Fix issues automatically where possible"
+    echo "  -r, --report-only      Only generate reports, don't fail on issues"
+    echo "  -s, --skip TOOL        Skip a specific tool"
+    echo "  -v, --verbose          Enable verbose output"
+    echo
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  ./s8r quality                       # Run standard quality profile"
+    echo "  ./s8r quality -p strict             # Run strict quality profile"
+    echo "  ./s8r quality -t spotless -t pmd    # Run only Spotless and PMD"
+    echo "  ./s8r quality -f                    # Fix issues where possible"
+    echo "  ./s8r quality -s jacoco             # Run all tools except JaCoCo"
+  else
+    # Show help for the old command handler
+    echo -e "${BOLD}COMMANDS:${RESET}"
+    echo "  check                Run all quality checks"
+    echo "  spotless             Run Spotless formatting check"
+    echo "  checkstyle           Run CheckStyle code style check"
+    echo "  spotbugs             Run SpotBugs bug detection"
+    echo "  jacoco               Run JaCoCo code coverage analysis"
+    echo "  encoding             Check file encodings and line endings"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  -h, --help           Display this help message"
+    echo "  -v, --verbose        Enable verbose output"
+    echo "  -f, --fix            Fix issues automatically (where applicable)"
+    echo
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  ./s8r quality check               # Run all quality checks"
+    echo "  ./s8r quality spotless -f         # Run Spotless and fix issues"
+    echo "  ./s8r quality encoding -v         # Check encodings with verbose output"
+  fi
+}
+
+function show_report_help() {
+  echo -e "${BOLD}Samstraumr Report${RESET} - Generate change management reports"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r report <from-version> <to-version> [options]"
+  echo
+  echo -e "${BOLD}ARGUMENTS:${RESET}"
+  echo "  from-version         Starting version (e.g., v1.2.8 or 1.2.8)"
+  echo "  to-version           Ending version (e.g., v1.2.9, 1.2.9, or HEAD)"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help           Display this help message"
+  echo "  -o, --output <dir>   Directory for report output (default: target/reports)"
+  echo "  -f, --format <fmt>   Output format (pdf, docx, html, md) (default: docx)"
+  echo
+  echo -e "${BOLD}NOTE:${RESET}"
+  echo "  When Docmosis is configured, rich formatted reports are generated."
+  echo "  When Docmosis is not available, the system falls back to generating"
+  echo "  markdown reports based on Git change history."
+}
+
+function show_docs_help() {
+  echo -e "${BOLD}Samstraumr Docs${RESET} - Generate project documentation"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r docs <command> [options]"
+  echo
+  echo -e "${BOLD}COMMANDS:${RESET}"
+  echo "  changelog           Generate or update changelog"
+  echo "  readme              Update README.md"
+  echo "  api                 Generate API documentation"
+  echo "  markdown            Convert Markdown to HTML"
+  echo "  all                 Generate all documentation"
+  echo "  check               Check documentation integrity"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help          Display this help message"
+  echo "  --output DIR        Output directory (default: target/site/docs)"
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  ./s8r docs changelog             # Generate changelog"
+  echo "  ./s8r docs api --packages org.s8r.component  # Generate API docs for specific packages"
+  echo "  ./s8r docs all --output docs/site # Generate all documentation in specific directory"
+  echo
+  echo -e "${BOLD}NOTE:${RESET}"
+  echo "  The new documentation system provides enhanced capabilities for generating"
+  echo "  comprehensive documentation. When legacy Docmosis is configured, it can also"
+  echo "  be used with './s8r docmosis generate' for document template processing."
+}
+
+function show_test_docmosis_help() {
+  echo -e "${BOLD}Samstraumr Test Docmosis${RESET} - Run a smoke test for Docmosis integration"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r test-docmosis [options]"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help           Display this help message"
+  echo
+  echo -e "${BOLD}NOTE:${RESET}"
+  echo "  Docmosis is optional and not required for core Samstraumr functionality."
+  echo "  This test will gracefully handle cases where Docmosis is not configured."
+}
+
+function show_install_help() {
+  echo -e "${BOLD}Samstraumr Install${RESET} - Initialize or update project configuration"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r install [options]"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help           Display this help message"
+  echo "  -f, --force          Force overwrite of existing configuration files"
+  echo "  -v, --verbose        Display verbose output during configuration"
+}
+
+function show_hooks_help() {
+  echo -e "${BOLD}Samstraumr Hooks${RESET} - Install or update git hooks for the repository"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r hooks [options]"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help           Display this help message"
+  echo "  -f, --force          Force overwrite of existing hooks"
+  echo "  -v, --verbose        Display verbose output during installation"
+  echo "  --list               List available hooks without installing"
+}
+
+function show_demo_help() {
+  echo -e "${BOLD}Samstraumr Demo${RESET} - Run demonstration scripts"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r demo [demo-name]"
+  echo
+  echo -e "${BOLD}DEMO SCRIPTS:${RESET}"
+  echo "  identity             Run tube identity demonstration"
+  echo "  list                 List all available demos"
+}
+
+function show_docmosis_help() {
+  echo -e "${BOLD}Samstraumr Docmosis${RESET} - Manage Docmosis document generation system"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r docmosis <command> [options]"
+  echo
+  echo -e "${BOLD}NOTE:${RESET}"
+  echo "  Docmosis is an optional component for enhanced document generation."
+  echo "  Samstraumr will function without Docmosis and use alternative"
+  echo "  document generation methods when Docmosis is not available."
+  echo
+  echo -e "${BOLD}COMMANDS:${RESET}"
+  echo "  setup                Configure Docmosis license and settings"
+  echo "  test                 Run Docmosis integration test"
+  echo "  install              Install Docmosis JAR files"
+  echo "  status               Show Docmosis configuration status"
+  echo "  generate <dir> <fmt> Generate documentation (alias for ./s8r docs)"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help           Display this help message"
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  ./s8r docmosis setup          # Configure Docmosis interactively"
+  echo "  ./s8r docmosis test           # Test Docmosis integration"
+  echo "  ./s8r docmosis status         # Show configuration status"
+}
+
+# Check requirements
+check_requirements "java" "mvn" "git"
+
+# Main entry point: Parse arguments and execute command
+parse_global_args "$@"
+
+# Exit with the status of the last command
+exit $?
