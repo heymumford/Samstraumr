@@ -156,21 +156,97 @@ composite.addComponent("name", component);
 composite.connect("source", "target");
 ```
 
+## Migration Utilities
+
+To assist with migration, S8r provides a comprehensive set of migration utilities in the `org.s8r.adapter` package. These utilities make it easier to transition from legacy code to the new architecture without breaking existing functionality.
+
+### S8rMigrationFactory
+
+The `S8rMigrationFactory` is the main entry point for using migration utilities:
+
+```java
+import org.s8r.adapter.S8rMigrationFactory;
+import org.s8r.domain.component.Component;
+import org.s8r.tube.Tube;
+import org.s8r.tube.Environment;
+
+// Create the migration factory
+S8rMigrationFactory migrationFactory = new S8rMigrationFactory();
+```
+
+### Converting Existing Tubes to Components
+
+You can wrap your existing Tube instances to use them with new Component-based code:
+
+```java
+// Existing Tube
+Environment env = new Environment();
+env.setParameter("name", "MyTube");
+Tube tube = Tube.create("Processing data", env);
+
+// Convert to Component
+Component component = migrationFactory.tubeToComponent(tube);
+
+// Now you can use this Component with new Component-based code
+component.activate();
+
+// If you need to get back the original Tube
+Tube originalTube = migrationFactory.extractTube(component);
+```
+
+### Creating New Components backed by Tubes
+
+For a gradual migration, you can create new components that use the legacy Tube implementation:
+
+```java
+// Create a new Component backed by a Tube
+Environment env = new Environment();
+env.setParameter("name", "NewComponent");
+Component component = migrationFactory.createTubeComponent("Analyzing data", env);
+```
+
+### Converting Between Environment Types
+
+```java
+// Convert Tube Environment to S8r Environment
+Environment tubeEnv = new Environment();
+tubeEnv.setParameter("setting1", "value1");
+org.s8r.component.core.Environment s8rEnv = migrationFactory.tubeEnvironmentToS8rEnvironment(tubeEnv);
+```
+
 ## Migration Strategy
 
-1. **Start with Core Components**:
+The migration strategy follows the Strangler Fig pattern, allowing you to gradually replace parts of the system while maintaining compatibility with existing code.
+
+1. **Use Migration Utilities First**:
+   - Wrap existing Tube instances with TubeComponentWrappers using the S8rMigrationFactory
+   - This allows gradual migration without breaking existing functionality
+   - Use the wrapped API to ensure compatibility during transition
+
+2. **Start with Core Components**:
    - Replace `Tube` usage with `Component`
    - Update state management to use unified `State` enum
    - Update logging to use new `Logger` class
-2. **Update Composite Usage**:
+   - Test thoroughly to ensure behavior is preserved
+
+3. **Update Composite Usage**:
    - Replace tube-based composites with component-based composites
-   - Update factory method calls
-3. **Update Machine Implementation**:
-   - Replace composite references with the new composite implementation
-   - Update factory method calls
-4. **Update Tests**:
+   - Use the CompositeAdapter to create wrappers or convert legacy composites
+   - Update factory method calls and composite creation patterns
+   - Connect components using the new API
+
+4. **Update Machine Implementation**:
+   - Use MachineAdapter to wrap or convert legacy machines
+   - Maintain connection topology during migration
+   - Ensure state changes propagate properly between systems
+   - Gradually replace wrapped machines with native implementations
+   - Use machine-level wrappers for complex migrations
+
+5. **Update Tests**:
    - Update test implementations to use new classes
    - Use the new tag structure for test categorization
+   - Ensure test coverage across both legacy and new code
+   - Add tests specific to the migration utilities
 
 ## Example Migration
 
@@ -199,7 +275,97 @@ if (tube.getStatus() == TubeStatus.READY) {
 }
 ```
 
-### After:
+### During Migration (using utilities):
+
+```java
+import org.samstraumr.tube.Environment;
+import org.samstraumr.tube.Tube;
+import org.s8r.adapter.S8rMigrationFactory;
+import org.s8r.domain.component.Component;
+import org.s8r.component.composite.Composite;
+import org.s8r.component.core.State;
+import org.s8r.tube.composite.Composite as TubeComposite;
+
+// Create migration factory
+S8rMigrationFactory migrationFactory = new S8rMigrationFactory();
+
+// Use existing tube code
+Environment env = new Environment();
+Tube tube = Tube.create("Process data", env);
+
+// Convert to Component 
+Component component = migrationFactory.tubeToComponent(tube);
+
+// Use new Component-based APIs
+if (component.getState() == State.READY) {
+    // Create composite with new Component API
+    Composite composite = new Composite("data-flow", 
+        migrationFactory.tubeEnvironmentToS8rEnvironment(env));
+    composite.addComponent("processor", component);
+    
+    // Process data with new API
+    composite.process("processor", inputData);
+}
+
+// If you need to access the original Tube from the component
+Tube originalTube = migrationFactory.extractTube(component);
+
+// ---- Working with Composites ----
+
+// Option 1: Convert an existing Tube composite to a Component composite
+TubeComposite tubeComposite = new TubeComposite("legacy-flow", env);
+tubeComposite.addTube("input", Tube.create("Input", env));
+tubeComposite.addTube("process", Tube.create("Process", env));
+tubeComposite.connect("input", "process");
+
+// Convert the entire composite
+Composite convertedComposite = migrationFactory.tubeCompositeToComponentComposite(tubeComposite);
+
+// Option 2: Wrap a Tube composite to use with Component APIs
+Composite wrappedComposite = migrationFactory.wrapTubeComposite(tubeComposite);
+
+// Option 3: Create a hybrid composite with both Tubes and Components
+Composite hybridComposite = migrationFactory.createHybridComposite("hybrid", env);
+
+// Add a tube from the legacy composite to the hybrid
+migrationFactory.addTubeToComponentComposite(
+    tubeComposite, "process", hybridComposite, "legacyProcessor");
+
+// Add a native component
+hybridComposite.addComponent(
+    "newComponent", 
+    Component.create("New component", migrationFactory.tubeEnvironmentToS8rEnvironment(env)));
+
+// Connect legacy and new
+hybridComposite.connect("legacyProcessor", "newComponent");
+
+// ---- Working with Machines ----
+
+// Option 1: Convert an existing Tube machine to a Component machine
+import org.s8r.tube.machine.Machine as TubeMachine;
+import org.s8r.component.Machine;
+
+// Create a tube machine
+TubeMachine tubeMachine = new TubeMachine("legacy-machine", env);
+tubeMachine.addComposite("flow", tubeComposite);
+
+// Convert the entire machine
+Machine convertedMachine = migrationFactory.tubeMachineToComponentMachine(tubeMachine);
+
+// Option 2: Wrap a Tube machine to use with Component APIs
+Machine wrappedMachine = migrationFactory.wrapTubeMachine(tubeMachine);
+
+// Use the machine with new API
+wrappedMachine.addComposite("newFlow", convertedComposite);
+wrappedMachine.connect("flow", "newFlow");
+
+// State changes propagate in both directions
+wrappedMachine.updateState("machineStatus", "processing");
+// The underlying tubeMachine is updated too
+assert tubeMachine.getState().get("machineStatus").equals("processing");
+```
+
+### After (fully migrated):
 
 ```java
 import org.s8r.component.core.Component;

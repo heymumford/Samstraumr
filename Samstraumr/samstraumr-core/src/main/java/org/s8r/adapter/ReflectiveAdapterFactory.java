@@ -26,6 +26,15 @@ import org.s8r.domain.identity.LegacyIdentityConverter;
  * This factory creates adapter implementations that use reflection to interact with legacy classes,
  * removing direct dependencies on those classes. This follows Clean Architecture principles by
  * isolating implementation details from the domain layer.
+ * </p>
+ * <p>
+ * Available adapters include:
+ * <ul>
+ *   <li>Environment converters - For working with legacy environment objects</li>
+ *   <li>Identity converters - For working with legacy identity objects</li>
+ *   <li>Component adapters - For wrapping legacy components in the new Component interface</li>
+ * </ul>
+ * </p>
  */
 public class ReflectiveAdapterFactory implements LegacyAdapterResolver {
     
@@ -34,6 +43,8 @@ public class ReflectiveAdapterFactory implements LegacyAdapterResolver {
     private static final String TUBE_IDENTITY_CLASS = "org.s8r.tube.TubeIdentity";
     private static final String CORE_ENVIRONMENT_CLASS = "org.s8r.core.tube.Environment";
     private static final String CORE_IDENTITY_CLASS = "org.s8r.core.tube.identity.Identity";
+    private static final String TUBE_COMPONENT_CLASS = "org.s8r.tube.Tube";
+    private static final String CORE_COMPONENT_CLASS = "org.s8r.core.tube.Tube";
     
     private final LoggerPort logger;
     
@@ -42,6 +53,8 @@ public class ReflectiveAdapterFactory implements LegacyAdapterResolver {
     private ReflectiveEnvironmentConverter coreEnvironmentConverter;
     private ReflectiveIdentityConverter tubeIdentityConverter;
     private ReflectiveIdentityConverter coreIdentityConverter;
+    private LegacyComponentAdapter tubeComponentAdapter;
+    private LegacyComponentAdapter coreComponentAdapter;
     
     /**
      * Creates a new reflective adapter factory.
@@ -116,5 +129,51 @@ public class ReflectiveAdapterFactory implements LegacyAdapterResolver {
             }
         }
         return coreIdentityConverter;
+    }
+    
+    /**
+     * Gets an adapter for Tube components.
+     *
+     * @return A component adapter for working with Tube instances
+     */
+    public LegacyComponentAdapter getTubeComponentAdapter() {
+        if (tubeComponentAdapter == null) {
+            try {
+                // First ensure the required converters are created
+                LegacyIdentityConverter identityConverter = getTubeIdentityConverter();
+                LegacyEnvironmentConverter environmentConverter = getTubeEnvironmentConverter();
+                
+                tubeComponentAdapter = new LegacyComponentAdapter(
+                    TUBE_COMPONENT_CLASS, identityConverter, environmentConverter, logger);
+                logger.debug("Created tube component adapter");
+            } catch (Exception e) {
+                logger.error("Failed to create tube component adapter: {}", e.getMessage());
+                throw new IllegalStateException("Could not create tube component adapter", e);
+            }
+        }
+        return tubeComponentAdapter;
+    }
+    
+    /**
+     * Gets an adapter for Core Tube components.
+     *
+     * @return A component adapter for working with Core Tube instances
+     */
+    public LegacyComponentAdapter getCoreComponentAdapter() {
+        if (coreComponentAdapter == null) {
+            try {
+                // First ensure the required converters are created
+                LegacyIdentityConverter identityConverter = getCoreIdentityConverter();
+                LegacyEnvironmentConverter environmentConverter = getCoreEnvironmentConverter();
+                
+                coreComponentAdapter = new LegacyComponentAdapter(
+                    CORE_COMPONENT_CLASS, identityConverter, environmentConverter, logger);
+                logger.debug("Created core component adapter");
+            } catch (Exception e) {
+                logger.error("Failed to create core component adapter: {}", e.getMessage());
+                throw new IllegalStateException("Could not create core component adapter", e);
+            }
+        }
+        return coreComponentAdapter;
     }
 }
