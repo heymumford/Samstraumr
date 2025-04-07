@@ -37,8 +37,8 @@ Or use the longer form:
 ```
 
 Options:
-- `-p, --package <name>`: Specify a custom package name (default: org.example)
-- `-n, --name <name>`: Specify a model name
+- `-p, --package <n>`: Specify a custom package name (default: org.example)
+- `-n, --name <n>`: Specify a model name
 - `-v, --verbose`: Enable verbose output
 - `-d, --debug`: Enable debug output (additional details)
 
@@ -200,7 +200,7 @@ Options:
 - `-p, --profile <profile>`: Use specific Maven profile
 - `-v, --verbose`: Show verbose output with detailed status
 - `--skip-quality`: Skip quality checks
-- `--cyclename <name>`: Specify a name for the test cycle (for reporting)
+- `--cyclename <n>`: Specify a name for the test cycle (for reporting)
 
 Examples:
 
@@ -391,94 +391,92 @@ The CLI uses configuration files from multiple locations:
 
 ## Script Organization
 
-Starting from version 2.4.6, the CLI scripts are organized into a more structured layout:
-
-### Root Directory Scripts
-
-The root directory contains commonly used script files for backward compatibility:
-
-```bash
-./s8r <command>                 # Main S8r CLI
-./s8r-build                     # Build commands
-./s8r-test                      # Test commands
-./s8r-version                   # Version management
-# ... and other core scripts
-```
+Starting from version 2.7.1, the CLI scripts are organized into a proper bin directory structure for better maintainability and adherence to standard practices.
 
 ### Bin Directory Organization
 
-All scripts are organized by category in the `bin` directory:
+All executables are organized by category in the `bin` directory:
 
 ```bash
 bin/
-├── core/           # Core framework commands (s8r, s8r-init, s8r-list)
-├── build/          # Build-related commands (s8r-build, s8r-ci)
-├── test/           # Testing commands (s8r-test, s8r-test-cli)
-├── component/      # Component-related commands (s8r-component, s8r-composite)
-├── dev/            # Development commands (s8r-dev)
-├── migration/      # Migration tools (s8r-migration-monitor, s8r-architecture-verify)
-├── help/           # Help commands (s8r-help)
-├── utils/          # Utility commands (s8r-docs, s8r-quality, s8r-version)
-└── s8r-all/        # All scripts in one place for convenience
+   core/           # Core framework executables (s8r, s8r-init, s8r-list)
+   build/          # Build-related executables (s8r-build, s8r-ci)
+   test/           # Testing executables (s8r-test, s8r-test-cli)
+   component/      # Component-related executables (s8r-component, s8r-composite)
+   dev/            # Development executables (s8r-dev)
+   migration/      # Migration tools (s8r-migration-monitor, s8r-architecture-verify)
+   help/           # Help executables (s8r-help)
+   utils/          # Utility executables (s8r-docs, s8r-quality, s8r-version)
+   setup-path.sh   # Script to add bin directory to PATH
+   remove-root-scripts.sh # Script to safely remove root directory scripts
 ```
 
-You can access scripts through the bin directory structure:
+### Setting Up Your PATH
+
+To properly use the Samstraumr executables, add the bin directory to your PATH:
 
 ```bash
-./bin/build/s8r-build            # Run build command
-./bin/test/s8r-test component    # Run component tests
-./bin/utils/s8r-version get      # Get version information
+# Run the setup script
+./bin/setup-path.sh
+
+# This will add the bin directory to your shell configuration
+# and provide instructions for activating it in your current session
 ```
 
-### Setting Up Script Organization
-
-To organize your scripts into the bin directory structure, you can use the provided organization script:
+After adding the bin directory to your PATH, you can run any executable directly:
 
 ```bash
-# Run the script organization tool
-./util/scripts/organize-s8r-scripts.sh
-
-# Clean up the root directory
-./util/scripts/cleanup-root.sh
+s8r-build                # Run build command
+s8r-test component       # Run component tests
+s8r-version get          # Get version information
 ```
 
-These scripts will:
-1. Create the appropriate bin directory structure
-2. Create symbolic links to all s8r scripts
-3. Clean up duplicate files and fix broken symlinks
-4. Create utility scripts for managing script versions
+This is preferred over using the deprecated scripts in the root directory.
+
+### Removing Root Directory Scripts
+
+For a cleaner repository structure, you can remove the deprecated scripts from the root directory:
+
+```bash
+# Run the removal script (after setting up your PATH)
+bin/remove-root-scripts.sh
+```
+
+The script will:
+1. Verify that the bin directory is in your PATH
+2. Check that all scripts have corresponding executables in the bin directory
+3. Safely remove the root directory scripts
 
 ### Script Variants
 
-Some scripts have both original and new versions. To manage these versions:
+Some scripts have both original and new versions. To manage these versions, use:
 
 ```bash
 # List available script versions
-./bin/utils/use-new-scripts.sh list
+s8r-scripts-version list
 
 # Switch to new versions of scripts
-./bin/utils/use-new-scripts.sh use-new
+s8r-scripts-version use-new
 
 # Switch back to original versions
-./bin/utils/use-new-scripts.sh use-old
+s8r-scripts-version use-old
 ```
 
 ### Utility Scripts
 
-The `util/scripts` directory contains various utility scripts:
+Development-specific utility scripts are located in the `util/scripts` directory:
 
 ```bash
 util/scripts/
-├── ci/             # CI-related scripts
-├── java/           # Java-related scripts
-├── test/           # Test utility scripts
-├── cleanup-root.sh # Script for cleaning up the root directory
-└── organize-s8r-scripts.sh # Script for organizing s8r scripts
+   ci/             # CI-related scripts
+   java/           # Java-related scripts
+   test/           # Test utility scripts
+   other utility scripts
 ```
 
-### Legacy Script Support
+### Legacy Script Support (Deprecated)
 
-All legacy script names continue to work for backward compatibility.
+The scripts previously located in the root directory are deprecated and will be removed in a future version. Please update your workflows to use the bin directory executables instead.
 
 ## Return to Main Documentation
 

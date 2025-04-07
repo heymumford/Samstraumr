@@ -19,7 +19,14 @@
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 .repository/
-/bin/
+# Exclude binary directories but not our bin script directory
+/bin-temp/
+**/bin-output/
+
+# Include our bin directory with scripts
+!/bin/
+!/bin/*/
+!/bin/**/
 /build/
 /coverage/
 /dist/
