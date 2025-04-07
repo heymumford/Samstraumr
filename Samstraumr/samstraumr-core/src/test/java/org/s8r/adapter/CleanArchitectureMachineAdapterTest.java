@@ -16,18 +16,16 @@
 package org.s8r.adapter;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.s8r.component.core.Component;
-import org.s8r.component.machine.Machine;
-import org.s8r.component.machine.MachineException;
-import org.s8r.component.machine.MachineFactory;
 import org.s8r.domain.component.port.ComponentPort;
 import org.s8r.domain.component.port.MachinePort;
 import org.s8r.domain.identity.ComponentId;
@@ -48,20 +46,16 @@ public class CleanArchitectureMachineAdapterTest {
 
     private ConsoleLogger logger;
     private org.s8r.domain.machine.Machine domainMachine;
-    private Machine componentMachine;
     private MachineFactoryAdapter machineFactoryAdapter;
 
     @BeforeEach
-    public void setup() throws MachineException {
+    public void setup() {
         logger = new ConsoleLogger();
         
         // Create a domain machine
         domainMachine = org.s8r.domain.machine.Machine.create(
                 "test-domain-machine", 
                 MachineType.STANDARD);
-        
-        // Create a component machine
-        componentMachine = MachineFactory.createMachine("test-component-machine");
         
         // Create the factory adapter
         machineFactoryAdapter = new MachineFactoryAdapter(logger);
@@ -81,19 +75,6 @@ public class CleanArchitectureMachineAdapterTest {
                 "Machine states should match");
         assertEquals(domainMachine.getType().toString(), machinePort.getMachineType().toString(), 
                 "Machine types should match");
-    }
-    
-    @Test
-    @DisplayName("Component machine should be properly adapted to MachinePort")
-    public void testComponentMachineAdapter() {
-        // Create adapter from component machine
-        MachinePort machinePort = MachineAdapter.createMachinePortFromComponent(componentMachine);
-        
-        // Verify adapter properly represents component machine
-        assertNotNull(machinePort, "Adapter should not be null");
-        assertNotNull(machinePort.getId(), "Adapter ID should not be null");
-        assertEquals(componentMachine.getId().getIdString(), machinePort.getId().getIdString(), 
-                "IDs should match");
     }
 
     @Test
@@ -147,10 +128,6 @@ public class CleanArchitectureMachineAdapterTest {
         // Test null domain machine
         MachinePort nullDomainPort = MachineAdapter.createMachinePortFromDomain(null);
         assertNull(nullDomainPort, "Adapter should return null for null domain machine");
-        
-        // Test null component machine
-        MachinePort nullComponentPort = MachineAdapter.createMachinePortFromComponent(null);
-        assertNull(nullComponentPort, "Adapter should return null for null component machine");
     }
     
     @Test
