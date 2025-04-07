@@ -62,12 +62,14 @@ This document tracks specific implementation tasks for the S8r framework. It pro
    - Completed on: 2025-04-06
    - Related: [Implementation documentation](../architecture/implementation.md)
 3. **Test Framework Consolidation**
-   - Review and update test annotations
-   - Consolidate test runners
-   - Update test execution documentation
-   - Status: Not started
+   - Review and update test annotations ✅
+   - Consolidate test runners ✅
+   - Migrate legacy tube tests to component tests 🔄
+   - Update test execution documentation ✅
+   - Status: In Progress
    - Target completion: 2025-04-20
    - Related: [Testing documentation](../architecture/testing.md)
+   - Related: [Test Migration Implementation](./completed/test-migration-implementation.md)
 
 ### P2: Medium Priority Tasks
 
