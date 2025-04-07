@@ -16,6 +16,7 @@ Port interfaces are a core concept in hexagonal architecture (also known as "por
 | `ComponentPort` | Domain | org.s8r.domain.component.port | Interface for components in the domain |
 | `CompositeComponentPort` | Domain | org.s8r.domain.component.port | Interface for composite components |
 | `MachinePort` | Domain | org.s8r.domain.component.port | Interface for machines |
+| `MachineFactoryPort` | Domain | org.s8r.domain.component.port | Interface for machine factory operations |
 | `DataFlowComponentPort` | Domain | org.s8r.domain.component.pattern | Interface for component data flow operations |
 | `DataFlowPort` | Domain | org.s8r.domain.component.pattern | Interface for data flow operations |
 | `ComponentRepository` | Secondary | org.s8r.application.port | Interface for component persistence |
@@ -30,6 +31,8 @@ Port interfaces are a core concept in hexagonal architecture (also known as "por
 | Implementation | Type | Implements | Description |
 |----------------|------|------------|-------------|
 | `ComponentAdapter` | Adapter | ComponentPort | Adapts domain components to port interface |
+| `MachineAdapter` | Adapter | MachinePort | Adapts domain machines to port interface |
+| `MachineFactoryAdapter` | Adapter | MachineFactoryPort | Adapts machine factory to port interface |
 | `InMemoryComponentRepository` | Infrastructure | ComponentRepository | In-memory implementation of component repository |
 | `InMemoryMachineRepository` | Infrastructure | MachineRepository | In-memory implementation of machine repository |
 | `InMemoryEventDispatcher` | Infrastructure | EventDispatcher | In-memory event dispatcher |

@@ -24,11 +24,14 @@ import org.s8r.application.port.LoggerPort;
 import org.s8r.application.port.MachineRepository;
 import org.s8r.domain.component.Component;
 import org.s8r.domain.component.composite.CompositeComponent;
+import org.s8r.domain.component.port.ComponentPort;
+import org.s8r.domain.component.port.CompositeComponentPort;
+import org.s8r.domain.component.port.MachinePort;
 import org.s8r.domain.exception.ComponentNotFoundException;
 import org.s8r.domain.exception.InvalidOperationException;
 import org.s8r.domain.identity.ComponentId;
-import org.s8r.domain.machine.Machine;
-import org.s8r.domain.machine.MachineFactory;
+import org.s8r.domain.component.port.MachineFactoryPort;
+import org.s8r.domain.machine.MachineState;
 import org.s8r.domain.machine.MachineType;
 
 /**
@@ -41,20 +44,24 @@ public class MachineService {
   private final MachineRepository machineRepository;
   private final ComponentRepository componentRepository;
   private final LoggerPort logger;
+  private final MachineFactoryPort machineFactory;
 
   /**
    * Creates a new MachineService.
    *
    * @param machineRepository The machine repository
    * @param componentRepository The component repository
+   * @param machineFactory The machine factory
    * @param logger The logger
    */
   public MachineService(
       MachineRepository machineRepository,
       ComponentRepository componentRepository,
+      MachineFactoryPort machineFactory,
       LoggerPort logger) {
     this.machineRepository = machineRepository;
     this.componentRepository = componentRepository;
+    this.machineFactory = machineFactory;
     this.logger = logger;
   }
 
@@ -71,12 +78,22 @@ public class MachineService {
       MachineType type, String name, String description, String version) {
     logger.info("Creating machine: " + name + " (" + type + ")");
 
-    Machine machine = MachineFactory.createMachine(type, name, description, version);
-    machineRepository.save(machine);
+    // Create configuration for the machine
+    java.util.Map<String, Object> config = new java.util.HashMap<>();
+    config.put("name", name);
+    config.put("description", description);
+    config.put("version", version);
+    
+    // Use the machine factory port to create the machine
+    MachinePort machinePort = machineFactory.createMachine(type, name, config);
+    
+    // Save the machine port
+    machineRepository.save(machinePort);
 
-    logger.info("Machine created successfully: " + machine.getId().getShortId());
+    logger.info("Machine created successfully: " + machinePort.getId().getShortId());
 
-    return new MachineDto(machine);
+    // Create the DTO using the port interface
+    return new MachineDto(machinePort);
   }
 
   /**
@@ -131,26 +148,31 @@ public class MachineService {
     logger.info(
         "Adding component " + componentId.getShortId() + " to machine " + machineId.getShortId());
 
-    // Get the machine
-    Machine machine = getMachineOrThrow(machineId);
+    // Get the machine port
+    MachinePort machinePort = getMachineOrThrow(machineId);
 
-    // Get the component
-    Component component =
+    // Get the component port
+    ComponentPort componentPort =
         componentRepository
             .findById(componentId)
             .orElseThrow(() -> new ComponentNotFoundException(componentId));
 
-    // Ensure the component is a composite component
-    if (!(component instanceof CompositeComponent)) {
+    // Ensure the component is a composite component port
+    if (!(componentPort instanceof CompositeComponentPort)) {
       throw new IllegalArgumentException(
           "Component " + componentId.getShortId() + " is not a composite component");
     }
 
     // Add the component to the machine
-    machine.addComponent((CompositeComponent) component);
+    CompositeComponentPort compositeComponentPort = (CompositeComponentPort) componentPort;
+    boolean success = machinePort.addComposite(compositeComponentPort.getCompositeId(), compositeComponentPort);
+    
+    if (!success) {
+      throw new InvalidOperationException("Failed to add component to machine");
+    }
 
     // Save the updated machine
-    machineRepository.save(machine);
+    machineRepository.save(machinePort);
     logger.info("Component added to machine successfully");
   }
 
@@ -170,14 +192,33 @@ public class MachineService {
             + " from machine "
             + machineId.getShortId());
 
-    // Get the machine
-    Machine machine = getMachineOrThrow(machineId);
+    // Get the machine port
+    MachinePort machinePort = getMachineOrThrow(machineId);
 
+    // Try to find the component by ID to get its name
+    // This is needed because MachinePort.removeComposite uses the name, not the ID
+    ComponentPort componentPort =
+        componentRepository
+            .findById(componentId)
+            .orElseThrow(() -> new ComponentNotFoundException(componentId));
+    
+    if (!(componentPort instanceof CompositeComponentPort)) {
+      throw new IllegalArgumentException(
+          "Component " + componentId.getShortId() + " is not a composite component");
+    }
+    
+    CompositeComponentPort compositeComponentPort = (CompositeComponentPort) componentPort;
+    String compositeName = compositeComponentPort.getCompositeId();
+    
     // Remove the component from the machine
-    machine.removeComponent(componentId);
+    java.util.Optional<CompositeComponentPort> removed = machinePort.removeComposite(compositeName);
+    if (!removed.isPresent()) {
+      throw new ComponentNotFoundException(
+          new ComponentId(compositeName, "Component not found in machine"));
+    }
 
     // Save the updated machine
-    machineRepository.save(machine);
+    machineRepository.save(machinePort);
     logger.info("Component removed from machine successfully");
   }
 
@@ -191,10 +232,15 @@ public class MachineService {
   public void initializeMachine(ComponentId machineId) {
     logger.info("Initializing machine: " + machineId.getShortId());
 
-    Machine machine = getMachineOrThrow(machineId);
-    machine.initialize();
+    MachinePort machinePort = getMachineOrThrow(machineId);
+    
+    // In MachinePort, initialization might be handled differently
+    // We use the start method as it's the closest equivalent
+    if (!machinePort.start()) {
+      throw new InvalidOperationException("Failed to initialize machine " + machineId.getShortId());
+    }
 
-    machineRepository.save(machine);
+    machineRepository.save(machinePort);
     logger.info("Machine initialized successfully");
   }
 
@@ -208,10 +254,12 @@ public class MachineService {
   public void startMachine(ComponentId machineId) {
     logger.info("Starting machine: " + machineId.getShortId());
 
-    Machine machine = getMachineOrThrow(machineId);
-    machine.start();
+    MachinePort machinePort = getMachineOrThrow(machineId);
+    if (!machinePort.start()) {
+      throw new InvalidOperationException("Failed to start machine " + machineId.getShortId());
+    }
 
-    machineRepository.save(machine);
+    machineRepository.save(machinePort);
     logger.info("Machine started successfully");
   }
 
@@ -225,10 +273,12 @@ public class MachineService {
   public void stopMachine(ComponentId machineId) {
     logger.info("Stopping machine: " + machineId.getShortId());
 
-    Machine machine = getMachineOrThrow(machineId);
-    machine.stop();
+    MachinePort machinePort = getMachineOrThrow(machineId);
+    if (!machinePort.stop()) {
+      throw new InvalidOperationException("Failed to stop machine " + machineId.getShortId());
+    }
 
-    machineRepository.save(machine);
+    machineRepository.save(machinePort);
     logger.info("Machine stopped successfully");
   }
 
@@ -241,10 +291,11 @@ public class MachineService {
   public void destroyMachine(ComponentId machineId) {
     logger.info("Destroying machine: " + machineId.getShortId());
 
-    Machine machine = getMachineOrThrow(machineId);
-    machine.destroy();
+    MachinePort machinePort = getMachineOrThrow(machineId);
+    // In MachinePort, we use terminate as the closest equivalent to destroy
+    machinePort.terminate();
 
-    machineRepository.save(machine);
+    machineRepository.save(machinePort);
     logger.info("Machine destroyed successfully");
   }
 
@@ -258,8 +309,8 @@ public class MachineService {
   public MachineDto getMachine(ComponentId machineId) {
     logger.debug("Getting machine: " + machineId.getShortId());
 
-    Machine machine = getMachineOrThrow(machineId);
-    return new MachineDto(machine);
+    MachinePort machinePort = getMachineOrThrow(machineId);
+    return new MachineDto(machinePort);
   }
 
   /**
@@ -270,7 +321,10 @@ public class MachineService {
   public List<MachineDto> getAllMachines() {
     logger.debug("Getting all machines");
 
-    return machineRepository.findAll().stream().map(MachineDto::new).collect(Collectors.toList());
+    // Use the port interface
+    return machineRepository.findAll().stream()
+        .map(MachineDto::new)
+        .collect(Collectors.toList());
   }
 
   /**
@@ -282,6 +336,7 @@ public class MachineService {
   public List<MachineDto> getMachinesByType(MachineType type) {
     logger.debug("Getting machines by type: " + type);
 
+    // Use the port interface
     return machineRepository.findByType(type).stream()
         .map(MachineDto::new)
         .collect(Collectors.toList());
@@ -296,6 +351,7 @@ public class MachineService {
   public List<MachineDto> getMachinesByName(String name) {
     logger.debug("Getting machines by name: " + name);
 
+    // Use the port interface
     return machineRepository.findByName(name).stream()
         .map(MachineDto::new)
         .collect(Collectors.toList());
@@ -310,6 +366,7 @@ public class MachineService {
   public List<MachineDto> getMachinesContainingComponent(ComponentId componentId) {
     logger.debug("Getting machines containing component: " + componentId.getShortId());
 
+    // Use the port interface
     return machineRepository.findContainingComponent(componentId).stream()
         .map(MachineDto::new)
         .collect(Collectors.toList());
@@ -323,15 +380,19 @@ public class MachineService {
    * @throws ComponentNotFoundException if the machine is not found
    * @throws InvalidOperationException if the machine is not in a valid state for updating the
    *     version
+   * @throws UnsupportedOperationException if the machine port does not support version updates
    */
   public void updateMachineVersion(ComponentId machineId, String version) {
     logger.info("Updating version of machine " + machineId.getShortId() + " to " + version);
 
-    Machine machine = getMachineOrThrow(machineId);
-    machine.setVersion(version);
-
-    machineRepository.save(machine);
-    logger.info("Machine version updated successfully");
+    MachinePort machinePort = getMachineOrThrow(machineId);
+    
+    // MachinePort interface doesn't directly support version updates
+    // This would typically be handled by a specific version management service
+    // We'll throw an exception for now, but in a real implementation,
+    // we might use a MachineVersionManager service or similar
+    throw new UnsupportedOperationException(
+        "Version management is not supported through the MachinePort interface");
   }
 
   /**
@@ -356,10 +417,10 @@ public class MachineService {
    * Helper method to get a machine or throw a ComponentNotFoundException.
    *
    * @param machineId The machine ID
-   * @return The machine
+   * @return The machine port
    * @throws ComponentNotFoundException if the machine is not found
    */
-  private Machine getMachineOrThrow(ComponentId machineId) {
+  private MachinePort getMachineOrThrow(ComponentId machineId) {
     return machineRepository
         .findById(machineId)
         .orElseThrow(() -> new ComponentNotFoundException(machineId));
