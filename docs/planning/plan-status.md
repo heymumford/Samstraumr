@@ -28,6 +28,7 @@ These plans have been completed and archived. See the Archived Plans section for
 
 |                               Document                               |                Description                | Completion Date |                     Outcome                     |
 |----------------------------------------------------------------------|-------------------------------------------|-----------------|-------------------------------------------------|
+| [script-reorganization-summary.md](./archived/archived-script-reorganization-summary.md) | Script reorganization and cleanup | 2025-04-07 | ✅ Implemented structured bin directory organization |
 | [version-management-enhancement.md](./archived/archived-version-management-enhancement.md) | Enhanced version management system | 2025-04-07 | ✅ Implemented robust version management system |
 | [test-migration-implementation.md](./archived/archived-test-migration-implementation.md) | Test migration from Tube to Component | 2025-04-07 | ✅ Migrated tests to new Component architecture |
 | [documentation-flattening-summary.md](./archived/archived-documentation-flattening-summary.md) | Documentation reorganization | 2025-04-07 | ✅ Flattened and standardized documentation structure |

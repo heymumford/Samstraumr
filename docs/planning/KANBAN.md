@@ -33,7 +33,11 @@ This document tracks the progress of tasks in the S8r project.
   - Standardize cross-references
   - Standardize code blocks and formatting
 - Scan root directory for non-README .md files that may contain tests we want to add or update to our test pyramid
-- Reorganize scripts from root directory to appropriate utility directories
+- Organize scripts into structured bin directory with categories
+  - Create cleanup-root.sh script to clean up duplicate files and fix symlinks
+  - Create organize-s8r-scripts.sh to establish structured bin directory
+  - Update CLI reference documentation with script organization information
+  - Create comprehensive README for bin directory
 - Implement test scenarios from markdown files into the test pyramid
 - Test build process with comprehensive BDD tests
 - Create test migration approach with atomic component identity tests

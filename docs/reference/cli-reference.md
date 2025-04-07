@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Samstraumr CLI Reference
+# Cli Reference
 
 The S8r command-line interface provides a unified way to interact with the Samstraumr framework for tasks like building, testing, and managing versions.
 
@@ -28,9 +28,9 @@ Or use the longer form:
 
 ## Available Commands
 
-### Model Management Commands
+### Model management commands
 
-#### Initialize a New Model
+#### Initialize a new model
 
 ```bash
 ./s8r init [options] [target-directory]
@@ -50,7 +50,7 @@ Examples:
 ./s8r init -n "Customer Data Model" -p com.example.customer  # Set model name and package
 ```
 
-#### Visualize Model Structure
+#### Visualize model structure
 
 ```bash
 ./s8r list [options] [directory]
@@ -69,7 +69,7 @@ Examples:
 ./s8r list -d               # Show detailed information
 ```
 
-#### Component Management
+#### Component management
 
 ```bash
 ./s8r component <subcommand> [arguments]
@@ -87,7 +87,7 @@ Examples:
 ./s8r component list --format json
 ```
 
-#### Composite Management
+#### Composite management
 
 ```bash
 ./s8r composite <subcommand> [arguments]
@@ -107,7 +107,7 @@ Examples:
 ./s8r composite add --component DataProcessor --composite DataFlow
 ```
 
-#### Machine Management
+#### Machine management
 
 ```bash
 ./s8r machine <subcommand> [arguments]
@@ -127,7 +127,7 @@ Examples:
 ./s8r machine add --composite DataFlow --machine DataPipeline
 ```
 
-### Build Commands
+### Build commands
 
 Build the project with various configurations:
 
@@ -161,7 +161,7 @@ Examples:
 ./s8r build -v -p test        # Run tests in parallel with verbose output
 ```
 
-### Test Commands
+### Test commands
 
 Run various types of tests:
 
@@ -211,7 +211,7 @@ Examples:
 ./s8r test -v adam             # Run Adam tube tests with verbose output
 ```
 
-### Version Commands
+### Version commands
 
 Manage project versioning:
 
@@ -239,7 +239,7 @@ Examples:
 ./s8r version test patch       # Bump patch, test, commit, tag
 ```
 
-### Quality Check Commands
+### Quality check commands
 
 Validate code quality:
 
@@ -267,7 +267,7 @@ Examples:
 ./s8r quality encoding -v      # Check encodings with verbose output
 ```
 
-### CI Commands
+### Ci commands
 
 Run GitHub Actions workflows locally:
 
@@ -304,9 +304,9 @@ You can also run CI checks after building:
 ./s8r build fast --ci           # Fast build followed by local CI check
 ```
 
-### Documentation Commands
+### Documentation commands
 
-#### Document Generation
+#### Document generation
 
 Generate documentation:
 
@@ -331,7 +331,7 @@ Examples:
 ./s8r docs ./my-docs docx          # Generate DOCX docs in ./my-docs  
 ```
 
-#### Documentation Integrity
+#### Documentation integrity
 
 Check and maintain documentation integrity:
 
@@ -388,6 +388,97 @@ The CLI uses configuration files from multiple locations:
 1. `.samstraumr.config`: Project-level configuration
 2. `.s8r/config.json`: User-level configuration
 3. Environment variables
+
+## Script Organization
+
+Starting from version 2.4.6, the CLI scripts are organized into a more structured layout:
+
+### Root Directory Scripts
+
+The root directory contains commonly used script files for backward compatibility:
+
+```bash
+./s8r <command>                 # Main S8r CLI
+./s8r-build                     # Build commands
+./s8r-test                      # Test commands
+./s8r-version                   # Version management
+# ... and other core scripts
+```
+
+### Bin Directory Organization
+
+All scripts are organized by category in the `bin` directory:
+
+```bash
+bin/
+├── core/           # Core framework commands (s8r, s8r-init, s8r-list)
+├── build/          # Build-related commands (s8r-build, s8r-ci)
+├── test/           # Testing commands (s8r-test, s8r-test-cli)
+├── component/      # Component-related commands (s8r-component, s8r-composite)
+├── dev/            # Development commands (s8r-dev)
+├── migration/      # Migration tools (s8r-migration-monitor, s8r-architecture-verify)
+├── help/           # Help commands (s8r-help)
+├── utils/          # Utility commands (s8r-docs, s8r-quality, s8r-version)
+└── s8r-all/        # All scripts in one place for convenience
+```
+
+You can access scripts through the bin directory structure:
+
+```bash
+./bin/build/s8r-build            # Run build command
+./bin/test/s8r-test component    # Run component tests
+./bin/utils/s8r-version get      # Get version information
+```
+
+### Setting Up Script Organization
+
+To organize your scripts into the bin directory structure, you can use the provided organization script:
+
+```bash
+# Run the script organization tool
+./util/scripts/organize-s8r-scripts.sh
+
+# Clean up the root directory
+./util/scripts/cleanup-root.sh
+```
+
+These scripts will:
+1. Create the appropriate bin directory structure
+2. Create symbolic links to all s8r scripts
+3. Clean up duplicate files and fix broken symlinks
+4. Create utility scripts for managing script versions
+
+### Script Variants
+
+Some scripts have both original and new versions. To manage these versions:
+
+```bash
+# List available script versions
+./bin/utils/use-new-scripts.sh list
+
+# Switch to new versions of scripts
+./bin/utils/use-new-scripts.sh use-new
+
+# Switch back to original versions
+./bin/utils/use-new-scripts.sh use-old
+```
+
+### Utility Scripts
+
+The `util/scripts` directory contains various utility scripts:
+
+```bash
+util/scripts/
+├── ci/             # CI-related scripts
+├── java/           # Java-related scripts
+├── test/           # Test utility scripts
+├── cleanup-root.sh # Script for cleaning up the root directory
+└── organize-s8r-scripts.sh # Script for organizing s8r scripts
+```
+
+### Legacy Script Support
+
+All legacy script names continue to work for backward compatibility.
 
 ## Return to Main Documentation
 
