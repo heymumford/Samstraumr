@@ -45,7 +45,7 @@ public class TestContext {
      * Creates a new test context with a default environment.
      */
     public TestContext() {
-        this.environment = Environment.create();
+        this.environment = new Environment();
     }
     
     /**

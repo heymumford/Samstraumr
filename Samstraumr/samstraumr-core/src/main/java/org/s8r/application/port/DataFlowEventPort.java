@@ -15,6 +15,7 @@
 
 package org.s8r.application.port;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -67,4 +68,13 @@ public interface DataFlowEventPort {
      * @return A set of channel names
      */
     Set<String> getComponentSubscriptions(ComponentId componentId);
+    
+    /**
+     * Publishes data from a component to a specific channel.
+     *
+     * @param componentId The source component's ID
+     * @param channel The channel to publish to
+     * @param data The data to publish
+     */
+    void publishData(ComponentId componentId, String channel, Map<String, Object> data);
 }

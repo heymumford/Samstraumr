@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.s8r.domain.component.Component;
+import org.s8r.domain.component.port.ComponentPort;
 import org.s8r.domain.identity.ComponentId;
 
 /**
@@ -35,7 +36,7 @@ public interface ComponentRepository {
    *
    * @param component The component to save
    */
-  void save(Component component);
+  void save(ComponentPort component);
 
   /**
    * Finds a component by its ID.
@@ -43,14 +44,14 @@ public interface ComponentRepository {
    * @param id The component ID to find
    * @return An Optional containing the component if found, or empty if not found
    */
-  Optional<Component> findById(ComponentId id);
+  Optional<ComponentPort> findById(ComponentId id);
 
   /**
    * Finds all components.
    *
    * @return A list of all components
    */
-  List<Component> findAll();
+  List<ComponentPort> findAll();
 
   /**
    * Finds child components for a parent component.
@@ -58,7 +59,7 @@ public interface ComponentRepository {
    * @param parentId The parent component ID
    * @return A list of child components
    */
-  List<Component> findChildren(ComponentId parentId);
+  List<ComponentPort> findChildren(ComponentId parentId);
 
   /**
    * Deletes a component.

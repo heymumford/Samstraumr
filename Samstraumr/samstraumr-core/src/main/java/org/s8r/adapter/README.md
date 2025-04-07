@@ -47,6 +47,10 @@ Converts between legacy Tube Composites and new Component Composites. This suppo
 
 Converts between legacy Tube Machines and new Component Machines. This enables migrating the highest level of orchestration in the system, including all composites, connections, and state management.
 
+The MachineAdapter provides two primary operations:
+1. `tubeMachineToComponentMachine`: Direct conversion creating a new Component Machine from a Tube Machine
+2. `wrapTubeMachine`: Creates a wrapper that delegates to a Tube Machine, with bidirectional state synchronization
+
 The MachineAdapter provides:
 
 1. **Machine State Synchronization**:

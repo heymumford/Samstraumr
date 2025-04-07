@@ -1,7 +1,7 @@
 
 # Samstraumr: Adaptive Resilient Software Framework
 
-[![Version](https://img.shields.io/badge/version-2.4.5-blue)](https://github.com/heymumford/Samstraumr/releases) 
+[![Version](https://img.shields.io/badge/version-2.4.6-blue)](https://github.com/heymumford/Samstraumr/releases) 
 [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) 
 [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/) 
@@ -109,7 +109,7 @@ Maven dependency:
 <dependency>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-core</artifactId>
-    <version>2.4.5</version>
+    <version>2.4.6</version>
 </dependency>
 ```
 
@@ -141,6 +141,7 @@ if (result.isValid()) {
 ### 📚 Guides
 - [Prerequisites](./docs/guides/prerequisites.md)
 - [Getting Started](./docs/guides/getting-started.md)
+- [Model Visualization](./docs/guides/model-visualization.md)
 - [Composition Strategies](./docs/guides/composition-strategies.md)
 - [Component Patterns](./docs/guides/component-patterns.md)
 - [Migration Guide](./docs/guides/migration-guide.md)
@@ -179,16 +180,21 @@ Samstraumr provides a unified CLI for all operations:
 ./s8r <command> [options] [arguments]
 
 # Example commands
-./s8r build fast --ci            # Fast build with local CI check
-./s8r test unit --parallel       # Run unit tests in parallel
-./s8r version bump minor         # Bump minor version
-./s8r docs target/docs pdf       # Generate PDF documentation
-./s8r-docs check                 # Check documentation integrity
-./s8r-ci --dry-run               # Test CI pipeline locally
+./s8r init --package com.example.model    # Initialize a new S8r model
+./s8r list --format tree                  # Visualize model in tree format
+./s8r build fast --ci                     # Fast build with local CI check
+./s8r test unit --parallel                # Run unit tests in parallel
+./s8r version bump minor                  # Bump minor version
+./s8r docs target/docs pdf                # Generate PDF documentation
 ```
 
 | Command | Description |
 |---------|-------------|
+| `./s8r init [options]` | Initialize a new S8r model repository |
+| `./s8r list [options]` | Visualize S8r models in ASCII or tree format |
+| `./s8r component <cmd>` | Manage components (create, list, info, delete) |
+| `./s8r composite <cmd>` | Manage composites (create, add, connect, list) |
+| `./s8r machine <cmd>` | Manage machines (create, add, connect, list) |
 | `./s8r build [mode]` | Build project (fast, test, package, install, full) |
 | `./s8r test <type>` | Run tests (unit, component, integration, all...) |
 | `./s8r version <cmd>` | Manage versions (get, bump, set, fix) |

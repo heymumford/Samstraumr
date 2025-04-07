@@ -16,6 +16,7 @@
 package org.s8r.domain.identity;
 
 import org.s8r.domain.component.Component;
+import org.s8r.domain.component.port.ComponentPort;
 
 /**
  * Port interface for adapting legacy components to Clean Architecture components.
@@ -23,6 +24,12 @@ import org.s8r.domain.component.Component;
  * This interface defines operations for working with legacy components without
  * direct dependencies on their implementation, maintaining clean architecture
  * principles by keeping the domain layer free of adapter dependencies.
+ * </p>
+ * <p>
+ * The adapter returns components as ComponentPort instances, ensuring that
+ * clients depend on abstractions rather than concrete implementations. This follows
+ * the Dependency Inversion Principle and allows for a smooth transition path
+ * when migrating from legacy code to the Clean Architecture model.
  * </p>
  */
 public interface LegacyComponentAdapterPort {
@@ -33,7 +40,7 @@ public interface LegacyComponentAdapterPort {
      * @param legacyComponent The legacy component to wrap
      * @return A Clean Architecture component that delegates to the legacy component
      */
-    Component wrapLegacyComponent(Object legacyComponent);
+    ComponentPort wrapLegacyComponent(Object legacyComponent);
     
     /**
      * Creates a legacy component with the specified parameters.
@@ -43,7 +50,7 @@ public interface LegacyComponentAdapterPort {
      * @param reason The reason for creation
      * @return A wrapped legacy component
      */
-    Component createLegacyComponent(String name, String type, String reason);
+    ComponentPort createLegacyComponent(String name, String type, String reason);
     
     /**
      * Sets the state of a legacy component.

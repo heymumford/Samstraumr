@@ -21,9 +21,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
-import org.s8r.component.composite.Composite;
-import org.s8r.component.machine.Machine;
-import org.s8r.component.machine.MachineFactory;
+import org.s8r.component.Composite;
+import org.s8r.component.Machine;
+import org.s8r.component.MachineFactory;
 
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.*;

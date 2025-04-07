@@ -43,6 +43,9 @@ import org.s8r.component.State;
 // This can lead to incompatible type errors
 ```
 
+Other type incompatibilities include domain vs. implementation models:
+- `org.s8r.domain.component.Component` ≠ `org.s8r.component.Component`
+
 ### Method Signature Changes
 
 Some method signatures may have changed during the flattening process:
@@ -53,6 +56,18 @@ environment.getParameter(key, defaultValue);
 
 // After
 environment.getParameter(key);
+```
+
+### Method Name Changes
+
+Some method names have changed:
+
+```java
+// Before
+ComponentId.generate("reason");
+
+// After
+ComponentId.create("reason");
 ```
 
 ## How to Fix These Issues
@@ -102,6 +117,28 @@ if (value == null) {
 }
 ```
 
+## Working with Adapter Utilities
+
+The codebase now includes adapter utilities to help with the transition period:
+
+### ComponentAdapter and ComponentTypeAdapter
+
+Basic conversion between domain and implementation components:
+
+```java
+// Domain to implementation
+Component component = ComponentTypeAdapter.fromDomainComponent(domainComponent);
+
+// Implementation to domain
+DomainComponent domainComponent = ComponentTypeAdapter.toDomainComponent(component);
+
+// Wrapping for use in tests expecting domain components
+DomainComponent wrapped = ComponentTypeAdapter.wrap(component);
+
+// Unwrapping when domain component is needed as implementation
+Component unwrapped = ComponentTypeAdapter.unwrap(domainComponent);
+```
+
 ## Testing Your Changes
 
 After making these changes, test your code thoroughly:
@@ -112,7 +149,7 @@ After making these changes, test your code thoroughly:
 
 ## Long-term Solution
 
-While the immediate fixes described above will get the codebase compiling, a more comprehensive refactoring is planned to fully migrate to the Clean Architecture model. See the [Clean Architecture Migration Plan](/docs/roadmap/clean-architecture-migration.md) for details.
+While the immediate fixes described above will get the codebase compiling, a more comprehensive refactoring is planned to fully migrate to the Clean Architecture model. See the [Clean Architecture Migration Plan](/docs/architecture/clean/clean-architecture-migration.md) for details.
 
 ## Common Error Messages and Solutions
 
@@ -120,9 +157,16 @@ While the immediate fixes described above will get the codebase compiling, a mor
 
 **Solution**: Update the import to `import org.s8r.component.State;`
 
-### "incompatible types: org.s8r.component.Component cannot be converted to org.s8r.component.core.Component"
+### "incompatible types: org.s8r.domain.component.Component cannot be converted to org.s8r.component.Component"
 
-**Solution**: Ensure consistent import usage throughout the codebase.
+**Solution**: Use the ComponentTypeAdapter to convert between types:
+```java
+component = ComponentTypeAdapter.fromDomainComponent(domainComponent);
+```
+
+### "cannot find symbol: method generate(java.lang.String)"
+
+**Solution**: Update the method call from `ComponentId.generate()` to `ComponentId.create()`
 
 ### "method getParameter in class Environment cannot be applied to given types"
 
@@ -134,5 +178,4 @@ The package flattening operation is a step towards a cleaner and more maintainab
 
 For more information, see:
 - [Package Flattening Fixes](/package-flattening-fixes.md)
-- [Clean Architecture Migration Plan](/docs/roadmap/clean-architecture-migration.md)
-- [Using Domain Adapters Guide](/docs/guides/migration/using-domain-adapters.md)
+- [Clean Architecture Migration Plan](/docs/architecture/clean/clean-architecture-migration.md)

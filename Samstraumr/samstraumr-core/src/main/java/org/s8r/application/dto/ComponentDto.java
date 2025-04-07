@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.s8r.domain.component.Component;
+import org.s8r.domain.component.port.ComponentPort;
+import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.lifecycle.LifecycleState;
 
 /**
@@ -56,6 +58,28 @@ public class ComponentDto {
 
     this.lineage = new ArrayList<>(component.getLineage());
     this.activityLog = new ArrayList<>(component.getActivityLog());
+  }
+  
+  /**
+   * Creates a new ComponentDto from a ComponentPort interface.
+   * This constructor supports Clean Architecture by working with the port interface
+   * rather than the concrete implementation.
+   *
+   * @param componentPort The component port interface
+   */
+  public ComponentDto(ComponentPort componentPort) {
+    ComponentId componentId = componentPort.getId();
+    this.id = componentId.getIdString();
+    this.shortId = componentId.getShortId();
+    this.reason = componentId.getReason();
+    this.creationTime = componentPort.getCreationTime();
+
+    LifecycleState state = componentPort.getLifecycleState();
+    this.lifecycleState = state.name();
+    this.lifecycleDescription = state.getDescription();
+
+    this.lineage = new ArrayList<>(componentPort.getLineage());
+    this.activityLog = new ArrayList<>(componentPort.getActivityLog());
   }
 
   /**
@@ -117,6 +141,17 @@ public class ComponentDto {
   public String getReason() {
     return reason;
   }
+  
+  /**
+   * Gets the component name, derived from the ID.
+   *
+   * @return The component name 
+   */
+  public String getName() {
+    // In a real implementation, the component might have a separate name field
+    // Here we derive a name from the shortId or reason
+    return reason != null && !reason.isEmpty() ? reason : shortId;
+  }
 
   /**
    * Gets the component creation time.
@@ -174,6 +209,21 @@ public class ComponentDto {
       return null;
     }
     return new ComponentDto(component);
+  }
+  
+  /**
+   * Factory method to create a ComponentDto from a domain ComponentPort interface.
+   * This supports Clean Architecture by working with the port interface rather
+   * than the concrete implementation.
+   *
+   * @param componentPort The domain component port interface
+   * @return A new ComponentDto or null if the componentPort is null
+   */
+  public static ComponentDto fromDomain(ComponentPort componentPort) {
+    if (componentPort == null) {
+      return null;
+    }
+    return new ComponentDto(componentPort);
   }
 
   @Override

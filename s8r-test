@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Fix project root path
+export PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 #==============================================================================
 # s8r-test: Simplified test runner for Samstraumr
 # Provides a streamlined interface for running different test types

@@ -18,6 +18,7 @@ package org.s8r.adapter;
 import java.util.Map;
 
 import org.s8r.domain.component.Component;
+import org.s8r.domain.component.port.ComponentPort;
 import org.s8r.domain.exception.ComponentException;
 import org.s8r.domain.exception.InvalidStateTransitionException;
 import org.s8r.domain.identity.ComponentId;
@@ -31,8 +32,14 @@ import org.s8r.domain.lifecycle.LifecycleState;
  * legacy component for actual implementation. This supports a smooth transition path
  * for legacy code while maintaining clean architecture principles.
  * </p>
+ * <p>
+ * By implementing the ComponentPort interface, this wrapper provides a standardized
+ * way for adapter clients to interact with components without depending on the concrete
+ * Component implementation. This follows the Dependency Inversion Principle by making both
+ * the wrapper and its clients depend on abstractions rather than concrete implementations.
+ * </p>
  */
-public class LegacyComponentWrapper extends Component {
+public class LegacyComponentWrapper extends Component implements ComponentPort {
     
     private final Object legacyComponent;
     private final LegacyComponentAdapterPort adapter;

@@ -22,9 +22,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.s8r.component.core.State;
-import org.s8r.component.exception.ComponentException;
-import org.s8r.component.exception.InvalidStateTransitionException;
+import org.s8r.component.State;
+import org.s8r.component.ComponentException;
+import org.s8r.component.InvalidStateTransitionException;
 
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.*;

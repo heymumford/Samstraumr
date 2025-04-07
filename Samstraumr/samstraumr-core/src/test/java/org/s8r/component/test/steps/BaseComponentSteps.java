@@ -21,11 +21,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.s8r.component.composite.Composite;
-import org.s8r.component.core.Component;
-import org.s8r.component.core.Environment;
-import org.s8r.component.identity.Identity;
-import org.s8r.component.machine.Machine;
+import org.s8r.component.Composite;
+import org.s8r.component.Component;
+import org.s8r.component.Environment;
+import org.s8r.component.Identity;
+import org.s8r.component.Machine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

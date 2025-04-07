@@ -18,6 +18,7 @@ package org.s8r.infrastructure.event;
 import org.s8r.application.port.EventDispatcher.EventHandler;
 import org.s8r.application.port.LoggerPort;
 import org.s8r.domain.event.ComponentConnectionEvent;
+import org.s8r.domain.event.ComponentCreated;
 import org.s8r.domain.event.ComponentCreatedEvent;
 import org.s8r.domain.event.ComponentStateChangedEvent;
 import org.s8r.domain.event.MachineStateChangedEvent;
@@ -51,6 +52,21 @@ public class LoggingEventHandler {
             "DOMAIN EVENT: Component created - ID: {}, Type: {}, Time: {}",
             event.getComponentId().getShortId(),
             event.getComponentType(),
+            event.getOccurredOn());
+  }
+  
+  /**
+   * Creates a handler for ComponentCreated events (new style without the Event suffix).
+   *
+   * @return The event handler
+   */
+  public EventHandler<ComponentCreated> componentCreatedHandlerNew() {
+    return event ->
+        logger.info(
+            "DOMAIN EVENT: Component created (new) - ID: {}, Type: {}, State: {}, Time: {}",
+            event.getComponentId().getShortId(),
+            event.getComponentType(),
+            event.getInitialState(),
             event.getOccurredOn());
   }
 

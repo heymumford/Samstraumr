@@ -207,14 +207,24 @@ public class FileSystemProjectInitializer implements ProjectInitializationPort {
      * @return the config.json content
      */
     private String generateConfigContent(String packageName) {
+        String modelName = System.getProperty("s8r.init.modelName", "S8r Model");
+        
         return "{\n" +
-               "  \"projectName\": \"Samstraumr Project\",\n" +
+               "  \"projectName\": \"" + modelName + "\",\n" +
                "  \"packageName\": \"" + packageName + "\",\n" +
                "  \"createdAt\": \"" + Instant.now() + "\",\n" +
+               "  \"modelVersion\": \"1.0.0\",\n" +
                "  \"defaultComponents\": {\n" +
                "    \"component\": true,\n" +
                "    \"composite\": true,\n" +
                "    \"machine\": true\n" +
+               "  },\n" +
+               "  \"visualization\": {\n" +
+               "    \"defaultFormat\": \"ascii\",\n" +
+               "    \"components\": {\n" +
+               "      \"showDetails\": false,\n" +
+               "      \"groupByType\": true\n" +
+               "    }\n" +
                "  }\n" +
                "}\n";
     }
@@ -226,23 +236,40 @@ public class FileSystemProjectInitializer implements ProjectInitializationPort {
      * @return the README.md content
      */
     private String generateReadmeContent(String packageName) {
-        return "# Samstraumr Project\n\n" +
-               "This project was initialized with the Samstraumr framework.\n\n" +
+        String modelName = System.getProperty("s8r.init.modelName", "S8r Model");
+        
+        return "# " + modelName + "\n\n" +
+               "This model was initialized with the S8r framework.\n\n" +
                "## Overview\n\n" +
-               "Samstraumr is a framework for building component-based systems with a biological-inspired " +
-               "lifecycle model. This project contains the foundation for building such systems.\n\n" +
+               "S8r is a framework for building component-based systems with a biological-inspired " +
+               "lifecycle model. This project contains the foundation for building model-driven systems.\n\n" +
                "## Getting Started\n\n" +
                "1. Explore the generated Adam component in `src/main/java/" + packageName.replace('.', '/') + 
                "/component/AdamComponent.java`\n" +
                "2. Run the Adam component to see it in action\n" +
-               "3. Create your own components by extending the framework classes\n\n" +
+               "3. Create your own components by extending the framework classes\n" +
+               "4. Use the `s8r list` command to visualize your model\n\n" +
                "## Project Structure\n\n" +
                "- `src/main/java/" + packageName.replace('.', '/') + "/component` - Component implementations\n" +
-               "- `src/main/java/" + packageName.replace('.', '/') + "/tube` - Tube implementations (legacy)\n" +
+               "- `src/main/java/" + packageName.replace('.', '/') + "/composite` - Composite implementations\n" +
                "- `src/main/java/" + packageName.replace('.', '/') + "/machine` - Machine implementations\n" +
                "- `src/test` - Test resources and implementations\n\n" +
+               "## CLI Commands\n\n" +
+               "S8r provides several CLI commands to help you work with your model:\n\n" +
+               "```bash\n" +
+               "# Initialize a new model (already done for this project)\n" +
+               "s8r init [--package com.example] [--name \"My Model\"] [directory]\n\n" +
+               "# List components and visualize model structure\n" +
+               "s8r list [--format ascii|tree|json] [--detailed]\n\n" +
+               "# Create a new component\n" +
+               "s8r component create [--type standard|transform|validator] [name]\n\n" +
+               "# Create a new composite\n" +
+               "s8r composite create [--type standard|processing|gateway] [name]\n\n" +
+               "# Create a new machine\n" +
+               "s8r machine create [--template empty|flow|star] [name]\n" +
+               "```\n\n" +
                "## Documentation\n\n" +
-               "For more information about the Samstraumr framework, see the " +
+               "For more information about the S8r framework, see the " +
                "[official documentation](https://github.com/heymumford/Samstraumr).\n";
     }
 }

@@ -16,7 +16,9 @@
 package org.s8r.application.dto;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.s8r.domain.component.Component;
@@ -91,6 +93,34 @@ public class CompositeComponentDto extends ComponentDto {
    */
   public List<ConnectionDto> getConnections() {
     return new ArrayList<>(connections);
+  }
+  
+  /**
+   * Gets the components in this composite.
+   *
+   * @return A map of component names to component DTOs
+   */
+  public Map<String, ComponentDto> getComponents() {
+    // This is a placeholder implementation - in a real implementation, 
+    // this would return actual components from the composite
+    Map<String, ComponentDto> result = new HashMap<>();
+    for (ComponentDto child : children) {
+      result.put(child.getName(), child);
+    }
+    return result;
+  }
+  
+  /**
+   * Gets the environment parameters for this composite.
+   *
+   * @return A map of environment parameter names to values
+   */
+  public Map<String, Object> getEnvironment() {
+    // This is a placeholder implementation - in a real implementation,
+    // this would return actual environment parameters from the composite
+    Map<String, Object> env = new HashMap<>();
+    env.put("type", compositeType);
+    return env;
   }
 
   /**

@@ -18,7 +18,9 @@ package org.s8r.adapter;
 import org.s8r.application.port.LoggerPort;
 import org.s8r.component.Composite;
 import org.s8r.component.Machine;
-import org.s8r.domain.component.Component;
+import org.s8r.domain.component.port.ComponentPort;
+import org.s8r.domain.component.port.CompositeComponentPort;
+import org.s8r.domain.component.port.MachinePort;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.identity.LegacyComponentAdapterPort;
 import org.s8r.domain.identity.LegacyEnvironmentConverter;
@@ -177,54 +179,54 @@ public class S8rMigrationFactory {
     // =================== Component Conversion ===================
     
     /**
-     * Wraps a Tube as a Component, allowing it to be used with new Component-based code.
+     * Wraps a Tube as a ComponentPort, allowing it to be used with new Component-based code.
      *
      * @param tube The Tube to wrap
-     * @return A Component that delegates to the Tube
+     * @return A ComponentPort that delegates to the Tube
      */
-    public Component tubeToComponent(Tube tube) {
-        logger.debug("Converting Tube to Component: {}", tube.getUniqueId());
+    public ComponentPort tubeToComponent(Tube tube) {
+        logger.debug("Converting Tube to ComponentPort: {}", tube.getUniqueId());
         return componentAdapter.wrapLegacyComponent(tube);
     }
     
     /**
-     * Creates a new Tube and wraps it as a Component.
+     * Creates a new Tube and wraps it as a ComponentPort.
      *
      * @param reason The reason for creating the tube
      * @param environment The environment for the tube
-     * @return A Component that delegates to a new Tube
+     * @return A ComponentPort that delegates to a new Tube
      */
-    public Component createTubeComponent(String reason, Environment environment) {
-        logger.debug("Creating new Tube Component with reason: {}", reason);
+    public ComponentPort createTubeComponent(String reason, Environment environment) {
+        logger.debug("Creating new Tube ComponentPort with reason: {}", reason);
         Tube tube = Tube.create(reason, environment);
         return tubeToComponent(tube);
     }
     
     /**
-     * Creates a child Tube from a parent Tube and wraps it as a Component.
+     * Creates a child Tube from a parent Tube and wraps it as a ComponentPort.
      *
      * @param reason The reason for creating the child
      * @param parentTube The parent tube
-     * @return A Component that delegates to the child Tube
+     * @return A ComponentPort that delegates to the child Tube
      */
-    public Component createChildTubeComponent(String reason, Tube parentTube) {
-        logger.debug("Creating child Tube Component with reason: {}", reason);
+    public ComponentPort createChildTubeComponent(String reason, Tube parentTube) {
+        logger.debug("Creating child Tube ComponentPort with reason: {}", reason);
         return ((TubeComponentAdapter) componentAdapter).createChildComponent(reason, parentTube);
     }
     
     /**
      * Extracts the wrapped Tube from a TubeComponentWrapper.
      *
-     * @param component The component to extract from
+     * @param componentPort The component port to extract from
      * @return The wrapped Tube, or null if not a TubeComponentWrapper
      */
-    public Tube extractTube(Component component) {
-        if (component instanceof TubeComponentWrapper) {
+    public Tube extractTube(ComponentPort componentPort) {
+        if (componentPort instanceof TubeComponentWrapper) {
             logger.debug("Extracting Tube from TubeComponentWrapper");
-            return ((TubeComponentWrapper) component).getTube();
+            return ((TubeComponentWrapper) componentPort).getTube();
         }
         
-        logger.warn("Component is not a TubeComponentWrapper, cannot extract Tube");
+        logger.warn("ComponentPort is not a TubeComponentWrapper, cannot extract Tube");
         return null;
     }
     
@@ -297,6 +299,19 @@ public class S8rMigrationFactory {
     }
     
     /**
+     * Converts a Tube machine to a MachinePort interface.
+     * This follows the Clean Architecture pattern by returning the port interface
+     * rather than the concrete implementation.
+     *
+     * @param tubeMachine The Tube machine to convert
+     * @return A MachinePort interface that mirrors the legacy machine
+     */
+    public MachinePort tubeMachineToMachinePort(org.s8r.tube.machine.Machine tubeMachine) {
+        logger.debug("Converting Tube machine to MachinePort: {}", tubeMachine.getMachineId());
+        return machineAdapter.tubeMachineToMachinePort(tubeMachine);
+    }
+    
+    /**
      * Creates a wrapper around a Tube machine, allowing it to be used with Component machine APIs.
      *
      * @param tubeMachine The Tube machine to wrap
@@ -305,5 +320,18 @@ public class S8rMigrationFactory {
     public Machine wrapTubeMachine(org.s8r.tube.machine.Machine tubeMachine) {
         logger.debug("Creating wrapper for Tube machine: {}", tubeMachine.getMachineId());
         return machineAdapter.wrapTubeMachine(tubeMachine);
+    }
+    
+    /**
+     * Creates a wrapper around a Tube machine that implements the MachinePort interface.
+     * This follows the Clean Architecture pattern by returning the port interface
+     * rather than the concrete implementation.
+     *
+     * @param tubeMachine The Tube machine to wrap
+     * @return A MachinePort that delegates to the Tube machine
+     */
+    public MachinePort wrapTubeMachineAsPort(org.s8r.tube.machine.Machine tubeMachine) {
+        logger.debug("Creating MachinePort wrapper for Tube machine: {}", tubeMachine.getMachineId());
+        return machineAdapter.wrapTubeMachineAsPort(tubeMachine);
     }
 }

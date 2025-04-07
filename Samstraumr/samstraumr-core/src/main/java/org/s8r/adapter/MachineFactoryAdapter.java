@@ -22,6 +22,7 @@ import org.s8r.domain.component.port.MachinePort;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.machine.Machine;
 import org.s8r.domain.machine.MachineFactory;
+import org.s8r.domain.machine.MachineState;
 import org.s8r.domain.machine.MachineType;
 
 /**
@@ -48,23 +49,55 @@ public class MachineFactoryAdapter implements MachineFactoryPort {
   public MachinePort createMachine(MachineType type, String reason) {
     logger.debug("Creating machine of type {} with reason: {}", type, reason);
     
-    Machine machine = MachineFactory.createMachine(type, reason);
-    return MachineAdapter.createMachinePort(machine);
+    // Create a machine with proper parameters
+    Machine machine = MachineFactory.createMachine(type, reason, reason, "1.0.0");
+    return MachineAdapter.createMachinePortFromDomain(machine);
   }
 
   @Override
   public MachinePort createMachine(ComponentId id, MachineType type) {
     logger.debug("Creating machine with ID {} of type {}", id.getShortId(), type);
     
-    Machine machine = MachineFactory.createMachine(id, type);
-    return MachineAdapter.createMachinePort(machine);
+    // Create machine with name and description derived from ID
+    String name = "Machine " + id.getShortId();
+    String description = "Created with ID " + id.getIdString();
+    Machine machine = Machine.create(id, type, name, description, "1.0.0");
+    return MachineAdapter.createMachinePortFromDomain(machine);
+  }
+
+  /**
+   * Creates a machine with the given name and type string.
+   * This is a convenience method that's not part of the port interface.
+   *
+   * @param name The name of the machine
+   * @param type The type of the machine as a string, should be one of the MachineType enum values
+   * @return A new machine port interface
+   */
+  public MachinePort createMachine(String name, String type) {
+    logger.debug("Creating machine with name {} and type {}", name, type);
+    
+    try {
+      // Convert string type to MachineType enum
+      MachineType machineType = MachineType.valueOf(type);
+      
+      // Create machine with the specified name and type
+      Machine machine = MachineFactory.createMachine(machineType, name, name, "1.0.0");
+      
+      return MachineAdapter.createMachinePortFromDomain(machine);
+    } catch (IllegalArgumentException e) {
+      logger.error("Invalid machine type: {}", type, e);
+      // Default to DATA_PROCESSOR type if the provided type is invalid
+      Machine machine = MachineFactory.createMachine(MachineType.DATA_PROCESSOR, name, name, "1.0.0");
+      return MachineAdapter.createMachinePortFromDomain(machine);
+    }
   }
 
   @Override
   public MachinePort createMachine(MachineType type, String reason, Map<String, Object> config) {
     logger.debug("Creating configured machine of type {} with reason: {}", type, reason);
     
-    Machine machine = MachineFactory.createMachine(type, reason);
+    // Create machine with proper parameters
+    Machine machine = MachineFactory.createMachine(type, reason, reason, "1.0.0");
     
     // Apply configuration to the machine
     if (config != null) {
@@ -73,11 +106,15 @@ public class MachineFactoryAdapter implements MachineFactoryPort {
         Object value = entry.getValue();
         
         logger.debug("Applying configuration: {}={}", key, value);
-        machine.setProperty(key, value);
+        // Machine doesn't have setProperty method, so we implement specific configuration logic
+        if ("version".equals(key) && value instanceof String) {
+            machine.setVersion((String)value);
+        }
+        // Additional configuration options can be implemented here
       }
     }
     
-    return MachineAdapter.createMachinePort(machine);
+    return MachineAdapter.createMachinePortFromDomain(machine);
   }
 
   @Override
@@ -85,12 +122,19 @@ public class MachineFactoryAdapter implements MachineFactoryPort {
     logger.debug("Cloning machine {} to new ID {}", 
         sourceMachine.getId().getShortId(), newId.getShortId());
     
-    // Although this is a naive implementation that doesn't truly clone all aspects,
-    // it demonstrates the pattern for adhering to the port interface
+    // Create a new machine with the same type as the source machine
     MachinePort newMachine = createMachine(newId, sourceMachine.getMachineType());
     
-    // Copy relevant properties from source to target
-    // In a full implementation, this would copy all relevant state
+    // Copy machine state if the source machine is active
+    if (sourceMachine.getMachineState() == MachineState.RUNNING) {
+      newMachine.setMachineState(MachineState.RUNNING);
+    }
+    
+    // In a full implementation, we would also:
+    // 1. Copy all composites from source to target
+    // 2. Recreate all connections between composites
+    // 3. Copy all configuration parameters
+    // 4. Copy machine state variables
     
     logger.debug("Machine cloned successfully");
     return newMachine;

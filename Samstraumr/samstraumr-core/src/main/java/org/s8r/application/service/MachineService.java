@@ -214,7 +214,7 @@ public class MachineService {
     java.util.Optional<CompositeComponentPort> removed = machinePort.removeComposite(compositeName);
     if (!removed.isPresent()) {
       throw new ComponentNotFoundException(
-          new ComponentId(compositeName, "Component not found in machine"));
+          ComponentId.create("Component not found in machine: " + compositeName));
     }
 
     // Save the updated machine

@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.s8r.component.core.State;
+import org.s8r.component.State;
 
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.*;

@@ -17,9 +17,14 @@ package org.s8r.application.dto;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.s8r.domain.component.port.ComponentPort;
+import org.s8r.domain.component.port.MachinePort;
+import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.machine.Machine;
 import org.s8r.domain.machine.MachineState;
 import org.s8r.domain.machine.MachineType;
@@ -73,6 +78,46 @@ public class MachineDto {
         machine.getComponents().stream().map(ComponentDto::new).collect(Collectors.toList());
 
     this.activityLog = new ArrayList<>(machine.getActivityLog());
+  }
+  
+  /**
+   * Creates a new MachineDto from a MachinePort interface.
+   * This constructor supports Clean Architecture by working with the port interface
+   * rather than the concrete implementation.
+   *
+   * @param machinePort The machine port interface
+   */
+  public MachineDto(MachinePort machinePort) {
+    ComponentId componentId = machinePort.getId();
+    this.id = componentId.getIdString();
+    this.shortId = componentId.getShortId();
+    this.name = machinePort.getMachineId(); // Using machineId as name
+    
+    // Default description if not available through the port
+    this.description = "Machine " + this.shortId;
+
+    MachineType type = machinePort.getMachineType();
+    this.type = type.name();
+    this.category = type.getCategory().name();
+
+    // Default version if not available through the port
+    this.version = "1.0.0";
+
+    MachineState state = machinePort.getMachineState();
+    this.state = state.name();
+    this.stateDescription = state.getDescription();
+
+    this.creationTime = machinePort.getCreationTime();
+
+    // Convert components to DTOs
+    this.components = new ArrayList<>();
+    Map<String, ComponentPort> portComponents = machinePort.getComponents();
+    for (Map.Entry<String, ComponentPort> entry : portComponents.entrySet()) {
+      ComponentPort componentPort = entry.getValue();
+      this.components.add(new ComponentDto(componentPort));
+    }
+
+    this.activityLog = machinePort.getActivityLog();
   }
 
   /**
@@ -227,6 +272,39 @@ public class MachineDto {
   public List<String> getActivityLog() {
     return new ArrayList<>(activityLog);
   }
+  
+  /**
+   * Gets the composites in this machine.
+   *
+   * @return A map of composite names to composite DTOs
+   */
+  public Map<String, CompositeComponentDto> getComposites() {
+    // This is a placeholder implementation - in a real implementation, 
+    // this would return actual composites from the machine
+    return new HashMap<>();
+  }
+  
+  /**
+   * Gets the connections between components in this machine.
+   *
+   * @return A map of source components to lists of target components
+   */
+  public Map<String, List<String>> getConnections() {
+    // This is a placeholder implementation - in a real implementation,
+    // this would return actual connections from the machine
+    return new HashMap<>();
+  }
+  
+  /**
+   * Checks if this machine is active.
+   *
+   * @return true if the machine is active, false otherwise
+   */
+  public boolean isActive() {
+    // This is a placeholder implementation - in a real implementation,
+    // this would check the machine state
+    return "ACTIVE".equals(state) || "RUNNING".equals(state);
+  }
 
   /**
    * Factory method to create a MachineDto from a domain Machine entity.
@@ -239,6 +317,21 @@ public class MachineDto {
       return null;
     }
     return new MachineDto(machine);
+  }
+  
+  /**
+   * Factory method to create a MachineDto from a domain MachinePort interface.
+   * This supports Clean Architecture by working with the port interface rather
+   * than the concrete implementation.
+   *
+   * @param machinePort The domain machine port interface
+   * @return A new MachineDto or null if the machinePort is null
+   */
+  public static MachineDto fromDomain(MachinePort machinePort) {
+    if (machinePort == null) {
+      return null;
+    }
+    return new MachineDto(machinePort);
   }
 
   @Override

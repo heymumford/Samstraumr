@@ -8,10 +8,10 @@ import java.util.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.s8r.component.exception.ComponentException;
+import org.s8r.component.ComponentException;
 import org.s8r.domain.exception.ComponentNotFoundException;
 import org.s8r.domain.exception.DuplicateComponentException;
-import org.s8r.component.composite.CompositeException;
+import org.s8r.component.CompositeException;
 import org.s8r.core.exception.InitializationException;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.test.annotation.UnitTest;
@@ -72,8 +72,8 @@ public class StandardizedErrorHandlingTest {
         // Verify that domain exceptions extend RuntimeException
         org.s8r.domain.exception.ComponentException domainEx = 
             new org.s8r.domain.exception.ComponentException("Test");
-        org.s8r.component.exception.ComponentException componentEx = 
-            new org.s8r.component.exception.ComponentException("Test");
+        org.s8r.component.ComponentException componentEx = 
+            new org.s8r.component.ComponentException("Test");
             
         assertTrue(domainEx instanceof RuntimeException, 
             "Domain exceptions should extend RuntimeException");
@@ -91,7 +91,7 @@ public class StandardizedErrorHandlingTest {
         // Check that these are different exception types (not inheritance)
         assertNotEquals(org.s8r.domain.exception.ComponentException.class, InitializationException.class,
             "Core exceptions should be separate from domain exceptions");
-        assertNotEquals(org.s8r.component.exception.ComponentException.class, InitializationException.class,
+        assertNotEquals(org.s8r.component.ComponentException.class, InitializationException.class,
             "Core exceptions should be separate from component exceptions");
         assertTrue(domainEx instanceof org.s8r.domain.exception.ComponentException,
             "Domain exceptions should extend the domain component exception");

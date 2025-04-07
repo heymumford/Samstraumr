@@ -28,6 +28,105 @@ Or use the longer form:
 
 ## Available Commands
 
+### Model Management Commands
+
+#### Initialize a New Model
+
+```bash
+./s8r init [options] [target-directory]
+```
+
+Options:
+- `-p, --package <name>`: Specify a custom package name (default: org.example)
+- `-n, --name <name>`: Specify a model name
+- `-v, --verbose`: Enable verbose output
+- `-d, --debug`: Enable debug output (additional details)
+
+Examples:
+```bash
+./s8r init                                  # Initialize in current directory
+./s8r init ~/new-model                      # Initialize in ~/new-model
+./s8r init -p com.example.model             # Use custom package name
+./s8r init -n "Customer Data Model" -p com.example.customer  # Set model name and package
+```
+
+#### Visualize Model Structure
+
+```bash
+./s8r list [options] [directory]
+```
+
+Options:
+- `-f, --format <format>`: Output format: ascii, tree, json (default: ascii)
+- `-d, --detailed`: Show detailed component information
+- `-v, --verbose`: Enable verbose output
+
+Examples:
+```bash
+./s8r list                  # List model in current directory
+./s8r list ~/my-model       # List model in specified directory
+./s8r list -f tree          # Display as tree structure
+./s8r list -d               # Show detailed information
+```
+
+#### Component Management
+
+```bash
+./s8r component <subcommand> [arguments]
+```
+
+Subcommands:
+- `create`: Create a new component
+- `list`: List all components
+- `info`: Show details about a component
+- `delete`: Delete a component
+
+Examples:
+```bash
+./s8r component create --type transformer DataProcessor
+./s8r component list --format json
+```
+
+#### Composite Management
+
+```bash
+./s8r composite <subcommand> [arguments]
+```
+
+Subcommands:
+- `create`: Create a new composite
+- `list`: List all composites
+- `add`: Add a component to a composite
+- `connect`: Connect components within a composite
+- `info`: Show details about a composite
+- `delete`: Delete a composite
+
+Examples:
+```bash
+./s8r composite create --type processing DataFlow
+./s8r composite add --component DataProcessor --composite DataFlow
+```
+
+#### Machine Management
+
+```bash
+./s8r machine <subcommand> [arguments]
+```
+
+Subcommands:
+- `create`: Create a new machine
+- `list`: List all machines
+- `add`: Add a composite to a machine
+- `connect`: Connect composites within a machine
+- `info`: Show details about a machine
+- `delete`: Delete a machine
+
+Examples:
+```bash
+./s8r machine create --template flow DataPipeline
+./s8r machine add --composite DataFlow --machine DataPipeline
+```
+
 ### Build Commands
 
 Build the project with various configurations:

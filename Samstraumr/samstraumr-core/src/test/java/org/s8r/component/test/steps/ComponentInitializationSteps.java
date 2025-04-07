@@ -22,9 +22,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.s8r.component.core.Component;
-import org.s8r.component.exception.ComponentException;
-import org.s8r.component.identity.Identity;
+import org.s8r.component.Component;
+import org.s8r.component.ComponentException;
+import org.s8r.component.Identity;
 
 import io.cucumber.java.en.*;
 

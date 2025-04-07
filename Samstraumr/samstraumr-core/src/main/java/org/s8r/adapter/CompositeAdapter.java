@@ -25,6 +25,8 @@ import org.s8r.application.port.LoggerPort;
 import org.s8r.component.Environment;
 import org.s8r.component.Composite;
 import org.s8r.component.Component;
+import org.s8r.domain.component.port.ComponentPort;
+import org.s8r.domain.identity.ComponentId;
 import org.s8r.tube.Tube;
 
 /**
@@ -41,21 +43,22 @@ public class CompositeAdapter {
     private final TubeLegacyEnvironmentConverter environmentConverter;
     
     /**
-     * Converts a domain component to a component interface suitable for the Composite.
+     * Converts a domain component port to a component interface suitable for the Composite.
      * This is a bridge between the domain and component layers.
      * 
-     * @param domainComponent The domain component to convert
+     * @param componentPort The domain component port to convert
      * @return A component suitable for use with Composite
      */
-    private static org.s8r.component.Component convertDomainComponentToComponentLayer(org.s8r.domain.component.Component domainComponent) {
-        if (domainComponent == null) {
+    private static org.s8r.component.Component convertDomainComponentToComponentLayer(ComponentPort componentPort) {
+        if (componentPort == null) {
             return null;
         }
         
         // This is a simplified conversion - in a real implementation, we would need
         // to properly map all state and behavior between the two types
         org.s8r.component.Environment env = new org.s8r.component.Environment();
-        return org.s8r.component.Component.create(domainComponent.getId().getReason(), env);
+        ComponentId componentId = componentPort.getId();
+        return org.s8r.component.Component.create(componentId.getReason(), env);
     }
     
     /**
@@ -123,9 +126,9 @@ public class CompositeAdapter {
             Tube tube = entry.getValue();
             
             // Convert and add to the new composite
-            org.s8r.domain.component.Component domainComponent = componentAdapter.wrapLegacyComponent(tube);
+            ComponentPort componentPort = componentAdapter.wrapLegacyComponent(tube);
             // Convert domain component to component layer component
-            org.s8r.component.Component componentLayerComponent = convertDomainComponentToComponentLayer(domainComponent);
+            org.s8r.component.Component componentLayerComponent = convertDomainComponentToComponentLayer(componentPort);
             componentComposite.addComponent(tubeName, componentLayerComponent);
             
             logger.debug("Added converted component to composite: {}", tubeName);
@@ -187,8 +190,8 @@ public class CompositeAdapter {
             Tube tube = tubeComposite.getTube(tubeName);
             
             // Convert and add to the new composite
-            org.s8r.domain.component.Component domainComponent = componentAdapter.wrapLegacyComponent(tube);
-            org.s8r.component.Component componentLayerComponent = convertDomainComponentToComponentLayer(domainComponent);
+            ComponentPort componentPort = componentAdapter.wrapLegacyComponent(tube);
+            org.s8r.component.Component componentLayerComponent = convertDomainComponentToComponentLayer(componentPort);
             componentComposite.addComponent(componentName, componentLayerComponent);
             
             logger.debug("Added tube {} from legacy composite to component composite as {}", 
@@ -352,9 +355,9 @@ public class CompositeAdapter {
             // Create a wrapper for the tube and cache it
             try {
                 Tube tube = tubeComposite.getTube(name);
-                // Convert from domain.component.Component to component.Component
-                org.s8r.domain.component.Component domainComponent = componentAdapter.wrapLegacyComponent(tube);
-                Component component = convertDomainComponentToComponentLayer(domainComponent);
+                // Convert from domain.component.ComponentPort to component.Component
+                ComponentPort componentPort = componentAdapter.wrapLegacyComponent(tube);
+                Component component = convertDomainComponentToComponentLayer(componentPort);
                 componentCache.put(name, component);
                 return component;
             } catch (IllegalArgumentException e) {
@@ -369,9 +372,9 @@ public class CompositeAdapter {
             for (Map.Entry<String, Tube> entry : tubes.entrySet()) {
                 String name = entry.getKey();
                 if (!componentCache.containsKey(name)) {
-                    // Convert from domain.component.Component to component.Component
-                    org.s8r.domain.component.Component domainComponent = componentAdapter.wrapLegacyComponent(entry.getValue());
-                    Component component = convertDomainComponentToComponentLayer(domainComponent);
+                    // Convert from domain.component.ComponentPort to component.Component
+                    ComponentPort componentPort = componentAdapter.wrapLegacyComponent(entry.getValue());
+                    Component component = convertDomainComponentToComponentLayer(componentPort);
                     componentCache.put(name, component);
                 }
             }

@@ -24,6 +24,14 @@ public class InvalidOperationException extends ComponentException {
   private final String operation;
   private String currentState;
   private LifecycleState lifecycleState;
+  
+  /** Creates a new InvalidOperationException with a simple message. */
+  public InvalidOperationException(String message) {
+    super(message);
+    this.operation = "unknown";
+    this.currentState = "unknown";
+    this.lifecycleState = null;
+  }
 
   /** Creates a new InvalidOperationException with component information. */
   public InvalidOperationException(String operation, Component component) {

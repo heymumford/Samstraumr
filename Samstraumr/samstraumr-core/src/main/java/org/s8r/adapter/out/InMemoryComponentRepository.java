@@ -22,8 +22,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.s8r.adapter.ComponentAdapter;
 import org.s8r.application.port.ComponentRepository;
 import org.s8r.domain.component.Component;
+import org.s8r.domain.component.port.ComponentPort;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.lifecycle.LifecycleState;
 
@@ -38,29 +40,68 @@ public class InMemoryComponentRepository implements ComponentRepository {
   // Using a map to store components with their IDs as keys
   private final Map<String, Component> componentStore = new HashMap<>();
 
+  /**
+   * Saves a component.
+   *
+   * @param component The component port to save
+   */
   @Override
-  public void save(Component component) {
-    componentStore.put(component.getId().getIdString(), component);
+  public void save(ComponentPort componentPort) {
+    // We can only store concrete component instances
+    if (componentPort instanceof ComponentAdapter.ComponentToPortAdapter) {
+      Component component = ((ComponentAdapter.ComponentToPortAdapter) componentPort).getComponent();
+      componentStore.put(component.getId().getIdString(), component);
+    } else {
+      throw new IllegalArgumentException("Cannot save non-adapter component: " + componentPort.getClass().getName());
+    }
   }
 
+  /**
+   * Finds a component by its ID.
+   *
+   * @param id The component ID to find
+   * @return An Optional containing the component port if found, or empty if not found
+   */
   @Override
-  public Optional<Component> findById(ComponentId id) {
-    return Optional.ofNullable(componentStore.get(id.getIdString()));
+  public Optional<ComponentPort> findById(ComponentId id) {
+    Component component = componentStore.get(id.getIdString());
+    return Optional.ofNullable(component)
+        .map(ComponentAdapter::createComponentPort);
   }
 
+  /**
+   * Finds all components.
+   *
+   * @return A list of all component ports
+   */
   @Override
-  public List<Component> findAll() {
-    return new ArrayList<>(componentStore.values());
-  }
-
-  public List<Component> findByState(LifecycleState state) {
+  public List<ComponentPort> findAll() {
     return componentStore.values().stream()
-        .filter(component -> component.getLifecycleState() == state)
+        .map(ComponentAdapter::createComponentPort)
         .collect(Collectors.toList());
   }
 
+  /**
+   * Finds components by lifecycle state.
+   *
+   * @param state The lifecycle state to filter by
+   * @return A list of components in the specified state
+   */
+  public List<ComponentPort> findByState(LifecycleState state) {
+    return componentStore.values().stream()
+        .filter(component -> component.getLifecycleState() == state)
+        .map(ComponentAdapter::createComponentPort)
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Finds child components for a parent component.
+   *
+   * @param parentId The parent component ID
+   * @return A list of child component ports
+   */
   @Override
-  public List<Component> findChildren(ComponentId parentId) {
+  public List<ComponentPort> findChildren(ComponentId parentId) {
     if (parentId == null) {
       return new ArrayList<>();
     }
@@ -71,9 +112,15 @@ public class InMemoryComponentRepository implements ComponentRepository {
             component ->
                 component.getLineage().stream()
                     .anyMatch(entry -> entry.contains(parentIdStr)))
+        .map(ComponentAdapter::createComponentPort)
         .collect(Collectors.toList());
   }
 
+  /**
+   * Deletes a component.
+   *
+   * @param id The ID of the component to delete
+   */
   @Override
   public void delete(ComponentId id) {
     componentStore.remove(id.getIdString());

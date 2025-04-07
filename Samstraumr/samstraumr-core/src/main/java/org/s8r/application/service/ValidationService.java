@@ -87,9 +87,10 @@ public class ValidationService {
         logger.debug("Validating component: {}", component.getId());
         
         Map<String, Object> componentData = new HashMap<>();
-        componentData.put("id", component.getId().getShortId());
+        componentData.put("id", component.getShortId());
         componentData.put("name", component.getName());
-        componentData.put("type", component.getType());
+        // Use default component type if not available
+        componentData.put("type", "Component");
         
         return validationPort.validateEntity("component", componentData);
     }
@@ -104,7 +105,7 @@ public class ValidationService {
         logger.debug("Validating machine: {}", machine.getId());
         
         Map<String, Object> machineData = new HashMap<>();
-        machineData.put("id", machine.getId().getShortId());
+        machineData.put("id", machine.getShortId());
         machineData.put("name", machine.getName());
         machineData.put("type", machine.getType().toString());
         

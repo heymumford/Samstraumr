@@ -164,37 +164,28 @@ show_help() {
   echo
   echo "Usage: ./s8r <command> [options] [arguments]"
   echo
-  echo "Core Commands:"
+  echo "User Commands:"
   echo "  init             Initialize a new Samstraumr repository"
-  echo "  build            Build the project (fast, test, package, install, full)"
-  echo "  test             Run tests (unit, component, integration, all...)"
-  echo "  version          Manage version information"
-  echo "  coverage         Run and manage code coverage"
-  echo "  clean            Clean build artifacts"
-  echo
-  echo "Additional Commands:"
-  echo "  quality          Run quality checks"
-  echo "  report           Generate change management reports"
-  echo "  docs             Generate project documentation"
-  echo "  docmosis         Manage optional Docmosis integration"
-  echo "  test-docmosis    Run a smoke test for Docmosis integration"
-  echo "  script-test      Test the build and test scripts themselves"
-  echo "  install          Initialize or update project configuration"
-  echo "  hooks            Install or update git hooks"
-  echo "  demo             Run demonstration scripts"
-  echo "  help             Show help for a command"
+  echo "  list             Display ASCII visualization of S8r models"
+  echo "  tube             Manage tubes in your S8r model (primary building block)"
+  echo "  component        Manage components in your S8r model (alternative to tube)"
+  echo "  composite        Manage composites in your S8r model"
+  echo "  machine          Manage machines in your S8r model"
+  echo "  help             Show help for a specific command"
   echo
   echo "Global Options:"
-  echo "  --watch, -w      Watch mode (continuous execution)"
-  echo "  --parallel, -p   Execute in parallel where supported"
   echo "  --help, -h       Show this help information"
   echo
   echo "Examples:"
-  echo "  ./s8r build fast                  # Fast build"
-  echo "  ./s8r test unit --parallel        # Run unit tests in parallel"
-  echo "  ./s8r build-test                  # Build and test in one command"
-  echo "  ./s8r coverage report             # Generate coverage report"
-  echo "  ./s8r version bump minor          # Bump minor version"
+  echo "  ./s8r init                        # Initialize a new S8r repository"
+  echo "  ./s8r list                        # Visualize your S8r model"
+  echo "  ./s8r tube create DataNode        # Create a new tube (primary approach)"
+  echo "  ./s8r component create Validator  # Create a new component (alternative)"
+  echo "  ./s8r composite list              # List all composites"
+  echo "  ./s8r machine create Pipeline     # Create a new machine"
+  echo
+  echo -e "${YELLOW}Note:${RESET} For development commands like build, test, and version management,"
+  echo "use the ./s8r-dev command instead."
   echo
   echo "For command-specific help, run:"
   echo "  ./s8r <command> --help"
@@ -202,46 +193,80 @@ show_help() {
 
 # Parse global arguments
 parse_global_args() {
+  # Trim all arguments to check for empty or whitespace-only arguments
+  local trimmed_args=""
+  for arg in "$@"; do
+    trimmed_args+="${arg// /}"
+  done
+  
+  # If no arguments provided or just whitespace, show help
+  if [[ $# -eq 0 || -z "$trimmed_args" ]]; then
+    show_help
+    exit 0
+  fi
+
   while [[ $# -gt 0 ]]; do
-    case "$1" in
-      --watch|-w)
-        WATCH_MODE=true
-        shift
-        ;;
-      --parallel|-p)
-        PARALLEL=true
-        shift
-        ;;
-      --help|-h)
+    # Convert argument to lowercase for case-insensitive matching
+    local arg_lower=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+    
+    case "$arg_lower" in
+      --help|-h|-help|help|--h|-?|/h|/?)
         show_help
         exit 0
         ;;
-      init|build|test|version|clean|coverage|quality|report|docs|docmosis|test-docmosis|script-test|install|hooks|demo)
+      # End-user commands
+      help)
+        echo "DEBUG: Recognized help command in parse_global_args" >&2
+        COMMAND="help"
+        shift
+        echo "DEBUG: Remaining args: $@" >&2
+        break
+        ;;
+      init|list|tube|component|composite|machine)
         COMMAND="$1"
         shift
         break
         ;;
-      build-test|build-test-package)
-        COMMAND="build-test"
-        shift
-        break
+      # Handle development commands with a message to use s8r-dev
+      build|test|version|clean|coverage|quality|report|docs|docmosis|test-docmosis|script-test|install|hooks|demo|build-test|build-test-package)
+        echo -e "${YELLOW}Note:${RESET} '$1' is a development command."
+        echo "Please use: ./s8r-dev $1"
+        # Ensure we return a non-zero exit code to indicate this is not a normal operation
+        exit 1
         ;;
       *)
-        error "Unknown command: $1. Run './s8r --help' for usage information."
+        echo -e "${RED}Error: Unknown command: $1. Run './s8r --help' for usage information.${RESET}" >&2
+        exit 1
         ;;
     esac
   done
   
   # Process command
   if [ -z "$COMMAND" ]; then
+    # This is a fallback in case we somehow get here without a command
     show_help
     exit 0
   fi
   
+  # Special handling now integrated into the help command case statement
+  
   # Execute appropriate command with remaining arguments
   case "$COMMAND" in
     init)
-      exec_init "$@"
+      # Use the new init script if available
+      if [ -x "${PROJECT_ROOT}/s8r-init-new" ]; then
+        "${PROJECT_ROOT}/s8r-init-new" "$@"
+      else
+        exec_init "$@"
+      fi
+      ;;
+    list)
+      # Use the new list script
+      if [ -x "${PROJECT_ROOT}/s8r-list" ]; then
+        "${PROJECT_ROOT}/s8r-list" "$@"
+      else
+        error "s8r-list command not found. Please ensure the script is installed."
+      fi
       ;;
     build)
       exec_build "$@"
@@ -286,10 +311,56 @@ parse_global_args() {
       handle_demo_command "$@"
       ;;
     help)
-      handle_help_command "$@"
+      # Handle help command
+      if [ $# -eq 0 ]; then
+        # No arguments, show general help
+        show_help
+      else
+        # Look for a help script for this topic
+        help_script="${PROJECT_ROOT}/s8r-help-$1"
+        if [ -x "$help_script" ]; then
+          # Execute the help script
+          "$help_script"
+        else
+          # No specific help found, show general help
+          show_help
+        fi
+      fi
       ;;
     build-test)
       exec_build_test "$@"
+      ;;
+    tube)
+      # Use the tube script
+      if [ -x "${PROJECT_ROOT}/s8r-tube" ]; then
+        "${PROJECT_ROOT}/s8r-tube" "$@"
+      else
+        error "s8r-tube command not found. Please ensure the script is installed."
+      fi
+      ;;
+    component)
+      # Use the new component script
+      if [ -x "${PROJECT_ROOT}/s8r-component" ]; then
+        "${PROJECT_ROOT}/s8r-component" "$@"
+      else
+        error "s8r-component command not found. Please ensure the script is installed."
+      fi
+      ;;
+    composite)
+      # Use the new composite script
+      if [ -x "${PROJECT_ROOT}/s8r-composite" ]; then
+        "${PROJECT_ROOT}/s8r-composite" "$@"
+      else
+        error "s8r-composite command not found. Please ensure the script is installed."
+      fi
+      ;;
+    machine)
+      # Use the new machine script
+      if [ -x "${PROJECT_ROOT}/s8r-machine" ]; then
+        "${PROJECT_ROOT}/s8r-machine" "$@"
+      else
+        error "s8r-machine command not found. Please ensure the script is installed."
+      fi
       ;;
     *)
       error "Implementation error: Command '$COMMAND' not handled."
@@ -957,62 +1028,60 @@ function show_script_test_help() {
   echo "  ./s8r script-test -v             # Run all tests with verbose output"
 }
 
-function handle_help_command() {
-  local help_topic="$1"
-  shift
-  
-  case "$help_topic" in
-    init)
-      show_init_help
-      ;;
-    build)
-      show_build_help
-      ;;
-    test)
-      show_test_help
-      ;;
-    version)
-      show_version_help
-      ;;
-    coverage)
-      show_coverage_help
-      ;;
-    quality)
-      show_quality_help
-      ;;
-    report)
-      show_report_help
-      ;;
-    docs)
-      show_docs_help
-      ;;
-    docmosis)
-      show_docmosis_help
-      ;;
-    test-docmosis)
-      show_test_docmosis_help
-      ;;
-    script-test)
-      show_script_test_help
-      ;;
-    install)
-      show_install_help
-      ;;
-    hooks)
-      show_hooks_help
-      ;;
-    demo)
-      show_demo_help
-      ;;
-    *)
-      show_help
-      ;;
-  esac
+function show_help_help() {
+  echo -e "${BOLD}S8r Help Command${RESET} - Get help for S8r commands"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r help [command]"
+  echo
+  echo -e "${BOLD}ARGUMENTS:${RESET}"
+  echo "  command    The command to get help for"
+  echo
+  echo -e "${BOLD}DESCRIPTION:${RESET}"
+  echo "  The help command displays detailed information about a specific command,"
+  echo "  including its usage, options, and examples. If no command is specified,"
+  echo "  general help information is displayed."
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  ./s8r help                 # Display general help"
+  echo "  ./s8r help init            # Display help for the init command"
+  echo "  ./s8r help component       # Display help for component commands"
+  echo
+  echo -e "${YELLOW}Note:${RESET} For help with development commands like build, test, and version,"
+  echo "use ./s8r-dev help [command] instead."
 }
+
+# Command-specific help is now handled directly in the case statement
 
 #------------------------------------------------------------------------------
 # Help Functions For Commands
 #------------------------------------------------------------------------------
+
+function show_list_help() {
+  echo -e "${BOLD}S8r List${RESET} - Display ASCII visualization of S8r models"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  ./s8r list [options] [directory]"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help                Display this help message"
+  echo "  -v, --verbose             Enable verbose output"
+  echo "  -f, --format <format>     Output format: ascii, tree, json (default: ascii)"
+  echo "  -d, --detailed            Show detailed component information"
+  echo
+  echo -e "${BOLD}ARGUMENTS:${RESET}"
+  echo "  directory                 S8r model directory (default: current directory)"
+  echo
+  echo -e "${BOLD}DESCRIPTION:${RESET}"
+  echo "  The list command displays a graphical representation of your S8r model,"
+  echo "  showing machines, composites, components, and their relationships."
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  ./s8r list                  # List model in current directory"
+  echo "  ./s8r list ~/my-model       # List model in specified directory"
+  echo "  ./s8r list -f tree          # Display as tree structure"
+  echo "  ./s8r list -d               # Show detailed information"
+}
 
 function show_init_help() {
   echo -e "${BOLD}Samstraumr Init${RESET} - Initialize a new Samstraumr repository"

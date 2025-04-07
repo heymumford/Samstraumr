@@ -30,7 +30,16 @@ import org.s8r.application.port.NotificationPort;
  * 
  * <p>This adapter provides notification operations for the application using a simple
  * in-memory notification system. In a production environment, this would be connected
- * to external notification systems (email, SMS, etc.).
+ * to external notification systems (email, SMS, push notifications, etc.).
+ * 
+ * <p>Features:
+ * <ul>
+ *   <li>Supports multiple notification channels (email, SMS, push)</li>
+ *   <li>Tracks notification delivery status</li>
+ *   <li>Supports recipient registration and management</li>
+ *   <li>Provides system-wide notifications</li>
+ *   <li>Configurable default recipient</li>
+ * </ul>
  */
 public class NotificationAdapter implements NotificationPort {
     
@@ -39,6 +48,12 @@ public class NotificationAdapter implements NotificationPort {
     private final Map<String, Map<String, String>> recipients;
     private final Map<String, NotificationRecord> notifications;
     private final String defaultRecipient;
+    
+    // Channel types supported by this adapter
+    private static final String CHANNEL_EMAIL = "email";
+    private static final String CHANNEL_SMS = "sms";
+    private static final String CHANNEL_PUSH = "push";
+    private static final String CHANNEL_SYSTEM = "system";
     
     /**
      * Record class to store notification information.
@@ -53,6 +68,10 @@ public class NotificationAdapter implements NotificationPort {
         private final LocalDateTime timestamp;
         private DeliveryStatus status;
         private String statusMessage;
+        private LocalDateTime deliveryTimestamp;
+        private String channel;
+        private int retryCount;
+        private int maxRetries;
         
         /**
          * Constructor for the notification record.
@@ -73,6 +92,9 @@ public class NotificationAdapter implements NotificationPort {
             this.timestamp = LocalDateTime.now();
             this.status = DeliveryStatus.PENDING;
             this.statusMessage = "Notification pending delivery";
+            this.retryCount = 0;
+            this.maxRetries = 3; // Default max retries
+            this.channel = determineChannel(recipient, metadata);
         }
         
         /**
@@ -84,6 +106,51 @@ public class NotificationAdapter implements NotificationPort {
         public void setStatus(DeliveryStatus status, String message) {
             this.status = status;
             this.statusMessage = message;
+            
+            if (status == DeliveryStatus.DELIVERED || status == DeliveryStatus.SENT) {
+                this.deliveryTimestamp = LocalDateTime.now();
+            }
+        }
+        
+        /**
+         * Increments the retry count.
+         * 
+         * @return true if retry limit not reached, false otherwise
+         */
+        public boolean incrementRetry() {
+            this.retryCount++;
+            return this.retryCount <= this.maxRetries;
+        }
+        
+        /**
+         * Gets the time elapsed since the notification was created.
+         * 
+         * @return The elapsed time in seconds
+         */
+        public long getElapsedTimeSeconds() {
+            return java.time.Duration.between(timestamp, LocalDateTime.now()).getSeconds();
+        }
+        
+        /**
+         * Determines the delivery channel for this notification.
+         * 
+         * @param recipient The recipient
+         * @param metadata The notification metadata
+         * @return The determined channel
+         */
+        private String determineChannel(String recipient, Map<String, String> metadata) {
+            // Use channel from metadata if specified
+            if (metadata.containsKey("channel")) {
+                return metadata.get("channel");
+            }
+            
+            // For system recipient, use system channel
+            if ("system".equals(recipient)) {
+                return CHANNEL_SYSTEM;
+            }
+            
+            // Default to email
+            return CHANNEL_EMAIL;
         }
     }
     
@@ -104,11 +171,96 @@ public class NotificationAdapter implements NotificationPort {
         
         // Register system recipient
         Map<String, String> systemContact = new HashMap<>();
-        systemContact.put("type", "system");
+        systemContact.put("type", CHANNEL_SYSTEM);
         systemContact.put("address", "system");
         this.recipients.put("system", systemContact);
         
-        logger.debug("NotificationAdapter initialized");
+        // Add test recipients if enabled
+        boolean addTestRecipients = configurationPort.getBoolean("notification.test.recipients.enabled", false);
+        if (addTestRecipients) {
+            initializeTestRecipients();
+        }
+        
+        // Start notification cleaner if enabled
+        boolean cleanupEnabled = configurationPort.getBoolean("notification.cleanup.enabled", true);
+        if (cleanupEnabled) {
+            scheduleNotificationCleanup();
+        }
+        
+        logger.info("NotificationAdapter initialized with default recipient: {}", defaultRecipient);
+    }
+    
+    /**
+     * Initializes test recipients for development and testing purposes.
+     */
+    private void initializeTestRecipients() {
+        // Add email recipient
+        Map<String, String> emailContact = new HashMap<>();
+        emailContact.put("type", CHANNEL_EMAIL);
+        emailContact.put("address", "test@example.com");
+        this.recipients.put("email-user", emailContact);
+        
+        // Add SMS recipient
+        Map<String, String> smsContact = new HashMap<>();
+        smsContact.put("type", CHANNEL_SMS);
+        smsContact.put("phone", "555-123-4567");
+        this.recipients.put("sms-user", smsContact);
+        
+        // Add push notification recipient
+        Map<String, String> pushContact = new HashMap<>();
+        pushContact.put("type", CHANNEL_PUSH);
+        pushContact.put("device", "device-token-123");
+        pushContact.put("platform", "android");
+        this.recipients.put("push-user", pushContact);
+        
+        logger.debug("Test recipients initialized");
+    }
+    
+    /**
+     * Schedules periodic cleanup of old notifications.
+     */
+    private void scheduleNotificationCleanup() {
+        // Simple cleanup thread that runs every minute
+        Thread cleanupThread = new Thread(() -> {
+            try {
+                while (!Thread.currentThread().isInterrupted()) {
+                    // Sleep for a minute
+                    Thread.sleep(60000);
+                    
+                    // Perform cleanup
+                    cleanupOldNotifications();
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.warn("Notification cleanup thread interrupted");
+            }
+        });
+        cleanupThread.setDaemon(true);
+        cleanupThread.setName("notification-cleanup");
+        cleanupThread.start();
+        
+        logger.debug("Notification cleanup scheduled");
+    }
+    
+    /**
+     * Cleans up old notifications to prevent memory leaks.
+     */
+    private void cleanupOldNotifications() {
+        int retentionDays = configurationPort.getInt("notification.retention.days", 30);
+        LocalDateTime cutoffTime = LocalDateTime.now().minusDays(retentionDays);
+        int cleanupCount = 0;
+        
+        for (Map.Entry<String, NotificationRecord> entry : new HashMap<>(notifications).entrySet()) {
+            NotificationRecord record = entry.getValue();
+            if (record.timestamp.isBefore(cutoffTime)) {
+                notifications.remove(entry.getKey());
+                cleanupCount++;
+            }
+        }
+        
+        if (cleanupCount > 0) {
+            logger.debug("Cleaned up {} old notifications", cleanupCount);
+        }
     }
     
     @Override
@@ -264,30 +416,59 @@ public class NotificationAdapter implements NotificationPort {
         // Log the notification details
         logger.info("Delivering notification: {} to {} ({})", 
                 record.id, record.recipient, recipientType);
-        logger.info("Subject: {}", record.subject);
-        logger.info("Content: {}", record.content);
-        logger.info("Severity: {}", record.severity);
+        logger.debug("Subject: {}", record.subject);
+        logger.debug("Content: {}", record.content);
+        logger.debug("Severity: {}", record.severity);
+        logger.debug("Channel: {}", record.channel);
         
         // In a real implementation, we would use different delivery methods
         // based on the recipient type and preferences
-        switch (recipientType) {
-            case "email":
-                // Send email notification
-                simulateEmailDelivery(record, recipientInfo);
-                break;
-            case "sms":
-                // Send SMS notification
-                simulateSmsDelivery(record, recipientInfo);
-                break;
-            case "system":
-                // Log system notification
-                logger.info("SYSTEM NOTIFICATION: {} - {}", record.subject, record.content);
-                break;
-            default:
-                // Default to logging
-                logger.info("NOTIFICATION [{}]: {} - {}", 
-                        recipientType, record.subject, record.content);
-                break;
+        boolean deliverySuccess = false;
+        
+        try {
+            switch (recipientType) {
+                case CHANNEL_EMAIL:
+                    // Send email notification
+                    deliverySuccess = simulateEmailDelivery(record, recipientInfo);
+                    break;
+                case CHANNEL_SMS:
+                    // Send SMS notification
+                    deliverySuccess = simulateSmsDelivery(record, recipientInfo);
+                    break;
+                case CHANNEL_PUSH:
+                    // Send push notification
+                    deliverySuccess = simulatePushDelivery(record, recipientInfo);
+                    break;
+                case CHANNEL_SYSTEM:
+                    // Log system notification
+                    logger.info("SYSTEM NOTIFICATION: {} - {}", record.subject, record.content);
+                    deliverySuccess = true;
+                    break;
+                default:
+                    // Default to logging
+                    logger.info("NOTIFICATION [{}]: {} - {}", 
+                            recipientType, record.subject, record.content);
+                    deliverySuccess = true;
+                    break;
+            }
+            
+            // Update status based on delivery result
+            if (deliverySuccess) {
+                record.setStatus(DeliveryStatus.DELIVERED, "Notification delivered successfully");
+            } else if (record.incrementRetry()) {
+                record.setStatus(DeliveryStatus.PENDING, 
+                        "Delivery failed, will retry (attempt " + record.retryCount + ")");
+                // In a real implementation, we would schedule a retry
+                logger.warn("Notification delivery failed, will retry: {}", record.id);
+            } else {
+                record.setStatus(DeliveryStatus.FAILED, 
+                        "Delivery failed after " + record.retryCount + " attempts");
+                logger.error("Notification delivery failed permanently: {}", record.id);
+            }
+            
+        } catch (Exception e) {
+            logger.error("Error delivering notification: {}", e.getMessage(), e);
+            record.setStatus(DeliveryStatus.FAILED, "Delivery error: " + e.getMessage());
         }
     }
     
@@ -296,16 +477,26 @@ public class NotificationAdapter implements NotificationPort {
      *
      * @param record The notification record
      * @param recipientInfo The recipient information
+     * @return true if delivery was successful, false otherwise
      */
-    private void simulateEmailDelivery(NotificationRecord record, Map<String, String> recipientInfo) {
+    private boolean simulateEmailDelivery(NotificationRecord record, Map<String, String> recipientInfo) {
         String emailAddress = recipientInfo.getOrDefault("address", "unknown");
         logger.info("EMAIL to {}: {} - {}", emailAddress, record.subject, record.content);
         
         // Simulate delivery delay
         try {
             Thread.sleep(100);
+            
+            // Simulate occasional delivery failures (10% chance)
+            if (Math.random() < 0.1) {
+                logger.warn("Simulated email delivery failure to: {}", emailAddress);
+                return false;
+            }
+            
+            return true;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            return false;
         }
     }
     
@@ -314,16 +505,84 @@ public class NotificationAdapter implements NotificationPort {
      *
      * @param record The notification record
      * @param recipientInfo The recipient information
+     * @return true if delivery was successful, false otherwise
      */
-    private void simulateSmsDelivery(NotificationRecord record, Map<String, String> recipientInfo) {
+    private boolean simulateSmsDelivery(NotificationRecord record, Map<String, String> recipientInfo) {
         String phoneNumber = recipientInfo.getOrDefault("phone", "unknown");
         logger.info("SMS to {}: {}", phoneNumber, record.content);
+        
+        // SMS messages are typically shorter, so truncate if needed
+        String smsContent = record.content;
+        if (smsContent.length() > 160) {
+            smsContent = smsContent.substring(0, 157) + "...";
+        }
         
         // Simulate delivery delay
         try {
             Thread.sleep(100);
+            
+            // Simulate occasional delivery failures (15% chance)
+            if (Math.random() < 0.15) {
+                logger.warn("Simulated SMS delivery failure to: {}", phoneNumber);
+                return false;
+            }
+            
+            return true;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            return false;
+        }
+    }
+    
+    /**
+     * Simulates push notification delivery (for demo purposes).
+     *
+     * @param record The notification record
+     * @param recipientInfo The recipient information
+     * @return true if delivery was successful, false otherwise
+     */
+    private boolean simulatePushDelivery(NotificationRecord record, Map<String, String> recipientInfo) {
+        String deviceToken = recipientInfo.getOrDefault("device", "unknown");
+        String platform = recipientInfo.getOrDefault("platform", "unknown");
+        
+        logger.info("PUSH to {} device {}: {}", 
+                platform, deviceToken, record.subject);
+        
+        // Construct push payload
+        Map<String, Object> pushPayload = new HashMap<>();
+        pushPayload.put("title", record.subject);
+        pushPayload.put("body", record.content);
+        pushPayload.put("severity", record.severity.toString());
+        
+        // Add notification ID to payload for tracking
+        pushPayload.put("notificationId", record.id);
+        
+        // Add custom data from metadata
+        Map<String, String> customData = new HashMap<>();
+        for (Map.Entry<String, String> entry : record.metadata.entrySet()) {
+            if (!entry.getKey().startsWith("_")) { // Skip internal metadata
+                customData.put(entry.getKey(), entry.getValue());
+            }
+        }
+        pushPayload.put("data", customData);
+        
+        logger.debug("Push payload: {}", pushPayload);
+        
+        // Simulate delivery delay
+        try {
+            Thread.sleep(150);
+            
+            // Simulate occasional delivery failures (20% chance)
+            if (Math.random() < 0.2) {
+                logger.warn("Simulated push delivery failure to: {} ({})", 
+                        deviceToken, platform);
+                return false;
+            }
+            
+            return true;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
         }
     }
     

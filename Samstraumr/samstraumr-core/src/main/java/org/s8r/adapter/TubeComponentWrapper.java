@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.s8r.domain.component.Component;
+import org.s8r.domain.component.port.ComponentPort;
 import org.s8r.domain.event.ComponentDataEvent;
 import org.s8r.domain.exception.ComponentException;
 import org.s8r.domain.identity.ComponentId;
@@ -33,8 +34,14 @@ import org.s8r.tube.Tube;
  * This wrapper allows existing Tube objects to be used with new Component-based code,
  * providing a smooth migration path while maintaining backward compatibility.
  * </p>
+ * <p>
+ * By implementing the ComponentPort interface, this wrapper provides a standardized
+ * way for adapter clients to interact with components without depending on the concrete
+ * Component implementation. This follows the Dependency Inversion Principle and ensures
+ * that clients depend on abstractions rather than concrete implementations.
+ * </p>
  */
-public class TubeComponentWrapper extends Component {
+public class TubeComponentWrapper extends Component implements ComponentPort {
     
     private final Tube tube;
     private final TubeComponentAdapter adapter;

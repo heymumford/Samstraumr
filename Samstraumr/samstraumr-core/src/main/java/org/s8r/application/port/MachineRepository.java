@@ -18,6 +18,7 @@ package org.s8r.application.port;
 import java.util.List;
 import java.util.Optional;
 
+import org.s8r.domain.component.port.MachinePort;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.machine.Machine;
 import org.s8r.domain.machine.MachineType;
@@ -36,7 +37,7 @@ public interface MachineRepository {
    *
    * @param machine The machine to save
    */
-  void save(Machine machine);
+  void save(MachinePort machine);
 
   /**
    * Finds a machine by its ID.
@@ -44,14 +45,14 @@ public interface MachineRepository {
    * @param id The machine ID to find
    * @return An Optional containing the machine if found, or empty if not found
    */
-  Optional<Machine> findById(ComponentId id);
+  Optional<MachinePort> findById(ComponentId id);
 
   /**
    * Finds all machines.
    *
    * @return A list of all machines
    */
-  List<Machine> findAll();
+  List<MachinePort> findAll();
 
   /**
    * Finds machines by type.
@@ -59,7 +60,7 @@ public interface MachineRepository {
    * @param type The machine type to filter by
    * @return A list of machines of the specified type
    */
-  List<Machine> findByType(MachineType type);
+  List<MachinePort> findByType(MachineType type);
 
   /**
    * Finds machines by name (partial match).
@@ -67,7 +68,7 @@ public interface MachineRepository {
    * @param name The machine name (or part of it) to search for
    * @return A list of machines with names containing the search string
    */
-  List<Machine> findByName(String name);
+  List<MachinePort> findByName(String name);
 
   /**
    * Finds machines containing a specific component.
@@ -75,7 +76,7 @@ public interface MachineRepository {
    * @param componentId The component ID to search for
    * @return A list of machines containing the specified component
    */
-  List<Machine> findContainingComponent(ComponentId componentId);
+  List<MachinePort> findContainingComponent(ComponentId componentId);
 
   /**
    * Deletes a machine.

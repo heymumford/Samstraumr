@@ -261,9 +261,33 @@ component.setState(State.ACTIVE);
 boolean isTerminated = component.isTerminated();
 ```
 
-## Migration Tool
+## Migration Utilities
 
-A migration assistant script is available to help with the conversion:
+S8r provides a comprehensive set of migration utilities to help with the transition from Tube-based code to Component-based code:
+
+### S8rMigrationFactory
+
+The `S8rMigrationFactory` class provides easy access to all migration utilities:
+
+```java
+import org.s8r.adapter.S8rMigrationFactory;
+
+// Create the factory
+S8rMigrationFactory factory = new S8rMigrationFactory();
+
+// Use the component adapter
+Component component = factory.tubeToComponent(tube);
+
+// Use the composite adapter
+Composite composite = factory.wrapTubeComposite(tubeComposite);
+
+// Use the machine adapter
+Machine machine = factory.wrapTubeMachine(tubeMachine);
+```
+
+### Migration Assistant Script
+
+A migration assistant script is also available to help with automated code conversion:
 
 ```bash
 ./util/migrate-code.sh path/to/your/code

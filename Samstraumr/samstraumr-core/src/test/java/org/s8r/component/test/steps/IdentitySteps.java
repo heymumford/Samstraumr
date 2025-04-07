@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.s8r.component.core.Component;
-import org.s8r.component.identity.Identity;
+import org.s8r.component.Component;
+import org.s8r.component.Identity;
 
 import io.cucumber.java.en.*;
 

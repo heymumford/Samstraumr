@@ -17,6 +17,7 @@ package org.s8r.application.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.s8r.application.port.LoggerPort;
 import org.s8r.application.port.NotificationPort;
@@ -31,6 +32,17 @@ import org.s8r.domain.machine.MachineType;
  * 
  * <p>This service provides high-level notification operations for the application,
  * using the NotificationPort interface to abstract the actual notification mechanism.
+ * 
+ * <p>Features:
+ * <ul>
+ *   <li>Component status and error notifications</li>
+ *   <li>Machine creation and status notifications</li>
+ *   <li>System warning and error notifications</li>
+ *   <li>User-targeted notifications via multiple channels</li>
+ *   <li>Push notification support</li>
+ *   <li>Asynchronous notification sending</li>
+ *   <li>Recipient management</li>
+ * </ul>
  */
 public class NotificationService {
     
@@ -219,5 +231,159 @@ public class NotificationService {
      */
     public DeliveryStatus getNotificationStatus(String notificationId) {
         return notificationPort.getNotificationStatus(notificationId);
+    }
+    
+    /**
+     * Sends a push notification to a user.
+     *
+     * @param userId The user ID
+     * @param title The notification title
+     * @param message The notification message
+     * @param severity The notification severity
+     * @param data Additional notification data
+     * @return The notification result
+     */
+    public NotificationResult sendPushNotification(
+            String userId, 
+            String title, 
+            String message, 
+            NotificationSeverity severity,
+            Map<String, String> data) {
+        logger.debug("Sending push notification to user {}", userId);
+        
+        // Check if user is registered
+        if (!notificationPort.isRecipientRegistered(userId)) {
+            logger.warn("User {} is not registered for push notifications", userId);
+            return NotificationResult.failure("N/A", "User not registered for push notifications");
+        }
+        
+        // Prepare metadata
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("userId", userId);
+        metadata.put("notificationType", "push_notification");
+        metadata.put("channel", "push");
+        
+        // Add data to metadata if provided
+        if (data != null) {
+            metadata.putAll(data);
+        }
+        
+        return notificationPort.sendNotificationToRecipient(
+                userId, title, message, severity, metadata);
+    }
+    
+    /**
+     * Sends a push notification asynchronously.
+     *
+     * @param userId The user ID
+     * @param title The notification title
+     * @param message The notification message
+     * @param severity The notification severity
+     * @param data Additional notification data
+     * @return A CompletableFuture that will be completed with the notification result
+     */
+    public CompletableFuture<NotificationResult> sendPushNotificationAsync(
+            String userId, 
+            String title, 
+            String message, 
+            NotificationSeverity severity,
+            Map<String, String> data) {
+        return CompletableFuture.supplyAsync(() -> 
+            sendPushNotification(userId, title, message, severity, data));
+    }
+    
+    /**
+     * Registers a user device for push notifications.
+     *
+     * @param userId The user ID
+     * @param deviceToken The device token
+     * @param platform The device platform (e.g., android, ios, web)
+     * @param appVersion The app version
+     * @return true if registration was successful, false otherwise
+     */
+    public boolean registerPushDevice(
+            String userId, String deviceToken, String platform, String appVersion) {
+        logger.debug("Registering push device for user {} on platform {}", userId, platform);
+        
+        Map<String, String> contactInfo = new HashMap<>();
+        contactInfo.put("type", "push");
+        contactInfo.put("device", deviceToken);
+        contactInfo.put("platform", platform);
+        contactInfo.put("appVersion", appVersion);
+        contactInfo.put("registeredAt", String.valueOf(System.currentTimeMillis()));
+        
+        return notificationPort.registerRecipient(userId, contactInfo);
+    }
+    
+    /**
+     * Sends a notification asynchronously.
+     *
+     * @param subject The notification subject
+     * @param content The notification content
+     * @param severity The notification severity
+     * @param metadata Additional notification metadata
+     * @return A CompletableFuture that will be completed with the notification result
+     */
+    public CompletableFuture<NotificationResult> sendNotificationAsync(
+            String subject, String content, NotificationSeverity severity, Map<String, String> metadata) {
+        return CompletableFuture.supplyAsync(() -> 
+            notificationPort.sendNotification(subject, content, severity, metadata));
+    }
+    
+    /**
+     * Sends a user notification asynchronously.
+     *
+     * @param userId The user ID
+     * @param subject The notification subject
+     * @param message The notification message
+     * @param severity The notification severity
+     * @return A CompletableFuture that will be completed with the notification result
+     */
+    public CompletableFuture<NotificationResult> sendUserNotificationAsync(
+            String userId, String subject, String message, NotificationSeverity severity) {
+        return CompletableFuture.supplyAsync(() -> 
+            sendUserNotification(userId, subject, message, severity));
+    }
+    
+    /**
+     * Sends a component status notification asynchronously.
+     *
+     * @param component The component
+     * @param status The status message
+     * @return A CompletableFuture that will be completed with the notification result
+     */
+    public CompletableFuture<NotificationResult> sendComponentStatusNotificationAsync(
+            ComponentPort component, String status) {
+        return CompletableFuture.supplyAsync(() -> 
+            sendComponentStatusNotification(component, status));
+    }
+    
+    /**
+     * Sends a batch of notifications to multiple recipients.
+     *
+     * @param recipientIds The recipient IDs
+     * @param subject The notification subject
+     * @param content The notification content
+     * @param severity The notification severity
+     * @param metadata Additional notification metadata
+     * @return A map of recipient IDs to notification results
+     */
+    public Map<String, NotificationResult> sendBatchNotification(
+            Iterable<String> recipientIds,
+            String subject,
+            String content,
+            NotificationSeverity severity,
+            Map<String, String> metadata) {
+        logger.debug("Sending batch notification to multiple recipients");
+        
+        Map<String, NotificationResult> results = new HashMap<>();
+        
+        for (String recipientId : recipientIds) {
+            NotificationResult result = notificationPort.sendNotificationToRecipient(
+                    recipientId, subject, content, severity, metadata);
+            results.put(recipientId, result);
+        }
+        
+        return results;
     }
 }

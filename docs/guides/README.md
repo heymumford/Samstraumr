@@ -11,6 +11,7 @@ This directory contains guides for using and developing with Samstraumr.
 - [Introduction](introduction.md) - Introduction to Samstraumr
 - [Prerequisites](prerequisites.md) - Required software and configuration
 - [Getting Started](getting-started.md) - First steps with Samstraumr
+- [Model Visualization](model-visualization.md) - Creating and visualizing S8r models
 
 ## Component Patterns
 

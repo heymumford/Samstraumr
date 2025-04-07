@@ -22,8 +22,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.s8r.adapter.ComponentAdapter;
 import org.s8r.application.port.ComponentRepository;
-import org.s8r.domain.component.Component;
+import org.s8r.application.port.LoggerPort;
+import org.s8r.domain.component.port.ComponentPort;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.lifecycle.LifecycleState;
 
@@ -35,21 +37,33 @@ import org.s8r.domain.lifecycle.LifecycleState;
  * layer port.
  */
 public class InMemoryComponentRepository implements ComponentRepository {
-  // Using a map to store components with their IDs as keys
-  private final Map<String, Component> componentStore = new HashMap<>();
-
-  @Override
-  public void save(Component component) {
-    componentStore.put(component.getId().getIdString(), component);
+  // Using a map to store component ports with their IDs as keys
+  private final Map<String, ComponentPort> componentStore = new HashMap<>();
+  private final LoggerPort logger;
+  
+  /**
+   * Creates a new InMemoryComponentRepository.
+   *
+   * @param logger Logger for recording operations
+   */
+  public InMemoryComponentRepository(LoggerPort logger) {
+    this.logger = logger;
+    logger.debug("Initialized InMemoryComponentRepository");
   }
 
   @Override
-  public Optional<Component> findById(ComponentId id) {
+  public void save(ComponentPort component) {
+    componentStore.put(component.getId().getIdString(), component);
+    logger.debug("Saved component: {}", component.getId().getIdString());
+  }
+
+  @Override
+  public Optional<ComponentPort> findById(ComponentId id) {
     return Optional.ofNullable(componentStore.get(id.getIdString()));
   }
 
   @Override
-  public List<Component> findAll() {
+  public List<ComponentPort> findAll() {
     return new ArrayList<>(componentStore.values());
   }
 
@@ -59,14 +73,14 @@ public class InMemoryComponentRepository implements ComponentRepository {
    * @param state The lifecycle state to filter by
    * @return A list of components in the given state
    */
-  public List<Component> findByState(LifecycleState state) {
+  public List<ComponentPort> findByState(LifecycleState state) {
     return componentStore.values().stream()
         .filter(component -> component.getLifecycleState() == state)
         .collect(Collectors.toList());
   }
 
   @Override
-  public List<Component> findChildren(ComponentId parentId) {
+  public List<ComponentPort> findChildren(ComponentId parentId) {
     if (parentId == null) {
       return new ArrayList<>();
     }
@@ -83,11 +97,13 @@ public class InMemoryComponentRepository implements ComponentRepository {
   @Override
   public void delete(ComponentId id) {
     componentStore.remove(id.getIdString());
+    logger.debug("Deleted component: {}", id.getIdString());
   }
 
   /** Clears all components from the repository. */
   public void clear() {
     componentStore.clear();
+    logger.debug("Cleared all components");
   }
 
   /**

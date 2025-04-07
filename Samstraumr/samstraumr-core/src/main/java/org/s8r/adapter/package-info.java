@@ -14,14 +14,32 @@
  */
 
 /**
- * Adapter package for bridging between new Clean Architecture components and legacy code.
+ * Adapter package for bridging between different architectural layers and legacy code.
  * <p>
- * This package provides adapters that facilitate communication between the new Clean
- * Architecture structure and legacy code. During the migration period, these adapters
- * allow gradual transition without breaking existing functionality.
+ * This package provides adapters that facilitate communication between:
+ * <ul>
+ *   <li>Domain layer and application layer using port interfaces</li>
+ *   <li>Application layer and infrastructure layer implementations</li>
+ *   <li>New Clean Architecture components and legacy code during migration</li>
+ * </ul>
  * </p>
  * <p>
- * Key components in this package:
+ * Following the Clean Architecture pattern and the Dependency Inversion Principle, these adapters
+ * allow higher-level modules (like domain and application layers) to remain independent of lower-level
+ * modules (like infrastructure or legacy implementations).
+ * </p>
+ * <p>
+ * Port Interface Adapters:
+ * <ul>
+ *   <li>ComponentAdapter - Converts between Component domain entities and ComponentPort interfaces</li>
+ *   <li>MachineAdapter - Converts between Machine domain entities and MachinePort interfaces</li>
+ *   <li>CompositeAdapter - Converts between Composite domain entities and CompositeComponentPort interfaces</li>
+ * </ul>
+ * These adapters implement the Adapter pattern to allow client code to depend on abstractions (ports)
+ * rather than concrete implementations, enabling better testability and flexibility.
+ * </p>
+ * <p>
+ * Legacy Migration Adapters:
  * <ul>
  *   <li>IdentityAdapter - Converts between new and legacy Identity objects</li>
  *   <li>ReflectiveIdentityConverter - Reflection-based converters for legacy types</li>
@@ -29,8 +47,6 @@
  *   <li>ReflectiveAdapterFactory - Factory for creating adapters with proper reflection</li>
  *   <li>TubeComponentAdapter - Specific adapter for Tube to Component conversion</li>
  *   <li>TubeComponentWrapper - Wrapper implementing Component while delegating to Tube</li>
- *   <li>CompositeAdapter - Adapter for converting between Tube Composites and Component Composites</li>
- *   <li>MachineAdapter - Adapter for converting between Tube Machines and Component Machines</li>
  *   <li>TubeLegacyIdentityConverter - Direct converter between TubeIdentity and ComponentId</li>
  *   <li>TubeLegacyEnvironmentConverter - Direct converter between Environment types</li>
  *   <li>S8rMigrationFactory - Factory for creating migration utilities</li>
@@ -46,13 +62,17 @@
  * </ul>
  * </p>
  * <p>
- * The S8rMigrationFactory simplifies the use of these utilities for client code, providing a
- * convenient entry point to the migration functionality. It helps implement the Strangler Fig pattern
- * by allowing gradual replacement of legacy code with new Clean Architecture components.
+ * The adapters in this package follow several design patterns:
+ * <ul>
+ *   <li>Adapter Pattern - Converts interfaces between different components</li>
+ *   <li>Factory Pattern - Creates adapter instances as needed</li>
+ *   <li>Bridge Pattern - Decouples abstraction from implementation</li>
+ *   <li>Decorator Pattern - Extends functionality while maintaining compatibility</li>
+ * </ul>
  * </p>
  * <p>
- * All legacy code access is encapsulated in this package, preventing it from spreading elsewhere
- * and maintaining Clean Architecture principles during the migration period.
+ * All adapters encapsulate conversion logic, preventing coupling between layers and maintaining
+ * Clean Architecture principles during both normal operation and the migration period.
  * </p>
  */
 package org.s8r.adapter;

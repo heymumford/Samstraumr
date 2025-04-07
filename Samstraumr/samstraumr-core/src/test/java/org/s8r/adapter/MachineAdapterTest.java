@@ -46,7 +46,7 @@ public class MachineAdapterTest {
     
     @BeforeEach
     public void setUp() {
-        factory = new S8rMigrationFactory(new ConsoleLogger());
+        factory = new S8rMigrationFactory(new ConsoleLogger("Test"));
         adapter = factory.getMachineAdapter();
     }
     

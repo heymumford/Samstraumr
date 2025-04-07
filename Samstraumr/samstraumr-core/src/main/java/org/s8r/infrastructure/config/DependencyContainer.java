@@ -88,6 +88,9 @@ public class DependencyContainer implements ServiceFactory {
     
     // Set up notification port
     setupNotification();
+    
+    // Set up security port
+    setupSecurity();
 
     // Set up event system
     setupEventSystem();
@@ -139,6 +142,28 @@ public class DependencyContainer implements ServiceFactory {
     register(org.s8r.application.port.NotificationPort.class, notificationAdapter);
     
     logger.debug("Notification port initialized");
+  }
+  
+  /** Sets up the security port. */
+  private void setupSecurity() {
+    LoggerPort logger = get(LoggerPort.class);
+    
+    // Create the security adapter
+    org.s8r.infrastructure.security.InMemorySecurityAdapter securityAdapter = 
+        new org.s8r.infrastructure.security.InMemorySecurityAdapter(logger);
+    
+    // Register it as implementation of the port interface
+    register(org.s8r.application.port.SecurityPort.class, securityAdapter);
+    
+    // Create the security service
+    org.s8r.application.service.SecurityService securityService =
+        new org.s8r.application.service.SecurityService(securityAdapter, logger);
+    register(org.s8r.application.service.SecurityService.class, securityService);
+    
+    // Initialize the security system
+    securityAdapter.initialize();
+    
+    logger.debug("Security port initialized");
   }
   
   /** Sets up legacy adapters. */
@@ -269,19 +294,29 @@ public class DependencyContainer implements ServiceFactory {
         new org.s8r.application.service.NotificationService(notificationPort, logger);
     register(org.s8r.application.service.NotificationService.class, notificationService);
 
+    // Create EventPublisherAdapter
+    org.s8r.infrastructure.event.EventPublisherAdapter eventPublisherAdapter =
+        new org.s8r.infrastructure.event.EventPublisherAdapter(eventDispatcher, componentRepository, logger);
+    register(org.s8r.application.port.EventPublisherPort.class, eventPublisherAdapter);
+        
     // Create ComponentService
     ComponentService componentService =
-        new ComponentService(componentRepository, logger, eventDispatcher);
+        new ComponentService(componentRepository, logger, eventPublisherAdapter);
     register(ComponentService.class, componentService);
 
+    // Create MachineFactoryAdapter
+    org.s8r.adapter.MachineFactoryAdapter machineFactoryAdapter =
+        new org.s8r.adapter.MachineFactoryAdapter(logger);
+    register(org.s8r.domain.component.port.MachineFactoryPort.class, machineFactoryAdapter);
+    
     // Create MachineService
     MachineService machineService =
-        new MachineService(machineRepository, componentRepository, logger);
+        new MachineService(machineRepository, componentRepository, machineFactoryAdapter, logger);
     register(MachineService.class, machineService);
 
     // Create DataFlowService
     DataFlowService dataFlowService =
-        new DataFlowService(componentRepository, dataFlowHandler, eventDispatcher, logger);
+        new DataFlowService(componentRepository, dataFlowHandler, eventPublisherAdapter, logger);
     register(DataFlowService.class, dataFlowService);
 
     // Create PatternFactory

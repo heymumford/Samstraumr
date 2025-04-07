@@ -351,6 +351,7 @@ tubeMachine.addComposite("flow", tubeComposite);
 
 // Convert the entire machine
 Machine convertedMachine = migrationFactory.tubeMachineToComponentMachine(tubeMachine);
+// This creates a completely new Machine with all composites and connections preserved
 
 // Option 2: Wrap a Tube machine to use with Component APIs
 Machine wrappedMachine = migrationFactory.wrapTubeMachine(tubeMachine);
@@ -363,6 +364,17 @@ wrappedMachine.connect("flow", "newFlow");
 wrappedMachine.updateState("machineStatus", "processing");
 // The underlying tubeMachine is updated too
 assert tubeMachine.getState().get("machineStatus").equals("processing");
+
+// Lifecycle management works bidirectionally
+wrappedMachine.deactivate();
+assert !tubeMachine.isActive(); // tube machine gets deactivated
+
+tubeMachine.activate();
+assert wrappedMachine.isActive(); // wrapper reflects activation
+
+// Shutdown also propagates
+wrappedMachine.shutdown();
+assert !tubeMachine.isActive(); // tube machine gets shut down properly
 ```
 
 ### After (fully migrated):

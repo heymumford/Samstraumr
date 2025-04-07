@@ -9,13 +9,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.s8r.component.core.Component;
-import org.s8r.component.core.Environment;
-import org.s8r.component.core.State;
-import org.s8r.component.exception.ComponentException;
-import org.s8r.component.identity.Identity;
-import org.s8r.component.composite.Composite;
-import org.s8r.component.machine.Machine;
+import org.s8r.component.Component;
+import org.s8r.component.Environment;
+import org.s8r.component.State;
+import org.s8r.component.ComponentException;
+import org.s8r.component.Identity;
+import org.s8r.component.Composite;
+import org.s8r.component.Machine;
 import org.s8r.test.annotation.UnitTest;
 
 /**

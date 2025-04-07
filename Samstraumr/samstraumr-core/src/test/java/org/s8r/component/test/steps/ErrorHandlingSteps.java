@@ -27,11 +27,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.s8r.component.core.Component;
-import org.s8r.component.core.Environment;
-import org.s8r.component.core.State;
-import org.s8r.component.exception.ComponentException;
-import org.s8r.component.exception.InvalidStateTransitionException;
+import org.s8r.component.Component;
+import org.s8r.component.Environment;
+import org.s8r.component.State;
+import org.s8r.component.ComponentException;
+import org.s8r.component.InvalidStateTransitionException;
 
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.*;

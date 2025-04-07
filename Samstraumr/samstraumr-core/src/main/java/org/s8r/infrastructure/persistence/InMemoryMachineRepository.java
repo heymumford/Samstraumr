@@ -22,10 +22,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.s8r.adapter.MachineAdapter;
+import org.s8r.application.port.LoggerPort;
 import org.s8r.application.port.MachineRepository;
-import org.s8r.domain.component.composite.CompositeComponent;
+import org.s8r.domain.component.port.CompositeComponentPort;
+import org.s8r.domain.component.port.MachinePort;
 import org.s8r.domain.identity.ComponentId;
-import org.s8r.domain.machine.Machine;
 import org.s8r.domain.machine.MachineType;
 
 /**
@@ -35,45 +37,57 @@ import org.s8r.domain.machine.MachineType;
  * applications. It follows Clean Architecture principles by implementing an application layer port.
  */
 public class InMemoryMachineRepository implements MachineRepository {
-  // Using a map to store machines with their IDs as keys
-  private final Map<String, Machine> machineStore = new HashMap<>();
-
-  @Override
-  public void save(Machine machine) {
-    machineStore.put(machine.getId().getIdString(), machine);
+  // Using a map to store machine ports with their IDs as keys
+  private final Map<String, MachinePort> machineStore = new HashMap<>();
+  private final LoggerPort logger;
+  
+  /**
+   * Creates a new InMemoryMachineRepository.
+   *
+   * @param logger Logger for recording operations
+   */
+  public InMemoryMachineRepository(LoggerPort logger) {
+    this.logger = logger;
+    logger.debug("Initialized InMemoryMachineRepository");
   }
 
   @Override
-  public Optional<Machine> findById(ComponentId id) {
+  public void save(MachinePort machine) {
+    machineStore.put(machine.getId().getIdString(), machine);
+    logger.debug("Saved machine: {}", machine.getId().getIdString());
+  }
+
+  @Override
+  public Optional<MachinePort> findById(ComponentId id) {
     return Optional.ofNullable(machineStore.get(id.getIdString()));
   }
 
   @Override
-  public List<Machine> findAll() {
+  public List<MachinePort> findAll() {
     return new ArrayList<>(machineStore.values());
   }
 
   @Override
-  public List<Machine> findByType(MachineType type) {
+  public List<MachinePort> findByType(MachineType type) {
     return machineStore.values().stream()
-        .filter(machine -> machine.getType() == type)
+        .filter(machine -> machine.getMachineType() == type)
         .collect(Collectors.toList());
   }
 
   @Override
-  public List<Machine> findByName(String name) {
+  public List<MachinePort> findByName(String name) {
     if (name == null || name.isEmpty()) {
       return new ArrayList<>();
     }
 
     String searchName = name.toLowerCase();
     return machineStore.values().stream()
-        .filter(machine -> machine.getName().toLowerCase().contains(searchName))
+        .filter(machine -> machine.getMachineId().toLowerCase().contains(searchName))
         .collect(Collectors.toList());
   }
 
   @Override
-  public List<Machine> findContainingComponent(ComponentId componentId) {
+  public List<MachinePort> findContainingComponent(ComponentId componentId) {
     if (componentId == null) {
       return new ArrayList<>();
     }
@@ -87,20 +101,21 @@ public class InMemoryMachineRepository implements MachineRepository {
   @Override
   public void delete(ComponentId id) {
     machineStore.remove(id.getIdString());
+    logger.debug("Deleted machine: {}", id.getIdString());
   }
 
   /**
    * Checks if a machine contains a component with the specified ID.
    *
-   * @param machine The machine to check
+   * @param machine The machine port to check
    * @param componentIdStr The component ID string
    * @return true if the machine contains the component, false otherwise
    */
-  private boolean containsComponent(Machine machine, String componentIdStr) {
-    List<CompositeComponent> components = machine.getComponents();
+  private boolean containsComponent(MachinePort machine, String componentIdStr) {
+    Map<String, CompositeComponentPort> components = machine.getComposites();
 
     // Check if any component matches the ID
-    for (CompositeComponent component : components) {
+    for (CompositeComponentPort component : components.values()) {
       if (component.getId().getIdString().equals(componentIdStr)) {
         return true;
       }
@@ -112,6 +127,7 @@ public class InMemoryMachineRepository implements MachineRepository {
   /** Clears all machines from the repository. */
   public void clear() {
     machineStore.clear();
+    logger.debug("Cleared all machines");
   }
 
   /**

@@ -49,6 +49,14 @@ public class NotificationAdapterTest {
         // Configure the default recipient
         when(mockConfigPort.getString("notification.default.recipient", "system"))
             .thenReturn("system");
+            
+        // Enable test recipients for testing
+        when(mockConfigPort.getBoolean("notification.test.recipients.enabled", false))
+            .thenReturn(true);
+            
+        // Disable notification cleanup for tests
+        when(mockConfigPort.getBoolean("notification.cleanup.enabled", true))
+            .thenReturn(false);
         
         adapter = new NotificationAdapter(mockLogger, mockConfigPort);
     }
@@ -201,5 +209,86 @@ public class NotificationAdapterTest {
         
         verify(mockLogger, atLeastOnce()).debug(anyString(), anyString());
         verify(mockLogger, atLeastOnce()).info(anyString(), anyString());
+    }
+    
+    @Test
+    void testSendPushNotification() {
+        // The push-user should be auto-registered in the setUp method
+        
+        // Create metadata with channel specification
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("channel", "push");
+        metadata.put("action", "open_screen");
+        metadata.put("screen", "dashboard");
+        
+        // Send a notification to the push user
+        NotificationResult result = adapter.sendNotificationToRecipient(
+                "push-user", "Push Title", "Push message content", 
+                NotificationSeverity.INFO, metadata);
+        
+        assertTrue(result.isSent());
+        assertEquals(DeliveryStatus.DELIVERED, result.getStatus());
+        assertNotNull(result.getNotificationId());
+        
+        verify(mockLogger, atLeastOnce()).debug(anyString(), anyString());
+        verify(mockLogger, atLeastOnce()).info(anyString(), anyString());
+    }
+    
+    @Test
+    void testRegisterPushRecipient() {
+        // Register a new push notification recipient
+        Map<String, String> pushContact = new HashMap<>();
+        pushContact.put("type", "push");
+        pushContact.put("device", "device-token-xyz");
+        pushContact.put("platform", "ios");
+        pushContact.put("appVersion", "2.1.0");
+        
+        assertTrue(adapter.registerRecipient("ios-user", pushContact));
+        assertTrue(adapter.isRecipientRegistered("ios-user"));
+        
+        // Send a notification to this recipient
+        NotificationResult result = adapter.sendNotificationToRecipient(
+                "ios-user", "iOS Push", "Test push to iOS device", 
+                NotificationSeverity.WARNING, null);
+        
+        assertTrue(result.isSent());
+        
+        verify(mockLogger, atLeastOnce()).debug(anyString(), anyString());
+        verify(mockLogger, atLeastOnce()).info(anyString(), anyString());
+    }
+    
+    @Test
+    void testNotificationChannelSelection() {
+        // Test that different channel types result in different delivery methods
+        
+        // Test channel override in metadata
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("channel", "push");
+        
+        // Send to an email user but override channel to push in metadata
+        NotificationResult result = adapter.sendNotificationToRecipient(
+                "email-user", "Channel Override", "Testing channel override", 
+                NotificationSeverity.INFO, metadata);
+        
+        assertTrue(result.isSent());
+        
+        // Test multichannel notification by creating a user with multiple contact methods
+        Map<String, String> multiChannelContact = new HashMap<>();
+        multiChannelContact.put("type", "email"); // Primary type
+        multiChannelContact.put("address", "multi@example.com");
+        multiChannelContact.put("phone", "555-987-6543"); // SMS
+        multiChannelContact.put("device", "device-abc"); // Push
+        multiChannelContact.put("platform", "web");
+        
+        assertTrue(adapter.registerRecipient("multi-channel-user", multiChannelContact));
+        
+        // Send to multichannel user
+        result = adapter.sendNotificationToRecipient(
+                "multi-channel-user", "Multi-channel Test", "Testing multi-channel", 
+                NotificationSeverity.INFO, null);
+        
+        assertTrue(result.isSent());
+        
+        verify(mockLogger, atLeastOnce()).info(contains("EMAIL to multi@example.com"));
     }
 }

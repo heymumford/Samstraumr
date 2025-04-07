@@ -44,13 +44,13 @@ public class ComponentCliAdapter {
 
   /** Creates a new ComponentCliAdapter with default implementations. */
   public ComponentCliAdapter() {
-    // Create infrastructure implementations
-    ComponentRepository repository = new InMemoryComponentRepository();
-    
-    // Create a LoggerFactory through dependency injection
+    // Get a LoggerFactory through dependency injection first
     // In a real application, this would be injected from outside
     LoggerFactory loggerFactory = org.s8r.infrastructure.config.DependencyContainer.getInstance().get(LoggerFactory.class);
     this.logger = loggerFactory.getLogger(ComponentCliAdapter.class);
+    
+    // Create infrastructure implementations with the logger
+    ComponentRepository repository = new InMemoryComponentRepository(logger);
 
     // Create a simple in-memory event dispatcher
     org.s8r.infrastructure.event.InMemoryEventDispatcher eventDispatcher =

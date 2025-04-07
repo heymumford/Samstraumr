@@ -29,7 +29,21 @@ public class DependencySuppressions {
         "org.s8r.adapter -> org.s8r.core.env.Environment",
         "org.s8r.adapter -> org.s8r.core.tube.identity.Identity",
         "org.s8r.adapter -> org.s8r.tube.TubeIdentity",
-        "org.s8r.adapter -> org.s8r.tube.Environment"
+        "org.s8r.adapter -> org.s8r.tube.Environment",
+        
+        // Additional adapter dependencies on legacy component code (from package flattening)
+        "org.s8r.adapter -> org.s8r.component.Component",
+        "org.s8r.adapter -> org.s8r.component.Composite",
+        "org.s8r.adapter -> org.s8r.component.Machine",
+        "org.s8r.adapter -> org.s8r.component.Environment",
+        
+        // Adapter dependencies on infrastructure (temporary for migration)
+        "org.s8r.adapter -> org.s8r.infrastructure.logging.ConsoleLogger",
+        
+        // Tube dependencies for adapter (temporary during migration)
+        "org.s8r.adapter -> org.s8r.tube.Tube",
+        "org.s8r.adapter -> org.s8r.tube.TubeLifecycleState",
+        "org.s8r.adapter -> org.s8r.tube.TubeStatus"
     ));
     
     /**

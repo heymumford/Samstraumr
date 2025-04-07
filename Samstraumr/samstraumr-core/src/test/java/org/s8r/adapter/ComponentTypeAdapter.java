@@ -55,7 +55,7 @@ public class ComponentTypeAdapter {
         
         // Create a domain component with the component's reason
         return org.s8r.domain.component.Component.create(
-            org.s8r.domain.identity.ComponentId.generate(component.getReason())
+            org.s8r.domain.identity.ComponentId.create(component.getReason())
         );
     }
     

@@ -1,0 +1,158 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r-list: Display ASCII visualization of S8r models
+# Part of the Samstraumr project CLI tools
+#==============================================================================
+set -e
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${SCRIPT_DIR}"
+
+# Source common library
+source "${PROJECT_ROOT}/.s8r/lib/common.sh"
+
+# Initialize variables
+VERBOSE=false
+TARGET_DIR="$(pwd)"
+FORMAT="ascii"
+DETAILED=false
+
+# Display help information
+show_help() {
+  echo -e "${BOLD}S8r List${RESET} - Display S8r model visualization"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  s8r list [options] [directory]"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help                Display this help message"
+  echo "  -v, --verbose             Enable verbose output"
+  echo "  -f, --format <format>     Output format: ascii, tree, json (default: ascii)"
+  echo "  -d, --detailed            Show detailed component information"
+  echo
+  echo -e "${BOLD}ARGUMENTS:${RESET}"
+  echo "  directory                 S8r model directory (default: current directory)"
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  s8r list                  # List model in current directory"
+  echo "  s8r list ~/my-model       # List model in specified directory"
+  echo "  s8r list -f tree          # Display as tree structure"
+  echo "  s8r list -d               # Show detailed information"
+}
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    -v|--verbose)
+      VERBOSE=true
+      shift
+      ;;
+    -f|--format)
+      if [[ -z "$2" || "$2" == -* ]]; then
+        error "Format argument missing"
+      fi
+      FORMAT="$2"
+      shift 2
+      ;;
+    -d|--detailed)
+      DETAILED=true
+      shift
+      ;;
+    *)
+      if [[ -z "$TARGET_DIR" || "$TARGET_DIR" == "$(pwd)" ]]; then
+        TARGET_DIR="$1"
+      else
+        error "Unexpected argument: $1"
+      fi
+      shift
+      ;;
+  esac
+done
+
+# Function to run Java-based model lister
+run_lister() {
+  local target_dir="$1"
+  local format="$2"
+  local detailed="$3"
+  
+  # Check if Maven is available
+  if ! command_exists "mvn"; then
+    error "Maven is required for model listing. Please install Maven and try again."
+  fi
+  
+  # Generate temporary classpath file
+  local classpath_file="/tmp/s8r-list-classpath-$$.txt"
+  
+  # Load classpath for ListModelCommand
+  if $VERBOSE; then
+    info "Resolving classpath for model lister..."
+  fi
+  
+  cd "${PROJECT_ROOT}"
+  mvn -q dependency:build-classpath -Dmdep.outputFile="$classpath_file" -DincludeTypes=jar
+  
+  if [ ! -f "$classpath_file" ]; then
+    error "Failed to generate classpath for model lister"
+  fi
+  
+  # Read classpath from file
+  CLASSPATH="$(<"$classpath_file"):${PROJECT_ROOT}/Samstraumr/samstraumr-core/target/classes"
+  
+  # Clean up temporary file
+  rm -f "$classpath_file"
+  
+  # Prepare command arguments
+  local java_args=()
+  
+  # Add format option if specified
+  if [ "$format" != "ascii" ]; then
+    java_args+=("-Ds8r.list.format=$format")
+  fi
+  
+  # Add detailed flag if requested
+  if $detailed; then
+    java_args+=("-Ds8r.list.detailed=true")
+  fi
+  
+  # Run the list command
+  if $VERBOSE; then
+    info "Running model visualization with format $format..."
+  fi
+  
+  # Run the command
+  java -cp "$CLASSPATH" "${java_args[@]}" \
+    org.s8r.adapter.in.cli.ListModelCommand "$target_dir"
+}
+
+# Main execution
+main() {
+  # Check if target is a valid S8r repository
+  if [ ! -d "$TARGET_DIR/.s8r" ]; then
+    error "Not a valid S8r project. Run 's8r init' to create an S8r model."
+  fi
+  
+  # Verify format is valid
+  case "$FORMAT" in
+    ascii|tree|json)
+      # Valid format
+      ;;
+    *)
+      error "Invalid format: $FORMAT. Valid options are: ascii, tree, json"
+      ;;
+  esac
+  
+  # Run the Java-based model lister
+  if $VERBOSE; then
+    info "Listing S8r model in: $TARGET_DIR"
+  fi
+  
+  run_lister "$TARGET_DIR" "$FORMAT" "$DETAILED"
+}
+
+# Execute the main function
+main

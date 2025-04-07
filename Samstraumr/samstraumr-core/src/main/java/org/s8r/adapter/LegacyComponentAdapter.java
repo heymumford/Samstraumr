@@ -17,6 +17,7 @@ package org.s8r.adapter;
 
 import org.s8r.application.port.LoggerPort;
 import org.s8r.domain.component.Component;
+import org.s8r.domain.component.port.ComponentPort;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.identity.LegacyComponentAdapterPort;
 import org.s8r.domain.identity.LegacyEnvironmentConverter;
@@ -32,6 +33,13 @@ import java.util.Map;
  * This adapter uses reflection to interact with legacy components, completely removing direct
  * dependencies on legacy code. This follows Clean Architecture principles by properly isolating
  * the adapter implementation details. The adapter works with any legacy component type.
+ * </p>
+ * <p>
+ * By returning the ComponentPort interface, this adapter decouples its clients from the
+ * concrete implementation details of the wrapped components. This promotes the Dependency
+ * Inversion Principle by making the clients depend on abstractions rather than concrete 
+ * implementations, ensuring a smooth migration path to Clean Architecture while preserving
+ * legacy functionality.
  * </p>
  */
 public class LegacyComponentAdapter implements LegacyComponentAdapterPort {
@@ -97,7 +105,7 @@ public class LegacyComponentAdapter implements LegacyComponentAdapterPort {
      * @param legacyComponent The legacy component to wrap
      * @return A clean architecture component that delegates to the legacy component
      */
-    public LegacyComponentWrapper wrapLegacyComponent(Object legacyComponent) {
+    public ComponentPort wrapLegacyComponent(Object legacyComponent) {
         if (legacyComponent == null) {
             throw new IllegalArgumentException("Legacy component cannot be null");
         }
@@ -134,7 +142,7 @@ public class LegacyComponentAdapter implements LegacyComponentAdapterPort {
      * @param reason The reason for creation
      * @return A wrapped legacy component
      */
-    public Component createLegacyComponent(String name, String type, String reason) {
+    public ComponentPort createLegacyComponent(String name, String type, String reason) {
         try {
             // Create an environment for the component
             Object legacyEnvironment = environmentConverter.createLegacyEnvironment(null);

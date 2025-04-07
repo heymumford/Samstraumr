@@ -14,16 +14,46 @@
  */
 
 /**
- * Composite component domain entities in the Samstraumr framework.
- * 
- * <p>This package contains domain entities related to composite components,
- * which are components that contain other components.</p>
- * 
- * <h2>Related Packages</h2>
+ * Composite component domain model.
+ * <p>
+ * This package contains the domain model for composite components, which are containers
+ * that can hold and manage multiple child components. Composites form a crucial part of
+ * the S8r framework's structural model, implementing the Composite design pattern.
+ * </p>
+ * <p>
+ * Key classes in this package:
  * <ul>
- *   <li>{@link org.s8r.domain.component} - Component domain model</li>
- *   <li>{@link org.s8r.domain.event} - Domain events for composites</li>
- *   <li>{@link org.s8r.component.composite} - Composite abstraction layer</li>
+ *   <li>{@link org.s8r.domain.component.composite.CompositeComponent} - Core composite entity</li>
+ *   <li>{@link org.s8r.domain.component.composite.CompositeException} - Domain exceptions</li>
+ *   <li>{@link org.s8r.domain.component.composite.CompositeFactory} - Factory for creating composites</li>
  * </ul>
+ * </p>
+ * <p>
+ * Each composite supports adding, removing, and connecting components, providing 
+ * a hierarchical structure that can represent complex systems. Composites implement
+ * the Component interface, allowing them to be treated uniformly with simple components.
+ * </p>
+ * <p>
+ * Integration with Clean Architecture:
+ * <ul>
+ *   <li>Composites are part of the domain layer, containing core business logic</li>
+ *   <li>Port interfaces ({@link org.s8r.domain.component.port.CompositeComponentPort}) define
+ *       the contract that allows adapter implementations to work with composites</li>
+ *   <li>Adapter implementations ({@link org.s8r.adapter.ComponentAdapter}) convert between
+ *       concrete CompositeComponent implementations and CompositeComponentPort interfaces</li>
+ *   <li>This ensures higher-level modules (application layer) can depend on abstractions
+ *       instead of concrete implementations</li>
+ * </ul>
+ * </p>
+ * <p>
+ * Related packages:
+ * <ul>
+ *   <li>{@link org.s8r.domain.component.port} - Port interfaces for composites</li>
+ *   <li>{@link org.s8r.domain.component} - Base component model</li>
+ *   <li>{@link org.s8r.domain.machine} - Higher-level structures that use composites</li>
+ *   <li>{@link org.s8r.adapter} - Adapters for composite components</li>
+ *   <li>{@link org.s8r.component.composite} - Legacy composite abstraction layer</li>
+ * </ul>
+ * </p>
  */
 package org.s8r.domain.component.composite;

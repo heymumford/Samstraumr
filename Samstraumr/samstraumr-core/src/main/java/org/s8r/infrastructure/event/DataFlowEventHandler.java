@@ -183,4 +183,58 @@ public class DataFlowEventHandler implements DataFlowEventPort {
     Set<String> subscriptions = componentSubscriptions.get(componentId);
     return subscriptions != null ? Set.copyOf(subscriptions) : Set.of();
   }
+  
+  /**
+   * Publishes data from a component to a specific channel.
+   *
+   * @param componentId The source component's ID
+   * @param channel The channel to publish to
+   * @param data The data to publish
+   */
+  @Override
+  public void publishData(ComponentId componentId, String channel, Map<String, Object> data) {
+    if (componentId == null || channel == null || data == null) {
+      logger.warn("Cannot publish data: componentId={}, channel={}, data={}", 
+          componentId, channel, data);
+      return;
+    }
+    
+    logger.debug("Publishing data from component [{}] to channel [{}]", 
+        componentId.getShortId(), channel);
+    
+    // Create a ComponentDataEvent
+    ComponentDataEvent event = new ComponentDataEvent(
+        componentId, 
+        channel, 
+        data);
+    
+    // Deliver this to subscribers directly
+    Map<ComponentId, Consumer<ComponentDataEvent>> subscribers = channelSubscribers.get(channel);
+    if (subscribers == null || subscribers.isEmpty()) {
+      logger.debug("No subscribers for channel [{}]", channel);
+      return;
+    }
+    
+    // Notify all subscribers
+    subscribers.forEach((subscriberId, consumer) -> {
+      // Don't send data back to the source component
+      if (!subscriberId.equals(componentId)) {
+        try {
+          consumer.accept(event);
+          logger.debug(
+              "Delivered data from [{}] to subscriber [{}] on channel [{}]",
+              componentId.getShortId(),
+              subscriberId.getShortId(),
+              channel);
+        } catch (Exception e) {
+          logger.error(
+              "Error delivering data to subscriber [{}] on channel [{}]: {}",
+              subscriberId.getShortId(),
+              channel,
+              e.getMessage(),
+              e);
+        }
+      }
+    });
+  }
 }

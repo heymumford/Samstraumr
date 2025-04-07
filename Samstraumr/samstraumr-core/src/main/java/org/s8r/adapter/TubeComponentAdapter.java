@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.s8r.application.port.LoggerPort;
 import org.s8r.domain.component.Component;
+import org.s8r.domain.component.port.ComponentPort;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.identity.LegacyComponentAdapterPort;
 import org.s8r.domain.lifecycle.LifecycleState;
@@ -35,6 +36,13 @@ import org.s8r.tube.TubeStatus;
  * <p>
  * This is more efficient than the reflection-based approach when we know we're working 
  * with Tube objects specifically, and serves as the primary migration path for existing code.
+ * </p>
+ * <p>
+ * This adapter implements the Dependency Inversion Principle by returning ComponentPort
+ * interfaces instead of concrete Component implementations. This allows client code to
+ * depend on abstractions rather than concrete implementations, facilitating a
+ * smooth migration to Clean Architecture.
+ * </p>
  */
 public class TubeComponentAdapter implements LegacyComponentAdapterPort {
     
@@ -60,7 +68,7 @@ public class TubeComponentAdapter implements LegacyComponentAdapterPort {
     }
     
     @Override
-    public Component wrapLegacyComponent(Object legacyComponent) {
+    public ComponentPort wrapLegacyComponent(Object legacyComponent) {
         if (!(legacyComponent instanceof Tube)) {
             throw new IllegalArgumentException("Expected Tube object, got: " + 
                     (legacyComponent != null ? legacyComponent.getClass().getName() : "null"));
@@ -90,7 +98,7 @@ public class TubeComponentAdapter implements LegacyComponentAdapterPort {
     }
     
     @Override
-    public Component createLegacyComponent(String name, String type, String reason) {
+    public ComponentPort createLegacyComponent(String name, String type, String reason) {
         logger.debug("Creating new Tube component: name={}, type={}, reason={}", name, type, reason);
         
         // Create environment
@@ -159,7 +167,7 @@ public class TubeComponentAdapter implements LegacyComponentAdapterPort {
      * @param parentTube The parent tube
      * @return A new Component wrapping the child tube
      */
-    public Component createChildComponent(String reason, Tube parentTube) {
+    public ComponentPort createChildComponent(String reason, Tube parentTube) {
         logger.debug("Creating child Tube with reason: {}", reason);
         
         Environment environment = parentTube.getEnvironment();

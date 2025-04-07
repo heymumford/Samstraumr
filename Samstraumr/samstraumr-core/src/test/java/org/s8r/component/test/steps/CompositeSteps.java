@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.s8r.component.composite.Composite;
-import org.s8r.component.composite.CompositeFactory;
-import org.s8r.component.core.Component;
+import org.s8r.component.Composite;
+import org.s8r.component.CompositeFactory;
+import org.s8r.component.Component;
 
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.*;
