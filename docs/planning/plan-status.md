@@ -18,8 +18,8 @@ This document provides a status overview of all planning documents in the Samstr
 
 |                                     Document                                     |                          Description                          |     Status     | Last Updated |
 |----------------------------------------------------------------------------------|---------------------------------------------------------------|----------------|--------------|
-| [documentation-standardization-plan.md](./documentation-standardization-plan.md) | Plan for standardizing documentation formats and organization | 🔄 In Progress | 2025-04-04   |
-| [kanban.md](./KANBAN.md)                                                    | Kanban board tracking all current tasks                       | 🔄 Active      | 2025-04-07   |
+| [documentation-standardization-plan.md](./documentation-standardization-plan.md) | Plan for standardizing documentation formats and organization | 🔄 In Progress<br>(Phase 3 Complete) | 2025-04-07   |
+| [kanban.md](./kanban.md)                                                    | Kanban board tracking all current tasks                       | 🔄 Active      | 2025-04-07   |
 | [script-reorganization-plan.md](./completed/script-reorganization-plan.md)  | Plan for reorganizing scripts to appropriate utility directories | ✅ Completed   | 2025-04-07   |
 | [md-file-analysis-plan.md](./completed/md-file-analysis-plan.md)            | Plan for analyzing markdown files for test scenarios          | ✅ Completed   | 2025-04-07   |
 
