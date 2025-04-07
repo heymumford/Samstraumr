@@ -42,10 +42,8 @@ This document tracks the progress of tasks in the S8r project.
 ## Tasks in Review
 
 - Implement BDD integration tests for ports
-
 - Implement TDD-driven port interface tests
 - Enhance NotificationPort with additional notification channels and testing
-- Finalize documentation for the migration utilities
 - Implement integration test suite for port interfaces working together (partial)
 - Create BDD tests for remaining port interfaces
 - Implement remaining port interfaces according to TDD plan (ValidationPort, PersistencePort)
@@ -56,6 +54,7 @@ This document tracks the progress of tasks in the S8r project.
 
 ## Tasks Done
 
+- Finalize documentation for the migration utilities
 - Create migration utilities for client code (Component, Composite, and Machine adapters)
 - Establish new Maven structure with s8r naming
 - Create core Component class as a replacement for Tube
@@ -123,7 +122,7 @@ This document tracks the progress of tasks in the S8r project.
 - ✅ Implement BDD integration tests for ports
 - ✅ Test build process
 - ✅ Migrate tests (Initial implementation with atomic component identity tests)
-- 🔄 Finalize documentation
+- ✅ Finalize documentation for migration utilities
 
 ### Phase 4: deployment (planned)
 
