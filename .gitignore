@@ -190,6 +190,8 @@ docmosis.properties
 
 # Build and LLM specific configuration - generated at install time
 /CLAUDE.md
+CLAUDE.md
+**/CLAUDE.md
 # New build documentation is now tracked in git
 
 #------------------------------------------------------------------------------
