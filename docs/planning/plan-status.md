@@ -30,6 +30,7 @@ This document provides a status overview of all planning documents in the Samstr
 | [file-reorganization-progress.md](./file-reorganization-progress.md) | Status of file reorganization efforts     | 2025-04-03      | ✅ Completed major file reorganization           |
 | [script-reorganization.md](./script-reorganization.md)               | Plan for reorganizing scripts             | 2025-04-03      | ✅ Simplified script structure                   |
 | [completed-port-bdd-test-implementation.md](./completed-port-bdd-test-implementation.md) | ComponentRepository BDD test implementation | 2025-04-07 | ✅ Implemented BDD tests for ComponentRepository |
+| [completed-port-interfaces-implementation.md](./completed-port-interfaces-implementation.md) | ValidationPort and PersistencePort implementation | 2025-04-07 | ✅ Implemented key port interfaces with TDD approach |
 
 ## Archived Plans
 
