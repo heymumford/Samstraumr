@@ -1,0 +1,38 @@
+# EditorConfig helps developers define and maintain consistent
+# coding styles between different editors and IDEs
+# https://editorconfig.org/
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 120
+
+# Java files
+[*.java]
+indent_size = 4
+
+# Markdown files
+[*.md]
+trim_trailing_whitespace = false
+
+# Shell scripts
+[*.sh]
+end_of_line = lf
+
+# Windows-specific files
+[*.bat]
+end_of_line = crlf
+
+# Maven files
+[*.xml]
+indent_size = 2
+
+# Feature files
+[*.feature]
+indent_size = 2

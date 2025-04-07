@@ -196,5 +196,28 @@ if [[ -L "$BASE_DIR/s8r_list" && -f "$BASE_DIR/s8r-list" ]]; then
   rm -v "$BASE_DIR/s8r_list"
 fi
 
+# 9. Organize git and config files
+print_message "Organizing git and config files..."
+
+# Create necessary directories
+mkdir -p "$BASE_DIR/util/git"
+mkdir -p "$BASE_DIR/util/config"
+
+# Git commit template
+if [[ -f "$BASE_DIR/.git-commit-template" && ! -L "$BASE_DIR/.git-commit-template" ]]; then
+  print_message "Moving .git-commit-template to util/git/"
+  mv -v "$BASE_DIR/.git-commit-template" "$BASE_DIR/util/git/"
+  ln -svf "util/git/.git-commit-template" "$BASE_DIR/.git-commit-template"
+fi
+
+# Config files
+for config_file in .actrc .editorconfig .samstraumr.config surefire-settings.xml docmosis.properties; do
+  if [[ -f "$BASE_DIR/$config_file" && ! -L "$BASE_DIR/$config_file" ]]; then
+    print_message "Moving $config_file to util/config/"
+    mv -v "$BASE_DIR/$config_file" "$BASE_DIR/util/config/"
+    ln -svf "util/config/$config_file" "$BASE_DIR/$config_file"
+  fi
+done
+
 print_success "Root directory cleanup completed!"
 print_message "Please review any remaining duplicates manually."
