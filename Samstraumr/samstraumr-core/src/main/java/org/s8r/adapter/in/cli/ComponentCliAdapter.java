@@ -18,16 +18,18 @@ package org.s8r.adapter.in.cli;
 import java.util.Optional;
 import java.util.Scanner;
 
-import org.s8r.adapter.out.InMemoryComponentRepository;
+import org.s8r.infrastructure.persistence.InMemoryComponentRepository;
 import org.s8r.application.port.ComponentRepository;
+import org.s8r.application.port.EventPublisherPort;
+import org.s8r.application.port.LoggerFactory;
 import org.s8r.application.port.LoggerPort;
 import org.s8r.application.service.ComponentService;
-import org.s8r.domain.component.Component;
+import org.s8r.domain.component.port.ComponentPort;
 import org.s8r.domain.exception.ComponentException;
 import org.s8r.domain.exception.ComponentNotFoundException;
 import org.s8r.domain.exception.InvalidOperationException;
 import org.s8r.domain.identity.ComponentId;
-import org.s8r.application.port.LoggerFactory;
+import org.s8r.infrastructure.event.EventPublisherAdapter;
 
 /**
  * Command-line interface adapter for demonstrating the Clean Architecture implementation.
@@ -44,6 +46,7 @@ public class ComponentCliAdapter {
   public ComponentCliAdapter() {
     // Create infrastructure implementations
     ComponentRepository repository = new InMemoryComponentRepository();
+    
     // Create a LoggerFactory through dependency injection
     // In a real application, this would be injected from outside
     LoggerFactory loggerFactory = org.s8r.infrastructure.config.DependencyContainer.getInstance().get(LoggerFactory.class);
@@ -52,9 +55,12 @@ public class ComponentCliAdapter {
     // Create a simple in-memory event dispatcher
     org.s8r.infrastructure.event.InMemoryEventDispatcher eventDispatcher =
         new org.s8r.infrastructure.event.InMemoryEventDispatcher(logger);
+        
+    // Create the event publisher adapter using the dispatcher
+    EventPublisherPort eventPublisher = new EventPublisherAdapter(eventDispatcher, repository, logger);
 
     // Create application service with dependencies injected
-    this.componentService = new ComponentService(repository, logger, eventDispatcher);
+    this.componentService = new ComponentService(repository, logger, eventPublisher);
   }
 
   /**
@@ -224,20 +230,26 @@ public class ComponentCliAdapter {
 
     try {
       ComponentId id = ComponentId.fromString(idStr, "View");
-      Optional<Component> component = componentService.getComponent(id);
+      Optional<ComponentPort> component = componentService.getComponent(id);
 
       if (component.isPresent()) {
-        Component c = component.get();
+        ComponentPort c = component.get();
         System.out.println("\nComponent Details:");
         System.out.println("------------------");
         System.out.println("ID: " + c.getId().getIdString());
-        System.out.println("Reason: " + c.getId().getReason());
-        System.out.println("Creation Time: " + c.getCreationTime());
         System.out.println("Lifecycle State: " + c.getLifecycleState());
-        System.out.println("Lineage: " + c.getLineage());
-
-        System.out.println("\nActivity Log:");
-        c.getActivityLog().forEach(System.out::println);
+        System.out.println("Lineage: " + String.join(" > ", c.getLineage()));
+        
+        if (c instanceof org.s8r.domain.component.port.CompositeComponentPort) {
+          org.s8r.domain.component.port.CompositeComponentPort composite = 
+              (org.s8r.domain.component.port.CompositeComponentPort) c;
+          System.out.println("Type: Composite");
+          System.out.println("Components: " + composite.getComponents().size());
+          
+          for (String name : composite.getComponents().keySet()) {
+            System.out.println("  - " + name);
+          }
+        }
       } else {
         System.out.println("Component not found");
       }
@@ -259,10 +271,11 @@ public class ComponentCliAdapter {
       System.out.println("\nAll Components:");
       System.out.println("--------------");
 
-      for (Component c : components) {
+      for (ComponentPort c : components) {
+        String type = c instanceof org.s8r.domain.component.port.CompositeComponentPort ? "Composite" : "Component";
         System.out.printf(
-            "ID: %s | Reason: %s | State: %s%n",
-            c.getId().getShortId(), c.getId().getReason(), c.getLifecycleState());
+            "ID: %s | Type: %s | State: %s%n",
+            c.getId().getShortId(), type, c.getLifecycleState());
       }
     } catch (Exception e) {
       System.out.println("Error listing components: " + e.getMessage());

@@ -17,9 +17,11 @@ package org.s8r.application.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.s8r.adapter.CompositeAdapter;
 import org.s8r.application.port.ComponentRepository;
-import org.s8r.application.port.EventDispatcher;
+import org.s8r.application.port.EventPublisherPort;
 import org.s8r.application.port.LoggerPort;
 import org.s8r.domain.component.Component;
 import org.s8r.domain.component.composite.ComponentConnection;
@@ -27,6 +29,8 @@ import org.s8r.domain.component.composite.CompositeComponent;
 import org.s8r.domain.component.composite.CompositeFactory;
 import org.s8r.domain.component.composite.CompositeType;
 import org.s8r.domain.component.composite.ConnectionType;
+import org.s8r.domain.component.port.ComponentPort;
+import org.s8r.domain.component.port.CompositeComponentPort;
 import org.s8r.domain.event.DomainEvent;
 import org.s8r.domain.exception.ComponentNotFoundException;
 import org.s8r.domain.exception.DuplicateComponentException;
@@ -42,20 +46,20 @@ import org.s8r.domain.identity.ComponentId;
 public class ComponentService {
   private final ComponentRepository componentRepository;
   private final LoggerPort logger;
-  private final EventDispatcher eventDispatcher;
+  private final EventPublisherPort eventPublisher;
 
   /**
    * Creates a new ComponentService.
    *
    * @param componentRepository The component repository
    * @param logger The logger
-   * @param eventDispatcher The event dispatcher
+   * @param eventPublisher The event publisher port
    */
   public ComponentService(
-      ComponentRepository componentRepository, LoggerPort logger, EventDispatcher eventDispatcher) {
+      ComponentRepository componentRepository, LoggerPort logger, EventPublisherPort eventPublisher) {
     this.componentRepository = componentRepository;
     this.logger = logger;
-    this.eventDispatcher = eventDispatcher;
+    this.eventPublisher = eventPublisher;
   }
 
   /**
@@ -69,11 +73,14 @@ public class ComponentService {
 
     ComponentId id = ComponentId.create(reason);
     Component component = Component.create(id);
+    
+    // Convert to ComponentPort using the adapter
+    ComponentPort componentPort = org.s8r.adapter.ComponentAdapter.createComponentPort(component);
 
     // Dispatch any events raised during creation
-    dispatchDomainEvents(component);
+    dispatchDomainEvents(componentPort);
 
-    componentRepository.save(component);
+    componentRepository.save(componentPort);
     logger.info("Component created successfully: " + id.getIdString());
 
     return id;
@@ -91,7 +98,7 @@ public class ComponentService {
     logger.info("Creating child component with reason: " + reason);
 
     // Find parent component
-    Component parent =
+    ComponentPort parentPort =
         componentRepository
             .findById(parentId)
             .orElseThrow(() -> new ComponentNotFoundException(parentId));
@@ -99,15 +106,16 @@ public class ComponentService {
     // Create child component
     ComponentId childId = ComponentId.create(reason);
     Component child = Component.create(childId);
+    ComponentPort childPort = org.s8r.adapter.ComponentAdapter.createComponentPort(child);
 
     // Add parent's lineage to child
-    parent.getLineage().forEach(child::addToLineage);
+    parentPort.getLineage().forEach(childPort::addToLineage);
 
     // Dispatch any events raised during creation
-    dispatchDomainEvents(child);
+    dispatchDomainEvents(childPort);
 
     // Save the child component
-    componentRepository.save(child);
+    componentRepository.save(childPort);
     logger.info("Child component created successfully: " + childId.getIdString());
 
     return childId;
@@ -123,15 +131,15 @@ public class ComponentService {
   public void activateComponent(ComponentId id) {
     logger.info("Activating component: " + id.getIdString());
 
-    Component component =
+    ComponentPort componentPort =
         componentRepository.findById(id).orElseThrow(() -> new ComponentNotFoundException(id));
 
-    component.activate();
+    componentPort.activate();
 
     // Dispatch any events raised during activation
-    dispatchDomainEvents(component);
+    dispatchDomainEvents(componentPort);
 
-    componentRepository.save(component);
+    componentRepository.save(componentPort);
 
     logger.info("Component activated successfully: " + id.getIdString());
   }
@@ -146,15 +154,15 @@ public class ComponentService {
   public void deactivateComponent(ComponentId id) {
     logger.info("Deactivating component: " + id.getIdString());
 
-    Component component =
+    ComponentPort componentPort =
         componentRepository.findById(id).orElseThrow(() -> new ComponentNotFoundException(id));
 
-    component.deactivate();
+    componentPort.deactivate();
 
     // Dispatch any events raised during deactivation
-    dispatchDomainEvents(component);
+    dispatchDomainEvents(componentPort);
 
-    componentRepository.save(component);
+    componentRepository.save(componentPort);
 
     logger.info("Component deactivated successfully: " + id.getIdString());
   }
@@ -168,15 +176,15 @@ public class ComponentService {
   public void terminateComponent(ComponentId id) {
     logger.info("Terminating component: " + id.getIdString());
 
-    Component component =
+    ComponentPort componentPort =
         componentRepository.findById(id).orElseThrow(() -> new ComponentNotFoundException(id));
 
-    component.terminate();
+    componentPort.terminate();
 
     // Dispatch any events raised during termination
-    dispatchDomainEvents(component);
+    dispatchDomainEvents(componentPort);
 
-    componentRepository.save(component);
+    componentRepository.save(componentPort);
 
     logger.info("Component terminated successfully: " + id.getIdString());
   }
@@ -185,9 +193,9 @@ public class ComponentService {
    * Gets a component by ID.
    *
    * @param id The component ID
-   * @return An Optional containing the component if found
+   * @return An Optional containing the component port if found
    */
-  public Optional<Component> getComponent(ComponentId id) {
+  public Optional<ComponentPort> getComponent(ComponentId id) {
     logger.debug("Getting component: " + id.getIdString());
     return componentRepository.findById(id);
   }
@@ -195,9 +203,9 @@ public class ComponentService {
   /**
    * Gets all components.
    *
-   * @return A list of all components
+   * @return A list of all component ports
    */
-  public List<Component> getAllComponents() {
+  public List<ComponentPort> getAllComponents() {
     logger.debug("Getting all components");
     return componentRepository.findAll();
   }
@@ -206,9 +214,9 @@ public class ComponentService {
    * Gets child components for a parent component.
    *
    * @param parentId The parent component ID
-   * @return A list of child components
+   * @return A list of child component ports
    */
-  public List<Component> getChildComponents(ComponentId parentId) {
+  public List<ComponentPort> getChildComponents(ComponentId parentId) {
     logger.debug("Getting child components for parent: " + parentId.getIdString());
     return componentRepository.findChildren(parentId);
   }
@@ -223,11 +231,11 @@ public class ComponentService {
   public void addToLineage(ComponentId id, String entry) {
     logger.debug("Adding lineage entry to component: " + id.getIdString());
 
-    Component component =
+    ComponentPort componentPort =
         componentRepository.findById(id).orElseThrow(() -> new ComponentNotFoundException(id));
 
-    component.addToLineage(entry);
-    componentRepository.save(component);
+    componentPort.addToLineage(entry);
+    componentRepository.save(componentPort);
 
     logger.debug("Lineage entry added successfully");
   }
@@ -246,14 +254,18 @@ public class ComponentService {
         "Creating new composite component of type " + compositeType + " with reason: " + reason);
 
     CompositeComponent composite = CompositeFactory.createComposite(compositeType, reason);
+    
+    // Convert to CompositeComponentPort using the adapter
+    CompositeComponentPort compositePort = 
+        org.s8r.adapter.ComponentAdapter.createCompositeComponentPort(composite);
 
     // Dispatch any events raised during creation
-    dispatchDomainEvents(composite);
+    dispatchDomainEvents(compositePort);
 
-    componentRepository.save(composite);
-    logger.info("Composite component created successfully: " + composite.getId().getIdString());
+    componentRepository.save(compositePort);
+    logger.info("Composite component created successfully: " + compositePort.getId().getIdString());
 
-    return composite.getId();
+    return compositePort.getId();
   }
 
   /**
@@ -310,32 +322,38 @@ public class ComponentService {
             + " to composite "
             + compositeId.getShortId());
 
-    // Get the composite
-    Component composite =
+    // Get the composite port
+    ComponentPort compositePort =
         componentRepository
             .findById(compositeId)
             .orElseThrow(() -> new ComponentNotFoundException(compositeId));
 
-    if (!(composite instanceof CompositeComponent)) {
+    if (!(compositePort instanceof CompositeComponentPort)) {
       throw new IllegalArgumentException(
           "Component " + compositeId.getShortId() + " is not a composite component");
     }
 
-    // Get the component to add
-    Component component =
+    // Get the component port to add
+    ComponentPort componentPort =
         componentRepository
             .findById(componentId)
             .orElseThrow(() -> new ComponentNotFoundException(componentId));
 
     // Add the component to the composite
-    CompositeComponent compositeComponent = (CompositeComponent) composite;
-    compositeComponent.addComponent(component);
+    CompositeComponentPort compositeComponentPort = (CompositeComponentPort) compositePort;
+    boolean success = compositeComponentPort.addComponent(componentId.getIdString(), componentPort);
+    
+    if (!success) {
+      throw new InvalidOperationException(
+          "Failed to add component " + componentId.getShortId() + 
+          " to composite " + compositeId.getShortId());
+    }
 
     // Dispatch any events raised during the operation
-    dispatchDomainEvents(compositeComponent);
+    dispatchDomainEvents(compositeComponentPort);
 
     // Save the updated composite
-    componentRepository.save(compositeComponent);
+    componentRepository.save(compositeComponentPort);
     logger.info("Component added to composite successfully");
   }
 
@@ -354,23 +372,34 @@ public class ComponentService {
             + " from composite "
             + compositeId.getShortId());
 
-    // Get the composite
-    Component composite =
+    // Get the composite port
+    ComponentPort compositePort =
         componentRepository
             .findById(compositeId)
             .orElseThrow(() -> new ComponentNotFoundException(compositeId));
 
-    if (!(composite instanceof CompositeComponent)) {
+    if (!(compositePort instanceof CompositeComponentPort)) {
       throw new IllegalArgumentException(
           "Component " + compositeId.getShortId() + " is not a composite component");
     }
 
+    // Find the component name within the composite
+    CompositeComponentPort compositeComponentPort = (CompositeComponentPort) compositePort;
+    
+    // This is a simplification - in a real implementation we would need a way to
+    // find a component by ID within a composite. Here we assume the component name
+    // is the same as its ID string.
+    String componentName = componentId.getIdString();
+    
     // Remove the component from the composite
-    CompositeComponent compositeComponent = (CompositeComponent) composite;
-    compositeComponent.removeComponent(componentId);
+    Optional<ComponentPort> removed = compositeComponentPort.removeComponent(componentName);
+    
+    if (!removed.isPresent()) {
+      throw new ComponentNotFoundException(componentId);
+    }
 
     // Save the updated composite
-    componentRepository.save(compositeComponent);
+    componentRepository.save(compositeComponentPort);
     logger.info("Component removed from composite successfully");
   }
 
@@ -382,11 +411,11 @@ public class ComponentService {
    * @param targetId The ID of the target component
    * @param type The type of connection
    * @param description A description of the connection
-   * @return The ID of the created connection
+   * @return True if the connection was created successfully
    * @throws ComponentNotFoundException if any component is not found
    * @throws InvalidOperationException if the composite is not in a valid state
    */
-  public String createConnection(
+  public boolean createConnection(
       ComponentId compositeId,
       ComponentId sourceId,
       ComponentId targetId,
@@ -394,62 +423,81 @@ public class ComponentService {
       String description) {
     logger.info("Creating " + type + " connection in composite " + compositeId.getShortId());
 
-    // Get the composite
-    Component composite =
+    // Get the composite port
+    ComponentPort compositePort =
         componentRepository
             .findById(compositeId)
             .orElseThrow(() -> new ComponentNotFoundException(compositeId));
 
-    if (!(composite instanceof CompositeComponent)) {
+    if (!(compositePort instanceof CompositeComponentPort)) {
       throw new IllegalArgumentException(
           "Component " + compositeId.getShortId() + " is not a composite component");
     }
 
     // Create the connection
-    CompositeComponent compositeComponent = (CompositeComponent) composite;
-    ComponentConnection connection =
-        compositeComponent.connect(sourceId, targetId, type, description);
+    CompositeComponentPort compositeComponentPort = (CompositeComponentPort) compositePort;
+    
+    // This is a simplification - in a real implementation we would need a way to
+    // convert ComponentIds to component names in the composite. Here we assume
+    // component names match their ID strings.
+    String sourceName = sourceId.getIdString();
+    String targetName = targetId.getIdString();
+    
+    boolean success = compositeComponentPort.connect(sourceName, targetName);
+    
+    if (!success) {
+      throw new InvalidOperationException(
+          "Failed to create connection from " + sourceId.getShortId() + 
+          " to " + targetId.getShortId());
+    }
 
     // Dispatch any events raised during the operation
-    dispatchDomainEvents(compositeComponent);
+    dispatchDomainEvents(compositeComponentPort);
 
     // Save the updated composite
-    componentRepository.save(compositeComponent);
+    componentRepository.save(compositeComponentPort);
     logger.info("Connection created successfully");
 
-    return connection.getConnectionId();
+    return true;
   }
 
   /**
    * Removes a connection from a composite.
    *
    * @param compositeId The ID of the composite component
-   * @param connectionId The ID of the connection to remove
+   * @param sourceName The name of the source component
+   * @param targetName The name of the target component
    * @throws ComponentNotFoundException if the composite is not found
    * @throws IllegalArgumentException if the connection is not found
    * @throws InvalidOperationException if the composite is not in a valid state
    */
-  public void removeConnection(ComponentId compositeId, String connectionId) {
+  public void removeConnection(ComponentId compositeId, String sourceName, String targetName) {
     logger.info(
-        "Removing connection " + connectionId + " from composite " + compositeId.getShortId());
+        "Removing connection from " + sourceName + " to " + targetName + 
+        " in composite " + compositeId.getShortId());
 
-    // Get the composite
-    Component composite =
+    // Get the composite port
+    ComponentPort compositePort =
         componentRepository
             .findById(compositeId)
             .orElseThrow(() -> new ComponentNotFoundException(compositeId));
 
-    if (!(composite instanceof CompositeComponent)) {
+    if (!(compositePort instanceof CompositeComponentPort)) {
       throw new IllegalArgumentException(
           "Component " + compositeId.getShortId() + " is not a composite component");
     }
 
     // Remove the connection
-    CompositeComponent compositeComponent = (CompositeComponent) composite;
-    compositeComponent.disconnect(connectionId);
+    CompositeComponentPort compositeComponentPort = (CompositeComponentPort) compositePort;
+    boolean success = compositeComponentPort.disconnect(sourceName, targetName);
+    
+    if (!success) {
+      throw new IllegalArgumentException(
+          "Connection from " + sourceName + " to " + targetName + " not found");
+    }
 
     // Save the updated composite
-    componentRepository.save(compositeComponent);
+    componentRepository.save(compositeComponentPort);
     logger.info("Connection removed successfully");
   }
 
@@ -457,18 +505,18 @@ public class ComponentService {
    * Gets a composite component by ID.
    *
    * @param id The component ID
-   * @return An Optional containing the composite component if found
+   * @return An Optional containing the composite component port if found
    * @throws IllegalArgumentException if the component is not a composite
    */
-  public Optional<CompositeComponent> getComposite(ComponentId id) {
+  public Optional<CompositeComponentPort> getComposite(ComponentId id) {
     logger.debug("Getting composite component: " + id.getIdString());
 
-    Optional<Component> component = componentRepository.findById(id);
+    Optional<ComponentPort> componentPort = componentRepository.findById(id);
 
-    return component.map(
+    return componentPort.map(
         c -> {
-          if (c instanceof CompositeComponent) {
-            return (CompositeComponent) c;
+          if (c instanceof CompositeComponentPort) {
+            return (CompositeComponentPort) c;
           } else {
             throw new IllegalArgumentException(
                 "Component " + id.getShortId() + " is not a composite component");
@@ -481,11 +529,11 @@ public class ComponentService {
    *
    * @param compositeId The ID of the composite component
    * @param componentId The ID of the component to get connections for
-   * @return A list of connections involving the specified component
+   * @return A list of target component names connected to the specified component
    * @throws ComponentNotFoundException if the composite is not found
    * @throws IllegalArgumentException if the component is not a composite
    */
-  public List<ComponentConnection> getComponentConnections(
+  public List<String> getComponentConnections(
       ComponentId compositeId, ComponentId componentId) {
     logger.debug(
         "Getting connections for component "
@@ -493,29 +541,34 @@ public class ComponentService {
             + " in composite "
             + compositeId.getShortId());
 
-    // Get the composite
-    Optional<CompositeComponent> composite = getComposite(compositeId);
+    // Get the composite port
+    Optional<CompositeComponentPort> compositePort = getComposite(compositeId);
 
-    if (!composite.isPresent()) {
+    if (!compositePort.isPresent()) {
       throw new ComponentNotFoundException(compositeId);
     }
 
-    return composite.get().getConnectionsForComponent(componentId);
+    // This is a simplification - in a real implementation we would need a way to
+    // find a component by ID within a composite. Here we assume the component name
+    // is the same as its ID string.
+    String componentName = componentId.getIdString();
+    
+    return compositePort.get().getConnectionsFrom(componentName);
   }
 
   /**
-   * Dispatches all domain events from a component and clears them.
+   * Dispatches all domain events from a component port and clears them.
    *
-   * @param component The component with events to dispatch
+   * @param componentPort The component port with events to dispatch
    */
-  private void dispatchDomainEvents(Component component) {
-    List<DomainEvent> events = component.getDomainEvents();
-
-    for (DomainEvent event : events) {
-      logger.debug("Dispatching event: {}", event.getEventType());
-      eventDispatcher.dispatch(event);
+  private void dispatchDomainEvents(ComponentPort componentPort) {
+    List<DomainEvent> events = componentPort.getDomainEvents();
+    
+    if (!events.isEmpty()) {
+      logger.debug("Dispatching {} events from component {}", 
+          events.size(), componentPort.getId().getIdString());
+      eventPublisher.publishEvents(events);
+      componentPort.clearEvents();
     }
-
-    component.clearEvents();
   }
 }
