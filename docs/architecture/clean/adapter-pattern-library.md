@@ -1,4 +1,4 @@
-# Samstraumr Adapter Pattern Library
+# Adapter Pattern Library
 
 This document provides a comprehensive guide to adapter implementations in the Samstraumr project following Clean Architecture principles. It serves as a reference for developers implementing new adapters or maintaining existing ones.
 
@@ -15,7 +15,7 @@ This document provides a comprehensive guide to adapter implementations in the S
 
 In Clean Architecture, adapters are responsible for converting between the interfaces and models used by the application core and the interfaces and models provided by external frameworks, libraries, or legacy systems. They serve as a bridge between the domain and infrastructure layers.
 
-### Key Concepts
+### Key concepts
 
 - **Ports**: Interfaces defined by the application core that specify what it needs from external systems
 - **Adapters**: Implementations of port interfaces that connect to external systems
@@ -26,7 +26,7 @@ In Clean Architecture, adapters are responsible for converting between the inter
 
 The Samstraumr project employs several adapter design patterns to maintain clean architectural boundaries:
 
-### 1. Port Adapter Pattern
+### 1. port adapter pattern
 
 Adapters implement port interfaces defined by the application core. This pattern ensures the application core remains isolated from infrastructure concerns.
 
@@ -57,7 +57,7 @@ public class Slf4jLogger implements LoggerPort {
 }
 ```
 
-### 2. Factory Adapter Pattern
+### 2. factory adapter pattern
 
 Factories create and configure adapters, providing a clean way to instantiate complex adapter types.
 
@@ -77,7 +77,7 @@ public class MachineFactoryAdapter {
 }
 ```
 
-### 3. Bidirectional Adapter Pattern
+### 3. bidirectional adapter pattern
 
 Adapters that convert between domain models and infrastructure models in both directions, ensuring clean separation while enabling data flow.
 
@@ -96,7 +96,7 @@ public class ComponentAdapter {
 }
 ```
 
-### 4. Event Adapter Pattern
+### 4. event adapter pattern
 
 Adapters that bridge the event systems of the domain and infrastructure layers, ensuring events flow between layers without creating dependencies.
 
@@ -117,7 +117,7 @@ public class EventPublisherAdapter implements EventPublisherPort {
 
 The project contains several reference implementations that serve as templates for new adapters:
 
-### MachineAdapter
+### Machineadapter
 
 The `MachineAdapter` demonstrates how to adapt between domain and component machine types, with proper handling of lifecycle states, identities, and operations.
 
@@ -128,9 +128,9 @@ The `MachineAdapter` demonstrates how to adapt between domain and component mach
 - Error handling for type conversions
 - Default method implementations where appropriate
 
-[View MachineAdapter Source](../../Samstraumr/samstraumr-core/src/main/java/org/s8r/adapter/MachineAdapter.java)
+[View MachineAdapter Source](../../Samstraumr/samstraumr-core/src/main/java/org/s8r/adapter/machine-adapter.java)
 
-### DataFlowEventHandler
+### Datafloweventhandler
 
 The `DataFlowEventHandler` demonstrates how to implement a port interface that manages event flow between components.
 
@@ -140,13 +140,13 @@ The `DataFlowEventHandler` demonstrates how to implement a port interface that m
 - Clear logging of operations
 - Null-safe operations
 
-[View DataFlowEventHandler Source](../../Samstraumr/samstraumr-core/src/main/java/org/s8r/infrastructure/event/DataFlowEventHandler.java)
+[View DataFlowEventHandler Source](../../Samstraumr/samstraumr-core/src/main/java/org/s8r/infrastructure/event/data-flow-event-handler.java)
 
 ## Testing Adapters
 
 The Samstraumr project employs a comprehensive approach to testing adapters:
 
-### Contract Tests
+### Contract tests
 
 Contract tests verify that adapters correctly implement their port interfaces. These tests focus on the behavior expected by the application core, not the internal implementation details.
 
@@ -165,33 +165,33 @@ public void subscriptionManagementTests() {
 }
 ```
 
-### Integration Tests
+### Integration tests
 
 Integration tests verify that adapters interact correctly with their external systems and with each other.
 
-### Unit Tests
+### Unit tests
 
 Unit tests verify the internal implementation of adapters, focusing on specific functionality.
 
-### Test Fixtures
+### Test fixtures
 
 The `TestFixtureFactory` provides standard implementations for use in tests, ensuring consistency across test classes.
 
 ## Common Pitfalls and Solutions
 
-### 1. Domain Leakage
+### 1. domain leakage
 
 **Pitfall**: Infrastructure concerns leaking into the domain layer through adapter implementations.
 
 **Solution**: Ensure adapters fully encapsulate all infrastructure concerns and expose only domain-compatible interfaces to the application core.
 
-### 2. Circular Dependencies
+### 2. circular dependencies
 
 **Pitfall**: Circular dependencies between domain and infrastructure layers.
 
 **Solution**: Ensure the domain layer defines port interfaces and the infrastructure layer implements them, not the other way around.
 
-### 3. Type Conversion Complexity
+### 3. type conversion complexity
 
 **Pitfall**: Complex conversions between domain and infrastructure models.
 
@@ -200,7 +200,7 @@ The `TestFixtureFactory` provides standard implementations for use in tests, ens
 - Create value objects or DTOs to facilitate conversions
 - Consider builder pattern for complex conversions
 
-### 4. Null Handling
+### 4. null handling
 
 **Pitfall**: Null values causing unexpected behavior or exceptions.
 
@@ -209,7 +209,7 @@ The `TestFixtureFactory` provides standard implementations for use in tests, ens
 - Use Optional for values that may be missing
 - Document null handling behavior in interface contracts
 
-### 5. Stateful Adapters
+### 5. stateful adapters
 
 **Pitfall**: Adapters with mutable state that can lead to concurrency issues.
 
@@ -242,4 +242,3 @@ The `TestFixtureFactory` provides standard implementations for use in tests, ens
 
 ---
 
-This pattern library will be updated as new patterns emerge and existing patterns evolve.

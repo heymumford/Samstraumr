@@ -1,4 +1,4 @@
-# Using Port Interfaces and Adapters in Clean Architecture
+# Using Domain Adapters
 
 This guide explains how to use port interfaces and adapters to implement Clean Architecture principles in the Samstraumr framework.
 
@@ -6,7 +6,7 @@ This guide explains how to use port interfaces and adapters to implement Clean A
 
 The Samstraumr framework has implemented Clean Architecture to improve modularity, testability, and maintainability. A key part of this implementation is the use of port interfaces and adapters, which allow different architectural layers to communicate without direct dependencies, following the Dependency Inversion Principle.
 
-### Recent Updates (April 2025)
+### Recent updates (april 2025)
 
 As of April 2025, we have completed the implementation of port interfaces in the infrastructure layer, particularly in the repository implementations:
 
@@ -52,7 +52,7 @@ The basic pattern for using port interfaces and adapters involves:
 2. Using the factory to create port interfaces from domain entities
 3. Working with the port interfaces instead of concrete implementations
 
-### Example: Creating and Using Port Interfaces
+### Example: creating and using port interfaces
 
 ```java
 // Create adapter factory
@@ -69,7 +69,7 @@ componentPort.activate();
 // No need to convert back - the adapter transparently delegates to the domain component
 ```
 
-### Example: Working with Legacy Code
+### Example: working with legacy code
 
 ```java
 // Create adapter factory
@@ -87,7 +87,7 @@ machinePort.start();
 
 ## Implementation Strategies
 
-### Strategy 1: Port Interfaces in Service Layer
+### Strategy 1: port interfaces in service layer
 
 Use port interfaces in the service layer to depend on abstractions rather than concrete implementations:
 
@@ -134,7 +134,7 @@ public class ComponentService {
 }
 ```
 
-### Strategy 2: Repository with Port Interfaces
+### Strategy 2: repository with port interfaces
 
 Implement repositories that work with port interfaces instead of concrete implementations:
 
@@ -186,7 +186,7 @@ public class InMemoryComponentRepository implements ComponentRepository {
 }
 ```
 
-### Strategy 3: Using Port Interfaces for New Code
+### Strategy 3: using port interfaces for new code
 
 Implement new functionality using port interfaces to ensure compatibility with both domain entities and legacy code:
 
@@ -255,7 +255,7 @@ However, for highly performance-critical sections, consider these optimizations:
 
 ## Troubleshooting
 
-### Common Issues
+### Common issues
 
 1. **Component Identity**: If components with the same ID are treated as different instances, check that you're using the port interfaces consistently and not mixing them with direct domain entity references.
 
@@ -309,9 +309,8 @@ Port interfaces and adapters are key to implementing Clean Architecture in the S
 By using port interfaces and adapters consistently, you can build a more maintainable, testable, and flexible system.
 
 For more information, see:
-- [Clean Architecture ADR](/docs/architecture/decisions/0003-adopt-clean-architecture-for-system-design.md)
-- [Adapter Package Documentation](/Samstraumr/samstraumr-core/src/main/java/org/s8r/adapter/package-info.java)
-- [Port Interfaces Documentation](/Samstraumr/samstraumr-core/src/main/java/org/s8r/domain/component/port/package-info.java)
-- [Port Interface Tests](/Samstraumr/samstraumr-core/src/test/java/org/s8r/domain/component/port/PortInterfaceTest.java)
-- [Repository Implementations](/Samstraumr/samstraumr-core/src/main/java/org/s8r/infrastructure/persistence/)
-- [Data Flow Service](/Samstraumr/samstraumr-core/src/main/java/org/s8r/application/service/DataFlowService.java)
+- [Clean Architecture ADR](../architecture/decisions/0003-adopt-clean-architecture-for-system-design.md)
+- [Adapter Package Documentation](/Samstraumr/samstraumr-core/src/main/java/org/s8r/adapter/package-info.java.md)
+- [Port Interfaces Documentation](/Samstraumr/samstraumr-core/src/main/java/org/s8r/domain/component/port/package-info.java.md)
+- [Port Interface Tests](/Samstraumr/samstraumr-core/src/test/java/org/s8r/domain/component/port/port-interface-test.java)
+- [Repository Implementations](/Samstraumr/samstraumr-core/src/main/java/org/s8r/infrastructure/persistence.persistence/)

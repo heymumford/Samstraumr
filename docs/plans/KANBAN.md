@@ -10,11 +10,11 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# S8r Project Kanban Board
+# KANBAN
 
 This document tracks the progress of tasks in the S8r project.
 
-## Tasks In Backlog
+## Tasks in Backlog
 
 - Set up CI/CD for S8r structure
 - Create comprehensive test suite in the new structure
@@ -22,7 +22,7 @@ This document tracks the progress of tasks in the S8r project.
 - Update documentation with component diagrams
 - Implement Clean Architecture verification in CI/CD
 
-## Tasks In Progress
+## Tasks in Progress
 
 - Create migration utilities for client code
 - Test the new Maven structure end-to-end
@@ -52,28 +52,28 @@ This document tracks the progress of tasks in the S8r project.
 
 ## S8r Migration Roadmap
 
-### Phase 1: Structure and Planning (Completed)
+### Phase 1: structure and planning (completed)
 
 - ✅ Create new Maven structure
 - ✅ Set up core component classes
 - ✅ Document API changes
 - ✅ Plan migration approach
 
-### Phase 2: Implementation (In Progress)
+### Phase 2: implementation (in progress)
 
 - ✅ Implement core Components
 - ✅ Create migration utilities
 - 🔄 Test build process
 - 🔄 Migrate tests
 
-### Phase 3: Deployment (Planned)
+### Phase 3: deployment (planned)
 
 - 📋 Finalize documentation
 - 📋 Perform full test suite verification
 - 📋 Tag new ${samstraumr.version} release
 - 📋 Set up CI/CD for new structure
 
-### Phase 4: Support (Planned)
+### Phase 4: support (planned)
 
 - 📋 Create examples for common migration patterns
 - 📋 Provide migration support

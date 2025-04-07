@@ -9,7 +9,7 @@ remain exclusively with the copyright holder listed above.
 Licensed under the Mozilla Public License 2.0
 -->
 
-# S8r Model Visualization Guide
+# Model Visualization
 
 This guide explains how to use the S8r CLI tools to create, visualize, and manage models efficiently. The S8r framework provides powerful visualization tools that help model designers understand their component structures and relationships.
 
@@ -29,11 +29,11 @@ This guide explains how to use the S8r CLI tools to create, visualize, and manag
 To use the S8r model visualization tools, you need to have a working Samstraumr installation:
 
 ```bash
-# Clone the repository
+# Model Visualization
 git clone https://github.com/heymumford/Samstraumr.git
 cd Samstraumr
 
-# Build project (ensures CLI tools are compiled)
+# Model Visualization
 ./s8r-build
 ```
 
@@ -48,20 +48,20 @@ The S8r CLI tools will be available in the project root directory:
 The `s8r init` command creates a new S8r model with the necessary directory structure and boilerplate files:
 
 ```bash
-# Initialize a new model in the current directory
+# Model Visualization
 ./s8r init
 
-# Initialize a new model in a specific directory
+# Model Visualization
 ./s8r init ~/my-new-model
 
-# Initialize with a custom package name
+# Model Visualization
 ./s8r init --package com.example.model
 
-# Initialize with a specific model name
+# Model Visualization
 ./s8r init --name "Customer Data Model" --package com.example.customer
 ```
 
-### Command Options
+### Command options
 
 | Option | Description |
 |--------|-------------|
@@ -70,7 +70,7 @@ The `s8r init` command creates a new S8r model with the necessary directory stru
 | `--verbose`, `-v` | Enable verbose output during initialization |
 | `--help`, `-h` | Show help information |
 
-### Directory Structure
+### Directory structure
 
 The initialization creates the following structure:
 
@@ -93,20 +93,20 @@ my-new-model/
 The `s8r list` command generates visual representations of your S8r model:
 
 ```bash
-# List model in the current directory
+# Model Visualization
 ./s8r list
 
-# List model in a specific directory
+# Model Visualization
 ./s8r list ~/my-model
 
-# Use a specific output format
+# Model Visualization
 ./s8r list --format tree
 
-# Show detailed component information
+# Model Visualization
 ./s8r list --detailed
 ```
 
-### Command Options
+### Command options
 
 | Option | Description |
 |--------|-------------|
@@ -115,7 +115,7 @@ The `s8r list` command generates visual representations of your S8r model:
 | `--verbose`, `-v` | Enable verbose output |
 | `--help`, `-h` | Show help information |
 
-### Sample Output
+### Sample output
 
 ASCII format:
 ```
@@ -159,16 +159,16 @@ S8r Model
 Components are the basic building blocks of your model. Use the following commands to manage them:
 
 ```bash
-# Create a new component
+# Model Visualization
 ./s8r component create --type transformer DataProcessor
 
-# List all components
+# Model Visualization
 ./s8r component list
 
-# Get detailed information about a component
+# Model Visualization
 ./s8r component info DataProcessor
 
-# Delete a component (use with caution)
+# Model Visualization
 ./s8r component delete DataProcessor
 ```
 
@@ -177,16 +177,16 @@ Components are the basic building blocks of your model. Use the following comman
 Composites group related components together:
 
 ```bash
-# Create a new composite
+# Model Visualization
 ./s8r composite create --type processing DataFlow
 
-# Add a component to a composite
+# Model Visualization
 ./s8r composite add --component DataProcessor --composite DataFlow
 
-# Connect components within a composite
+# Model Visualization
 ./s8r composite connect --source Parser --target Validator --composite DataFlow
 
-# List all composites
+# Model Visualization
 ./s8r composite list
 ```
 
@@ -195,13 +195,13 @@ Composites group related components together:
 Machines orchestrate composites to form complete processing systems:
 
 ```bash
-# Create a new machine
+# Model Visualization
 ./s8r machine create --template flow DataPipeline
 
-# Add a composite to a machine
+# Model Visualization
 ./s8r machine add --composite DataFlow --machine DataPipeline
 
-# Connect composites within a machine
+# Model Visualization
 ./s8r machine connect --source InputFlow --target ProcessingFlow --machine DataPipeline
 ```
 
@@ -222,4 +222,3 @@ Machines orchestrate composites to form complete processing systems:
 | Cannot find commands | Make sure S8r CLI tools are executable (`chmod +x s8r*`) |
 | Java errors during initialization | Check that you're using Java 17 or higher |
 
-For more information, run any command with the `--help` flag or consult the [official documentation](https://github.com/heymumford/Samstraumr/docs).

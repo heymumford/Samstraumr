@@ -1,0 +1,209 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r-version: Simplified version management for Samstraumr (< 200 lines)
+# Created as an alternative to the full system, following Unix principles:
+# "Do one thing and do it well" and "Simple is better than complex"
+#==============================================================================
+set -e
+
+# Find repository root
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel)}"
+VERSION_FILE="${PROJECT_ROOT}/Samstraumr/version.properties"
+VERSION_PATTERN='[0-9]+\.[0-9]+\.[0-9]+'
+
+# Terminal colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+# Functions for prettier output
+info() { set +e;  echo -e "${BLUE}$1${RESET}"; }
+success() { echo -e "${GREEN}$1${RESET}"; }
+error() { set +e;  echo -e "${RED}Error: $1${RESET}" >&2; exit 1; }
+
+# Get current version from source of truth
+get_version() {
+  if [[ ! -f "$VERSION_FILE" ]]; then
+    error "Version file not found: $VERSION_FILE"
+  fi
+  grep "samstraumr.version=" "$VERSION_FILE" | cut -d= -f2
+}
+
+# Update all files with new version
+update_version() {
+  local old=$1
+  local new=$2
+  local today=$(date +"%Y-%m-%d")
+  local files_updated=0
+  
+  # Validate version format
+  if ! [[ "$new" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    error "Invalid version format: $new (must be in format x.y.z)"
+  fi
+  
+  info "Updating version from $old to $new"
+  
+  # Update version.properties (source of truth)
+  if [[ -f "$VERSION_FILE" ]]; then
+    sed -i "s/^samstraumr.version=.*/samstraumr.version=$new/" "$VERSION_FILE"
+    sed -i "s/^samstraumr.last.updated=.*/samstraumr.last.updated=$(date +'%B %d, %Y')/" "$VERSION_FILE"
+    ((files_updated++))
+    echo -e "${GREEN}✓ Updated $VERSION_FILE${RESET}"
+  else
+    error "Version properties file not found: $VERSION_FILE"
+  fi
+  
+  # Update POM files
+  for pom in "$PROJECT_ROOT/pom.xml" "$PROJECT_ROOT/Samstraumr/pom.xml" "$PROJECT_ROOT/Samstraumr/samstraumr-core/pom.xml"; do
+    if [[ -f "$pom" ]]; then
+      # Update project version
+      if grep -q "<version>[0-9].*</version>" "$pom"; then
+        sed -i "s|<version>[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*</version>|<version>$new</version>|g" "$pom"
+        echo -e "${GREEN}✓ Updated project version in $pom${RESET}"
+      fi
+      
+      # Update samstraumr.version property
+      if grep -q "<samstraumr.version>" "$pom"; then
+        sed -i "s|<samstraumr.version>[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*</samstraumr.version>|<samstraumr.version>$new</samstraumr.version>|g" "$pom"
+        echo -e "${GREEN}✓ Updated property in $pom${RESET}"
+      fi
+      
+      # Update parent version
+      if grep -q "<parent>" "$pom"; then
+        sed -i "/<parent>/,/<\/parent>/s|<version>[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*</version>|<version>$new</version>|g" "$pom"
+        echo -e "${GREEN}✓ Updated parent in $pom${RESET}"
+      fi
+      
+      ((files_updated++))
+    fi
+  done
+  
+  # Update README.md
+  if [[ -f "$PROJECT_ROOT/README.md" ]]; then
+    # Update badge
+    sed -i "s|version-[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*-blue|version-$new-blue|g" "$PROJECT_ROOT/README.md"
+    # Update dependency example
+    sed -i "s|<version>[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*</version>|<version>$new</version>|g" "$PROJECT_ROOT/README.md"
+    ((files_updated++))
+    echo -e "${GREEN}✓ Updated README.md${RESET}"
+  fi
+  
+  # Update CLAUDE.md if it exists
+  if [[ -f "$PROJECT_ROOT/CLAUDE.md" ]]; then
+    # Simple replacement pattern for version references
+    sed -i "s|[0-9]\+\.[0-9]\+\.[0-9]\+|$new|g" "$PROJECT_ROOT/CLAUDE.md"
+    ((files_updated++))
+    echo -e "${GREEN}✓ Updated CLAUDE.md${RESET}"
+  fi
+  
+  # Update changelog
+  local changelog="$PROJECT_ROOT/docs/reference/release/changelog.md"
+  if [[ -f "$changelog" ]]; then
+    # Create new entry template
+    local template=$(cat <<EOF
+## [$new] - $today
+
+### Added
+
+- 
+
+### Changed
+
+- 
+
+### Fixed
+
+- 
+
+EOF
+)
+    # Find header line and insert new entry after it
+    local header_line=$(grep -n "All notable changes to this project will be documented in this file." "$changelog" | cut -d: -f1)
+    if [[ -n "$header_line" ]]; then
+      header_line=$((header_line + 2)) # Skip to the blank line after header
+      
+      # Create temporary file with new content
+      { head -n $header_line "$changelog"; echo -e "$template"; tail -n +$((header_line+1)) "$changelog"; } > "$changelog.new"
+      mv "$changelog.new" "$changelog"
+      
+      ((files_updated++))
+      echo -e "${GREEN}✓ Updated changelog.md${RESET}"
+    else
+      echo "Warning: Could not locate changelog header line"
+    fi
+  fi
+  
+  echo -e "${BLUE}Updated $files_updated files${RESET}"
+  echo -e "${GREEN}Version successfully updated to $new${RESET}"
+}
+
+# Parse command
+command=$1
+shift
+
+case "$command" in
+  get)
+    # Get current version
+    current=$(get_version)
+    echo -e "${BLUE}${BOLD}Samstraumr Version:${RESET} $current"
+    ;;
+    
+  bump)
+    # Bump version
+    type=${1:-patch}
+    current=$(get_version)
+    
+    # Parse version components
+    IFS='.' read -r major minor patch <<< "$current"
+    
+    # Calculate new version
+    case "$type" in
+      major) new="$((major+1)).0.0" ;;
+      minor) new="${major}.$((minor+1)).0" ;;
+      patch) new="${major}.${minor}.$((patch+1))" ;;
+      *)     error "Invalid bump type: $type (use major, minor, or patch)" ;;
+    esac
+    
+    update_version "$current" "$new"
+    ;;
+    
+  set)
+    # Set version to specific value
+    new=$1
+    if [[ -z "$new" ]]; then
+      error "Version must be specified (format: x.y.z)"
+    fi
+    
+    current=$(get_version)
+    update_version "$current" "$new"
+    ;;
+  
+  fix)
+    # Fix version inconsistencies
+    current=$(get_version)
+    info "Fixing version inconsistencies - forcing all files to use $current"
+    update_version "$current" "$current"
+    ;;
+    
+  *)
+    # Help message
+    echo -e "${BLUE}${BOLD}Samstraumr Version Manager${RESET}"
+    echo
+    echo "Usage: $0 <command> [options]"
+    echo
+    echo "Commands:"
+    echo "  get                 Show current version"
+    echo "  bump [type]         Bump version (type: major, minor, patch)"
+    echo "  set <version>       Set specific version (format: x.y.z)"
+    echo "  fix                 Fix version inconsistencies across files"
+    echo
+    echo "Examples:"
+    echo "  $0 get              # Show current version"
+    echo "  $0 bump patch       # Increment patch version"
+    echo "  $0 bump minor       # Increment minor version"
+    echo "  $0 set 2.0.0        # Set version to 2.0.0"
+    exit 1
+    ;;
+esac

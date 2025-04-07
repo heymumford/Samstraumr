@@ -24,11 +24,11 @@ Both systems ensure consistent versioning across all project files using `versio
 ## Original Command System
 
 ```bash
-# Use the original full-featured system
+# Version Management
 ./s8r version <command> [options]
 ```
 
-### View Commands
+### View commands
 
 | Command | Description | Example |
 |---------|-------------|---------|
@@ -38,7 +38,7 @@ Both systems ensure consistent versioning across all project files using `versio
 | `history` | Version history | `./s8r version history` |
 | `verify` | Check tag alignment | `./s8r version verify` |
 
-### Modification Commands
+### Modification commands
 
 | Command | Description | Example |
 |---------|-------------|---------|
@@ -52,7 +52,7 @@ Both systems ensure consistent versioning across all project files using `versio
 ## Simplified Command System
 
 ```bash
-# Use the new lightweight system (recommended)
+# Version Management
 ./s8r-version <command> [options]
 ```
 
@@ -102,7 +102,7 @@ The simplified system follows these design principles:
 3. **Consistency**: Ensures all version references stay synchronized
 4. **Transparency**: Clear output showing what changed and where
 
-### Example Output
+### Example output
 
 ```
 Updating version from 1.7.1 to 1.7.2
@@ -129,4 +129,3 @@ The system automatically creates new entries in the changelog file whenever the 
 1. Use semantic versioning consistently
 2. Run tests before finalizing version changes
 3. Use `fix` command to correct any synchronization issues
-4. Consider using the simplified system for most operations

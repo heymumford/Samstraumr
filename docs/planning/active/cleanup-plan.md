@@ -1,10 +1,10 @@
-# Repository Cleanup Plan (Completed)
+# Cleanup Plan
 
 This document outlines the plan for organizing files in the repository to maintain a clean and structured codebase.
 
 ## Files to Organize
 
-### Test Files to Move to /test-scripts Directory
+### Test files to move to /test-scripts directory
 
 These files should be moved to a new `test-scripts` directory:
 - s8r-acceptance-tests.sh
@@ -21,7 +21,7 @@ These files should be moved to a new `test-scripts` directory:
 - test-machine-adapter.sh
 - verify-cli.sh
 
-### Script Files to Move to /util/scripts Directory
+### Script files to move to /util/scripts directory
 
 These utility scripts should be organized in the util/scripts directory:
 - flatten-component-layer.sh
@@ -38,7 +38,7 @@ These utility scripts should be organized in the util/scripts directory:
 - merge-redundant-resources.sh
 - standardize-todo-implementation.sh
 
-### Documentation Files to Move to /docs Directory
+### Documentation files to move to /docs directory
 
 These documentation files should be organized in appropriate subdirectories of /docs:
 - consolidation-summary.md -> docs/planning/completed/
@@ -51,7 +51,7 @@ These documentation files should be organized in appropriate subdirectories of /
 - source-code-flattening-summary.md -> docs/planning/completed/
 - redundant-resources-analysis.md -> docs/planning/completed/
 
-### Consolidation Scripts to Move to /util/bin Directory
+### Consolidation scripts to move to /util/bin directory
 
 These consolidation scripts should be moved to util/bin:
 - cleanup-legacy-packages.sh
@@ -63,14 +63,14 @@ These consolidation scripts should be moved to util/bin:
 - consolidate-temporary-files.sh
 - create-component-symlinks.sh
 
-### Temporary/Backup Directories to Remove
+### Temporary/backup directories to remove
 
 These directories appear to be temporary backups and should be removed:
 - tag-standardization-backup-* (multiple directories)
 - redundant-resources-backup-*
 - feature-file-backup-*
 
-### Version and Build Scripts to Organize
+### Version and build scripts to organize
 
 Version and build scripts should be organized:
 - s8r-build -> Keep in root (primary user command)
@@ -82,7 +82,7 @@ Version and build scripts should be organized:
 - s8r-updated -> Move to util/bin/archived/
 - s8r-new -> Move to util/bin/archived/
 
-### Special Files to Handle
+### Special files to handle
 
 - VALIDATION-TODOS.md -> Move to docs/planning/active/
 - stack-trace-output.log -> Delete (temporary file)
@@ -94,4 +94,3 @@ Version and build scripts should be organized:
 2. Move files to their designated locations
 3. Update any references/symlinks as needed
 4. Remove temporary backup directories
-5. Verify all scripts still function after reorganization

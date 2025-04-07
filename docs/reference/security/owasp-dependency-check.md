@@ -1,4 +1,4 @@
-# OWASP Dependency Check Configuration
+# Owasp Dependency Check
 
 This document describes how the OWASP Dependency Check tool is configured and used in the Samstraumr project to identify and manage security vulnerabilities in project dependencies.
 
@@ -22,7 +22,7 @@ Two profiles have been created to run the dependency check:
    - Generates reports but does not fail the build
    - Useful for local testing of the CI pipeline
 
-### Configuration Options
+### Configuration options
 
 The following configuration options have been set:
 
@@ -37,11 +37,11 @@ The following configuration options have been set:
 - `skipOnError`: Set to true for nonblocking profile, false for blocking profile
 - Various analyzer settings optimized for this project
 
-### NVD API Key
+### Nvd api key
 
 OWASP Dependency Check can use the NVD (National Vulnerability Database) API to fetch vulnerability data. Using an API key significantly improves performance and reliability.
 
-#### Setting up an NVD API Key
+#### Setting up an nvd api key
 
 1. Register for an API key at the [NVD Website](https://nvd.nist.gov/developers/request-an-api-key)
 2. Set the API key as an environment variable:
@@ -63,11 +63,11 @@ For GitHub Actions workflows, add it as a repository secret and reference it in 
 
 ## Usage
 
-### In CI Pipeline
+### In ci pipeline
 
 The CI pipeline should activate the `ci-pipeline` profile to run the dependency check and fail the build if medium to high severity vulnerabilities are found.
 
-### Local Testing
+### Local testing
 
 To test the dependency check locally without failing the build:
 
@@ -117,4 +117,3 @@ After running the dependency check, reports can be found at:
 2. Review all vulnerabilities and address high severity issues promptly
 3. Document any suppressed vulnerabilities thoroughly
 4. Keep the NVD database up to date by running the check periodically
-5. Include dependency-check reports in security reviews

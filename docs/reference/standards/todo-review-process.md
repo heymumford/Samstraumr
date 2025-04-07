@@ -9,7 +9,7 @@ remain exclusively with the copyright holder listed above.
 Licensed under the Mozilla Public License 2.0
 -->
 
-# TODO Review Process
+# Todo Review Process
 
 This document outlines the standard process for regularly reviewing and managing TODOs in the Samstraumr codebase.
 
@@ -24,16 +24,16 @@ TODOs should be reviewed on a regular schedule to prevent technical debt accumul
 
 ## Review Process
 
-### 1. Generate TODO Report
+### 1. generate todo report
 
 Before each review, generate an up-to-date TODO report:
 
 ```bash
-# Generate a TODO report
+# Todo Review Process
 ./docs/scripts/extract-todos.sh --output ./docs/reports/todo-status.md
 ```
 
-### 2. Categorize TODOs
+### 2. categorize todos
 
 During the review, categorize TODOs into action groups:
 
@@ -43,32 +43,32 @@ During the review, categorize TODOs into action groups:
 - **Delegate**: TODOs that should be assigned to a specific team member
 - **Obsolete**: TODOs that are no longer relevant and can be removed
 
-### 3. Create GitHub Issues
+### 3. create github issues
 
 For all TODOs in the "Fix Now" and "Next Sprint" categories, ensure GitHub issues exist:
 
 ```bash
-# Verify GitHub issues exist for high-priority TODOs
+# Todo Review Process
 ./docs/scripts/check-todo-format.sh --github-issues --high-priority
 ```
 
 If an issue doesn't exist, create one using:
 
 ```bash
-# Create a GitHub issue for a TODO
+# Todo Review Process
 ./docs/scripts/todo-to-issue.sh "path/to/file.java:line_number"
 ```
 
-### 4. Update TODO Priorities
+### 4. update todo priorities
 
 Based on the review, update TODO priorities as needed:
 
 ```bash
-# Fix a TODO's priority
+# Todo Review Process
 ./docs/scripts/standardize-todos.sh --fix --directory path/to/specific/file.java
 ```
 
-### 5. Track Progress
+### 5. track progress
 
 At the end of each review cycle, generate metrics to track progress:
 
@@ -80,23 +80,23 @@ At the end of each review cycle, generate metrics to track progress:
 
 ## Integration with Development Workflow
 
-### Pre-commit Checks
+### Pre-commit checks
 
 Before committing code, run the TODO format check to ensure new TODOs follow the standard format:
 
 ```bash
-# Check TODO format
+# Todo Review Process
 ./docs/scripts/check-todo-format.sh
 ```
 
-### CI/CD Integration
+### Ci/cd integration
 
 The CI pipeline includes a check for TODO format compliance:
 
 1. All TODOs must follow the standard format
 2. P0/P1 TODOs must have associated GitHub issues
 
-### Sprint Planning
+### Sprint planning
 
 During sprint planning:
 
@@ -149,4 +149,3 @@ Here's an example of a typical TODO review session:
    - Determine if it's still relevant
    - Consider if it should be converted to a GitHub issue for the backlog
 6. Generate summary statistics
-7. Update the TODO status dashboard

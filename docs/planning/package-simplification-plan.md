@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Package Structure Simplification Plan
+# Package Simplification Plan
 
 ## Overview
 
@@ -53,14 +53,14 @@ org.s8r                         (← replace org.samstraumr)
 
 ## Implementation Phases
 
-### Phase 1: Document and Plan (Current)
+### Phase 1: document and plan (current)
 
 - ✅ Analyze current package structure
 - ✅ Identify redundancies and problems
 - ✅ Create documentation with proposed structure
 - ⬜ Create a detailed migration roadmap
 
-### Phase 2: Testing Infrastructure Consolidation
+### Phase 2: testing infrastructure consolidation
 
 - ⬜ Create new `org.s8r.test.annotation` package
 - ⬜ Migrate all test annotations to this package
@@ -68,20 +68,20 @@ org.s8r                         (← replace org.samstraumr)
 - ⬜ Consolidate test runners
 - ⬜ Establish clear guidelines for test organization
 
-### Phase 3: Core Infrastructure Consolidation
+### Phase 3: core infrastructure consolidation
 
 - ⬜ Create new package structure starting with `org.s8r.core`
 - ⬜ Migrate core classes to new structure
 - ⬜ Centralize exception handling
 - ⬜ Implement shim classes for backward compatibility
 
-### Phase 4: Maven Artifact Simplification
+### Phase 4: maven artifact simplification
 
 - ⬜ Update artifactIDs to use s8r prefix
 - ⬜ Update version properties
 - ⬜ Adjust build configuration
 
-### Phase 5: Documentation and Cleanup
+### Phase 5: documentation and cleanup
 
 - ⬜ Update all documentation to reflect new structure
 - ⬜ Add deprecation annotations to old structure

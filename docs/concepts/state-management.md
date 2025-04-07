@@ -30,7 +30,7 @@ S8r brings awareness to software through its unified state model complemented by
 
 ## Unified State Model
 
-### Component State Lifecycle
+### Component state lifecycle
 
 S8r's unified State enum represents the component's position in a lifecycle:
 
@@ -50,7 +50,7 @@ public enum State {
 }
 ```
 
-### Component Properties
+### Component properties
 
 While State provides lifecycle and operational status, properties manage detailed, dynamic information:
 
@@ -63,7 +63,7 @@ component.setProperty("errorRate", 0.002);
 int count = (int)component.getProperty("processingCount");
 ```
 
-### State-Property Interplay
+### State-property interplay
 
 1. **State Provides Context**: Property interpretation depends on current state
 2. **Properties Influence Transitions**: Patterns in properties can trigger state changes
@@ -71,7 +71,7 @@ int count = (int)component.getProperty("processingCount");
 
 ## State at Different Levels
 
-### Component State
+### Component state
 
 ```java
 public void processItem(Item item) {
@@ -91,7 +91,7 @@ public void processItem(Item item) {
 }
 ```
 
-### Composite State
+### Composite state
 
 Composites aggregate states of their components:
 
@@ -119,7 +119,7 @@ public void evaluateCompositeState() {
 }
 ```
 
-### Machine State
+### Machine state
 
 Machines coordinate multiple composites:
 
@@ -148,7 +148,7 @@ public void determineMachineState() {
 
 ## State Transitions
 
-### Intentional Transitions
+### Intentional transitions
 
 Explicitly requested by the component or controller:
 
@@ -170,7 +170,7 @@ public void shutDown() {
 }
 ```
 
-### Reactive Transitions
+### Reactive transitions
 
 Occur in response to observed conditions:
 
@@ -191,7 +191,7 @@ public void monitorHealthAndAdapt() {
 }
 ```
 
-### Propagated Transitions
+### Propagated transitions
 
 State changes in one component trigger changes in related components:
 
@@ -210,7 +210,7 @@ public void onComponentStateChanged(Component component, State oldState, State n
 
 ## Monitoring and Observability
 
-### Health Assessments
+### Health assessments
 
 Structured evaluation of operational wellness:
 
@@ -241,7 +241,7 @@ public HealthAssessment assessHealth() {
 }
 ```
 
-### System-Wide Observability
+### System-wide observability
 
 Beyond individual components:
 
@@ -252,7 +252,7 @@ Beyond individual components:
 
 ## Implementation Guidelines
 
-### State Implementation
+### State implementation
 
 1. **Use an Enum for Primary State**: Type safety and clear documentation
 2. **Validate State Transitions**: Only allow valid transitions
@@ -285,7 +285,7 @@ public void setState(State newState) {
 }
 ```
 
-### Properties Implementation
+### Properties implementation
 
 1. **Use a Flexible Structure**: Accommodate various types without code changes
 2. **Include Timestamps**: Attach timestamps to property changes
@@ -308,7 +308,7 @@ public void setProperty(String key, Object value) {
 
 ## Advanced State Management
 
-### State Machines
+### State machines
 
 For components with complex transition rules:
 
@@ -330,7 +330,7 @@ public boolean transitionTo(OrderState targetState) {
 }
 ```
 
-### State Persistence
+### State persistence
 
 For long-running or mission-critical systems:
 
@@ -356,7 +356,7 @@ public PersistentStateComponent(Identity identity, Environment env,
 }
 ```
 
-### Distributed State
+### Distributed state
 
 Maintaining coherent state across multiple nodes:
 
@@ -379,7 +379,7 @@ private void onDistributedStateChange(String componentId, State newState) {
 
 ## State Management Patterns
 
-### Self-Healing State
+### Self-healing state
 
 Components that detect and recover from failures:
 
@@ -406,7 +406,7 @@ public Object process(Object input) {
 }
 ```
 
-### Degraded State
+### Degraded state
 
 Components operating with reduced functionality:
 
@@ -429,7 +429,7 @@ public Object process(Object input) {
 }
 ```
 
-### State-Based Routing
+### State-based routing
 
 Using state to direct work flow:
 
@@ -467,7 +467,7 @@ private String selectRouteBasedOnState() {
 
 ## Common Challenges
 
-### State Explosion
+### State explosion
 
 **Solution**: Use state abstraction and hierarchical properties
 
@@ -486,7 +486,7 @@ setProperty("processing", processingProps);
 setProperty("resources", resourceProps);
 ```
 
-### State Visibility Delays
+### State visibility delays
 
 **Solution**: Implement eventually consistent state patterns
 
@@ -506,4 +506,3 @@ private void onRemoteStateChange(State remoteState) {
 }
 ```
 
-[← Return to Core Concepts](./core-concepts.md) | [Explore Component Patterns →](../guides/component-patterns.md)

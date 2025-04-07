@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Testing Strategy
+# Test Strategy
 
 > **⚠️ This document has been consolidated!**
 >

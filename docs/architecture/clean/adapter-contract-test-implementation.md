@@ -8,7 +8,7 @@ The adapter contract test suite ensures that all adapter implementations correct
 
 ## Key Components
 
-### Base Contract Test Class
+### Base contract test class
 
 All contract tests extend the abstract `PortContractTest<T>` class, which provides:
 
@@ -34,7 +34,7 @@ public abstract class PortContractTest<T> {
 }
 ```
 
-### Test Fixture Factory
+### Test fixture factory
 
 The `TestFixtureFactory` class provides standardized methods for creating test fixtures:
 
@@ -56,7 +56,7 @@ public class TestFixtureFactory {
 }
 ```
 
-### Contract Test Suite
+### Contract test suite
 
 The `RunAdapterContractTests` class defines a JUnit 5 test suite for running all contract tests:
 
@@ -72,7 +72,7 @@ public class RunAdapterContractTests {
 
 ## Implemented Contract Tests
 
-### Component Port Contract Test
+### Component port contract test
 
 Tests for the `ComponentPort` interface, covering:
 
@@ -87,7 +87,7 @@ public class ComponentPortContractTest extends PortContractTest<ComponentPort> {
 }
 ```
 
-### Machine Port Contract Test
+### Machine port contract test
 
 Tests for the `MachinePort` interface, covering:
 
@@ -102,7 +102,7 @@ public class MachinePortContractTest extends PortContractTest<MachinePort> {
 }
 ```
 
-### Data Flow Event Port Contract Test
+### Data flow event port contract test
 
 Tests for the `DataFlowEventPort` interface, covering:
 
@@ -117,7 +117,7 @@ public class DataFlowEventPortContractTest extends PortContractTest<DataFlowEven
 }
 ```
 
-### Configuration Port Contract Test
+### Configuration port contract test
 
 Tests for the `ConfigurationPort` interface, covering:
 
@@ -132,7 +132,7 @@ public class ConfigurationPortContractTest extends PortContractTest<Configuratio
 }
 ```
 
-### File System Port Contract Test
+### File system port contract test
 
 Tests for the `FileSystemPort` interface, covering:
 
@@ -194,4 +194,3 @@ Planned enhancements to the contract testing approach:
 
 ---
 
-The adapter contract tests provide a robust framework for verifying adapter implementations and maintaining the Clean Architecture principles in the Samstraumr project.

@@ -13,7 +13,7 @@ Licensed under the Mozilla Public License 2.0
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-# Build and Test System
+# Build and Test
 
 The Samstraumr build and test system is designed to be simple, efficient, and maintainable. It provides a straightforward interface for common build and test operations while abstracting away the complexity of the underlying Maven configuration.
 
@@ -27,7 +27,7 @@ Samstraumr provides a single entry point for all operations through the `s8r` sc
 ./s8r <command> [options] [arguments]
 ```
 
-### Core Commands
+### Core commands
 
 - `build`: Build the project with various modes
 - `test`: Run tests of different types
@@ -35,18 +35,18 @@ Samstraumr provides a single entry point for all operations through the `s8r` sc
 - `coverage`: Run and manage code coverage
 - `clean`: Clean build artifacts
 
-### Global Options
+### Global options
 
 - `--watch, -w`: Watch mode (continuous execution)
 - `--parallel, -p`: Execute in parallel where supported
 - `--help, -h`: Show help information
 
-### Command Chaining
+### Command chaining
 
 The system supports command chaining for common operations:
 
 ```bash
-# Build and test in one command
+# Build and Test
 ./s8r build-test unit
 ```
 
@@ -82,16 +82,16 @@ The build system is accessible through the `s8r build` command, providing a simp
 ### Examples
 
 ```bash
-# Quick compilation without tests
+# Build and Test
 ./s8r build
 
-# Clean build with tests
+# Build and Test
 ./s8r build --clean test
 
-# Parallel build for faster execution
+# Build and Test
 ./s8r build --parallel full
 
-# Watch mode for continuous compilation during development
+# Build and Test
 ./s8r build --watch
 ```
 
@@ -105,7 +105,7 @@ The test system is accessible through the `s8r test` command, providing a simple
 ./s8r test [options] [test-type]
 ```
 
-### Test Types
+### Test types
 
 - `unit`: Run unit and tube tests (fast, focused tests)
 - `component`: Run component and composite tests
@@ -133,16 +133,16 @@ The test system is accessible through the `s8r test` command, providing a simple
 ### Examples
 
 ```bash
-# Run unit tests
+# Build and Test
 ./s8r test unit
 
-# Run component tests in parallel
+# Build and Test
 ./s8r test --parallel component
 
-# Run tests with code coverage analysis
+# Build and Test
 ./s8r test --coverage all
 
-# Continuous testing with watch mode
+# Build and Test
 ./s8r test --watch unit
 ```
 
@@ -164,10 +164,10 @@ The coverage system is accessible through the `s8r coverage` command, providing 
 ### Examples
 
 ```bash
-# Generate coverage report
+# Build and Test
 ./s8r coverage
 
-# Run unit tests with coverage
+# Build and Test
 ./s8r coverage run unit
 ```
 
@@ -210,14 +210,14 @@ The new build and test system represents a significant improvement over the prev
 The system provides seamless integration between build, test, and version management:
 
 ```bash
-# Update version and build
+# Build and Test
 ./s8r version bump minor
 ./s8r build package
 
-# Verify version consistency
+# Build and Test
 ./s8r version fix
 
-# Combined operations
+# Build and Test
 ./s8r build-test unit
 ./s8r coverage run integration
 ```

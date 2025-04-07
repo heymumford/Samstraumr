@@ -2,7 +2,7 @@
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-# Event-Driven Architecture in Samstraumr
+# README
 
 This document describes the event-driven architecture implemented in the Samstraumr framework.
 
@@ -14,7 +14,7 @@ The event system follows Clean Architecture principles, with domain events defin
 
 ## Core Components
 
-### Domain Events
+### Domain events
 
 Domain events represent significant occurrences within the domain model. They are defined in the domain layer and are immutable value objects.
 
@@ -43,7 +43,7 @@ public abstract class DomainEvent {
 - `MachineStateChangedEvent`: Raised when a machine's state changes
 - `ComponentDataEvent`: Raised when a component publishes data for other components
 
-### Event Dispatcher
+### Event dispatcher
 
 The event dispatcher is defined as a port (interface) in the application layer and implemented in the infrastructure layer. It allows components to register handlers for specific event types and dispatches events to the appropriate handlers.
 
@@ -73,7 +73,7 @@ public class InMemoryEventDispatcher implements EventDispatcher {
 }
 ```
 
-### Data Flow Service
+### Data flow service
 
 The `DataFlowService` provides a facade for the event system, simplifying the publication and subscription of data events.
 
@@ -90,7 +90,7 @@ public class DataFlowService {
 
 ## Event Types and Flows
 
-### System Events
+### System events
 
 System events represent significant changes to the system state, such as component creation, state changes, and component connections.
 
@@ -101,7 +101,7 @@ System events represent significant changes to the system state, such as compone
 
 These events are primarily used for system monitoring, logging, and maintaining consistency across the system.
 
-### Data Events
+### Data events
 
 Data events (`ComponentDataEvent`) represent data flowing between components. These events carry a payload of data from one component to another, enabling communication without direct dependencies.
 
@@ -110,7 +110,7 @@ Data events include:
 - Data channel (logical topic for the data)
 - Data payload (map of key-value pairs)
 
-### Event Channels
+### Event channels
 
 Event channels provide logical segmentation of event flows. Components can subscribe to specific channels to receive only events they are interested in.
 

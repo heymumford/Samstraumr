@@ -24,7 +24,7 @@ Licensed under the Mozilla Public License 2.0
 - [The Journey Ahead](#the-journey-ahead)
 - [Related Documentation](#related-documentation)
 
-## Introduction: A New Way of Seeing Software
+## Introduction: a New Way of Seeing Software
 
 For too long, we've built software as if it were a static machine—something to be assembled once and maintained with occasional repairs. But what if we could create systems that behave more like living organisms—adapting, evolving, and responding intelligently to their environment?
 
@@ -36,7 +36,7 @@ This document introduces the core concepts that make S8r unique and powerful. Ea
 
 At the heart of S8r lies the component—a self-contained, purposeful unit that processes inputs and produces outputs while maintaining awareness of its own state and context.
 
-### Anatomy of a Component
+### Anatomy of a component
 
 A component combines several essential elements:
 
@@ -65,7 +65,7 @@ The identity serves as both documentation and a formal verification mechanism, a
 
 S8r components maintain a unified state system that captures both the lifecycle phase and operational status of a component.
 
-### Component States
+### Component states
 
 The State enum represents the fundamental operational and developmental phases of a component:
 
@@ -80,7 +80,7 @@ The State enum represents the fundamental operational and developmental phases o
 - **TERMINATING**: In process of shutting down
 - **TERMINATED**: No longer operating
 
-### State Transitions
+### State transitions
 
 State changes follow a biological-inspired lifecycle:
 
@@ -89,7 +89,7 @@ State changes follow a biological-inspired lifecycle:
 3. **Operational Phase**: READY → ACTIVE ↔ DEGRADED
 4. **Termination Phase**: TERMINATING → TERMINATED
 
-### State Propagation and Recovery
+### State propagation and recovery
 
 S8r implements sophisticated patterns for managing state across components:
 
@@ -102,7 +102,7 @@ S8r implements sophisticated patterns for managing state across components:
 
 Perhaps the most revolutionary aspect of S8r is its emphasis on self-awareness—the ability of software components to observe, evaluate, and adjust their own operation.
 
-### Dimensions of Awareness
+### Dimensions of awareness
 
 Components maintain awareness across several dimensions:
 
@@ -112,7 +112,7 @@ Components maintain awareness across several dimensions:
 4. **History Awareness**: Memory of past states and transitions
 5. **Capability Awareness**: Understanding of current processing abilities
 
-### Awareness in Action
+### Awareness in action
 
 This self-awareness manifests in practical behaviors:
 

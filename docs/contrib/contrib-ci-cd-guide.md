@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# C I C D Guide
+# Contrib Ci Cd Guide
 
 This guide explains how to work with Samstraumr's CI/CD pipeline and verify your changes before submitting them.
 
@@ -48,10 +48,10 @@ The build status badge in the README is automatically updated when the pipeline 
 For generating build reports locally without GitHub Actions:
 
 ```bash
-# C I C D Guide
+# Contrib Ci Cd Guide
 ./util/build/generate-build-report.sh --skip-tests --skip-quality
 
-# C I C D Guide
+# Contrib Ci Cd Guide
 ./util/build/generate-build-report.sh
 ```
 

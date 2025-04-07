@@ -2,7 +2,7 @@
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-# Samstraumr Architecture Documentation
+# README
 
 This directory contains the high-level architecture documentation for the Samstraumr (S8r) framework.
 
@@ -28,11 +28,11 @@ The architecture is documented using the [C4 model](https://c4model.com/) approa
 
 These diagrams are automatically generated during the build process and stored in the [diagrams](../diagrams.md) directory.
 
-### Viewing the Latest Diagrams
+### Viewing the latest diagrams
 
 The latest generated diagrams can be found in the [diagrams directory](../diagrams/readme.md).
 
-### Generating Diagrams
+### Generating diagrams
 
 The C4 model diagrams are automatically generated during the Maven build process. To manually generate them, run:
 
@@ -66,14 +66,14 @@ To create a new ADR, use the `new-adr` script:
 
 Samstraumr is built on Clean Architecture principles as defined by Robert C. Martin (Uncle Bob). The architecture is organized into concentric layers with dependencies pointing inward, ensuring a clear separation of concerns and making the system more maintainable and testable.
 
-### Architectural Layers
+### Architectural layers
 
 1. **Domain Layer** - The innermost layer that contains business entities, value objects, and domain logic.
 2. **Application Layer** - Contains application-specific business rules, use cases, and ports (interfaces) for external services.
 3. **Infrastructure Layer** - Implements the interfaces defined in the application layer, providing concrete implementations for external services.
 4. **Presentation Layer** - Handles user interactions, whether through CLI, GUI, or API endpoints.
 
-### Key Architectural Principles
+### Key architectural principles
 
 - **Dependency Rule**: Dependencies only point inward. Inner layers know nothing about outer layers.
 - **Domain-Centered**: The domain model is at the core, immune to external changes.

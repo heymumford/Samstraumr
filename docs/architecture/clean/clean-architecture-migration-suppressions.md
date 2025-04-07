@@ -1,4 +1,4 @@
-# Clean Architecture Migration Dependency Suppressions
+# Clean Architecture Migration Suppressions
 
 ## Overview
 
@@ -6,7 +6,7 @@ During the migration to Clean Architecture, certain dependency violations need t
 
 ## Current Suppressions
 
-### Adapter Dependencies on Legacy Code
+### Adapter dependencies on legacy code
 
 These suppressions allow the adapter layer to temporarily depend on implementation classes during migration:
 
@@ -48,7 +48,7 @@ These suppressions allow the adapter layer to temporarily depend on implementati
 
 ## Resolution Plan
 
-### Short-term Solutions (1-2 weeks)
+### Short-term solutions (1-2 weeks)
 
 1. **Interface Extraction**:
    - Define interfaces in the domain layer that capture essential behavior
@@ -58,7 +58,7 @@ These suppressions allow the adapter layer to temporarily depend on implementati
    - Use domain interfaces instead of concrete types where possible
    - Implement factory methods that return interface types
 
-### Medium-term Solutions (3-4 weeks)
+### Medium-term solutions (3-4 weeks)
 
 1. **Reflection-based Adapters**:
    - Replace direct dependencies with reflection-based adapters
@@ -68,7 +68,7 @@ These suppressions allow the adapter layer to temporarily depend on implementati
    - Replace direct calls with events where appropriate
    - Use domain events to decouple components
 
-### Long-term Solutions (1-3 months)
+### Long-term solutions (1-3 months)
 
 1. **Complete Migration**:
    - Gradually replace all legacy components with clean architecture implementations
@@ -83,4 +83,3 @@ These suppressions allow the adapter layer to temporarily depend on implementati
 
 The architecture tests automatically detect violations not covered by these suppressions. Any new dependency from the adapter layer to implementation classes should be carefully considered and added to this list only if absolutely necessary.
 
-The goal is to progressively reduce this list until all dependencies follow Clean Architecture principles.

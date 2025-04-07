@@ -1,4 +1,4 @@
-# Adapter Pattern Implementation for Legacy Code
+# Adapter Pattern Implementation
 
 This document describes the implementation of the Adapter pattern to manage dependencies on legacy code while maintaining Clean Architecture principles.
 
@@ -34,7 +34,7 @@ To fix this issue, we applied the Adapter pattern in combination with the Depend
 
 ## Implementation Details
 
-### Interface Design
+### Interface design
 
 The interfaces define operations in terms of generic `Object` parameters and return types, with specific validation inside the implementations. This allows the domain layer to remain completely independent of legacy implementation details:
 
@@ -46,7 +46,7 @@ public interface LegacyEnvironmentConverter {
 }
 ```
 
-### Adapter Implementation
+### Adapter implementation
 
 Each adapter implementation provides specific handling for a legacy type:
 
@@ -62,7 +62,7 @@ public class TubeLegacyEnvironmentConverter implements LegacyEnvironmentConverte
 }
 ```
 
-### Factory Pattern
+### Factory pattern
 
 The factory pattern is used to create and provide access to adapter instances:
 
@@ -78,7 +78,7 @@ public class LegacyAdapterFactory {
 }
 ```
 
-### Dependency Injection
+### Dependency injection
 
 The adapters are registered in the dependency container to be injected where needed:
 
@@ -105,4 +105,3 @@ private void setupLegacyAdapters() {
 
 ## Conclusion
 
-Using the Adapter pattern with Dependency Inversion has successfully decoupled the adapter layer from direct dependencies on legacy code while maintaining backward compatibility. This approach ensures Clean Architecture principles are followed without requiring immediate replacement of all legacy code.

@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Migrating from Samstraumr to S8r
+# SamstraumrToS8rMigration
 
 This guide provides detailed instructions for migrating client code from Samstraumr (tube-based) to S8r (component-based).
 
@@ -97,7 +97,7 @@ Tube tube = Tube.create("reason", env);
 Component component = Component.create("reason", env);
 ```
 
-### Child Creation
+### Child creation
 
 **Old:**
 
@@ -111,7 +111,7 @@ Tube child = Tube.createChild("reason", env, parentTube);
 Component child = Component.createChild("reason", env, parentComponent);
 ```
 
-### Status/State Checking
+### Status/state checking
 
 **Old:**
 
@@ -133,7 +133,7 @@ if (component.getState() == State.READY) {
 }
 ```
 
-### Environment Interaction
+### Environment interaction
 
 **Old:**
 
@@ -223,7 +223,7 @@ If you have tests using Samstraumr annotations, update them:
 
 ## Common Migration Patterns
 
-### Creating Components
+### Creating components
 
 ```java
 // Old
@@ -235,7 +235,7 @@ Environment env = new Environment("test", params);
 Component component = Component.create("testing", env);
 ```
 
-### Component Hierarchies
+### Component hierarchies
 
 ```java
 // Old
@@ -249,7 +249,7 @@ Component child1 = Component.createChild("child1", env, parent);
 Component child2 = Component.createChild("child2", env, parent);
 ```
 
-### Working with State
+### Working with state
 
 ```java
 // Old
@@ -265,7 +265,7 @@ boolean isTerminated = component.isTerminated();
 
 S8r provides a comprehensive set of migration utilities to help with the transition from Tube-based code to Component-based code:
 
-### S8rMigrationFactory
+### S8rmigrationfactory
 
 The `S8rMigrationFactory` class provides easy access to all migration utilities:
 
@@ -285,7 +285,7 @@ Composite composite = factory.wrapTubeComposite(tubeComposite);
 Machine machine = factory.wrapTubeMachine(tubeMachine);
 ```
 
-### Migration Assistant Script
+### Migration assistant script
 
 A migration assistant script is also available to help with automated code conversion:
 

@@ -1,4 +1,4 @@
-# Package Flattening Migration Guide
+# Package Flattening Guide
 
 ## Introduction
 
@@ -8,7 +8,7 @@ This guide helps developers navigate through the recent package flattening chang
 
 The Samstraumr codebase recently underwent a package flattening operation that moved files from deeply nested subdirectories to their parent directories. This was done to simplify the package structure and make it more maintainable.
 
-### Key Changes
+### Key changes
 
 1. Files moved from `org.s8r.component.core.*` to `org.s8r.component.*`
 2. Files moved from `org.s8r.component.exception.*` to `org.s8r.component.*`
@@ -18,7 +18,7 @@ The Samstraumr codebase recently underwent a package flattening operation that m
 
 ## Common Issues
 
-### Import Statement Mismatches
+### Import statement mismatches
 
 The most common issue is import statements that still reference the old package structure. For example:
 
@@ -30,7 +30,7 @@ import org.s8r.component.core.State;
 import org.s8r.component.State; // This is the correct import
 ```
 
-### Type Incompatibilities
+### Type incompatibilities
 
 Type incompatibilities can occur when different parts of the code use different import paths for the same class:
 
@@ -46,7 +46,7 @@ import org.s8r.component.State;
 Other type incompatibilities include domain vs. implementation models:
 - `org.s8r.domain.component.Component` ≠ `org.s8r.component.Component`
 
-### Method Signature Changes
+### Method signature changes
 
 Some method signatures may have changed during the flattening process:
 
@@ -58,7 +58,7 @@ environment.getParameter(key, defaultValue);
 environment.getParameter(key);
 ```
 
-### Method Name Changes
+### Method name changes
 
 Some method names have changed:
 
@@ -72,7 +72,7 @@ ComponentId.create("reason");
 
 ## How to Fix These Issues
 
-### 1. Update Import Statements
+### 1. update import statements
 
 Systematically update all import statements to use the new flattened package structure:
 
@@ -88,7 +88,7 @@ import org.s8r.component.composite.*;
 import org.s8r.component.*;
 ```
 
-### 2. Use Type Adapters for Incompatible Types
+### 2. use type adapters for incompatible types
 
 For type incompatibilities between `org.s8r.component.*` and `org.s8r.domain.*` packages, use the provided adapter utilities:
 
@@ -102,7 +102,7 @@ org.s8r.domain.component.Component domainComponent =
     ComponentTypeAdapter.toDomainComponent(component);
 ```
 
-### 3. Update Method Calls
+### 3. update method calls
 
 Update method calls to match the new signatures:
 
@@ -121,7 +121,7 @@ if (value == null) {
 
 The codebase now includes adapter utilities to help with the transition period:
 
-### ComponentAdapter and ComponentTypeAdapter
+### Componentadapter and componenttypeadapter
 
 Basic conversion between domain and implementation components:
 
@@ -147,28 +147,28 @@ After making these changes, test your code thoroughly:
 2. Run unit tests: `./s8r-test unit`
 3. Run component tests: `./s8r-test component`
 
-## Long-term Solution
+## Long-Term Solution
 
-While the immediate fixes described above will get the codebase compiling, a more comprehensive refactoring is planned to fully migrate to the Clean Architecture model. See the [Clean Architecture Migration Plan](/docs/architecture/clean/clean-architecture-migration.md) for details.
+While the immediate fixes described above will get the codebase compiling, a more comprehensive refactoring is planned to fully migrate to the Clean Architecture model. See the [Clean Architecture Migration Plan](../architecture/clean/clean-architecture-migration.md) for details.
 
 ## Common Error Messages and Solutions
 
-### "cannot find symbol: class State; location: package org.s8r.component.core"
+### "cannot find symbol: class state; location: package org.s8r.component.core"
 
 **Solution**: Update the import to `import org.s8r.component.State;`
 
-### "incompatible types: org.s8r.domain.component.Component cannot be converted to org.s8r.component.Component"
+### "incompatible types: org.s8r.domain.component.component cannot be converted to org.s8r.component.component"
 
 **Solution**: Use the ComponentTypeAdapter to convert between types:
 ```java
 component = ComponentTypeAdapter.fromDomainComponent(domainComponent);
 ```
 
-### "cannot find symbol: method generate(java.lang.String)"
+### "cannot find symbol: method generate(java.lang.string)"
 
 **Solution**: Update the method call from `ComponentId.generate()` to `ComponentId.create()`
 
-### "method getParameter in class Environment cannot be applied to given types"
+### "method getparameter in class environment cannot be applied to given types"
 
 **Solution**: Update the method call to match the new signature.
 
@@ -178,4 +178,3 @@ The package flattening operation is a step towards a cleaner and more maintainab
 
 For more information, see:
 - [Package Flattening Fixes](/package-flattening-fixes.md)
-- [Clean Architecture Migration Plan](/docs/architecture/clean/clean-architecture-migration.md)

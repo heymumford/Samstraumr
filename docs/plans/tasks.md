@@ -10,13 +10,13 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Implementation Tasks
+# Tasks
 
 This document tracks specific implementation tasks for the S8r framework. It provides a consolidated view of what needs to be done, organized by priority.
 
 ## Current Tasks
 
-### P0: Critical Tasks
+### P0: critical tasks
 
 1. **Package Structure Refactoring**
    - Create simplified `org.s8r.component` structure ✅
@@ -43,7 +43,7 @@ This document tracks specific implementation tasks for the S8r framework. It pro
    - Target completion: 2025-04-12
    - Related: [Testing documentation](../architecture/testing.md)
 
-### P1: High Priority Tasks
+### P1: high priority tasks
 
 1. **Composite Component Implementation**
    - Create Composite class in new package structure ✅
@@ -69,7 +69,7 @@ This document tracks specific implementation tasks for the S8r framework. It pro
    - Target completion: 2025-04-20
    - Related: [Testing documentation](../architecture/testing.md)
 
-### P2: Medium Priority Tasks
+### P2: medium priority tasks
 
 1. **Legacy Code Removal**
    - Identify legacy code to remove

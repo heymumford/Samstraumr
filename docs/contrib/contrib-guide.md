@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Contributing
+# Contrib Guide
 
 Thank you for your interest in contributing to Samstraumr! This guide will help you understand the contribution process and expectations.
 

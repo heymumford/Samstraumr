@@ -29,16 +29,16 @@ The test suite is organized by architectural principles:
 The architecture tests can be run using:
 
 ```bash
-# Run all architecture tests
+# Architecture Test Suite
 mvn test -Dtest=RunArchitectureTests -pl Samstraumr/samstraumr-core
 
-# Run a specific architecture test
+# Architecture Test Suite
 mvn test -Dtest=ComponentBasedArchitectureTest -pl Samstraumr/samstraumr-core
 ```
 
 ## Test Details
 
-### ComponentBasedArchitectureTest
+### Componentbasedarchitecturetest
 
 Validates ADR-0007 (Component-Based Architecture for System Modularity) by ensuring:
 
@@ -48,7 +48,7 @@ Validates ADR-0007 (Component-Based Architecture for System Modularity) by ensur
 - Machines can manage components
 - Component properties can be injected
 
-### EventDrivenCommunicationTest
+### Eventdrivencommunicationtest
 
 Validates ADR-0010 (Event-Driven Communication Model) by ensuring:
 
@@ -58,7 +58,7 @@ Validates ADR-0010 (Event-Driven Communication Model) by ensuring:
 - Event hierarchy is respected (parent event handlers can receive child events)
 - Machine state changes trigger appropriate events
 
-### HierarchicalIdentitySystemTest
+### Hierarchicalidentitysystemtest
 
 Validates ADR-0008 (Hierarchical Identity System) by ensuring:
 
@@ -68,7 +68,7 @@ Validates ADR-0008 (Hierarchical Identity System) by ensuring:
 - Component lookups work with hierarchical addressing
 - Component paths are correctly generated
 
-### AcyclicDependencyTest
+### Acyclicdependencytest
 
 Validates ADR-0012 (Enforce Acyclic Dependencies) by ensuring:
 
@@ -79,7 +79,7 @@ Validates ADR-0012 (Enforce Acyclic Dependencies) by ensuring:
 
 See [Acyclic Dependency Enforcement](acyclic-dependency-enforcement.md) for details on the approach.
 
-### CleanArchitectureComplianceTest
+### Cleanarchitecturecompliancetest
 
 Validates ADR-0003 (Clean Architecture for System Design) and ADR-0005 (Package Structure Alignment with Clean Architecture) by ensuring:
 
@@ -88,7 +88,7 @@ Validates ADR-0003 (Clean Architecture for System Design) and ADR-0005 (Package 
 - Domain layer has no external dependencies
 - Infrastructure implementations are hidden behind interfaces
 
-### StandardizedErrorHandlingTest
+### Standardizederrorhandlingtest
 
 Validates ADR-0011 (Standardized Error Handling Strategy) by ensuring:
 
@@ -116,4 +116,3 @@ Planned improvements to the architecture test suite:
 
 ## Conclusion
 
-The Architecture Test Suite is a critical tool for maintaining the architectural integrity of Samstraumr. By validating compliance with ADRs through automated tests, we ensure that the architecture evolves in a controlled way and that all team members understand and follow the architectural principles.

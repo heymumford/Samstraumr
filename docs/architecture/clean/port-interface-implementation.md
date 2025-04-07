@@ -1,4 +1,4 @@
-# Port Interface Implementation for Clean Architecture
+# Port Interface Implementation
 
 This document describes the implementation of port interfaces in the Samstraumr framework following Clean Architecture principles.
 
@@ -15,7 +15,7 @@ In Samstraumr, we've implemented two types of ports:
 
 Primary ports are implemented in the `org.s8r.adapter.in` package and include:
 
-### CLI Adapters
+### Cli adapters
 
 - `ComponentCliAdapter`: Adapts CLI commands to component service calls
 - `MachineCliAdapter`: Adapts CLI commands to machine service calls
@@ -25,23 +25,23 @@ Primary ports are implemented in the `org.s8r.adapter.in` package and include:
 
 Secondary ports are defined in the `org.s8r.application.port` package and include:
 
-### Repository Ports
+### Repository ports
 
 - `ComponentRepository`: Interface for component persistence operations
 - `MachineRepository`: Interface for machine persistence operations
 
-### Event Handling Ports
+### Event handling ports
 
 - `EventDispatcher`: Interface for dispatching domain events
 - `EventPublisherPort`: Interface for publishing domain events (simplifies event handling)
 - `DataFlowEventPort`: Interface for component data flow events
 
-### Logging Ports
+### Logging ports
 
 - `LoggerPort`: Interface for logging operations
 - `LoggerFactory`: Interface for creating loggers
 
-### Other Infrastructure Ports
+### Other infrastructure ports
 
 - `ProjectInitializationPort`: Interface for project initialization operations
 
@@ -107,4 +107,3 @@ Port adapter implementations bridge between the domain model and the ports:
 
 - [Clean Architecture Implementation](clean-architecture-implementation.md)
 - [Adapter Pattern Implementation](adapter-pattern-implementation.md)
-- [Repository Pattern Implementation](repository-pattern-implementation.md)

@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Clean Architecture Migration Plan
+# Clean Architecture Migration
 
 *Document version: 1.0 - April 4, 2025*
 
@@ -44,9 +44,9 @@ org.samstraumr/
     └── logging/         # Logging framework
 ```
 
-## Step-by-Step Migration Plan
+## Step-By-Step Migration Plan
 
-### Phase 1: Domain Layer (4-5 weeks)
+### Phase 1: domain layer (4-5 weeks)
 
 **Objective**: Extract pure domain entities, free from framework dependencies
 
@@ -89,7 +89,7 @@ public class Component {
 }
 ```
 
-### Phase 2: Application Layer (5-6 weeks)
+### Phase 2: application layer (5-6 weeks)
 
 **Objective**: Implement use cases and service orchestration
 
@@ -123,7 +123,7 @@ public class ComponentService {
 }
 ```
 
-### Phase 3: Adapters (4-5 weeks)
+### Phase 3: adapters (4-5 weeks)
 
 **Objective**: Implement the connection layer between application and infrastructure
 
@@ -158,7 +158,7 @@ public class ComponentRepositoryAdapter implements ComponentRepository {
 }
 ```
 
-### Phase 4: Infrastructure (3-4 weeks)
+### Phase 4: infrastructure (3-4 weeks)
 
 **Objective**: Implement technical concerns and configuration
 

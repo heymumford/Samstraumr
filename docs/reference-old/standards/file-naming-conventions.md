@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# FileNamingConventions
+# File Naming Conventions
 
 This document outlines the standard naming conventions for files within the Samstraumr project.
 
@@ -95,10 +95,10 @@ This document outlines the standard naming conventions for files within the Sams
 To ensure all files follow these conventions, we have created standardization scripts:
 
 ```bash
-# FileNamingConventions
+# File Naming Conventions
 ./docs/scripts/standardize-md-filenames.sh
 
-# FileNamingConventions
+# File Naming Conventions
 ./docs/scripts/standardize-feature-filenames.sh
 ```
 

@@ -45,7 +45,7 @@ Currently, the README and other documentation files are maintained manually, whi
 
 ## Implementation Plan
 
-### Phase 1: Research and Planning
+### Phase 1: research and planning
 
 1. ⬜ Research documentation generation tools:
    - MkDocs
@@ -63,7 +63,7 @@ Currently, the README and other documentation files are maintained manually, whi
    - Development guides
    - Reference documentation
 
-### Phase 2: Changelog Generation
+### Phase 2: changelog generation
 
 1. ✅ Create changelog generation script:
    - Parse conventional commits
@@ -76,7 +76,7 @@ Currently, the README and other documentation files are maintained manually, whi
    - Generate changelog preview for PRs
    - Update docs/reference/release/changelog.md on release
 
-### Phase 3: README Automation
+### Phase 3: readme automation
 
 1. ✅ Create README template with placeholders:
    - Version information
@@ -91,7 +91,7 @@ Currently, the README and other documentation files are maintained manually, whi
    - `s8r docs update-readme`
    - Options for different sections
 
-### Phase 4: API Documentation
+### Phase 4: api documentation
 
 1. ✅ Configure JavaDoc generation:
    - Custom template
@@ -105,7 +105,7 @@ Currently, the README and other documentation files are maintained manually, whi
    - Search functionality
    - Version switching
 
-### Phase 5: Integration and Automation
+### Phase 5: integration and automation
 
 1. ✅ Create documentation CI job:
    - Generate documentation on commit

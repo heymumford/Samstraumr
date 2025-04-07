@@ -1,4 +1,4 @@
-# Clean Architecture Migration Plan
+# Clean Architecture Migration
 
 ## Overview
 
@@ -41,7 +41,7 @@ The codebase currently has several architectural issues:
 
 The migration will proceed in three phases:
 
-### Phase 1: Refactor Package Structure (Initial Clean-up)
+### Phase 1: refactor package structure (initial clean-up)
 
 1. **Complete Package Flattening**:
    - Fix remaining import statements
@@ -57,7 +57,7 @@ The migration will proceed in three phases:
    - Create README.md files for each package
    - Document dependency rules in architecture tests
 
-### Phase 2: Implement Adapters (Bridge Between Models)
+### Phase 2: implement adapters (bridge between models)
 
 1. **Define Clear Interfaces in Domain Layer**:
    - Create interfaces for all domain concepts
@@ -73,7 +73,7 @@ The migration will proceed in three phases:
    - Replace with interfaces and Dependency Injection
    - Update architecture tests to verify compliance
 
-### Phase 3: Migrate Client Code (Gradual Transition)
+### Phase 3: migrate client code (gradual transition)
 
 1. **Identify Client Code**:
    - Map all code using legacy models
@@ -95,7 +95,7 @@ The migration will proceed in three phases:
 
 ## Implementation Details
 
-### Domain Model Interfaces
+### Domain model interfaces
 
 ```java
 // Domain interfaces
@@ -115,7 +115,7 @@ public interface EnvironmentPort {
 }
 ```
 
-### Adapter Implementation
+### Adapter implementation
 
 ```java
 // Adapter implementation
@@ -145,7 +145,7 @@ public class ComponentAdapter implements ComponentPort {
 }
 ```
 
-### Service Implementation Using Interfaces
+### Service implementation using interfaces
 
 ```java
 // Application service using interfaces
@@ -223,4 +223,3 @@ These suppressions allow the codebase to compile and function while we progressi
 
 This migration plan provides a structured approach to transitioning the Samstraumr codebase to Clean Architecture. By following these steps, we can resolve the current issues while establishing a more maintainable and flexible architecture for the future.
 
-The immediate focus should be on fixing the compilation issues using temporary adapters, then progressively implementing a proper Clean Architecture through the phases outlined above.

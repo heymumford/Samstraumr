@@ -29,7 +29,7 @@ S8r component patterns speak the language of flow—describing how data, control
 
 ## Foundational Patterns
 
-### Validator-Transformer-Persister
+### Validator-transformer-persister
 
 **Context:** Processing input data requires validation, transformation, and persistence.
 
@@ -94,7 +94,7 @@ public class MetricsObserverComponent implements Component {
 }
 ```
 
-### Circuit Breaker
+### Circuit breaker
 
 **Context:** Prevent cascading failures when calling potentially failing services.
 
@@ -152,7 +152,7 @@ public class CircuitBreakerComponent implements Component {
 
 ## Flow Control Patterns
 
-### Splitter-Aggregator
+### Splitter-aggregator
 
 **Context:** Divide work for parallel processing and recombine results.
 
@@ -231,7 +231,7 @@ public class ContentBasedRouter implements Component {
 }
 ```
 
-### Load Balancer
+### Load balancer
 
 **Context:** Distribute workload across multiple instances for scalability.
 
@@ -298,7 +298,7 @@ public class ThrottleComponent implements Component {
 
 ## State Management Patterns
 
-### State Machine
+### State machine
 
 **Context:** Manage complex state transitions clearly.
 
@@ -356,7 +356,7 @@ public class OrderStateMachineComponent implements Component {
 }
 ```
 
-### Compensating Transaction
+### Compensating transaction
 
 **Context:** Undo the effects of a completed operation in a distributed system.
 
@@ -483,7 +483,7 @@ Component component = new LoggingDecorator(
 
 ## Adaptation Patterns
 
-### Self-Healing
+### Self-healing
 
 **Context:** Detect and recover from failures automatically.
 
@@ -535,7 +535,7 @@ public class SelfHealingComponent implements Component {
 }
 ```
 
-### Degraded Mode
+### Degraded mode
 
 **Context:** Continue with reduced functionality when resources are constrained.
 
@@ -589,7 +589,7 @@ public class DegradedModeComponent implements Component {
 
 ## Anti-Patterns
 
-### Leaky Component
+### Leaky component
 
 **Anti-Pattern:** Implementation details leak through the interface.
 
@@ -614,7 +614,7 @@ public class CleanComponent implements Component {
 }
 ```
 
-### Entangled Components
+### Entangled components
 
 **Anti-Pattern:** Tightly coupled components directly calling each other.
 
@@ -672,4 +672,3 @@ Pipeline<Object, Object> pipeline = new Pipeline<>()
 
 Remember that patterns are tools, not rules. Apply them thoughtfully and adapt them to your specific needs.
 
-[← Return to Core Concepts](/docs/concepts/core-concepts.md) | [Explore Composites and Machines →](/docs/concepts/composites-and-machines.md)

@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Script Simplification and Reorganization Plan
+# Script Simplification Plan
 
 ## Overview
 
@@ -18,7 +18,7 @@ This document consolidates our plan for reorganizing and simplifying bash script
 
 ## Current Issues
 
-### Organization Issues
+### Organization issues
 
 1. Too many scripts scattered throughout the codebase
 2. Inconsistent organization and naming conventions
@@ -27,7 +27,7 @@ This document consolidates our plan for reorganizing and simplifying bash script
 5. Hardcoded paths and values
 6. Duplicate functionality
 
-### Implementation Issues
+### Implementation issues
 
 1. **Excessive Duplication**:
    - Significant code duplication between `run-tests.sh` and `run-atl-tests.sh`
@@ -54,7 +54,7 @@ This document consolidates our plan for reorganizing and simplifying bash script
 
 ## Reorganization Plan
 
-### New Directory Structure
+### New directory structure
 
 ```
 /util
@@ -73,40 +73,40 @@ This document consolidates our plan for reorganizing and simplifying bash script
     └── ui-lib.sh      # UI/output formatting functions
 ```
 
-### Script Template
+### Script template
 
 Each script will follow this template:
 
 ```bash
-#!/bin/bash
-#==============================================================================
-# Filename: script-name.sh
-# Description: Clear description of the script's purpose
-# Author: Original author (and Claude)
-# Created: YYYY-MM-DD
-# Updated: YYYY-MM-DD
-#==============================================================================
-# Usage: ./script-name.sh [options] <args>
+# Script Simplification Plan
+# Script Simplification Plan
+# Script Simplification Plan
+# Script Simplification Plan
+# Script Simplification Plan
+# Script Simplification Plan
+# Script Simplification Plan
+# Script Simplification Plan
+# Script Simplification Plan
 #
-# Options:
-#   -h, --help    Display this help message
-#   -v, --verbose Enable verbose output
+# Script Simplification Plan
+# Script Simplification Plan
+# Script Simplification Plan
 #
-# Examples:
-#   ./script-name.sh arg1
-#   ./script-name.sh --option value
-#==============================================================================
+# Script Simplification Plan
+# Script Simplification Plan
+# Script Simplification Plan
+# Script Simplification Plan
 
-# Determine script directory and load library
+# Script Simplification Plan
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
-# Source shared libraries
+# Script Simplification Plan
 source "${PROJECT_ROOT}/util/lib/common.sh"
 
-#------------------------------------------------------------------------------
-# Functions
-#------------------------------------------------------------------------------
+# Script Simplification Plan
+# Script Simplification Plan
+# Script Simplification Plan
 
 function do_something() {
     local param1="$1"
@@ -122,9 +122,9 @@ function main() {
     another_function
 }
 
-#------------------------------------------------------------------------------
-# Main
-#------------------------------------------------------------------------------
+# Script Simplification Plan
+# Script Simplification Plan
+# Script Simplification Plan
 main "$@"
 ```
 
@@ -138,7 +138,7 @@ main "$@"
 
 ## Simplification Plan
 
-### Phase 1: Enhance Common Libraries
+### Phase 1: enhance common libraries
 
 1. **Centralize Color and Formatting Logic**:
    - Use only `common.sh` for color definitions
@@ -157,7 +157,7 @@ main "$@"
    - Handle path determination and config loading
    - Set up error handling and default options
 
-### Phase 2: Consolidate Test Scripts
+### Phase 2: consolidate test scripts
 
 1. **Merge Test Execution Scripts**:
    - Combine `run-tests.sh` and `run-atl-tests.sh` into a single script
@@ -172,7 +172,7 @@ main "$@"
    - Standardize test result formatting and display
    - Improve verbose mode output for better debugging
 
-### Phase 3: Update Main CLI (s8r)
+### Phase 3: update main cli (s8r)
 
 1. **Refactor Command Handling**:
    - Use the command pattern for cleaner organization
@@ -183,7 +183,7 @@ main "$@"
    - Implement dynamic help generation for commands
    - Ensure consistent help format across all commands
 
-### Phase 4: Implement Modern Shell Features
+### Phase 4: implement modern shell features
 
 1. **Use Associative Arrays** for configuration and argument storage
 2. **Leverage Parameter Expansion** for cleaner variable defaults
@@ -191,7 +191,7 @@ main "$@"
 4. **Use Here Strings** for more readable command inputs
 5. **Enforce Local Variables** to prevent scope leakage
 
-### Phase 5: Testing and Documentation
+### Phase 5: testing and documentation
 
 1. **Develop Test Cases** for the simplified scripts
 2. **Document New Patterns** for future script development

@@ -32,7 +32,7 @@ This leads to several paths exceeding our maximum target depth of 9 levels, with
 
 The target structure consolidates small directories using file naming conventions:
 
-### 1. Component Layer
+### 1. component layer
 
 ```
 org/s8r/component/
@@ -45,7 +45,7 @@ org/s8r/component/
   package-info.java
 ```
 
-### 2. Domain Layer
+### 2. domain layer
 
 ```
 org/s8r/domain/
@@ -73,7 +73,7 @@ org/s8r/domain/
     package-info.java
 ```
 
-### 3. Core Layer
+### 3. core layer
 
 ```
 org/s8r/core/
@@ -90,7 +90,7 @@ org/s8r/core/
 
 ## Implementation Steps
 
-### 1. Component Layer Consolidation
+### 1. component layer consolidation
 
 1. Move `/org/s8r/component/composite/*.java` to `/org/s8r/component/`
    - `Composite.java` → `CompositeComponent.java`
@@ -115,7 +115,7 @@ org/s8r/core/
 
 7. Update import statements in all dependent files
 
-### 2. Domain Layer Consolidation
+### 2. domain layer consolidation
 
 1. Consolidate `/org/s8r/domain/component/composite/` into `/org/s8r/domain/component/`
    - Use appropriate naming prefixes
@@ -133,7 +133,7 @@ org/s8r/core/
    - Use appropriate naming prefixes
    - Update package declarations
 
-### 3. Tube Layer Consolidation
+### 3. tube layer consolidation
 
 1. Consolidate `/org/s8r/tube/composite/` into `/org/s8r/tube/`
    - Use appropriate naming prefixes
@@ -147,7 +147,7 @@ org/s8r/core/
    - Use appropriate naming prefixes
    - Update package declarations
 
-### 4. Infrastructure Layer Consolidation
+### 4. infrastructure layer consolidation
 
 1. Consolidate `/org/s8r/infrastructure/config/` into `/org/s8r/infrastructure/`
    - Use appropriate naming prefixes
@@ -233,4 +233,3 @@ After implementation:
 | Breaking changes to the API | Carefully preserve public API signatures |
 | Compilation failures | Incremental testing approach |
 | Missing import updates | Use IDE refactoring tools to catch missed imports |
-| Circular dependencies | Analyze and break any circular dependencies before consolidation |

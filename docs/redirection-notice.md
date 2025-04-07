@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# REDIRECTION NOTICE
+# Redirection Notice
 
 > **⚠️ This document has moved!**
 >

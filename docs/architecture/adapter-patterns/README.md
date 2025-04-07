@@ -1,4 +1,4 @@
-# Adapter Implementation Patterns
+# README
 
 This directory contains documentation for the various adapter patterns used in the Samstraumr framework. These patterns are part of the Clean Architecture implementation that separates core domain logic from external interfaces.
 
@@ -33,4 +33,3 @@ When implementing a new adapter:
 2. Follow the consistent implementation approach
 3. Ensure complete interface coverage
 4. Add tests that verify both interface compliance and type conversion logic
-5. Document any special considerations or edge cases

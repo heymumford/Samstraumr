@@ -1,0 +1,117 @@
+name: s8r-structure-ci
+
+run-name: S8r Structure CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 's8r*'
+      - '.github/workflows/s8r-structure-pipeline.yml'
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 's8r*'
+      - '.github/workflows/s8r-structure-pipeline.yml'
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  # Verify S8r CLI structure and functionality
+  s8r-structure-verification:
+    name: S8r Structure Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Verify S8r scripts exist
+        run: |
+          echo "Verifying S8r CLI structure..."
+          
+          if [ ! -f "./s8r-test" ]; then
+            echo "Critical file s8r-test missing"
+            exit 1
+          fi
+          
+          if [ ! -f "./s8r-build" ]; then
+            echo "Critical file s8r-build missing"
+            exit 1
+          fi
+          
+          if [ ! -f "./s8r-version" ]; then
+            echo "Critical file s8r-version missing"
+            exit 1
+          fi
+          
+          if [ ! -f "./s8r-ci" ]; then
+            echo "Critical file s8r-ci missing"
+            exit 1
+          fi
+          
+          echo "✅ Essential S8r scripts exist"
+
+      - name: Run s8r-structure-verify
+        if: success()
+        run: |
+          echo "Running S8r structure verification..."
+          
+          # Set up Java 21 reflection options
+          export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+          
+          # Make sure the script is executable
+          chmod +x ./s8r-structure-verify
+          
+          # Run the verification
+          ./s8r-structure-verify --quick
+
+      - name: Upload verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s8r-structure-report
+          path: reports/s8r-structure-report.md
+          retention-days: 14
+          if-no-files-found: ignore
+
+  # Test integration with S8r structure
+  s8r-integration-test:
+    name: S8r Integration Test
+    runs-on: ubuntu-latest
+    needs: s8r-structure-verification
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Test S8r-Maven integration
+        run: |
+          echo "Testing S8r integration with Maven structure..."
+          
+          # Set up Java 21 reflection options
+          export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+          
+          # Make sure scripts are executable
+          chmod +x ./s8r-build
+          chmod +x ./s8r-version
+          
+          # Run a basic version check
+          ./s8r-version get
+          
+          # Run a fast build to test integration
+          ./s8r-build fast
+
+      - name: Verify success
+        run: echo "✅ S8r structure CI passed!"

@@ -1,0 +1,248 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r-migration-report: Tool for reporting migration issues
+# Analyzes and reports on issues detected during migration from Samstraumr to S8r
+#==============================================================================
+set -e
+
+# Terminal colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+# Functions for prettier output
+info() { echo -e "${BLUE}$1${RESET}"; }
+success() { echo -e "${GREEN}$1${RESET}"; }
+error() { echo -e "${RED}Error: $1${RESET}" >&2; exit 1; }
+warn() { echo -e "${YELLOW}Warning: $1${RESET}" >&2; }
+
+# Find repository root
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Default configuration
+FORMAT="text"
+OUTPUT=""
+MIN_SEVERITY="info"
+INCLUDE_RECOMMENDATIONS=true
+WATCH_MODE=false
+EXPORT_MODE=false
+SUMMARY_ONLY=false
+
+# Parse arguments
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -f|--format)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          FORMAT="$2"
+          shift 2
+        else
+          error "Format missing after -f/--format"
+        fi
+        ;;
+      -o|--output)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          OUTPUT="$2"
+          EXPORT_MODE=true
+          shift 2
+        else
+          error "Output file path missing after -o/--output"
+        fi
+        ;;
+      -s|--severity)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          MIN_SEVERITY="$2"
+          shift 2
+        else
+          error "Severity level missing after -s/--severity"
+        fi
+        ;;
+      -w|--watch)
+        WATCH_MODE=true
+        shift
+        ;;
+      --no-recommendations)
+        INCLUDE_RECOMMENDATIONS=false
+        shift
+        ;;
+      --summary)
+        SUMMARY_ONLY=true
+        shift
+        ;;
+      --html)
+        FORMAT="html"
+        shift
+        ;;
+      --json)
+        FORMAT="json"
+        shift
+        ;;
+      --csv)
+        FORMAT="csv"
+        shift
+        ;;
+      -h|--help)
+        show_help
+        exit 0
+        ;;
+      *)
+        error "Unknown argument: $1"
+        ;;
+    esac
+  done
+}
+
+# Display help information
+show_help() {
+  echo -e "${BOLD}S8r Migration Report Tool${RESET}"
+  echo
+  echo "Usage: ./s8r-migration-report [options]"
+  echo
+  echo "Options:"
+  echo "  -f, --format FORMAT     Output format: text, json, csv, html (default: text)"
+  echo "  -o, --output FILE       Write report to file"
+  echo "  -s, --severity LEVEL    Minimum severity level: debug, info, warning, error, critical (default: info)"
+  echo "  -w, --watch             Watch mode - continuously update the report"
+  echo "  --no-recommendations    Don't include recommendations in the report"
+  echo "  --summary               Show only a summary, not individual issues"
+  echo "  --html                  Shorthand for --format html"
+  echo "  --json                  Shorthand for --format json"
+  echo "  --csv                   Shorthand for --format csv"
+  echo "  -h, --help              Show this help message"
+  echo
+  echo "Examples:"
+  echo "  ./s8r-migration-report                     # Basic text report to console"
+  echo "  ./s8r-migration-report --json -o report.json    # Export JSON report to file"
+  echo "  ./s8r-migration-report -s warning          # Show only warnings and above"
+  echo "  ./s8r-migration-report -w                  # Watch mode with updates every 5 seconds"
+}
+
+# Main function to generate report
+generate_report() {
+  # Class path for the CLI
+  CLASSPATH="$PROJECT_ROOT/Samstraumr/samstraumr-core/target/samstraumr-core.jar"
+  MAIN_CLASS="org.s8r.migration.feedback.cli.MigrationReportCLI"
+  
+  # Add Java 21 reflection options if needed
+  JAVA_OPTS=""
+  if java -version 2>&1 | grep -q "version \"21"; then
+    JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+  fi
+  
+  # Build the command arguments
+  ARGS=""
+  
+  if [[ -n "$FORMAT" ]]; then
+    ARGS="$ARGS --format=$FORMAT"
+  fi
+  
+  if [[ -n "$OUTPUT" ]]; then
+    ARGS="$ARGS --output=$OUTPUT"
+  fi
+  
+  if [[ -n "$MIN_SEVERITY" ]]; then
+    ARGS="$ARGS --min-severity=$MIN_SEVERITY"
+  fi
+  
+  if [[ "$INCLUDE_RECOMMENDATIONS" = false ]]; then
+    ARGS="$ARGS --no-recommendations"
+  fi
+  
+  if [[ "$SUMMARY_ONLY" = true ]]; then
+    ARGS="$ARGS --summary"
+  fi
+  
+  # Execute the command
+  if [[ "$WATCH_MODE" = true ]]; then
+    info "Entering watch mode. Press Ctrl+C to exit."
+    
+    # Use a fallback if the Java class doesn't exist
+    if [[ -f "$CLASSPATH" ]]; then
+      # Clear screen and position cursor at top left
+      clear
+      
+      while true; do
+        # Move cursor to top left corner
+        echo -e "\033[H"
+        
+        # Generate report
+        java $JAVA_OPTS -cp "$CLASSPATH" "$MAIN_CLASS" $ARGS
+        
+        # Wait for 5 seconds
+        sleep 5
+      done
+    else
+      # Fall back to using the MigrationFeedback API directly
+      info "Java class not found, using fallback watch mode."
+      
+      # If Java isn't available, use a custom watch mode
+      while true; do
+        clear
+        echo -e "${BOLD}S8r Migration Report${RESET} (Updated: $(date '+%H:%M:%S'))"
+        echo "================================================================="
+        
+        # Get summary from the migration service (fallback)
+        if [[ -f "$PROJECT_ROOT/reports/migration_issues_status.json" ]]; then
+          # Try to generate a simple report from stored issues
+          cat "$PROJECT_ROOT/reports/migration_issues_status.json" | jq . 2>/dev/null || \
+            echo "Unable to parse migration status file"
+        else
+          echo "No migration issue data available. Run migration operations with feedback enabled."
+        fi
+        
+        echo
+        echo "Press Ctrl+C to exit watch mode."
+        sleep 5
+      done
+    fi
+  else
+    # Run once
+    if [[ -f "$CLASSPATH" ]]; then
+      java $JAVA_OPTS -cp "$CLASSPATH" "$MAIN_CLASS" $ARGS
+    else
+      # Fallback if the JAR file doesn't exist: use direct API access
+      
+      # Fall back to using direct file access
+      if [[ "$EXPORT_MODE" = true && -n "$OUTPUT" ]]; then
+        info "Generating migration report to $OUTPUT"
+        
+        # Check for existing report file
+        if [[ -f "$PROJECT_ROOT/reports/migration_report.md" ]]; then
+          cp "$PROJECT_ROOT/reports/migration_report.md" "$OUTPUT"
+          success "Saved report to $OUTPUT"
+        else
+          error "No migration report found. Run migration operations with feedback enabled."
+        fi
+      else
+        # Display a summary of the migration issues
+        echo -e "${BOLD}S8r Migration Report Summary${RESET}"
+        echo "================================================================="
+        
+        # Display warning if we're in fallback mode
+        warn "Using fallback report generation (standard JAR not found)"
+        
+        # Try to find any existing reports
+        if [[ -f "$PROJECT_ROOT/reports/migration_issues_summary.txt" ]]; then
+          cat "$PROJECT_ROOT/reports/migration_issues_summary.txt"
+        else
+          echo "No migration issue data available. Run migration operations with feedback enabled."
+          echo "You can use:"
+          echo "  ./s8r-migration-monitor    # to start real-time monitoring"
+          echo "  ./migrate-code.sh --feedback <dir>    # to run code migration with feedback"
+        fi
+      fi
+    fi
+  fi
+}
+
+# Main execution
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+  show_help
+  exit 0
+fi
+
+parse_args "$@"
+generate_report

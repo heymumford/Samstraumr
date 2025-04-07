@@ -1,4 +1,4 @@
-# Acyclic Dependency Enforcement Strategy
+# Acyclic Dependency Enforcement
 
 This document outlines the Samstraumr project's strategy for enforcing acyclic dependencies throughout the codebase, as mandated by ADR-0012.
 
@@ -93,4 +93,3 @@ The acyclic dependency rules are enforced through:
 
 ## Conclusion
 
-By enforcing acyclic dependencies, Samstraumr maintains a more maintainable, understandable, and testable architecture. The automated tests and tooling ensure architectural integrity is preserved as the codebase evolves.

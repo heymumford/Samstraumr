@@ -21,7 +21,7 @@ This approach allows for a gradual migration rather than a disruptive "big bang"
 
 ## Test Structure Changes
 
-### Java Test Classes
+### Java test classes
 
 **Old Structure**:
 ```
@@ -39,7 +39,7 @@ org/s8r/test/tube/TubeTestRunner.java
 org/s8r/test/legacy/LegacySteps.java
 ```
 
-### Feature Files
+### Feature files
 
 **Old Structure**:
 ```
@@ -59,7 +59,7 @@ test/resources/features/system/system-end-to-end-test.feature
 
 ## Migration Steps for Developers
 
-### For Test Classes
+### For test classes
 
 1. **Update Imports in New Code**:
    - Use the new package structure in all new imports:
@@ -79,7 +79,7 @@ test/resources/features/system/system-end-to-end-test.feature
    - Update test runners to use the new package structure
    - Add the new package to the `@ComponentScan` or `glue` paths if needed
 
-### For Feature Files
+### For feature files
 
 1. **Create New Feature Files**:
    - Place new feature files in the new structure:
@@ -116,7 +116,7 @@ After making changes:
 
 Configure your IDE to prefer imports from the new structure:
 
-### IntelliJ IDEA
+### Intellij idea
 1. Go to Settings > Editor > Code Style > Java > Imports
 2. Add the new packages to the "Packages to Use Import with '*'" section
 3. Move them above the old packages
@@ -133,4 +133,3 @@ If you encounter any issues while migrating to the new structure, please reach o
 ## References
 
 - [Directory Flattening Plan](./docs/planning/folder-flattening-plan.md)
-- [Directory Flattening Summary](./directory-flattening-summary.md)

@@ -1,0 +1,205 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r-migration-monitor: Real-time monitoring of migration issues
+# Provides a dashboard view of ongoing migration activities
+#==============================================================================
+set -e
+
+# Terminal colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+# Functions for prettier output
+info() { echo -e "${BLUE}$1${RESET}"; }
+success() { echo -e "${GREEN}$1${RESET}"; }
+error() { echo -e "${RED}Error: $1${RESET}" >&2; exit 1; }
+warn() { echo -e "${YELLOW}Warning: $1${RESET}" >&2; }
+
+# Find repository root
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Create report directory if it doesn't exist
+REPORT_DIR="${PROJECT_ROOT}/reports"
+mkdir -p "$REPORT_DIR"
+
+# Default configuration
+REFRESH_INTERVAL=5  # seconds
+
+# Parse arguments
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -i|--interval)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          REFRESH_INTERVAL="$2"
+          shift 2
+        else
+          error "Interval value missing after -i/--interval"
+        fi
+        ;;
+      -h|--help)
+        show_help
+        exit 0
+        ;;
+      *)
+        error "Unknown argument: $1"
+        ;;
+    esac
+  done
+}
+
+# Display help information
+show_help() {
+  echo -e "${BOLD}S8r Migration Monitor${RESET}"
+  echo
+  echo "Usage: ./s8r-migration-monitor [options]"
+  echo
+  echo "Options:"
+  echo "  -i, --interval SECONDS  Refresh interval in seconds (default: 5)"
+  echo "  -h, --help              Show this help message"
+  echo
+  echo "Examples:"
+  echo "  ./s8r-migration-monitor                # Monitor with default refresh rate"
+  echo "  ./s8r-migration-monitor --interval 10  # Monitor with 10-second refresh"
+}
+
+# Initialize counters
+issue_count=0
+error_count=0
+warning_count=0
+info_count=0
+
+# Monitor migration issues
+monitor_issues() {
+  # Clear screen on first run
+  clear
+  
+  while true; do
+    # Move cursor to the top left
+    echo -e "\033[H"
+    
+    # Get timestamp for header
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    
+    # Print header
+    echo -e "${BOLD}==================== S8r Migration Monitor ====================${RESET}"
+    echo -e "Updated: ${timestamp}                Refresh: ${REFRESH_INTERVAL}s"
+    echo -e "=============================================================="
+    echo
+    
+    # Check for the latest migration issues file
+    LATEST_ISSUES="${REPORT_DIR}/latest_migration_issues.json"
+    if [[ -f "$LATEST_ISSUES" ]]; then
+      # If we have jq, use it for better formatted output
+      if command -v jq &> /dev/null; then
+        echo -e "${BOLD}Migration Issues Summary:${RESET}"
+        echo
+        
+        # Extract issue counts using jq
+        total_files=$(jq -r '.stats.total_files // 0' "$LATEST_ISSUES")
+        affected_files=$(jq -r '.stats.affected_files // 0' "$LATEST_ISSUES")
+        import_replacements=$(jq -r '.stats.import_replacements // 0' "$LATEST_ISSUES")
+        api_replacements=$(jq -r '.stats.api_replacements // 0' "$LATEST_ISSUES")
+        potential_issues=$(jq -r '.stats.potential_issues // 0' "$LATEST_ISSUES")
+        incomplete_migrations=$(jq -r '.issues.incomplete_migrations // 0' "$LATEST_ISSUES")
+        state_transitions=$(jq -r '.issues.state_transitions // 0' "$LATEST_ISSUES")
+        
+        # Latest migration timestamp
+        timestamp=$(jq -r '.timestamp // "Unknown"' "$LATEST_ISSUES")
+        
+        # Format and display the information
+        echo -e "Last Migration: ${BOLD}${timestamp}${RESET}"
+        echo -e "Files Analyzed: ${BOLD}${total_files}${RESET}, Modified: ${BOLD}${affected_files}${RESET}"
+        echo -e "API Changes: ${BOLD}${api_replacements}${RESET}, Import Changes: ${BOLD}${import_replacements}${RESET}"
+        echo
+        
+        # Show issue counts
+        echo -e "${BOLD}Potential Issues:${RESET}"
+        echo -e "- Total Potential Issues: ${YELLOW}${potential_issues}${RESET}"
+        
+        if [[ "$incomplete_migrations" -gt 0 ]]; then
+          echo -e "- Incomplete Migrations: ${YELLOW}${incomplete_migrations}${RESET}"
+        fi
+        
+        if [[ "$state_transitions" -gt 0 ]]; then
+          echo -e "- State Transitions to Review: ${YELLOW}${state_transitions}${RESET}"
+        fi
+        
+        echo
+      else
+        # If jq is not available, use a simpler output
+        echo -e "${BOLD}Migration Issues Summary (latest):${RESET}"
+        echo
+        cat "$LATEST_ISSUES" | tr '{},' '\n' | grep -v '^[[:space:]]*$' | sort
+        echo
+      fi
+      
+      # List recent feedback reports
+      echo -e "${BOLD}Recent Feedback Reports:${RESET}"
+      echo
+      ls -lt "${REPORT_DIR}"/migration_feedback_*.md 2>/dev/null | head -n 5 | while read -r line; do
+        report_file=$(echo "$line" | awk '{print $NF}')
+        report_date=$(echo "$line" | awk '{print $6, $7, $8}')
+        report_name=$(basename "$report_file")
+        echo -e "- ${report_date}: ${BLUE}${report_name}${RESET}"
+      done
+      
+      # If no reports found
+      if ! ls -t "${REPORT_DIR}"/migration_feedback_*.md &>/dev/null; then
+        echo -e "${YELLOW}No feedback reports found.${RESET}"
+      fi
+      
+      echo
+    else
+      # No migration data found
+      echo -e "${YELLOW}No migration issue data available.${RESET}"
+      echo
+      echo "Run migration operations with the feedback option enabled:"
+      echo "  ./util/migrate-code.sh --feedback <directory>"
+      echo
+    fi
+    
+    # Display active migration operations if possible
+    migration_processes=$(ps aux | grep -E "migrate-code.sh|s8r-migration" | grep -v grep | grep -v monitor)
+    if [[ -n "$migration_processes" ]]; then
+      echo -e "${BOLD}Active Migration Processes:${RESET}"
+      echo
+      echo "$migration_processes" | while read -r process; do
+        pid=$(echo "$process" | awk '{print $2}')
+        command=$(echo "$process" | awk '{for(i=11;i<=NF;i++) printf "%s ", $i}')
+        echo -e "- PID ${BOLD}${pid}${RESET}: ${command}"
+      done
+      echo
+    fi
+    
+    # Show recommendations if any migrations have been done
+    if [[ -f "$LATEST_ISSUES" ]]; then
+      echo -e "${BOLD}Recommendations:${RESET}"
+      echo
+      echo -e "1. Run tests on migrated components: ${BLUE}./s8r-test component${RESET}"
+      echo -e "2. Verify state transitions: ${BLUE}./s8r-test state${RESET}"
+      echo -e "3. Generate detailed report: ${BLUE}./s8r-migration-report --html -o report.html${RESET}"
+      echo
+    fi
+    
+    # Display footer
+    echo -e "=============================================================="
+    echo -e "Press Ctrl+C to exit"
+    
+    # Wait before refreshing
+    sleep "$REFRESH_INTERVAL"
+  done
+}
+
+# Main execution
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+  show_help
+  exit 0
+fi
+
+parse_args "$@"
+monitor_issues

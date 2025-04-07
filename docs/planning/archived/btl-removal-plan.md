@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# BTL Tests Removal Plan
+# Btl Removal Plan
 
 ## Overview
 
@@ -18,7 +18,7 @@ This plan outlines the steps to remove the BTL (Below The Line) test implementat
 
 ## Files to Modify
 
-### 1. Test Runners to Remove
+### 1. test runners to remove
 
 The following test runners should be removed as they specifically run BTL tests:
 
@@ -27,7 +27,7 @@ Samstraumr/samstraumr-core/src/test/java/org/samstraumr/tube/lifecycle/RunLifecy
 Samstraumr/samstraumr-core/src/test/java/org/samstraumr/tube/RunBTLCucumberTest.java
 ```
 
-### 2. Feature Files to Modify
+### 2. feature files to modify
 
 The following feature files contain BTL-tagged scenarios that should be removed or commented out:
 
@@ -52,14 +52,14 @@ src/test/resources/test/features/conception-phase-tests.feature
 
 These files need to be examined to remove BTL-tagged scenarios while preserving non-BTL scenarios.
 
-### 3. Maven Configuration
+### 3. maven configuration
 
 Update the pom.xml files to remove BTL profile configuration:
 
 1. Find and modify the `btl-tests` profile in Samstraumr/pom.xml and Samstraumr/samstraumr-core/pom.xml
 2. Remove or comment out the profile, but keep it as documentation for future reference
 
-### 4. Test Scripts to Modify
+### 4. test scripts to modify
 
 Update the test scripts to remove BTL test execution but preserve the BTL infrastructure:
 
@@ -69,14 +69,14 @@ Update the test scripts to remove BTL test execution but preserve the BTL infras
 
 ## Files to Preserve
 
-### 1. BTL Annotations
+### 1. btl annotations
 
 Keep these annotations as part of the testing infrastructure:
 
 - `org.samstraumr.tube.annotations.BTL.java`
 - `org.samstraumr.tube.annotations.BelowTheLine.java`
 
-### 2. BTL Testing Documentation
+### 2. btl testing documentation
 
 Preserve the following documentation files describing the BTL strategy:
 

@@ -9,7 +9,7 @@ remain exclusively with the copyright holder listed above.
 Licensed under the Mozilla Public License 2.0
 -->
 
-# REDIRECT NOTICE
+# Folder Structure
 
 This file has been consolidated with the canonical version at:
 

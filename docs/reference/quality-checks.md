@@ -9,7 +9,7 @@ remain exclusively with the copyright holder listed above.
 Licensed under the Mozilla Public License 2.0
 -->
 
-# Quality Checks Reference
+# Quality Checks
 
 This document provides reference information for the unified quality check system in Samstraumr.
 
@@ -46,53 +46,53 @@ The unified quality check system includes three profiles:
 
 The unified quality check system can be used in two ways:
 
-### S8r CLI Integration
+### S8r cli integration
 
 ```bash
-# Run standard quality profile
+# Quality Checks
 ./s8r quality
 
-# Run strict quality profile
+# Quality Checks
 ./s8r quality -p strict
 
-# Run only specific tools
+# Quality Checks
 ./s8r quality -t spotless -t checkstyle
 
-# Run with automatic fixes
+# Quality Checks
 ./s8r quality -f
 
-# Skip specific tools
+# Quality Checks
 ./s8r quality -s jacoco
 
-# Generate reports without failing
+# Quality Checks
 ./s8r quality -r
 
-# Show verbose output
+# Quality Checks
 ./s8r quality -v
 ```
 
-### Direct Script Usage
+### Direct script usage
 
 ```bash
-# Run standard quality profile
+# Quality Checks
 ./s8r-quality
 
-# Run strict quality profile
+# Quality Checks
 ./s8r-quality --profile strict
 
-# Run only specific tools
+# Quality Checks
 ./s8r-quality --tool spotless --tool checkstyle
 
-# Run with automatic fixes
+# Quality Checks
 ./s8r-quality --fix
 
-# Skip specific tools
+# Quality Checks
 ./s8r-quality --skip jacoco
 
-# Generate reports without failing
+# Quality Checks
 ./s8r-quality --report-only
 
-# Show verbose output
+# Quality Checks
 ./s8r-quality --verbose
 ```
 
@@ -100,7 +100,7 @@ The unified quality check system can be used in two ways:
 
 The unified quality check system enforces the following thresholds:
 
-### Code Coverage
+### Code coverage
 
 - Line coverage: 70%
 - Branch coverage: 60%
@@ -177,11 +177,11 @@ This will run all quality checks in strict mode and generate reports without fai
 To run quality checks before committing, add the following to your pre-commit hook:
 
 ```bash
-#!/bin/bash
-# Run quality checks before committing
+# Quality Checks
+# Quality Checks
 ./s8r-quality --profile standard
 
-# If quality checks fail, ask user if they want to commit anyway
+# Quality Checks
 if [ $? -ne 0 ]; then
   echo "Quality checks failed. Commit anyway? (y/n)"
   read -r response
@@ -207,4 +207,3 @@ Common issues and solutions:
 - [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html)
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [SpotBugs Documentation](https://spotbugs.readthedocs.io/en/latest/)
-- [JaCoCo Documentation](https://www.jacoco.org/jacoco/trunk/doc/)

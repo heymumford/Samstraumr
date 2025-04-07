@@ -9,7 +9,7 @@ remain exclusively with the copyright holder listed above.
 Licensed under the Mozilla Public License 2.0
 -->
 
-# Samstraumr Documentation
+# README
 
 This directory contains all documentation for the Samstraumr project. The documentation is organized into a structure that follows the project's conceptual model.
 

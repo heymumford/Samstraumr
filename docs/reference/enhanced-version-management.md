@@ -13,7 +13,7 @@ Licensed under the Mozilla Public License 2.0
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-# Enhanced Version Management Guide
+# Enhanced Version Management
 
 This document provides a comprehensive guide to the enhanced version management system in Samstraumr.
 
@@ -45,44 +45,44 @@ When version changes are made, several files are automatically updated:
 
 ## Commands
 
-### Basic Version Operations
+### Basic version operations
 
 ```bash
-# Show the current version
+# Enhanced Version Management
 ./s8r-version get
 
-# Export the version as plain text (for scripts)
+# Enhanced Version Management
 ./s8r-version export
 
-# Bump the patch version (2.5.1 -> 2.5.2)
+# Enhanced Version Management
 ./s8r-version bump patch
 
-# Bump the minor version (2.5.1 -> 2.6.0)
+# Enhanced Version Management
 ./s8r-version bump minor
 
-# Bump the major version (2.5.1 -> 3.0.0)
+# Enhanced Version Management
 ./s8r-version bump major
 
-# Set a specific version
+# Enhanced Version Management
 ./s8r-version set 2.6.0
 ```
 
-### Advanced Operations
+### Advanced operations
 
 ```bash
-# Check for version inconsistencies
+# Enhanced Version Management
 ./s8r-version check
 
-# Fix all version inconsistencies
+# Enhanced Version Management
 ./s8r-version fix
 
-# List all references to the current version
+# Enhanced Version Management
 ./s8r-version list-refs
 
-# Find references to a specific version
+# Enhanced Version Management
 ./s8r-version find 2.4.6
 
-# Enable debug mode for any command
+# Enhanced Version Management
 ./s8r-version --debug bump minor
 ```
 
@@ -137,4 +137,3 @@ The enhanced version management system offers several improvements over the orig
 4. Follow semantic versioning guidelines
    - Patch (x.y.Z): Bug fixes, documentation changes
    - Minor (x.Y.z): New features, backward compatible changes
-   - Major (X.y.z): Breaking changes, major refactoring

@@ -1,4 +1,4 @@
-# Clean Architecture Migration Plan
+# Clean Architecture Migration
 
 ## Introduction
 
@@ -16,7 +16,7 @@ The codebase currently has several architectural challenges:
 
 The migration will follow a three-phase approach:
 
-### Phase 1: Refactor Package Structure (In Progress)
+### Phase 1: refactor package structure (in progress)
 
 1. ✅ Fix import statements after package flattening
 2. ✅ Add temporary adapter utilities for tests
@@ -24,7 +24,7 @@ The migration will follow a three-phase approach:
 4. 🔄 Ensure all tests compile and pass
 5. ⬜ Document mapping between old and new structures
 
-### Phase 2: Implement Clean Architecture Adapters
+### Phase 2: implement clean architecture adapters
 
 1. ⬜ Create comprehensive adapter layer in `org.s8r.adapter.clean` package
 2. ⬜ Implement bidirectional conversion between models
@@ -32,7 +32,7 @@ The migration will follow a three-phase approach:
 4. ⬜ Integrate adapters into DI container
 5. ⬜ Document adapter usage patterns
 
-### Phase 3: Migrate Client Code
+### Phase 3: migrate client code
 
 1. ⬜ Update services to use domain interfaces
 2. ⬜ Create repository adapters
@@ -42,7 +42,7 @@ The migration will follow a three-phase approach:
 
 ## Implementation Details
 
-### Adapter Pattern Implementation
+### Adapter pattern implementation
 
 The adapter layer will include:
 
@@ -53,7 +53,7 @@ The adapter layer will include:
 - `IdentityAdapter`: Converts between identity types
 - `EnvironmentAdapter`: Converts between environment types
 
-### Key Mapping Challenges
+### Key mapping challenges
 
 | Legacy Type | Domain Type | Conversion Challenges |
 |-------------|-------------|----------------------|
@@ -63,7 +63,7 @@ The adapter layer will include:
 | `org.s8r.component.Identity` | `org.s8r.domain.identity.ComponentId` | Hierarchy mapping, lineage |
 | `org.s8r.component.Environment` | `Map<String, String>` | Parameter conversion |
 
-### Migration Roadmap
+### Migration roadmap
 
 1. **Q2 2025**: Complete Phase 1
 2. **Q3 2025**: Implement Phase 2
@@ -81,6 +81,5 @@ Comprehensive documentation will be created for:
 
 ## References
 
-- [Clean Architecture ADR](/docs/architecture/decisions/0003-adopt-clean-architecture-for-system-design.md)
-- [Using Domain Adapters Guide](/docs/guides/migration/using-domain-adapters.md)
-- [Adapter Package Documentation](/Samstraumr/samstraumr-core/src/main/java/org/s8r/adapter/clean/README.md)
+- [Clean Architecture ADR](../architecture/decisions/0003-adopt-clean-architecture-for-system-design.md)
+- [Using Domain Adapters Guide](../guides/migration/using-domain-adapters.md)

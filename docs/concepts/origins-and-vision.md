@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Origins and Vision of Samstraumr
+# Origins and Vision
 
 ## A 30-Year Journey
 
@@ -36,7 +36,7 @@ Enterprise software development faces a fundamental paradox. Organizations need 
 
 Yet traditional architectural approaches force tradeoffs between these needs, creating inherent fragility. Systems designed for stability resist change. Systems optimized for rapid evolution often sacrifice reliability. Systems built for scale frequently become complex and brittle.
 
-## Natural Systems as Inspiration
+## Natural Systems As Inspiration
 
 The breakthrough insight behind Samstraumr came from studying natural systems, which have solved these seemingly contradictory requirements through billions of years of evolution:
 

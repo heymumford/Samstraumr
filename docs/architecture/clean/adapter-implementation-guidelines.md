@@ -1,4 +1,4 @@
-# Samstraumr Adapter Implementation Guidelines
+# Adapter Implementation Guidelines
 
 This document provides comprehensive guidelines for implementing new adapters in the Samstraumr project according to Clean Architecture principles. It consolidates the patterns and best practices that have been established through the adapter reconciliation process.
 
@@ -52,7 +52,7 @@ When implementing a new adapter in the Samstraumr project, follow this structure
 
 Use this checklist to ensure that your adapter implementation follows best practices:
 
-### Port Interface Checklist
+### Port interface checklist
 
 - [ ] Interface is placed in the `org.s8r.application.port` package
 - [ ] Interface methods represent domain operations
@@ -62,7 +62,7 @@ Use this checklist to ensure that your adapter implementation follows best pract
 - [ ] Error handling mechanism is defined (exceptions, result objects, etc.)
 - [ ] Default methods are provided where appropriate to simplify implementation
 
-### Adapter Implementation Checklist
+### Adapter implementation checklist
 
 - [ ] Adapter is placed in the `org.s8r.infrastructure` package
 - [ ] Adapter implements the appropriate port interface
@@ -73,7 +73,7 @@ Use this checklist to ensure that your adapter implementation follows best pract
 - [ ] Adapter logs important operations and errors
 - [ ] Adapter initializes and cleans up resources properly
 
-### Testing Checklist
+### Testing checklist
 
 - [ ] Contract tests extend `PortContractTest<T>` base class
 - [ ] Contract tests verify all interface methods
@@ -87,7 +87,7 @@ Use this checklist to ensure that your adapter implementation follows best pract
 
 The Samstraumr project uses several adapter design patterns to maintain clean architectural boundaries:
 
-### Port Adapter Pattern
+### Port adapter pattern
 
 The primary pattern used for implementing adapters in Samstraumr is the Port Adapter Pattern. This pattern involves:
 
@@ -118,7 +118,7 @@ public class StandardFileSystemAdapter implements FileSystemPort {
 }
 ```
 
-### Result Object Pattern
+### Result object pattern
 
 For operations that may fail, use the Result Object Pattern to encapsulate success/failure information:
 
@@ -141,7 +141,7 @@ public class FileResult {
 }
 ```
 
-### Factory Method Pattern
+### Factory method pattern
 
 For complex object creation, use the Factory Method Pattern:
 
@@ -157,7 +157,7 @@ public class MachineFactoryAdapter implements MachineFactoryPort {
 }
 ```
 
-### Null Object Pattern
+### Null object pattern
 
 For cases where a null value might be returned, consider using the Null Object Pattern:
 
@@ -181,7 +181,7 @@ public class NullLogger implements LoggerPort {
 
 Adapters must be thoroughly tested to ensure they correctly implement their port interfaces and handle infrastructure concerns properly. The Samstraumr project uses a three-tier testing approach:
 
-### Contract Tests
+### Contract tests
 
 Contract tests verify that adapters correctly implement their port interfaces, focusing on the behavior expected by the application core:
 
@@ -202,7 +202,7 @@ public class ConfigurationPortContractTest extends PortContractTest<Configuratio
 }
 ```
 
-### Unit Tests
+### Unit tests
 
 Unit tests focus on the internal implementation details of adapters:
 
@@ -217,7 +217,7 @@ public class StandardFileSystemAdapterTest {
 }
 ```
 
-### Integration Tests
+### Integration tests
 
 Integration tests verify that adapters interact correctly with real infrastructure:
 
@@ -273,7 +273,7 @@ Adapters should manage their dependencies carefully:
 
 The following adapter implementations serve as reference examples:
 
-### FileSystemAdapter
+### Filesystemadapter
 
 The `StandardFileSystemAdapter` provides a comprehensive example of implementing a port interface for file system operations:
 
@@ -284,7 +284,7 @@ The `StandardFileSystemAdapter` provides a comprehensive example of implementing
 - Provides comprehensive logging
 - Cleans up resources properly
 
-### ConfigurationAdapter
+### Configurationadapter
 
 The `ConfigurationAdapter` demonstrates how to implement a port interface for configuration operations:
 
@@ -294,7 +294,7 @@ The `ConfigurationAdapter` demonstrates how to implement a port interface for co
 - Logs parsing errors and other issues
 - Supports different configuration sources
 
-### MachineAdapter
+### Machineadapter
 
 The `MachineAdapter` demonstrates how to implement an adapter for domain objects:
 
@@ -306,4 +306,3 @@ The `MachineAdapter` demonstrates how to implement an adapter for domain objects
 
 ---
 
-By following these guidelines, you will create adapters that adhere to Clean Architecture principles, maintain proper separation of concerns, and provide reliable interfaces between the domain and infrastructure layers.

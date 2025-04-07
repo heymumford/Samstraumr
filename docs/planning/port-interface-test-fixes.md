@@ -9,7 +9,7 @@ remain exclusively with the copyright holder listed above.
 Licensed under the Mozilla Public License 2.0
 -->
 
-# Port Interface Tests - Fixes Required
+# Port Interface Test Fixes
 
 This document outlines the compilation issues found in our test suite and provides a plan to fix them.
 
@@ -84,4 +84,3 @@ Document all fixes made to the existing code to help future developers understan
 - The approach taken to resolve them
 - How the ports and adapters pattern should be implemented going forward
 
-This will ensure that our Clean Architecture approach is consistently followed throughout the codebase.

@@ -68,7 +68,7 @@ When referring to other documentation files:
 
 1. **Use relative paths with .md extension**:
    - ✅ `[Core Concepts](../concepts/core-concepts.md)`
-   - ❌ `[Core Concepts](../concepts/core-concepts)` (absolute path)
+   - ❌ `[Core Concepts](../concepts/core-concepts.md)` (absolute path)
    - ❌ `[Core Concepts](../concepts/core-concepts.md)` (missing extension)
 2. **For section links, use lowercase anchor references**:
    - ✅ `[Configuration Options](./configuration.md#configuration-options)`
@@ -142,7 +142,7 @@ Each major directory should have a README.md file that:
 3. **Provides usage examples** where applicable
 4. **Links to more detailed documentation** when needed
 
-### API documentation
+### Api documentation
 
 For API documentation:
 
@@ -178,19 +178,19 @@ These documentation standards are implemented through:
 
 ## Documentation Maintenance Plan
 
-### 1. Copyright Headers
+### 1. copyright headers
 
-#### 1.1 Standardize Copyright Headers
+#### 1.1 standardize copyright headers
 
 - All files should have a consistent copyright header format
 - Java files and markdown files should use different but consistent formats
 - Remove any duplicate copyright headers
 
-#### 1.2 Automation for Headers
+#### 1.2 automation for headers
 
 ```bash
-#!/bin/bash
-# Example script to check for duplicate copyright notices
+# Documentation Standards
+# Documentation Standards
 
 find . -name "*.java" -type f -not -path "*/node_modules/*" -not -path "*/target/*" | while read -r file; do
     # Check for duplicate copyright notices
@@ -200,47 +200,47 @@ find . -name "*.java" -type f -not -path "*/node_modules/*" -not -path "*/target
 done
 ```
 
-### 2. CLI Command References
+### 2. cli command references
 
 - Update all documentation to reference the current CLI commands
   - Use `./s8r test all` instead of `./run-tests.sh all`
   - Use `./s8r quality check` instead of `./build-checks.sh`
 - Scan documentation regularly for outdated command references
 
-### 3. Internal Links Validation
+### 3. internal links validation
 
-#### 3.1 Review Process
+#### 3.1 review process
 
 - Regularly check that all links in documentation accurately reference existing files
 - Standardize casing in links to match file system
 - Ensure all cross-references use relative paths with extensions
 
-#### 3.2 Architecture Documentation
+#### 3.2 architecture documentation
 
 - Maintain accurate links between architecture documents
 - Use consistent linking patterns for sections and subsections
 
-### 4. Documentation Organization
+### 4. documentation organization
 
-#### 4.1 Avoiding Duplication
+#### 4.1 avoiding duplication
 
 - Maintain a single source of truth for each piece of information
 - Remove redundant files after consolidating content
 - Document the correct location for various types of documentation
 
-#### 4.2 Filename Conventions
+#### 4.2 filename conventions
 
 - Regularly audit documentation to ensure kebab-case naming is followed
 - Use standardization scripts to detect and fix naming issues
 
-### 5. Implementation Process
+### 5. implementation process
 
 1. Fix any copyright header duplication issues
 2. Update CLI command references
 3. Fix internal links and references
 4. Clean up documentation organization
 
-### 6. Validation Process
+### 6. validation process
 
 After implementing documentation updates:
 1. Run documentation scans to verify no duplicate headers exist

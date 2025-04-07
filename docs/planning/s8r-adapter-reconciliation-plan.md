@@ -1,4 +1,4 @@
-# Samstraumr Adapter Reconciliation Plan (S8R-ARP)
+# S8r Adapter Reconciliation Plan
 
 ## Overview
 
@@ -21,9 +21,9 @@ S8R-REF-001,"Create Machine Adapter Reference Implementation","Develop a clean, 
 
 ## Implementation Approach
 
-### Domain-Specific Work Management
+### Domain-specific work management
 
-#### Complex Domain Work (Probe-Sense-Respond)
+#### Complex domain work (probe-sense-respond)
 - **Items**: S8R-ARCH-001, S8R-KNOW-001
 - **Approach**: 
   - Small, safe-to-fail experiments with architectural boundaries
@@ -35,7 +35,7 @@ S8R-REF-001,"Create Machine Adapter Reference Implementation","Develop a clean, 
   - Pattern adoption rate across codebase
   - Architecture compliance scores from automated tests
 
-#### Complicated Domain Work (Sense-Analyze-Respond)
+#### Complicated domain work (sense-analyze-respond)
 - **Items**: S8R-ADPT-001, S8R-COMP-003, S8R-TEST-001, S8R-REF-001
 - **Approach**:
   - Expert analysis of adapter implementation options
@@ -48,7 +48,7 @@ S8R-REF-001,"Create Machine Adapter Reference Implementation","Develop a clean, 
   - Technical debt reduction metrics
   - Documentation completeness
 
-#### Clear Domain Work (Sense-Categorize-Respond)
+#### Clear domain work (sense-categorize-respond)
 - **Items**: S8R-PORT-001, S8R-COMP-001, S8R-COMP-002
 - **Approach**:
   - Direct implementation of known solutions
@@ -61,7 +61,7 @@ S8R-REF-001,"Create Machine Adapter Reference Implementation","Develop a clean, 
   - Regression test pass rate
   - Build pipeline stability
 
-### Cognitive Load Management
+### Cognitive load management
 
 - **High Cognitive Load Items** (S8R-ARCH-001):
   - Break into smaller, focused sessions
@@ -168,4 +168,3 @@ S8R-REF-001,"Create Machine Adapter Reference Implementation","Develop a clean, 
 
 ---
 
-*This plan follows the Ryōrin-dō Standard for Information Technology Work Management (RDSITWM.02) and will be updated as implementation progresses and new insights emerge.*

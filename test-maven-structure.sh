@@ -1,0 +1,1 @@
+util/scripts/test/test-maven-structure.sh

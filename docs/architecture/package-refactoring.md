@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Package Refactoring Plan
+# Package Refactoring
 
 This document outlines a plan to refactor the Java package structure in the S8r framework to reduce folder depth by at least 30% and consolidate similar files.
 

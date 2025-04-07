@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Unified Quality Checks Plan
+# Active Unified Quality Checks
 
 This document outlines the plan to implement a unified quality check system for the Samstraumr project.
 
@@ -45,7 +45,7 @@ Currently, quality checks are scattered across multiple scripts and configuratio
 
 ## Implementation Plan
 
-### Phase 1: Inventory and Analysis (Completed)
+### Phase 1: inventory and analysis (completed)
 
 1. ✅ Inventory all existing quality check tools:
    - Checkstyle
@@ -66,7 +66,7 @@ Currently, quality checks are scattered across multiple scripts and configuratio
    - Documented common patterns across quality scripts
    - Planned unified structure for consolidation
 
-### Phase 2: Tool Configuration Standardization (In Progress)
+### Phase 2: tool configuration standardization (in progress)
 
 1. ✅ Create standardized configuration files:
    - Checkstyle: `quality-tools/checkstyle/checkstyle.xml`
@@ -84,7 +84,7 @@ Currently, quality checks are scattered across multiple scripts and configuratio
    - Security: Focused on security issues
    - Defined in `quality-tools/quality-thresholds.xml`
 
-### Phase 3: Script Implementation (Completed)
+### Phase 3: script implementation (completed)
 
 1. ✅ Create a unified script structure:
    - `util/bin/quality/check-quality.sh`: Main entry point
@@ -104,7 +104,7 @@ Currently, quality checks are scattered across multiple scripts and configuratio
    - Consolidated output with colored formatting
    - Tool-specific reports linked from main report
 
-### Phase 4: Integration (Completed)
+### Phase 4: integration (completed)
 
 1. ✅ Integrate with s8r CLI:
    - Added s8r-quality symbolic link
@@ -119,7 +119,7 @@ Currently, quality checks are scattered across multiple scripts and configuratio
    - Added report-only mode for non-blocking checks
    - Added tool-specific selection and skipping
 
-### Phase 5: Documentation and Training (Completed)
+### Phase 5: documentation and training (completed)
 
 1. ✅ Create documentation:
    - Tool configuration documentation

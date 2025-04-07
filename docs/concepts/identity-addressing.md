@@ -22,7 +22,7 @@ Licensed under the Mozilla Public License 2.0
 - [Advanced Identity Concepts](#advanced-identity-concepts)
 - [Implementation Guidelines](#implementation-guidelines)
 
-## Introduction: The Power of Names
+## Introduction: the Power of Names
 
 "To name a thing is to know a thing." This ancient wisdom holds true in software as much as in mythology. In complex systems, clear identity becomes not just a convenience but a necessity—the foundation upon which awareness, communication, and trust are built.
 

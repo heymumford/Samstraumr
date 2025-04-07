@@ -239,4 +239,4 @@ Before committing code, verify these style standards:
 
 ## Current Version
 
-The current version of Samstraumr is: 2.7.0 (as of April 07, 2025)
+The current version of Samstraumr is: 2.7.1 (as of April 07, 2025)
