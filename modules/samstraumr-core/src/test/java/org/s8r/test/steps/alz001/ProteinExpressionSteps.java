@@ -17,9 +17,11 @@ package org.s8r.test.steps.alz001;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 
@@ -37,6 +39,111 @@ import io.cucumber.java.en.When;
 public class ProteinExpressionSteps extends ALZ001BaseSteps {
   
   private final Random random = new Random(42); // Using seed for reproducibility
+  
+  /**
+   * Asserts that a value is within the specified range.
+   * 
+   * @param description Description of the value being checked
+   * @param actual The actual value
+   * @param min Minimum acceptable value (inclusive)
+   * @param max Maximum acceptable value (inclusive)
+   */
+  private void assertInRange(String description, double actual, double min, double max) {
+    Assertions.assertTrue(
+        actual >= min && actual <= max,
+        String.format("%s (%.6f) should be in range [%.6f, %.6f]", description, actual, min, max));
+    
+    if (actual >= min && actual <= max) {
+      logInfo(String.format("%s: %.6f is within range [%.6f, %.6f]", description, actual, min, max));
+    } else {
+      logWarning(String.format("%s: %.6f is outside range [%.6f, %.6f]", description, actual, min, max));
+    }
+  }
+  
+  /**
+   * Class representing a protein measurement with value, unit, and range information.
+   */
+  private static class ProteinMeasurement {
+    private String proteinType;
+    private double value;
+    private String unit;
+    private double minRange;
+    private double maxRange;
+    
+    public ProteinMeasurement(String proteinType, double value, String unit, 
+                             double minRange, double maxRange) {
+      this.proteinType = proteinType;
+      this.value = value;
+      this.unit = unit;
+      this.minRange = minRange;
+      this.maxRange = maxRange;
+    }
+    
+    public String getProteinType() {
+      return proteinType;
+    }
+    
+    public double getValue() {
+      return value;
+    }
+    
+    public void setValue(double value) {
+      this.value = value;
+    }
+    
+    public String getUnit() {
+      return unit;
+    }
+    
+    public void setUnit(String unit) {
+      this.unit = unit;
+    }
+    
+    public double getMinRange() {
+      return minRange;
+    }
+    
+    public double getMaxRange() {
+      return maxRange;
+    }
+    
+    public boolean isWithinRange() {
+      return value >= minRange && value <= maxRange;
+    }
+    
+    @Override
+    public String toString() {
+      return String.format("%s: %.2f %s [%.2f-%.2f]", 
+          proteinType, value, unit, minRange, maxRange);
+    }
+  }
+  
+  /**
+   * Class representing a time series data point.
+   */
+  private static class TimeSeriesDataPoint {
+    private long timestamp;
+    private double value;
+    private String id;
+    
+    public TimeSeriesDataPoint(long timestamp, double value, String id) {
+      this.timestamp = timestamp;
+      this.value = value;
+      this.id = id;
+    }
+    
+    public long getTimestamp() {
+      return timestamp;
+    }
+    
+    public double getValue() {
+      return value;
+    }
+    
+    public String getId() {
+      return id;
+    }
+  }
   
   @Before
   public void setupTest() {
@@ -971,8 +1078,85 @@ public class ProteinExpressionSteps extends ALZ001BaseSteps {
   
   @Then("the component should attempt unit conversion")
   public void theComponentShouldAttemptUnitConversion() {
-    // In a real implementation, this would perform unit conversion
-    logInfo("Unit conversion attempted: 0.12 µg/ml -> 120 ng/ml");
+    ProteinExpressionComponent component = getFromContext("protein_component");
+    List<ProteinMeasurement> measurements = component.getMeasurements();
+    
+    // Find measurements with inconsistent units for the same protein type
+    Map<String, Set<String>> unitsByProtein = new HashMap<>();
+    for (ProteinMeasurement measurement : measurements) {
+      unitsByProtein.computeIfAbsent(
+          measurement.getProteinType(), 
+          k -> new HashSet<>()).add(measurement.getUnit());
+    }
+    
+    // Perform unit conversion for proteins with multiple units
+    for (Map.Entry<String, Set<String>> entry : unitsByProtein.entrySet()) {
+      if (entry.getValue().size() > 1) {
+        String proteinType = entry.getKey();
+        
+        logInfo("Converting units for " + proteinType + " between: " + String.join(", ", entry.getValue()));
+        
+        // Convert all measurements to the standardized unit
+        // For Tau: ng/ml as standard
+        // For Amyloid-beta: pg/ml as standard
+        // For other proteins: based on first encountered unit
+        
+        String standardUnit = determineStandardUnit(proteinType);
+        
+        for (ProteinMeasurement measurement : measurements) {
+            if (measurement.getProteinType().equals(proteinType) && 
+                !measurement.getUnit().equals(standardUnit)) {
+                
+                double convertedValue = convertUnit(
+                    measurement.getValue(), 
+                    measurement.getUnit(), 
+                    standardUnit);
+                
+                logInfo("Converted " + measurement.getValue() + " " + measurement.getUnit() + 
+                       " to " + convertedValue + " " + standardUnit);
+                
+                // Update the measurement with the converted value and unit
+                measurement.setValue(convertedValue);
+                measurement.setUnit(standardUnit);
+            }
+        }
+      }
+    }
+  }
+  
+  private String determineStandardUnit(String proteinType) {
+    // Define standard units for common protein types
+    if ("Tau".equals(proteinType)) {
+      return "ng/ml";
+    } else if ("Amyloid-beta".equals(proteinType)) {
+      return "pg/ml";
+    } else if ("APOE".equals(proteinType)) {
+      return "mg/dl";
+    } else {
+      return "ng/ml"; // Default standard
+    }
+  }
+  
+  private double convertUnit(double value, String fromUnit, String toUnit) {
+    // Handle common unit conversions
+    if (fromUnit.equals("µg/ml") && toUnit.equals("ng/ml")) {
+      return value * 1000.0;
+    } else if (fromUnit.equals("ng/ml") && toUnit.equals("µg/ml")) {
+      return value / 1000.0;
+    } else if (fromUnit.equals("mg/dl") && toUnit.equals("g/l")) {
+      return value / 100.0;
+    } else if (fromUnit.equals("g/l") && toUnit.equals("mg/dl")) {
+      return value * 100.0;
+    } else if (fromUnit.equals("pmol/l") && toUnit.equals("ng/ml")) {
+      // This requires molecular weight which would depend on the protein
+      // For simplicity using a generic conversion factor
+      return value * 0.012;
+    } else if (fromUnit.equals("ng/ml") && toUnit.equals("pmol/l")) {
+      return value / 0.012;
+    } else {
+      logWarning("Unsupported unit conversion from " + fromUnit + " to " + toUnit);
+      return value; // Return original value if conversion not supported
+    }
   }
   
   @Then("the component should generate appropriate warnings")
@@ -996,20 +1180,201 @@ public class ProteinExpressionSteps extends ALZ001BaseSteps {
   
   @When("I submit protein data with the following corruption patterns:")
   public void iSubmitProteinDataWithTheFollowingCorruptionPatterns(DataTable dataTable) {
-    // In a real implementation, this would corrupt the data according to the patterns
+    // Create a protein component if not already in context
+    ProteinExpressionComponent component = getFromContext("protein_component");
+    if (component == null) {
+      component = new ProteinExpressionComponent();
+      component.setState("initialized");
+    }
+    
+    // Add some baseline measurements if there are none
+    if (component.getMeasurements().isEmpty()) {
+      component.addMeasurement(new ProteinMeasurement("Tau", 110.0, "ng/ml", 80.0, 150.0));
+      component.addMeasurement(new ProteinMeasurement("Amyloid-beta", 750.0, "pg/ml", 500.0, 1200.0));
+      component.addMeasurement(new ProteinMeasurement("APOE", 38.0, "mg/dl", 30.0, 45.0));
+    }
+    
+    // Create time series data if none exists
+    List<TimeSeriesDataPoint> tauSeries = new ArrayList<>();
+    List<TimeSeriesDataPoint> amyloidSeries = new ArrayList<>();
+    List<TimeSeriesDataPoint> apoeSeries = new ArrayList<>();
+    
+    long baseTime = System.currentTimeMillis();
+    int timeStep = 1000;
+    
+    // Generate basic time series
+    for (int i = 0; i < 20; i++) {
+      long timestamp = baseTime + (i * timeStep);
+      tauSeries.add(new TimeSeriesDataPoint(timestamp, 110.0 + i * 0.5, "Tau_" + i));
+      amyloidSeries.add(new TimeSeriesDataPoint(timestamp, 750.0 + i * 2.0, "Amyloid_" + i));
+      apoeSeries.add(new TimeSeriesDataPoint(timestamp, 38.0 - i * 0.1, "APOE_" + i));
+    }
+    
+    // Now corrupt the data according to the patterns
     List<Map<String, String>> rows = dataTable.asMaps();
     
     for (Map<String, String> row : rows) {
       String corruptionType = row.get("corruption_type");
-      String frequency = row.get("frequency");
-      String magnitude = row.get("magnitude");
+      String frequencyStr = row.get("frequency");
+      String magnitudeStr = row.get("magnitude");
+      
+      // Parse frequency and magnitude values
+      double frequency = parseFrequency(frequencyStr);
+      double magnitude = Double.parseDouble(magnitudeStr.replace("%", "")) / 100.0;
+      
+      // Apply the corruption pattern
+      switch (corruptionType) {
+        case "missing_values":
+          applyMissingValueCorruption(tauSeries, frequency, magnitude);
+          applyMissingValueCorruption(amyloidSeries, frequency, magnitude);
+          applyMissingValueCorruption(apoeSeries, frequency, magnitude);
+          break;
+          
+        case "outliers":
+          applyOutlierCorruption(tauSeries, frequency, magnitude);
+          applyOutlierCorruption(amyloidSeries, frequency, magnitude);
+          applyOutlierCorruption(apoeSeries, frequency, magnitude);
+          break;
+          
+        case "noise":
+          applyNoiseCorruption(tauSeries, frequency, magnitude);
+          applyNoiseCorruption(amyloidSeries, frequency, magnitude);
+          applyNoiseCorruption(apoeSeries, frequency, magnitude);
+          break;
+          
+        case "shift":
+          applyShiftCorruption(tauSeries, frequency, magnitude);
+          applyShiftCorruption(amyloidSeries, frequency, magnitude);
+          applyShiftCorruption(apoeSeries, frequency, magnitude);
+          break;
+          
+        default:
+          logWarning("Unsupported corruption type: " + corruptionType);
+          break;
+      }
       
       logInfo("Applied corruption: " + corruptionType + 
-              " with frequency " + frequency + 
-              " and magnitude " + magnitude);
+              " with frequency " + frequencyStr + 
+              " and magnitude " + magnitudeStr);
     }
     
+    // Store the corrupted data in the component
+    component.processTimeSeries("Tau", tauSeries);
+    component.processTimeSeries("Amyloid-beta", amyloidSeries);
+    component.processTimeSeries("APOE", apoeSeries);
+    
+    storeInContext("protein_component", component);
     storeInContext("data_corruption_applied", true);
+  }
+  
+  /**
+   * Parses frequency string into a double value between 0 and 1.
+   */
+  private double parseFrequency(String frequency) {
+    if (frequency.equals("low")) {
+      return 0.1; // 10% of data points
+    } else if (frequency.equals("medium")) {
+      return 0.3; // 30% of data points
+    } else if (frequency.equals("high")) {
+      return 0.5; // 50% of data points
+    } else {
+      // Try to parse as percentage
+      return Double.parseDouble(frequency.replace("%", "")) / 100.0;
+    }
+  }
+  
+  /**
+   * Sets values to Double.NaN to simulate missing values.
+   */
+  private void applyMissingValueCorruption(List<TimeSeriesDataPoint> series, double frequency, double magnitude) {
+    int pointsToCorrupt = (int) Math.ceil(series.size() * frequency * magnitude);
+    
+    for (int i = 0; i < pointsToCorrupt; i++) {
+      int index = random.nextInt(series.size());
+      // Create a new point with NaN value (represented as -1 since we can't store NaN directly)
+      TimeSeriesDataPoint original = series.get(index);
+      series.set(index, new TimeSeriesDataPoint(original.getTimestamp(), -1, original.getId() + "_missing"));
+    }
+  }
+  
+  /**
+   * Creates outliers by multiplying values by a large factor.
+   */
+  private void applyOutlierCorruption(List<TimeSeriesDataPoint> series, double frequency, double magnitude) {
+    int pointsToCorrupt = (int) Math.ceil(series.size() * frequency);
+    
+    for (int i = 0; i < pointsToCorrupt; i++) {
+      int index = random.nextInt(series.size());
+      TimeSeriesDataPoint original = series.get(index);
+      
+      // Create outlier by multiplying or dividing value by factor based on magnitude
+      double factor = 1.0 + 10.0 * magnitude;
+      double newValue = random.nextBoolean() ? 
+          original.getValue() * factor : original.getValue() / factor;
+      
+      series.set(index, new TimeSeriesDataPoint(original.getTimestamp(), newValue, original.getId() + "_outlier"));
+    }
+  }
+  
+  /**
+   * Adds random noise to data points.
+   */
+  private void applyNoiseCorruption(List<TimeSeriesDataPoint> series, double frequency, double magnitude) {
+    // Calculate baseline statistics to determine noise scale
+    double sum = 0, min = Double.MAX_VALUE, max = Double.MIN_VALUE;
+    
+    for (TimeSeriesDataPoint point : series) {
+      double value = point.getValue();
+      sum += value;
+      min = Math.min(min, value);
+      max = Math.max(max, value);
+    }
+    
+    double mean = sum / series.size();
+    double range = max - min;
+    double noiseScale = range * magnitude;
+    
+    // Apply noise to selected points
+    int pointsToCorrupt = (int) Math.ceil(series.size() * frequency);
+    
+    for (int i = 0; i < pointsToCorrupt; i++) {
+      int index = random.nextInt(series.size());
+      TimeSeriesDataPoint original = series.get(index);
+      
+      // Add random noise scaled by magnitude
+      double noise = (random.nextDouble() - 0.5) * 2 * noiseScale;
+      double newValue = original.getValue() + noise;
+      
+      series.set(index, new TimeSeriesDataPoint(original.getTimestamp(), newValue, original.getId() + "_noisy"));
+    }
+  }
+  
+  /**
+   * Applies a shift to consecutive data points.
+   */
+  private void applyShiftCorruption(List<TimeSeriesDataPoint> series, double frequency, double magnitude) {
+    if (series.size() < 3) return;
+    
+    // Determine if we should add a shift
+    if (random.nextDouble() < frequency) {
+      // Choose a random starting point for the shift (not at the beginning or end)
+      int startIdx = random.nextInt(series.size() - 2) + 1;
+      
+      // Calculate baseline value 
+      double baseline = series.get(startIdx - 1).getValue();
+      
+      // Calculate the shift amount based on baseline and magnitude
+      double shiftAmount = baseline * magnitude;
+      
+      // Apply the shift to all subsequent points
+      for (int i = startIdx; i < series.size(); i++) {
+        TimeSeriesDataPoint original = series.get(i);
+        double newValue = original.getValue() + shiftAmount;
+        series.set(i, new TimeSeriesDataPoint(original.getTimestamp(), newValue, original.getId() + "_shifted"));
+      }
+      
+      logInfo("Applied shift of " + shiftAmount + " starting at index " + startIdx);
+    }
   }
   
   @Then("the composite should detect the corrupted data")

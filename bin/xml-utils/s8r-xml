@@ -1,0 +1,89 @@
+#!/bin/bash
+#
+# Copyright (c) 2025 Eric C. Mumford (@heymumford)
+#
+# This software was developed with analytical assistance from AI tools 
+# including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+# which were used as paid services. All intellectual property rights 
+# remain exclusively with the copyright holder listed above.
+#
+# Licensed under the Mozilla Public License 2.0
+
+# Script to manage XML files, especially POM files
+# Wrapper for XML utilities in util/lib/xml-lib.sh
+
+# Find the repository root
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)")
+
+# Terminal colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+RESET='\033[0m'
+
+# Functions for prettier output
+info() { echo -e "\n${YELLOW}$1${RESET}"; }
+success() { echo -e "${GREEN}$1${RESET}"; }
+error() { echo -e "${RED}$1${RESET}" >&2; }
+detail() { echo -e "${BLUE}$1${RESET}"; }
+
+# Print usage information
+print_usage() {
+    echo -e "Usage: $(basename $0) <command> [options] [path]"
+    echo
+    echo -e "Commands:"
+    echo -e "  ${GREEN}validate${RESET}    Validate XML files"
+    echo -e "  ${GREEN}fix${RESET}         Fix common XML problems (like <n> vs <name>)"
+    echo -e "  ${GREEN}check${RESET}       Check for XML issues without fixing them"
+    echo -e "  ${GREEN}pom${RESET}         Check/fix POM files specifically"
+    echo -e "  ${GREEN}help${RESET}        Show this help message"
+    echo
+    echo -e "Options:"
+    echo -e "  ${BLUE}-r, --recursive${RESET}    Process directories recursively"
+    echo -e "  ${BLUE}-v, --verbose${RESET}      Show verbose output"
+    echo
+    echo -e "Examples:"
+    echo -e "  ${YELLOW}$(basename $0) validate ./modules/samstraumr-core/pom.xml${RESET}"
+    echo -e "  ${YELLOW}$(basename $0) fix -r ./modules${RESET}"
+    echo -e "  ${YELLOW}$(basename $0) pom --fix ./modules/samstraumr-core/pom.xml${RESET}"
+    echo
+}
+
+# Check command
+if [ $# -eq 0 ]; then
+    print_usage
+    exit 1
+fi
+
+COMMAND="$1"
+shift
+
+# Process command
+case "$COMMAND" in
+    validate)
+        exec "$REPO_ROOT/util/scripts/check-pom-files.sh" --action validate "$@"
+        ;;
+    fix)
+        exec "$REPO_ROOT/util/scripts/fix-pom-tags.sh" --fix "$@"
+        ;;
+    check)
+        exec "$REPO_ROOT/util/scripts/check-pom-files.sh" --action check "$@"
+        ;;
+    pom)
+        if [[ "$*" == *"--fix"* ]]; then
+            exec "$REPO_ROOT/util/scripts/fix-pom-tags.sh" --fix "$@"
+        else
+            exec "$REPO_ROOT/util/scripts/check-pom-files.sh" --action check "$@"
+        fi
+        ;;
+    help|--help|-h)
+        print_usage
+        exit 0
+        ;;
+    *)
+        error "Unknown command: $COMMAND"
+        print_usage
+        exit 1
+        ;;
+esac

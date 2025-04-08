@@ -88,12 +88,16 @@ show_help() {
   echo "  ./s8r-version <command> [options]"
   echo
   print_section "Commands"
-  echo "  get                 Show current version"
-  echo "  bump [type]         Bump version (type: major, minor, patch)"
-  echo "  set <version>       Set specific version (format: x.y.z)"
-  echo "  fix                 Fix version inconsistencies across files"
-  echo "  verify              Verify version consistency across all files"
-  echo "  help                Show this help message"
+  echo "  get                         Show current version"
+  echo "  bump [type]                 Bump version (type: major, minor, patch)"
+  echo "  set <version>               Set specific version (format: x.y.z)"
+  echo "  fix                         Fix version inconsistencies across files"
+  echo "  verify                      Verify version consistency across all files"
+  echo "  build-number get            Show current build number"
+  echo "  build-number increment      Increment build number"
+  echo "  build-number set <number>   Set build number to specific value"
+  echo "  setup-git-hook              Create Git hook to increment build number on push"
+  echo "  help                        Show this help message"
   echo
   print_section "Options"
   echo "  --simple            Use simple behavior with less error recovery"
@@ -101,12 +105,16 @@ show_help() {
   echo "  --verbose           Show detailed information"
   echo
   print_section "Examples"
-  echo "  ./s8r-version get              # Show current version"
-  echo "  ./s8r-version bump patch       # Increment patch version"
-  echo "  ./s8r-version bump minor       # Increment minor version"
-  echo "  ./s8r-version set 2.0.0        # Set version to 2.0.0"
-  echo "  ./s8r-version verify           # Check for version inconsistencies"
-  echo "  ./s8r-version fix              # Fix version inconsistencies"
+  echo "  ./s8r-version get                     # Show current version"
+  echo "  ./s8r-version bump patch              # Increment patch version"
+  echo "  ./s8r-version bump minor              # Increment minor version"
+  echo "  ./s8r-version set 2.0.0               # Set version to 2.0.0"
+  echo "  ./s8r-version verify                  # Check for version inconsistencies"
+  echo "  ./s8r-version fix                     # Fix version inconsistencies"
+  echo "  ./s8r-version build-number get        # Show current build number"
+  echo "  ./s8r-version build-number increment  # Increment build number"
+  echo "  ./s8r-version build-number set 501    # Set build number to 501"
+  echo "  ./s8r-version setup-git-hook          # Set up Git hook for auto-increment"
 }
 
 # Check that the script is properly installed
@@ -178,6 +186,52 @@ get_version() {
   fi
   
   echo "$version"
+}
+
+# Get current build number from the version file
+get_build_number() {
+  if [[ ! -f "$VERSION_FILE" ]]; then
+    error "Version file not found: $VERSION_FILE"
+  fi
+  
+  local build_number=$(grep "samstraumr.build.number=" "$VERSION_FILE" | cut -d= -f2)
+  
+  if [[ -z "$build_number" ]]; then
+    # Simple mode just fails, robust mode tries to recover
+    if [[ "$SIMPLE_MODE" == "true" ]]; then
+      error "Failed to extract build number from $VERSION_FILE"
+    else
+      print_error "Failed to extract build number from $VERSION_FILE"
+      print_info "Defaulting to build number 1"
+      build_number="1"
+    fi
+  fi
+  
+  # Validate build number format
+  if ! [[ "$build_number" =~ ^[0-9]+$ ]]; then
+    print_warning "Invalid build number format: $build_number (must be a number)"
+    print_info "Defaulting to build number 1"
+    build_number="1"
+  fi
+  
+  echo "$build_number"
+}
+
+# Increment build number
+increment_build_number() {
+  local current_build_number=$(get_build_number)
+  local new_build_number=$((current_build_number + 1))
+  
+  if [[ ! -f "$VERSION_FILE" ]]; then
+    error "Version file not found: $VERSION_FILE"
+  fi
+  
+  # Update build number in version.properties
+  sed -i "s/^samstraumr.build.number=.*/samstraumr.build.number=$new_build_number/" "$VERSION_FILE"
+  
+  print_success "Build number incremented from $current_build_number to $new_build_number"
+  
+  echo "$new_build_number"
 }
 
 # Check for version inconsistencies across files
@@ -486,6 +540,46 @@ if [[ "$SIMPLE_MODE" != "true" ]]; then
   check_installation
 fi
 
+# Create Git pre-push hook to increment build number
+create_git_push_hook() {
+  local hooks_dir="${PROJECT_ROOT}/.git/hooks"
+  local pre_push_hook="${hooks_dir}/pre-push"
+  
+  # Create hooks directory if it doesn't exist
+  if [[ ! -d "$hooks_dir" ]]; then
+    mkdir -p "$hooks_dir"
+  fi
+  
+  # Create pre-push hook script with build number incrementation
+  cat > "$pre_push_hook" << 'EOF'
+#!/bin/bash
+
+# Pre-push hook to increment build number automatically
+# This script runs before 'git push' and increments the build number
+
+# Get project root directory
+PROJECT_ROOT=$(git rev-parse --show-toplevel)
+
+# Run the s8r-version script to increment the build number
+"$PROJECT_ROOT/bin/s8r-version" build-number increment
+
+# Add the version.properties file to the commit
+git add "$PROJECT_ROOT/modules/version.properties"
+
+# Create a new commit with the incremented build number
+git commit -m "chore: increment build number [ci skip]"
+
+# Allow the push to continue
+exit 0
+EOF
+  
+  # Make the hook executable
+  chmod +x "$pre_push_hook"
+  
+  print_success "Git pre-push hook created at $pre_push_hook"
+  print_info "The build number will be automatically incremented before each git push"
+}
+
 # Process commands
 command="$1"
 shift || true
@@ -494,7 +588,8 @@ case "$command" in
   get|version)
     # Get current version
     current=$(get_version)
-    print_info "Samstraumr Version: $current"
+    build=$(get_build_number)
+    print_info "Samstraumr Version: $current (Build: $build)"
     # Optional verification
     if [[ "$*" == *"--verify"* ]]; then
       verify_version
@@ -542,6 +637,43 @@ case "$command" in
     # Verify version consistency
     verify_version
     exit $?
+    ;;
+    
+  build-number)
+    action="${1:-get}"
+    
+    case "$action" in
+      get)
+        build=$(get_build_number)
+        print_info "Current build number: $build"
+        ;;
+      increment)
+        build=$(increment_build_number)
+        print_success "Build number incremented to $build"
+        ;;
+      set)
+        new_build="$2"
+        if [[ -z "$new_build" || ! "$new_build" =~ ^[0-9]+$ ]]; then
+          error "Build number must be a valid number"
+        fi
+        
+        if [[ ! -f "$VERSION_FILE" ]]; then
+          error "Version file not found: $VERSION_FILE"
+        fi
+        
+        # Update build number in version.properties
+        sed -i "s/^samstraumr.build.number=.*/samstraumr.build.number=$new_build/" "$VERSION_FILE"
+        
+        print_success "Build number set to $new_build"
+        ;;
+      *)
+        error "Invalid build-number action: $action (use get, increment, or set)"
+        ;;
+    esac
+    ;;
+    
+  setup-git-hook)
+    create_git_push_hook
     ;;
     
   help|-h|--help)

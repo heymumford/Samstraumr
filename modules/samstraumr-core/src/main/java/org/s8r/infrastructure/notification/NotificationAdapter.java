@@ -315,8 +315,7 @@ public class NotificationAdapter implements NotificationPort {
     notifications.put(notificationId, record);
 
     try {
-      // In a real implementation, this would send the notification through an external system
-      // For demo purposes, we'll just log it and consider it sent
+      // Use the appropriate delivery method based on the recipient's channel
       deliverNotification(record);
 
       logger.info("Notification sent successfully: {}", notificationId);
@@ -575,10 +574,55 @@ public class NotificationAdapter implements NotificationPort {
 
     logger.info("Notification scheduled successfully: {}", notificationId);
 
-    // In a real implementation, this would add the notification to a scheduling system
-    // For this demo, we'll just log it
-    logger.info(
-        "SCHEDULED NOTIFICATION [{}]: {} for {} at {}", channel, subject, recipient, scheduledTime);
+    // Add the notification to the scheduling system
+    Thread schedulerThread = new Thread(() -> {
+        try {
+            // Parse the scheduled time
+            LocalDateTime scheduleTime = LocalDateTime.parse(scheduledTime);
+            
+            // Calculate delay until scheduled time
+            long delayMillis = java.time.Duration.between(
+                LocalDateTime.now(), scheduleTime).toMillis();
+            
+            if (delayMillis > 0) {
+                Thread.sleep(delayMillis);
+                
+                // Retrieve the notification record (it might have been updated)
+                NotificationRecord scheduledRecord = notifications.get(notificationId);
+                
+                if (scheduledRecord != null && scheduledRecord.status == DeliveryStatus.SCHEDULED) {
+                    // Deliver the notification via the specified channel
+                    deliverNotificationViaChannel(scheduledRecord, channel);
+                    logger.info("Scheduled notification {} delivered at {}", 
+                        notificationId, LocalDateTime.now());
+                }
+            } else {
+                // If scheduled time is in the past, deliver immediately
+                NotificationRecord scheduledRecord = notifications.get(notificationId);
+                if (scheduledRecord != null) {
+                    deliverNotificationViaChannel(scheduledRecord, channel);
+                    logger.info("Past-due scheduled notification {} delivered immediately", notificationId);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error delivering scheduled notification {}: {}", 
+                notificationId, e.getMessage(), e);
+            
+            // Update notification status
+            NotificationRecord failedRecord = notifications.get(notificationId);
+            if (failedRecord != null) {
+                failedRecord.setStatus(DeliveryStatus.FAILED, 
+                    "Failed to deliver scheduled notification: " + e.getMessage());
+            }
+        }
+    });
+    
+    schedulerThread.setDaemon(true);
+    schedulerThread.setName("notification-scheduler-" + notificationId);
+    schedulerThread.start();
+    
+    logger.info("SCHEDULED NOTIFICATION [{}]: {} for {} at {}", 
+        channel, subject, recipient, scheduledTime);
 
     // Return the scheduled result
     return NotificationResult.scheduled(notificationId, scheduledTime);
