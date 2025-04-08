@@ -10,6 +10,10 @@
   <description>A minimal test module to verify the testing infrastructure</description>
 
   <properties>
+    <jacoco.line.coverage>0.80</jacoco.line.coverage>
+    <jacoco.branch.coverage>0.80</jacoco.branch.coverage>
+    <jacoco.method.coverage>0.85</jacoco.method.coverage>
+    <jacoco.class.coverage>0.90</jacoco.class.coverage>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>

@@ -273,8 +273,16 @@ main() {
     print_warning "Running in dry-run mode. No files will be modified."
   fi
   
-  # Find and update all POM files
-  find "$PROJECT_ROOT" -name "pom.xml" | while read -r pom_file; do
+  # Explicitly list the POM files we want to update
+  pom_files=(
+    "$PROJECT_ROOT/pom.xml"
+    "$PROJECT_ROOT/modules/pom.xml"
+    "$PROJECT_ROOT/modules/samstraumr-core/pom.xml"
+    "$PROJECT_ROOT/test-module/pom.xml"
+  )
+  
+  # Process each POM file
+  for pom_file in "${pom_files[@]}"; do
     if $DRY_RUN; then
       print_info "Would update $pom_file"
     else

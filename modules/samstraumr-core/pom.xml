@@ -25,6 +25,10 @@ Licensed under the Mozilla Public License 2.0
   <description>Core framework components for the Samstraumr project</description>
 
   <properties>
+    <jacoco.line.coverage>0.80</jacoco.line.coverage>
+    <jacoco.branch.coverage>0.80</jacoco.branch.coverage>
+    <jacoco.method.coverage>0.85</jacoco.method.coverage>
+    <jacoco.class.coverage>0.90</jacoco.class.coverage>
     <!-- Main class for exec plugin -->
     <exec.mainClass>org.s8r.app.CliApplication</exec.mainClass>
   </properties>

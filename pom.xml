@@ -72,8 +72,8 @@ Licensed under the Mozilla Public License 2.0
     <checkstyle.version>10.14.0</checkstyle.version>
     <spotbugs.plugin.version>4.8.3.0</spotbugs.plugin.version>
     <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
-    <jacoco.line.coverage>0.75</jacoco.line.coverage>
-    <jacoco.branch.coverage>0.75</jacoco.branch.coverage>
+    <jacoco.line.coverage>0.80</jacoco.line.coverage>
+    <jacoco.branch.coverage>0.80</jacoco.branch.coverage>
     <maven.site.plugin.version>4.0.0-M13</maven.site.plugin.version>
     <maven.project.info.reports.plugin.version>3.5.0</maven.project.info.reports.plugin.version>
     <dependency-check.version>9.0.7</dependency-check.version>
@@ -498,8 +498,8 @@ Licensed under the Mozilla Public License 2.0
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <jacoco.line.coverage>0.0</jacoco.line.coverage>
-        <jacoco.branch.coverage>0.0</jacoco.branch.coverage>
+        <jacoco.line.coverage>0.80</jacoco.line.coverage>
+        <jacoco.branch.coverage>0.80</jacoco.branch.coverage>
       </properties>
     </profile>
     
@@ -607,6 +607,111 @@ Licensed under the Mozilla Public License 2.0
             <version>${owasp.plugin.version}</version>
             <executions>
               <execution>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- Enhanced Quality Profile -->
+    <profile>
+      <id>enhanced-quality</id>
+      <build>
+        <plugins>
+          <!-- PMD with enhanced ruleset -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <version>${pmd.plugin.version}</version>
+            <configuration>
+              <skip>false</skip>
+              <skipEmptyReport>true</skipEmptyReport>
+              <rulesets>
+                <ruleset>quality-tools/pmd/pmd-enhancements.xml</ruleset>
+              </rulesets>
+              <excludeFromFailureFile>quality-tools/pmd/pmd-exclude.properties</excludeFromFailureFile>
+            </configuration>
+            <executions>
+              <execution>
+                <id>pmd-enhanced-check</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>check</goal>
+                  <goal>cpd-check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          
+          <!-- SpotBugs with enhanced configuration -->
+          <plugin>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
+            <configuration>
+              <effort>Max</effort>
+              <threshold>Low</threshold> <!-- Lower threshold to catch more issues -->
+              <xmlOutput>true</xmlOutput>
+              <excludeFilterFile>quality-tools/spotbugs/spotbugs-strict.xml</excludeFilterFile>
+              <failOnError>false</failOnError> <!-- Initially set to false to avoid breaking builds -->
+              <plugins>
+                <plugin>
+                  <groupId>com.h3xstream.findsecbugs</groupId>
+                  <artifactId>findsecbugs-plugin</artifactId>
+                  <version>${findsecbugs.version}</version>
+                </plugin>
+              </plugins>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>verify</phase>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          
+          <!-- Enforce strict Javadoc -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <source>${maven.compiler.source}</source>
+              <doclint>all</doclint> <!-- Enforce all Javadoc rules -->
+              <failOnWarnings>true</failOnWarnings> <!-- Fail on Javadoc warnings -->
+              <detectJavaApiLink>true</detectJavaApiLink>
+              <quiet>true</quiet>
+            </configuration>
+            <executions>
+              <execution>
+                <id>check-enhanced-javadoc</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>javadoc</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          
+          <!-- Strict checkstyle rules -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <configuration>
+              <configLocation>quality-tools/checkstyle/checkstyle.xml</configLocation>
+              <failOnViolation>true</failOnViolation> <!-- Fail on checkstyle violations -->
+              <consoleOutput>true</consoleOutput>
+              <failsOnError>true</failsOnError>
+              <includeTestSourceDirectory>true</includeTestSourceDirectory>
+              <violationSeverity>warning</violationSeverity> <!-- Treat warnings as errors -->
+            </configuration>
+            <executions>
+              <execution>
+                <phase>validate</phase>
                 <goals>
                   <goal>check</goal>
                 </goals>

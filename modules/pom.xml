@@ -55,8 +55,8 @@ Licensed under the Mozilla Public License 2.0
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <jacoco.line.coverage>0.0</jacoco.line.coverage>
-        <jacoco.branch.coverage>0.0</jacoco.branch.coverage>
+        <jacoco.line.coverage>0.80</jacoco.line.coverage>
+        <jacoco.branch.coverage>0.80</jacoco.branch.coverage>
         
         <skipTests>false</skipTests>
         <maven.test.skip>false</maven.test.skip>
