@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<\!--
+<!--
 Copyright (c) 2025 Eric C. Mumford (@heymumford)
 
 This software was developed with analytical assistance from AI tools 
@@ -16,8 +16,9 @@ Licensed under the Mozilla Public License 2.0
 
   <parent>
     <groupId>org.s8r</groupId>
-    <artifactId>samstraumr</artifactId>
+    <artifactId>samstraumr-parent</artifactId>
     <version>3.0.2</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <artifactId>samstraumr-core</artifactId>
@@ -58,37 +59,58 @@ Licensed under the Mozilla Public License 2.0
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <!-- Version managed by parent -->
+      <version>2.10.1</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <!-- Version managed by parent -->
+      <version>2.15.1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <!-- Version managed by parent -->
+      <version>3.14.0</version>
     </dependency>
     <dependency>
       <groupId>info.picocli</groupId>
       <artifactId>picocli</artifactId>
-      <!-- Version managed by parent -->
+      <version>4.7.5</version>
     </dependency>
     <dependency>
       <groupId>org.freemarker</groupId>
       <artifactId>freemarker</artifactId>
-      <!-- Version managed by parent -->
+      <version>2.3.32</version>
     </dependency>
     <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
-      <!-- Version managed by parent -->
+      <version>2.2</version>
     </dependency>
     <dependency>
       <groupId>org.jetbrains</groupId>
       <artifactId>annotations</artifactId>
-      <!-- Version managed by parent -->
+      <version>24.1.0</version>
+    </dependency>
+    <!-- Additional dependencies needed for Environment and Identity classes -->
+    <dependency>
+      <groupId>com.github.oshi</groupId>
+      <artifactId>oshi-core</artifactId>
+      <version>${oshi.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.spotbugs</groupId>
+      <artifactId>spotbugs-annotations</artifactId>
+      <version>${spotbugs.annotations.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -135,31 +157,49 @@ Licensed under the Mozilla Public License 2.0
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-spring</artifactId>
-      <!-- Version managed by parent -->
+      <version>${cucumber.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-junit</artifactId>
+      <version>${cucumber.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-core</artifactId>
+      <version>${cucumber.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
-      <!-- Version managed by parent -->
+      <version>6.1.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
-      <!-- Version managed by parent -->
+      <version>6.1.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.tngtech.archunit</groupId>
       <artifactId>archunit-junit5</artifactId>
-      <!-- Version managed by parent -->
+      <version>${archunit.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>net.sourceforge.plantuml</groupId>
       <artifactId>plantuml</artifactId>
-      <!-- Version managed by parent -->
+      <version>1.2023.13</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -231,16 +271,19 @@ Licensed under the Mozilla Public License 2.0
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
+        <version>3.3.0</version>
         <!-- Version managed by parent -->
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
+        <version>${maven.site.plugin.version}</version>
         <!-- Version managed by parent -->
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
+        <version>${maven.exec.plugin.version}</version>
         <!-- Version managed by parent -->
         <configuration>
           <mainClass>${exec.mainClass}</mainClass>
