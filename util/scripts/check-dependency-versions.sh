@@ -16,13 +16,13 @@ cat > target/version-check/pom.xml << 'EOF'
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.samstraumr</groupId>
+    <groupId>org.s8r</groupId>
     <artifactId>version-check</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
     <parent>
-        <groupId>org.samstraumr</groupId>
+        <groupId>org.s8r</groupId>
         <artifactId>samstraumr</artifactId>
         <version>2.0.0</version>
         <relativePath>../../pom.xml</relativePath>

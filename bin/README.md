@@ -1,83 +1,113 @@
-# Samstraumr Executables Directory
+# Samstraumr Script Consolidation
 
-This directory contains all executable scripts for the Samstraumr project, organized into categories for better maintainability and discovery.
+This directory contains consolidated scripts for the Samstraumr project, designed to reduce redundancy, improve maintainability, and ensure consistent behavior across the codebase.
 
-## Setup Instructions
+## Consolidated Scripts
 
-To properly use these executables, you have three options:
+| Script                    | Description                                       | Replaces                                      |
+|---------------------------|---------------------------------------------------|-----------------------------------------------|
+| `s8r-version`             | Unified version management                        | `s8r-version`, `s8r-version-robust`, `s8r-version-simple` |
+| `s8r-build`               | Unified build tool                                | `s8r-build`, `s8r-build-new`                  |
+| `s8r-test`                | Unified test runner                               | `s8r-test`, `s8r-test-new`                    |
 
-### Option 1: Add this directory to your PATH
+## Shared Library
 
-```bash
-# Run the setup script
-./bin/setup-path.sh
+The scripts leverage a unified common library (`util/lib/unified-common.sh`) that provides:
 
-# This will add the bin directory to your shell configuration
-# and provide instructions for activating it in your current session
-```
+- Consistent output formatting and color handling
+- Standardized argument parsing
+- Common file and path operations
+- Maven integration functions
+- Validation utilities
+- System and Git utilities
 
-### Option 2: Create shell aliases (recommended)
+## Script Features
 
-```bash
-# Run the aliases script
-./bin/create-aliases.sh
-
-# This will create aliases for all scripts in your shell configuration
-# and provide instructions for activating them in your current session
-```
-
-### Option 3: Use the scripts directly with full paths
+### s8r-version
 
 ```bash
-# You can always use the full path to run a script
-/path/to/Samstraumr/bin/core/s8r
-/path/to/Samstraumr/bin/build/s8r-build
+./s8r-version <command> [options]
 ```
 
-## Directory Structure
+**Commands:**
+- `get` - Show current version
+- `bump [type]` - Bump version (major, minor, patch)
+- `set <version>` - Set specific version
+- `fix` - Fix version inconsistencies
+- `verify` - Verify version consistency
 
-Scripts are organized by functionality:
+**Options:**
+- `--simple` - Use simplified behavior with less error recovery
+- `--verify` - Verify consistency after getting version
+- `--verbose` - Show detailed information
 
-- `core/` - Core S8r framework executables (s8r, s8r-init, s8r-list)
-- `build/` - Build-related executables (s8r-build, s8r-ci)
-- `test/` - Testing executables (s8r-test, s8r-test-cli)
-- `component/` - Component-related executables (s8r-component, s8r-composite, s8r-machine, s8r-tube)
-- `dev/` - Development executables (s8r-dev)
-- `migration/` - Migration-related executables (s8r-migration-monitor, s8r-architecture-verify)
-- `help/` - Help documentation executables (s8r-help)
-- `utils/` - Utility executables (s8r-docs, s8r-quality, s8r-version)
-- `ai/` - AI-related executables (s8r-ai-test)
-- `s8r-all/` - Backup copies of all scripts
-
-## Management Scripts
-
-This directory also contains management scripts:
-
-- `setup-path.sh` - Adds the bin directory to your PATH
-- `create-aliases.sh` - Creates shell aliases for all scripts
-- `remove-root-scripts.sh` - Safely removes scripts from the root directory
-- `setup-bin-directory.sh` - Sets up the entire bin directory structure
-- `s8r-scripts-version` - Manages script versions
-
-## Script Versions
-
-Some scripts have both original and new versions. To manage these versions, use:
+### s8r-build
 
 ```bash
-# List available script versions
-s8r-scripts-version list
-
-# Switch to new versions of scripts
-s8r-scripts-version use-new
-
-# Switch back to original versions
-s8r-scripts-version use-old
+./s8r-build [options] [mode]
 ```
 
-## Implementation Notes
+**Modes:**
+- `fast` - Skip tests and quality checks (default)
+- `test` - Run tests during build
+- `package` - Create JAR package
+- `install` - Install to local Maven repository
+- `compile` - Compile only
+- `full` - Full build with all checks
+- `docs` - Generate documentation
+- `site` - Generate Maven site
 
-These are the canonical executables for the project. They are actual files (not symlinks) that should be used for all operations.
+**Options:**
+- `-c, --clean` - Clean before building
+- `-v, --verbose` - Enable verbose output
+- `-p, --parallel` - Build in parallel where possible
+- `--skip-quality` - Skip quality checks
+- `--ci` - Run local CI checks after build
 
-The scripts previously in the root directory are deprecated and have been removed. If you need to restore them, you can find backup copies in the `s8r-all` directory, but it's strongly recommended to use the bin-directory executables instead.
+### s8r-test
 
-When updating scripts, please update them directly in their appropriate subdirectory. The `setup-bin-directory.sh` script will automatically create backups in the `s8r-all` directory.
+```bash
+./s8r-test [options] [test-type]
+```
+
+**Test types:**
+- Standard: `unit`, `component`, `integration`, `system`, `all`
+- Functional: `functional`, `error-handling`, `dataflow`, `state`, etc.
+- Legacy: `tube`, `composite`, `machine`, `atl`, `btl`, etc.
+
+**Options:**
+- `-v, --verbose` - Enable verbose output
+- `-p, --parallel` - Run tests in parallel
+- `--coverage` - Run with code coverage
+- `--skip-quality` - Skip quality checks
+- `-o, --output <file>` - Write output to file
+- `--tags <expression>` - Run tests with specific tags
+
+## Installation
+
+Use the `consolidate-scripts.sh` script to install the consolidated versions:
+
+```bash
+./bin/consolidate-scripts.sh
+```
+
+This will:
+1. Back up the original scripts
+2. Install the consolidated versions
+3. Create symlinks for backward compatibility
+
+To see available options:
+
+```bash
+./bin/consolidate-scripts.sh --help
+```
+
+## Reverting Changes
+
+If you need to revert to the original scripts, the consolidation script creates a timestamped backup in `backup/scripts/YYYYMMDD_HHMMSS`.
+
+To restore from backup:
+
+```bash
+cp -r /path/to/backup/scripts/* /path/to/project
+```

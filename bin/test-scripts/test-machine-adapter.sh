@@ -275,16 +275,16 @@ public class MachineAdapterTester {
 EOF
 
 # Get Maven dependencies classpath
-cd Samstraumr/samstraumr-core
+cd modules/samstraumr-core
 MAVEN_CP=$(mvn dependency:build-classpath -Dmdep.outputFile=/dev/stdout -q)
 cd ../..
 
 # Compile tester class to target directory
 mkdir -p target/test-classes
-javac -cp "./Samstraumr/samstraumr-core/target/classes:$MAVEN_CP" -d target/test-classes test-temp/MachineAdapterTester.java
+javac -cp "./modules/samstraumr-core/target/classes:$MAVEN_CP" -d target/test-classes test-temp/MachineAdapterTester.java
 
 # Run the tester
 echo "Running tests..."
-java -cp "./target/test-classes:./Samstraumr/samstraumr-core/target/classes:$MAVEN_CP" MachineAdapterTester
+java -cp "./target/test-classes:./modules/samstraumr-core/target/classes:$MAVEN_CP" MachineAdapterTester
 
 echo "======== Test script completed ========"

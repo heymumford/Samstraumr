@@ -16,7 +16,7 @@ set -e
 
 # Base directory
 BASE_DIR="/home/emumford/NativeLinuxProjects/Samstraumr"
-SRC_DIR="$BASE_DIR/Samstraumr/samstraumr-core/src/main/java/org/s8r"
+SRC_DIR="$BASE_DIR/modules/samstraumr-core/src/main/java/org/s8r"
 
 # Create component/core directory if it doesn't exist
 mkdir -p "$SRC_DIR/component/core"

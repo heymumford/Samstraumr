@@ -587,8 +587,8 @@ To properly use these executables, you have three options:
 
 ```bash
 # You can always use the full path to run a script
-/path/to/Samstraumr/bin/core/s8r
-/path/to/Samstraumr/bin/build/s8r-build
+/path/to/modules/bin/core/s8r
+/path/to/modules/bin/build/s8r-build
 ```
 
 ## Directory Structure

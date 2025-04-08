@@ -303,9 +303,9 @@ EOF
     
     # Get the current version
     local version="1.0.0"
-    if [ -f "${PROJECT_ROOT}/Samstraumr/version.properties" ]; then
+    if [ -f "${PROJECT_ROOT}/modules/version.properties" ]; then
       local found_version
-      found_version=$(grep -oP 'samstraumr\.version=\K[0-9]+\.[0-9]+\.[0-9]+' "${PROJECT_ROOT}/Samstraumr/version.properties" 2>/dev/null || echo "")
+      found_version=$(grep -oP 'samstraumr\.version=\K[0-9]+\.[0-9]+\.[0-9]+' "${PROJECT_ROOT}/modules/version.properties" 2>/dev/null || echo "")
       if [ -n "$found_version" ]; then
         version="$found_version"
       fi
@@ -321,10 +321,10 @@ EOF
     "scripts_dir": "util/bin"
   },
   "paths": {
-    "src": "Samstraumr/samstraumr-core/src",
+    "src": "modules/samstraumr-core/src",
     "docs": "docs",
-    "tests": "Samstraumr/samstraumr-core/src/test",
-    "templates": "Samstraumr/samstraumr-core/src/main/resources/templates",
+    "tests": "modules/samstraumr-core/src/test",
+    "templates": "modules/samstraumr-core/src/main/resources/templates",
     "output": "target"
   },
   "commands": {

@@ -18,7 +18,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="${SCRIPT_DIR}"
-SRC_DIR="${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r"
+SRC_DIR="${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r"
 DOMAIN_DIR="${SRC_DIR}/domain"
 DOMAIN_COMP_DIR="${DOMAIN_DIR}/component"
 DOMAIN_NEW_DIR="${DOMAIN_DIR}-new"

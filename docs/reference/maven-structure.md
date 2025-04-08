@@ -22,11 +22,11 @@ Samstraumr uses a three-tiered Maven structure:
    - Serves as the project entry point
    - Contains shared configuration and properties
    - Defines quality profiles and plugin management
-2. **Modules POM (`/Samstraumr/pom.xml`)**
+2. **Modules POM (`/modules/pom.xml`)**
    - Intermediate POM for managing submodules
    - Coordinates shared configuration among modules
    - Sets up common test profiles
-3. **Core Module POM (`/Samstraumr/samstraumr-core/pom.xml`)**
+3. **Core Module POM (`/modules/samstraumr-core/pom.xml`)**
    - Implements the actual framework functionality
    - Defines specific dependencies and test configurations
    - Contains domain-specific Maven profiles
@@ -77,14 +77,14 @@ The project includes quality-related profiles:
 2. **Coverage**:
    - `jacoco` for code coverage analysis
 
-## S8r Migration Plan
+## Migration Plan
 
-As part of the ongoing development, the project will migrate to a new structure using "s8r" as the official abbreviation:
+As part of the ongoing development, the project is migrating to a more standard structure:
 
 ### Directory structure
 
 ```
-/s8r/                      (Renamed from /Samstraumr/)
+/modules/                  (Renamed from /Samstraumr/)
 ├── pom.xml                (Modules POM)
 ├── s8r-core/              (Renamed from samstraumr-core)
 │   ├── pom.xml

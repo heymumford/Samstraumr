@@ -123,7 +123,7 @@ show_help() {
 # Main function to generate report
 generate_report() {
   # Class path for the CLI
-  CLASSPATH="$PROJECT_ROOT/Samstraumr/samstraumr-core/target/samstraumr-core.jar"
+  CLASSPATH="$PROJECT_ROOT/modules/samstraumr-core/target/samstraumr-core.jar"
   MAIN_CLASS="org.s8r.migration.feedback.cli.MigrationReportCLI"
   
   # Add Java 21 reflection options if needed

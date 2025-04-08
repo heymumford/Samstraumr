@@ -110,7 +110,7 @@ run_initializer() {
   fi
   
   # Read classpath from file
-  CLASSPATH="$(<"$classpath_file"):${PROJECT_ROOT}/Samstraumr/samstraumr-core/target/classes"
+  CLASSPATH="$(<"$classpath_file"):${PROJECT_ROOT}/modules/samstraumr-core/target/classes"
   
   # Clean up temporary file
   rm -f "$classpath_file"

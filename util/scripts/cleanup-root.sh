@@ -207,7 +207,7 @@ if [[ -f "$BASE_DIR/.git-commit-template" ]]; then
 fi
 
 # Config files (except docmosis.properties which needs to stay in root)
-for config_file in .actrc .editorconfig .samstraumr.config surefire-settings.xml; do
+for config_file in .actrc .editorconfig .s8r.config surefire-settings.xml; do
   if [[ -f "$BASE_DIR/$config_file" ]]; then
     print_message "Moving $config_file to util/config/"
     mv -v "$BASE_DIR/$config_file" "$BASE_DIR/util/config/"

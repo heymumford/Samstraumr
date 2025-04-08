@@ -124,8 +124,8 @@ get_project_version() {
     local version
     
     # First try the version.properties file
-    if [ -f "${PROJECT_ROOT}/Samstraumr/version.properties" ]; then
-      version=$(grep "version=" "${PROJECT_ROOT}/Samstraumr/version.properties" | cut -d= -f2)
+    if [ -f "${PROJECT_ROOT}/modules/version.properties" ]; then
+      version=$(grep "version=" "${PROJECT_ROOT}/modules/version.properties" | cut -d= -f2)
     fi
     
     # If not found, try to get from pom.xml using the library function
@@ -137,8 +137,8 @@ get_project_version() {
   else
     # Fall back to original implementation
     # Try to get version from version.properties
-    if [ -f "${PROJECT_ROOT}/Samstraumr/version.properties" ]; then
-      grep "version=" "${PROJECT_ROOT}/Samstraumr/version.properties" | cut -d= -f2
+    if [ -f "${PROJECT_ROOT}/modules/version.properties" ]; then
+      grep "version=" "${PROJECT_ROOT}/modules/version.properties" | cut -d= -f2
     else
       # Fall back to extracting from pom.xml
       grep -m 1 "<version>" "${PROJECT_ROOT}/pom.xml" | sed 's/.*<version>\(.*\)<\/version>.*/\1/'
@@ -209,7 +209,7 @@ parse_commits() {
         issue_ref=""
         if [[ "$detail" =~ \#([0-9]+) ]]; then
           issue_num="${BASH_REMATCH[1]}"
-          issue_ref=" ([#${issue_num}](https://github.com/emumford/Samstraumr/issues/${issue_num}))"
+          issue_ref=" ([#${issue_num}](https://github.com/emumford/modules/issues/${issue_num}))"
         fi
         
         # Format the commit entry and add to appropriate array

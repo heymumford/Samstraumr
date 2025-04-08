@@ -474,7 +474,7 @@ generate_docs() {
     
     # Run the documentation generator
     docmosis_info "Generating documentation in ${format} format..."
-    cd "${PROJECT_ROOT}/Samstraumr/samstraumr-core" || return 1
+    cd "${PROJECT_ROOT}/modules/samstraumr-core" || return 1
     
     # Set environment variables for the generator
     export DOCMOSIS_KEY="${DOCMOSIS_KEY}"
@@ -485,7 +485,7 @@ generate_docs() {
     java -cp target/samstraumr-core.jar \
          -Ddocmosis.key="${DOCMOSIS_KEY}" \
          -Ddocmosis.site="${DOCMOSIS_SITE}" \
-         org.samstraumr.tube.reporting.DocumentGenerator "${output_dir}" "${format}"
+         org.s8r.tube.reporting.DocumentGenerator "${output_dir}" "${format}"
     
     # Check if generation was successful
     if [ $? -eq 0 ]; then
@@ -651,13 +651,13 @@ generate_change_report() {
     
     # Generate the report
     docmosis_info "Generating change management report from ${from_version} to ${to_version}..."
-    cd "${PROJECT_ROOT}/Samstraumr/samstraumr-core" || return 1
+    cd "${PROJECT_ROOT}/modules/samstraumr-core" || return 1
     
     # Run change report generator
     java -cp target/samstraumr-core.jar \
          -Ddocmosis.key="${DOCMOSIS_KEY}" \
          -Ddocmosis.site="${DOCMOSIS_SITE}" \
-         org.samstraumr.tube.reporting.ChangeReportGenerator "$from_version" "$to_version" "$output_dir"
+         org.s8r.tube.reporting.ChangeReportGenerator "$from_version" "$to_version" "$output_dir"
     
     # Check if generation was successful
     if [ $? -eq 0 ]; then

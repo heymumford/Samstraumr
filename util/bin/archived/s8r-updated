@@ -409,7 +409,7 @@ exec_coverage() {
       run_maven test jacoco:report
       
       # Open report if generated successfully
-      local report_path="${PROJECT_ROOT}/Samstraumr/samstraumr-core/target/site/jacoco/index.html"
+      local report_path="${PROJECT_ROOT}/modules/samstraumr-core/target/site/jacoco/index.html"
       if [ -f "$report_path" ]; then
         print_success "Coverage report generated at: $report_path"
         

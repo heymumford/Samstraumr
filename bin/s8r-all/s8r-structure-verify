@@ -292,8 +292,8 @@ EOF
   
   # Check version in version.properties
   PROPERTIES_VERSION=""
-  if [ -f "$PROJECT_ROOT/Samstraumr/version.properties" ]; then
-    PROPERTIES_VERSION=$(grep "samstraumr.version=" "$PROJECT_ROOT/Samstraumr/version.properties" | cut -d= -f2 | tr -d ' \t\n\r')
+  if [ -f "$PROJECT_ROOT/modules/version.properties" ]; then
+    PROPERTIES_VERSION=$(grep "samstraumr.version=" "$PROJECT_ROOT/modules/version.properties" | cut -d= -f2 | tr -d ' \t\n\r')
   fi
   
   # Check version in pom.xml

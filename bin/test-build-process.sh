@@ -78,7 +78,7 @@ if [ "$SKIP_COMPILE" = false ]; then
     MVN_ARGS+=("-q")
   fi
   
-  mvn -pl Samstraumr/samstraumr-core "${MVN_ARGS[@]}"
+  mvn -pl modules/samstraumr-core "${MVN_ARGS[@]}"
 fi
 
 # Run the build process tests
@@ -89,12 +89,12 @@ if [ "$VERBOSE" = true ]; then
   MVN_ARGS+=("-e")
 fi
 
-mvn -pl Samstraumr/samstraumr-core "${MVN_ARGS[@]}"
+mvn -pl modules/samstraumr-core "${MVN_ARGS[@]}"
 
 # Check if tests passed
 if [ $? -eq 0 ]; then
   echo -e "${GREEN}All build process tests passed!${NC}"
-  echo -e "Test report is available at: ${BLUE}Samstraumr/samstraumr-core/target/cucumber-reports/build-process-tests.html${NC}"
+  echo -e "Test report is available at: ${BLUE}modules/samstraumr-core/target/cucumber-reports/build-process-tests.html${NC}"
   exit 0
 else
   echo -e "${RED}Some tests failed. See above output for details.${NC}"

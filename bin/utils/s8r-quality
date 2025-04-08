@@ -23,7 +23,7 @@ header() { echo -e "\n${BOLD}${YELLOW}$1${RESET}\n"; }
 
 # Find repository root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$SCRIPT_DIR"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 QUALITY_DIR="${PROJECT_ROOT}/quality-tools"
 REPORT_DIR="${PROJECT_ROOT}/target/quality-reports"
 
@@ -269,7 +269,7 @@ info "Profile: $PROFILE"
 mkdir -p "${PROJECT_ROOT}/util/quality/modules"
 
 # Load base modules
-source "${PROJECT_ROOT}/util/lib/quality-lib.sh"
+source "${SCRIPT_DIR}/../../util/lib/quality-lib.sh"
 
 # Determine which tools to run
 determine_tools

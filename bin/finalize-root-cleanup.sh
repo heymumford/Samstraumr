@@ -138,7 +138,7 @@ fi
 # Check for any remaining non-standard directories
 print_message "Checking for remaining non-standard directories..."
 
-STANDARD_DIRS=".git .github .idea .mvn .s8r .samstraumr Samstraumr bin docs quality-tools src target util"
+STANDARD_DIRS=".git .github .idea .mvn .s8r .s8r Samstraumr bin docs quality-tools src target util"
 REMAINING_DIRS=$(find "$PROJECT_ROOT" -maxdepth 1 -type d -not -path "$PROJECT_ROOT" | while read dir; do
   dir_name=$(basename "$dir")
   if ! echo "$STANDARD_DIRS" | grep -q -w "$dir_name"; then

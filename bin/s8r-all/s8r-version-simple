@@ -8,7 +8,7 @@ set -e
 
 # Find repository root
 PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel)}"
-VERSION_FILE="${PROJECT_ROOT}/Samstraumr/version.properties"
+VERSION_FILE="${PROJECT_ROOT}/modules/version.properties"
 VERSION_PATTERN='[0-9]+\.[0-9]+\.[0-9]+'
 
 # Terminal colors
@@ -56,7 +56,7 @@ update_version() {
   fi
   
   # Update POM files
-  for pom in "$PROJECT_ROOT/pom.xml" "$PROJECT_ROOT/Samstraumr/pom.xml" "$PROJECT_ROOT/Samstraumr/samstraumr-core/pom.xml"; do
+  for pom in "$PROJECT_ROOT/pom.xml" "$PROJECT_ROOT/modules/pom.xml" "$PROJECT_ROOT/modules/samstraumr-core/pom.xml"; do
     if [[ -f "$pom" ]]; then
       # Update project version
       if grep -q "<version>[0-9].*</version>" "$pom"; then

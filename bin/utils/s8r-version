@@ -9,15 +9,15 @@
 set -o pipefail
 
 # Configuration - version file paths and patterns
-VERSION_FILE="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/Samstraumr/version.properties"
+VERSION_FILE="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/modules/version.properties"
 VERSION_PATTERN='[0-9]+\.[0-9]+\.[0-9]+'
 
 # Known files that should contain version information
 declare -A VERSION_LOCATIONS=(
   ["$VERSION_FILE"]="samstraumr.version="
   ["${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/pom.xml"]="<version>VERSION</version>\|<samstraumr.version>VERSION</samstraumr.version>"
-  ["${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/Samstraumr/pom.xml"]="<version>VERSION</version>\|<samstraumr.version>VERSION</samstraumr.version>"
-  ["${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/Samstraumr/samstraumr-core/pom.xml"]="<version>VERSION</version>\|<samstraumr.version>VERSION</samstraumr.version>"
+  ["${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/modules/pom.xml"]="<version>VERSION</version>\|<samstraumr.version>VERSION</samstraumr.version>"
+  ["${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/modules/samstraumr-core/pom.xml"]="<version>VERSION</version>\|<samstraumr.version>VERSION</samstraumr.version>"
   ["${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/README.md"]="version-VERSION-blue\|<version>VERSION</version>"
   ["${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/CLAUDE.md"]="version of Samstraumr is: VERSION"
 )

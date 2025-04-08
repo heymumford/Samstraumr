@@ -727,16 +727,16 @@ EOF
   
   if [ -f "$FEATURE_PATH" ]; then
     # Determine target feature directory
-    local TARGET_DIR="$PROJECT_ROOT/Samstraumr/samstraumr-core/src/test/resources/component/features"
+    local TARGET_DIR="$PROJECT_ROOT/modules/samstraumr-core/src/test/resources/component/features"
     
     if [[ "$test_type" == "composite" ]]; then
-      TARGET_DIR="$PROJECT_ROOT/Samstraumr/samstraumr-core/src/test/resources/component/features/L1_Composite"
+      TARGET_DIR="$PROJECT_ROOT/modules/samstraumr-core/src/test/resources/component/features/L1_Composite"
     elif [[ "$test_type" == "machine" ]]; then
-      TARGET_DIR="$PROJECT_ROOT/Samstraumr/samstraumr-core/src/test/resources/component/features/L2_Machine" 
+      TARGET_DIR="$PROJECT_ROOT/modules/samstraumr-core/src/test/resources/component/features/L2_Machine" 
     elif [[ "$test_type" == "orchestration" ]]; then
-      TARGET_DIR="$PROJECT_ROOT/Samstraumr/samstraumr-core/src/test/resources/component/features/L0_Orchestration"
+      TARGET_DIR="$PROJECT_ROOT/modules/samstraumr-core/src/test/resources/component/features/L0_Orchestration"
     else
-      TARGET_DIR="$PROJECT_ROOT/Samstraumr/samstraumr-core/src/test/resources/component/features/L0_Core"
+      TARGET_DIR="$PROJECT_ROOT/modules/samstraumr-core/src/test/resources/component/features/L0_Core"
     fi
     
     # Ensure target directory exists
@@ -798,7 +798,7 @@ from datetime import datetime
 
 def find_test_files(root_dir, test_type):
     """Find relevant test files based on test type"""
-    feature_dir = os.path.join(root_dir, "Samstraumr/samstraumr-core/src/test/resources")
+    feature_dir = os.path.join(root_dir, "modules/samstraumr-core/src/test/resources")
     
     # Map test type to directory pattern
     if test_type.lower() == "component" or test_type.lower() == "tube":
@@ -1319,7 +1319,7 @@ from collections import Counter, defaultdict
 
 def find_test_files(root_dir, test_type):
     """Find relevant test files based on test type"""
-    feature_dir = os.path.join(root_dir, "Samstraumr/samstraumr-core/src/test/resources")
+    feature_dir = os.path.join(root_dir, "modules/samstraumr-core/src/test/resources")
     
     # Map test type to directory pattern
     if test_type.lower() == "component" or test_type.lower() == "tube":

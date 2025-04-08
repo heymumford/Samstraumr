@@ -161,7 +161,7 @@ extract_java_examples() {
       api_matches=${api_matches%, }
       
       # Attempt to compile the example
-      if javac -cp "${PROJECT_ROOT}/Samstraumr/samstraumr-core/target/classes" "$example_file" 2>/dev/null; then
+      if javac -cp "${PROJECT_ROOT}/modules/samstraumr-core/target/classes" "$example_file" 2>/dev/null; then
         echo "| Example ${java_block_count} | ✅ Valid | Uses: ${api_matches:-none} |" >> "$REPORT_FILE"
         ((valid_examples++))
       else

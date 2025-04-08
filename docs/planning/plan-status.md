@@ -21,6 +21,7 @@ This document provides a status overview of all planning documents in the Samstr
 | [documentation-standardization-plan.md](./documentation-standardization-plan.md) | Plan for standardizing documentation formats and organization | 🔄 In Progress<br>(Phase 4 in progress) | 2025-04-07   |
 | [kanban.md](./kanban.md)                                                    | Kanban board tracking all current tasks                       | 🔄 Active      | 2025-04-07   |
 | [migration-utilities-completion.md](./archived/archived-migration-utilities-completion.md) | Documentation for migration utilities | ✅ Completed | 2025-04-07 |
+| [maven-structure-migration.md](./maven-structure-migration.md) | Migration from Samstraumr/ to modules/ directory structure | ✅ Completed | 2025-04-07 |
 
 ## Completed Plans
 

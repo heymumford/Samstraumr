@@ -1,0 +1,559 @@
+#!/usr/bin/env bash
+#==============================================================================
+# Filename: s8r-version
+# Description: Unified version management system for Samstraumr framework
+#
+# This script provides comprehensive version management for the Samstraumr
+# project, ensuring all version references stay synchronized across the codebase.
+# It supports version bumping, setting specific versions, and fixing
+# inconsistencies across all version-referencing files.
+#==============================================================================
+# Usage: ./s8r-version <command> [options]
+#
+# Commands:
+#   get                 Show current version
+#   bump [type]         Bump version (type: major, minor, patch)
+#   set <version>       Set specific version (format: x.y.z)
+#   fix                 Fix version inconsistencies across files
+#   verify              Verify version consistency across all files
+#   help                Show this help message
+#
+# Options:
+#   --simple            Use simple behavior with less error recovery
+#   --verify            Verify consistency after getting version
+#   --verbose           Show detailed information
+#==============================================================================
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+
+# Source unified common library if available, otherwise define minimal functions
+if [ -f "${PROJECT_ROOT}/util/lib/unified-common.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/unified-common.sh"
+elif [ -f "${PROJECT_ROOT}/.s8r/lib/common.sh" ]; then
+  source "${PROJECT_ROOT}/.s8r/lib/common.sh"
+else
+  # If we can't find the library, define minimal required functions
+  # ANSI color codes
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  BLUE='\033[0;34m'
+  YELLOW='\033[0;33m'
+  BOLD='\033[1m'
+  RESET='\033[0m'
+  
+  # Output functions
+  print_info() { echo -e "${BLUE}→ $1${RESET}"; }
+  print_success() { echo -e "${GREEN}✓ $1${RESET}"; }
+  print_error() { echo -e "${RED}✗ $1${RESET}" >&2; }
+  print_warning() { echo -e "${YELLOW}! $1${RESET}" >&2; }
+  print_debug() { [[ "$VERBOSE" == "true" ]] && echo -e "DEBUG: $1" >&2 || true; }
+  
+  # Shorthand aliases for backward compatibility
+  info() { print_info "$1"; }
+  success() { print_success "$1"; }
+  error() { print_error "$1"; exit 1; }
+  warn() { print_warning "$1"; }
+fi
+
+# Configuration - version file paths and patterns
+VERSION_FILE="${PROJECT_ROOT}/modules/version.properties"
+VERSION_PATTERN='[0-9]+\.[0-9]+\.[0-9]+'
+
+# Known files that should contain version information
+declare -A VERSION_LOCATIONS=(
+  ["$VERSION_FILE"]="samstraumr.version="
+  ["${PROJECT_ROOT}/pom.xml"]="<version>VERSION</version>\|<samstraumr.version>VERSION</samstraumr.version>"
+  ["${PROJECT_ROOT}/modules/pom.xml"]="<version>VERSION</version>\|<samstraumr.version>VERSION</samstraumr.version>"
+  ["${PROJECT_ROOT}/modules/samstraumr-core/pom.xml"]="<version>VERSION</version>\|<samstraumr.version>VERSION</samstraumr.version>"
+  ["${PROJECT_ROOT}/README.md"]="version-VERSION-blue\|<version>VERSION</version>"
+  ["${PROJECT_ROOT}/CLAUDE.md"]="version of Samstraumr is: VERSION"
+)
+
+# Initialize variables
+VALIDATION_FAILED=0
+SIMPLE_MODE=false
+VERBOSE=false
+
+#------------------------------------------------------------------------------
+# Helper Functions
+#------------------------------------------------------------------------------
+
+# Display help information
+show_help() {
+  print_header "Samstraumr Version Manager"
+  echo
+  print_section "Usage"
+  echo "  ./s8r-version <command> [options]"
+  echo
+  print_section "Commands"
+  echo "  get                 Show current version"
+  echo "  bump [type]         Bump version (type: major, minor, patch)"
+  echo "  set <version>       Set specific version (format: x.y.z)"
+  echo "  fix                 Fix version inconsistencies across files"
+  echo "  verify              Verify version consistency across all files"
+  echo "  help                Show this help message"
+  echo
+  print_section "Options"
+  echo "  --simple            Use simple behavior with less error recovery"
+  echo "  --verify            Verify consistency after getting version"
+  echo "  --verbose           Show detailed information"
+  echo
+  print_section "Examples"
+  echo "  ./s8r-version get              # Show current version"
+  echo "  ./s8r-version bump patch       # Increment patch version"
+  echo "  ./s8r-version bump minor       # Increment minor version"
+  echo "  ./s8r-version set 2.0.0        # Set version to 2.0.0"
+  echo "  ./s8r-version verify           # Check for version inconsistencies"
+  echo "  ./s8r-version fix              # Fix version inconsistencies"
+}
+
+# Check that the script is properly installed
+check_installation() {
+  # Only in robust mode
+  if [[ "$SIMPLE_MODE" == "true" ]]; then
+    return 0
+  fi
+  
+  # Check if running from correct location
+  local script_path="$(realpath "$0")"
+  local expected_dir="${PROJECT_ROOT}"
+  
+  if [[ ! "$script_path" == "$expected_dir"/* ]]; then
+    print_warning "Script not running from expected project directory"
+    print_warning "Found: $script_path"
+    print_warning "Expected: $expected_dir/s8r-version"
+    # Continue anyway - this might be a copy or symlink
+  fi
+  
+  # Check for required files
+  if [[ ! -f "$VERSION_FILE" ]]; then
+    print_error "Version properties file not found: $VERSION_FILE"
+    print_info "Attempting to recover by searching for version.properties..."
+    
+    # Attempt recovery by searching for version.properties
+    local found_version_file=$(find "${PROJECT_ROOT}" -name "version.properties" -type f | head -n 1)
+    
+    if [[ -n "$found_version_file" ]]; then
+      VERSION_FILE="$found_version_file"
+      print_success "Found alternative version file: $VERSION_FILE"
+      VERSION_LOCATIONS["$VERSION_FILE"]="samstraumr.version="
+    else
+      error "Could not locate version.properties file in project. Please verify project structure."
+    fi
+  fi
+}
+
+# Get current version from the version file
+get_version() {
+  if [[ ! -f "$VERSION_FILE" ]]; then
+    error "Version file not found: $VERSION_FILE"
+  fi
+  
+  local version=$(grep "samstraumr.version=" "$VERSION_FILE" | cut -d= -f2)
+  
+  if [[ -z "$version" ]]; then
+    # Simple mode just fails, robust mode tries to recover
+    if [[ "$SIMPLE_MODE" == "true" ]]; then
+      error "Failed to extract version from $VERSION_FILE"
+    else
+      print_error "Failed to extract version from $VERSION_FILE"
+      print_info "Attempting to recover by searching file content..."
+      
+      # Attempt recovery by searching for version pattern
+      version=$(grep -o "$VERSION_PATTERN" "$VERSION_FILE" | head -n 1)
+      
+      if [[ -z "$version" ]]; then
+        error "Could not extract version information from $VERSION_FILE"
+      else
+        print_success "Recovered version: $version"
+      fi
+    fi
+  fi
+  
+  # Validate version format
+  if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    error "Invalid version format: $version (must be in format x.y.z)"
+  fi
+  
+  echo "$version"
+}
+
+# Check for version inconsistencies across files
+check_version_consistency() {
+  local reference_version="$1"
+  local inconsistencies=0
+  local absent_files=0
+  
+  print_info "Checking version consistency across all known files..."
+  
+  for file in "${!VERSION_LOCATIONS[@]}"; do
+    if [[ ! -f "$file" ]]; then
+      print_warning "Version file not found: $file"
+      ((absent_files++))
+      continue
+    fi
+    
+    local pattern="${VERSION_LOCATIONS[$file]}"
+    # Replace VERSION placeholder with actual version for search
+    pattern="${pattern//VERSION/$reference_version}"
+    
+    if ! grep -q "$pattern" "$file"; then
+      print_warning "Version inconsistency in $file"
+      print_debug "Expected to find: $pattern"
+      ((inconsistencies++))
+    fi
+  done
+  
+  # Return results
+  if [[ $inconsistencies -gt 0 || $absent_files -gt 0 ]]; then
+    print_warning "Found $inconsistencies inconsistencies and $absent_files missing files"
+    return 1
+  else
+    print_success "All files contain consistent version information"
+    return 0
+  fi
+}
+
+# Update a specific file with the new version
+update_file_version() {
+  local file="$1"
+  local old_version="$2"
+  local new_version="$3"
+  local pattern="${VERSION_LOCATIONS[$file]}"
+  local updated=0
+  
+  # Skip if file doesn't exist
+  if [[ ! -f "$file" ]]; then
+    print_warning "Cannot update $file: File not found"
+    return 1
+  fi
+  
+  # In robust mode, make backup of file before changes
+  if [[ "$SIMPLE_MODE" != "true" ]]; then
+    cp "$file" "${file}.bak"
+  fi
+  
+  # Handle special cases by file type
+  if [[ "$file" == *"version.properties" ]]; then
+    # Update version property
+    sed -i "s/^samstraumr.version=.*/samstraumr.version=$new_version/" "$file"
+    
+    # Update last updated date
+    sed -i "s/^samstraumr.last.updated=.*/samstraumr.last.updated=$(date +'%B %d, %Y')/" "$file"
+    
+    updated=1
+  elif [[ "$file" == *"pom.xml" ]]; then
+    # Update project version
+    if grep -q "<version>[0-9].*</version>" "$file"; then
+      sed -i "s|<version>[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*</version>|<version>$new_version</version>|g" "$file"
+      updated=1
+    fi
+    
+    # Update samstraumr.version property
+    if grep -q "<samstraumr.version>" "$file"; then
+      sed -i "s|<samstraumr.version>[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*</samstraumr.version>|<samstraumr.version>$new_version</samstraumr.version>|g" "$file"
+      updated=1
+    fi
+    
+    # Update parent version
+    if grep -q "<parent>" "$file"; then
+      sed -i "/<parent>/,/<\/parent>/s|<version>[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*</version>|<version>$new_version</version>|g" "$file"
+      updated=1
+    fi
+  elif [[ "$file" == *"README.md" ]]; then
+    # Update badge
+    if grep -q "version-.*-blue" "$file"; then
+      sed -i "s|version-[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*-blue|version-$new_version-blue|g" "$file"
+      updated=1
+    fi
+    
+    # Update dependency example
+    if grep -q "<version>[0-9]" "$file"; then
+      sed -i "s|<version>[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*</version>|<version>$new_version</version>|g" "$file"
+      updated=1
+    fi
+  elif [[ "$file" == *"CLAUDE.md" ]]; then
+    # Match specific pattern to avoid unwanted replacements
+    if grep -q "version of Samstraumr is: " "$file"; then
+      sed -i "s|version of Samstraumr is: [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*|version of Samstraumr is: $new_version|g" "$file"
+      updated=1
+    fi
+  fi
+  
+  # In robust mode, verify the update was successful
+  if [[ "$SIMPLE_MODE" != "true" ]]; then
+    if grep -q "${pattern//VERSION/$new_version}" "$file"; then
+      print_success "Updated $file"
+      # Remove backup if successful
+      rm "${file}.bak"
+      return 0
+    else
+      print_error "Failed to update $file correctly"
+      print_info "Restoring backup..."
+      
+      # Restore from backup
+      mv "${file}.bak" "$file"
+      VALIDATION_FAILED=1
+      return 1
+    fi
+  else
+    # In simple mode, just report success
+    print_success "Updated $file"
+    return 0
+  fi
+}
+
+# Handles changelog updates for new versions
+update_changelog() {
+  local old_version="$1"
+  local new_version="$2"
+  local today="$(date +"%Y-%m-%d")"
+  local changelog="${PROJECT_ROOT}/docs/reference/release/changelog.md"
+  
+  # Skip if changelog doesn't exist
+  if [[ ! -f "$changelog" ]]; then
+    print_warning "Changelog not found: $changelog"
+    return 1
+  fi
+  
+  # Generate new entry template
+  local template=$(cat <<EOF
+## [$new_version] - $today
+
+### Added
+
+- 
+
+### Changed
+
+- 
+
+### Fixed
+
+- 
+
+EOF
+)
+  
+  # Find header line to insert after
+  local header_line=$(grep -n "All notable changes to this project will be documented in this file." "$changelog" | cut -d: -f1)
+  
+  if [[ -n "$header_line" ]]; then
+    # Skip to blank line after header
+    header_line=$((header_line + 2))
+    
+    # Create backup in robust mode
+    if [[ "$SIMPLE_MODE" != "true" ]]; then
+      cp "$changelog" "${changelog}.bak"
+    fi
+    
+    # Create temporary file with new content
+    { head -n $header_line "$changelog"; echo -e "$template"; tail -n +$((header_line+1)) "$changelog"; } > "${changelog}.new"
+    
+    if [[ $? -eq 0 ]]; then
+      mv "${changelog}.new" "$changelog"
+      print_success "Updated changelog.md with new version entry"
+      if [[ "$SIMPLE_MODE" != "true" ]]; then
+        rm "${changelog}.bak"
+      fi
+      return 0
+    else
+      print_error "Failed to update changelog"
+      if [[ "$SIMPLE_MODE" != "true" ]]; then
+        print_info "Restoring from backup..."
+        mv "${changelog}.bak" "$changelog"
+      fi
+      return 1
+    fi
+  else
+    print_warning "Could not locate changelog header line"
+    print_debug "Header pattern 'All notable changes...' not found"
+    return 1
+  fi
+}
+
+# Main function to update all version references
+update_version() {
+  local old_version="$1"
+  local new_version="$2"
+  local files_updated=0
+  local files_failed=0
+  
+  # Validate version format
+  if ! [[ "$new_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    error "Invalid version format: $new_version (must be in format x.y.z)"
+  fi
+  
+  print_info "Updating version from $old_version to $new_version"
+  
+  # First, update version properties file (source of truth)
+  update_file_version "$VERSION_FILE" "$old_version" "$new_version"
+  local result=$?
+  
+  if [[ $result -ne 0 ]]; then
+    error "Failed to update primary version file. Aborting."
+  fi
+  
+  # Then update all other known files
+  for file in "${!VERSION_LOCATIONS[@]}"; do
+    # Skip version.properties as it's already done
+    if [[ "$file" == "$VERSION_FILE" ]]; then
+      continue
+    fi
+    
+    update_file_version "$file" "$old_version" "$new_version"
+    result=$?
+    
+    if [[ $result -eq 0 ]]; then
+      ((files_updated++))
+    else
+      ((files_failed++))
+    fi
+  done
+  
+  # Update changelog
+  update_changelog "$old_version" "$new_version"
+  
+  # Verify consistency in robust mode
+  if [[ "$SIMPLE_MODE" != "true" ]]; then
+    print_info "Verifying version consistency after update..."
+    check_version_consistency "$new_version"
+    local consistency_check=$?
+  else
+    local consistency_check=0
+  fi
+  
+  # Report results
+  if [[ $VALIDATION_FAILED -eq 0 && $consistency_check -eq 0 ]]; then
+    print_success "Version successfully updated from $old_version to $new_version"
+    print_debug "Updated $((files_updated + 1)) files successfully"
+    return 0
+  else
+    print_warning "Version update completed with warnings"
+    print_debug "Successfully updated: $((files_updated + 1)) files"
+    
+    if [[ $files_failed -gt 0 ]]; then
+      print_debug "Failed to update: $files_failed files"
+    fi
+    
+    if [[ $consistency_check -ne 0 ]]; then
+      print_debug "Some files may still have inconsistent version information"
+      print_info "Run '$0 verify' to check all files or '$0 fix' to attempt repair"
+    fi
+    
+    return 1
+  fi
+}
+
+# Verify version consistency across all files
+verify_version() {
+  local current=$(get_version)
+  
+  print_info "Current version: $current"
+  check_version_consistency "$current"
+  
+  local result=$?
+  if [[ $result -ne 0 ]]; then
+    print_info "To fix inconsistencies, run: $0 fix"
+    return 1
+  fi
+  return 0
+}
+
+#------------------------------------------------------------------------------
+# Command Processing
+#------------------------------------------------------------------------------
+
+# Parse global options first
+for arg in "$@"; do
+  case "$arg" in
+    --simple)
+      SIMPLE_MODE=true
+      ;;
+    --verbose)
+      VERBOSE=true
+      ;;
+    *)
+      # Not a global option
+      ;;
+  esac
+done
+
+# Initial self-check in robust mode
+if [[ "$SIMPLE_MODE" != "true" ]]; then
+  check_installation
+fi
+
+# Process commands
+command="$1"
+shift || true
+
+case "$command" in
+  get|version)
+    # Get current version
+    current=$(get_version)
+    print_info "Samstraumr Version: $current"
+    # Optional verification
+    if [[ "$*" == *"--verify"* ]]; then
+      verify_version
+    fi
+    ;;
+    
+  bump)
+    # Bump version
+    type="${1:-patch}"
+    current=$(get_version)
+    
+    # Parse version components
+    IFS='.' read -r major minor patch <<< "$current"
+    
+    # Calculate new version
+    case "$type" in
+      major) new="$((major+1)).0.0" ;;
+      minor) new="${major}.$((minor+1)).0" ;;
+      patch) new="${major}.${minor}.$((patch+1))" ;;
+      *)     error "Invalid bump type: $type (use major, minor, or patch)" ;;
+    esac
+    
+    update_version "$current" "$new"
+    ;;
+    
+  set)
+    # Set version to specific value
+    new="$1"
+    if [[ -z "$new" ]]; then
+      error "Version must be specified (format: x.y.z)"
+    fi
+    
+    current=$(get_version)
+    update_version "$current" "$new"
+    ;;
+  
+  fix)
+    # Fix version inconsistencies
+    current=$(get_version)
+    print_info "Fixing version inconsistencies - forcing all files to use $current"
+    update_version "$current" "$current"
+    ;;
+    
+  verify)
+    # Verify version consistency
+    verify_version
+    exit $?
+    ;;
+    
+  help|-h|--help)
+    # Show help
+    show_help
+    exit 0
+    ;;
+    
+  *)
+    # Default: show help for unknown commands
+    print_error "Unknown command: $command"
+    show_help
+    exit 1
+    ;;
+esac

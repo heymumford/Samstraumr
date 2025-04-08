@@ -192,8 +192,8 @@ check_package_references() {
   
   for file in "${md_files[@]}"; do
     # Look for old package references
-    if grep -q -E "org\.samstraumr|org\.tube" "$file"; then
-      warning "Found old package references in $file (org.samstraumr or org.tube)"
+    if grep -q -E "org\.s8r|org\.tube" "$file"; then
+      warning "Found old package references in $file (org.s8r or org.tube)"
       WARNINGS=$((WARNINGS + 1))
     fi
   done
@@ -213,7 +213,7 @@ check_code_examples() {
       local code_blocks=$(awk '/```java/,/```/ { print }' "$file")
       
       # Check if code blocks contain old package references
-      if echo "$code_blocks" | grep -q -E "org\.samstraumr|org\.tube"; then
+      if echo "$code_blocks" | grep -q -E "org\.s8r|org\.tube"; then
         warning "Found old package references in code examples in $file"
         WARNINGS=$((WARNINGS + 1))
       fi
@@ -398,7 +398,7 @@ fix_common_issues() {
   
   # Fall back to original implementation
   # 1. Replace old package references in markdown files
-  find docs -type f -name "*.md" -exec sed -i 's/org\.samstraumr/org.s8r/g' {} \;
+  find docs -type f -name "*.md" -exec sed -i 's/org\.s8r/org.s8r/g' {} \;
   find docs -type f -name "*.md" -exec sed -i 's/org\.tube/org.s8r.tube.legacy/g' {} \;
   success "Updated package references in markdown files"
   

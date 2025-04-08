@@ -15,8 +15,8 @@ echo "Analyzing code for circular dependencies between packages"
 echo
 
 # Set directories to analyze
-SOURCE_DIR="$REPO_ROOT/Samstraumr/samstraumr-core/src/main/java/org/s8r"
-TEST_DIR="$REPO_ROOT/Samstraumr/samstraumr-core/src/test/java/org/s8r"
+SOURCE_DIR="$REPO_ROOT/modules/samstraumr-core/src/main/java/org/s8r"
+TEST_DIR="$REPO_ROOT/modules/samstraumr-core/src/test/java/org/s8r"
 
 # Java class to run the dependency analysis
 ANALYZER_CLASS="org.s8r.architecture.util.CircularDependencyAnalyzer"
