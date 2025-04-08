@@ -1,0 +1,290 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r-test-coverage-update-pom - Update Maven POMs with 80% coverage thresholds
+#
+# This script updates the Maven POM files to set JaCoCo coverage thresholds
+# to 80% for line and branch coverage, and configures the proper reporting.
+#==============================================================================
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Set colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+# Pretty output functions
+print_info() { echo -e "${BLUE}→ $1${RESET}"; }
+print_success() { echo -e "${GREEN}✓ $1${RESET}"; }
+print_error() { echo -e "${RED}✗ $1${RESET}" >&2; }
+print_warning() { echo -e "${YELLOW}! $1${RESET}" >&2; }
+print_header() { echo -e "${BLUE}${BOLD}$1${RESET}"; echo -e "${BLUE}${BOLD}$(printf '=%.0s' $(seq 1 ${#1}))${RESET}"; }
+
+# Default values
+DRY_RUN=false
+VERBOSE=false
+
+# Process command line arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run)
+      DRY_RUN=true
+      shift
+      ;;
+    -v|--verbose)
+      VERBOSE=true
+      shift
+      ;;
+    -h|--help)
+      echo "Usage: $0 [options]"
+      echo
+      echo "Options:"
+      echo "  --dry-run      Show changes without updating files"
+      echo "  -v, --verbose  Show detailed output"
+      echo "  -h, --help     Show this help message"
+      exit 0
+      ;;
+    *)
+      print_error "Unknown option: $1"
+      exit 1
+      ;;
+  esac
+done
+
+# Function to update POM file
+update_pom() {
+  local pom_file="$1"
+  local temp_file=$(mktemp)
+  
+  print_info "Processing $pom_file..."
+  
+  # Read the POM file
+  if [ ! -f "$pom_file" ]; then
+    print_error "POM file not found: $pom_file"
+    return 1
+  fi
+  
+  # Check if JaCoCo plugin is present
+  if ! grep -q "<artifactId>jacoco-maven-plugin</artifactId>" "$pom_file"; then
+    print_warning "JaCoCo plugin not found in $pom_file"
+    return 1
+  fi
+  
+  if $VERBOSE; then
+    print_info "Found JaCoCo plugin in $pom_file"
+  fi
+  
+  # Update coverage thresholds
+  if grep -q "<jacoco.line.coverage>" "$pom_file"; then
+    # Update existing thresholds
+    if $VERBOSE; then
+      print_info "Updating existing coverage thresholds"
+    fi
+    
+    # Update line coverage threshold
+    sed -E 's|<jacoco\.line\.coverage>[0-9.]+</jacoco\.line\.coverage>|<jacoco.line.coverage>0.80</jacoco.line.coverage>|g' "$pom_file" > "$temp_file"
+    mv "$temp_file" "$pom_file"
+    
+    # Update branch coverage threshold
+    sed -E 's|<jacoco\.branch\.coverage>[0-9.]+</jacoco\.branch\.coverage>|<jacoco.branch.coverage>0.80</jacoco.branch.coverage>|g' "$pom_file" > "$temp_file"
+    mv "$temp_file" "$pom_file"
+    
+    print_success "Updated coverage thresholds in $pom_file"
+  else
+    # Add new thresholds in properties section
+    if $VERBOSE; then
+      print_info "Adding new coverage thresholds"
+    fi
+    
+    # Find the properties section and add thresholds
+    sed -E '/<properties>/a \
+    <jacoco.line.coverage>0.80</jacoco.line.coverage>\
+    <jacoco.branch.coverage>0.80</jacoco.branch.coverage>\
+    <jacoco.method.coverage>0.85</jacoco.method.coverage>\
+    <jacoco.class.coverage>0.90</jacoco.class.coverage>' "$pom_file" > "$temp_file"
+    
+    # Check if any changes were made
+    if diff -q "$pom_file" "$temp_file" > /dev/null; then
+      print_warning "Could not update properties in $pom_file"
+      rm "$temp_file"
+    else
+      mv "$temp_file" "$pom_file"
+      print_success "Added coverage thresholds to $pom_file"
+    fi
+  fi
+  
+  # Update JaCoCo check configuration
+  update_jacoco_check "$pom_file"
+}
+
+# Function to update JaCoCo check configuration
+update_jacoco_check() {
+  local pom_file="$1"
+  local temp_file=$(mktemp)
+  
+  # Check if JaCoCo check execution is present
+  if grep -q "<id>check</id>" "$pom_file" && grep -q "<goal>check</goal>" "$pom_file"; then
+    if $VERBOSE; then
+      print_info "Updating existing JaCoCo check configuration"
+    fi
+    
+    # Update or add rules configuration
+    local check_block=$(sed -n '/<id>check<\/id>/,/<\/execution>/p' "$pom_file")
+    
+    if echo "$check_block" | grep -q "<rules>"; then
+      # Update existing rules
+      if $VERBOSE; then
+        print_info "Updating existing rules"
+      fi
+      
+      # This is a complex update that requires a multi-line pattern match and replacement
+      # Using a temporary approach with line markers
+      # 1. Add line markers
+      sed -i '/BUNDLE/,/rule>/s/<counter>LINE<\/counter>/LINE_COUNTER_MARK/g' "$pom_file"
+      sed -i '/BUNDLE/,/rule>/s/<counter>BRANCH<\/counter>/BRANCH_COUNTER_MARK/g' "$pom_file"
+      sed -i '/BUNDLE/,/rule>/s/<counter>METHOD<\/counter>/METHOD_COUNTER_MARK/g' "$pom_file"
+      sed -i '/BUNDLE/,/rule>/s/<counter>CLASS<\/counter>/CLASS_COUNTER_MARK/g' "$pom_file"
+      
+      # 2. Replace coverage values
+      sed -i '/LINE_COUNTER_MARK/,/limit>/s/<minimum>[0-9.]\+<\/minimum>/<minimum>${jacoco.line.coverage}<\/minimum>/g' "$pom_file"
+      sed -i '/BRANCH_COUNTER_MARK/,/limit>/s/<minimum>[0-9.]\+<\/minimum>/<minimum>${jacoco.branch.coverage}<\/minimum>/g' "$pom_file"
+      sed -i '/METHOD_COUNTER_MARK/,/limit>/s/<minimum>[0-9.]\+<\/minimum>/<minimum>${jacoco.method.coverage}<\/minimum>/g' "$pom_file"
+      sed -i '/CLASS_COUNTER_MARK/,/limit>/s/<minimum>[0-9.]\+<\/minimum>/<minimum>${jacoco.class.coverage}<\/minimum>/g' "$pom_file"
+      
+      # 3. Restore markers
+      sed -i 's/LINE_COUNTER_MARK/<counter>LINE<\/counter>/g' "$pom_file"
+      sed -i 's/BRANCH_COUNTER_MARK/<counter>BRANCH<\/counter>/g' "$pom_file"
+      sed -i 's/METHOD_COUNTER_MARK/<counter>METHOD<\/counter>/g' "$pom_file"
+      sed -i 's/CLASS_COUNTER_MARK/<counter>CLASS<\/counter>/g' "$pom_file"
+      
+      print_success "Updated JaCoCo check rules in $pom_file"
+    else
+      # Add new rules
+      if $VERBOSE; then
+        print_info "Adding new rules"
+      fi
+      
+      sed -E '/<goal>check<\/goal>/a \
+                <configuration>\
+                  <rules>\
+                    <rule>\
+                      <element>BUNDLE</element>\
+                      <limits>\
+                        <limit>\
+                          <counter>LINE</counter>\
+                          <value>COVEREDRATIO</value>\
+                          <minimum>${jacoco.line.coverage}</minimum>\
+                        </limit>\
+                        <limit>\
+                          <counter>BRANCH</counter>\
+                          <value>COVEREDRATIO</value>\
+                          <minimum>${jacoco.branch.coverage}</minimum>\
+                        </limit>\
+                        <limit>\
+                          <counter>METHOD</counter>\
+                          <value>COVEREDRATIO</value>\
+                          <minimum>${jacoco.method.coverage}</minimum>\
+                        </limit>\
+                        <limit>\
+                          <counter>CLASS</counter>\
+                          <value>COVEREDRATIO</value>\
+                          <minimum>${jacoco.class.coverage}</minimum>\
+                        </limit>\
+                      </limits>\
+                    </rule>\
+                  </rules>\
+                </configuration>' "$pom_file" > "$temp_file"
+      
+      # Check if any changes were made
+      if diff -q "$pom_file" "$temp_file" > /dev/null; then
+        print_warning "Could not update JaCoCo check configuration in $pom_file"
+        rm "$temp_file"
+      else
+        mv "$temp_file" "$pom_file"
+        print_success "Added JaCoCo check rules to $pom_file"
+      fi
+    fi
+  else
+    if $VERBOSE; then
+      print_info "JaCoCo check execution not found, adding it"
+    fi
+    
+    # Add check execution
+    sed -E '/<artifactId>jacoco-maven-plugin<\/artifactId>/,/<\/plugin>/s/(<\/executions>)/              <execution>\
+                <id>check<\/id>\
+                <phase>verify<\/phase>\
+                <goals>\
+                  <goal>check<\/goal>\
+                <\/goals>\
+                <configuration>\
+                  <rules>\
+                    <rule>\
+                      <element>BUNDLE<\/element>\
+                      <limits>\
+                        <limit>\
+                          <counter>LINE<\/counter>\
+                          <value>COVEREDRATIO<\/value>\
+                          <minimum>${jacoco.line.coverage}<\/minimum>\
+                        <\/limit>\
+                        <limit>\
+                          <counter>BRANCH<\/counter>\
+                          <value>COVEREDRATIO<\/value>\
+                          <minimum>${jacoco.branch.coverage}<\/minimum>\
+                        <\/limit>\
+                        <limit>\
+                          <counter>METHOD<\/counter>\
+                          <value>COVEREDRATIO<\/value>\
+                          <minimum>${jacoco.method.coverage}<\/minimum>\
+                        <\/limit>\
+                        <limit>\
+                          <counter>CLASS<\/counter>\
+                          <value>COVEREDRATIO<\/value>\
+                          <minimum>${jacoco.class.coverage}<\/minimum>\
+                        <\/limit>\
+                      <\/limits>\
+                    <\/rule>\
+                  <\/rules>\
+                <\/configuration>\
+              <\/execution>\
+              \1/' "$pom_file" > "$temp_file"
+    
+    # Check if any changes were made
+    if diff -q "$pom_file" "$temp_file" > /dev/null; then
+      print_warning "Could not add JaCoCo check execution in $pom_file"
+      rm "$temp_file"
+    else
+      mv "$temp_file" "$pom_file"
+      print_success "Added JaCoCo check execution to $pom_file"
+    fi
+  fi
+}
+
+# Main function
+main() {
+  print_header "Updating POM files with 80% coverage thresholds"
+  
+  # If dry run, set notification
+  if $DRY_RUN; then
+    print_warning "Running in dry-run mode. No files will be modified."
+  fi
+  
+  # Find and update all POM files
+  find "$PROJECT_ROOT" -name "pom.xml" | while read -r pom_file; do
+    if $DRY_RUN; then
+      print_info "Would update $pom_file"
+    else
+      update_pom "$pom_file"
+    fi
+  done
+  
+  print_success "POM update completed."
+  print_info "Remember to review the changes and run 'mvn clean verify' to validate."
+}
+
+# Run the main function
+main
