@@ -100,8 +100,11 @@ cd Samstraumr
 # Build project
 ./s8r-build
 
-# Run tests
+# Run all tests
 ./s8r-test all
+
+# Run tests with coverage analysis
+./s8r-test all --coverage
 ```
 
 Maven dependency:
