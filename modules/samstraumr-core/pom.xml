@@ -159,6 +159,12 @@ Licensed under the Mozilla Public License 2.0
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
       <!-- Version managed by parent -->
@@ -304,6 +310,12 @@ Licensed under the Mozilla Public License 2.0
       <id>all-tests</id>
       <properties>
         <cucumber.filter.tags>not @disabled</cucumber.filter.tags>
+      </properties>
+    </profile>
+    <profile>
+      <id>alz001-tests</id>
+      <properties>
+        <cucumber.filter.tags>@ALZ001</cucumber.filter.tags>
       </properties>
     </profile>
     <profile>

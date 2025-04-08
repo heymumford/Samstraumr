@@ -169,8 +169,20 @@ if (result.isValid()) {
 - [Version Management](./docs/reference/version-management.md)
 - [Changelog](./docs/reference/release/changelog.md)
 - [FAQ](./docs/reference/f-a-q.md)
+- [Maven & Cucumber Standards](./modules/samstraumr-core/src/test/java/org/s8r/test/steps/alz001/MAVEN_CUCUMBER_STANDARDS.md)
 
 **🧪 Current Development**: We're using [Test-Driven Development](./docs/dev/tdd-development.md) with [BDD/Cucumber](./docs/dev/test-bdd-cucumber.md)
+
+#### Maven & Cucumber Configuration Standards
+
+The project follows strict Maven and Cucumber configuration standards to ensure maintainable, reliable tests:
+
+- **Maven Configuration**: Structured POM hierarchy with inheritance and proper dependency management
+- **Cucumber Configuration**: Standardized properties files with parallel execution and proper reporting
+- **Test Organization**: Well-defined directory structure with clear separation of concerns
+- **Configuration Documentation**: Comprehensive documentation with absolute paths for all configuration files
+
+[📚 **Maven & Cucumber Standards**](./modules/samstraumr-core/src/test/java/org/s8r/test/steps/alz001/MAVEN_CUCUMBER_STANDARDS.md)
 
 ## Command-Line Interface & Tools
 
