@@ -1,4 +1,4 @@
-#!/bin/bash
+#\!/bin/bash
 #
 # Samstraumr pre-commit hook to run local CI checks
 #
@@ -7,21 +7,17 @@
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
 RESET='\033[0m'
 
 # Functions for prettier output
 info() { echo -e "\n${YELLOW}$1${RESET}"; }
 success() { echo -e "${GREEN}$1${RESET}"; }
 error() { echo -e "${RED}$1${RESET}" >&2; }
+detail() { echo -e "${BLUE}$1${RESET}"; }
 
 # Get the root of the project
 PROJECT_ROOT="$(git rev-parse --show-toplevel)"
-
-# Check if s8r-ci exists
-if [ ! -f "${PROJECT_ROOT}/s8r-ci" ]; then
-  error "s8r-ci script not found. Skipping local CI checks."
-  exit 0
-fi
 
 # Check if this is an initial commit
 if git rev-parse --verify HEAD >/dev/null 2>&1; then
@@ -34,19 +30,91 @@ fi
 # Redirect output to stderr.
 exec 1>&2
 
+# Check XML/POM files
+info "Checking XML/POM files..."
+XML_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.xml$')
+
+if [ -n "$XML_FILES" ]; then
+  # Load the XML utilities if available
+  XML_LIB="${PROJECT_ROOT}/util/lib/xml-lib.sh"
+  if [ -f "$XML_LIB" ]; then
+    source "$XML_LIB"
+    
+    # Process each XML file
+    XML_ERRORS=0
+    for file in $XML_FILES; do
+      detail "Checking $file..."
+      full_path="${PROJECT_ROOT}/$file"
+      
+      # Special handling for POM files
+      if [[ "$file" == *"pom.xml" ]]; then
+        # Check for <n> vs <name> issue
+        if grep -q "<n>" "$full_path"; then
+          error "POM ERROR: Found <n> tag instead of <name> in $file"
+          detail "Run './util/scripts/check-pom-files.sh --action fix $full_path' to fix"
+          XML_ERRORS=1
+        fi
+        
+        # Full POM validation
+        pom_validate_file "$full_path" > /dev/null 2>&1
+        if [ $? -ne 0 ]; then
+          error "POM ERROR: Validation failed for $file"
+          detail "Run './util/scripts/check-pom-files.sh --action check $full_path' for details"
+          XML_ERRORS=1
+        fi
+      else
+        # General XML validation
+        xml_validate_file "$full_path" > /dev/null 2>&1
+        if [ $? -ne 0 ]; then
+          error "XML ERROR: Validation failed for $file"
+          XML_ERRORS=1
+        fi
+      fi
+    done
+    
+    if [ $XML_ERRORS -eq 0 ]; then
+      success "XML/POM validation passed."
+    else
+      error "XML/POM validation failed. Please fix the issues before committing."
+      exit 1
+    fi
+  else
+    info "XML utilities not found. Skipping detailed XML validation."
+  fi
+fi
+
+# Check for new files in root directory
+info "Checking for new files in root directory..."
+ROOT_FILES=$(git diff --cached --name-only --diff-filter=A | grep -v "/" | grep -v "^\." | grep -v "^README" | grep -v "^LICENSE")
+
+if [ -n "$ROOT_FILES" ]; then
+  error "New files detected in root directory:"
+  for file in $ROOT_FILES; do
+    detail "- $file"
+  done
+  error "Please move these files to appropriate subdirectories."
+  exit 1
+fi
+
 # Only run CI if Java files are changed (for performance)
 if git diff --cached --name-only --diff-filter=ACM | grep -q "\.java$"; then
   info "Java files changed. Running basic CI checks..."
   
-  # Run the most basic verification only to keep it fast
-  if ! "${PROJECT_ROOT}/s8r-ci" --workflow local-pipeline.yml --job basic-verification --dry-run; then
-    error "Local CI check would fail. Fix the issues or use git commit --no-verify to bypass this check."
-    exit 1
-  fi
+  # Check if s8r-ci exists
+  if [ \! -f "${PROJECT_ROOT}/s8r-ci" ]; then
+    error "s8r-ci script not found. Skipping local CI checks."
+  else
+    # Run the most basic verification only to keep it fast
+    if \! "${PROJECT_ROOT}/s8r-ci" --workflow local-pipeline.yml --job basic-verification --dry-run; then
+      error "Local CI check would fail. Fix the issues or use git commit --no-verify to bypass this check."
+      exit 1
+    fi
   
-  success "Local CI checks passed."
+    success "Local CI checks passed."
+  fi
 else
   info "No Java files changed. Skipping CI checks."
 fi
 
+success "All pre-commit checks passed."
 exit 0
