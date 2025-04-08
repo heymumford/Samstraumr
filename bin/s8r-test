@@ -170,6 +170,7 @@ function show_help() {
   echo "  ./s8r-test functional                     # Run core functionality tests"
   echo "  ./s8r-test --tags \"@L1_Component and @DataFlow\"  # Run component data flow tests"
   echo "  ./s8r-test -v component                   # Run component tests verbosely"
+  echo "  ./s8r-test all --coverage                 # Run all tests with coverage analysis"
 }
 
 # Map test type to appropriate tag expressions
@@ -356,7 +357,7 @@ function run_tests() {
   
   # Add coverage if requested
   if $COVERAGE; then
-    mvn_args+=("jacoco:prepare-agent")
+    mvn_args+=("jacoco:prepare-agent" "jacoco:report")
     print_info "Code coverage analysis enabled"
   fi
   
@@ -414,6 +415,19 @@ function run_tests() {
       print_info "See test output in: $OUTPUT_FILE"
     fi
     return 1
+  fi
+  
+  # Run coverage analysis if requested
+  if $COVERAGE; then
+    if [ -x "${PROJECT_ROOT}/bin/s8r-test-coverage" ]; then
+      print_info "Running test coverage analysis..."
+      "${PROJECT_ROOT}/bin/s8r-test-coverage"
+    elif [ -x "${PROJECT_ROOT}/bin/s8r-all/s8r-test-coverage" ]; then
+      print_info "Running test coverage analysis..."
+      "${PROJECT_ROOT}/bin/s8r-all/s8r-test-coverage"
+    else
+      print_warning "Coverage analysis requested but s8r-test-coverage not found"
+    fi
   fi
   
   return 0

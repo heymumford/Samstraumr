@@ -57,34 +57,46 @@ The `s8r-test` script provides a standardized way to run tests:
 ./s8r-test port
 ```
 
-## Next Steps
+## Completed Actions
 
-1. **Consolidate Test Resources**
-   - Move all feature files to a single structure under `modules/samstraumr-core/src/test/resources/features`
-   - Ensure consistent naming and organization
+1. **Consolidated Test Resources**
+   - Moved feature files to a standard structure under `modules/samstraumr-core/src/test/resources/features`
+   - Created a consistent naming scheme for feature files
 
 2. **Standard Test Annotations**
-   - Keep all test annotations in the `org.s8r.test.annotation` package
-   - Avoid duplicate annotations
+   - Consolidated annotations in the `org.s8r.test.annotation` package
+   - Removed duplicate annotation definitions
 
 3. **Test Runner Consolidation**
-   - Use JUnit 5 test suites for grouping tests
-   - Standardize on Cucumber for BDD tests
+   - Created JUnit 5 test suites for grouping tests
+   - Standardized on Cucumber for BDD tests
+   - Implemented specialized test runners for different test types
 
-4. **Test Naming Conventions**
-   - [Class]Test.java for unit tests
-   - [Feature]Tests.java for test suites
+4. **Improved CLI Tools**
+   - Enhanced s8r-test script with better test filtering
+   - Created s8r-test-coverage tool for test analysis
+   - Added coverage reporting and gap identification
 
-5. **Test Layers**
-   - Maintain clear separation between test layers:
-     - Unit/Component tests
-     - Integration tests
-     - BDD tests
-     - Architecture tests
+## Next Steps
 
-6. **CI Integration**
-   - Ensure all tests can be run in CI pipeline
-   - Add test reports and test coverage metrics
+1. **Address Coverage Gaps**
+   - Add more domain model tests (need 6 more)
+   - Add application service tests (need 5 more)
+   - Add infrastructure adapter tests (need 5 more)
+   - Improve adapter test coverage (need 4 more)
+   - Add integration tests (need 6 more)
+
+2. **Test Tagging**
+   - Standardize test tags across all test files
+   - Tag tests by functionality and layer
+
+3. **CI Integration**
+   - Include coverage analysis in CI pipeline
+   - Generate coverage reports as part of build process
+
+4. **Documentation**
+   - Add test examples for each component type
+   - Document test patterns for complex scenarios
 
 ## Current Test File Structure
 
