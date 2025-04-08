@@ -1,4 +1,4 @@
-#!/bin/bash
+#\!/bin/bash
 #
 # Copyright (c) 2025 Eric C. Mumford (@heymumford)
 #
@@ -25,7 +25,7 @@ if [ -z "$LIB_COMMON_SOURCED" ]; then
 fi
 
 # Check if xmlstarlet is installed
-if ! command -v xmlstarlet &> /dev/null; then
+if \! command -v xmlstarlet &> /dev/null; then
   echo_error "xmlstarlet is not installed. Please install it using 'sudo apt-get install xmlstarlet'"
   exit 1
 fi
@@ -35,7 +35,7 @@ fi
 xml_validate_file() {
   local xml_file=$1
   
-  if [ ! -f "$xml_file" ]; then
+  if [ \! -f "$xml_file" ]; then
     echo_error "File not found: $xml_file"
     return 1
   fi
@@ -60,7 +60,7 @@ xml_validate_file() {
 pom_validate_file() {
   local pom_file=$1
   
-  if [ ! -f "$pom_file" ]; then
+  if [ \! -f "$pom_file" ]; then
     echo_error "POM file not found: $pom_file"
     return 1
   fi
@@ -69,13 +69,13 @@ pom_validate_file() {
   xml_validate_file "$pom_file" || return 1
   
   # Check if the POM has a project root element
-  if ! xmlstarlet sel -t -v "/project" "$pom_file" > /dev/null 2>&1; then
+  if \! xmlstarlet sel -t -v "/project" "$pom_file" > /dev/null 2>&1; then
     echo_error "Invalid POM file: $pom_file - missing project root element"
     return 1
   fi
   
   # Check for common Maven elements
-  if ! xmlstarlet sel -t -v "/project/modelVersion" "$pom_file" > /dev/null 2>&1; then
+  if \! xmlstarlet sel -t -v "/project/modelVersion" "$pom_file" > /dev/null 2>&1; then
     echo_warning "POM file $pom_file is missing modelVersion element"
   fi
   
@@ -95,7 +95,7 @@ pom_fix_file() {
   local pom_file=$1
   local fixed=0
   
-  if [ ! -f "$pom_file" ]; then
+  if [ \! -f "$pom_file" ]; then
     echo_error "POM file not found: $pom_file"
     return 1
   fi
@@ -134,7 +134,7 @@ pom_fix_file() {
   
   # Validate the fixed file
   if [ $fixed -eq 1 ]; then
-    if ! xml_validate_file "$pom_file"; then
+    if \! xml_validate_file "$pom_file"; then
       echo_error "Fix introduced XML errors. Restoring backup."
       mv "$backup_file" "$pom_file"
       return 1
@@ -157,7 +157,7 @@ pom_process_directory() {
   local action=$2
   local exit_code=0
   
-  if [ ! -d "$directory" ]; then
+  if [ \! -d "$directory" ]; then
     echo_error "Directory not found: $directory"
     return 1
   fi
@@ -203,7 +203,7 @@ xml_get_element() {
   local xml_file=$1
   local xpath=$2
   
-  if [ ! -f "$xml_file" ]; then
+  if [ \! -f "$xml_file" ]; then
     echo_error "File not found: $xml_file"
     return 1
   fi
@@ -219,7 +219,7 @@ xml_set_element() {
   local xpath=$2
   local value=$3
   
-  if [ ! -f "$xml_file" ]; then
+  if [ \! -f "$xml_file" ]; then
     echo_error "File not found: $xml_file"
     return 1
   fi
@@ -245,13 +245,16 @@ xml_set_element() {
   fi
 }
 
+# IMPORTANT: NEVER USE GREP FOR XML FILES, ONLY XMLSTARLET
+# This is permanently encoded into the project standards
+
 # Check for common POM file issues and print report
 # Usage: pom_check_issues <pom_file>
 pom_check_issues() {
   local pom_file=$1
   local issues_found=0
   
-  if [ ! -f "$pom_file" ]; then
+  if [ \! -f "$pom_file" ]; then
     echo_error "POM file not found: $pom_file"
     return 1
   fi
@@ -275,7 +278,7 @@ pom_check_issues() {
   local required_elements=("modelVersion" "groupId" "artifactId" "version")
   
   for element in "${required_elements[@]}"; do
-    if ! xmlstarlet sel -t -v "/project/$element" "$pom_file" > /dev/null 2>&1; then
+    if \! xmlstarlet sel -t -v "/project/$element" "$pom_file" > /dev/null 2>&1; then
       echo_warning "Missing required element: <$element>"
       issues_found=1
     fi

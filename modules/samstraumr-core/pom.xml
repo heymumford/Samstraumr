@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
+<\!--
 Copyright (c) 2025 Eric C. Mumford (@heymumford)
 
 This software was developed with analytical assistance from AI tools 
@@ -17,7 +17,7 @@ Licensed under the Mozilla Public License 2.0
   <parent>
     <groupId>org.s8r</groupId>
     <artifactId>samstraumr</artifactId>
-    <version>2.7.1</version>
+    <version>3.0.2</version>
   </parent>
 
   <artifactId>samstraumr-core</artifactId>
@@ -55,72 +55,40 @@ Licensed under the Mozilla Public License 2.0
       <artifactId>log4j-core</artifactId>
       <!-- Version managed by parent -->
     </dependency>
-
-    <!-- Document generation -->
     <dependency>
-      <groupId>com.itextpdf</groupId>
-      <artifactId>itextpdf</artifactId>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
       <!-- Version managed by parent -->
     </dependency>
-    
-    <!-- Additional dependencies -->
-    <dependency>
-      <groupId>com.github.oshi</groupId>
-      <artifactId>oshi-core</artifactId>
-      <!-- Version managed by parent -->
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <!-- Version managed by parent -->
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <!-- Version managed by parent -->
-    </dependency>
-    <dependency>
-      <groupId>com.github.spotbugs</groupId>
-      <artifactId>spotbugs-annotations</artifactId>
-      <!-- Version managed by parent -->
-    </dependency>
-
-    <!-- Testing dependencies -->
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.11.0</version>
-      <scope>test</scope>
+      <!-- Version managed by parent -->
     </dependency>
     <dependency>
-      <groupId>io.cucumber</groupId>
-      <artifactId>cucumber-java</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
       <!-- Version managed by parent -->
-      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>io.cucumber</groupId>
-      <artifactId>cucumber-junit-platform-engine</artifactId>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli</artifactId>
       <!-- Version managed by parent -->
-      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>io.cucumber</groupId>
-      <artifactId>cucumber-core</artifactId>
+      <groupId>org.freemarker</groupId>
+      <artifactId>freemarker</artifactId>
       <!-- Version managed by parent -->
-      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>io.cucumber</groupId>
-      <artifactId>cucumber-plugin</artifactId>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
       <!-- Version managed by parent -->
-      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>io.cucumber</groupId>
-      <artifactId>cucumber-junit</artifactId>
+      <groupId>org.jetbrains</groupId>
+      <artifactId>annotations</artifactId>
       <!-- Version managed by parent -->
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -135,26 +103,8 @@ Licensed under the Mozilla Public License 2.0
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.junit.vintage</groupId>
-      <artifactId>junit-vintage-engine</artifactId>
-      <!-- Version managed by parent -->
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-suite</artifactId>
-      <!-- Version managed by parent -->
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-suite-api</artifactId>
-      <!-- Version managed by parent -->
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-launcher</artifactId>
       <!-- Version managed by parent -->
       <scope>test</scope>
     </dependency>
@@ -171,8 +121,44 @@ Licensed under the Mozilla Public License 2.0
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-junit-jupiter</artifactId>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-java</artifactId>
+      <!-- Version managed by parent -->
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-junit-platform-engine</artifactId>
+      <!-- Version managed by parent -->
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.cucumber</groupId>
+      <artifactId>cucumber-spring</artifactId>
+      <!-- Version managed by parent -->
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <!-- Version managed by parent -->
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <!-- Version managed by parent -->
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit-junit5</artifactId>
+      <!-- Version managed by parent -->
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.plantuml</groupId>
+      <artifactId>plantuml</artifactId>
       <!-- Version managed by parent -->
       <scope>test</scope>
     </dependency>
@@ -183,131 +169,116 @@ Licensed under the Mozilla Public License 2.0
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>${maven.compiler.source}</source>
-          <target>${maven.compiler.target}</target>
-          <compilerArgs>
-            <arg>--add-opens</arg>
-            <arg>java.base/java.lang=ALL-UNNAMED</arg>
-            <arg>--add-opens</arg>
-            <arg>java.base/java.util=ALL-UNNAMED</arg>
-            <arg>--add-opens</arg>
-            <arg>java.base/java.lang.reflect=ALL-UNNAMED</arg>
-          </compilerArgs>
-          <!-- Configure test compilation separately -->
-          <testIncludes>
-            <include>isolated/**/*.java</include>
-            <include>org/s8r/isolated/**/*.java</include>
-            <include>org/s8r/**/*.java</include>
-            <include>org/s8r/test/**/*.java</include>
-          </testIncludes>
-        </configuration>
+        <!-- Version managed by parent -->
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>${maven.surefire.plugin.version}</version>
+        <!-- Version managed by parent -->
         <configuration>
-          <argLine>
-            --add-opens java.base/java.lang=ALL-UNNAMED
-            --add-opens java.base/java.util=ALL-UNNAMED
-            --add-opens java.base/java.lang.reflect=ALL-UNNAMED
-          </argLine>
-          <!-- Include our test classes -->
           <includes>
-            <include>isolated/**/*Test.java</include>
-            <include>org/s8r/isolated/**/*Test.java</include>
-            <include>org/s8r/**/*Test.java</include>
-            <include>org/s8r/test/**/*.java</include>
+            <include>**/*Test.java</include>
           </includes>
-          <testFailureIgnore>true</testFailureIgnore>
-          <skipTests>false</skipTests>
           <systemPropertyVariables>
-            <junit.jupiter.extensions.autodetection.enabled>true</junit.jupiter.extensions.autodetection.enabled>
+            <cucumber.publish.quiet>true</cucumber.publish.quiet>
+            <cucumber.junit-platform.naming-strategy>long</cucumber.junit-platform.naming-strategy>
           </systemPropertyVariables>
         </configuration>
-        <!-- Removed junit-platform-surefire-provider dependency as it's no longer needed with Surefire 3.2.5 -->
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <!-- Version managed by parent -->
+        <configuration>
+          <excludes>
+            <exclude>**/adapter/**/impl/**</exclude>
+            <exclude>**/adapter/**/port/**</exclude>
+          </excludes>
+          <rules>
+            <rule>
+              <element>BUNDLE</element>
+              <limits>
+                <limit>
+                  <counter>LINE</counter>
+                  <value>COVEREDRATIO</value>
+                  <minimum>${jacoco.line.coverage}</minimum>
+                </limit>
+                <limit>
+                  <counter>BRANCH</counter>
+                  <value>COVEREDRATIO</value>
+                  <minimum>${jacoco.branch.coverage}</minimum>
+                </limit>
+                <limit>
+                  <counter>METHOD</counter>
+                  <value>COVEREDRATIO</value>
+                  <minimum>${jacoco.method.coverage}</minimum>
+                </limit>
+                <limit>
+                  <counter>CLASS</counter>
+                  <value>COVEREDRATIO</value>
+                  <minimum>${jacoco.class.coverage}</minimum>
+                </limit>
+              </limits>
+            </rule>
+          </rules>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <!-- Version managed by parent -->
       </plugin>
-      
-      <!-- Execute architecture documentation generation during build -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <!-- Version managed by parent -->
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <!-- Version managed by parent -->
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>${maven.exec.plugin.version}</version>
-        <executions>
-          <execution>
-            <id>generate-diagrams</id>
-            <phase>pre-site</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <configuration>
-              <executable>${project.basedir}/../../bin/generate-diagrams.sh</executable>
-              <arguments>
-                <argument>--async</argument>
-                <argument>--format</argument>
-                <argument>svg</argument>
-                <argument>--type</argument>
-                <argument>all</argument>
-              </arguments>
-              <workingDirectory>${project.basedir}/../..</workingDirectory>
-            </configuration>
-          </execution>
-        </executions>
+        <!-- Version managed by parent -->
+        <configuration>
+          <mainClass>${exec.mainClass}</mainClass>
+        </configuration>
       </plugin>
     </plugins>
-    
-    <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>**/*.properties</include>
-          <include>**/*.xml</include>
-          <include>**/*.feature</include>
-          <include>**/*.md</include>
-        </includes>
-      </testResource>
-    </testResources>
   </build>
 
   <profiles>
     <profile>
-      <id>unit-tests</id>
+      <id>fast</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
       <properties>
-        <cucumber.filter.tags>@UnitTest or @TubeTest</cucumber.filter.tags>
+        <skipTests>true</skipTests>
       </properties>
     </profile>
     <profile>
-      <id>component-tests</id>
+      <id>api-tests</id>
       <properties>
-        <cucumber.filter.tags>@ComponentTest</cucumber.filter.tags>
+        <groups>api</groups>
       </properties>
     </profile>
     <profile>
-      <id>atl-tests</id>
+      <id>architecture-checks</id>
       <properties>
-        <cucumber.filter.tags>@ATL</cucumber.filter.tags>
+        <groups>architecture</groups>
       </properties>
     </profile>
     <profile>
-      <id>btl-tests</id>
+      <id>integration-tests</id>
       <properties>
-        <cucumber.filter.tags>@BTL</cucumber.filter.tags>
+        <cucumber.filter.tags>@integration and not @disabled</cucumber.filter.tags>
       </properties>
     </profile>
     <profile>
-      <id>orchestration-tests</id>
-      <properties>
-        <cucumber.filter.tags>@OrchestrationTest</cucumber.filter.tags>
-      </properties>
-    </profile>
-    <profile>
-      <id>all-tests</id>
+      <id>cucumber-tests</id>
       <properties>
         <cucumber.filter.tags>not @disabled</cucumber.filter.tags>
       </properties>
@@ -321,57 +292,24 @@ Licensed under the Mozilla Public License 2.0
     <profile>
       <id>architecture-tests</id>
       <properties>
-        <groups>architecture</groups>
+        <cucumber.filter.tags>@architecture</cucumber.filter.tags>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <groups>architecture</groups>
-              <includes>
-                <include>**/Run*Tests.java</include>
-                <include>**/*Test.java</include>
-              </includes>
-              <argLine>
-                --add-opens java.base/java.lang=ALL-UNNAMED
-                --add-opens java.base/java.util=ALL-UNNAMED
-                --add-opens java.base/java.lang.reflect=ALL-UNNAMED
-              </argLine>
-              <systemPropertyVariables>
-                <junit.jupiter.extensions.autodetection.enabled>true</junit.jupiter.extensions.autodetection.enabled>
-              </systemPropertyVariables>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
     <profile>
-      <id>port-tests</id>
-      <properties>
-        <cucumber.filter.tags>@port or @ports</cucumber.filter.tags>
-      </properties>
+      <id>documentation</id>
       <build>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <includes>
-                <include>org/s8r/test/runner/*.java</include>
-                <include>org/s8r/test/steps/*.java</include>
-              </includes>
-              <argLine>
-                --add-opens java.base/java.lang=ALL-UNNAMED
-                --add-opens java.base/java.util=ALL-UNNAMED
-                --add-opens java.base/java.lang.reflect=ALL-UNNAMED
-              </argLine>
-              <systemPropertyVariables>
-                <cucumber.filter.tags>${cucumber.filter.tags}</cucumber.filter.tags>
-                <junit.jupiter.extensions.autodetection.enabled>true</junit.jupiter.extensions.autodetection.enabled>
-              </systemPropertyVariables>
-            </configuration>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>

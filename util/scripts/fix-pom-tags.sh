@@ -1,4 +1,4 @@
-#!/bin/bash
+#\!/bin/bash
 #
 # Copyright (c) 2025 Eric C. Mumford (@heymumford)
 #
@@ -8,6 +8,9 @@
 # remain exclusively with the copyright holder listed above.
 #
 # Licensed under the Mozilla Public License 2.0
+
+# IMPORTANT: NEVER USE GREP FOR XML FILES, ONLY XMLSTARLET
+# This is permanently encoded into the project standards
 
 # Script for fixing common POM file issues:
 # 1. <n> -> <name> conversion
@@ -31,13 +34,13 @@ error() { echo -e "${RED}$1${RESET}" >&2; }
 detail() { echo -e "${BLUE}$1${RESET}"; }
 
 # Check for XMLStarlet
-if ! command -v xmlstarlet &> /dev/null; then
+if \! command -v xmlstarlet &> /dev/null; then
     error "XMLStarlet not found. Please install it using 'sudo apt-get install xmlstarlet'"
     exit 1
 fi
 
 # Check if xmllint is available
-if ! command -v xmllint &> /dev/null; then
+if \! command -v xmllint &> /dev/null; then
     error "xmllint not found. Please install it using 'sudo apt-get install libxml2-utils'"
     exit 1
 fi
@@ -98,7 +101,7 @@ process_pom_file() {
     local pom_file="$1"
     local fixed=false
     
-    if [ ! -f "$pom_file" ]; then
+    if [ \! -f "$pom_file" ]; then
         error "File not found: $pom_file"
         return 1
     fi
@@ -106,7 +109,7 @@ process_pom_file() {
     info "Processing $pom_file"
     
     # Validate XML format first
-    if ! xmllint --noout "$pom_file" 2>/dev/null; then
+    if \! xmllint --noout "$pom_file" 2>/dev/null; then
         error "XML validation failed for $pom_file"
         return 1
     fi
@@ -154,7 +157,7 @@ process_pom_file() {
 process_directory() {
     local dir="$1"
     
-    if [ ! -d "$dir" ]; then
+    if [ \! -d "$dir" ]; then
         error "Directory not found: $dir"
         return 1
     fi
@@ -189,4 +192,4 @@ else
 fi
 
 # Success message
-success "POM file processing complete!"
+success "POM file processing complete\!"

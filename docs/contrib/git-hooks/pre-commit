@@ -48,8 +48,9 @@ if [ -n "$XML_FILES" ]; then
       
       # Special handling for POM files
       if [[ "$file" == *"pom.xml" ]]; then
-        # Check for <n> vs <name> issue
-        if grep -q "<n>" "$full_path"; then
+        # IMPORTANT: NEVER USE GREP FOR XML FILES, ONLY XMLSTARLET
+        # Check for <n> vs <name> issue using xmlstarlet
+        if xmlstarlet sel -t -v "/project/n" "$full_path" > /dev/null 2>&1; then
           error "POM ERROR: Found <n> tag instead of <name> in $file"
           detail "Run './util/scripts/check-pom-files.sh --action fix $full_path' to fix"
           XML_ERRORS=1
@@ -101,11 +102,11 @@ if git diff --cached --name-only --diff-filter=ACM | grep -q "\.java$"; then
   info "Java files changed. Running basic CI checks..."
   
   # Check if s8r-ci exists
-  if [ \! -f "${PROJECT_ROOT}/s8r-ci" ]; then
+  if [ \\! -f "${PROJECT_ROOT}/s8r-ci" ]; then
     error "s8r-ci script not found. Skipping local CI checks."
   else
     # Run the most basic verification only to keep it fast
-    if \! "${PROJECT_ROOT}/s8r-ci" --workflow local-pipeline.yml --job basic-verification --dry-run; then
+    if \\! "${PROJECT_ROOT}/s8r-ci" --workflow local-pipeline.yml --job basic-verification --dry-run; then
       error "Local CI check would fail. Fix the issues or use git commit --no-verify to bypass this check."
       exit 1
     fi
