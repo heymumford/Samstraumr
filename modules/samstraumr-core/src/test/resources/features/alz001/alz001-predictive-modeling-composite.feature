@@ -1,4 +1,4 @@
-Feature: Predictive Modeling Composite in Alzheimer's Disease Research
+@L0_Unit Feature: Predictive Modeling Composite in Alzheimer's Disease Research
   As a neurodegenerative disease researcher
   I want to use predictive modeling capabilities for Alzheimer's disease
   So that I can forecast disease progression and optimize interventions

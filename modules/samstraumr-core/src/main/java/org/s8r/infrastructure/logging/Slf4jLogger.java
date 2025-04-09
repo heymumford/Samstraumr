@@ -50,38 +50,53 @@ public class Slf4jLogger implements LoggerPort {
   }
 
   @Override
-  public void debug(String message) {
-    logger.debug(message);
+  public void trace(String message) {
+    logger.trace(message);
+  }
+  
+  @Override
+  public void trace(String format, Object... args) {
+    logger.trace(format, args);
   }
 
   @Override
-  public void debug(String message, Throwable e) {
-    logger.debug(message, e);
+  public void debug(String message) {
+    logger.debug(message);
+  }
+  
+  @Override
+  public void debug(String format, Object... args) {
+    logger.debug(format, args);
   }
 
   @Override
   public void info(String message) {
     logger.info(message);
   }
-
+  
   @Override
-  public void info(String message, Throwable e) {
-    logger.info(message, e);
+  public void info(String format, Object... args) {
+    logger.info(format, args);
   }
 
   @Override
   public void warn(String message) {
     logger.warn(message);
   }
-
+  
   @Override
-  public void warn(String message, Throwable e) {
-    logger.warn(message, e);
+  public void warn(String format, Object... args) {
+    logger.warn(format, args);
   }
 
   @Override
   public void error(String message) {
     logger.error(message);
+  }
+  
+  @Override
+  public void error(String format, Object... args) {
+    logger.error(format, args);
   }
 
   @Override
@@ -89,22 +104,19 @@ public class Slf4jLogger implements LoggerPort {
     logger.error(message, e);
   }
 
-  /**
-   * Checks if debug logging is enabled.
-   *
-   * @return true if debug is enabled, false otherwise
-   */
+  @Override
   public boolean isDebugEnabled() {
     return logger.isDebugEnabled();
   }
 
-  /**
-   * Checks if trace logging is enabled.
-   *
-   * @return true if trace is enabled, false otherwise
-   */
+  @Override
   public boolean isTraceEnabled() {
     return logger.isTraceEnabled();
+  }
+  
+  @Override
+  public String getName() {
+    return logger.getName();
   }
 
   /**

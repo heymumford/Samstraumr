@@ -17,6 +17,7 @@ package org.s8r.infrastructure.notification;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
@@ -26,9 +27,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.s8r.application.port.ConfigurationPort;
 import org.s8r.application.port.LoggerPort;
-import org.s8r.application.port.NotificationPort.DeliveryStatus;
-import org.s8r.application.port.NotificationPort.NotificationResult;
-import org.s8r.application.port.NotificationPort.NotificationSeverity;
+import org.s8r.application.port.notification.DeliveryStatus;
+import org.s8r.application.port.notification.NotificationResult;
+import org.s8r.application.port.notification.NotificationSeverity;
 import org.s8r.test.annotation.UnitTest;
 
 /** Unit tests for the NotificationAdapter class. */
@@ -294,6 +295,6 @@ public class NotificationAdapterTest {
 
     assertTrue(result.isSent());
 
-    verify(mockLogger, atLeastOnce()).info(contains("EMAIL to multi@example.com"));
+    verify(mockLogger, atLeastOnce()).info(eq("Sent EMAIL notification to multi@example.com"), anyString());
   }
 }

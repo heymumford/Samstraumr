@@ -19,7 +19,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.s8r.application.port.ComponentRepository;
+import org.s8r.application.port.DataFlowEventPort;
 import org.s8r.application.port.EventDispatcher;
+import org.s8r.application.port.EventHandler;
 import org.s8r.application.port.LegacyAdapterResolver;
 import org.s8r.application.port.LoggerFactory;
 import org.s8r.application.port.LoggerPort;
@@ -37,6 +39,7 @@ import org.s8r.domain.event.ComponentCreatedEvent;
 import org.s8r.domain.event.ComponentDataEvent;
 import org.s8r.domain.event.ComponentStateChangedEvent;
 import org.s8r.domain.event.MachineStateChangedEvent;
+import org.s8r.infrastructure.event.DataFlowEventAdapter;
 import org.s8r.infrastructure.event.DataFlowEventHandler;
 import org.s8r.infrastructure.event.InMemoryEventDispatcher;
 import org.s8r.infrastructure.event.LoggingEventHandler;
@@ -135,7 +138,7 @@ public class DependencyContainer implements ServiceFactory {
 
     // Create the notification adapter
     org.s8r.infrastructure.notification.NotificationAdapter notificationAdapter =
-        new org.s8r.infrastructure.notification.NotificationAdapter(logger, configurationPort);
+        new org.s8r.infrastructure.notification.NotificationAdapter();
 
     // Register it as implementation of the port interface
     register(org.s8r.application.port.NotificationPort.class, notificationAdapter);
@@ -321,8 +324,9 @@ public class DependencyContainer implements ServiceFactory {
     register(MachineService.class, machineService);
 
     // Create DataFlowService
+    org.s8r.application.port.DataFlowEventPort dataFlowEventPort = get(org.s8r.application.port.DataFlowEventPort.class);
     DataFlowService dataFlowService =
-        new DataFlowService(componentRepository, dataFlowHandler, eventPublisherAdapter, logger);
+        new DataFlowService(componentRepository, dataFlowEventPort, eventPublisherAdapter, logger);
     register(DataFlowService.class, dataFlowService);
 
     // Create PatternFactory
@@ -368,27 +372,33 @@ public class DependencyContainer implements ServiceFactory {
 
     // Create event handlers
     LoggingEventHandler loggingHandler = new LoggingEventHandler(logger);
-    DataFlowEventHandler dataFlowHandler = new DataFlowEventHandler(logger);
     register(LoggingEventHandler.class, loggingHandler);
+    
+    // Create data flow event adapter
+    DataFlowEventAdapter dataFlowEventAdapter = new DataFlowEventAdapter(logger);
+    register(org.s8r.application.port.DataFlowEventPort.class, dataFlowEventAdapter);
+    
+    // Get the data flow event handler from the adapter
+    DataFlowEventHandler dataFlowHandler = dataFlowEventAdapter.getDataFlowHandler();
     register(DataFlowEventHandler.class, dataFlowHandler);
 
     // Register handlers with the dispatcher
     eventDispatcher.registerHandler(
-        ComponentCreatedEvent.class, loggingHandler.componentCreatedHandler());
+        "component.created", loggingHandler.componentCreatedHandler());
 
     // Register the new-style ComponentCreated event handler (without Event suffix)
     // This supports the new Clean Architecture event model
     eventDispatcher.registerHandler(
-        ComponentCreated.class, loggingHandler.componentCreatedHandlerNew());
+        "component.created.v2", loggingHandler.componentCreatedHandlerNew());
     logger.info("Registered handler for new-style ComponentCreated events");
 
     eventDispatcher.registerHandler(
-        ComponentStateChangedEvent.class, loggingHandler.componentStateChangedHandler());
+        "component.state.changed", loggingHandler.componentStateChangedHandler());
     eventDispatcher.registerHandler(
-        ComponentConnectionEvent.class, loggingHandler.componentConnectionHandler());
+        "component.connection", loggingHandler.componentConnectionHandler());
     eventDispatcher.registerHandler(
-        MachineStateChangedEvent.class, loggingHandler.machineStateChangedHandler());
-    eventDispatcher.registerHandler(ComponentDataEvent.class, dataFlowHandler.dataEventHandler());
+        "machine.state.changed", loggingHandler.machineStateChangedHandler());
+    eventDispatcher.registerHandler("data.flow", dataFlowHandler.dataEventHandler());
 
     logger.info("Initialized event system with hierarchical event propagation");
   }
@@ -483,13 +493,13 @@ public class DependencyContainer implements ServiceFactory {
   private void registerHandlerForCompatibility(
       EventDispatcher dispatcher,
       Class<?> eventClass,
-      EventDispatcher.EventHandler<?> handler,
+      org.s8r.application.port.EventHandler handler,
       LoggerPort logger) {
     try {
       // Use reflection to bypass the generic type checking
       java.lang.reflect.Method registerMethod =
           InMemoryEventDispatcher.class.getMethod(
-              "registerHandler", Class.class, EventDispatcher.EventHandler.class);
+              "registerHandler", Class.class, org.s8r.application.port.EventHandler.class);
 
       registerMethod.invoke(dispatcher, eventClass, handler);
     } catch (Exception e) {

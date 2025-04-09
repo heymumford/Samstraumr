@@ -1,11 +1,11 @@
 
 # Samstraumr: Adaptive Resilient Software Framework
 
-[![Version](https://img.shields.io/badge/version-3.0.2-blue)](https://github.com/heymumford/Samstraumr/releases) 
+[![Version](https://img.shields.io/badge/version-3.0.4-blue)](https://github.com/heymumford/Samstraumr/releases) 
 [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) 
-[![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/) 
-[![Maven](https://img.shields.io/badge/Maven-3.6%2B-purple)](https://maven.apache.org/)
+[![Java](https://img.shields.io/badge/Java-21-orange)](https://openjdk.org/projects/jdk/21/) 
+[![Maven](https://img.shields.io/badge/Maven-3.9%2B-purple)](https://maven.apache.org/)
 
 **Samstraumr (S8r)** is an enterprise Java framework for building resilient, self-healing software systems with adaptive components and event-driven architecture. Inspired by natural systems' resilience, it enables applications that autonomously monitor, adapt, and recover from disruptions.
 
@@ -15,7 +15,7 @@
 
 | [What is S8r?](#what-is-samstraumr) | [Why Use It?](#why-use-samstraumr) | [Core Concepts](#core-concepts) | [Getting Started](#getting-started) | [Documentation](#documentation) |
 |:--:|:--:|:--:|:--:|:--:|
-| [CLI Reference](#command-line-interface--tools) | [Project Structure](#project-structure) | [Contributing](#contributing--connect) | [License](#license) | [Connect](#connect) |
+| [CLI Reference](#command-line-interface--tools) | [Project Structure](#project-structure) | [Contributing](#contributing--connect) | [License](#license) | [Project Status](./KANBAN.md) |
 
 ## What is Samstraumr?
 
@@ -84,8 +84,8 @@ Samstraumr implements a cohesive set of architectural concepts that work togethe
 
 ### Prerequisites
 
-- **Java**: JDK 17 or higher
-- **Maven**: 3.6 or higher
+- **Java**: JDK 21 (recommended) or JDK 17
+- **Maven**: 3.9 or higher
 - **Git**: Latest version
 
 [📋 **Setup Guide**](./docs/guides/prerequisites.md)
@@ -112,7 +112,7 @@ Maven dependency:
 <dependency>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-core</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.4</version>
 </dependency>
 ```
 
@@ -149,6 +149,12 @@ if (result.isValid()) {
 - [Component Patterns](./docs/guides/component-patterns.md)
 - [Migration Guide](./docs/guides/migration-guide.md)
 
+### 🔬 Research
+- [Testing in the Age of AI](./docs/research/test-in-age-of-ai.md) - Eric C. Mumford
+- [AI-Enhanced Testing Integration](./docs/research/ai-enhanced-testing-integration.md) - Eric C. Mumford
+- [QA Cognitive Transformation](./docs/research/qa-cognitive-transformation-ai.md) - Eric C. Mumford
+- [Cell Activity Simulation](./docs/research/critical-components-of-simulating-and-monitoring-human-cell-activity-in-vitro.md) - Eric C. Mumford
+
 ### 🏛️ Architecture
 - [Architecture Overview](./docs/architecture/README.md)
 - [Clean Architecture](./docs/architecture/clean/README.md)
@@ -171,7 +177,7 @@ if (result.isValid()) {
 - [FAQ](./docs/reference/f-a-q.md)
 - [Maven & Cucumber Standards](./modules/samstraumr-core/src/test/java/org/s8r/test/steps/alz001/MAVEN_CUCUMBER_STANDARDS.md)
 
-**🧪 Current Development**: We're using [Test-Driven Development](./docs/dev/tdd-development.md) with [BDD/Cucumber](./docs/dev/test-bdd-cucumber.md)
+**🧪 Current Development**: We're using [Test-Driven Development](./docs/dev/tdd-development.md) with [BDD/Cucumber](./docs/dev/test-bdd-cucumber.md). Recently completed lifecycle test infrastructure enhancements with specialized test runners and improved script utilities. For current status and work in progress, see our [KANBAN Board](./docs/planning/KANBAN.md) and [Test Suite Implementation Report](./docs/test-reports/test-suite-implementation-report.md).
 
 #### Maven & Cucumber Configuration Standards
 

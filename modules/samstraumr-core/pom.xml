@@ -16,9 +16,9 @@ Licensed under the Mozilla Public License 2.0
 
   <parent>
     <groupId>org.s8r</groupId>
-    <artifactId>samstraumr-parent</artifactId>
+    <artifactId>samstraumr</artifactId>
     <version>3.0.2</version>
-    <relativePath>../../pom.xml</relativePath>
+    <relativePath>..</relativePath>
   </parent>
 
   <artifactId>samstraumr-core</artifactId>

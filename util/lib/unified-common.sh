@@ -39,14 +39,27 @@ S8R_CORE_MODULE=""
 S8R_MEMORY_OPTS=""
 VERBOSE="${VERBOSE:-false}"
 
+# Source the output standard library first to get consistent output functions
+if [ -f "${SCRIPT_LIB_DIR}/output-standard.sh" ]; then
+  source "${SCRIPT_LIB_DIR}/output-standard.sh"
+else
+  echo "Warning: output-standard.sh not found. Falling back to basic output functions."
+  # Basic output functions will be defined below
+fi
+
 # Source the configuration file
 if [ -f "${PROJECT_ROOT}/.s8r.config" ]; then
   source "${PROJECT_ROOT}/.s8r.config"
 elif [ -f "${PROJECT_ROOT}/.s8r/config.sh" ]; then
   source "${PROJECT_ROOT}/.s8r/config.sh"
 else
-  echo "Warning: Configuration file not found: ${PROJECT_ROOT}/.s8r.config or ${PROJECT_ROOT}/.s8r/config.sh"
-  echo "The common.sh library will use default values."
+  if type print_warning &>/dev/null; then
+    print_warning "Configuration file not found: ${PROJECT_ROOT}/.s8r.config or ${PROJECT_ROOT}/.s8r/config.sh"
+    print_info "The common.sh library will use default values."
+  else
+    echo "Warning: Configuration file not found: ${PROJECT_ROOT}/.s8r.config or ${PROJECT_ROOT}/.s8r/config.sh"
+    echo "The common.sh library will use default values."
+  fi
 fi
 
 #------------------------------------------------------------------------------

@@ -107,7 +107,7 @@ The scripts leverage a unified common library (`util/lib/unified-common.sh`) tha
 
 **Test types:**
 - Standard: `unit`, `component`, `integration`, `system`, `all`
-- Functional: `functional`, `error-handling`, `dataflow`, `state`, etc.
+- Functional: `functional`, `lifecycle`, `identity`, `error-handling`, `dataflow`, etc.
 - Legacy: `tube`, `composite`, `machine`, `atl`, `btl`, etc.
 
 **Options:**
@@ -117,6 +117,33 @@ The scripts leverage a unified common library (`util/lib/unified-common.sh`) tha
 - `--skip-quality` - Skip quality checks
 - `-o, --output <file>` - Write output to file
 - `--tags <expression>` - Run tests with specific tags
+- `--verify` - Verify test suite structure
+- `--fix` - Fix common test issues
+- `--report` - Generate test verification report
+
+### Specialized Test Scripts
+
+The project includes specialized test scripts for specific test categories:
+
+#### s8r-test-lifecycle
+
+```bash
+./s8r-test-lifecycle [options] [mode]
+```
+
+**Modes:**
+- `states` - Test state-dependent behavior only (default)
+- `transitions` - Test state transitions only
+- `resources` - Test resource management only
+- `negative` - Test error handling and exceptional conditions
+- `comprehensive` - Run all lifecycle tests
+
+**Options:**
+- `-v, --verbose` - Show detailed output
+- `-o, --output` - Write results to file
+- `-d, --dir` - Specify custom output directory
+- `-q, --quality` - Run with quality checks (slower)
+- `-h, --help` - Show help
 
 ## Installation
 

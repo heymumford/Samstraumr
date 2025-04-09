@@ -62,16 +62,30 @@ public class ConsoleLogger implements LoggerPort {
   }
 
   @Override
+  public void trace(String message) {
+    if (isLevelEnabled(LogLevel.TRACE)) {
+      log(LogLevel.TRACE, message, null);
+    }
+  }
+  
+  @Override
+  public void trace(String format, Object... args) {
+    if (isLevelEnabled(LogLevel.TRACE)) {
+      log(LogLevel.TRACE, String.format(format, args), null);
+    }
+  }
+
+  @Override
   public void debug(String message) {
     if (isLevelEnabled(LogLevel.DEBUG)) {
       log(LogLevel.DEBUG, message, null);
     }
   }
-
+  
   @Override
-  public void debug(String message, Throwable e) {
+  public void debug(String format, Object... args) {
     if (isLevelEnabled(LogLevel.DEBUG)) {
-      log(LogLevel.DEBUG, message, e);
+      log(LogLevel.DEBUG, String.format(format, args), null);
     }
   }
 
@@ -81,11 +95,11 @@ public class ConsoleLogger implements LoggerPort {
       log(LogLevel.INFO, message, null);
     }
   }
-
+  
   @Override
-  public void info(String message, Throwable e) {
+  public void info(String format, Object... args) {
     if (isLevelEnabled(LogLevel.INFO)) {
-      log(LogLevel.INFO, message, e);
+      log(LogLevel.INFO, String.format(format, args), null);
     }
   }
 
@@ -95,11 +109,11 @@ public class ConsoleLogger implements LoggerPort {
       log(LogLevel.WARN, message, null);
     }
   }
-
+  
   @Override
-  public void warn(String message, Throwable e) {
+  public void warn(String format, Object... args) {
     if (isLevelEnabled(LogLevel.WARN)) {
-      log(LogLevel.WARN, message, e);
+      log(LogLevel.WARN, String.format(format, args), null);
     }
   }
 
@@ -109,12 +123,34 @@ public class ConsoleLogger implements LoggerPort {
       log(LogLevel.ERROR, message, null);
     }
   }
+  
+  @Override
+  public void error(String format, Object... args) {
+    if (isLevelEnabled(LogLevel.ERROR)) {
+      log(LogLevel.ERROR, String.format(format, args), null);
+    }
+  }
 
   @Override
   public void error(String message, Throwable e) {
     if (isLevelEnabled(LogLevel.ERROR)) {
       log(LogLevel.ERROR, message, e);
     }
+  }
+  
+  @Override
+  public boolean isTraceEnabled() {
+    return isLevelEnabled(LogLevel.TRACE);
+  }
+  
+  @Override
+  public boolean isDebugEnabled() {
+    return isLevelEnabled(LogLevel.DEBUG);
+  }
+  
+  @Override
+  public String getName() {
+    return name;
   }
 
   /**

@@ -1,117 +1,156 @@
 /*
- * Copyright (c) 2025 Eric C. Mumford (@heymumford)
- *
- * This software was developed with analytical assistance from AI tools
- * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
- * which were used as paid services. All intellectual property rights
- * remain exclusively with the copyright holder listed above.
- *
- * Licensed under the Mozilla Public License 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.mozilla.org/en-US/MPL/2.0/
+ * Copyright (c) 2025
+ * All rights reserved.
  */
-
 package org.s8r.infrastructure.event;
 
-import org.s8r.application.port.EventDispatcher.EventHandler;
+import org.s8r.application.port.EventHandler;
 import org.s8r.application.port.LoggerPort;
-import org.s8r.domain.event.ComponentConnectionEvent;
-import org.s8r.domain.event.ComponentCreated;
-import org.s8r.domain.event.ComponentCreatedEvent;
-import org.s8r.domain.event.ComponentStateChangedEvent;
-import org.s8r.domain.event.MachineStateChangedEvent;
+
+import java.util.Arrays;
+import java.util.Map;
 
 /**
- * Event handler that logs domain events.
- *
- * <p>This handler demonstrates how to implement the EventHandler interface for specific event types
- * and provides a useful logging capability for system monitoring and diagnostics.
+ * Event handler that logs events.
  */
-public class LoggingEventHandler {
-  private final LoggerPort logger;
-
-  /**
-   * Creates a new logging event handler.
-   *
-   * @param logger The logger to use
-   */
-  public LoggingEventHandler(LoggerPort logger) {
-    this.logger = logger;
-  }
-
-  /**
-   * Creates a handler for ComponentCreatedEvent events.
-   *
-   * @return The event handler
-   */
-  public EventHandler<ComponentCreatedEvent> componentCreatedHandler() {
-    return event ->
-        logger.info(
-            "DOMAIN EVENT: Component created - ID: {}, Type: {}, Time: {}",
-            event.getComponentId().getShortId(),
-            event.getComponentType(),
-            event.getOccurredOn());
-  }
-
-  /**
-   * Creates a handler for ComponentCreated events (new style without the Event suffix).
-   *
-   * @return The event handler
-   */
-  public EventHandler<ComponentCreated> componentCreatedHandlerNew() {
-    return event ->
-        logger.info(
-            "DOMAIN EVENT: Component created (new) - ID: {}, Type: {}, State: {}, Time: {}",
-            event.getComponentId().getShortId(),
-            event.getComponentType(),
-            event.getInitialState(),
-            event.getOccurredOn());
-  }
-
-  /**
-   * Creates a handler for ComponentStateChangedEvent events.
-   *
-   * @return The event handler
-   */
-  public EventHandler<ComponentStateChangedEvent> componentStateChangedHandler() {
-    return event ->
-        logger.info(
-            "DOMAIN EVENT: Component state changed - ID: {}, From: {}, To: {}, Reason: {}",
-            event.getComponentId().getShortId(),
-            event.getPreviousState(),
-            event.getNewState(),
-            event.getTransitionReason());
-  }
-
-  /**
-   * Creates a handler for ComponentConnectionEvent events.
-   *
-   * @return The event handler
-   */
-  public EventHandler<ComponentConnectionEvent> componentConnectionHandler() {
-    return event ->
-        logger.info(
-            "DOMAIN EVENT: Component connection created - Type: {}, Source: {}, Target: {}, Name: {}",
-            event.getConnectionType(),
-            event.getSourceId().getShortId(),
-            event.getTargetId().getShortId(),
-            event.getConnectionName());
-  }
-
-  /**
-   * Creates a handler for MachineStateChangedEvent events.
-   *
-   * @return The event handler
-   */
-  public EventHandler<MachineStateChangedEvent> machineStateChangedHandler() {
-    return event ->
-        logger.info(
-            "DOMAIN EVENT: Machine state changed - ID: {}, From: {}, To: {}, Reason: {}",
-            event.getMachineId().getShortId(),
-            event.getPreviousState(),
-            event.getNewState(),
-            event.getTransitionReason());
-  }
+public class LoggingEventHandler implements EventHandler {
+    
+    private final LoggerPort logger;
+    private final String[] eventTypes;
+    
+    /**
+     * Creates a new LoggingEventHandler that handles all events.
+     *
+     * @param logger The logger to use
+     */
+    public LoggingEventHandler(LoggerPort logger) {
+        this(logger, new String[] { "*" });
+    }
+    
+    /**
+     * Creates a new LoggingEventHandler that handles the specified event types.
+     *
+     * @param logger The logger to use
+     * @param eventTypes The event types to handle
+     */
+    public LoggingEventHandler(LoggerPort logger, String[] eventTypes) {
+        this.logger = logger;
+        this.eventTypes = eventTypes;
+    }
+    
+    @Override
+    public void handleEvent(String eventType, String source, String payload, Map<String, String> properties) {
+        logger.info("Event received - Type: {}, Source: {}, Payload: {}, Properties: {}", 
+                eventType, source, payload, properties);
+    }
+    
+    @Override
+    public String[] getEventTypes() {
+        return Arrays.copyOf(eventTypes, eventTypes.length);
+    }
+    
+    /**
+     * Creates a specialized event handler for component creation events.
+     * 
+     * @return A specialized event handler for component creation events
+     */
+    public EventHandler componentCreatedHandler() {
+        return new EventHandler() {
+            @Override
+            public void handleEvent(String eventType, String source, String payload, Map<String, String> properties) {
+                logger.info("Component created - ID: {}, Type: {}", source, properties.getOrDefault("type", "unknown"));
+            }
+            
+            @Override
+            public String[] getEventTypes() {
+                return new String[] { "component.created" };
+            }
+        };
+    }
+    
+    /**
+     * Creates an updated specialized event handler for component creation events.
+     * 
+     * @return A specialized event handler for component creation events
+     */
+    public EventHandler componentCreatedHandlerNew() {
+        return new EventHandler() {
+            @Override
+            public void handleEvent(String eventType, String source, String payload, Map<String, String> properties) {
+                logger.info("Component created (new) - ID: {}, Type: {}", 
+                        source, properties.getOrDefault("type", "unknown"));
+            }
+            
+            @Override
+            public String[] getEventTypes() {
+                return new String[] { "component.created.v2" };
+            }
+        };
+    }
+    
+    /**
+     * Creates a specialized event handler for component state change events.
+     * 
+     * @return A specialized event handler for component state change events
+     */
+    public EventHandler componentStateChangedHandler() {
+        return new EventHandler() {
+            @Override
+            public void handleEvent(String eventType, String source, String payload, Map<String, String> properties) {
+                logger.info("Component state changed - ID: {}, From: {}, To: {}", 
+                        source, 
+                        properties.getOrDefault("previousState", "unknown"),
+                        properties.getOrDefault("newState", "unknown"));
+            }
+            
+            @Override
+            public String[] getEventTypes() {
+                return new String[] { "component.state.changed" };
+            }
+        };
+    }
+    
+    /**
+     * Creates a specialized event handler for component connection events.
+     * 
+     * @return A specialized event handler for component connection events
+     */
+    public EventHandler componentConnectionHandler() {
+        return new EventHandler() {
+            @Override
+            public void handleEvent(String eventType, String source, String payload, Map<String, String> properties) {
+                logger.info("Component connection - Source: {}, Target: {}, Status: {}", 
+                        source, 
+                        properties.getOrDefault("targetId", "unknown"),
+                        properties.getOrDefault("connectionStatus", "established"));
+            }
+            
+            @Override
+            public String[] getEventTypes() {
+                return new String[] { "component.connection.created", "component.connection.removed" };
+            }
+        };
+    }
+    
+    /**
+     * Creates a specialized event handler for machine state change events.
+     * 
+     * @return A specialized event handler for machine state change events
+     */
+    public EventHandler machineStateChangedHandler() {
+        return new EventHandler() {
+            @Override
+            public void handleEvent(String eventType, String source, String payload, Map<String, String> properties) {
+                logger.info("Machine state changed - ID: {}, From: {}, To: {}", 
+                        source, 
+                        properties.getOrDefault("previousState", "unknown"),
+                        properties.getOrDefault("newState", "unknown"));
+            }
+            
+            @Override
+            public String[] getEventTypes() {
+                return new String[] { "machine.state.changed" };
+            }
+        };
+    }
 }

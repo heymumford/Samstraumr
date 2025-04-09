@@ -23,7 +23,9 @@ Licensed under the Mozilla Public License 2.0
 7. [Test Organization](#test-organization)
 8. [Continuous Integration Strategy](#continuous-integration-strategy)
 9. [Running Tests](#running-tests)
-10. [References](#references)
+10. [Implementation Status](#implementation-status)
+11. [Related Research](#related-research)
+12. [References](#references)
 
 ## Overview
 
@@ -182,6 +184,30 @@ Tests can be run using both terminology sets with our custom runner:
 # Testing Strategy
 ./run-tests.sh --profile btl-tests integration
 ```
+
+## Implementation Status
+
+For the current implementation status of our testing infrastructure, see the following reports:
+
+- [Test Suite Implementation Report](../test-reports/test-suite-implementation-report.md) - Detailed status of test implementation progress
+- [Test Suite Verification Summary](../test-reports/test-suite-verification-summary.md) - Summary of verification results for existing tests
+- [Test Verification Report](../test-reports/test-verification-report.md) - Comprehensive verification of test quality and coverage
+
+### Recent Enhancements
+
+The following recent enhancements have been made to our testing infrastructure:
+
+1. **Lifecycle Testing** - Comprehensive test infrastructure for component lifecycle management with specialized test runners and execution modes
+2. **Test Verification** - Enhanced verification tools to ensure test completeness and quality
+3. **Test Organization** - Improved directory structure and naming conventions for tests
+
+## Related Research
+
+Our testing strategy is informed by current research in software testing, particularly in the context of AI-enhanced testing approaches:
+
+- [Testing in the Age of AI](../research/test-in-age-of-ai.md) - Eric C. Mumford's research on how AI is transforming testing strategies and methodologies
+- [AI-Enhanced Testing Integration](../research/ai-enhanced-testing-integration.md) - Practical strategies for integrating AI capabilities into the testing framework
+- [QA Cognitive Transformation in AI](../research/qa-cognitive-transformation-ai.md) - How AI is reshaping QA roles and responsibilities
 
 ## References
 

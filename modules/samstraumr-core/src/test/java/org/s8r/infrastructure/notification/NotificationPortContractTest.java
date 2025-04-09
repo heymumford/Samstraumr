@@ -29,9 +29,9 @@ import org.junit.jupiter.api.Test;
 import org.s8r.application.port.ConfigurationPort;
 import org.s8r.application.port.LoggerPort;
 import org.s8r.application.port.NotificationPort;
-import org.s8r.application.port.NotificationPort.DeliveryStatus;
-import org.s8r.application.port.NotificationPort.NotificationResult;
-import org.s8r.application.port.NotificationPort.NotificationSeverity;
+import org.s8r.application.port.notification.DeliveryStatus;
+import org.s8r.application.port.notification.NotificationResult;
+import org.s8r.application.port.notification.NotificationSeverity;
 import org.s8r.test.annotation.UnitTest;
 
 /**

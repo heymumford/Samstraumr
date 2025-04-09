@@ -93,6 +93,17 @@ public class Environment {
     Object value = environmentParameters.get(key);
     return value != null ? value.toString() : null;
   }
+  
+  /**
+   * Gets a specific value from the environment.
+   * This is an alias for getParameter() that's used in tests.
+   *
+   * @param key the parameter key
+   * @return the value, or null if not found
+   */
+  public String getValue(String key) {
+    return getParameter(key);
+  }
 
   /**
    * Sets a parameter value in the environment.
@@ -104,6 +115,17 @@ public class Environment {
     if (key != null && value != null) {
       environmentParameters.put(key, value);
     }
+  }
+  
+  /**
+   * Sets a value in the environment.
+   * This is an alias for setParameter() that's used in tests.
+   *
+   * @param key the key
+   * @param value the value
+   */
+  public void setValue(String key, String value) {
+    setParameter(key, value);
   }
 
   /**

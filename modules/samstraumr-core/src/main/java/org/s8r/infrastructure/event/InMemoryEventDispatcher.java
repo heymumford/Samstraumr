@@ -1,162 +1,114 @@
 /*
- * Copyright (c) 2025 Eric C. Mumford (@heymumford)
- *
- * This software was developed with analytical assistance from AI tools
- * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
- * which were used as paid services. All intellectual property rights
- * remain exclusively with the copyright holder listed above.
- *
- * Licensed under the Mozilla Public License 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.mozilla.org/en-US/MPL/2.0/
+ * Copyright (c) 2025
+ * All rights reserved.
  */
-
 package org.s8r.infrastructure.event;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import org.s8r.application.port.EventDispatcher;
+import org.s8r.application.port.EventHandler;
 import org.s8r.application.port.LoggerPort;
-import org.s8r.domain.event.DomainEvent;
+
+import java.util.Map;
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.List;
 
 /**
- * In-memory implementation of the EventDispatcher interface with hierarchical event dispatch.
- *
- * <p>This implementation stores event handlers in memory and dispatches events synchronously. It
- * provides thread-safe registration and dispatching of events.
- *
- * <p>This dispatcher supports hierarchical event propagation, where events are dispatched to
- * handlers for the specific event type and also to handlers registered for the parent classes in
- * the inheritance hierarchy. This enables polymorphic event handling where handlers can subscribe
- * to base types and receive all derived events.
+ * In-memory implementation of the EventDispatcher interface.
+ * 
+ * <p>This adapter provides a simple in-memory event dispatching system.
+ * It is primarily intended for testing and development environments.
  */
 public class InMemoryEventDispatcher implements EventDispatcher {
-  private final Map<Class<? extends DomainEvent>, List<EventHandler<? extends DomainEvent>>>
-      handlers;
-  private final LoggerPort logger;
-
-  /**
-   * Creates a new in-memory event dispatcher.
-   *
-   * @param logger The logger to use for event dispatching
-   */
-  public InMemoryEventDispatcher(LoggerPort logger) {
-    this.handlers = new HashMap<>();
-    this.logger = logger;
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public void dispatch(DomainEvent event) {
-    if (event == null) {
-      return;
+    
+    private final Map<String, List<EventHandler>> handlers = new ConcurrentHashMap<>();
+    private final LoggerPort logger;
+    
+    public InMemoryEventDispatcher(LoggerPort logger) {
+        this.logger = logger;
     }
 
-    // Get the event class
-    Class<? extends DomainEvent> eventClass = event.getClass();
-    logger.debug("Dispatching event: {} (ID: {})", eventClass.getSimpleName(), event.getEventId());
-
-    // Process handlers for the exact event type
-    dispatchToHandlers(event, eventClass);
-
-    // Process handlers for parent classes for hierarchical propagation
-    processParentEventHandlers(event, eventClass);
-  }
-
-  /**
-   * Recursively processes handlers for parent event classes to implement hierarchical dispatch.
-   * This enables polymorphic event handling where handlers registered for a parent event type will
-   * receive events of derived types.
-   *
-   * @param event The event to dispatch
-   * @param eventClass The current event class being processed
-   */
-  private void processParentEventHandlers(
-      DomainEvent event, Class<? extends DomainEvent> eventClass) {
-    // Get the superclass
-    Class<?> superClass = eventClass.getSuperclass();
-
-    // If the superclass is DomainEvent or a subclass of DomainEvent, dispatch to its handlers
-    if (DomainEvent.class.isAssignableFrom(superClass) && superClass != Object.class) {
-      @SuppressWarnings("unchecked")
-      Class<? extends DomainEvent> parentEventClass = (Class<? extends DomainEvent>) superClass;
-
-      // Dispatch to handlers for this parent class
-      dispatchToHandlers(event, parentEventClass);
-
-      // Continue with the next parent in the hierarchy
-      processParentEventHandlers(event, parentEventClass);
-    }
-  }
-
-  /**
-   * Dispatches an event to handlers registered for a specific event type.
-   *
-   * @param event The event to dispatch
-   * @param eventType The event type class to dispatch to
-   */
-  @SuppressWarnings("unchecked")
-  private void dispatchToHandlers(DomainEvent event, Class<? extends DomainEvent> eventType) {
-    List<EventHandler<? extends DomainEvent>> eventHandlers = handlers.get(eventType);
-    if (eventHandlers == null || eventHandlers.isEmpty()) {
-      logger.debug("No handlers registered for event type: {}", eventType.getSimpleName());
-      return;
+    @Override
+    public boolean registerHandler(String eventType, EventHandler handler) {
+        handlers.computeIfAbsent(eventType, k -> new CopyOnWriteArrayList<>()).add(handler);
+        return true;
     }
 
-    for (EventHandler<? extends DomainEvent> handler : eventHandlers) {
-      try {
-        ((EventHandler<DomainEvent>) handler).handle(event);
-      } catch (Exception e) {
-        logger.error(
-            "Error dispatching event {} to handler {}: {}",
-            eventType.getSimpleName(),
-            handler.getClass().getSimpleName(),
-            e.getMessage(),
-            e);
-      }
+    @Override
+    public boolean unregisterHandler(String eventType, EventHandler handler) {
+        if (!handlers.containsKey(eventType)) {
+            return false;
+        }
+        
+        boolean removed = handlers.get(eventType).remove(handler);
+        if (handlers.get(eventType).isEmpty()) {
+            handlers.remove(eventType);
+        }
+        
+        return removed;
     }
-  }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public <T extends DomainEvent> void registerHandler(Class<T> eventType, EventHandler<T> handler) {
-    List<EventHandler<? extends DomainEvent>> eventHandlers =
-        handlers.computeIfAbsent(eventType, k -> new CopyOnWriteArrayList<>());
-
-    eventHandlers.add(handler);
-    logger.debug(
-        "Registered handler {} for event type: {}",
-        handler.getClass().getSimpleName(),
-        eventType.getSimpleName());
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public <T extends DomainEvent> void registerHandler(
-      Class<T> eventType, java.util.function.Consumer<T> handler) {
-    // Create an adapter from the consumer to the EventHandler interface
-    EventHandler<T> handlerAdapter = event -> handler.accept(event);
-
-    registerHandler(eventType, handlerAdapter);
-    logger.debug("Registered consumer handler for event type: {}", eventType.getSimpleName());
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public <T extends DomainEvent> void unregisterHandler(
-      Class<T> eventType, EventHandler<T> handler) {
-    List<EventHandler<? extends DomainEvent>> eventHandlers = handlers.get(eventType);
-    if (eventHandlers != null) {
-      eventHandlers.remove(handler);
-      logger.debug(
-          "Unregistered handler {} for event type: {}",
-          handler.getClass().getSimpleName(),
-          eventType.getSimpleName());
+    @Override
+    public int dispatchEvent(String eventType, String source, String payload, Map<String, String> properties) {
+        if (!handlers.containsKey(eventType)) {
+            // No handlers for this event type
+            return 0;
+        }
+        
+        int handlerCount = 0;
+        
+        // Notify all handlers
+        for (EventHandler handler : handlers.get(eventType)) {
+            try {
+                // Check if the handler is interested in this event type
+                boolean shouldHandle = false;
+                String[] handlerEventTypes = handler.getEventTypes();
+                if (handlerEventTypes != null) {
+                    for (String type : handlerEventTypes) {
+                        if (type.equals(eventType) || type.equals("*")) {
+                            shouldHandle = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (shouldHandle) {
+                    handler.handleEvent(eventType, source, payload, properties);
+                    handlerCount++;
+                }
+            } catch (Exception e) {
+                // Log the exception but continue processing other handlers
+                if (logger != null) {
+                    logger.error("Error in event handler for type " + eventType + ": " + e.getMessage(), e);
+                } else {
+                    System.err.println("Error in event handler for type " + eventType + ": " + e.getMessage());
+                }
+            }
+        }
+        
+        return handlerCount;
     }
-  }
+    
+    /**
+     * Utility method to dispatch an event with a map of data
+     * 
+     * @param eventType The type of event
+     * @param eventData The event data
+     * @return true if dispatched successfully
+     */
+    public boolean dispatchEvent(String eventType, Map<String, Object> eventData) {
+        String source = (String) eventData.getOrDefault("source", "system");
+        String payload = (String) eventData.getOrDefault("payload", "{}");
+        
+        // Convert to string map for properties
+        Map<String, String> properties = new HashMap<>();
+        for (Map.Entry<String, Object> entry : eventData.entrySet()) {
+            if (entry.getValue() != null) {
+                properties.put(entry.getKey(), entry.getValue().toString());
+            }
+        }
+        
+        return dispatchEvent(eventType, source, payload, properties) > 0;
+    }
 }

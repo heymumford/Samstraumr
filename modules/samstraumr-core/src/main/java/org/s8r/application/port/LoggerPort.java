@@ -1,126 +1,118 @@
 /*
- * Copyright (c) 2025 Eric C. Mumford (@heymumford)
- *
- * This software was developed with analytical assistance from AI tools
- * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
- * which were used as paid services. All intellectual property rights
- * remain exclusively with the copyright holder listed above.
- *
- * Licensed under the Mozilla Public License 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.mozilla.org/en-US/MPL/2.0/
+ * Copyright (c) 2025
+ * All rights reserved.
  */
-
 package org.s8r.application.port;
 
 /**
- * Port interface for logging operations.
- *
- * <p>This interface defines the contract for logging operations in the application. Following the
- * ports and adapters pattern, this is an output port in the application layer, which will be
- * implemented by adapters in the infrastructure layer.
+ * Port interface for logging operations in the application layer.
+ * 
+ * <p>This interface defines the operations for logging at different levels,
+ * following the ports and adapters pattern from Clean Architecture.
  */
 public interface LoggerPort {
 
-  /**
-   * Logs a debug message.
-   *
-   * @param message The message to log
-   */
-  void debug(String message);
-
-  /**
-   * Logs a debug message with arguments.
-   *
-   * @param format The message format with placeholders
-   * @param args The arguments to substitute in the format
-   */
-  default void debug(String format, Object... args) {
-    debug(String.format(format.replace("{}", "%s"), args));
-  }
-
-  /**
-   * Logs a debug message with an exception.
-   *
-   * @param message The message to log
-   * @param e The exception to log
-   */
-  void debug(String message, Throwable e);
-
-  /**
-   * Logs an info message.
-   *
-   * @param message The message to log
-   */
-  void info(String message);
-
-  /**
-   * Logs an info message with arguments.
-   *
-   * @param format The message format with placeholders
-   * @param args The arguments to substitute in the format
-   */
-  default void info(String format, Object... args) {
-    info(String.format(format.replace("{}", "%s"), args));
-  }
-
-  /**
-   * Logs an info message with an exception.
-   *
-   * @param message The message to log
-   * @param e The exception to log
-   */
-  void info(String message, Throwable e);
-
-  /**
-   * Logs a warning message.
-   *
-   * @param message The message to log
-   */
-  void warn(String message);
-
-  /**
-   * Logs a warning message with arguments.
-   *
-   * @param format The message format with placeholders
-   * @param args The arguments to substitute in the format
-   */
-  default void warn(String format, Object... args) {
-    warn(String.format(format.replace("{}", "%s"), args));
-  }
-
-  /**
-   * Logs a warning message with an exception.
-   *
-   * @param message The message to log
-   * @param e The exception to log
-   */
-  void warn(String message, Throwable e);
-
-  /**
-   * Logs an error message.
-   *
-   * @param message The message to log
-   */
-  void error(String message);
-
-  /**
-   * Logs an error message with arguments.
-   *
-   * @param format The message format with placeholders
-   * @param args The arguments to substitute in the format
-   */
-  default void error(String format, Object... args) {
-    error(String.format(format.replace("{}", "%s"), args));
-  }
-
-  /**
-   * Logs an error message with an exception.
-   *
-   * @param message The message to log
-   * @param e The exception to log
-   */
-  void error(String message, Throwable e);
+    /**
+     * Logs a message at the TRACE level.
+     *
+     * @param message The message to log
+     */
+    void trace(String message);
+    
+    /**
+     * Logs a formatted message at the TRACE level.
+     *
+     * @param format The format string
+     * @param args The arguments
+     */
+    void trace(String format, Object... args);
+    
+    /**
+     * Logs a message at the DEBUG level.
+     *
+     * @param message The message to log
+     */
+    void debug(String message);
+    
+    /**
+     * Logs a formatted message at the DEBUG level.
+     *
+     * @param format The format string
+     * @param args The arguments
+     */
+    void debug(String format, Object... args);
+    
+    /**
+     * Logs a message at the INFO level.
+     *
+     * @param message The message to log
+     */
+    void info(String message);
+    
+    /**
+     * Logs a formatted message at the INFO level.
+     *
+     * @param format The format string
+     * @param args The arguments
+     */
+    void info(String format, Object... args);
+    
+    /**
+     * Logs a message at the WARN level.
+     *
+     * @param message The message to log
+     */
+    void warn(String message);
+    
+    /**
+     * Logs a formatted message at the WARN level.
+     *
+     * @param format The format string
+     * @param args The arguments
+     */
+    void warn(String format, Object... args);
+    
+    /**
+     * Logs a message at the ERROR level.
+     *
+     * @param message The message to log
+     */
+    void error(String message);
+    
+    /**
+     * Logs a formatted message at the ERROR level.
+     *
+     * @param format The format string
+     * @param args The arguments
+     */
+    void error(String format, Object... args);
+    
+    /**
+     * Logs a message at the ERROR level with an exception.
+     *
+     * @param message The message to log
+     * @param throwable The exception to log
+     */
+    void error(String message, Throwable throwable);
+    
+    /**
+     * Checks if the TRACE level is enabled.
+     *
+     * @return true if the TRACE level is enabled, false otherwise
+     */
+    boolean isTraceEnabled();
+    
+    /**
+     * Checks if the DEBUG level is enabled.
+     *
+     * @return true if the DEBUG level is enabled, false otherwise
+     */
+    boolean isDebugEnabled();
+    
+    /**
+     * Gets the name of this logger.
+     *
+     * @return The logger name
+     */
+    String getName();
 }

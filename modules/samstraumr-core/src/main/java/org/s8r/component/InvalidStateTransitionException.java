@@ -15,30 +15,44 @@
 
 package org.s8r.component;
 
-import org.s8r.core.tube.LifecycleState;
-
 /**
  * Exception thrown when a component attempts an invalid state transition.
  *
  * <p>This exception indicates that a state transition was requested that doesn't follow the allowed
  * path through the component lifecycle states.
  */
-public class InvalidStateTransitionException extends ComponentException {
+public class InvalidStateTransitionException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
-  private final LifecycleState fromState;
-  private final LifecycleState toState;
+  private final State fromState;
+  private final State toState;
+  private final String componentId;
 
   /**
    * Creates a new InvalidStateTransitionException with the specified from and to states.
    *
+   * @param message The error message
+   * @param componentId The ID of the component
    * @param fromState The current state
    * @param toState The target state that can't be transitioned to
    */
-  public InvalidStateTransitionException(LifecycleState fromState, LifecycleState toState) {
-    super(String.format("Invalid state transition from %s to %s", fromState, toState));
+  public InvalidStateTransitionException(String message, String componentId, State fromState, State toState) {
+    super(message);
+    this.componentId = componentId;
     this.fromState = fromState;
     this.toState = toState;
+  }
+  
+  /**
+   * Creates a new InvalidStateTransitionException with default message.
+   *
+   * @param componentId The ID of the component
+   * @param fromState The current state
+   * @param toState The target state that can't be transitioned to
+   */
+  public InvalidStateTransitionException(String componentId, State fromState, State toState) {
+    this(String.format("Invalid state transition from %s to %s", fromState, toState), 
+         componentId, fromState, toState);
   }
 
   /**
@@ -46,7 +60,7 @@ public class InvalidStateTransitionException extends ComponentException {
    *
    * @return The current state
    */
-  public LifecycleState getFromState() {
+  public State getCurrentState() {
     return fromState;
   }
 
@@ -55,7 +69,16 @@ public class InvalidStateTransitionException extends ComponentException {
    *
    * @return The target state
    */
-  public LifecycleState getToState() {
+  public State getTargetState() {
     return toState;
+  }
+  
+  /**
+   * Gets the component ID.
+   *
+   * @return The component ID
+   */
+  public String getComponentId() {
+    return componentId;
   }
 }

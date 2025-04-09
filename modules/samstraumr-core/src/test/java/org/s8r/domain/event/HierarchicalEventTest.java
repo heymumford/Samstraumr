@@ -19,7 +19,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,7 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.s8r.application.port.EventDispatcher;
-import org.s8r.application.port.EventDispatcher.EventHandler;
+import org.s8r.application.port.EventHandler;
 import org.s8r.application.port.LoggerPort;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.infrastructure.event.InMemoryEventDispatcher;
@@ -50,10 +52,10 @@ public class HierarchicalEventTest {
   private EventDispatcher eventDispatcher;
 
   // Test event handlers
-  private TestEventHandler<DomainEvent> baseEventHandler;
-  private TestEventHandler<ComponentEvent> componentEventHandler;
-  private TestEventHandler<ComponentCreatedEvent> createdEventHandler;
-  private TestEventHandler<ComponentStateChangedEvent> stateChangedEventHandler;
+  private TestEventHandler baseEventHandler;
+  private TestEventHandler componentEventHandler;
+  private TestEventHandler createdEventHandler;
+  private TestEventHandler stateChangedEventHandler;
 
   @BeforeEach
   void setUp() {
@@ -63,16 +65,16 @@ public class HierarchicalEventTest {
     eventDispatcher = new InMemoryEventDispatcher(mockLogger);
 
     // Create test event handlers
-    baseEventHandler = new TestEventHandler<>();
-    componentEventHandler = new TestEventHandler<>();
-    createdEventHandler = new TestEventHandler<>();
-    stateChangedEventHandler = new TestEventHandler<>();
+    baseEventHandler = new TestEventHandler("domain.event");
+    componentEventHandler = new TestEventHandler("component.event");
+    createdEventHandler = new TestEventHandler("component.created");
+    stateChangedEventHandler = new TestEventHandler("component.state.changed");
 
     // Register the event handlers
-    eventDispatcher.registerHandler(DomainEvent.class, baseEventHandler);
-    eventDispatcher.registerHandler(ComponentEvent.class, componentEventHandler);
-    eventDispatcher.registerHandler(ComponentCreatedEvent.class, createdEventHandler);
-    eventDispatcher.registerHandler(ComponentStateChangedEvent.class, stateChangedEventHandler);
+    eventDispatcher.registerHandler("domain.event", baseEventHandler);
+    eventDispatcher.registerHandler("component.event", componentEventHandler);
+    eventDispatcher.registerHandler("component.created", createdEventHandler);
+    eventDispatcher.registerHandler("component.state.changed", stateChangedEventHandler);
   }
 
   @Nested
@@ -326,15 +328,33 @@ public class HierarchicalEventTest {
    *
    * @param <T> The type of event this handler handles
    */
-  private static class TestEventHandler<T extends DomainEvent> implements EventHandler<T> {
-    private final List<T> receivedEvents = new ArrayList<>();
-
-    @Override
-    public void handle(T event) {
-      receivedEvents.add(event);
+  private static class TestEventHandler implements EventHandler {
+    private final List<DomainEvent> receivedEvents = new ArrayList<>();
+    private final String[] eventTypes;
+    
+    public TestEventHandler(String... eventTypes) {
+      this.eventTypes = eventTypes != null ? eventTypes : new String[]{"*"};
     }
 
-    public List<T> getReceivedEvents() {
+    @Override
+    public void handleEvent(String eventType, String source, String payload, Map<String, String> properties) {
+      // Create a simple domain event to track what was received
+      ComponentId componentId = ComponentId.create(source);
+      DomainEvent event = new DomainEvent() {
+        @Override
+        public String getEventType() {
+          return eventType;
+        }
+      };
+      receivedEvents.add(event);
+    }
+    
+    @Override
+    public String[] getEventTypes() {
+      return eventTypes;
+    }
+
+    public List<DomainEvent> getReceivedEvents() {
       return receivedEvents;
     }
   }
