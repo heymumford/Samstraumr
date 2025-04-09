@@ -34,6 +34,16 @@ public enum DeliveryStatus {
     REJECTED,
     
     /**
+     * The notification was scheduled for future delivery.
+     */
+    SCHEDULED,
+    
+    /**
+     * The notification was canceled before delivery.
+     */
+    CANCELED,
+    
+    /**
      * The notification delivery status is unknown.
      */
     UNKNOWN

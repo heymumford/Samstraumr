@@ -27,6 +27,7 @@ Licensed under the Mozilla Public License 2.0
   <modules>
     <module>modules</module>
     <module>test-module</module>
+    <module>test-port-interfaces</module>
   </modules>
 
   <properties>

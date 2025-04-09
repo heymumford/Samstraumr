@@ -23,6 +23,8 @@ import io.cucumber.junit.platform.engine.Constants;
  * <ul>
  *   <li>Cache and FileSystem Integration - For persistent caching functionality</li>
  *   <li>Event and Notification Integration - For events triggering notifications</li>
+ *   <li>Validation and Persistence Integration - For data validation before storage</li>
+ *   <li>DataFlow and Messaging Integration - For connecting component data flows with messaging systems</li>
  * </ul>
  * 
  * <p>These integration tests ensure that the port interfaces can work together

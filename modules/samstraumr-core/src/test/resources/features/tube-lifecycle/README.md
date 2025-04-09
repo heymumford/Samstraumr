@@ -31,6 +31,16 @@ The tube lifecycle tests verify the behavior of tubes as they progress through t
 - `infancy-phase-tests.feature` - Tests for the infancy lifecycle phase
 - `pre-conception-phase-tests.feature` - Tests for pre-conception state
 - `tube-initialization-tests.feature` - Tests for tube initialization process
+- `tube-survival-strategies.feature` - Tests for tube survival strategies (immortality vs. reproduction)
+
+## Survival Strategies
+
+The tube survival strategies tests implement the conceptual model where tubes have two fundamental survival approaches: immortality and reproduction. The choice between these strategies is determined by environmental conditions:
+
+- In harsh or unfavorable environments, tubes choose immortality with self-sufficiency and self-management
+- In favorable environments, tubes choose reproduction, transferring essential knowledge to offspring before terminating
+
+These tests employ comprehensive pairwise analysis to verify tube behavior across different environmental conditions and strategy combinations.
 
 ## Related Directories
 

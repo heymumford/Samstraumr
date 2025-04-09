@@ -94,3 +94,88 @@ Feature: Configuration Port Interface
     Given a configuration service with default properties
     When I clear all configuration properties
     Then the configuration should be empty
+
+  @Error
+  Scenario: Handle loading configuration from nonexistent file
+    Given a configuration service
+    When I load a configuration file from path "nonexistent.properties"
+    Then the load operation should fail with appropriate error
+    And the configuration should remain empty
+
+  @Error
+  Scenario: Handle saving configuration to invalid location
+    Given a configuration service with default properties
+    When I save the configuration to path "/invalid/location/config.properties"
+    Then the save operation should fail with appropriate error
+    And the error details should be logged
+
+  @Error
+  Scenario: Handle parsing invalid integer values
+    Given a configuration service
+    When I set a string property "invalid.integer" to "not-a-number"
+    Then getting an integer value for "invalid.integer" should return empty
+    But getting an integer value with default 42 should return 42
+
+  @Error
+  Scenario: Handle parsing invalid boolean values
+    Given a configuration service
+    When I set a string property "invalid.boolean" to "not-a-boolean"
+    Then getting a boolean value for "invalid.boolean" should return empty
+    But getting a boolean value with default true should return true
+
+  @Error
+  Scenario: Handle loading malformed properties file
+    Given a configuration service
+    And a malformed properties file
+    When I attempt to load the malformed properties file
+    Then the load operation should fail with appropriate error
+    And the error details should contain "malformed"
+
+  @ChangeListener
+  Scenario: Register and notify configuration change listener
+    Given a configuration service with default properties
+    When I register a configuration change listener
+    And I set a string property "test.property" to "new-value"
+    Then the configuration change listener should be notified
+    And the listener should receive the correct key "test.property"
+    And the listener should receive the correct value "new-value"
+    And the listener should receive the correct change type "SET"
+
+  @ChangeListener
+  Scenario: Listener notification on property removal
+    Given a configuration service with default properties
+    When I register a configuration change listener
+    And I remove the property "app.name"
+    Then the configuration change listener should be notified
+    And the listener should receive the correct key "app.name"
+    And the listener should receive null value
+    And the listener should receive the correct change type "REMOVE"
+
+  @ChangeListener
+  Scenario: Multiple listeners for configuration changes
+    Given a configuration service with default properties
+    When I register 3 configuration change listeners
+    And I set a string property "multi.test" to "notify-all"
+    Then all 3 listeners should be notified about the change
+    And each listener should receive the correct key and value
+
+  @ChangeListener
+  Scenario: Unregister configuration change listener
+    Given a configuration service with default properties
+    When I register a configuration change listener
+    And I unregister the configuration change listener
+    And I set a string property "test.after.unregister" to "should-not-notify"
+    Then the configuration change listener should not be notified
+
+  @Performance
+  Scenario: Performance test for property access
+    Given a configuration service with 1000 properties
+    When I measure the time to retrieve 100 random properties
+    Then the average access time should be less than 1 millisecond per property
+    
+  @RaceCondition
+  Scenario: Thread safety for concurrent property updates
+    Given a configuration service with default properties
+    When 10 threads concurrently update 100 properties each
+    Then no data should be lost or corrupted
+    And final property count should match expected count

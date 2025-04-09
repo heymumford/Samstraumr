@@ -1,0 +1,592 @@
+#!/usr/bin/env bash
+#==============================================================================
+# Filename: s8r-build-orchestrator
+# Description: Unified build orchestration system for Samstraumr framework
+#
+# This script provides a centralized entry point for all build, test, and release
+# operations, ensuring consistent version management, build orchestration, and
+# reporting across the entire project.
+#==============================================================================
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+
+# Source unified common library
+source "${PROJECT_ROOT}/util/lib/unified-common.sh"
+
+# Initialize configuration
+VERSION_FILE="${PROJECT_ROOT}/modules/version.properties"
+OUTPUT_DIR="${PROJECT_ROOT}/build-reports"
+TIMESTAMP=$(date "+%Y%m%d_%H%M%S")
+REPORT_FILE="${OUTPUT_DIR}/build_report_${TIMESTAMP}.md"
+LOG_FILE="${OUTPUT_DIR}/build_log_${TIMESTAMP}.txt"
+
+# Initialize variables
+BUILD_MODE="compile"
+CLEAN_BUILD=false
+RUN_TESTS=false
+TEST_TYPE="all"
+SKIP_QUALITY=false
+SKIP_VERSIONING=false
+INCREMENT_BUILD=true
+DEBUG_MODE=false
+GENERATE_REPORT=true
+VERBOSE=false
+CUSTOM_TAGS=""
+ADDITIONAL_ARGS=""
+
+#------------------------------------------------------------------------------
+# Helper Functions
+#------------------------------------------------------------------------------
+
+# Display help information
+show_help() {
+  print_header "Samstraumr Build Orchestrator"
+  echo
+  print_section "Usage"
+  echo "  ${0} [options] [build-mode]"
+  echo
+  print_section "Build Modes"
+  echo "  compile        Compile the project (default)"
+  echo "  test           Compile and test the project"
+  echo "  verify         Run all tests including integration tests"
+  echo "  package        Create distribution packages"
+  echo "  install        Install packages to local Maven repository"
+  echo "  deploy         Deploy packages to remote repository"
+  echo
+  print_section "Options"
+  echo "  -c, --clean             Clean before building"
+  echo "  -t, --test <type>       Run specific test type (all, unit, component, integration)"
+  echo "  -p, --profile <name>    Use specific Maven profile"
+  echo "  -s, --skip-quality      Skip quality checks"
+  echo "  -n, --no-version        Skip version increment"
+  echo "  -d, --debug             Enable debug mode"
+  echo "  -v, --verbose           Enable verbose output"
+  echo "  --tags <tag-expr>       Specify test tags (e.g. \"@L1_Component and @Identity\")"
+  echo "  --skip-report           Skip report generation"
+  echo "  --mvn-args <args>       Additional Maven arguments (quote if multiple)"
+  echo "  -h, --help              Show this help message"
+  echo
+  print_section "Examples"
+  echo "  ${0} compile            # Compile the project"
+  echo "  ${0} test --clean       # Clean and run all tests"
+  echo "  ${0} test --test unit   # Run only unit tests"
+  echo "  ${0} package --profile prod  # Package with production profile"
+  echo
+}
+
+# Parse command line arguments
+parse_arguments() {
+  # If no arguments are provided, use default settings
+  if [[ $# -eq 0 ]]; then
+    BUILD_MODE="compile"
+    return
+  fi
+
+  # First positional argument might be the build mode
+  if [[ "${1}" =~ ^(compile|test|verify|package|install|deploy)$ ]]; then
+    BUILD_MODE="${1}"
+    shift
+  fi
+
+  # Parse remaining options
+  while [[ $# -gt 0 ]]; do
+    case "${1}" in
+      -h|--help)
+        show_help
+        exit 0
+        ;;
+      -c|--clean)
+        CLEAN_BUILD=true
+        shift
+        ;;
+      -t|--test)
+        RUN_TESTS=true
+        if [[ -n "${2}" && ! "${2}" =~ ^- ]]; then
+          TEST_TYPE="${2}"
+          shift 2
+        else
+          TEST_TYPE="all"
+          shift
+        fi
+        ;;
+      -p|--profile)
+        if [[ -n "${2}" && ! "${2}" =~ ^- ]]; then
+          PROFILE="${2}"
+          shift 2
+        else
+          print_error "Profile name required after -p/--profile"
+          exit 1
+        fi
+        ;;
+      -s|--skip-quality)
+        SKIP_QUALITY=true
+        shift
+        ;;
+      -n|--no-version)
+        SKIP_VERSIONING=true
+        INCREMENT_BUILD=false
+        shift
+        ;;
+      -d|--debug)
+        DEBUG_MODE=true
+        shift
+        ;;
+      -v|--verbose)
+        VERBOSE=true
+        shift
+        ;;
+      --tags)
+        if [[ -n "${2}" && ! "${2}" =~ ^- ]]; then
+          CUSTOM_TAGS="${2}"
+          shift 2
+        else
+          print_error "Tag expression required after --tags"
+          exit 1
+        fi
+        ;;
+      --skip-report)
+        GENERATE_REPORT=false
+        shift
+        ;;
+      --mvn-args)
+        if [[ -n "${2}" && ! "${2}" =~ ^- ]]; then
+          ADDITIONAL_ARGS="${2}"
+          shift 2
+        else
+          print_error "Arguments required after --mvn-args"
+          exit 1
+        fi
+        ;;
+      *)
+        print_error "Unknown option: ${1}"
+        show_help
+        exit 1
+        ;;
+    esac
+  done
+
+  # If build mode is test or verify, enable RUN_TESTS
+  if [[ "${BUILD_MODE}" == "test" || "${BUILD_MODE}" == "verify" ]]; then
+    RUN_TESTS=true
+  fi
+}
+
+# Ensure the output directory exists
+ensure_output_directories() {
+  mkdir -p "${OUTPUT_DIR}"
+  
+  # Create reports subdirectories if they don't exist
+  mkdir -p "${OUTPUT_DIR}/coverage"
+  mkdir -p "${OUTPUT_DIR}/tests"
+}
+
+# Get current version information
+get_version_info() {
+  if [[ ! -f "${VERSION_FILE}" ]]; then
+    print_error "Version file not found: ${VERSION_FILE}"
+    exit 1
+  fi
+
+  VERSION=$(grep "samstraumr.version=" "${VERSION_FILE}" | cut -d= -f2)
+  BUILD_NUMBER=$(grep "samstraumr.build.number=" "${VERSION_FILE}" | cut -d= -f2)
+  LAST_UPDATED=$(grep "samstraumr.last.updated=" "${VERSION_FILE}" | cut -d= -f2)
+
+  # Validate version format
+  if ! [[ "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    print_error "Invalid version format: ${VERSION}"
+    exit 1
+  fi
+
+  # Validate build number
+  if ! [[ "${BUILD_NUMBER}" =~ ^[0-9]+$ ]]; then
+    print_warning "Invalid build number format: ${BUILD_NUMBER}, defaulting to 1"
+    BUILD_NUMBER=1
+  fi
+
+  print_debug "Current version: ${VERSION} (Build: ${BUILD_NUMBER})"
+}
+
+# Increment the build number
+increment_build_number() {
+  if [[ "${INCREMENT_BUILD}" != "true" ]]; then
+    print_info "Skipping build number increment"
+    return
+  fi
+
+  NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
+  print_info "Incrementing build number from ${BUILD_NUMBER} to ${NEW_BUILD_NUMBER}"
+  
+  # Update build number in version.properties
+  sed -i "s/^samstraumr.build.number=.*/samstraumr.build.number=${NEW_BUILD_NUMBER}/" "${VERSION_FILE}"
+  
+  # Update last updated date
+  CURRENT_DATE=$(date "+%B %d, %Y")
+  sed -i "s/^samstraumr.last.updated=.*/samstraumr.last.updated=${CURRENT_DATE}/" "${VERSION_FILE}"
+  
+  # Update build number variable for reporting
+  BUILD_NUMBER="${NEW_BUILD_NUMBER}"
+}
+
+# Run Maven build with proper arguments
+run_maven_build() {
+  local maven_args=()
+  
+  # Add clean if requested
+  if [[ "${CLEAN_BUILD}" == "true" ]]; then
+    maven_args+=("clean")
+  fi
+  
+  # Add build mode
+  maven_args+=("${BUILD_MODE}")
+  
+  # Add profile if specified
+  if [[ -n "${PROFILE}" ]]; then
+    maven_args+=("-P" "${PROFILE}")
+  fi
+  
+  # Skip quality checks if requested
+  if [[ "${SKIP_QUALITY}" == "true" ]]; then
+    maven_args+=("-Dskip.quality.checks=true")
+  fi
+  
+  # Add verbose flag if needed
+  if [[ "${VERBOSE}" == "true" ]]; then
+    maven_args+=("-e")
+  else
+    maven_args+=("-q")
+  fi
+  
+  # Add additional args if specified
+  if [[ -n "${ADDITIONAL_ARGS}" ]]; then
+    maven_args+=("${ADDITIONAL_ARGS}")
+  fi
+  
+  # Print the command being executed
+  print_info "Running: mvn ${maven_args[*]}"
+  
+  # Set Maven options for memory
+  setup_maven_opts
+  
+  # Execute Maven command
+  local start_time=$(date +%s)
+  
+  mvn "${maven_args[@]}" | tee -a "${LOG_FILE}"
+  BUILD_RESULT=${PIPESTATUS[0]}
+  
+  local end_time=$(date +%s)
+  local duration=$((end_time - start_time))
+  
+  # Record build time for reporting
+  BUILD_DURATION="${duration}"
+  
+  return ${BUILD_RESULT}
+}
+
+# Run tests based on configuration
+run_tests() {
+  if [[ "${RUN_TESTS}" != "true" ]]; then
+    print_info "Skipping tests"
+    return 0
+  fi
+  
+  print_header "Running Tests: ${TEST_TYPE}"
+  
+  local test_args=("test")
+  
+  # Set test type
+  if [[ -n "${TEST_TYPE}" && "${TEST_TYPE}" != "all" ]]; then
+    test_args+=("-Dtest.type=${TEST_TYPE}")
+  fi
+  
+  # Add custom tags if specified
+  if [[ -n "${CUSTOM_TAGS}" ]]; then
+    test_args+=("-Dcucumber.filter.tags=\"${CUSTOM_TAGS}\"")
+  fi
+  
+  # Add skip-quality flag if specified
+  if [[ "${SKIP_QUALITY}" == "true" ]]; then
+    test_args+=("-Dskip.quality.checks=true")
+  fi
+  
+  # Add verbose flag if needed
+  if [[ "${VERBOSE}" == "true" ]]; then
+    test_args+=("-e")
+  else
+    test_args+=("-q")
+  fi
+  
+  # Record test results
+  local test_output="${OUTPUT_DIR}/tests/test_results_${TIMESTAMP}.txt"
+  
+  # Print the command being executed
+  print_info "Running: ${PROJECT_ROOT}/s8r-test ${TEST_TYPE} -o ${test_output}"
+  
+  # Execute test command
+  local start_time=$(date +%s)
+  
+  if "${PROJECT_ROOT}/s8r-test" "${TEST_TYPE}" -o "${test_output}"; then
+    TEST_RESULT=0
+  else
+    TEST_RESULT=1
+  fi
+  
+  local end_time=$(date +%s)
+  local duration=$((end_time - start_time))
+  
+  # Record test time and output location for reporting
+  TEST_DURATION="${duration}"
+  TEST_OUTPUT_FILE="${test_output}"
+  
+  return ${TEST_RESULT}
+}
+
+# Collect test metrics for reporting
+collect_test_metrics() {
+  if [[ "${RUN_TESTS}" != "true" || ! -f "${TEST_OUTPUT_FILE}" ]]; then
+    return
+  fi
+  
+  # Extract test metrics from the output file
+  TESTS_TOTAL=$(grep -c "Running test:" "${TEST_OUTPUT_FILE}" || echo "0")
+  TESTS_PASSED=$(grep -c "Tests run: .*, Failures: 0, Errors: 0" "${TEST_OUTPUT_FILE}" || echo "0")
+  TESTS_FAILED=$((TESTS_TOTAL - TESTS_PASSED))
+  
+  # Extract coverage if available
+  if grep -q "Overall coverage:" "${TEST_OUTPUT_FILE}"; then
+    COVERAGE=$(grep "Overall coverage:" "${TEST_OUTPUT_FILE}" | sed -E 's/.*Overall coverage: ([0-9.]+)%.*/\1/')
+  else
+    COVERAGE="N/A"
+  fi
+}
+
+# Commit version changes to Git
+commit_version_changes() {
+  if [[ "${INCREMENT_BUILD}" != "true" ]]; then
+    return
+  fi
+  
+  if ! is_git_repo; then
+    print_warning "Not in a Git repository, skipping commit"
+    return
+  fi
+  
+  # Check if there are changes to commit
+  if ! has_git_changes; then
+    print_debug "No changes to commit"
+    return
+  fi
+  
+  print_info "Committing version changes to Git"
+  
+  # Stage the version file
+  git add "${VERSION_FILE}"
+  
+  # Create commit with message
+  git commit -m "chore: increment build number to ${BUILD_NUMBER} [ci skip]"
+  
+  # Optional: Push changes
+  if [[ "${GIT_PUSH}" == "true" ]]; then
+    git push
+  fi
+}
+
+# Generate build summary report
+generate_report() {
+  if [[ "${GENERATE_REPORT}" != "true" ]]; then
+    return
+  fi
+  
+  print_header "Generating Build Report"
+  
+  # Collect metrics for report
+  collect_test_metrics
+  
+  # Set up report header
+  local report_header=$(cat << EOF
+# Samstraumr Build Report
+
+- **Date:** $(date "+%Y-%m-%d %H:%M:%S")
+- **Version:** ${VERSION}
+- **Build:** ${BUILD_NUMBER}
+- **Mode:** ${BUILD_MODE}
+
+## Build Information
+
+- **Clean Build:** ${CLEAN_BUILD}
+- **Profile:** ${PROFILE:-"default"}
+- **Build Duration:** $(format_duration ${BUILD_DURATION})
+- **Build Result:** $(if [[ ${BUILD_RESULT} -eq 0 ]]; then echo "✅ Success"; else echo "❌ Failed"; fi)
+
+## Git Information
+
+- **Branch:** $(get_git_branch)
+- **Commit:** $(git rev-parse --short HEAD)
+- **Status:** $(if has_git_changes; then echo "Uncommitted changes"; else echo "Clean"; fi)
+
+EOF
+)
+
+  # Add test section if tests were run
+  if [[ "${RUN_TESTS}" == "true" ]]; then
+    local test_section=$(cat << EOF
+
+## Test Results
+
+- **Test Type:** ${TEST_TYPE}
+- **Tests Run:** ${TESTS_TOTAL}
+- **Tests Passed:** ${TESTS_PASSED}
+- **Tests Failed:** ${TESTS_FAILED}
+- **Test Duration:** $(format_duration ${TEST_DURATION})
+- **Coverage:** ${COVERAGE}%
+- **Test Output:** [View Test Log](${TEST_OUTPUT_FILE})
+
+EOF
+)
+    report_header="${report_header}${test_section}"
+  fi
+
+  # Add artifact information
+  if [[ "${BUILD_MODE}" == "package" || "${BUILD_MODE}" == "install" || "${BUILD_MODE}" == "deploy" ]]; then
+    # Get artifact information
+    local artifact_id=$(get_maven_property "${PROJECT_ROOT}/pom.xml" "artifactId")
+    local group_id=$(get_maven_property "${PROJECT_ROOT}/pom.xml" "groupId")
+    
+    local artifact_section=$(cat << EOF
+
+## Artifacts
+
+- **Group ID:** ${group_id}
+- **Artifact ID:** ${artifact_id}
+- **Version:** ${VERSION}-b${BUILD_NUMBER}
+- **Location:** ${PROJECT_ROOT}/modules/target/${artifact_id}-${VERSION}.jar
+
+EOF
+)
+    report_header="${report_header}${artifact_section}"
+  fi
+
+  # Add dependency information
+  local dependency_section=$(cat << EOF
+
+## Dependencies
+
+| Name | Version | Scope |
+|------|---------|-------|
+$(mvn dependency:list -DincludeScope=compile,runtime,test -DoutputFile=/tmp/deps.txt > /dev/null && grep "compile\|runtime\|test" /tmp/deps.txt | awk '{print "| " $2 " | " $4 " | " $3 " |"}')
+
+EOF
+)
+  report_header="${report_header}${dependency_section}"
+
+  # Write the report to file
+  echo "${report_header}" > "${REPORT_FILE}"
+  
+  # Display report location
+  print_success "Build report generated: ${REPORT_FILE}"
+}
+
+# Format duration in human-readable format
+format_duration() {
+  local seconds=$1
+  
+  if [[ $seconds -lt 60 ]]; then
+    echo "${seconds} seconds"
+  else
+    local minutes=$((seconds / 60))
+    local remaining_seconds=$((seconds % 60))
+    echo "${minutes} minutes ${remaining_seconds} seconds"
+  fi
+}
+
+# Display build summary to the console
+display_summary() {
+  print_header "Build Summary"
+  
+  echo "Version: ${VERSION} (Build: ${BUILD_NUMBER})"
+  echo "Build mode: ${BUILD_MODE}"
+  echo "Build result: $(if [[ ${BUILD_RESULT} -eq 0 ]]; then echo "✅ Success"; else echo "❌ Failed"; fi)"
+  echo "Build duration: $(format_duration ${BUILD_DURATION})"
+  
+  if [[ "${RUN_TESTS}" == "true" ]]; then
+    echo
+    echo "Tests run: ${TESTS_TOTAL}"
+    echo "Tests passed: ${TESTS_PASSED}"
+    echo "Tests failed: ${TESTS_FAILED}"
+    echo "Test duration: $(format_duration ${TEST_DURATION})"
+    echo "Coverage: ${COVERAGE}%"
+  fi
+  
+  if [[ "${GENERATE_REPORT}" == "true" ]]; then
+    echo
+    echo "Build report: ${REPORT_FILE}"
+    echo "Build log: ${LOG_FILE}"
+  fi
+}
+
+#------------------------------------------------------------------------------
+# Main Execution
+#------------------------------------------------------------------------------
+
+main() {
+  # Parse command line arguments
+  parse_arguments "$@"
+  
+  # Show debug information if requested
+  if [[ "${DEBUG_MODE}" == "true" ]]; then
+    VERBOSE=true
+    set -x
+  fi
+  
+  # Ensure output directories exist
+  ensure_output_directories
+  
+  # Display header
+  print_header "Samstraumr Build Orchestrator"
+  echo "Starting build: $(date)"
+  
+  # Get current version information
+  get_version_info
+  
+  # Increment build number
+  increment_build_number
+  
+  # Run the build
+  local start_time=$(date +%s)
+  
+  run_maven_build
+  BUILD_RESULT=$?
+  
+  # Run tests if requested
+  if [[ "${RUN_TESTS}" == "true" ]]; then
+    run_tests
+    TEST_RESULT=$?
+    
+    # Use test result as overall result if build succeeded
+    if [[ ${BUILD_RESULT} -eq 0 ]]; then
+      BUILD_RESULT=${TEST_RESULT}
+    fi
+  fi
+  
+  local end_time=$(date +%s)
+  local total_duration=$((end_time - start_time))
+  
+  # Generate build report
+  generate_report
+  
+  # Commit version changes if successful
+  if [[ ${BUILD_RESULT} -eq 0 ]]; then
+    commit_version_changes
+  fi
+  
+  # Display summary
+  display_summary
+  
+  # Set exit code
+  return ${BUILD_RESULT}
+}
+
+# Execute main function
+main "$@"
+exit $?

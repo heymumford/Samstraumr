@@ -182,11 +182,16 @@ Port interfaces follow Clean Architecture principles:
 The port interface test strategy incorporates:
 
 1. **BDD Approach**: Uses Gherkin feature files to define the expected behavior of ports
-2. **Contract Verification**: Ensures both the port interface and adapters adhere to the defined contract
-3. **Isolation**: Tests each port independently to validate its interface
-4. **Integration**: Tests combinations of ports to ensure they work together properly
+2. **Karate Integration**: Uses Karate testing framework for system-level testing of port interfaces
+3. **Contract Verification**: Ensures both the port interface and adapters adhere to the defined contract
+4. **Isolation**: Tests each port independently to validate its interface
+5. **Integration**: Tests combinations of ports to ensure they work together properly
 
-For more details, see [Port Interface Testing](port-interface-testing.md) and the [Port Interface Test Report](../test-reports/port-interface-test-report.md).
+For more details, see:
+- [Port Interface Testing](port-interface-testing.md)
+- [Port Interface Test Report](../test-reports/port-interface-test-report.md)
+- [Karate Testing Guide](karate-testing-guide.md)
+- [Karate Syntax Reference](karate-syntax-reference.md)
 
 ## Continuous Integration Strategy
 

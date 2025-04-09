@@ -1,136 +1,80 @@
-# XML Tools Reference
-
-This document provides reference information for the XML tools included in the Samstraumr project.
+# XML Standardization Tools Reference
 
 ## Overview
 
-The Samstraumr XML tools are designed to:
+This document describes the XML standardization tools available in the Samstraumr project, which help maintain consistent formatting and structure across XML files, particularly Maven POM files.
 
-1. Validate XML files, especially Maven POM files
-2. Fix common XML issues, such as `<n>` vs `<name>` in POM files
-3. Prevent XML errors from being committed
-4. Provide precise XML manipulation capabilities
+## Tools
 
-## Command Line Interface
+### s8r-xml-standardize (s8r-xml)
 
-The `s8r-xml` script provides a convenient interface to the XML utilities:
+**Purpose**: Standardize XML files with consistent formatting and detect common issues.
 
+**Location**: `/s8r-xml` (symlink to `/s8r-xml-standardize`)
+
+**Features**:
+- Formats XML files with consistent indentation
+- Validates required elements
+- Detects missing plugin versions
+- Finds duplicate dependencies and plugins
+- Identifies incorrect element names (e.g., `<n>` should be `<name>`)
+
+**Usage**:
 ```bash
-./s8r-xml <command> [options] [path]
+# Format all XML files
+./s8r-xml
+
+# Check only (no changes)
+./s8r-xml --check
+
+# Format only POM files
+./s8r-xml --pom-only
+
+# Verbose output
+./s8r-xml --verbose
+
+# Process a specific file
+./s8r-xml path/to/file.xml
 ```
 
-### Commands
+## Automated Checks
 
-- `validate`: Validate XML files
-- `fix`: Fix common XML problems
-- `check`: Check for XML issues without fixing them
-- `pom`: Check/fix POM files specifically
-- `help`: Show help message
+The XML standardization is integrated into the Git workflow via hooks:
 
-### Options
+1. **Pre-push Hook**: Runs the XML standardization check every 10 builds
+2. **Build Number Tracking**: Increments the build number in `modules/version.properties` on every push
+3. **Counter Mechanism**: Tracks which builds should trigger XML checks
 
-- `-r, --recursive`: Process directories recursively
-- `-v, --verbose`: Show verbose output
+### How it works
 
-### Examples
+1. The pre-push hook increments the build number in `version.properties`
+2. If the new build number is a multiple of 10, the XML check is performed
+3. If issues are found, the push is blocked until they're resolved
+4. A counter file (`.xml_check_counter`) tracks the check sequence
 
-```bash
-# Validate a specific POM file
-./s8r-xml validate ./modules/samstraumr-core/pom.xml
+## Common Issues Detected
 
-# Fix all POM files in the modules directory recursively
-./s8r-xml fix -r ./modules
+1. **Missing plugin versions**: All Maven plugins should specify explicit versions for reproducible builds
+2. **Duplicate dependencies**: Redundant dependencies that may cause conflicts
+3. **Duplicate plugins**: Multiple declarations of the same plugin
+4. **Invalid element names**: Using abbreviated elements like `<n>` instead of `<name>`
 
-# Check a specific POM file for issues
-./s8r-xml pom ./modules/samstraumr-core/pom.xml
+## Resolving Issues
 
-# Fix a specific POM file
-./s8r-xml pom --fix ./modules/samstraumr-core/pom.xml
-```
+When the XML standardization check fails, you have two options:
 
-## Pre-commit Hook
+1. **Automatic Fix**: Run `./s8r-xml` without the `--check` flag to automatically fix formatting issues
+2. **Manual Fix**: Edit the files directly to address structural issues like missing versions or duplicates
 
-The XML validation is integrated into the pre-commit hook to prevent XML issues from being committed:
+## Implementation Details
 
-1. When you commit XML files, the hook will:
-   - Validate XML syntax
-   - Check for `<n>` vs `<name>` issues in POM files
-   - Reject the commit if issues are found
+The XML standardization system uses [XMLStarlet](http://xmlstar.sourceforge.net/) for XML processing, which provides a command-line tool for querying, transforming, and validating XML documents.
 
-2. If an issue is found, the hook will:
-   - Display an error message
-   - Suggest a fix command
-   - Prevent the commit
+Key files:
+- `/s8r-xml-standardize`: Main standardization script
+- `/util/git/pre-push-hook.sh`: Git hook that runs the standardization check
+- `/util/git/install-hooks.sh`: Script to install the Git hooks
 
-3. To fix issues:
-   ```bash
-   ./s8r-xml fix <file-path>
-   ```
+## Configuration
 
-4. To bypass the hook (not recommended):
-   ```bash
-   git commit --no-verify
-   ```
-
-## Specialized XML Utilities
-
-### XML Validation
-
-For XML validation:
-
-```bash
-./util/scripts/check-pom-files.sh --action validate [path]
-```
-
-This will:
-- Check XML syntax
-- Validate against XML schema if available
-- Report any issues found
-
-### POM File Fixes
-
-For fixing POM files:
-
-```bash
-./util/scripts/fix-pom-tags.sh --fix [path]
-```
-
-This will:
-- Fix `<n>` tags to proper `<name>` tags
-- Validate XML after fixes
-- Report the changes made
-
-## Important Guidelines
-
-1. **Never abbreviate XML element names**
-   - Always use standard Maven element names (e.g., `<name>`, never `<n>`)
-   - Follow the XML schema for the file type
-
-2. **Validate XML files before committing**
-   - Run `./s8r-xml validate` on modified files
-   - Fix any issues found
-
-3. **Use XML-aware tools for editing**
-   - Avoid text-based search/replace on XML files
-   - Use XMLStarlet or xmllint for precise XML manipulation
-
-## Technical Details
-
-The XML tools are built on:
-
-- **XMLStarlet**: For precise XML manipulation
-- **xmllint**: For validation and formatting
-- **Bash scripts**: For workflow integration
-
-The library is located at `./util/lib/xml-lib.sh` and provides functions for:
-
-- XML validation
-- POM file analysis
-- XML element access and modification
-- Error reporting and fixing
-
-## Additional Resources
-
-- [Maven POM Reference](https://maven.apache.org/pom.html)
-- [XMLStarlet Documentation](http://xmlstar.sourceforge.net/doc.php)
-- [XML Schema Documentation](https://www.w3.org/XML/Schema)
+The frequency of XML checks can be adjusted by modifying the `XML_CHECK_FREQUENCY` variable in `/util/git/pre-push-hook.sh`. The default is set to 10 (every 10th build).

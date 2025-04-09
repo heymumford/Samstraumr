@@ -1,69 +1,48 @@
 /*
- * Copyright (c) 2025
- * All rights reserved.
+ * Copyright (c) 2025 Eric C. Mumford (@heymumford)
+ *
+ * This software was developed with analytical assistance from AI tools 
+ * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+ * which were used as paid services. All intellectual property rights 
+ * remain exclusively with the copyright holder listed above.
+ *
+ * Licensed under the Mozilla Public License 2.0
  */
+
 package org.s8r.application.port;
 
+import org.s8r.application.port.event.EventDeliveryResult;
+
+import java.util.List;
 import java.util.Map;
 
 /**
- * Port interface for event publishing operations in the application layer.
- * 
- * <p>This interface defines the operations for publishing events and subscribing to topics,
- * following the ports and adapters pattern from Clean Architecture.
+ * Port interface for event publishing operations.
  */
 public interface EventPublisherPort {
-
     /**
-     * Publishes an event to a topic.
+     * Publishes an event.
      *
-     * @param topic The topic to publish to
-     * @param eventType The type of the event
-     * @param payload The event payload
-     * @return true if the event was published successfully, false otherwise
+     * @param eventType The event type.
+     * @param eventData The event data.
+     * @return The result of the publish operation.
      */
-    boolean publishEvent(String topic, String eventType, String payload);
+    EventDeliveryResult publishEvent(String eventType, Map<String, Object> eventData);
     
     /**
-     * Publishes an event with additional properties.
+     * Publishes an event asynchronously.
      *
-     * @param topic The topic to publish to
-     * @param eventType The type of the event
-     * @param payload The event payload
-     * @param properties Additional properties for the event
-     * @return true if the event was published successfully, false otherwise
+     * @param eventType The event type.
+     * @param eventData The event data.
+     * @return The result of the publish operation.
      */
-    boolean publishEvent(String topic, String eventType, String payload, Map<String, String> properties);
+    EventDeliveryResult publishEventAsync(String eventType, Map<String, Object> eventData);
     
     /**
-     * Subscribes to events on a topic.
+     * Publishes multiple events.
      *
-     * @param topic The topic to subscribe to
-     * @param subscriber The subscriber to register
-     * @return A subscription ID
+     * @param events The events to publish.
+     * @return The results of the publish operations.
      */
-    String subscribe(String topic, EventSubscriber subscriber);
-    
-    /**
-     * Unsubscribes from a topic.
-     *
-     * @param subscriptionId The subscription ID to unsubscribe
-     * @return true if the unsubscription was successful, false otherwise
-     */
-    boolean unsubscribe(String subscriptionId);
-    
-    /**
-     * Interface for event subscribers.
-     */
-    interface EventSubscriber {
-        /**
-         * Called when an event is received.
-         *
-         * @param topic The topic of the event
-         * @param eventType The type of the event
-         * @param payload The event payload
-         * @param properties Additional properties of the event
-         */
-        void onEvent(String topic, String eventType, String payload, Map<String, String> properties);
-    }
+    List<EventDeliveryResult> publishEvents(List<Map<String, Object>> events);
 }

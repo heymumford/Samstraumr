@@ -138,6 +138,7 @@ public class MachineService {
    * @param machineId The machine ID
    * @param componentId The component ID
    * @throws ComponentNotFoundException if either component is not found
+   * @throws NonExistentComponentReferenceException if the referenced component doesn't exist
    * @throws InvalidOperationException if the machine is not in a valid state for adding components
    * @throws IllegalArgumentException if the component is not a composite component
    */
@@ -147,6 +148,13 @@ public class MachineService {
 
     // Get the machine port
     MachinePort machinePort = getMachineOrThrow(machineId);
+    
+    // Validate that the referenced component exists
+    org.s8r.domain.validation.ComponentReferenceValidator.validateComponentReference(
+        "addComponentToMachine",
+        machineId,
+        componentId,
+        id -> componentRepository.findById(id).isPresent());
 
     // Get the component port
     ComponentPort componentPort =
@@ -180,6 +188,7 @@ public class MachineService {
    * @param machineId The machine ID
    * @param componentId The component ID
    * @throws ComponentNotFoundException if either component is not found
+   * @throws NonExistentComponentReferenceException if the referenced component doesn't exist
    * @throws InvalidOperationException if the machine is not in a valid state for removing
    *     components
    */
@@ -192,6 +201,13 @@ public class MachineService {
 
     // Get the machine port
     MachinePort machinePort = getMachineOrThrow(machineId);
+    
+    // Validate that the referenced component exists
+    org.s8r.domain.validation.ComponentReferenceValidator.validateComponentReference(
+        "removeComponentFromMachine",
+        machineId,
+        componentId,
+        id -> componentRepository.findById(id).isPresent());
 
     // Try to find the component by ID to get its name
     // This is needed because MachinePort.removeComposite uses the name, not the ID

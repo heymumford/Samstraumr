@@ -47,7 +47,13 @@ public enum ConnectionType {
   MONITORING("Monitoring of source state by target"),
 
   /** Dependency relationship where source depends on target. */
-  DEPENDENCY("Source component depends on target component");
+  DEPENDENCY("Source component depends on target component"),
+  
+  /** Peer relationship between components with no hierarchy (non-directional). */
+  PEER("Non-hierarchical peer relationship between components"),
+  
+  /** Sibling relationship between components under same parent (non-directional). */
+  SIBLING("Non-hierarchical sibling relationship between components");
 
   private final String description;
 
@@ -75,7 +81,7 @@ public enum ConnectionType {
    * @return true if the connection has a clear direction, false otherwise
    */
   public boolean isDirectional() {
-    return this != BIDIRECTIONAL;
+    return this != BIDIRECTIONAL && this != PEER && this != SIBLING;
   }
 
   /**

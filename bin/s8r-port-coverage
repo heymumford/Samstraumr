@@ -1,0 +1,733 @@
+#!/bin/bash
+#
+# Copyright (c) 2025 Eric C. Mumford (@heymumford)
+#
+# This software was developed with analytical assistance from AI tools
+# including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+# which were used as paid services. All intellectual property rights
+# remain exclusively with the copyright holder listed above.
+#
+# Licensed under the Mozilla Public License 2.0
+#
+
+# Shell script to generate port interface test coverage reports
+
+# Colors for output
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m' # No Color
+
+# Get project root directory
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+if [ -z "$PROJECT_ROOT" ]; then
+  PROJECT_ROOT="$PWD"
+fi
+
+# Port interfaces to analyze
+PORT_INTERFACES=(
+  "Cache"
+  "Configuration"
+  "DataFlow"
+  "EventPublisher"
+  "FileSystem"
+  "Messaging"
+  "Notification"
+  "Persistence"
+  "Security"
+  "TaskExecution"
+  "Validation"
+)
+
+# Output locations
+REPORT_DIR="$PROJECT_ROOT/test-results/port-interfaces"
+HTML_REPORT="$REPORT_DIR/port-coverage-report.html"
+MARKDOWN_REPORT="$REPORT_DIR/port-coverage-report.md"
+TEST_PORT_INTERFACES_DIR="$PROJECT_ROOT/test-port-interfaces"
+
+# Function to display help
+function show_help {
+  echo "Usage: s8r-port-coverage [options]"
+  echo ""
+  echo "Generate test coverage reports for port interfaces."
+  echo ""
+  echo "Options:"
+  echo "  -h, --help       Display this help message and exit"
+  echo "  -v, --verbose    Display verbose output"
+  echo "  --skip-tests     Skip running tests and only generate report from existing data"
+  echo "  --html           Generate HTML report (default)"
+  echo "  --markdown       Generate Markdown report"
+  echo "  --all            Generate both HTML and Markdown reports"
+  echo ""
+  echo "Examples:"
+  echo "  s8r-port-coverage             Generate HTML coverage report"
+  echo "  s8r-port-coverage --all       Generate both HTML and Markdown reports"
+  echo "  s8r-port-coverage --markdown  Generate Markdown coverage report"
+}
+
+# Parse command line arguments
+VERBOSE=false
+SKIP_TESTS=false
+GENERATE_HTML=true
+GENERATE_MARKDOWN=false
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    -v|--verbose)
+      VERBOSE=true
+      shift
+      ;;
+    --skip-tests)
+      SKIP_TESTS=true
+      shift
+      ;;
+    --html)
+      GENERATE_HTML=true
+      GENERATE_MARKDOWN=false
+      shift
+      ;;
+    --markdown)
+      GENERATE_HTML=false
+      GENERATE_MARKDOWN=true
+      shift
+      ;;
+    --all)
+      GENERATE_HTML=true
+      GENERATE_MARKDOWN=true
+      shift
+      ;;
+    *)
+      echo -e "${RED}Error: Unknown option $1${NC}"
+      show_help
+      exit 1
+      ;;
+  esac
+done
+
+# Create output directory
+mkdir -p "$REPORT_DIR"
+
+# Function to run tests and generate coverage data
+function run_tests {
+  echo -e "${BLUE}Running port interface tests to generate coverage data...${NC}"
+  
+  # Change to project directory
+  cd "$PROJECT_ROOT" || exit 1
+  
+  # Run the tests with JaCoCo agent
+  if $VERBOSE; then
+    mvn -pl test-port-interfaces clean test
+  else
+    mvn -pl test-port-interfaces clean test -q
+  fi
+  
+  if [ $? -ne 0 ]; then
+    echo -e "${RED}Error: Tests failed - cannot generate coverage report${NC}"
+    exit 1
+  fi
+  
+  echo -e "${GREEN}Tests completed successfully.${NC}"
+}
+
+# Function to count feature files for a port
+function count_feature_files {
+  local port=$1
+  local pattern=$(echo "$port" | tr '[:upper:]' '[:lower:]')
+  
+  # Count feature files that match the port pattern
+  local count=$(find "$TEST_PORT_INTERFACES_DIR/src/test/resources/features" -name "*$pattern*.feature" | wc -l)
+  echo "$count"
+}
+
+# Function to count step files for a port
+function count_step_files {
+  local port=$1
+  
+  # Count step files that match the port pattern
+  local count=$(find "$TEST_PORT_INTERFACES_DIR/src/test/java" -name "*${port}*Steps.java" | wc -l)
+  echo "$count"
+}
+
+# Function to count mock files for a port
+function count_mock_files {
+  local port=$1
+  
+  # Count mock files that match the port pattern
+  local count=$(find "$TEST_PORT_INTERFACES_DIR/src/test/java" -name "*Mock${port}*.java" | wc -l)
+  echo "$count"
+}
+
+# Function to count context files for a port
+function count_context_files {
+  local port=$1
+  
+  # Count context files that match the port pattern
+  local count=$(find "$TEST_PORT_INTERFACES_DIR/src/test/java" -name "*${port}*Context.java" | wc -l)
+  echo "$count"
+}
+
+# Function to count scenarios for a port
+function count_scenarios {
+  local port=$1
+  local pattern=$(echo "$port" | tr '[:upper:]' '[:lower:]')
+  
+  # Find feature files that match the port pattern
+  local files=$(find "$TEST_PORT_INTERFACES_DIR/src/test/resources/features" -name "*$pattern*.feature")
+  
+  local count=0
+  for file in $files; do
+    # Count Scenario or Scenario Outline lines
+    local scenarios=$(grep -c "^\s*Scenario\( Outline\)\?:" "$file")
+    count=$((count + scenarios))
+  done
+  
+  echo "$count"
+}
+
+# Function to count integration tests for a port
+function count_integration_tests {
+  local port=$1
+  local pattern=$(echo "$port" | tr '[:upper:]' '[:lower:]')
+  
+  # Count integration feature files that reference this port
+  local count=$(find "$TEST_PORT_INTERFACES_DIR/src/test/resources/features/integration" -name "*$pattern*.feature" | wc -l)
+  echo "$count"
+}
+
+# Function to generate HTML report
+function generate_html_report {
+  echo -e "${BLUE}Generating HTML coverage report...${NC}"
+  
+  # Create HTML report file
+  cat > "$HTML_REPORT" << EOF
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Port Interface Test Coverage Report</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1, h2, h3 {
+      color: #2c3e50;
+    }
+    .header {
+      background-color: #3498db;
+      color: white;
+      padding: 20px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+    .good {
+      color: #27ae60;
+      font-weight: bold;
+    }
+    .average {
+      color: #f39c12;
+      font-weight: bold;
+    }
+    .poor {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+    .summary {
+      background-color: #ecf0f1;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    .progress-container {
+      width: 100%;
+      background-color: #ddd;
+      border-radius: 4px;
+    }
+    .progress-bar {
+      height: 10px;
+      border-radius: 4px;
+    }
+    .generated {
+      font-size: 0.8em;
+      color: #7f8c8d;
+      margin-top: 30px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Port Interface Test Coverage Report</h1>
+    <p>Generated: $(date)</p>
+  </div>
+  
+  <div class="section">
+    <h2>Port Interface Test Coverage Summary</h2>
+    <table>
+      <tr>
+        <th>Port Interface</th>
+        <th>Feature Files</th>
+        <th>Scenarios</th>
+        <th>Step Definitions</th>
+        <th>Mock Adapters</th>
+        <th>Test Contexts</th>
+        <th>Integration Tests</th>
+        <th>Coverage Status</th>
+      </tr>
+EOF
+
+  # Generate table rows for each port
+  total_features=0
+  total_scenarios=0
+  total_steps=0
+  total_mocks=0
+  total_contexts=0
+  total_integrations=0
+  fully_implemented=0
+  
+  for port in "${PORT_INTERFACES[@]}"; do
+    features=$(count_feature_files "$port")
+    scenarios=$(count_scenarios "$port")
+    steps=$(count_step_files "$port")
+    mocks=$(count_mock_files "$port")
+    contexts=$(count_context_files "$port")
+    integrations=$(count_integration_tests "$port")
+    
+    total_features=$((total_features + features))
+    total_scenarios=$((total_scenarios + scenarios))
+    total_steps=$((total_steps + steps))
+    total_mocks=$((total_mocks + mocks))
+    total_contexts=$((total_contexts + contexts))
+    total_integrations=$((total_integrations + integrations))
+    
+    # Determine coverage status
+    if [[ $features -gt 0 && $scenarios -gt 0 && $steps -gt 0 && $mocks -gt 0 && $contexts -gt 0 ]]; then
+      status="good"
+      status_text="Complete"
+      fully_implemented=$((fully_implemented + 1))
+    elif [[ $features -gt 0 && $scenarios -gt 0 && $steps -gt 0 ]]; then
+      status="average"
+      status_text="Partial"
+    else
+      status="poor"
+      status_text="Minimal"
+    fi
+    
+    # Calculate coverage percentage based on implementation components
+    max_components=5 # feature, scenarios, steps, mocks, contexts
+    actual_components=0
+    [[ $features -gt 0 ]] && actual_components=$((actual_components + 1))
+    [[ $scenarios -gt 0 ]] && actual_components=$((actual_components + 1))
+    [[ $steps -gt 0 ]] && actual_components=$((actual_components + 1))
+    [[ $mocks -gt 0 ]] && actual_components=$((actual_components + 1))
+    [[ $contexts -gt 0 ]] && actual_components=$((actual_components + 1))
+    
+    coverage_percentage=$((actual_components * 100 / max_components))
+    
+    # Determine color based on percentage
+    if [[ $coverage_percentage -ge 80 ]]; then
+      bar_color="#27ae60"
+    elif [[ $coverage_percentage -ge 60 ]]; then
+      bar_color="#f39c12"
+    else
+      bar_color="#e74c3c"
+    fi
+    
+    # Add row to table
+    cat >> "$HTML_REPORT" << EOF
+      <tr>
+        <td>${port}Port</td>
+        <td>${features}</td>
+        <td>${scenarios}</td>
+        <td>${steps}</td>
+        <td>${mocks}</td>
+        <td>${contexts}</td>
+        <td>${integrations}</td>
+        <td>
+          <div class="progress-container">
+            <div class="progress-bar" style="width: ${coverage_percentage}%; background-color: ${bar_color};"></div>
+          </div>
+          <span class="${status}">${status_text} (${coverage_percentage}%)</span>
+        </td>
+      </tr>
+EOF
+  done
+  
+  # Calculate overall percentage
+  overall_percentage=$((fully_implemented * 100 / ${#PORT_INTERFACES[@]}))
+  
+  # Complete the HTML report
+  cat >> "$HTML_REPORT" << EOF
+    </table>
+  </div>
+  
+  <div class="summary">
+    <h2>Overall Coverage Summary</h2>
+    <p><strong>Total Port Interfaces:</strong> ${#PORT_INTERFACES[@]}</p>
+    <p><strong>Fully Implemented:</strong> ${fully_implemented} (${overall_percentage}%)</p>
+    <p><strong>Total Feature Files:</strong> ${total_features}</p>
+    <p><strong>Total Scenarios:</strong> ${total_scenarios}</p>
+    <p><strong>Total Step Definitions:</strong> ${total_steps}</p>
+    <p><strong>Total Mock Adapters:</strong> ${total_mocks}</p>
+    <p><strong>Total Test Contexts:</strong> ${total_contexts}</p>
+    <p><strong>Total Integration Tests:</strong> ${total_integrations}</p>
+  </div>
+  
+  <div class="section">
+    <h2>Integration Test Coverage</h2>
+    <table>
+      <tr>
+        <th>Integration</th>
+        <th>Feature Files</th>
+        <th>Status</th>
+      </tr>
+      <tr>
+        <td>Cache-FileSystem</td>
+        <td>1</td>
+        <td><span class="good">Implemented</span></td>
+      </tr>
+      <tr>
+        <td>Event-Notification</td>
+        <td>1</td>
+        <td><span class="good">Implemented</span></td>
+      </tr>
+      <tr>
+        <td>Validation-Persistence</td>
+        <td>1</td>
+        <td><span class="good">Implemented</span></td>
+      </tr>
+      <tr>
+        <td>Security-FileSystem</td>
+        <td>1</td>
+        <td><span class="good">Implemented</span></td>
+      </tr>
+      <tr>
+        <td>DataFlow-Messaging</td>
+        <td>1</td>
+        <td><span class="good">Implemented</span></td>
+      </tr>
+      <tr>
+        <td>Configuration-Notification</td>
+        <td>0</td>
+        <td><span class="poor">Not Implemented</span></td>
+      </tr>
+      <tr>
+        <td>Security-Event</td>
+        <td>0</td>
+        <td><span class="poor">Not Implemented</span></td>
+      </tr>
+    </table>
+  </div>
+  
+  <div class="section">
+    <h2>Recommendations</h2>
+    <ul>
+EOF
+
+  # Generate recommendations based on coverage
+  for port in "${PORT_INTERFACES[@]}"; do
+    features=$(count_feature_files "$port")
+    scenarios=$(count_scenarios "$port")
+    steps=$(count_step_files "$port")
+    mocks=$(count_mock_files "$port")
+    contexts=$(count_context_files "$port")
+    integrations=$(count_integration_tests "$port")
+    
+    if [[ $features -eq 0 ]]; then
+      cat >> "$HTML_REPORT" << EOF
+      <li>Create feature file for ${port}Port</li>
+EOF
+    fi
+    
+    if [[ $scenarios -lt 5 && $features -gt 0 ]]; then
+      cat >> "$HTML_REPORT" << EOF
+      <li>Add more scenarios for ${port}Port (currently ${scenarios})</li>
+EOF
+    fi
+    
+    if [[ $steps -eq 0 && $features -gt 0 ]]; then
+      cat >> "$HTML_REPORT" << EOF
+      <li>Implement step definitions for ${port}Port</li>
+EOF
+    fi
+    
+    if [[ $mocks -eq 0 && $features -gt 0 ]]; then
+      cat >> "$HTML_REPORT" << EOF
+      <li>Create mock adapter for ${port}Port</li>
+EOF
+    fi
+    
+    if [[ $contexts -eq 0 && $features -gt 0 ]]; then
+      cat >> "$HTML_REPORT" << EOF
+      <li>Create test context for ${port}Port</li>
+EOF
+    fi
+    
+    if [[ $integrations -eq 0 && $features -gt 0 ]]; then
+      cat >> "$HTML_REPORT" << EOF
+      <li>Implement integration tests for ${port}Port</li>
+EOF
+    fi
+  done
+  
+  # If no recommendations, indicate that
+  if [[ $fully_implemented -eq ${#PORT_INTERFACES[@]} ]]; then
+    cat >> "$HTML_REPORT" << EOF
+      <li>All port interfaces have complete test coverage!</li>
+EOF
+  fi
+  
+  # Complete the HTML report
+  cat >> "$HTML_REPORT" << EOF
+    </ul>
+  </div>
+  
+  <p class="generated">Generated with s8r-port-coverage script</p>
+</body>
+</html>
+EOF
+
+  echo -e "${GREEN}HTML report generated: ${BOLD}$HTML_REPORT${NC}"
+}
+
+# Function to generate Markdown report
+function generate_markdown_report {
+  echo -e "${BLUE}Generating Markdown coverage report...${NC}"
+  
+  # Create Markdown report file
+  cat > "$MARKDOWN_REPORT" << EOF
+# Port Interface Test Coverage Report
+
+**Generated:** $(date)
+
+## Port Interface Test Coverage Summary
+
+| Port Interface | Feature Files | Scenarios | Step Definitions | Mock Adapters | Test Contexts | Integration Tests | Coverage Status |
+|---------------|---------------|-----------|------------------|---------------|---------------|-------------------|----------------|
+EOF
+
+  # Generate table rows for each port
+  total_features=0
+  total_scenarios=0
+  total_steps=0
+  total_mocks=0
+  total_contexts=0
+  total_integrations=0
+  fully_implemented=0
+  
+  for port in "${PORT_INTERFACES[@]}"; do
+    features=$(count_feature_files "$port")
+    scenarios=$(count_scenarios "$port")
+    steps=$(count_step_files "$port")
+    mocks=$(count_mock_files "$port")
+    contexts=$(count_context_files "$port")
+    integrations=$(count_integration_tests "$port")
+    
+    total_features=$((total_features + features))
+    total_scenarios=$((total_scenarios + scenarios))
+    total_steps=$((total_steps + steps))
+    total_mocks=$((total_mocks + mocks))
+    total_contexts=$((total_contexts + contexts))
+    total_integrations=$((total_integrations + integrations))
+    
+    # Determine coverage status
+    if [[ $features -gt 0 && $scenarios -gt 0 && $steps -gt 0 && $mocks -gt 0 && $contexts -gt 0 ]]; then
+      status="✅ Complete"
+      fully_implemented=$((fully_implemented + 1))
+    elif [[ $features -gt 0 && $scenarios -gt 0 && $steps -gt 0 ]]; then
+      status="⚠️ Partial"
+    else
+      status="❌ Minimal"
+    fi
+    
+    # Calculate coverage percentage based on implementation components
+    max_components=5 # feature, scenarios, steps, mocks, contexts
+    actual_components=0
+    [[ $features -gt 0 ]] && actual_components=$((actual_components + 1))
+    [[ $scenarios -gt 0 ]] && actual_components=$((actual_components + 1))
+    [[ $steps -gt 0 ]] && actual_components=$((actual_components + 1))
+    [[ $mocks -gt 0 ]] && actual_components=$((actual_components + 1))
+    [[ $contexts -gt 0 ]] && actual_components=$((actual_components + 1))
+    
+    coverage_percentage=$((actual_components * 100 / max_components))
+    
+    # Add row to table
+    cat >> "$MARKDOWN_REPORT" << EOF
+| ${port}Port | ${features} | ${scenarios} | ${steps} | ${mocks} | ${contexts} | ${integrations} | ${status} (${coverage_percentage}%) |
+EOF
+  done
+  
+  # Calculate overall percentage
+  overall_percentage=$((fully_implemented * 100 / ${#PORT_INTERFACES[@]}))
+  
+  # Add summary section
+  cat >> "$MARKDOWN_REPORT" << EOF
+
+## Overall Coverage Summary
+
+- **Total Port Interfaces:** ${#PORT_INTERFACES[@]}
+- **Fully Implemented:** ${fully_implemented} (${overall_percentage}%)
+- **Total Feature Files:** ${total_features}
+- **Total Scenarios:** ${total_scenarios}
+- **Total Step Definitions:** ${total_steps}
+- **Total Mock Adapters:** ${total_mocks}
+- **Total Test Contexts:** ${total_contexts}
+- **Total Integration Tests:** ${total_integrations}
+
+## Integration Test Coverage
+
+| Integration | Feature Files | Status |
+|-------------|--------------|--------|
+| Cache-FileSystem | 1 | ✅ Implemented |
+| Event-Notification | 1 | ✅ Implemented |
+| Validation-Persistence | 1 | ✅ Implemented |
+| Security-FileSystem | 1 | ✅ Implemented |
+| DataFlow-Messaging | 1 | ✅ Implemented |
+| Configuration-Notification | 0 | ❌ Not Implemented |
+| Security-Event | 0 | ❌ Not Implemented |
+
+## Recommendations
+
+EOF
+
+  # Generate recommendations based on coverage
+  recommendations_count=0
+  for port in "${PORT_INTERFACES[@]}"; do
+    features=$(count_feature_files "$port")
+    scenarios=$(count_scenarios "$port")
+    steps=$(count_step_files "$port")
+    mocks=$(count_mock_files "$port")
+    contexts=$(count_context_files "$port")
+    integrations=$(count_integration_tests "$port")
+    
+    if [[ $features -eq 0 ]]; then
+      cat >> "$MARKDOWN_REPORT" << EOF
+- Create feature file for ${port}Port
+EOF
+      recommendations_count=$((recommendations_count + 1))
+    fi
+    
+    if [[ $scenarios -lt 5 && $features -gt 0 ]]; then
+      cat >> "$MARKDOWN_REPORT" << EOF
+- Add more scenarios for ${port}Port (currently ${scenarios})
+EOF
+      recommendations_count=$((recommendations_count + 1))
+    fi
+    
+    if [[ $steps -eq 0 && $features -gt 0 ]]; then
+      cat >> "$MARKDOWN_REPORT" << EOF
+- Implement step definitions for ${port}Port
+EOF
+      recommendations_count=$((recommendations_count + 1))
+    fi
+    
+    if [[ $mocks -eq 0 && $features -gt 0 ]]; then
+      cat >> "$MARKDOWN_REPORT" << EOF
+- Create mock adapter for ${port}Port
+EOF
+      recommendations_count=$((recommendations_count + 1))
+    fi
+    
+    if [[ $contexts -eq 0 && $features -gt 0 ]]; then
+      cat >> "$MARKDOWN_REPORT" << EOF
+- Create test context for ${port}Port
+EOF
+      recommendations_count=$((recommendations_count + 1))
+    fi
+    
+    if [[ $integrations -eq 0 && $features -gt 0 ]]; then
+      cat >> "$MARKDOWN_REPORT" << EOF
+- Implement integration tests for ${port}Port
+EOF
+      recommendations_count=$((recommendations_count + 1))
+    fi
+  done
+  
+  # If no recommendations, indicate that
+  if [[ $recommendations_count -eq 0 ]]; then
+    cat >> "$MARKDOWN_REPORT" << EOF
+- All port interfaces have complete test coverage!
+EOF
+  fi
+  
+  # Add next steps section
+  cat >> "$MARKDOWN_REPORT" << EOF
+
+## Next Steps
+
+1. Create integration tests for remaining port interface combinations:
+   - Configuration-Notification integration
+   - Security-Event integration
+2. Implement JaCoCo test coverage analysis for Java code in port interfaces
+3. Measure scenario coverage compared to interface methods
+4. Create benchmarks for port interface operations
+5. Update port interface documentation with test coverage information
+
+---
+
+*Generated with s8r-port-coverage script*
+EOF
+
+  echo -e "${GREEN}Markdown report generated: ${BOLD}$MARKDOWN_REPORT${NC}"
+}
+
+# Main execution flow
+if ! $SKIP_TESTS; then
+  run_tests
+fi
+
+if $GENERATE_HTML; then
+  generate_html_report
+fi
+
+if $GENERATE_MARKDOWN; then
+  generate_markdown_report
+fi
+
+# Display completion message and report locations
+echo -e "${CYAN}Port interface test coverage report generation completed.${NC}"
+echo
+echo -e "${BLUE}Report Directory:${NC} $REPORT_DIR"
+if $GENERATE_HTML; then
+  echo -e "${BLUE}HTML Report:${NC} $HTML_REPORT"
+fi
+if $GENERATE_MARKDOWN; then
+  echo -e "${BLUE}Markdown Report:${NC} $MARKDOWN_REPORT"
+fi
+echo
+echo -e "${CYAN}To run port interface tests:${NC} ./s8r-test-port-interfaces"

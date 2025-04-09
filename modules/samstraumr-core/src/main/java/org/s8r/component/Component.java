@@ -112,6 +112,9 @@ public class Component {
     if (reason == null) throw new IllegalArgumentException("Reason cannot be null");
     if (environment == null) throw new IllegalArgumentException("Environment cannot be null");
 
+    // Validate component name
+    org.s8r.domain.validation.ComponentNameValidator.validateComponentName(reason);
+
     String uniqueId = generateUniqueId(reason, environment);
     return new Component(reason, environment, uniqueId, null);
   }
@@ -119,6 +122,9 @@ public class Component {
   /** Creates a new Adam component (primary originating component with no parent). */
   public static Component createAdam(String reason) {
     if (reason == null) throw new IllegalArgumentException("Reason cannot be null");
+    
+    // Validate component name
+    org.s8r.domain.validation.ComponentNameValidator.validateComponentName(reason);
     
     Environment environment = new Environment();
     environment.setParameter("component.type", "adam");
@@ -135,6 +141,9 @@ public class Component {
     if (environmentParams == null)
       throw new IllegalArgumentException("Environment parameters cannot be null");
 
+    // Validate component name
+    org.s8r.domain.validation.ComponentNameValidator.validateComponentName(reason);
+
     Environment env = new Environment();
     for (Map.Entry<String, String> entry : environmentParams.entrySet()) {
       env.setParameter(entry.getKey(), entry.getValue());
@@ -148,6 +157,9 @@ public class Component {
     if (reason == null) throw new IllegalArgumentException("Reason cannot be null");
     if (environment == null) throw new IllegalArgumentException("Environment cannot be null");
     if (parent == null) throw new IllegalArgumentException("Parent component cannot be null");
+    
+    // Validate component name
+    org.s8r.domain.validation.ComponentNameValidator.validateComponentName(reason);
     
     // Check if parent is terminated
     if (parent.isTerminated()) {
@@ -184,9 +196,13 @@ public class Component {
    * @param reason The reason for creating this child
    * @return A new child component
    * @throws ComponentTerminatedException if this component is terminated
+   * @throws org.s8r.domain.exception.InvalidComponentNameException if the component name is invalid
    */
   public Component createChild(String reason) {
     if (reason == null) throw new IllegalArgumentException("Reason cannot be null");
+    
+    // Validate component name
+    org.s8r.domain.validation.ComponentNameValidator.validateComponentName(reason);
     
     if (isTerminated()) {
       throw createTerminatedException("Cannot create child: component is terminated");
@@ -207,6 +223,9 @@ public class Component {
     if (environmentParams == null)
       throw new IllegalArgumentException("Environment parameters cannot be null");
     if (parent == null) throw new IllegalArgumentException("Parent component cannot be null");
+    
+    // Validate component name
+    org.s8r.domain.validation.ComponentNameValidator.validateComponentName(reason);
     
     // Check if parent is terminated
     if (parent.isTerminated()) {
@@ -1332,9 +1351,16 @@ public class Component {
         
       case "reset_config":
         // Reset configuration to defaults
-        environment = new Environment();
+        // Note: environment is final, so we create a new one and copy the parameters
+        Environment newEnv = new Environment();
+        for (String key : environment.getParameterKeys()) {
+          // Copy only default parameters or reset to defaults as needed
+          if (key.startsWith("default.")) {
+            newEnv.setParameter(key.replace("default.", ""), environment.getParameter(key));
+          }
+        }
         logToMemory("Configuration reset to defaults");
-        return "Configuration reset";
+        return "Configuration reset (default parameters applied)";
         
       case "view_config":
         // View current configuration

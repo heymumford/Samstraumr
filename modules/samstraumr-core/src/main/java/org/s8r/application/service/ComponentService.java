@@ -66,11 +66,24 @@ public class ComponentService {
    *
    * @param reason The reason for creating the component
    * @return The ID of the created component
+   * @throws DuplicateComponentException if a component with the same ID already exists
    */
   public ComponentId createComponent(String reason) {
     logger.info("Creating new component with reason: " + reason);
 
     ComponentId id = ComponentId.create(reason);
+    
+    // Check if component with this ID already exists
+    if (componentRepository instanceof org.s8r.infrastructure.persistence.InMemoryComponentRepository) {
+      org.s8r.infrastructure.persistence.InMemoryComponentRepository repo = 
+          (org.s8r.infrastructure.persistence.InMemoryComponentRepository) componentRepository;
+      
+      if (repo.exists(id)) {
+        logger.error("Cannot create component: Component with ID {} already exists", id.getIdString());
+        throw new DuplicateComponentException(id);
+      }
+    }
+    
     Component component = Component.create(id);
 
     // Convert to ComponentPort using the adapter
@@ -79,7 +92,8 @@ public class ComponentService {
     // Dispatch any events raised during creation
     dispatchDomainEvents(componentPort);
 
-    componentRepository.save(componentPort);
+    // Save the component (the repository's save method will check for duplicates)
+    saveOrUpdateComponent(componentPort);
     logger.info("Component created successfully: " + id.getIdString());
 
     return id;
@@ -92,6 +106,7 @@ public class ComponentService {
    * @param parentId The parent component's ID
    * @return The ID of the created child component
    * @throws ComponentNotFoundException if the parent component doesn't exist
+   * @throws DuplicateComponentException if a component with the same ID already exists
    */
   public ComponentId createChildComponent(String reason, ComponentId parentId) {
     logger.info("Creating child component with reason: " + reason);
@@ -104,6 +119,18 @@ public class ComponentService {
 
     // Create child component
     ComponentId childId = ComponentId.create(reason);
+    
+    // Check if component with this ID already exists
+    if (componentRepository instanceof org.s8r.infrastructure.persistence.InMemoryComponentRepository) {
+      org.s8r.infrastructure.persistence.InMemoryComponentRepository repo = 
+          (org.s8r.infrastructure.persistence.InMemoryComponentRepository) componentRepository;
+      
+      if (repo.exists(childId)) {
+        logger.error("Cannot create child component: Component with ID {} already exists", childId.getIdString());
+        throw new DuplicateComponentException(childId);
+      }
+    }
+    
     Component child = Component.create(childId);
     ComponentPort childPort = org.s8r.adapter.ComponentAdapter.createComponentPort(child);
 
@@ -114,7 +141,7 @@ public class ComponentService {
     dispatchDomainEvents(childPort);
 
     // Save the child component
-    componentRepository.save(childPort);
+    saveOrUpdateComponent(childPort);
     logger.info("Child component created successfully: " + childId.getIdString());
 
     return childId;
@@ -138,7 +165,8 @@ public class ComponentService {
     // Dispatch any events raised during activation
     dispatchDomainEvents(componentPort);
 
-    componentRepository.save(componentPort);
+    // Update the component
+    saveOrUpdateComponent(componentPort);
 
     logger.info("Component activated successfully: " + id.getIdString());
   }
@@ -161,7 +189,8 @@ public class ComponentService {
     // Dispatch any events raised during deactivation
     dispatchDomainEvents(componentPort);
 
-    componentRepository.save(componentPort);
+    // Update the component
+    saveOrUpdateComponent(componentPort);
 
     logger.info("Component deactivated successfully: " + id.getIdString());
   }
@@ -183,7 +212,8 @@ public class ComponentService {
     // Dispatch any events raised during termination
     dispatchDomainEvents(componentPort);
 
-    componentRepository.save(componentPort);
+    // Update the component
+    saveOrUpdateComponent(componentPort);
 
     logger.info("Component terminated successfully: " + id.getIdString());
   }
@@ -234,7 +264,9 @@ public class ComponentService {
         componentRepository.findById(id).orElseThrow(() -> new ComponentNotFoundException(id));
 
     componentPort.addToLineage(entry);
-    componentRepository.save(componentPort);
+    
+    // Update the component
+    saveOrUpdateComponent(componentPort);
 
     logger.debug("Lineage entry added successfully");
   }
@@ -247,12 +279,25 @@ public class ComponentService {
    * @param reason The reason for creating the composite
    * @param compositeType The type of composite to create
    * @return The ID of the created composite component
+   * @throws DuplicateComponentException if a component with the same ID already exists
    */
   public ComponentId createComposite(String reason, CompositeType compositeType) {
     logger.info(
         "Creating new composite component of type " + compositeType + " with reason: " + reason);
 
     CompositeComponent composite = CompositeFactory.createComposite(compositeType, reason);
+    ComponentId compositeId = composite.getId();
+    
+    // Check if component with this ID already exists
+    if (componentRepository instanceof org.s8r.infrastructure.persistence.InMemoryComponentRepository) {
+      org.s8r.infrastructure.persistence.InMemoryComponentRepository repo = 
+          (org.s8r.infrastructure.persistence.InMemoryComponentRepository) componentRepository;
+      
+      if (repo.exists(compositeId)) {
+        logger.error("Cannot create composite: Component with ID {} already exists", compositeId.getIdString());
+        throw new DuplicateComponentException(compositeId);
+      }
+    }
 
     // Convert to CompositeComponentPort using the adapter
     CompositeComponentPort compositePort =
@@ -261,7 +306,8 @@ public class ComponentService {
     // Dispatch any events raised during creation
     dispatchDomainEvents(compositePort);
 
-    componentRepository.save(compositePort);
+    // Save the composite
+    saveOrUpdateComponent(compositePort);
     logger.info("Composite component created successfully: " + compositePort.getId().getIdString());
 
     return compositePort.getId();
@@ -311,6 +357,7 @@ public class ComponentService {
    * @param compositeId The ID of the composite component
    * @param componentId The ID of the component to add
    * @throws ComponentNotFoundException if either component is not found
+   * @throws NonExistentComponentReferenceException if either component doesn't exist
    * @throws InvalidOperationException if the composite is not in a valid state
    * @throws DuplicateComponentException if the component is already in the composite
    */
@@ -320,6 +367,13 @@ public class ComponentService {
             + componentId.getShortId()
             + " to composite "
             + compositeId.getShortId());
+            
+    // Validate that both components exist
+    org.s8r.domain.validation.ComponentReferenceValidator.validateComponentReferences(
+        "addComponentToComposite",
+        compositeId, // The composite is the referring component
+        id -> componentRepository.findById(id).isPresent(),
+        compositeId, componentId);
 
     // Get the composite port
     ComponentPort compositePort =
@@ -353,8 +407,8 @@ public class ComponentService {
     // Dispatch any events raised during the operation
     dispatchDomainEvents(compositeComponentPort);
 
-    // Save the updated composite
-    componentRepository.save(compositeComponentPort);
+    // Update the composite
+    saveOrUpdateComponent(compositeComponentPort);
     logger.info("Component added to composite successfully");
   }
 
@@ -364,6 +418,7 @@ public class ComponentService {
    * @param compositeId The ID of the composite component
    * @param componentId The ID of the component to remove
    * @throws ComponentNotFoundException if either component is not found
+   * @throws NonExistentComponentReferenceException if either component doesn't exist
    * @throws InvalidOperationException if the composite is not in a valid state
    */
   public void removeComponentFromComposite(ComponentId compositeId, ComponentId componentId) {
@@ -372,6 +427,13 @@ public class ComponentService {
             + componentId.getShortId()
             + " from composite "
             + compositeId.getShortId());
+            
+    // Validate that both components exist
+    org.s8r.domain.validation.ComponentReferenceValidator.validateComponentReferences(
+        "removeComponentFromComposite",
+        compositeId, // The composite is the referring component
+        id -> componentRepository.findById(id).isPresent(),
+        compositeId, componentId);
 
     // Get the composite port
     ComponentPort compositePort =
@@ -399,8 +461,8 @@ public class ComponentService {
       throw new ComponentNotFoundException(componentId);
     }
 
-    // Save the updated composite
-    componentRepository.save(compositeComponentPort);
+    // Update the composite
+    saveOrUpdateComponent(compositeComponentPort);
     logger.info("Component removed from composite successfully");
   }
 
@@ -414,6 +476,7 @@ public class ComponentService {
    * @param description A description of the connection
    * @return True if the connection was created successfully
    * @throws ComponentNotFoundException if any component is not found
+   * @throws NonExistentComponentReferenceException if any referenced component doesn't exist
    * @throws InvalidOperationException if the composite is not in a valid state
    */
   public boolean createConnection(
@@ -423,6 +486,13 @@ public class ComponentService {
       ConnectionType type,
       String description) {
     logger.info("Creating " + type + " connection in composite " + compositeId.getShortId());
+    
+    // Validate that all components exist
+    org.s8r.domain.validation.ComponentReferenceValidator.validateComponentReferences(
+        "createConnection",
+        compositeId, // The composite is the referring component
+        id -> componentRepository.findById(id).isPresent(),
+        compositeId, sourceId, targetId);
 
     // Get the composite port
     ComponentPort compositePort =
@@ -457,8 +527,8 @@ public class ComponentService {
     // Dispatch any events raised during the operation
     dispatchDomainEvents(compositeComponentPort);
 
-    // Save the updated composite
-    componentRepository.save(compositeComponentPort);
+    // Update the composite
+    saveOrUpdateComponent(compositeComponentPort);
     logger.info("Connection created successfully");
 
     return true;
@@ -503,8 +573,8 @@ public class ComponentService {
           "Connection from " + sourceName + " to " + targetName + " not found");
     }
 
-    // Save the updated composite
-    componentRepository.save(compositeComponentPort);
+    // Update the composite
+    saveOrUpdateComponent(compositeComponentPort);
     logger.info("Connection removed successfully");
   }
 
@@ -560,6 +630,30 @@ public class ComponentService {
     String componentName = componentId.getIdString();
 
     return compositePort.get().getConnectionsFrom(componentName);
+  }
+
+  /**
+   * Saves or updates a component in the repository based on whether it already exists.
+   * This helper method handles the logic of determining whether to use save() or update().
+   *
+   * @param componentPort The component port to save or update
+   */
+  private void saveOrUpdateComponent(ComponentPort componentPort) {
+    if (componentRepository instanceof org.s8r.infrastructure.persistence.InMemoryComponentRepository) {
+      org.s8r.infrastructure.persistence.InMemoryComponentRepository repo = 
+          (org.s8r.infrastructure.persistence.InMemoryComponentRepository) componentRepository;
+      
+      if (repo.exists(componentPort.getId())) {
+        // Component already exists, use update
+        repo.update(componentPort);
+      } else {
+        // New component, use save
+        repo.save(componentPort);
+      }
+    } else {
+      // For other repository implementations, use save (which may handle updates differently)
+      componentRepository.save(componentPort);
+    }
   }
 
   /**

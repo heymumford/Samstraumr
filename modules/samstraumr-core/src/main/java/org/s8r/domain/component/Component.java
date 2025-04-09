@@ -26,34 +26,88 @@ import org.s8r.domain.event.ComponentCreatedEvent;
 import org.s8r.domain.event.ComponentDataEvent;
 import org.s8r.domain.event.ComponentStateChangedEvent;
 import org.s8r.domain.event.DomainEvent;
+import org.s8r.domain.exception.InvalidComponentTypeException;
 import org.s8r.domain.exception.InvalidOperationException;
 import org.s8r.domain.exception.InvalidStateTransitionException;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.lifecycle.LifecycleState;
+import org.s8r.domain.validation.ComponentTypeValidator;
 
 /** Core domain entity representing a Component in the S8r framework. */
 public class Component {
   private final ComponentId id;
   private LifecycleState lifecycleState;
+  private final String componentType;
   private final List<String> lineage = new ArrayList<>();
   private final List<String> activityLog = new ArrayList<>();
   private final Instant creationTime = Instant.now();
   private final List<DomainEvent> domainEvents = new ArrayList<>();
 
+  /**
+   * Creates a new Component with the default type.
+   *
+   * @param id The component ID
+   */
   public Component(ComponentId id) {
+    this(id, ComponentType.STANDARD.getCode());
+  }
+  
+  /**
+   * Creates a new Component with a specific type.
+   *
+   * @param id The component ID
+   * @param componentType The component type code
+   * @throws InvalidComponentTypeException if the component type is invalid
+   */
+  public Component(ComponentId id, String componentType) {
     this.id = Objects.requireNonNull(id, "Component ID cannot be null");
+    
+    // Validate component type
+    ComponentTypeValidator.validateComponentType(componentType, id);
+    this.componentType = componentType;
+    
     this.lifecycleState = LifecycleState.CONCEPTION;
     this.lineage.add(id.getReason());
 
-    logActivity("Component created with reason: " + id.getReason());
-    raiseEvent(new ComponentCreatedEvent(id, this.getClass().getSimpleName()));
+    logActivity("Component created with reason: " + id.getReason() + ", type: " + componentType);
+    raiseEvent(new ComponentCreatedEvent(id, componentType));
   }
 
-  /** Creates a new Component. */
+  /** 
+   * Creates a new Component with the default component type.
+   *
+   * @param id The component ID
+   * @return A new component
+   */
   public static Component create(ComponentId id) {
     Component component = new Component(id);
     component.initialize();
     return component;
+  }
+  
+  /**
+   * Creates a new Component with the specified component type.
+   *
+   * @param id The component ID
+   * @param componentType The component type code
+   * @return A new component
+   * @throws InvalidComponentTypeException if the component type is invalid
+   */
+  public static Component create(ComponentId id, String componentType) {
+    Component component = new Component(id, componentType);
+    component.initialize();
+    return component;
+  }
+  
+  /**
+   * Creates a new Component with the specified ComponentType enum.
+   *
+   * @param id The component ID
+   * @param componentType The component type
+   * @return A new component
+   */
+  public static Component create(ComponentId id, ComponentType componentType) {
+    return create(id, componentType.getCode());
   }
 
   /** Initialize the component, progressing through early lifecycle states. */
@@ -167,6 +221,27 @@ public class Component {
     activityLog.add(Instant.now() + ": " + activity);
   }
 
+  /**
+   * Checks if this component type allows a specific operation.
+   *
+   * @param operation The operation to check
+   * @return true if the operation is allowed, false otherwise
+   * @throws InvalidComponentTypeException if the component type is invalid
+   */
+  public boolean isOperationAllowed(String operation) {
+    return ComponentTypeValidator.isAllowedForOperation(componentType, operation);
+  }
+  
+  /**
+   * Validates that this component type allows a specific operation.
+   *
+   * @param operation The operation to validate
+   * @throws InvalidComponentTypeException if the operation is not allowed for this component type
+   */
+  public void validateOperation(String operation) {
+    ComponentTypeValidator.validateComponentTypeForOperation(componentType, id, operation);
+  }
+
   // Getters
   public ComponentId getId() {
     return id;
@@ -174,6 +249,26 @@ public class Component {
 
   public LifecycleState getLifecycleState() {
     return lifecycleState;
+  }
+  
+  /**
+   * Gets the component type code.
+   *
+   * @return The component type code
+   */
+  public String getComponentType() {
+    return componentType;
+  }
+  
+  /**
+   * Gets the component type as an enum value.
+   *
+   * @return The component type enum value
+   * @throws IllegalStateException if the component type is not recognized (should not happen due to validation)
+   */
+  public ComponentType getComponentTypeEnum() {
+    return ComponentType.fromCode(componentType)
+        .orElseThrow(() -> new IllegalStateException("Unknown component type: " + componentType));
   }
 
   public List<String> getLineage() {
@@ -229,6 +324,8 @@ public class Component {
   public String toString() {
     return "Component{id="
         + id
+        + ", type="
+        + componentType
         + ", lifecycleState="
         + lifecycleState
         + ", creationTime="

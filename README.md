@@ -1,7 +1,9 @@
 
 # Samstraumr: Adaptive Resilient Software Framework
 
-[![Version](https://img.shields.io/badge/version-3.0.4-blue)](https://github.com/heymumford/Samstraumr/releases) 
+In a world where scientific simulations and complex applications drown in tangled object hierarchies, Samstraumr emerges as a breath of fresh air—a flowing river of clarity cutting through chaotic code landscapes. It liberates researchers and engineers from the tyranny of rigid, brittle systems that collapse under their own complexity, offering instead a living architecture that breathes, adapts, and heals like natural organisms. By weaving together composable units that communicate through elegant event flows rather than tight coupling, Samstraumr empowers scientists to focus on discovery rather than debugging, enabling simulations that evolve alongside insight and code that transforms as gracefully as the natural systems it often models.
+
+[![Version](https://img.shields.io/badge/version-3.0.5-blue)](https://github.com/heymumford/Samstraumr/releases) 
 [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) 
 [![Java](https://img.shields.io/badge/Java-21-orange)](https://openjdk.org/projects/jdk/21/) 
@@ -30,6 +32,7 @@ The framework excels at managing complexity in distributed systems, service ecos
 - 📊 **Scale precisely**: Targeted scaling without system-wide changes
 - 🛠️ **Recover automatically**: Component-level failure recovery
 - 🌱 **Evolve continuously**: Incremental adaptation without rewrites
+- 🛡️ **Validate comprehensively**: Early error detection with clear feedback
 
 **Learn More:** [📜 Origins and Vision](./docs/concepts/origins-and-vision.md) • [🌿 Systems Theory Foundation](./docs/concepts/systems-theory-foundation.md) • [🧩 Core Concepts](./docs/concepts/core-concepts.md)
 
@@ -44,6 +47,7 @@ The framework excels at managing complexity in distributed systems, service ecos
 | **Complex Integrations** | Event-driven patterns create loosely coupled system interactions |
 | **Operational Opacity** | Comprehensive observability with built-in component monitoring |
 | **Inconsistent Recovery** | Standardized lifecycle management with predictable recovery paths |
+| **Silent Failures** | Comprehensive validation system with early failure detection |
 
 ### Benefits for Key Stakeholders
 
@@ -58,6 +62,7 @@ The framework excels at managing complexity in distributed systems, service ecos
 - Isolated components for parallel development
 - Consistent patterns across system domains
 - Self-documenting architecture with clear contracts
+- Early failure detection with detailed validation errors
 
 **💼 Business Stakeholders**
 - Lower maintenance costs via self-healing
@@ -77,6 +82,7 @@ Samstraumr implements a cohesive set of architectural concepts that work togethe
 - **➡️ Flow-Oriented**: Data and control along well-defined pathways
 - **🏷️ Identity**: Hierarchical addressing for all system elements
 - **📢 Event-Driven**: Loose coupling through publish-subscribe patterns
+- **🛡️ Validation**: Comprehensive checks at all system boundaries
 
 [📘 **Learn more about core concepts**](./docs/concepts/core-concepts.md)
 
@@ -112,7 +118,7 @@ Maven dependency:
 <dependency>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-core</artifactId>
-    <version>3.0.4</version>
+    <version>3.0.5</version>
 </dependency>
 ```
 

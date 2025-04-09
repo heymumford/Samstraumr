@@ -50,10 +50,44 @@ public class InMemoryComponentRepository implements ComponentRepository {
     logger.debug("Initialized InMemoryComponentRepository");
   }
 
+  /**
+   * Checks if a component with the given ID already exists.
+   *
+   * @param id The component ID to check
+   * @return true if a component with this ID exists, false otherwise
+   */
+  public boolean exists(ComponentId id) {
+    return componentStore.containsKey(id.getIdString());
+  }
+
+  /**
+   * Updates an existing component. 
+   * This method should be used when you know the component already exists and you want to update it.
+   *
+   * @param component The component to update
+   * @throws ComponentNotFoundException if the component doesn't exist
+   */
+  public void update(ComponentPort component) {
+    String idString = component.getId().getIdString();
+    if (!componentStore.containsKey(idString)) {
+      throw new org.s8r.domain.exception.ComponentNotFoundException(component.getId());
+    }
+    
+    componentStore.put(idString, component);
+    logger.debug("Updated component: {}", idString);
+  }
+
   @Override
   public void save(ComponentPort component) {
-    componentStore.put(component.getId().getIdString(), component);
-    logger.debug("Saved component: {}", component.getId().getIdString());
+    // Check for duplicate components
+    String idString = component.getId().getIdString();
+    if (componentStore.containsKey(idString)) {
+      logger.error("Attempt to save duplicate component: {}", idString);
+      throw new org.s8r.domain.exception.DuplicateComponentException(component.getId());
+    }
+    
+    componentStore.put(idString, component);
+    logger.debug("Saved component: {}", idString);
   }
 
   @Override

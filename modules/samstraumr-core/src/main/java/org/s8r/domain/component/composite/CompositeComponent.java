@@ -26,8 +26,10 @@ import java.util.stream.Collectors;
 import org.s8r.domain.component.Component;
 import org.s8r.domain.event.ComponentConnectionEvent;
 import org.s8r.domain.exception.ComponentNotFoundException;
+import org.s8r.domain.exception.ConnectionCycleException;
 import org.s8r.domain.exception.DuplicateComponentException;
 import org.s8r.domain.exception.InvalidOperationException;
+import org.s8r.domain.exception.NonExistentComponentReferenceException;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.lifecycle.LifecycleState;
 
@@ -161,6 +163,8 @@ public class CompositeComponent extends Component {
    * @param description A description of the connection
    * @return The created connection
    * @throws ComponentNotFoundException if either component is not found
+   * @throws NonExistentComponentReferenceException if either referenced component doesn't exist
+   * @throws ConnectionCycleException if the connection would create a cycle
    * @throws InvalidOperationException if the composite is not in a valid state
    */
   public ComponentConnection connect(
@@ -169,14 +173,14 @@ public class CompositeComponent extends Component {
       throw new InvalidOperationException("connect", this);
     }
 
-    // Verify both components exist
-    if (!containsComponent(sourceId)) {
-      throw new ComponentNotFoundException(sourceId);
-    }
-
-    if (!containsComponent(targetId)) {
-      throw new ComponentNotFoundException(targetId);
-    }
+    // Perform comprehensive validation of the connection
+    org.s8r.domain.validation.CompositeConnectionValidator.validateConnection(
+        getId(),
+        sourceId,
+        targetId,
+        type,
+        connections,
+        this::containsComponent);
 
     ComponentConnection connection = new ComponentConnection(sourceId, targetId, type, description);
     connections.add(connection);

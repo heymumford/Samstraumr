@@ -1,0 +1,101 @@
+#!/bin/bash
+#
+# Copyright (c) 2025 Eric C. Mumford (@heymumford)
+#
+# This software was developed with analytical assistance from AI tools 
+# including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+# which were used as paid services. All intellectual property rights 
+# remain exclusively with the copyright holder listed above.
+#
+# Licensed under the Mozilla Public License 2.0
+#
+# Run Karate tests for system-level testing
+
+# Colors for output
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+# Set Karate environment if specified
+if [ ! -z "$1" ]; then
+    KARATE_ENV="$1"
+    echo -e "${BLUE}Setting Karate environment to ${YELLOW}$KARATE_ENV${NC}"
+    KARATE_ENV_OPT="-Dkarate.env=$KARATE_ENV"
+else
+    KARATE_ENV_OPT=""
+fi
+
+# Run specific test if specified
+if [ ! -z "$2" ]; then
+    TEST_TO_RUN="$2"
+    echo -e "${BLUE}Running test ${YELLOW}$TEST_TO_RUN${NC}"
+    
+    if [[ "$TEST_TO_RUN" == "security" ]]; then
+        TEST_CLASS="org.s8r.test.karate.KarateRunner#securityEventTests"
+    elif [[ "$TEST_TO_RUN" == "task" ]]; then
+        TEST_CLASS="org.s8r.test.karate.KarateRunner#taskNotificationTests"
+    elif [[ "$TEST_TO_RUN" == "cache" ]]; then
+        TEST_CLASS="org.s8r.test.karate.KarateRunner#cachePortTests"
+    elif [[ "$TEST_TO_RUN" == "filesystem" ]]; then
+        TEST_CLASS="org.s8r.test.karate.KarateRunner#filesystemPortTests"
+    elif [[ "$TEST_TO_RUN" == "port" ]]; then
+        TEST_CLASS="org.s8r.test.karate.KarateRunner#portInterfaceTests"
+    else
+        TEST_CLASS="org.s8r.test.karate.KarateRunner#$TEST_TO_RUN"
+    fi
+else
+    echo -e "${BLUE}Running all Karate tests${NC}"
+    TEST_CLASS="org.s8r.test.karate.KarateRunner"
+fi
+
+# Add Java options for compatibility with Java 21
+JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+
+echo -e "${BLUE}Running Karate tests with Java options: ${YELLOW}$JAVA_OPTS${NC}"
+
+# Run tests using Maven
+cd "$(dirname "$0")"
+mvn test -Dtest=$TEST_CLASS $KARATE_ENV_OPT -Dorg.slf4j.simpleLogger.defaultLogLevel=info "-Dkarate.options=--tags ~@ignore" -DargLine="$JAVA_OPTS" -pl test-port-interfaces
+
+# Check if tests passed
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}Karate tests passed!${NC}"
+    
+    # Open the report if available
+    REPORT_PATH="test-port-interfaces/target/karate-reports/karate-summary.html"
+    if [ -f "$REPORT_PATH" ]; then
+        echo -e "${BLUE}Karate report available at:${NC} $REPORT_PATH"
+        
+        # Try to open the report in the default browser (if available)
+        if command -v xdg-open &> /dev/null; then
+            echo -e "${BLUE}Opening report in browser...${NC}"
+            xdg-open "$REPORT_PATH"
+        elif command -v open &> /dev/null; then
+            echo -e "${BLUE}Opening report in browser...${NC}"
+            open "$REPORT_PATH"
+        fi
+    fi
+    
+    exit 0
+else
+    echo -e "${RED}Karate tests failed.${NC}"
+    
+    # Open the report if available
+    REPORT_PATH="test-port-interfaces/target/karate-reports/karate-summary.html"
+    if [ -f "$REPORT_PATH" ]; then
+        echo -e "${BLUE}Karate report available at:${NC} $REPORT_PATH"
+        
+        # Try to open the report in the default browser (if available)
+        if command -v xdg-open &> /dev/null; then
+            echo -e "${BLUE}Opening report in browser...${NC}"
+            xdg-open "$REPORT_PATH"
+        elif command -v open &> /dev/null; then
+            echo -e "${BLUE}Opening report in browser...${NC}"
+            open "$REPORT_PATH"
+        fi
+    fi
+    
+    exit 1
+fi

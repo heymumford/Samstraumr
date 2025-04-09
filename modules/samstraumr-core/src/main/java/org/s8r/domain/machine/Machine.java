@@ -28,9 +28,11 @@ import org.s8r.domain.component.composite.CompositeComponent;
 import org.s8r.domain.event.DomainEvent;
 import org.s8r.domain.event.MachineStateChangedEvent;
 import org.s8r.domain.exception.ComponentNotFoundException;
+import org.s8r.domain.exception.InvalidMachineStateTransitionException;
 import org.s8r.domain.exception.InvalidOperationException;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.lifecycle.LifecycleState;
+import org.s8r.domain.validation.MachineStateValidator;
 
 /** Represents a machine that coordinates multiple composite components. */
 public class Machine {
@@ -63,20 +65,39 @@ public class Machine {
     return new Machine(id, type, name, description, version);
   }
 
-  /** Adds a composite component to this machine. */
+  /** 
+   * Adds a composite component to this machine.
+   *
+   * @param component The composite component to add
+   * @throws InvalidOperationException if the operation is not allowed in the current state
+   * @throws IllegalArgumentException if the component is null
+   * @throws InvalidCompositeTypeException if the component is not a valid composite
+   */
   public void addComponent(CompositeComponent component) {
-    if (!isModifiable()) {
-      throw new InvalidOperationException("addComponent", this.id.getShortId(), getStateName());
-    }
+    // Validate that this operation is allowed in the current state
+    MachineStateValidator.validateOperationState(id, "addComponent", state);
+    
+    // Validate that the component is a valid composite component
+    org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(this, component);
 
     components.put(component.getId().getIdString(), component);
     logActivity("Added component: " + component.getId().getShortId());
   }
 
-  /** Removes a component from this machine. */
+  /**
+   * Removes a component from this machine.
+   *
+   * @param componentId The ID of the component to remove
+   * @throws InvalidOperationException if the operation is not allowed in the current state
+   * @throws ComponentNotFoundException if the component is not found
+   */
   public void removeComponent(ComponentId componentId) {
-    if (!isModifiable()) {
-      throw new InvalidOperationException("removeComponent", this.id.getShortId(), getStateName());
+    // Validate that this operation is allowed in the current state
+    MachineStateValidator.validateOperationState(id, "removeComponent", state);
+    
+    // Validate that the component exists
+    if (componentId == null) {
+      throw new IllegalArgumentException("Component ID cannot be null");
     }
 
     String componentIdStr = componentId.getIdString();
@@ -89,8 +110,18 @@ public class Machine {
     logActivity("Removed component: " + componentId.getShortId());
   }
 
-  /** Gets a component by its ID. */
+  /**
+   * Gets a component by its ID.
+   *
+   * @param componentId The ID of the component to retrieve
+   * @return An Optional containing the component if found, or empty if not found
+   * @throws IllegalArgumentException if the component ID is null
+   */
   public Optional<CompositeComponent> getComponent(ComponentId componentId) {
+    if (componentId == null) {
+      throw new IllegalArgumentException("Component ID cannot be null");
+    }
+    
     return Optional.ofNullable(components.get(componentId.getIdString()));
   }
 
@@ -99,16 +130,22 @@ public class Machine {
     return Collections.unmodifiableList(new ArrayList<>(components.values()));
   }
 
-  /** Initializes this machine, preparing it for operation. */
+  /**
+   * Initializes this machine, preparing it for operation.
+   *
+   * @throws InvalidOperationException if the operation is not allowed in the current state
+   */
   public void initialize() {
-    if (state != MachineState.CREATED) {
-      throw new InvalidOperationException("initialize", this.id.getShortId(), getStateName());
-    }
+    // Validate that this operation is allowed in the current state
+    MachineStateValidator.validateOperationState(id, "initialize", state);
 
     logActivity("Initializing machine");
 
     // Initialize all components
     for (CompositeComponent component : components.values()) {
+      // Validate component before initialization (redundant here but included for completeness)
+      org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(this, component);
+      
       if (component.getLifecycleState() == LifecycleState.READY) {
         logActivity("Component already initialized: " + component.getId().getShortId());
       } else {
@@ -116,24 +153,27 @@ public class Machine {
       }
     }
 
-    MachineState oldState = state;
-    state = MachineState.READY;
-    logActivity("Machine initialized successfully");
-
-    raiseEvent(new MachineStateChangedEvent(id, oldState, state, "Initialization completed"));
+    // Transition to READY state using our new setState method
+    setState(MachineState.READY, "Initialization completed");
   }
 
-  /** Starts this machine, activating all components. */
+  /**
+   * Starts this machine, activating all components.
+   *
+   * @throws InvalidOperationException if the operation is not allowed in the current state
+   */
   public void start() {
-    if (state != MachineState.READY && state != MachineState.STOPPED) {
-      throw new InvalidOperationException("start", this.id.getShortId(), getStateName());
-    }
+    // Validate that this operation is allowed in the current state
+    MachineStateValidator.validateOperationState(id, "start", state);
 
     logActivity("Starting machine");
 
     // Activate all components
     for (CompositeComponent component : components.values()) {
       try {
+        // Validate component before activation
+        org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(this, component);
+        
         component.activate();
         logActivity("Activated component: " + component.getId().getShortId());
       } catch (Exception e) {
@@ -145,24 +185,27 @@ public class Machine {
       }
     }
 
-    MachineState oldState = state;
-    state = MachineState.RUNNING;
-    logActivity("Machine started successfully");
-
-    raiseEvent(new MachineStateChangedEvent(id, oldState, state, "Machine started"));
+    // Transition to RUNNING state using our new setState method
+    setState(MachineState.RUNNING, "Machine started");
   }
 
-  /** Stops this machine, deactivating all components. */
+  /**
+   * Stops this machine, deactivating all components.
+   *
+   * @throws InvalidOperationException if the operation is not allowed in the current state
+   */
   public void stop() {
-    if (state != MachineState.RUNNING) {
-      throw new InvalidOperationException("stop", this.id.getShortId(), getStateName());
-    }
+    // Validate that this operation is allowed in the current state
+    MachineStateValidator.validateOperationState(id, "stop", state);
 
     logActivity("Stopping machine");
 
     // Deactivate all components
     for (CompositeComponent component : components.values()) {
       try {
+        // Validate component before deactivation
+        org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(this, component);
+        
         component.deactivate();
         logActivity("Deactivated component: " + component.getId().getShortId());
       } catch (Exception e) {
@@ -174,20 +217,96 @@ public class Machine {
       }
     }
 
-    MachineState oldState = state;
-    state = MachineState.STOPPED;
-    logActivity("Machine stopped successfully");
-
-    raiseEvent(new MachineStateChangedEvent(id, oldState, state, "Machine stopped"));
+    // Transition to STOPPED state using our new setState method
+    setState(MachineState.STOPPED, "Machine stopped");
   }
 
-  /** Destroys this machine, terminating all components and releasing resources. */
+  /**
+   * Pause this machine, temporarily suspending activities but maintaining state.
+   *
+   * @throws InvalidOperationException if the operation is not allowed in the current state
+   */
+  public void pause() {
+    // Validate that this operation is allowed in the current state
+    MachineStateValidator.validateOperationState(id, "pause", state);
+    
+    logActivity("Pausing machine");
+    
+    // Suspend components but don't stop them completely
+    for (CompositeComponent component : components.values()) {
+      try {
+        // Validate component before suspension
+        org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(this, component);
+        
+        if (component.getLifecycleState().isActive()) {
+          // We deactivate here, but we could have a more specialized suspend method
+          component.deactivate();
+          logActivity("Suspended component: " + component.getId().getShortId());
+        }
+      } catch (Exception e) {
+        logActivity(
+            "Failed to suspend component: "
+                + component.getId().getShortId()
+                + ", reason: "
+                + e.getMessage());
+      }
+    }
+    
+    // Transition to PAUSED state
+    setState(MachineState.PAUSED, "Machine paused");
+  }
+  
+  /**
+   * Resume this machine from a paused state.
+   *
+   * @throws InvalidOperationException if the operation is not allowed in the current state
+   */
+  public void resume() {
+    // Validate that this operation is allowed in the current state
+    MachineStateValidator.validateOperationState(id, "resume", state);
+    
+    logActivity("Resuming machine");
+    
+    // Resume components
+    for (CompositeComponent component : components.values()) {
+      try {
+        // Validate component before resuming
+        org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(this, component);
+        
+        if (component.getLifecycleState().isStandby()) {
+          component.activate();
+          logActivity("Resumed component: " + component.getId().getShortId());
+        }
+      } catch (Exception e) {
+        logActivity(
+            "Failed to resume component: "
+                + component.getId().getShortId()
+                + ", reason: "
+                + e.getMessage());
+      }
+    }
+    
+    // Transition to RUNNING state
+    setState(MachineState.RUNNING, "Machine resumed");
+  }
+
+  /**
+   * Destroys this machine, terminating all components and releasing resources.
+   *
+   * @throws InvalidOperationException if the operation is not allowed in the current state
+   */
   public void destroy() {
+    // Validate that this operation is allowed in the current state
+    MachineStateValidator.validateOperationState(id, "destroy", state);
+    
     logActivity("Destroying machine");
 
     // Terminate all components
     for (CompositeComponent component : components.values()) {
       try {
+        // Validate component before termination
+        org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(this, component);
+        
         component.terminate();
         logActivity("Terminated component: " + component.getId().getShortId());
       } catch (Exception e) {
@@ -199,33 +318,73 @@ public class Machine {
       }
     }
 
-    MachineState oldState = state;
-    state = MachineState.DESTROYED;
-    logActivity("Machine destroyed successfully");
-
-    raiseEvent(new MachineStateChangedEvent(id, oldState, state, "Machine destroyed"));
+    // Transition to DESTROYED state using our new setState method
+    setState(MachineState.DESTROYED, "Machine destroyed");
   }
 
   /** Sets the version of this machine. */
   public void setVersion(String version) {
-    if (!isModifiable()) {
-      throw new InvalidOperationException("setVersion", this.id.getShortId(), getStateName());
-    }
+    // Validate that this operation is allowed in the current state
+    MachineStateValidator.validateOperationState(id, "setVersion", state);
 
     this.version = version;
     logActivity("Version updated to: " + version);
   }
 
-  /** Checks if this machine is in a modifiable state. */
-  private boolean isModifiable() {
-    return state == MachineState.CREATED
-        || state == MachineState.READY
-        || state == MachineState.STOPPED;
+  /**
+   * Sets the machine state to a new state, validating the transition.
+   *
+   * @param newState The new state to transition to
+   * @param reason The reason for the state change
+   * @throws InvalidMachineStateTransitionException if the transition is invalid
+   */
+  public void setState(MachineState newState, String reason) {
+    MachineStateValidator.validateStateTransition(id, state, newState);
+    
+    MachineState oldState = state;
+    state = newState;
+    logActivity("State changed to " + newState + ": " + reason);
+    
+    raiseEvent(new MachineStateChangedEvent(id, oldState, state, reason));
+  }
+  
+  /**
+   * Attempts to transition the machine to the error state.
+   *
+   * @param errorReason The reason for entering the error state
+   * @return true if the transition succeeded, false if already in error or destroyed state
+   */
+  public boolean setErrorState(String errorReason) {
+    // Skip if already in ERROR state or DESTROYED state
+    if (state == MachineState.ERROR || state == MachineState.DESTROYED) {
+      return false;
+    }
+    
+    try {
+      setState(MachineState.ERROR, "Error: " + errorReason);
+      return true;
+    } catch (InvalidMachineStateTransitionException e) {
+      logActivity("Failed to transition to ERROR state: " + e.getMessage());
+      return false;
+    }
   }
 
-  /** Gets the current state name of this machine. */
-  private String getStateName() {
-    return state.name();
+  /**
+   * Resets the machine from an error state back to a ready state.
+   *
+   * @throws InvalidMachineStateTransitionException if the machine is not in the ERROR state
+   */
+  public void resetFromError() {
+    // Validate using operation validation
+    MachineStateValidator.validateOperationState(id, "reset", state);
+    
+    // Transition back to READY state
+    setState(MachineState.READY, "Reset from error state");
+  }
+  
+  /** Checks if this machine is in a modifiable state. */
+  private boolean isModifiable() {
+    return MachineStateValidator.isOperationAllowed("addComponent", state);
   }
 
   /** Logs an activity for this machine. */

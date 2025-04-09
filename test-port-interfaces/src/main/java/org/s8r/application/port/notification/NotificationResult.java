@@ -53,7 +53,7 @@ public class NotificationResult {
      *
      * @return true if the notification was successful, false otherwise
      */
-    public boolean isSuccess() {
+    public boolean isSuccessful() {
         return success;
     }
     
@@ -90,6 +90,15 @@ public class NotificationResult {
      * @return An Optional containing the error details, or empty if no error occurred
      */
     public Optional<String> getErrorDetails() {
+        return Optional.ofNullable(errorDetails);
+    }
+    
+    /**
+     * Gets the reason for failure, if any.
+     *
+     * @return An Optional containing the error reason, or empty if no error occurred
+     */
+    public Optional<String> getReason() {
         return Optional.ofNullable(errorDetails);
     }
     

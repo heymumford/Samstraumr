@@ -4,19 +4,30 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     
-    <groupId>org.s8r</groupId>
+    <parent>
+        <groupId>org.s8r</groupId>
+        <artifactId>samstraumr-parent</artifactId>
+        <version>3.0.2</version>
+        <relativePath>..</relativePath>
+    </parent>
+    
     <artifactId>port-interfaces-test</artifactId>
     <version>1.0.0</version>
+    <name>Samstraumr Port Interfaces Test Module</name>
+    <description>Test module for port interface tests</description>
     
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <cucumber.version>7.15.0</cucumber.version>
-        <junit.version>5.10.1</junit.version>
+        <karate.version>1.4.1</karate.version>
     </properties>
     
     <dependencies>
+        <dependency>
+            <groupId>org.s8r</groupId>
+            <artifactId>samstraumr-core</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        
+        <!-- Cucumber Dependencies -->
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>
@@ -35,6 +46,8 @@
             <version>${cucumber.version}</version>
             <scope>test</scope>
         </dependency>
+        
+        <!-- JUnit Dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -51,6 +64,34 @@
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-suite</artifactId>
             <version>1.10.1</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- Mockito Dependencies -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.10.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.10.0</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- Karate Dependencies -->
+        <dependency>
+            <groupId>com.intuit.karate</groupId>
+            <artifactId>karate-junit5</artifactId>
+            <version>${karate.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.intuit.karate</groupId>
+            <artifactId>karate-core</artifactId>
+            <version>${karate.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

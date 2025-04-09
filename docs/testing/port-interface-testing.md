@@ -1,7 +1,18 @@
-# Port Interface Testing Strategy
+<!--
+Copyright (c) 2025 Eric C. Mumford (@heymumford)
+
+This software was developed with analytical assistance from AI tools 
+including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+which were used as paid services. All intellectual property rights 
+remain exclusively with the copyright holder listed above.
+
+Licensed under the Mozilla Public License 2.0
+-->
+
+# Port Interface Testing Guide
 
 **Status:** Active  
-**Last Updated:** April 8, 2025  
+**Last Updated:** April 9, 2025  
 **Author:** Eric C. Mumford (@heymumford)
 
 ## Overview
@@ -81,20 +92,32 @@ Feature: [Port A]-[Port B] Integration
     And [expected integrated behavior is observed]
 ```
 
-## Directory Structure
+## Port Interface Test Module
 
-Port interface tests are organized as follows:
+The `test-port-interfaces` module contains all tests for the port interfaces in the Samstraumr framework. It follows a Behavior-Driven Development (BDD) approach using Cucumber to define test scenarios in feature files.
 
-- **Feature Files**:
-  - `modules/samstraumr-core/src/test/resources/features/port-interfaces/` - Port interface tests
-  - `modules/samstraumr-core/src/test/resources/features/integration/` - Integration tests
+### Module Structure
 
-- **Step Definitions**:
-  - `modules/samstraumr-core/src/test/java/org/s8r/test/steps/` - Port step definitions
-
-- **Test Runners**:
-  - `modules/samstraumr-core/src/test/java/org/s8r/test/runner/PortIntegrationTests.java` - Port tests
-  - `modules/samstraumr-core/src/test/java/org/s8r/test/runner/IntegrationTests.java` - Integration tests
+```
+test-port-interfaces/
+├── pom.xml                      # Maven configuration
+├── src/
+│   └── test/
+│       ├── java/
+│       │   └── org/
+│       │       └── s8r/
+│       │           ├── test/
+│       │           │   ├── context/   # Test contexts
+│       │           │   ├── integration/ # Integration components
+│       │           │   ├── mock/      # Mock adapters
+│       │           │   ├── runner/    # Test runners
+│       │           │   ├── runners/   # Individual test runners
+│       │           │   └── steps/     # Step definitions
+│       └── resources/
+│           └── features/
+│               ├── integration/   # Integration test features
+│               └── port-interfaces/ # Port interface test features
+```
 
 ## Port Interface Test Types
 
@@ -134,26 +157,59 @@ Each port interface should be tested for:
 3. Update the test runner if needed
    - The `IntegrationTests.java` runner will automatically include the test if it has the `@integration` tag
 
-## Running Port Interface Tests
+## Testing Tools
 
-Use the dedicated script to run port interface tests:
+Samstraumr provides dedicated tools for testing port interfaces:
+
+### s8r-test-port-interfaces
+
+A shell script for running port interface tests. It supports running all tests or filtering by specific port:
 
 ```bash
 # Run all port interface tests
-./s8r-test-port-interfaces
+./s8r-test-port-interfaces all
 
 # Run tests for a specific port
 ./s8r-test-port-interfaces cache
-./s8r-test-port-interfaces notification
+./s8r-test-port-interfaces filesystem
+./s8r-test-port-interfaces configuration
+./s8r-test-port-interfaces dataflow
 
-# Run all port integration tests
-./s8r-test-port-interfaces --integration all
+# Run integration tests between ports
+./s8r-test-port-interfaces integration
 
-# Run specific integration tests
-./s8r-test-port-interfaces --integration cache-fs
+# Run tests with verbose output
+./s8r-test-port-interfaces all --verbose
 
-# Generate a report on port interface test status
-./s8r-test-port-interfaces --verify --report
+# Clean before running tests
+./s8r-test-port-interfaces all --clean
+
+# Generate a test report
+./s8r-test-port-interfaces all --report
+
+# Run Karate tests only
+./s8r-test-port-interfaces karate
+```
+
+### s8r-port-coverage
+
+A tool for generating test coverage reports for port interfaces:
+
+```bash
+# Generate HTML coverage report
+./s8r-port-coverage
+
+# Generate Markdown coverage report
+./s8r-port-coverage --markdown
+
+# Generate both HTML and Markdown reports
+./s8r-port-coverage --all
+
+# Skip running tests and generate report from existing data
+./s8r-port-coverage --skip-tests
+
+# Generate coverage for Karate tests
+./s8r-port-coverage --karate
 ```
 
 ## Test Coverage Goals
@@ -167,9 +223,237 @@ Use the dedicated script to run port interface tests:
 
 For the current implementation status of port interface tests, see the [Port Interface Test Report](/docs/test-reports/port-interface-test-report.md).
 
+## Port Interface Test Implementation
+
+Each port interface test implementation consists of the following components:
+
+1. **Feature File**: Defines the behavior of the port interface using Gherkin syntax.
+2. **Test Context**: Manages the state and operations for the tests.
+3. **Mock Adapter**: Implements the port interface for testing.
+4. **Step Definitions**: Implements the steps from the feature file.
+5. **Test Runner**: Configures and runs the tests.
+
+### Example: DataFlowEventPort Test Implementation
+
+#### Feature File
+
+```gherkin
+@L2_Integration @Functional @PortInterface @DataFlow
+Feature: DataFlow Event Port Interface
+  As a system developer
+  I want to use the DataFlowEventPort interface for component data communication
+  So that I can enable components to communicate data without direct dependencies
+
+  Background:
+    Given a clean system environment
+    And the DataFlowEventPort interface is properly initialized
+    ...
+```
+
+#### Test Context
+
+```java
+public class DataFlowEventPortTestContext {
+    private final DataFlowEventPort dataFlowEventPort;
+    private final Map<String, ComponentId> componentIds;
+    private final Map<String, List<ComponentDataEvent>> receivedEvents;
+    
+    // Methods for managing test state and operations
+    ...
+}
+```
+
+#### Mock Adapter
+
+```java
+public class MockDataFlowEventAdapter implements DataFlowEventPort {
+    private final Map<String, Map<ComponentId, Consumer<ComponentDataEvent>>> channelSubscriptions;
+    private final Map<ComponentId, Set<String>> componentSubscriptions;
+    
+    // Implementation of port interface methods
+    ...
+}
+```
+
+#### Step Definitions
+
+```java
+public class DataFlowEventPortSteps {
+    private final DataFlowEventPortTestContext context;
+    
+    // Step definitions for the feature file
+    @Given("component {string} subscribes to data channel {string}")
+    public void givenComponentSubscribesToDataChannel(String componentId, String channel) {
+        ...
+    }
+    ...
+}
+```
+
+#### Test Runner
+
+```java
+@Suite
+@IncludeEngines("cucumber")
+@SelectClasspathResource("features/port-interfaces/dataflow-event-port-test.feature")
+@IncludeTags("DataFlow")
+@ConfigurationParameter(key = Constants.GLUE_PROPERTY_NAME, value = "org.s8r.test.steps")
+public class DataFlowEventPortTests {
+}
+```
+
+## Integration Testing
+
+Integration tests verify the interaction between different port interfaces. Each integration test consists of:
+
+1. **Feature File**: Defines the integration scenarios.
+2. **Integration Components**: Classes that bridge between port interfaces.
+3. **Test Context**: Manages both port interfaces and their integration.
+4. **Step Definitions**: Implements the integration steps.
+5. **Test Runner**: Configures and runs the integration tests.
+
+### Example: DataFlow-Messaging Integration
+
+The DataFlow-Messaging integration test verifies the bidirectional communication between the DataFlowEventPort and MessagingPort interfaces:
+
+```gherkin
+@L2_Integration @Functional @DataFlow @Messaging @integration
+Feature: DataFlow Event and Messaging Port Integration
+  As a system developer
+  I want to integrate DataFlowEventPort with MessagingPort
+  So that component data events can be published to messaging channels and vice versa
+```
+
+The integration is implemented using a bridge component:
+
+```java
+public class DataFlowMessagingBridge {
+    private final DataFlowEventPort dataFlowEventPort;
+    private final MessagingPort messagingPort;
+    
+    // Methods for bridging between port interfaces
+    ...
+}
+```
+
+## Best Practices
+
+When implementing port interface tests, follow these best practices:
+
+1. **Complete Port Testing**: Ensure each port interface has:
+   - A feature file with comprehensive scenarios
+   - A mock adapter implementation
+   - A test context for managing state
+   - Step definitions for all scenarios
+   - A test runner
+
+2. **Integration Testing**: Create integration tests between related port interfaces.
+
+3. **Test Coverage**: Use `s8r-port-coverage` to monitor test coverage and identify gaps.
+
+4. **Error Handling**: Include error scenarios to verify proper handling of edge cases.
+
+5. **Thread Safety**: Ensure mock implementations are thread-safe for concurrent operations.
+
+6. **Clean Architecture Principles**: Keep tests aligned with Clean Architecture principles,
+   focusing on the interface contract rather than implementation details.
+
+## Karate Testing Framework Integration
+
+In addition to Cucumber BDD tests, Samstraumr now supports the Karate testing framework for port interface tests. Karate provides a more concise syntax for API testing and is particularly well-suited for testing interfaces.
+
+### Karate Test Structure
+
+Karate tests are structured as `.feature` files with a syntax similar to Cucumber, but with built-in support for HTTP, JSON, and JavaScript:
+
+```gherkin
+Feature: Configuration Port Interface Tests
+  As an application developer
+  I want to use a standardized Configuration Port interface
+  So that I can manage application configuration properties in a consistent way
+
+  Background:
+    * def configAdapter = Java.type('org.s8r.infrastructure.config.PropertiesConfigurationAdapter').createInstance()
+    * def testProperties = { 'app.name': 'Samstraumr', 'app.version': '2.7.1' }
+
+  Scenario: Get string properties
+    Given def adapter = Java.type('org.s8r.infrastructure.config.PropertiesConfigurationAdapter').createWithProperties(karate.fromJson(testProperties))
+    When def appName = adapter.getString('app.name').get()
+    Then assert appName == 'Samstraumr'
+```
+
+### Karate vs. Cucumber BDD Tests
+
+Both testing frameworks serve different needs in the Samstraumr project:
+
+| Feature | Karate | Cucumber BDD |
+|---------|--------|-------------|
+| Primary Focus | API and Interface Testing | Behavior Verification |
+| Integration with Java | JavaScript bridge to Java | Direct Java integration |
+| Syntax Complexity | Simple, concise | More verbose |
+| Test Level | System (L3) | Unit/Integration (L0-L2) |
+| Best For | Port implementations | Domain behavior |
+
+### Currently Implemented Karate Tests
+
+The following port interfaces have Karate tests implemented:
+
+1. **Cache Port**: Testing in-memory cache operations
+2. **FileSystem Port**: Testing file system operations
+3. **Configuration Port**: Testing configuration property management
+4. **Security-Event Integration**: Testing security event publishing
+5. **Task-Notification Integration**: Testing task scheduling notifications
+
+### Running Karate Tests
+
+To run Karate tests:
+
+```bash
+# Run all Karate tests
+./s8r-test-port-interfaces karate
+
+# Run specific Karate tests
+./s8r-test-port-interfaces karate:cache
+./s8r-test-port-interfaces karate:filesystem
+./s8r-test-port-interfaces karate:configuration
+```
+
+### Karate Documentation
+
+For detailed information on writing Karate tests for Samstraumr port interfaces, see:
+- [Karate Testing Guide](/docs/testing/karate-testing-guide.md)
+- [Karate Syntax Reference](/docs/testing/karate-syntax-reference.md)
+
 ## Related Documentation
 
-- [Clean Architecture in Samstraumr](/docs/architecture/clean-architecture-migration.md)
-- [Adapter Pattern Implementation](/docs/architecture/clean/adapter-pattern-implementation.md)
-- [Port Interfaces Summary](/docs/architecture/clean/port-interfaces-summary.md)
-- [Integration Testing Strategy](/docs/testing/testing-strategy.md#integration-testing)
+- [Port Interface Test Report](/docs/test-reports/port-interface-test-report.md)
+- [Port Interface Testing Summary](/docs/test-reports/port-interface-testing-summary.md)
+- [Clean Architecture Ports](/docs/architecture/clean/port-interfaces-summary.md)
+- [Test Strategy](/docs/testing/test-strategy.md)
+- [Karate Testing Guide](/docs/testing/karate-testing-guide.md)
+- [Karate Syntax Reference](/docs/testing/karate-syntax-reference.md)
+
+## Recently Implemented: Security-Event Integration
+
+The Security-Event integration test has been implemented to verify that security events are properly published to the event system when security-related operations occur. This integration connects the SecurityPort and EventPublisherPort interfaces.
+
+### Key Components
+
+1. **SecurityEventBridge**: A bridge that connects SecurityPort and EventPublisherPort interfaces
+2. **MockSecurityAdapter**: A mock implementation of the SecurityPort interface
+3. **MockEventPublisherAdapter**: A mock implementation of the EventPublisherPort interface
+4. **SecurityEventIntegrationContext**: A test context class for managing state
+5. **SecurityEventIntegrationSteps**: Step definitions for the Cucumber BDD tests
+6. **SecurityEventIntegrationTests**: A test runner for the integration tests
+
+### Test Scenarios
+
+The Security-Event integration tests cover:
+
+1. Authentication events (success/failure)
+2. Token management events (generation, validation, revocation)
+3. Access control events (granted/denied)
+4. Security alerts (brute force attempts)
+5. User management events (role changes)
+
+For complete details on the Security-Event integration implementation, see the [Port Interface Testing Summary](/docs/test-reports/port-interface-testing-summary.md#security-event-integration).
