@@ -168,6 +168,16 @@ Thumbs.db
 #------------------------------------------------------------------------------
 # Configuration & Security Files
 #------------------------------------------------------------------------------
+# Config directory structure is tracked, but allow specific overrides
+/config/*
+!/config/.gitkeep
+!/config/README.md
+# Explicitly track specific config files as needed
+!/config/surefire-settings.xml
+# Exclude generated and backup files
+/config/effective-pom.xml
+/config/pom.xml.bak
+/config/*.bak
 # Security files
 **/*.crt
 **/*.jks
@@ -196,8 +206,9 @@ Thumbs.db
 docmosis.properties
 
 # Build and LLM specific configuration - generated at install time
+# CLAUDE.md is now tracked in docs/config/CLAUDE.md
+!/docs/config/CLAUDE.md
 /CLAUDE.md
-CLAUDE.md
 **/CLAUDE.md
 # New build documentation is now tracked in git
 

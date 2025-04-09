@@ -44,8 +44,8 @@ move_file() {
   local dest_dir=$(dirname "$dest")
   
   if [[ ! -f "$src" ]]; then
-    print_warning "Source file not found: $src"
-    return 1
+    print_warning "Source file not found: $src (skipping)"
+    return 0
   fi
   
   mkdir -p "$dest_dir"
@@ -143,8 +143,6 @@ ROOT_SAFE_FILES=(
   "$PROJECT_ROOT/README.md"
   "$PROJECT_ROOT/LICENSE"
   "$PROJECT_ROOT/pom.xml"
-  "$PROJECT_ROOT/CLAUDE.md"
-  "$PROJECT_ROOT/docmosis.properties"
   "$PROJECT_ROOT/.gitignore"
 )
 
@@ -154,8 +152,6 @@ REMAINING_FILES=$(find "$PROJECT_ROOT" -maxdepth 1 -type f \
   ! -path "$PROJECT_ROOT/README.md" \
   ! -path "$PROJECT_ROOT/LICENSE" \
   ! -path "$PROJECT_ROOT/pom.xml" \
-  ! -path "$PROJECT_ROOT/CLAUDE.md" \
-  ! -path "$PROJECT_ROOT/docmosis.properties" \
   ! -path "$PROJECT_ROOT/.gitignore" \
   ! -path "$PROJECT_ROOT/.git/*" \
   ! -path "$PROJECT_ROOT/index.html" \

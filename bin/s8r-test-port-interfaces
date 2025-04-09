@@ -1,658 +1,308 @@
-#!/usr/bin/env bash
-#==============================================================================
-# Filename: s8r-test-port-interfaces
-# Description: Test runner for port interface tests in Samstraumr
+#!/bin/bash
 #
-# Provides a dedicated interface for running port interface tests
-# with configurable options for test types, tags, and output.
-#==============================================================================
+# Copyright (c) 2025 Eric C. Mumford (@heymumford)
+#
+# This software was developed with analytical assistance from AI tools
+# including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+# which were used as paid services. All intellectual property rights
+# remain exclusively with the copyright holder listed above.
+#
+# Licensed under the Mozilla Public License 2.0
+#
 
-# Determine script directory and project root
+# Shell script to run port interface tests
+
+# Define minimal logging functions
+function log_info() {
+    echo -e "\033[0;34m[INFO]\033[0m $1"
+}
+
+function log_success() {
+    echo -e "\033[0;32m[SUCCESS]\033[0m $1"
+}
+
+function log_warning() {
+    echo -e "\033[0;33m[WARNING]\033[0m $1"
+}
+
+function log_error() {
+    echo -e "\033[0;31m[ERROR]\033[0m $1"
+}
+
+# Try to load common functions
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-export PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
-
-# Source unified common library
-if [ -f "${PROJECT_ROOT}/util/lib/unified-common.sh" ]; then
-  source "${PROJECT_ROOT}/util/lib/unified-common.sh"
-else
-  # Fallback to minimal functionality if libraries not found
-  print_error "Required libraries not found. Please run from project root."
-  exit 1
+if [ -f "${SCRIPT_DIR}/util/lib/unified-common.sh" ]; then
+    source "${SCRIPT_DIR}/util/lib/unified-common.sh"
 fi
 
-#==============================================================================
-# Configuration Constants
-#==============================================================================
+# Constants
+TEST_MODULE="test-port-interfaces"
+DEFAULT_TEST_TYPE="all"
 
-# Port interface test paths
-FEATURE_DIR="${PROJECT_ROOT}/modules/samstraumr-core/src/test/resources/features/port-interfaces"
-INTEGRATION_FEATURE_DIR="${PROJECT_ROOT}/modules/samstraumr-core/src/test/resources/features/integration"
-STEP_DEF_DIR="${PROJECT_ROOT}/modules/samstraumr-core/src/test/java/org/s8r/test/steps"
-TEST_RUNNER_CLASS="org.s8r.test.runner.PortIntegrationTests"
-INTEGRATION_RUNNER_CLASS="org.s8r.test.runner.IntegrationTests"
-
-# Port interface test types
-declare -A PORT_TESTS
-PORT_TESTS=(
-  [cache]="cache-port-test.feature,CachePortSteps"
-  [event]="event-publisher-port-test.feature,EventPublisherPortSteps"
-  [filesystem]="filesystem-port-test.feature,FileSystemPortSteps"
-  [notification]="notification-port-test.feature,NotificationPortSteps"
-  [config]="configuration-port-test.feature,ConfigurationPortSteps"
-  [task]="task-execution-port-test.feature,TaskExecutionPortSteps"
-  [all]="@port,${TEST_RUNNER_CLASS}"
-)
-
-# Integration test types
-declare -A INTEGRATION_TESTS
-INTEGRATION_TESTS=(
-  [cache-fs]="cache-filesystem-integration-test.feature,CacheFileSystemIntegrationSteps"
-  [event-notification]="event-notification-integration-test.feature,EventNotificationIntegrationSteps"
-  [validation-persistence]="validation-persistence-integration-test.feature,ValidationPersistenceIntegrationSteps"
-  [security-fs]="security-filesystem-integration-test.feature,SecurityFileSystemIntegrationSteps"
-  [all]="@integration,${INTEGRATION_RUNNER_CLASS}"
-)
-
-#==============================================================================
-# Initialize Variables
-#==============================================================================
-
-# Test execution settings
-TEST_TYPE="all"
-TEST_MODE="port"  # port (interface tests) or integration (between ports)
-VERBOSE=false
-SKIP_QUALITY=false
-OUTPUT_FILE=""
-PARALLEL=false
-COVERAGE=false
-CUSTOM_TAGS=""
-VERIFY_ONLY=false
-GENERATE_REPORT=false
-REPORT_FILE="${PROJECT_ROOT}/docs/test-reports/port-interface-verification-report.md"
-
-#==============================================================================
-# Functions
-#==============================================================================
+# Function to display help
+function show_help {
+    echo "Usage: s8r-test-port-interfaces [options] [test-type]"
+    echo ""
+    echo "Run port interface tests."
+    echo ""
+    echo "Options:"
+    echo "  -h, --help       Display this help message and exit"
+    echo "  -v, --verbose    Display verbose output"
+    echo "  --clean          Clean before running tests"
+    echo "  --report         Generate test report (implies --clean)"
+    echo ""
+    echo "Test Types:"
+    echo "  all              Run all port interface tests (default)"
+    echo "  cache            Run Cache port tests"
+    echo "  config           Run Configuration port tests"
+    echo "  dataflow         Run DataFlow port tests"
+    echo "  event            Run Event Publisher port tests"
+    echo "  filesystem       Run FileSystem port tests"
+    echo "  messaging        Run Messaging port tests"
+    echo "  notification     Run Notification port tests"
+    echo "  persistence      Run Persistence port tests"
+    echo "  security         Run Security port tests"
+    echo "  task             Run Task Execution port tests"
+    echo "  validation       Run Validation port tests"
+    echo "  integration      Run all integration tests between ports"
+    echo "  cache-filesystem Run Cache-FileSystem integration tests"
+    echo "  dataflow-messaging Run DataFlow-Messaging integration tests"
+    echo "  validation-persistence Run Validation-Persistence integration tests"
+    echo "  security-filesystem Run Security-FileSystem integration tests"
+    echo "  security-event   Run Security-Event integration tests"
+    echo "  event-notification Run Event-Notification integration tests"
+    echo "  configuration-notification Run Configuration-Notification integration tests"
+    echo "  task-notification Run Task-Notification integration tests"
+    echo ""
+    echo "Examples:"
+    echo "  s8r-test-port-interfaces all            Run all port interface tests"
+    echo "  s8r-test-port-interfaces cache          Run Cache port tests"
+    echo "  s8r-test-port-interfaces --report       Run all tests and generate report"
+    echo "  s8r-test-port-interfaces integration    Run all integration tests between ports"
+    echo "  s8r-test-port-interfaces security-event Run Security-Event integration tests"
+}
 
 # Parse command line arguments
-function parse_args() {
-  while [[ $# -gt 0 ]]; do
+VERBOSE=false
+CLEAN=false
+REPORT=false
+TEST_TYPE="$DEFAULT_TEST_TYPE"
+
+while [[ $# -gt 0 ]]; do
     case "$1" in
-      -v|--verbose)
-        VERBOSE=true
-        shift
-        ;;
-      -p|--parallel)
-        PARALLEL=true
-        shift
-        ;;
-      --coverage)
-        COVERAGE=true
-        shift
-        ;;
-      --skip-quality)
-        SKIP_QUALITY=true
-        shift
-        ;;
-      -o|--output)
-        if [[ -n "$2" && "$2" != -* ]]; then
-          OUTPUT_FILE="$2"
-          shift 2
-        else
-          print_error "Output file path missing after -o/--output"
-          show_help
-          exit 1
-        fi
-        ;;
-      --tags)
-        if [[ -n "$2" && "$2" != -* ]]; then
-          CUSTOM_TAGS="$2"
-          shift 2
-        else
-          print_error "Tag expression missing after --tags"
-          show_help
-          exit 1
-        fi
-        ;;
-      --verify)
-        VERIFY_ONLY=true
-        shift
-        ;;
-      --report)
-        GENERATE_REPORT=true
-        shift
-        ;;
-      --report-file)
-        if [[ -n "$2" && "$2" != -* ]]; then
-          REPORT_FILE="$2"
-          shift 2
-        else
-          print_error "Report file path missing after --report-file"
-          show_help
-          exit 1
-        fi
-        ;;
-      --integration)
-        TEST_MODE="integration"
-        shift
-        ;;
-      -h|--help)
-        show_help
-        exit 0
-        ;;
-      *)
-        # Try to find the test type
-        TEST_TYPE="$1"
-        shift
-        ;;
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        -v|--verbose)
+            VERBOSE=true
+            shift
+            ;;
+        --clean)
+            CLEAN=true
+            shift
+            ;;
+        --report)
+            REPORT=true
+            CLEAN=true
+            shift
+            ;;
+        all|cache|config|dataflow|event|filesystem|messaging|notification|persistence|security|task|validation|integration|cache-filesystem|dataflow-messaging|validation-persistence|security-filesystem|security-event|event-notification|configuration-notification|task-notification)
+            TEST_TYPE="$1"
+            shift
+            ;;
+        *)
+            log_error "Unknown option: $1"
+            show_help
+            exit 1
+            ;;
     esac
-  done
-}
+done
 
-# Display help information
-function show_help() {
-  print_header "Samstraumr Port Interface Test Runner"
-  echo
-  print_section "Usage"
-  echo "  ./s8r-test-port-interfaces [options] [test-type]"
-  echo
-  print_section "Options"
-  echo "  -v, --verbose           Enable verbose output"
-  echo "  -p, --parallel          Run tests in parallel"
-  echo "  --coverage              Run tests with code coverage analysis"
-  echo "  --skip-quality          Skip quality checks"
-  echo "  -o, --output <file>     Write test output to file"
-  echo "  --tags <expression>     Run tests with specific tags (e.g. \"@port and @smoke\")"
-  echo "  --verify                Only verify test suite without running tests"
-  echo "  --report                Generate test verification report"
-  echo "  --report-file <file>    Specify report output file"
-  echo "  --integration           Run integration tests between ports (instead of port interface tests)"
-  echo "  -h, --help              Show this help message"
-  echo
-  print_section "Port Test Types"
-  echo "  all                     Run all port interface tests (default)"
-  echo "  cache                   Run cache port interface tests"
-  echo "  event                   Run event publisher port interface tests"
-  echo "  filesystem              Run filesystem port interface tests"
-  echo "  notification            Run notification port interface tests"
-  echo "  config                  Run configuration port interface tests"
-  echo "  task                    Run task execution port interface tests"
-  echo
-  print_section "Integration Test Types"
-  echo "  cache-fs                Run cache-filesystem integration tests"
-  echo "  event-notification      Run event-notification integration tests"
-  echo "  validation-persistence  Run validation-persistence integration tests"
-  echo "  security-fs             Run security-filesystem integration tests"
-  echo
-  print_section "Examples"
-  echo "  ./s8r-test-port-interfaces                      # Run all port interface tests"
-  echo "  ./s8r-test-port-interfaces notification         # Run notification port tests"
-  echo "  ./s8r-test-port-interfaces --integration all    # Run all port integration tests"
-  echo "  ./s8r-test-port-interfaces --verify --report    # Verify and generate report"
-  echo "  ./s8r-test-port-interfaces --tags \"@port and @smoke\" # Run smoke tests for ports"
-}
+# Function to run Maven with the appropriate arguments
+function run_maven_test {
+    local test_class="$1"
+    local args="-f $TEST_MODULE/pom.xml"
 
-# Get test configuration based on type and mode
-function get_test_config() {
-  local test_type="$1"
-  local test_mode="$2"
-  
-  if [[ "$test_mode" == "port" ]]; then
-    if [[ -n "${PORT_TESTS[$test_type]}" ]]; then
-      echo "${PORT_TESTS[$test_type]}"
+    if $CLEAN; then
+        args="$args clean"
+    fi
+
+    args="$args test"
+
+    if [ -n "$test_class" ] && [ "$test_class" != "all" ]; then
+        args="$args -Dtest=$test_class"
+    fi
+
+    if $VERBOSE; then
+        log_info "Running: mvn $args"
+        mvn $args
     else
-      # Default to all port tests if type not found
-      print_warning "Unknown port test type: $test_type. Defaulting to 'all'."
-      echo "${PORT_TESTS[all]}"
+        log_info "Running tests for $test_class..."
+        mvn $args -q
     fi
-  else
-    if [[ -n "${INTEGRATION_TESTS[$test_type]}" ]]; then
-      echo "${INTEGRATION_TESTS[$test_type]}"
-    else
-      # Default to all integration tests if type not found
-      print_warning "Unknown integration test type: $test_type. Defaulting to 'all'."
-      echo "${INTEGRATION_TESTS[all]}"
-    fi
-  fi
 }
 
-# Verify the port interface test structure
-function verify_port_tests() {
-  print_header "Verifying Port Interface Tests"
-  
-  local details=""
-  local feature_dir
-  
-  if [[ "$TEST_MODE" == "port" ]]; then
-    feature_dir="$FEATURE_DIR"
-  else
-    feature_dir="$INTEGRATION_FEATURE_DIR"
-  fi
-  
-  # Check feature directory exists
-  if [[ ! -d "$feature_dir" ]]; then
-    print_error "Feature directory not found: $feature_dir"
-    return 1
-  fi
-  
-  # Count feature files
-  local total_files=$(find "$feature_dir" -name "*.feature" 2>/dev/null | wc -l)
-  
-  if [[ "$VERBOSE" == true ]]; then
-    print_info "Found $total_files feature files in $feature_dir"
-  fi
-  
-  # Check step definition directory exists
-  if [[ ! -d "$STEP_DEF_DIR" ]]; then
-    print_error "Step definition directory not found: $STEP_DEF_DIR"
-    return 1
-  fi
-  
-  # Verify each port or integration test
-  if [[ "$TEST_MODE" == "port" ]]; then
-    print_section "Verifying Port Interface Tests"
-    verify_test_implementation PORT_TESTS
-  else
-    print_section "Verifying Port Integration Tests"
-    verify_test_implementation INTEGRATION_TESTS
-  fi
-  
-  print_header "Port Interface Test Verification Complete"
+# Main function to run the tests
+function run_tests {
+    case "$TEST_TYPE" in
+        all)
+            log_info "Running all port interface tests..."
+            run_maven_test "org.s8r.test.runner.PortTests"
+            ;;
+        cache)
+            log_info "Running Cache port tests..."
+            run_maven_test "org.s8r.test.runners.CachePortTests"
+            ;;
+        config)
+            log_info "Running Configuration port tests..."
+            run_maven_test "org.s8r.test.runners.ConfigurationPortTests"
+            ;;
+        dataflow)
+            log_info "Running DataFlow port tests..."
+            run_maven_test "org.s8r.test.runners.DataFlowEventPortTests"
+            ;;
+        event)
+            log_info "Running Event Publisher port tests..."
+            run_maven_test "org.s8r.test.runners.EventPublisherPortTests"
+            ;;
+        filesystem)
+            log_info "Running FileSystem port tests..."
+            run_maven_test "org.s8r.test.runners.FileSystemPortTests"
+            ;;
+        messaging)
+            log_info "Running Messaging port tests..."
+            run_maven_test "org.s8r.test.runners.MessagingPortTests"
+            ;;
+        notification)
+            log_info "Running Notification port tests..."
+            run_maven_test "org.s8r.test.runners.NotificationPortTests"
+            ;;
+        persistence)
+            log_info "Running Persistence port tests..."
+            run_maven_test "org.s8r.test.runners.PersistencePortTests"
+            ;;
+        security)
+            log_info "Running Security port tests..."
+            run_maven_test "org.s8r.test.runners.SecurityPortTests"
+            ;;
+        task)
+            log_info "Running Task Execution port tests..."
+            run_maven_test "org.s8r.test.runners.TaskExecutionPortTests"
+            ;;
+        validation)
+            log_info "Running Validation port tests..."
+            run_maven_test "org.s8r.test.runners.ValidationPortTests"
+            ;;
+        integration)
+            log_info "Running integration tests between ports..."
+            run_maven_test "org.s8r.test.runner.IntegrationTests"
+            ;;
+        cache-filesystem)
+            log_info "Running Cache-FileSystem integration tests..."
+            run_maven_test "org.s8r.test.runners.CacheFileSystemIntegrationTests"
+            ;;
+        dataflow-messaging)
+            log_info "Running DataFlow-Messaging integration tests..."
+            run_maven_test "org.s8r.test.runners.DataFlowMessagingIntegrationTests"
+            ;;
+        validation-persistence)
+            log_info "Running Validation-Persistence integration tests..."
+            run_maven_test "org.s8r.test.runners.ValidationPersistenceIntegrationTests"
+            ;;
+        security-filesystem)
+            log_info "Running Security-FileSystem integration tests..."
+            run_maven_test "org.s8r.test.runners.SecurityFileSystemIntegrationTests"
+            ;;
+        security-event)
+            log_info "Running Security-Event integration tests..."
+            run_maven_test "org.s8r.test.runner.SecurityEventIntegrationTests"
+            ;;
+        event-notification)
+            log_info "Running Event-Notification integration tests..."
+            run_maven_test "org.s8r.test.runners.EventNotificationIntegrationTests"
+            ;;
+        configuration-notification)
+            log_info "Running Configuration-Notification integration tests..."
+            run_maven_test "org.s8r.test.runners.ConfigurationNotificationIntegrationTests"
+            ;;
+        task-notification)
+            log_info "Running Task-Notification integration tests..."
+            run_maven_test "org.s8r.test.runner.TaskNotificationIntegrationTests"
+            ;;
+        *)
+            log_error "Unknown test type: $TEST_TYPE"
+            show_help
+            exit 1
+            ;;
+    esac
 }
 
-# Verify implementation of specific tests
-function verify_test_implementation() {
-  local -n test_map="$1"
-  local feature_dir
-  local all_passed=true
-  
-  if [[ "$TEST_MODE" == "port" ]]; then
-    feature_dir="$FEATURE_DIR"
-  else
-    feature_dir="$INTEGRATION_FEATURE_DIR"
-  fi
-  
-  # Skip the 'all' entry which is a special case
-  for test_type in "${!test_map[@]}"; do
-    if [[ "$test_type" != "all" ]]; then
-      IFS=',' read -r feature_file step_class <<< "${test_map[$test_type]}"
-      
-      print_info "Verifying $test_type test..."
-      
-      # Check if feature file exists
-      if [[ -f "$feature_dir/$feature_file" ]]; then
-        if [[ "$VERBOSE" == true ]]; then
-          print_success "Feature file exists: $feature_file"
-        fi
-      else
-        print_warning "Feature file missing: $feature_file"
-        all_passed=false
-      fi
-      
-      # Check if step class exists
-      if [[ -f "$STEP_DEF_DIR/$step_class.java" ]]; then
-        if [[ "$VERBOSE" == true ]]; then
-          print_success "Step class exists: $step_class.java"
-        fi
-      else
-        print_warning "Step class missing: $step_class.java"
-        all_passed=false
-      fi
-      
-      # Verify feature file has proper tags
-      if [[ -f "$feature_dir/$feature_file" ]]; then
-        local has_port_tag=false
-        local has_level_tag=false
-        
-        if grep -q "@port" "$feature_dir/$feature_file"; then
-          has_port_tag=true
-        fi
-        
-        if grep -q "@L[0-9]" "$feature_dir/$feature_file"; then
-          has_level_tag=true
-        fi
-        
-        if [[ "$has_port_tag" == true && "$has_level_tag" == true ]]; then
-          if [[ "$VERBOSE" == true ]]; then
-            print_success "Feature file has required tags: $feature_file"
-          fi
-        else
-          print_warning "Feature file missing required tags: $feature_file"
-          all_passed=false
-        fi
-      fi
-    fi
-  done
-  
-  if [[ "$all_passed" == true ]]; then
-    print_success "All tests verified successfully!"
-  else
-    print_warning "Some tests have issues. See warnings above."
-  fi
-}
-
-# Run the chosen test
-function run_port_tests() {
-  local config=$(get_test_config "$TEST_TYPE" "$TEST_MODE")
-  
-  # Parse configuration
-  IFS=',' read -r feature_id test_class <<< "$config"
-  
-  # Determine if we're using tags or a specific feature
-  local use_tags=false
-  if [[ "$feature_id" == @* ]]; then
-    use_tags=true
-    local tags="$feature_id"
-  else
-    local feature_file="$feature_id"
-  fi
-  
-  # Construct Maven command for test execution
-  local mvn_args=("test" "-Dmaven.test.failure.ignore=false")
-  
-  if [[ -n "$CUSTOM_TAGS" ]]; then
-    # Use custom tags if provided
-    mvn_args+=("-Dcucumber.filter.tags=\"$CUSTOM_TAGS\"")
-  elif [[ "$use_tags" == true ]]; then
-    # Use tag from configuration
-    mvn_args+=("-Dcucumber.filter.tags=\"$tags\"")
-  else
-    # Use specific feature file
-    if [[ "$TEST_MODE" == "port" ]]; then
-      mvn_args+=("-Dcucumber.features=\"src/test/resources/features/port-interfaces/$feature_file\"")
-    else
-      mvn_args+=("-Dcucumber.features=\"src/test/resources/features/integration/$feature_file\"")
-    fi
-  fi
-  
-  # Add test class if provided
-  if [[ "$test_class" != "" && "$test_class" == org.s8r.* ]]; then
-    mvn_args+=("-Dtest=${test_class##*.}")
-  fi
-  
-  # Add quality skip if requested
-  if $SKIP_QUALITY; then
-    mvn_args+=("-Dskip.quality.checks=true")
-  fi
-  
-  # Explicitly enable tests regardless of other profiles
-  mvn_args+=("-DskipTests=false")
-  mvn_args+=("-Dmaven.test.skip=false")
-  
-  # Add parallel execution if requested
-  if $PARALLEL; then
-    mvn_args+=("-Dsurefire.parallel=classes")
-    mvn_args+=("-Dsurefire.threadCount=4")
-    print_info "Parallel test execution enabled"
-  fi
-  
-  # Add coverage if requested
-  if $COVERAGE; then
-    mvn_args+=("jacoco:prepare-agent" "jacoco:report")
-    print_info "Code coverage analysis enabled"
-  fi
-  
-  # Add verbose flag if requested
-  if $VERBOSE; then
-    mvn_args+=("-e")
-  else
-    mvn_args+=("-q")
-  fi
-  
-  # Display test information
-  if [[ "$TEST_MODE" == "port" ]]; then
-    print_header "Running Port Interface Tests: $TEST_TYPE"
-  else
-    print_header "Running Port Integration Tests: $TEST_TYPE"
-  fi
-  
-  if [[ "$use_tags" == true ]]; then
-    print_info "Using tags: $tags"
-  else
-    print_info "Feature file: $feature_file"
-  fi
-  
-  print_info "Test class: ${test_class##*.}"
-  
-  # Change to project root
-  cd "$PROJECT_ROOT"
-  
-  # Create Maven settings for tests
-  create_test_settings
-  
-  # Display the command being executed
-  print_debug "Running: mvn ${mvn_args[*]} -s surefire-settings.xml"
-  
-  # Run the tests with appropriate output handling
-  local test_result=0
-  
-  if [[ -n "$OUTPUT_FILE" ]]; then
-    # Ensure output directory exists
-    local output_dir=$(dirname "$OUTPUT_FILE")
-    ensure_directory_exists "$output_dir"
+# Function to generate test report
+function generate_report {
+    log_info "Generating test report..."
     
-    print_info "Writing output to: $OUTPUT_FILE"
+    # Create report directory if it doesn't exist
+    mkdir -p "test-results/port-interfaces"
     
-    # Use tee to capture output while still displaying it
-    if mvn "${mvn_args[@]}" -s "${PROJECT_ROOT}/surefire-settings.xml" | tee "$OUTPUT_FILE"; then
-      test_result=0
-    else
-      test_result=1
-    fi
-  else
-    # Run tests without output redirection
-    if mvn "${mvn_args[@]}" -s "${PROJECT_ROOT}/surefire-settings.xml"; then
-      test_result=0
-    else
-      test_result=1
-    fi
-  fi
-  
-  # Report result
-  if [ $test_result -eq 0 ]; then
-    print_success "Tests completed successfully"
-  else
-    print_error "Tests failed"
-    if [[ -n "$OUTPUT_FILE" ]]; then
-      print_info "See test output in: $OUTPUT_FILE"
-    fi
-    return 1
-  fi
-  
-  return 0
-}
-
-# Create Maven settings file for tests
-function create_test_settings() {
-  if [ ! -f "${PROJECT_ROOT}/surefire-settings.xml" ]; then
-    print_debug "Creating custom Maven settings for tests"
-    cat > "${PROJECT_ROOT}/surefire-settings.xml" << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
-  <activeProfiles>
-    <activeProfile>test-enabler</activeProfile>
-  </activeProfiles>
-  <profiles>
-    <profile>
-      <id>test-enabler</id>
-      <properties>
-        <skipTests>false</skipTests>
-        <maven.test.skip>false</maven.test.skip>
-      </properties>
-    </profile>
-  </profiles>
-</settings>
-EOF
-  fi
-}
-
-# Generate report on port interface tests
-function generate_report() {
-  print_header "Generating Port Interface Test Report"
-  
-  local report_dir=$(dirname "$REPORT_FILE")
-  mkdir -p "$report_dir"
-  
-  # Initialize report header
-  cat > "$REPORT_FILE" << EOF
-# Port Interface Test Report
-
-**Generated:** $(date "+%Y-%m-%d %H:%M:%S")  
-**Mode:** ${TEST_MODE^} Tests  
-**Type:** ${TEST_TYPE}
-
-## Overview
-
-This report documents the status of port interface tests in the Samstraumr project.
-Port interfaces are a critical component in maintaining clean architecture boundaries
-between application core and infrastructure components.
-
-## Test Structure
-
-EOF
-
-  # Describe test structure
-  if [[ "$TEST_MODE" == "port" ]]; then
-    cat >> "$REPORT_FILE" << EOF
-The port interface tests verify that each port correctly defines its contract 
-and that adapters properly implement the port interface contract. These tests
-ensure that the ports can be properly used by the application core and that
-adapters can be swapped without affecting the application behavior.
-
-### Port Interfaces
-
-| Port | Feature File | Implementation Status |
-|------|-------------|-----------------|
-EOF
-
-    # List all port interfaces with status
-    for test_type in "${!PORT_TESTS[@]}"; do
-      if [[ "$test_type" != "all" ]]; then
-        IFS=',' read -r feature_file step_class <<< "${PORT_TESTS[$test_type]}"
+    # Generate test report
+    local report_file="test-results/port-interfaces/port-interface-test-report-$(date +%Y%m%d_%H%M%S).txt"
+    
+    echo "Port Interface Test Report" > "$report_file"
+    echo "=========================" >> "$report_file"
+    echo "" >> "$report_file"
+    echo "Generated: $(date)" >> "$report_file"
+    echo "" >> "$report_file"
+    
+    echo "Test Results:" >> "$report_file"
+    echo "------------" >> "$report_file"
+    
+    # Parse the test results
+    local test_results=$(find "$TEST_MODULE/target/surefire-reports" -name "TEST-*.xml")
+    
+    local total_tests=0
+    local passed_tests=0
+    local failed_tests=0
+    local skipped_tests=0
+    
+    for result in $test_results; do
+        local class_name=$(grep -o 'classname="[^"]*"' "$result" | head -1 | cut -d'"' -f2)
+        local tests=$(grep -o 'tests="[^"]*"' "$result" | head -1 | cut -d'"' -f2)
+        local failures=$(grep -o 'failures="[^"]*"' "$result" | head -1 | cut -d'"' -f2)
+        local errors=$(grep -o 'errors="[^"]*"' "$result" | head -1 | cut -d'"' -f2)
+        local skipped=$(grep -o 'skipped="[^"]*"' "$result" | head -1 | cut -d'"' -f2)
         
-        local status="✅ Implemented"
-        if [[ ! -f "$FEATURE_DIR/$feature_file" || ! -f "$STEP_DEF_DIR/$step_class.java" ]]; then
-          status="❌ Missing"
-        elif ! grep -q "@port" "$FEATURE_DIR/$feature_file"; then
-          status="⚠️ Incomplete"
-        fi
+        echo "- $class_name:" >> "$report_file"
+        echo "  Tests: $tests, Failures: $failures, Errors: $errors, Skipped: $skipped" >> "$report_file"
         
-        echo "| ${test_type^} Port | $feature_file | $status |" >> "$REPORT_FILE"
-      fi
+        total_tests=$((total_tests + tests))
+        failed_tests=$((failed_tests + failures + errors))
+        skipped_tests=$((skipped_tests + skipped))
     done
-  else
-    cat >> "$REPORT_FILE" << EOF
-The port integration tests verify that different ports can work together correctly in
-integrated scenarios. These tests ensure that adapters for different ports can interoperate
-and maintain clean architecture boundaries while still providing the required functionality.
-
-### Port Integration Tests
-
-| Integration | Feature File | Implementation Status |
-|-------------|-------------|-----------------|
-EOF
-
-    # List all integration tests with status
-    for test_type in "${!INTEGRATION_TESTS[@]}"; do
-      if [[ "$test_type" != "all" ]]; then
-        IFS=',' read -r feature_file step_class <<< "${INTEGRATION_TESTS[$test_type]}"
-        
-        local status="✅ Implemented"
-        if [[ ! -f "$INTEGRATION_FEATURE_DIR/$feature_file" || ! -f "$STEP_DEF_DIR/$step_class.java" ]]; then
-          status="❌ Missing"
-        elif ! grep -q "@integration" "$INTEGRATION_FEATURE_DIR/$feature_file"; then
-          status="⚠️ Incomplete"
-        fi
-        
-        echo "| ${test_type} | $feature_file | $status |" >> "$REPORT_FILE"
-      fi
-    done
-  fi
-  
-  # Add test implementation instructions
-  cat >> "$REPORT_FILE" << EOF
-
-## Implementation Guide
-
-To implement new port interface tests:
-
-1. Create a new feature file in the appropriate directory:
-   - Port interface tests: \`modules/samstraumr-core/src/test/resources/features/port-interfaces/\`
-   - Port integration tests: \`modules/samstraumr-core/src/test/resources/features/integration/\`
-
-2. Add appropriate tags to the feature file:
-   - Port interface tests: \`@port @L1\`
-   - Port integration tests: \`@integration @L2\`
-
-3. Create step definition class in \`modules/samstraumr-core/src/test/java/org/s8r/test/steps/\`
-
-4. Run the tests with:
-   \`\`\`
-   ./s8r-test-port-interfaces [port-name]
-   \`\`\`
-   or
-   \`\`\`
-   ./s8r-test-port-interfaces --integration [integration-name]
-   \`\`\`
-
-## Related Documentation
-
-- [Port Interface Testing Strategy](/docs/testing/port-interface-testing.md)
-- [Clean Architecture Adapters](/docs/architecture/clean/adapter-pattern-implementation.md)
-- [Port Interface Implementations](/docs/guides/migration/port-interfaces-guide.md)
-
-EOF
-
-  print_success "Report generated: $REPORT_FILE"
-}
-
-# Main function to orchestrate execution
-function main() {
-  parse_args "$@"
-  
-  # Print a summary of what we're about to do
-  if $VERBOSE; then
-    print_debug "Test type: $TEST_TYPE"
-    print_debug "Test mode: $TEST_MODE"
-    print_debug "Verify only: $VERIFY_ONLY"
-    print_debug "Parallel: $PARALLEL"
-    print_debug "Coverage: $COVERAGE"
-    print_debug "Skip quality: $SKIP_QUALITY"
-    print_debug "Generate report: $GENERATE_REPORT"
-    [ -n "$OUTPUT_FILE" ] && print_debug "Output file: $OUTPUT_FILE"
-    [ -n "$REPORT_FILE" ] && print_debug "Report file: $REPORT_FILE"
-    [ -n "$CUSTOM_TAGS" ] && print_debug "Custom tags: $CUSTOM_TAGS"
-  fi
-  
-  # Setup Maven environment
-  setup_maven_opts
-  
-  # Run in verification-only mode or normal test mode
-  if [[ "$VERIFY_ONLY" == true ]]; then
-    verify_port_tests
-  else
-    # Generate report if requested
-    if [[ "$GENERATE_REPORT" == true ]]; then
-      generate_report
+    
+    passed_tests=$((total_tests - failed_tests - skipped_tests))
+    
+    echo "" >> "$report_file"
+    echo "Summary:" >> "$report_file"
+    echo "--------" >> "$report_file"
+    echo "Total Tests: $total_tests" >> "$report_file"
+    echo "Passed: $passed_tests" >> "$report_file"
+    echo "Failed: $failed_tests" >> "$report_file"
+    echo "Skipped: $skipped_tests" >> "$report_file"
+    
+    if [ $total_tests -gt 0 ]; then
+        local pass_percentage=$((passed_tests * 100 / total_tests))
+        echo "Pass Rate: $pass_percentage%" >> "$report_file"
     fi
     
-    # Run tests
-    run_port_tests
-  fi
+    log_success "Test report generated: $report_file"
 }
 
-#==============================================================================
-# Main Execution
-#==============================================================================
+# Main execution
+run_tests
 
-# Check if help is requested with no arguments or explicit help flag
-if [[ $# -eq 0 || "$1" == "-h" || "$1" == "--help" ]]; then
-  show_help
-  exit 0
+if $REPORT; then
+    generate_report
 fi
 
-# Run main function with all arguments
-main "$@"
-exit $?
+exit 0
