@@ -32,7 +32,9 @@ import org.s8r.domain.event.DomainEvent;
 import org.s8r.domain.exception.ComponentNotFoundException;
 import org.s8r.domain.exception.DuplicateComponentException;
 import org.s8r.domain.exception.InvalidOperationException;
+import org.s8r.domain.exception.PropertyBasedDuplicateComponentException;
 import org.s8r.domain.identity.ComponentId;
+import org.s8r.domain.validation.ComponentDuplicateDetector;
 
 /**
  * Application service for managing components.
@@ -44,6 +46,8 @@ public class ComponentService {
   private final ComponentRepository componentRepository;
   private final LoggerPort logger;
   private final EventPublisherPort eventPublisher;
+  private final ComponentDuplicateDetector duplicateDetector;
+  private boolean strictDuplicateDetection = false;
 
   /**
    * Creates a new ComponentService.
@@ -59,6 +63,22 @@ public class ComponentService {
     this.componentRepository = componentRepository;
     this.logger = logger;
     this.eventPublisher = eventPublisher;
+    
+    // Initialize the duplicate detector with default settings
+    this.duplicateDetector = new ComponentDuplicateDetector(componentRepository, logger);
+  }
+  
+  /**
+   * Sets whether strict duplicate detection is enabled.
+   * When enabled, components that are potential duplicates based on properties
+   * will cause exceptions to be thrown during creation.
+   *
+   * @param strict Whether strict duplicate detection is enabled
+   */
+  public void setStrictDuplicateDetection(boolean strict) {
+    this.strictDuplicateDetection = strict;
+    this.duplicateDetector.setStrictMode(strict);
+    logger.info("Strict duplicate detection set to: {}", strict);
   }
 
   /**
@@ -88,6 +108,23 @@ public class ComponentService {
 
     // Convert to ComponentPort using the adapter
     ComponentPort componentPort = org.s8r.adapter.ComponentAdapter.createComponentPort(component);
+
+    // Perform property-based duplicate detection
+    if (strictDuplicateDetection) {
+      // If strict mode is enabled, the detector will throw an exception if duplicates are found
+      duplicateDetector.checkForDuplicates(componentPort);
+    } else {
+      // In non-strict mode, just check and log potential duplicates
+      List<ComponentPort> potentialDuplicates = duplicateDetector.checkForDuplicates(componentPort);
+      
+      if (!potentialDuplicates.isEmpty()) {
+        logger.warn("Potential duplicate component(s) detected for new component {}: {}",
+            id.getIdString(),
+            potentialDuplicates.stream()
+                .map(c -> c.getId().getIdString())
+                .collect(java.util.stream.Collectors.joining(", ")));
+      }
+    }
 
     // Dispatch any events raised during creation
     dispatchDomainEvents(componentPort);
@@ -136,6 +173,23 @@ public class ComponentService {
 
     // Add parent's lineage to child
     parentPort.getLineage().forEach(childPort::addToLineage);
+    
+    // Perform property-based duplicate detection
+    if (strictDuplicateDetection) {
+      // If strict mode is enabled, the detector will throw an exception if duplicates are found
+      duplicateDetector.checkForDuplicates(childPort);
+    } else {
+      // In non-strict mode, just check and log potential duplicates
+      List<ComponentPort> potentialDuplicates = duplicateDetector.checkForDuplicates(childPort);
+      
+      if (!potentialDuplicates.isEmpty()) {
+        logger.warn("Potential duplicate component(s) detected for new child component {}: {}",
+            childId.getIdString(),
+            potentialDuplicates.stream()
+                .map(c -> c.getId().getIdString())
+                .collect(java.util.stream.Collectors.joining(", ")));
+      }
+    }
 
     // Dispatch any events raised during creation
     dispatchDomainEvents(childPort);
@@ -302,6 +356,23 @@ public class ComponentService {
     // Convert to CompositeComponentPort using the adapter
     CompositeComponentPort compositePort =
         org.s8r.adapter.ComponentAdapter.createCompositeComponentPort(composite);
+        
+    // Perform property-based duplicate detection
+    if (strictDuplicateDetection) {
+      // If strict mode is enabled, the detector will throw an exception if duplicates are found
+      duplicateDetector.checkForDuplicates(compositePort);
+    } else {
+      // In non-strict mode, just check and log potential duplicates
+      List<ComponentPort> potentialDuplicates = duplicateDetector.checkForDuplicates(compositePort);
+      
+      if (!potentialDuplicates.isEmpty()) {
+        logger.warn("Potential duplicate component(s) detected for new composite {}: {}",
+            compositeId.getIdString(),
+            potentialDuplicates.stream()
+                .map(c -> c.getId().getIdString())
+                .collect(java.util.stream.Collectors.joining(", ")));
+      }
+    }
 
     // Dispatch any events raised during creation
     dispatchDomainEvents(compositePort);
