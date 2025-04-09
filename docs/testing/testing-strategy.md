@@ -21,11 +21,12 @@ Licensed under the Mozilla Public License 2.0
 5. [Above The Line vs Below The Line](#above-the-line-vs-below-the-line)
 6. [Testing Taxonomy in Detail](#testing-taxonomy-in-detail)
 7. [Test Organization](#test-organization)
-8. [Continuous Integration Strategy](#continuous-integration-strategy)
-9. [Running Tests](#running-tests)
-10. [Implementation Status](#implementation-status)
-11. [Related Research](#related-research)
-12. [References](#references)
+8. [Port Interface Testing](#port-interface-testing)
+9. [Continuous Integration Strategy](#continuous-integration-strategy)
+10. [Running Tests](#running-tests)
+11. [Implementation Status](#implementation-status)
+12. [Related Research](#related-research)
+13. [References](#references)
 
 ## Overview
 
@@ -160,6 +161,33 @@ Tests are organized by their level:
 4. **L3 - Stream (System) Tests** - Tests the entire system
 5. **L4 - Orchestration (Smoke) Tests** - Tests system assembly
 
+## Port Interface Testing
+
+Port interface testing is a critical aspect of maintaining clean architecture boundaries in the Samstraumr system. Port interfaces define the boundary between the application core and infrastructure components, allowing for modularity and interchangeability of external systems.
+
+### Port Interface Test Organization
+
+Port interface tests are organized into two main categories:
+
+1. **Port Interface Tests** - Tests individual port interfaces in isolation to verify their contract
+2. **Port Integration Tests** - Tests the integration between different ports to verify their interoperability
+
+Port interfaces follow Clean Architecture principles:
+
+- **Ports**: Defined by the application core (inner circle)
+- **Adapters**: Implement port interfaces in the infrastructure layer (outer circle)
+
+### Port Interface Test Strategy
+
+The port interface test strategy incorporates:
+
+1. **BDD Approach**: Uses Gherkin feature files to define the expected behavior of ports
+2. **Contract Verification**: Ensures both the port interface and adapters adhere to the defined contract
+3. **Isolation**: Tests each port independently to validate its interface
+4. **Integration**: Tests combinations of ports to ensure they work together properly
+
+For more details, see [Port Interface Testing](port-interface-testing.md) and the [Port Interface Test Report](../test-reports/port-interface-test-report.md).
+
 ## Continuous Integration Strategy
 
 Our CI pipeline implements a progressive testing approach:
@@ -172,17 +200,29 @@ Our CI pipeline implements a progressive testing approach:
 
 ## Running Tests
 
-Tests can be run using both terminology sets with our custom runner:
+Tests can be run using our specialized test runners:
 
 ```bash
-# Testing Strategy
-./run-tests.sh unit
+# Run tests by level and type
+bin/s8r-test unit           # Run unit (L0) tests
+bin/s8r-test component      # Run component (L1) tests
+bin/s8r-test integration    # Run integration (L2) tests
+bin/s8r-test system         # Run system (L3) tests
 
-# Testing Strategy
-./run-tests.sh --both unit
+# Run tests by function
+bin/s8r-test lifecycle      # Run lifecycle tests
+bin/s8r-test identity       # Run identity tests
+bin/s8r-test error-handling # Run error handling tests
 
-# Testing Strategy
-./run-tests.sh --profile btl-tests integration
+# Run port interface tests
+bin/s8r-test-port-interfaces                # Run all port interface tests
+bin/s8r-test-port-interfaces cache          # Test cache port interface
+bin/s8r-test-port-interfaces notification   # Test notification port interface
+bin/s8r-test-port-interfaces --integration  # Run port integration tests
+
+# Run with verification and reporting
+bin/s8r-test --verify --report              # Verify test structure and generate report
+bin/s8r-test-port-interfaces --verify --report # Verify port tests and generate report
 ```
 
 ## Implementation Status
@@ -192,14 +232,16 @@ For the current implementation status of our testing infrastructure, see the fol
 - [Test Suite Implementation Report](../test-reports/test-suite-implementation-report.md) - Detailed status of test implementation progress
 - [Test Suite Verification Summary](../test-reports/test-suite-verification-summary.md) - Summary of verification results for existing tests
 - [Test Verification Report](../test-reports/test-verification-report.md) - Comprehensive verification of test quality and coverage
+- [Port Interface Test Report](../test-reports/port-interface-test-report.md) - Status of port interface tests and integration tests
 
 ### Recent Enhancements
 
 The following recent enhancements have been made to our testing infrastructure:
 
 1. **Lifecycle Testing** - Comprehensive test infrastructure for component lifecycle management with specialized test runners and execution modes
-2. **Test Verification** - Enhanced verification tools to ensure test completeness and quality
-3. **Test Organization** - Improved directory structure and naming conventions for tests
+2. **Port Interface Testing** - Dedicated infrastructure for testing port interfaces and port integration with a specialized test runner
+3. **Test Verification** - Enhanced verification tools to ensure test completeness and quality
+4. **Test Organization** - Improved directory structure and naming conventions for tests
 
 ## Related Research
 

@@ -84,6 +84,12 @@ bin/s8r-test lifecycle      # Lifecycle tests (P1)
 bin/s8r-test error-handling # Error handling tests (P1)
 bin/s8r-test integration    # Integration tests
 
+# Run port interface tests
+bin/s8r-test-port-interfaces                # Run all port interface tests
+bin/s8r-test-port-interfaces cache          # Test cache port interface
+bin/s8r-test-port-interfaces notification   # Test notification port interface
+bin/s8r-test-port-interfaces --integration  # Run port integration tests
+
 # Run with specialized test scripts
 bin/s8r-test-lifecycle             # Run basic lifecycle state tests
 bin/s8r-test-lifecycle negative    # Run lifecycle error handling tests
@@ -298,6 +304,8 @@ java-switch 21
 
 - [Maven Structure Guide](maven-structure.md)
 - [Test Strategy](../testing/test-strategy.md)
+- [Port Interface Testing](../testing/port-interface-testing.md)
 - [Quality Checks](quality-checks.md)
 - [Version Management](version-management.md)
 - [Test Suite Implementation Report](../test-reports/test-suite-implementation-report.md)
+- [Port Interface Test Report](../test-reports/port-interface-test-report.md)
