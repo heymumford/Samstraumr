@@ -29,6 +29,23 @@ public class KarateL3SystemRunner {
         return Karate.run("classpath:karate/L3_System/system-end-to-end-test.feature").relativeTo(getClass());
     }
     
-    // Additional test methods for other L3_System tests can be added here
-    // as they are migrated from Cucumber to Karate
+    @Karate.Test
+    Karate systemResilienceTests() {
+        return Karate.run("classpath:karate/L3_System/system-resilience-test.feature").relativeTo(getClass());
+    }
+    
+    @Karate.Test
+    Karate systemSecurityTests() {
+        return Karate.run("classpath:karate/L3_System/system-security-test.feature").relativeTo(getClass());
+    }
+    
+    @Karate.Test
+    Karate systemReliabilityTests() {
+        return Karate.run("classpath:karate/L3_System/system-reliability-test.feature").relativeTo(getClass());
+    }
+    
+    @Karate.Test
+    Karate systemScalabilityTests() {
+        return Karate.run("classpath:karate/L3_System/system-scalability-test.feature").relativeTo(getClass());
+    }
 }
