@@ -59,7 +59,7 @@ Licensed under the Mozilla Public License 2.0
     
     <!-- Plugin versions -->
     <pmd.plugin.version>3.21.0</pmd.plugin.version>
-    <owasp.plugin.version>8.4.2</owasp.plugin.version>
+    <owasp.plugin.version>12.1.6</owasp.plugin.version>
     <findsecbugs.version>1.13.0</findsecbugs.version>
     <javadoc.plugin.version>3.6.3</javadoc.plugin.version>
     <maven.enforcer.plugin.version>3.4.1</maven.enforcer.plugin.version>
@@ -77,7 +77,7 @@ Licensed under the Mozilla Public License 2.0
     <jacoco.branch.coverage>0.80</jacoco.branch.coverage>
     <maven.site.plugin.version>4.0.0-M13</maven.site.plugin.version>
     <maven.project.info.reports.plugin.version>3.5.0</maven.project.info.reports.plugin.version>
-    <dependency-check.version>9.0.7</dependency-check.version>
+    <dependency-check.version>12.1.6</dependency-check.version>
   </properties>
   
   <!-- Dependency management to ensure consistent versions across modules -->
