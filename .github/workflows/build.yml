@@ -30,7 +30,7 @@ jobs:
         NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
     
     - name: Upload OWASP Dependency Check report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v5
       if: always()
       with:
         name: dependency-check-report

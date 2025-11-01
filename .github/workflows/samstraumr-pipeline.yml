@@ -175,7 +175,7 @@ jobs:
       # Upload architecture verification report
       - name: Upload Architecture Report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: architecture-report
           path: architecture-report.md
