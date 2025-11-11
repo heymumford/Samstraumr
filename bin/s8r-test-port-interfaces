@@ -1,0 +1,308 @@
+#!/bin/bash
+#
+# Copyright (c) 2025 Eric C. Mumford (@heymumford)
+#
+# This software was developed with analytical assistance from AI tools
+# including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+# which were used as paid services. All intellectual property rights
+# remain exclusively with the copyright holder listed above.
+#
+# Licensed under the Mozilla Public License 2.0
+#
+
+# Shell script to run port interface tests
+
+# Define minimal logging functions
+function log_info() {
+    echo -e "\033[0;34m[INFO]\033[0m $1"
+}
+
+function log_success() {
+    echo -e "\033[0;32m[SUCCESS]\033[0m $1"
+}
+
+function log_warning() {
+    echo -e "\033[0;33m[WARNING]\033[0m $1"
+}
+
+function log_error() {
+    echo -e "\033[0;31m[ERROR]\033[0m $1"
+}
+
+# Try to load common functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "${SCRIPT_DIR}/util/lib/unified-common.sh" ]; then
+    source "${SCRIPT_DIR}/util/lib/unified-common.sh"
+fi
+
+# Constants
+TEST_MODULE="test-port-interfaces"
+DEFAULT_TEST_TYPE="all"
+
+# Function to display help
+function show_help {
+    echo "Usage: s8r-test-port-interfaces [options] [test-type]"
+    echo ""
+    echo "Run port interface tests."
+    echo ""
+    echo "Options:"
+    echo "  -h, --help       Display this help message and exit"
+    echo "  -v, --verbose    Display verbose output"
+    echo "  --clean          Clean before running tests"
+    echo "  --report         Generate test report (implies --clean)"
+    echo ""
+    echo "Test Types:"
+    echo "  all              Run all port interface tests (default)"
+    echo "  cache            Run Cache port tests"
+    echo "  config           Run Configuration port tests"
+    echo "  dataflow         Run DataFlow port tests"
+    echo "  event            Run Event Publisher port tests"
+    echo "  filesystem       Run FileSystem port tests"
+    echo "  messaging        Run Messaging port tests"
+    echo "  notification     Run Notification port tests"
+    echo "  persistence      Run Persistence port tests"
+    echo "  security         Run Security port tests"
+    echo "  task             Run Task Execution port tests"
+    echo "  validation       Run Validation port tests"
+    echo "  integration      Run all integration tests between ports"
+    echo "  cache-filesystem Run Cache-FileSystem integration tests"
+    echo "  dataflow-messaging Run DataFlow-Messaging integration tests"
+    echo "  validation-persistence Run Validation-Persistence integration tests"
+    echo "  security-filesystem Run Security-FileSystem integration tests"
+    echo "  security-event   Run Security-Event integration tests"
+    echo "  event-notification Run Event-Notification integration tests"
+    echo "  configuration-notification Run Configuration-Notification integration tests"
+    echo "  task-notification Run Task-Notification integration tests"
+    echo ""
+    echo "Examples:"
+    echo "  s8r-test-port-interfaces all            Run all port interface tests"
+    echo "  s8r-test-port-interfaces cache          Run Cache port tests"
+    echo "  s8r-test-port-interfaces --report       Run all tests and generate report"
+    echo "  s8r-test-port-interfaces integration    Run all integration tests between ports"
+    echo "  s8r-test-port-interfaces security-event Run Security-Event integration tests"
+}
+
+# Parse command line arguments
+VERBOSE=false
+CLEAN=false
+REPORT=false
+TEST_TYPE="$DEFAULT_TEST_TYPE"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        -v|--verbose)
+            VERBOSE=true
+            shift
+            ;;
+        --clean)
+            CLEAN=true
+            shift
+            ;;
+        --report)
+            REPORT=true
+            CLEAN=true
+            shift
+            ;;
+        all|cache|config|dataflow|event|filesystem|messaging|notification|persistence|security|task|validation|integration|cache-filesystem|dataflow-messaging|validation-persistence|security-filesystem|security-event|event-notification|configuration-notification|task-notification)
+            TEST_TYPE="$1"
+            shift
+            ;;
+        *)
+            log_error "Unknown option: $1"
+            show_help
+            exit 1
+            ;;
+    esac
+done
+
+# Function to run Maven with the appropriate arguments
+function run_maven_test {
+    local test_class="$1"
+    local args="-f $TEST_MODULE/pom.xml"
+
+    if $CLEAN; then
+        args="$args clean"
+    fi
+
+    args="$args test"
+
+    if [ -n "$test_class" ] && [ "$test_class" != "all" ]; then
+        args="$args -Dtest=$test_class"
+    fi
+
+    if $VERBOSE; then
+        log_info "Running: mvn $args"
+        mvn $args
+    else
+        log_info "Running tests for $test_class..."
+        mvn $args -q
+    fi
+}
+
+# Main function to run the tests
+function run_tests {
+    case "$TEST_TYPE" in
+        all)
+            log_info "Running all port interface tests..."
+            run_maven_test "org.s8r.test.runner.PortTests"
+            ;;
+        cache)
+            log_info "Running Cache port tests..."
+            run_maven_test "org.s8r.test.runners.CachePortTests"
+            ;;
+        config)
+            log_info "Running Configuration port tests..."
+            run_maven_test "org.s8r.test.runners.ConfigurationPortTests"
+            ;;
+        dataflow)
+            log_info "Running DataFlow port tests..."
+            run_maven_test "org.s8r.test.runners.DataFlowEventPortTests"
+            ;;
+        event)
+            log_info "Running Event Publisher port tests..."
+            run_maven_test "org.s8r.test.runners.EventPublisherPortTests"
+            ;;
+        filesystem)
+            log_info "Running FileSystem port tests..."
+            run_maven_test "org.s8r.test.runners.FileSystemPortTests"
+            ;;
+        messaging)
+            log_info "Running Messaging port tests..."
+            run_maven_test "org.s8r.test.runners.MessagingPortTests"
+            ;;
+        notification)
+            log_info "Running Notification port tests..."
+            run_maven_test "org.s8r.test.runners.NotificationPortTests"
+            ;;
+        persistence)
+            log_info "Running Persistence port tests..."
+            run_maven_test "org.s8r.test.runners.PersistencePortTests"
+            ;;
+        security)
+            log_info "Running Security port tests..."
+            run_maven_test "org.s8r.test.runners.SecurityPortTests"
+            ;;
+        task)
+            log_info "Running Task Execution port tests..."
+            run_maven_test "org.s8r.test.runners.TaskExecutionPortTests"
+            ;;
+        validation)
+            log_info "Running Validation port tests..."
+            run_maven_test "org.s8r.test.runners.ValidationPortTests"
+            ;;
+        integration)
+            log_info "Running integration tests between ports..."
+            run_maven_test "org.s8r.test.runner.IntegrationTests"
+            ;;
+        cache-filesystem)
+            log_info "Running Cache-FileSystem integration tests..."
+            run_maven_test "org.s8r.test.runners.CacheFileSystemIntegrationTests"
+            ;;
+        dataflow-messaging)
+            log_info "Running DataFlow-Messaging integration tests..."
+            run_maven_test "org.s8r.test.runners.DataFlowMessagingIntegrationTests"
+            ;;
+        validation-persistence)
+            log_info "Running Validation-Persistence integration tests..."
+            run_maven_test "org.s8r.test.runners.ValidationPersistenceIntegrationTests"
+            ;;
+        security-filesystem)
+            log_info "Running Security-FileSystem integration tests..."
+            run_maven_test "org.s8r.test.runners.SecurityFileSystemIntegrationTests"
+            ;;
+        security-event)
+            log_info "Running Security-Event integration tests..."
+            run_maven_test "org.s8r.test.runner.SecurityEventIntegrationTests"
+            ;;
+        event-notification)
+            log_info "Running Event-Notification integration tests..."
+            run_maven_test "org.s8r.test.runners.EventNotificationIntegrationTests"
+            ;;
+        configuration-notification)
+            log_info "Running Configuration-Notification integration tests..."
+            run_maven_test "org.s8r.test.runners.ConfigurationNotificationIntegrationTests"
+            ;;
+        task-notification)
+            log_info "Running Task-Notification integration tests..."
+            run_maven_test "org.s8r.test.runner.TaskNotificationIntegrationTests"
+            ;;
+        *)
+            log_error "Unknown test type: $TEST_TYPE"
+            show_help
+            exit 1
+            ;;
+    esac
+}
+
+# Function to generate test report
+function generate_report {
+    log_info "Generating test report..."
+    
+    # Create report directory if it doesn't exist
+    mkdir -p "test-results/port-interfaces"
+    
+    # Generate test report
+    local report_file="test-results/port-interfaces/port-interface-test-report-$(date +%Y%m%d_%H%M%S).txt"
+    
+    echo "Port Interface Test Report" > "$report_file"
+    echo "=========================" >> "$report_file"
+    echo "" >> "$report_file"
+    echo "Generated: $(date)" >> "$report_file"
+    echo "" >> "$report_file"
+    
+    echo "Test Results:" >> "$report_file"
+    echo "------------" >> "$report_file"
+    
+    # Parse the test results
+    local test_results=$(find "$TEST_MODULE/target/surefire-reports" -name "TEST-*.xml")
+    
+    local total_tests=0
+    local passed_tests=0
+    local failed_tests=0
+    local skipped_tests=0
+    
+    for result in $test_results; do
+        local class_name=$(grep -o 'classname="[^"]*"' "$result" | head -1 | cut -d'"' -f2)
+        local tests=$(grep -o 'tests="[^"]*"' "$result" | head -1 | cut -d'"' -f2)
+        local failures=$(grep -o 'failures="[^"]*"' "$result" | head -1 | cut -d'"' -f2)
+        local errors=$(grep -o 'errors="[^"]*"' "$result" | head -1 | cut -d'"' -f2)
+        local skipped=$(grep -o 'skipped="[^"]*"' "$result" | head -1 | cut -d'"' -f2)
+        
+        echo "- $class_name:" >> "$report_file"
+        echo "  Tests: $tests, Failures: $failures, Errors: $errors, Skipped: $skipped" >> "$report_file"
+        
+        total_tests=$((total_tests + tests))
+        failed_tests=$((failed_tests + failures + errors))
+        skipped_tests=$((skipped_tests + skipped))
+    done
+    
+    passed_tests=$((total_tests - failed_tests - skipped_tests))
+    
+    echo "" >> "$report_file"
+    echo "Summary:" >> "$report_file"
+    echo "--------" >> "$report_file"
+    echo "Total Tests: $total_tests" >> "$report_file"
+    echo "Passed: $passed_tests" >> "$report_file"
+    echo "Failed: $failed_tests" >> "$report_file"
+    echo "Skipped: $skipped_tests" >> "$report_file"
+    
+    if [ $total_tests -gt 0 ]; then
+        local pass_percentage=$((passed_tests * 100 / total_tests))
+        echo "Pass Rate: $pass_percentage%" >> "$report_file"
+    fi
+    
+    log_success "Test report generated: $report_file"
+}
+
+# Main execution
+run_tests
+
+if $REPORT; then
+    generate_report
+fi
+
+exit 0

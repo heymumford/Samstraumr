@@ -74,18 +74,18 @@ fix_file() {
 }
 
 # Fix composite tests
-fix_file "/home/emumford/NativeLinuxProjects/Samstraumr/s8r-component-tests.sh" "composite create without name" "" "COMPONENT" "composite" "create"
-fix_file "/home/emumford/NativeLinuxProjects/Samstraumr/s8r-component-tests.sh" "composite add without component" "" "COMPONENT" "composite" "add"
-fix_file "/home/emumford/NativeLinuxProjects/Samstraumr/s8r-component-tests.sh" "composite add without composite" "" "COMPONENT" "composite" "add"
-fix_file "/home/emumford/NativeLinuxProjects/Samstraumr/s8r-component-tests.sh" "composite connect without from" "" "COMPONENT" "composite" "connect"
-fix_file "/home/emumford/NativeLinuxProjects/Samstraumr/s8r-component-tests.sh" "composite connect without to" "" "COMPONENT" "composite" "connect"
-fix_file "/home/emumford/NativeLinuxProjects/Samstraumr/s8r-component-tests.sh" "composite connect without composite" "" "COMPONENT" "composite" "connect"
+fix_file "/home/emumford/NativeLinuxProjects/modules/s8r-component-tests.sh" "composite create without name" "" "COMPONENT" "composite" "create"
+fix_file "/home/emumford/NativeLinuxProjects/modules/s8r-component-tests.sh" "composite add without component" "" "COMPONENT" "composite" "add"
+fix_file "/home/emumford/NativeLinuxProjects/modules/s8r-component-tests.sh" "composite add without composite" "" "COMPONENT" "composite" "add"
+fix_file "/home/emumford/NativeLinuxProjects/modules/s8r-component-tests.sh" "composite connect without from" "" "COMPONENT" "composite" "connect"
+fix_file "/home/emumford/NativeLinuxProjects/modules/s8r-component-tests.sh" "composite connect without to" "" "COMPONENT" "composite" "connect"
+fix_file "/home/emumford/NativeLinuxProjects/modules/s8r-component-tests.sh" "composite connect without composite" "" "COMPONENT" "composite" "connect"
 
 # Fix machine tests
-fix_file "/home/emumford/NativeLinuxProjects/Samstraumr/s8r-component-tests.sh" "machine create without name" "" "COMPONENT" "machine" "create"
-fix_file "/home/emumford/NativeLinuxProjects/Samstraumr/s8r-component-tests.sh" "machine add without composite" "" "COMPONENT" "machine" "add"
-fix_file "/home/emumford/NativeLinuxProjects/Samstraumr/s8r-component-tests.sh" "machine add without machine" "" "COMPONENT" "machine" "add"
-fix_file "/home/emumford/NativeLinuxProjects/Samstraumr/s8r-component-tests.sh" "machine start without name" "" "COMPONENT" "machine" "start"
-fix_file "/home/emumford/NativeLinuxProjects/Samstraumr/s8r-component-tests.sh" "machine stop without name" "" "COMPONENT" "machine" "stop"
+fix_file "/home/emumford/NativeLinuxProjects/modules/s8r-component-tests.sh" "machine create without name" "" "COMPONENT" "machine" "create"
+fix_file "/home/emumford/NativeLinuxProjects/modules/s8r-component-tests.sh" "machine add without composite" "" "COMPONENT" "machine" "add"
+fix_file "/home/emumford/NativeLinuxProjects/modules/s8r-component-tests.sh" "machine add without machine" "" "COMPONENT" "machine" "add"
+fix_file "/home/emumford/NativeLinuxProjects/modules/s8r-component-tests.sh" "machine start without name" "" "COMPONENT" "machine" "start"
+fix_file "/home/emumford/NativeLinuxProjects/modules/s8r-component-tests.sh" "machine stop without name" "" "COMPONENT" "machine" "stop"
 
 echo "Tests fixed\!"

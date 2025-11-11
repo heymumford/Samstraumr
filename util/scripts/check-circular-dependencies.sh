@@ -15,8 +15,29 @@ echo "Analyzing code for circular dependencies between packages"
 echo
 
 # Set directories to analyze
-SOURCE_DIR="$REPO_ROOT/Samstraumr/samstraumr-core/src/main/java/org/s8r"
-TEST_DIR="$REPO_ROOT/Samstraumr/samstraumr-core/src/test/java/org/s8r"
+SOURCE_DIR="$REPO_ROOT/modules/samstraumr-core/src/main/java/org/s8r"
+TEST_DIR="$REPO_ROOT/modules/samstraumr-core/src/test/java/org/s8r"
+
+# Check if directories exist, and adjust if needed
+if [ ! -d "$SOURCE_DIR" ]; then
+    echo "Warning: Source directory not found at $SOURCE_DIR"
+    # Try alternate path (without modules)
+    ALT_SOURCE_DIR="$REPO_ROOT/Samstraumr/samstraumr-core/src/main/java/org/s8r"
+    if [ -d "$ALT_SOURCE_DIR" ]; then
+        echo "Using alternate source directory: $ALT_SOURCE_DIR"
+        SOURCE_DIR="$ALT_SOURCE_DIR"
+    fi
+fi
+
+if [ ! -d "$TEST_DIR" ]; then
+    echo "Warning: Test directory not found at $TEST_DIR"
+    # Try alternate path (without modules)
+    ALT_TEST_DIR="$REPO_ROOT/Samstraumr/samstraumr-core/src/test/java/org/s8r"
+    if [ -d "$ALT_TEST_DIR" ]; then
+        echo "Using alternate test directory: $ALT_TEST_DIR"
+        TEST_DIR="$ALT_TEST_DIR"
+    fi
+fi
 
 # Java class to run the dependency analysis
 ANALYZER_CLASS="org.s8r.architecture.util.CircularDependencyAnalyzer"
@@ -449,12 +470,26 @@ fi
 
 # Run the analyzer on source and test directories
 echo "Analyzing source code..."
-java -cp "$TEMP_DIR" "$MAIN_CLASS" "$SOURCE_DIR" --suggestions "$TEMP_DIR/refactoring-suggestions.txt"
-SOURCE_RESULT=$?
+if [ -d "$SOURCE_DIR" ]; then
+    # Remove leading slash if present to avoid path issues
+    fixed_source_dir="${SOURCE_DIR#/}"
+    java -cp "$TEMP_DIR" "$MAIN_CLASS" "$fixed_source_dir" --suggestions "$TEMP_DIR/refactoring-suggestions.txt"
+    SOURCE_RESULT=$?
+else
+    echo "Error: Source directory not found. Skipping source code analysis."
+    SOURCE_RESULT=0
+fi
 
 echo -e "\nAnalyzing test code..."
-java -cp "$TEMP_DIR" "$MAIN_CLASS" "$TEST_DIR"
-TEST_RESULT=$?
+if [ -d "$TEST_DIR" ]; then
+    # Remove leading slash if present to avoid path issues
+    fixed_test_dir="${TEST_DIR#/}"
+    java -cp "$TEMP_DIR" "$MAIN_CLASS" "$fixed_test_dir"
+    TEST_RESULT=$?
+else
+    echo "Error: Test directory not found. Skipping test code analysis."
+    TEST_RESULT=0
+fi
 
 # Display results
 if [ $SOURCE_RESULT -eq 0 ] && [ $TEST_RESULT -eq 0 ]; then

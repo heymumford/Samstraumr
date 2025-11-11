@@ -27,7 +27,7 @@ PROJECT_ROOT="$SCRIPT_DIR"
 cd "$PROJECT_ROOT"
 
 # Define source and target directories
-SRC_DIR="Samstraumr/samstraumr-core/src/test/resources"
+SRC_DIR="modules/samstraumr-core/src/test/resources"
 FEATURE_DIR="$SRC_DIR/features"
 
 # Back up existing feature files

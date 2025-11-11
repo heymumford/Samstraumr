@@ -1,0 +1,195 @@
+#!/bin/bash
+# s8r-test-coverage - A script to analyze and report test coverage across different categories
+
+# Set colors for output
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+# Get project root directory
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+if [ -z "$PROJECT_ROOT" ]; then
+  PROJECT_ROOT="$PWD"
+fi
+
+# Display header
+echo -e "${BLUE}======================================================${NC}"
+echo -e "${BLUE}      Samstraumr Test Coverage Analysis              ${NC}"
+echo -e "${BLUE}======================================================${NC}"
+echo
+
+# Function to count test files by category
+count_test_files() {
+  local package="$1"
+  local count=$(find "$PROJECT_ROOT/modules/samstraumr-core/src/test/java/org/s8r/$package" -name "*Test.java" 2>/dev/null | wc -l)
+  echo "$count"
+}
+
+# Function to count feature files by category
+count_feature_files() {
+  local dir="$1"
+  local count=$(find "$PROJECT_ROOT/modules/samstraumr-core/src/test/resources/features/$dir" -name "*.feature" 2>/dev/null | wc -l)
+  echo "$count"
+}
+
+# Calculate test statistics
+ARCHITECTURE_TESTS=$(count_test_files "architecture")
+ADAPTER_TESTS=$(count_test_files "adapter")
+APPLICATION_TESTS=$(count_test_files "application")
+DOMAIN_TESTS=$(count_test_files "domain")
+INFRASTRUCTURE_TESTS=$(count_test_files "infrastructure")
+TUBE_TESTS=$(count_test_files "tube")
+MIGRATION_TESTS=$(count_test_files "migration")
+
+COMPONENT_FEATURES=$(count_feature_files "component")
+COMPOSITE_FEATURES=$(count_feature_files "composite-patterns")
+IDENTITY_FEATURES=$(count_feature_files "identity")
+INTEGRATION_FEATURES=$(count_feature_files "integration")
+LIFECYCLE_FEATURES=$(count_feature_files "lifecycle-unified")
+MACHINE_FEATURES=$(count_feature_files "machine")
+PATTERN_FEATURES=$(count_feature_files "patterns-unified")
+PORT_FEATURES=$(count_feature_files "port-interfaces")
+SYSTEM_FEATURES=$(count_feature_files "system")
+
+TOTAL_JAVA_TESTS=$((ARCHITECTURE_TESTS + ADAPTER_TESTS + APPLICATION_TESTS + DOMAIN_TESTS + INFRASTRUCTURE_TESTS + TUBE_TESTS + MIGRATION_TESTS))
+TOTAL_FEATURE_FILES=$((COMPONENT_FEATURES + COMPOSITE_FEATURES + IDENTITY_FEATURES + INTEGRATION_FEATURES + LIFECYCLE_FEATURES + MACHINE_FEATURES + PATTERN_FEATURES + PORT_FEATURES + SYSTEM_FEATURES))
+
+# Calculate code coverage if JaCoCo report exists
+CODE_COVERAGE_LINE="N/A"
+CODE_COVERAGE_BRANCH="N/A"
+CODE_COVERAGE_METHOD="N/A"
+CODE_COVERAGE_CLASS="N/A"
+JACOCO_REPORT="$PROJECT_ROOT/modules/samstraumr-core/target/site/jacoco/index.html"
+if [ -f "$JACOCO_REPORT" ]; then
+  # Extract code coverage percentages from JaCoCo report
+  CODE_COVERAGE_LINE=$(grep -o 'Total.*Line.*[0-9]\+\.[0-9]\+%' "$JACOCO_REPORT" 2>/dev/null | grep -o '[0-9]\+\.[0-9]\+%')
+  CODE_COVERAGE_BRANCH=$(grep -o 'Total.*Branch.*[0-9]\+\.[0-9]\+%' "$JACOCO_REPORT" 2>/dev/null | grep -o '[0-9]\+\.[0-9]\+%')
+  CODE_COVERAGE_METHOD=$(grep -o 'Total.*Method.*[0-9]\+\.[0-9]\+%' "$JACOCO_REPORT" 2>/dev/null | grep -o '[0-9]\+\.[0-9]\+%')
+  CODE_COVERAGE_CLASS=$(grep -o 'Total.*Class.*[0-9]\+\.[0-9]\+%' "$JACOCO_REPORT" 2>/dev/null | grep -o '[0-9]\+\.[0-9]\+%')
+  
+  # Set defaults if not found
+  CODE_COVERAGE_LINE=${CODE_COVERAGE_LINE:-"N/A"}
+  CODE_COVERAGE_BRANCH=${CODE_COVERAGE_BRANCH:-"N/A"}
+  CODE_COVERAGE_METHOD=${CODE_COVERAGE_METHOD:-"N/A"} 
+  CODE_COVERAGE_CLASS=${CODE_COVERAGE_CLASS:-"N/A"}
+fi
+
+# Display test statistics by category
+echo -e "${CYAN}Java Test Files by Category:${NC}"
+echo -e "Architecture Tests:    ${GREEN}$ARCHITECTURE_TESTS${NC}"
+echo -e "Adapter Tests:         ${GREEN}$ADAPTER_TESTS${NC}"
+echo -e "Application Tests:     ${GREEN}$APPLICATION_TESTS${NC}"
+echo -e "Domain Tests:          ${GREEN}$DOMAIN_TESTS${NC}"
+echo -e "Infrastructure Tests:  ${GREEN}$INFRASTRUCTURE_TESTS${NC}"
+echo -e "Tube Tests:            ${GREEN}$TUBE_TESTS${NC}"
+echo -e "Migration Tests:       ${GREEN}$MIGRATION_TESTS${NC}"
+echo -e "${CYAN}Total Java Test Files:  ${GREEN}$TOTAL_JAVA_TESTS${NC}"
+echo
+
+echo -e "${CYAN}BDD Feature Files by Category:${NC}"
+echo -e "Component Features:    ${GREEN}$COMPONENT_FEATURES${NC}"
+echo -e "Composite Features:    ${GREEN}$COMPOSITE_FEATURES${NC}"
+echo -e "Identity Features:     ${GREEN}$IDENTITY_FEATURES${NC}"
+echo -e "Integration Features:  ${GREEN}$INTEGRATION_FEATURES${NC}"
+echo -e "Lifecycle Features:    ${GREEN}$LIFECYCLE_FEATURES${NC}"
+echo -e "Machine Features:      ${GREEN}$MACHINE_FEATURES${NC}"
+echo -e "Pattern Features:      ${GREEN}$PATTERN_FEATURES${NC}"
+echo -e "Port Interface Features:${GREEN}$PORT_FEATURES${NC}"
+echo -e "System Features:       ${GREEN}$SYSTEM_FEATURES${NC}"
+echo -e "${CYAN}Total Feature Files:   ${GREEN}$TOTAL_FEATURE_FILES${NC}"
+echo
+
+echo -e "${CYAN}Code Coverage:${NC}"
+echo -e "Line Coverage:         ${GREEN}$CODE_COVERAGE_LINE${NC} (Target: ${YELLOW}75%${NC})"
+echo -e "Branch Coverage:       ${GREEN}$CODE_COVERAGE_BRANCH${NC} (Target: ${YELLOW}75%${NC})"
+echo -e "Method Coverage:       ${GREEN}$CODE_COVERAGE_METHOD${NC}"
+echo -e "Class Coverage:        ${GREEN}$CODE_COVERAGE_CLASS${NC}"
+echo
+
+# Check for test coverage gaps
+echo -e "${CYAN}Test Coverage Analysis:${NC}"
+
+# Function to evaluate coverage and give recommendation
+evaluate_coverage() {
+  local category="$1"
+  local count="$2"
+  local target="$3"
+  
+  if [ "$count" -lt "$target" ]; then
+    local gap=$((target - count))
+    echo -e "$category: ${RED}$count/$target${NC} (Need $gap more tests)"
+    return 1
+  else
+    echo -e "$category: ${GREEN}$count/$target${NC} (Good coverage)"
+    return 0
+  fi
+}
+
+# Set minimum targets
+DOMAIN_TARGET=10
+APPLICATION_TARGET=15
+INFRA_TARGET=15
+ADAPTER_TARGET=15
+INTEGRATION_TARGET=10
+SYSTEM_TARGET=5
+
+# Evaluate all categories
+GAPS=0
+
+evaluate_coverage "Domain Tests" "$DOMAIN_TESTS" "$DOMAIN_TARGET" || ((GAPS++))
+evaluate_coverage "Application Tests" "$APPLICATION_TESTS" "$APPLICATION_TARGET" || ((GAPS++))
+evaluate_coverage "Infrastructure Tests" "$INFRASTRUCTURE_TESTS" "$INFRA_TARGET" || ((GAPS++))
+evaluate_coverage "Adapter Tests" "$ADAPTER_TESTS" "$ADAPTER_TARGET" || ((GAPS++))
+evaluate_coverage "Integration Features" "$INTEGRATION_FEATURES" "$INTEGRATION_TARGET" || ((GAPS++))
+evaluate_coverage "System Features" "$SYSTEM_FEATURES" "$SYSTEM_TARGET" || ((GAPS++))
+
+echo
+
+# Give overall assessment
+if [ "$GAPS" -eq 0 ]; then
+  echo -e "${GREEN}✓ Overall test coverage meets recommended targets${NC}"
+else
+  echo -e "${YELLOW}! Found $GAPS test coverage gaps that should be addressed${NC}"
+  echo
+  echo -e "${CYAN}Recommendations:${NC}"
+  
+  if [ "$DOMAIN_TESTS" -lt "$DOMAIN_TARGET" ]; then
+    echo -e "→ Add more domain model tests to verify core business logic"
+  fi
+  
+  if [ "$APPLICATION_TESTS" -lt "$APPLICATION_TARGET" ]; then
+    echo -e "→ Add more application service tests to verify use case implementations"
+  fi
+  
+  if [ "$INFRASTRUCTURE_TESTS" -lt "$INFRA_TARGET" ]; then
+    echo -e "→ Add more infrastructure adapter tests for external services"
+  fi
+  
+  if [ "$ADAPTER_TESTS" -lt "$ADAPTER_TARGET" ]; then
+    echo -e "→ Add more adapter tests for clean architecture boundaries"
+  fi
+  
+  if [ "$INTEGRATION_FEATURES" -lt "$INTEGRATION_TARGET" ]; then
+    echo -e "→ Add more integration tests for component interactions"
+  fi
+  
+  if [ "$SYSTEM_FEATURES" -lt "$SYSTEM_TARGET" ]; then
+    echo -e "→ Add more system tests for end-to-end functionality"
+  fi
+fi
+
+echo
+echo -e "${BLUE}To run all tests:${NC} ./s8r-test all"
+echo -e "${BLUE}For code coverage analysis:${NC} ./s8r-test all --coverage"
+echo -e "${BLUE}Coverage report location:${NC} ./modules/samstraumr-core/target/site/jacoco/index.html"
+echo
+
+# Display last test run timestamp
+LAST_TEST_RUN=$(find "$PROJECT_ROOT/modules/samstraumr-core/target/surefire-reports" -name "*.xml" -type f -printf "%TY-%Tm-%Td %TH:%TM:%TS\n" 2>/dev/null | sort -r | head -n 1)
+
+if [ -n "$LAST_TEST_RUN" ]; then
+  echo -e "${BLUE}Last test run:${NC} $LAST_TEST_RUN"
+fi

@@ -1,0 +1,632 @@
+#!/usr/bin/env bash
+#==============================================================================
+# Filename: analyze-test-coverage
+# Description: Detailed test coverage analysis tool
+#
+# Analyzes test coverage reports and provides detailed insights into coverage
+# gaps, helping to prioritize additional test development.
+#==============================================================================
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+
+# Source unified common library for consistent output formatting
+if [ -f "${PROJECT_ROOT}/util/lib/unified-common.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/unified-common.sh"
+else
+  # Fallback to minimal functionality if library not found
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  BLUE='\033[0;34m'
+  YELLOW='\033[0;33m'
+  BOLD='\033[1m'
+  RESET='\033[0m'
+  
+  print_info() { echo -e "${BLUE}→ $1${RESET}"; }
+  print_success() { echo -e "${GREEN}✓ $1${RESET}"; }
+  print_error() { echo -e "${RED}✗ $1${RESET}" >&2; exit 1; }
+  print_warning() { echo -e "${YELLOW}! $1${RESET}" >&2; }
+  print_header() { echo -e "${BLUE}${BOLD}$1${RESET}"; echo -e "${BLUE}${BOLD}$(printf '=%.0s' $(seq 1 ${#1}))${RESET}"; }
+  print_section() { echo -e "${BLUE}$1${RESET}"; }
+fi
+
+# Initialize variables
+VERBOSE=false
+GENERATE_REPORT=false
+REPORT_FILE="${PROJECT_ROOT}/test-coverage-analysis.md"
+MIN_COVERAGE_THRESHOLD=80
+TARGET_COVERAGE_THRESHOLD=90
+COVERAGE_REPORT_DIR=""
+OUTPUT_FORMAT="text"
+INCLUDE_PATTERNS=()
+EXCLUDE_PATTERNS=()
+
+# Function to display help
+show_help() {
+  print_header "Test Coverage Analysis Tool"
+  echo
+  print_section "Description"
+  echo "  This tool analyzes test coverage reports and identifies coverage gaps to help prioritize"
+  echo "  further test development efforts."
+  echo
+  print_section "Usage"
+  echo "  analyze-test-coverage [options]"
+  echo
+  print_section "Options"
+  echo "  -v, --verbose             Show detailed output"
+  echo "  -r, --report              Generate a detailed markdown report"
+  echo "  -o, --output FILE         Specify report output file (default: test-coverage-analysis.md)"
+  echo "  -d, --report-dir DIR      Specify JaCoCo report directory (auto-detected by default)"
+  echo "  -f, --format FORMAT       Output format: text, markdown, html (default: text)"
+  echo "  -m, --min-threshold N     Minimum coverage threshold percentage (default: 80)"
+  echo "  -t, --target-threshold N  Target coverage threshold percentage (default: 90)"
+  echo "  -i, --include PATTERN     Include only classes matching pattern (can be used multiple times)"
+  echo "  -e, --exclude PATTERN     Exclude classes matching pattern (can be used multiple times)"
+  echo "  -h, --help                Show this help message"
+  echo
+  print_section "Examples"
+  echo "  analyze-test-coverage                     # Basic coverage analysis"
+  echo "  analyze-test-coverage -v -r               # Verbose analysis with report"
+  echo "  analyze-test-coverage -i 'org.s8r.core.*' # Analyze only core packages"
+  echo "  analyze-test-coverage -m 70 -t 85         # Set custom thresholds"
+}
+
+# Parse command line arguments
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -v|--verbose)
+        VERBOSE=true
+        shift
+        ;;
+      -r|--report)
+        GENERATE_REPORT=true
+        shift
+        ;;
+      -o|--output)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          REPORT_FILE="$2"
+          shift 2
+        else
+          print_error "Output file path missing after -o/--output"
+          show_help
+          exit 1
+        fi
+        ;;
+      -d|--report-dir)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          COVERAGE_REPORT_DIR="$2"
+          shift 2
+        else
+          print_error "Report directory path missing after -d/--report-dir"
+          show_help
+          exit 1
+        fi
+        ;;
+      -f|--format)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          OUTPUT_FORMAT="$2"
+          shift 2
+        else
+          print_error "Format value missing after -f/--format"
+          show_help
+          exit 1
+        fi
+        ;;
+      -m|--min-threshold)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          MIN_COVERAGE_THRESHOLD="$2"
+          shift 2
+        else
+          print_error "Threshold value missing after -m/--min-threshold"
+          show_help
+          exit 1
+        fi
+        ;;
+      -t|--target-threshold)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          TARGET_COVERAGE_THRESHOLD="$2"
+          shift 2
+        else
+          print_error "Threshold value missing after -t/--target-threshold"
+          show_help
+          exit 1
+        fi
+        ;;
+      -i|--include)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          INCLUDE_PATTERNS+=("$2")
+          shift 2
+        else
+          print_error "Pattern missing after -i/--include"
+          show_help
+          exit 1
+        fi
+        ;;
+      -e|--exclude)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          EXCLUDE_PATTERNS+=("$2")
+          shift 2
+        else
+          print_error "Pattern missing after -e/--exclude"
+          show_help
+          exit 1
+        fi
+        ;;
+      -h|--help)
+        show_help
+        exit 0
+        ;;
+      *)
+        print_error "Unknown option: $1"
+        show_help
+        exit 1
+        ;;
+    esac
+  done
+}
+
+# Find the JaCoCo report directory if not specified
+find_coverage_report() {
+  if [[ -z "$COVERAGE_REPORT_DIR" ]]; then
+    # Look for JaCoCo report directory in common locations
+    local jacoco_paths=(
+      "${PROJECT_ROOT}/modules/samstraumr-core/target/site/jacoco"
+      "${PROJECT_ROOT}/Samstraumr/samstraumr-core/target/site/jacoco"
+      "${PROJECT_ROOT}/target/site/jacoco"
+    )
+    
+    for path in "${jacoco_paths[@]}"; do
+      if [[ -d "$path" && -f "$path/index.html" ]]; then
+        COVERAGE_REPORT_DIR="$path"
+        print_info "Found JaCoCo report directory: $COVERAGE_REPORT_DIR"
+        return 0
+      fi
+    done
+    
+    # If report not found, try to generate it
+    print_info "No coverage report found. Generating coverage report..."
+    
+    if [[ -x "${PROJECT_ROOT}/bin/s8r-test" ]]; then
+      "${PROJECT_ROOT}/bin/s8r-test" all --coverage >/dev/null 2>&1
+    else
+      print_error "Cannot generate coverage report: s8r-test script not found."
+      exit 1
+    fi
+    
+    # Check again for report directory
+    for path in "${jacoco_paths[@]}"; do
+      if [[ -d "$path" && -f "$path/index.html" ]]; then
+        COVERAGE_REPORT_DIR="$path"
+        print_info "Generated JaCoCo report directory: $COVERAGE_REPORT_DIR"
+        return 0
+      fi
+    done
+    
+    print_error "Failed to find or generate coverage report."
+    exit 1
+  else
+    # Verify specified directory exists
+    if [[ ! -d "$COVERAGE_REPORT_DIR" || ! -f "$COVERAGE_REPORT_DIR/index.html" ]]; then
+      print_error "Specified coverage report directory is invalid: $COVERAGE_REPORT_DIR"
+      exit 1
+    fi
+  fi
+  
+  return 0
+}
+
+# Initialize the report file
+init_report() {
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    # Create report directory if it doesn't exist
+    local report_dir=$(dirname "$REPORT_FILE")
+    mkdir -p "$report_dir"
+    
+    # Initialize report with header and timestamp
+    cat > "$REPORT_FILE" << EOF
+# Test Coverage Analysis Report
+
+**Generated:** $(date "+%Y-%m-%d %H:%M:%S")  
+**Minimum Threshold:** ${MIN_COVERAGE_THRESHOLD}%  
+**Target Threshold:** ${TARGET_COVERAGE_THRESHOLD}%
+
+## Summary
+
+_Summary will be populated after analysis_
+
+## Coverage by Package
+
+_Package analysis will be populated after analysis_
+
+## Coverage Gaps
+
+_Coverage gaps will be populated after analysis_
+
+## Recommendations
+
+_Recommendations will be populated after analysis_
+
+EOF
+  fi
+}
+
+# Parse JaCoCo HTML report to extract coverage data
+parse_jacoco_report() {
+  print_header "Parsing JaCoCo Coverage Report"
+  
+  local index_file="${COVERAGE_REPORT_DIR}/index.html"
+  if [[ ! -f "$index_file" ]]; then
+    print_error "JaCoCo index.html not found in ${COVERAGE_REPORT_DIR}"
+    exit 1
+  fi
+  
+  # Extract overall coverage metrics
+  print_info "Extracting overall coverage metrics..."
+  
+  # Line coverage
+  local line_coverage=$(grep -A1 "Lines" "$index_file" | tail -n1 | sed -n 's/.*>\([0-9.]*\)%<.*/\1/p')
+  
+  # Branch coverage
+  local branch_coverage=$(grep -A1 "Branches" "$index_file" | tail -n1 | sed -n 's/.*>\([0-9.]*\)%<.*/\1/p')
+  
+  # Method coverage
+  local method_coverage=$(grep -A1 "Methods" "$index_file" | tail -n1 | sed -n 's/.*>\([0-9.]*\)%<.*/\1/p')
+  
+  # Class coverage
+  local class_coverage=$(grep -A1 "Classes" "$index_file" | tail -n1 | sed -n 's/.*>\([0-9.]*\)%<.*/\1/p')
+  
+  # Calculate total coverage (average of line and branch coverage)
+  local total_coverage=$(echo "scale=2; ($line_coverage + $branch_coverage) / 2" | bc)
+  
+  # Output overall coverage metrics
+  print_section "Overall Coverage Metrics"
+  echo "  Line Coverage:   ${line_coverage}%"
+  echo "  Branch Coverage: ${branch_coverage}%"
+  echo "  Method Coverage: ${method_coverage}%"
+  echo "  Class Coverage:  ${class_coverage}%"
+  echo "  Total Coverage:  ${total_coverage}%"
+  
+  # Extract package-level coverage data
+  print_info "Extracting package-level coverage data..."
+  
+  # Temporary file to store package data
+  local package_data_file="/tmp/jacoco_package_data.txt"
+  
+  # Extract package tables from index.html
+  grep -A500 "<table " "$index_file" | grep -B500 "</table>" | grep -A2 "package.html" > "$package_data_file"
+  
+  # Parse package data
+  declare -A package_coverage
+  declare -A package_missing_lines
+  declare -A package_missing_branches
+  
+  while IFS= read -r line; do
+    if [[ "$line" == *"package.html"* ]]; then
+      # Extract package name
+      local package_name=$(echo "$line" | sed -n 's/.*>\(.*\)<\/a>.*/\1/p')
+      
+      # Skip if package should be excluded
+      local should_exclude=false
+      for pattern in "${EXCLUDE_PATTERNS[@]}"; do
+        if [[ "$package_name" =~ $pattern ]]; then
+          should_exclude=true
+          break
+        fi
+      done
+      
+      if [[ "$should_exclude" == true ]]; then
+        continue
+      fi
+      
+      # Skip if include patterns exist and package doesn't match any
+      if [[ ${#INCLUDE_PATTERNS[@]} -gt 0 ]]; then
+        local should_include=false
+        for pattern in "${INCLUDE_PATTERNS[@]}"; do
+          if [[ "$package_name" =~ $pattern ]]; then
+            should_include=true
+            break
+          fi
+        done
+        
+        if [[ "$should_include" == false ]]; then
+          continue
+        fi
+      fi
+      
+      # Get package report
+      local package_report="${COVERAGE_REPORT_DIR}/${package_name}/index.html"
+      if [[ -f "$package_report" ]]; then
+        # Extract coverage data from package report
+        local pkg_line_coverage=$(grep -A1 "Lines" "$package_report" | tail -n1 | sed -n 's/.*>\([0-9.]*\)%<.*/\1/p')
+        local pkg_branch_coverage=$(grep -A1 "Branches" "$package_report" | tail -n1 | sed -n 's/.*>\([0-9.]*\)%<.*/\1/p')
+        
+        # Store coverage data
+        package_coverage["$package_name"]=$(echo "scale=2; ($pkg_line_coverage + $pkg_branch_coverage) / 2" | bc)
+        
+        # Extract missing coverage data
+        local missing_lines=$(grep -o "[0-9,]* of [0-9,]* lines missed" "$package_report" | sed 's/ of [0-9,]* lines missed//')
+        local missing_branches=$(grep -o "[0-9,]* of [0-9,]* branches missed" "$package_report" | sed 's/ of [0-9,]* branches missed//')
+        
+        package_missing_lines["$package_name"]="$missing_lines"
+        package_missing_branches["$package_name"]="$missing_branches"
+        
+        if [[ "$VERBOSE" == true ]]; then
+          echo "  Package: $package_name, Coverage: ${package_coverage["$package_name"]}%, Missing: ${package_missing_lines["$package_name"]} lines, ${package_missing_branches["$package_name"]} branches"
+        fi
+      fi
+    fi
+  done < "$package_data_file"
+  
+  # Find low coverage packages
+  print_section "Low Coverage Packages"
+  local low_coverage_packages=()
+  local medium_coverage_packages=()
+  local high_coverage_packages=()
+  
+  for package in "${!package_coverage[@]}"; do
+    local coverage=${package_coverage["$package"]}
+    
+    if (( $(echo "$coverage < $MIN_COVERAGE_THRESHOLD" | bc -l) )); then
+      low_coverage_packages+=("$package")
+      echo "  ❌ $package: ${coverage}% (${package_missing_lines["$package"]} lines, ${package_missing_branches["$package"]} branches missed)"
+    elif (( $(echo "$coverage < $TARGET_COVERAGE_THRESHOLD" | bc -l) )); then
+      medium_coverage_packages+=("$package")
+      echo "  ⚠️ $package: ${coverage}% (${package_missing_lines["$package"]} lines, ${package_missing_branches["$package"]} branches missed)"
+    else
+      high_coverage_packages+=("$package")
+      if [[ "$VERBOSE" == true ]]; then
+        echo "  ✅ $package: ${coverage}% (${package_missing_lines["$package"]} lines, ${package_missing_branches["$package"]} branches missed)"
+      fi
+    fi
+  done
+  
+  # Extract class-level coverage data for low coverage packages
+  print_section "Classes Needing Additional Tests"
+  
+  for package in "${low_coverage_packages[@]}"; do
+    local package_report="${COVERAGE_REPORT_DIR}/${package}/index.html"
+    if [[ -f "$package_report" ]]; then
+      echo "  Package: $package"
+      
+      # Extract class tables from package report
+      grep -A500 "<table " "$package_report" | grep -B500 "</table>" | grep -A2 ".html\"" | grep -v "package.html" > "/tmp/jacoco_class_data.txt"
+      
+      # Parse class data
+      while IFS= read -r line; do
+        if [[ "$line" == *".html"* ]]; then
+          # Extract class name
+          local class_name=$(echo "$line" | sed -n 's/.*>\(.*\)<\/a>.*/\1/p')
+          local class_file=$(echo "$line" | sed -n 's/.*href="\([^"]*\)".*/\1/p')
+          
+          # Get class report
+          local class_report="${COVERAGE_REPORT_DIR}/${package}/${class_file}"
+          if [[ -f "$class_report" ]]; then
+            # Extract coverage data from class report
+            local cls_line_coverage=$(grep -A1 "Lines" "$class_report" | tail -n1 | sed -n 's/.*>\([0-9.]*\)%<.*/\1/p')
+            local cls_branch_coverage=$(grep -A1 "Branches" "$class_report" | tail -n1 | sed -n 's/.*>\([0-9.]*\)%<.*/\1/p')
+            
+            # Calculate overall class coverage
+            local cls_coverage=$(echo "scale=2; ($cls_line_coverage + $cls_branch_coverage) / 2" | bc)
+            
+            # Show low coverage classes
+            if (( $(echo "$cls_coverage < $MIN_COVERAGE_THRESHOLD" | bc -l) )); then
+              echo "    ❌ $class_name: ${cls_coverage}%"
+            elif (( $(echo "$cls_coverage < $TARGET_COVERAGE_THRESHOLD" | bc -l) )); then
+              echo "    ⚠️ $class_name: ${cls_coverage}%"
+            elif [[ "$VERBOSE" == true ]]; then
+              echo "    ✅ $class_name: ${cls_coverage}%"
+            fi
+          fi
+        fi
+      done < "/tmp/jacoco_class_data.txt"
+    fi
+  done
+  
+  # Clean up temporary files
+  rm -f "/tmp/jacoco_package_data.txt" "/tmp/jacoco_class_data.txt"
+  
+  # Generate recommendations
+  print_section "Recommendations"
+  
+  if [[ ${#low_coverage_packages[@]} -gt 0 ]]; then
+    echo "  High Priority: Create tests for these packages:"
+    for package in "${low_coverage_packages[@]}"; do
+      echo "    - $package (${package_coverage["$package"]}%)"
+    done
+  fi
+  
+  if [[ ${#medium_coverage_packages[@]} -gt 0 ]]; then
+    echo "  Medium Priority: Improve test coverage for these packages:"
+    for package in "${medium_coverage_packages[@]}"; do
+      echo "    - $package (${package_coverage["$package"]}%)"
+    done
+  fi
+  
+  # Update the report
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    # Create a temporary file for the updated report
+    local temp_file="/tmp/coverage_report_temp.md"
+    
+    # Keep the header
+    head -n 7 "$REPORT_FILE" > "$temp_file"
+    
+    # Add summary section
+    cat >> "$temp_file" << EOF
+## Summary
+
+| Metric | Coverage | Status |
+|--------|----------|--------|
+| Line Coverage | ${line_coverage}% | $(if (( $(echo "$line_coverage >= $TARGET_COVERAGE_THRESHOLD" | bc -l) )); then echo "✅"; elif (( $(echo "$line_coverage >= $MIN_COVERAGE_THRESHOLD" | bc -l) )); then echo "⚠️"; else echo "❌"; fi) |
+| Branch Coverage | ${branch_coverage}% | $(if (( $(echo "$branch_coverage >= $TARGET_COVERAGE_THRESHOLD" | bc -l) )); then echo "✅"; elif (( $(echo "$branch_coverage >= $MIN_COVERAGE_THRESHOLD" | bc -l) )); then echo "⚠️"; else echo "❌"; fi) |
+| Method Coverage | ${method_coverage}% | $(if (( $(echo "$method_coverage >= $TARGET_COVERAGE_THRESHOLD" | bc -l) )); then echo "✅"; elif (( $(echo "$method_coverage >= $MIN_COVERAGE_THRESHOLD" | bc -l) )); then echo "⚠️"; else echo "❌"; fi) |
+| Class Coverage | ${class_coverage}% | $(if (( $(echo "$class_coverage >= $TARGET_COVERAGE_THRESHOLD" | bc -l) )); then echo "✅"; elif (( $(echo "$class_coverage >= $MIN_COVERAGE_THRESHOLD" | bc -l) )); then echo "⚠️"; else echo "❌"; fi) |
+| **Total Coverage** | **${total_coverage}%** | $(if (( $(echo "$total_coverage >= $TARGET_COVERAGE_THRESHOLD" | bc -l) )); then echo "✅"; elif (( $(echo "$total_coverage >= $MIN_COVERAGE_THRESHOLD" | bc -l) )); then echo "⚠️"; else echo "❌"; fi) |
+
+**Status Legend:**
+- ✅ Meets target threshold (${TARGET_COVERAGE_THRESHOLD}%+)
+- ⚠️ Meets minimum threshold (${MIN_COVERAGE_THRESHOLD}%-${TARGET_COVERAGE_THRESHOLD}%)
+- ❌ Below minimum threshold (<${MIN_COVERAGE_THRESHOLD}%)
+
+## Coverage by Package
+
+| Package | Coverage | Missing Lines | Missing Branches | Status |
+|---------|----------|---------------|-----------------|--------|
+EOF
+    
+    # Add package coverage data
+    for package in "${!package_coverage[@]}"; do
+      local coverage=${package_coverage["$package"]}
+      local status_icon
+      
+      if (( $(echo "$coverage >= $TARGET_COVERAGE_THRESHOLD" | bc -l) )); then
+        status_icon="✅"
+      elif (( $(echo "$coverage >= $MIN_COVERAGE_THRESHOLD" | bc -l) )); then
+        status_icon="⚠️"
+      else
+        status_icon="❌"
+      fi
+      
+      echo "| $package | ${coverage}% | ${package_missing_lines["$package"]} | ${package_missing_branches["$package"]} | $status_icon |" >> "$temp_file"
+    done
+    
+    # Add coverage gaps section
+    cat >> "$temp_file" << EOF
+
+## Coverage Gaps
+
+### Low Coverage Packages (below ${MIN_COVERAGE_THRESHOLD}%)
+
+EOF
+    
+    if [[ ${#low_coverage_packages[@]} -gt 0 ]]; then
+      for package in "${low_coverage_packages[@]}"; do
+        echo "- **$package**: ${package_coverage["$package"]}% coverage" >> "$temp_file"
+        
+        # Add low coverage classes for this package
+        local package_report="${COVERAGE_REPORT_DIR}/${package}/index.html"
+        if [[ -f "$package_report" ]]; then
+          echo "  - Classes needing tests:" >> "$temp_file"
+          
+          # Extract class tables from package report
+          grep -A500 "<table " "$package_report" | grep -B500 "</table>" | grep -A2 ".html\"" | grep -v "package.html" > "/tmp/jacoco_class_data.txt"
+          
+          # Parse class data
+          while IFS= read -r line; do
+            if [[ "$line" == *".html"* ]]; then
+              # Extract class name
+              local class_name=$(echo "$line" | sed -n 's/.*>\(.*\)<\/a>.*/\1/p')
+              local class_file=$(echo "$line" | sed -n 's/.*href="\([^"]*\)".*/\1/p')
+              
+              # Get class report
+              local class_report="${COVERAGE_REPORT_DIR}/${package}/${class_file}"
+              if [[ -f "$class_report" ]]; then
+                # Extract coverage data from class report
+                local cls_line_coverage=$(grep -A1 "Lines" "$class_report" | tail -n1 | sed -n 's/.*>\([0-9.]*\)%<.*/\1/p')
+                local cls_branch_coverage=$(grep -A1 "Branches" "$class_report" | tail -n1 | sed -n 's/.*>\([0-9.]*\)%<.*/\1/p')
+                
+                # Calculate overall class coverage
+                local cls_coverage=$(echo "scale=2; ($cls_line_coverage + $cls_branch_coverage) / 2" | bc)
+                
+                # Show low coverage classes
+                if (( $(echo "$cls_coverage < $MIN_COVERAGE_THRESHOLD" | bc -l) )); then
+                  echo "    - $class_name: ${cls_coverage}% coverage" >> "$temp_file"
+                fi
+              fi
+            fi
+          done < "/tmp/jacoco_class_data.txt"
+        fi
+      done
+    else
+      echo "No packages with coverage below ${MIN_COVERAGE_THRESHOLD}% found." >> "$temp_file"
+    fi
+    
+    cat >> "$temp_file" << EOF
+
+### Medium Coverage Packages (${MIN_COVERAGE_THRESHOLD}%-${TARGET_COVERAGE_THRESHOLD}%)
+
+EOF
+    
+    if [[ ${#medium_coverage_packages[@]} -gt 0 ]]; then
+      for package in "${medium_coverage_packages[@]}"; do
+        echo "- **$package**: ${package_coverage["$package"]}% coverage" >> "$temp_file"
+      done
+    else
+      echo "No packages with coverage between ${MIN_COVERAGE_THRESHOLD}% and ${TARGET_COVERAGE_THRESHOLD}% found." >> "$temp_file"
+    fi
+    
+    # Add recommendations section
+    cat >> "$temp_file" << EOF
+
+## Recommendations
+
+EOF
+    
+    if [[ ${#low_coverage_packages[@]} -gt 0 ]]; then
+      cat >> "$temp_file" << EOF
+### High Priority Test Additions
+
+The following packages have coverage below the minimum threshold (${MIN_COVERAGE_THRESHOLD}%) and should be prioritized for test development:
+
+EOF
+      
+      for package in "${low_coverage_packages[@]}"; do
+        echo "1. **$package** (${package_coverage["$package"]}%)" >> "$temp_file"
+        echo "   - Missing ${package_missing_lines["$package"]} lines and ${package_missing_branches["$package"]} branches" >> "$temp_file"
+      done
+    fi
+    
+    if [[ ${#medium_coverage_packages[@]} -gt 0 ]]; then
+      cat >> "$temp_file" << EOF
+
+### Medium Priority Test Improvements
+
+The following packages have coverage above the minimum threshold but below the target (${MIN_COVERAGE_THRESHOLD}%-${TARGET_COVERAGE_THRESHOLD}%):
+
+EOF
+      
+      for package in "${medium_coverage_packages[@]}"; do
+        echo "1. **$package** (${package_coverage["$package"]}%)" >> "$temp_file"
+        echo "   - Missing ${package_missing_lines["$package"]} lines and ${package_missing_branches["$package"]} branches" >> "$temp_file"
+      done
+    fi
+    
+    cat >> "$temp_file" << EOF
+
+### Next Steps
+
+1. Create unit tests for the high-priority packages and classes listed above
+2. Focus on testing key branches and decision points
+3. Improve test coverage for medium-priority packages
+4. Run this analysis tool regularly to track progress
+
+EOF
+    
+    # Replace the original report with the updated one
+    mv "$temp_file" "$REPORT_FILE"
+    
+    print_success "Coverage analysis report generated: $REPORT_FILE"
+  fi
+  
+  return 0
+}
+
+main() {
+  # Parse command line arguments
+  parse_args "$@"
+  
+  # Find the JaCoCo report directory
+  find_coverage_report
+  
+  # Initialize the report
+  init_report
+  
+  # Parse JaCoCo report and generate coverage analysis
+  parse_jacoco_report
+  
+  print_header "Test Coverage Analysis Complete"
+}
+
+# Run the script
+main "$@"

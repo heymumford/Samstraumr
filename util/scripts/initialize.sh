@@ -5,17 +5,17 @@
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Check for Maven and compile if needed
-if ! [ -d "${PROJECT_ROOT}/Samstraumr/samstraumr-core/target/classes" ]; then
+if ! [ -d "${PROJECT_ROOT}/modules/samstraumr-core/target/classes" ]; then
   echo "Building project first..."
   cd "${PROJECT_ROOT}"
   mvn clean compile
 fi
 
 # Set up classpath
-CLASSPATH="${PROJECT_ROOT}/Samstraumr/samstraumr-core/target/classes"
+CLASSPATH="${PROJECT_ROOT}/modules/samstraumr-core/target/classes"
 
 # Add required libraries
-for jar in "${PROJECT_ROOT}"/Samstraumr/samstraumr-core/target/dependency/*.jar; do
+for jar in "${PROJECT_ROOT}"/modules/samstraumr-core/target/dependency/*.jar; do
   CLASSPATH="${CLASSPATH}:${jar}"
 done
 

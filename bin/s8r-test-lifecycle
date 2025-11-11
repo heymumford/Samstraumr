@@ -1,0 +1,218 @@
+#!/usr/bin/env bash
+#==============================================================================
+# Filename: s8r-test-lifecycle
+# Description: Specialized test runner for lifecycle tests
+#
+# Copyright (c) 2025 Eric C. Mumford (@heymumford)
+#
+# This software was developed with analytical assistance from AI tools 
+# including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+# which were used as paid services. All intellectual property rights 
+# remain exclusively with the copyright holder listed above.
+#
+# Licensed under the Mozilla Public License 2.0
+#==============================================================================
+
+# Set error handling
+set -e
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${PROJECT_ROOT:-$(cd "$SCRIPT_DIR/.." && pwd)}"
+
+# Source common utilities if available
+if [ -f "${PROJECT_ROOT}/util/lib/unified-common.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/unified-common.sh"
+else
+  # Fallback to minimal functionality if no libraries are found
+  # Terminal colors
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  BLUE='\033[0;34m'
+  YELLOW='\033[0;33m'
+  BOLD='\033[1m'
+  RESET='\033[0m'
+  
+  # Functions for prettier output
+  print_info() { echo -e "${BLUE}→ $1${RESET}"; }
+  print_success() { echo -e "${GREEN}✓ $1${RESET}"; }
+  print_error() { echo -e "${RED}✗ $1${RESET}" >&2; }
+  print_warning() { echo -e "${YELLOW}! $1${RESET}" >&2; }
+  print_header() { echo -e "${BLUE}${BOLD}$1${RESET}"; echo -e "${BLUE}${BOLD}$(printf '=%.0s' $(seq 1 ${#1}))${RESET}"; }
+fi
+
+# Print script header
+print_header "S8r Lifecycle Test Runner"
+print_info "Focusing on component lifecycle implementation tests"
+
+# Initialize option variables
+TEST_MODE="states"  # Default to basic lifecycle states
+VERBOSE=false
+TEST_CLASS="org.s8r.test.runner.RunBasicLifecycleStateTests"
+OUTPUT_DIR="${PROJECT_ROOT}/test-results"
+OUTPUT_FILE=""
+TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
+SKIP_QUALITY=true # Skip quality checks by default for faster testing
+
+# Function to show help
+function show_lifecycle_help() {
+    echo "Samstraumr Lifecycle Test Runner"
+    echo ""
+    echo "Usage: s8r-test-lifecycle [options] [mode]"
+    echo ""
+    echo "Modes:"
+    echo "  states          - Test state-dependent behavior only (default)"
+    echo "  transitions     - Test state transitions only"
+    echo "  resources       - Test resource management only"
+    echo "  negative        - Test error handling and exceptional conditions only"
+    echo "  comprehensive   - Run all lifecycle tests"
+    echo ""
+    echo "Options:"
+    echo "  -v, --verbose   - Show detailed output"
+    echo "  -o, --output    - Write results to file (auto-named with timestamp)"
+    echo "  -d, --dir       - Custom output directory (default: test-results/)"
+    echo "  -q, --quality   - Run with quality checks (slower)"
+    echo "  -h, --help      - Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  s8r-test-lifecycle                   # Run basic lifecycle state tests"
+    echo "  s8r-test-lifecycle comprehensive     # Run all lifecycle tests"
+    echo "  s8r-test-lifecycle negative -v       # Test error paths with verbose output"
+    echo "  s8r-test-lifecycle transitions -o    # Test transitions and save output to file"
+}
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -v|--verbose)
+            VERBOSE=true
+            shift
+            ;;
+        -o|--output)
+            OUTPUT_FILE="${OUTPUT_DIR}/lifecycle_test_${TIMESTAMP}.txt"
+            shift
+            ;;
+        -d|--dir)
+            if [[ -n "$2" && "$2" != -* ]]; then
+                OUTPUT_DIR="$2"
+                shift 2
+            else
+                print_error "Output directory path missing after -d/--dir"
+                show_lifecycle_help
+                exit 1
+            fi
+            ;;
+        -q|--quality)
+            SKIP_QUALITY=false
+            shift
+            ;;
+        -h|--help)
+            show_lifecycle_help
+            exit 0
+            ;;
+        states|state)
+            TEST_MODE="states"
+            TEST_CLASS="org.s8r.test.runner.RunBasicLifecycleStateTests"
+            shift
+            ;;
+        transitions|transition)
+            TEST_MODE="transitions"
+            TEST_CLASS="org.s8r.test.runner.RunBasicLifecycleTests"
+            shift
+            ;;
+        resources|resource)
+            TEST_MODE="resources"
+            TEST_CLASS="org.s8r.test.runner.RunLifecycleResourceTests"
+            shift
+            ;;
+        negative|error|errors)
+            TEST_MODE="negative"
+            TEST_CLASS="org.s8r.test.runner.RunLifecycleNegativePathTests"
+            shift
+            ;;
+        comprehensive|complete|all)
+            TEST_MODE="comprehensive"
+            TEST_CLASS="org.s8r.test.runner.RunComprehensiveLifecycleTests"
+            shift
+            ;;
+        *)
+            print_error "Unknown argument: $1"
+            show_lifecycle_help
+            exit 1
+            ;;
+    esac
+done
+
+# Ensure output directory exists if needed
+if [[ -n "$OUTPUT_FILE" ]]; then
+    mkdir -p "$OUTPUT_DIR"
+    print_info "Test output will be saved to: $OUTPUT_FILE"
+fi
+
+# Change to project root
+cd "$PROJECT_ROOT"
+
+# Setup Maven command
+MVN_CMD="mvn test -Dtest=${TEST_CLASS##*.}"
+
+# Add module location
+MVN_CMD+=" -f modules/samstraumr-core/pom.xml"
+
+# Add quality skip if requested
+if $SKIP_QUALITY; then
+    MVN_CMD+=" -Dskip.quality.checks=true"
+fi
+
+# Add verbose flag if requested
+if $VERBOSE; then
+    MVN_CMD+=" -e"
+else
+    MVN_CMD+=" -q"
+fi
+
+# Display test information
+print_header "Running Lifecycle Tests: $TEST_MODE mode"
+print_info "Runner: ${TEST_CLASS##*.}"
+
+# Display the command being executed
+if $VERBOSE; then
+    print_info "Running: $MVN_CMD"
+fi
+
+# Run the tests with appropriate output handling
+test_result=0
+
+if [[ -n "$OUTPUT_FILE" ]]; then
+    # Run tests with output redirection
+    if eval "$MVN_CMD" | tee "$OUTPUT_FILE"; then
+        test_result=0
+    else
+        test_result=1
+    fi
+else
+    # Run tests without output redirection
+    if eval "$MVN_CMD"; then
+        test_result=0
+    else
+        test_result=1
+    fi
+fi
+
+# Report result
+if [ $test_result -eq 0 ]; then
+    print_success "Lifecycle tests completed successfully"
+    
+    # Show test report location
+    REPORT_DIR="${PROJECT_ROOT}/modules/samstraumr-core/target/cucumber-reports"
+    if [[ -d "$REPORT_DIR" ]]; then
+        print_info "HTML report available at: $REPORT_DIR"
+    fi
+    
+    exit 0
+else
+    print_error "Lifecycle tests failed"
+    if [[ -n "$OUTPUT_FILE" ]]; then
+        print_info "See test output in: $OUTPUT_FILE"
+    fi
+    exit 1
+fi

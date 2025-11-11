@@ -6,10 +6,10 @@
     "scripts_dir": "util/bin"
   },
   "paths": {
-    "src": "Samstraumr/samstraumr-core/src",
+    "src": "modules/samstraumr-core/src",
     "docs": "docs",
-    "tests": "Samstraumr/samstraumr-core/src/test",
-    "templates": "Samstraumr/samstraumr-core/src/main/resources/templates",
+    "tests": "modules/samstraumr-core/src/test",
+    "templates": "modules/samstraumr-core/src/main/resources/templates",
     "output": "target"
   },
   "commands": {

@@ -95,85 +95,81 @@ fi
 # 5. Clean up symlinks to test scripts
 print_message "Organizing test script symlinks..."
 
-# Ensure all test scripts symlinks point to util/scripts/test
+# Move test scripts to util/scripts/test directory
 for script in maven-profile-test.sh maven-structure-test.sh run-architecture-tests.sh test-maven-structure.sh; do
-  # Check if the script exists in util/scripts/test
-  if [[ -f "$BASE_DIR/util/scripts/test/$script" ]]; then
-    # Create/update symlink
-    if [[ -L "$BASE_DIR/$script" ]]; then
-      rm -v "$BASE_DIR/$script"
-    elif [[ -f "$BASE_DIR/$script" ]]; then
-      print_message "Moving $script to util/scripts/test/"
-      mv -v "$BASE_DIR/$script" "$BASE_DIR/util/scripts/test/$script"
-    fi
-    ln -svf "util/scripts/test/$script" "$BASE_DIR/$script"
-  else
-    # If not in util/scripts/test, move it there first
-    if [[ -f "$BASE_DIR/$script" && ! -L "$BASE_DIR/$script" ]]; then
-      print_message "Moving $script to util/scripts/test/"
-      mv -v "$BASE_DIR/$script" "$BASE_DIR/util/scripts/test/$script"
-      ln -svf "util/scripts/test/$script" "$BASE_DIR/$script"
-    fi
+  # Check if the script exists in the root directory
+  if [[ -f "$BASE_DIR/$script" && ! -L "$BASE_DIR/$script" ]]; then
+    print_message "Moving $script to util/scripts/test/"
+    mv -v "$BASE_DIR/$script" "$BASE_DIR/util/scripts/test/$script"
+    print_message "⚠️  Warning: $script moved to util/scripts/test/ - update any references"
+  fi
+  
+  # Remove symlinks
+  if [[ -L "$BASE_DIR/$script" ]]; then
+    print_message "Removing symlink for $script"
+    rm -v "$BASE_DIR/$script"
   fi
 done
 
-# 6. Clean up other symlinks
-print_message "Organizing other symlinks..."
+# 6. Move other utility scripts to appropriate directories
+print_message "Moving utility scripts to appropriate directories..."
 
-# Ensure trigger-workflow.sh points to util/scripts/ci
-if [[ -f "$BASE_DIR/util/scripts/ci/trigger-workflow.sh" ]]; then
-  if [[ -L "$BASE_DIR/trigger-workflow.sh" ]]; then
-    rm -v "$BASE_DIR/trigger-workflow.sh"
-  elif [[ -f "$BASE_DIR/trigger-workflow.sh" ]]; then
-    print_message "Moving trigger-workflow.sh to util/scripts/ci/"
-    mv -v "$BASE_DIR/trigger-workflow.sh" "$BASE_DIR/util/scripts/ci/trigger-workflow.sh"
-  fi
-  ln -svf "util/scripts/ci/trigger-workflow.sh" "$BASE_DIR/trigger-workflow.sh"
+# Move trigger-workflow.sh to util/scripts/ci/
+if [[ -f "$BASE_DIR/trigger-workflow.sh" && ! -L "$BASE_DIR/trigger-workflow.sh" ]]; then
+  print_message "Moving trigger-workflow.sh to util/scripts/ci/"
+  mkdir -p "$BASE_DIR/util/scripts/ci/"
+  mv -v "$BASE_DIR/trigger-workflow.sh" "$BASE_DIR/util/scripts/ci/trigger-workflow.sh"
+  print_message "⚠️  Warning: trigger-workflow.sh moved to util/scripts/ci/ - update any references"
+fi
+# Remove symlink if it exists
+if [[ -L "$BASE_DIR/trigger-workflow.sh" ]]; then
+  rm -v "$BASE_DIR/trigger-workflow.sh"
 fi
 
-# Ensure use-java21.sh points to util/scripts/java
-if [[ -f "$BASE_DIR/util/scripts/java/use-java21.sh" ]]; then
-  if [[ -L "$BASE_DIR/use-java21.sh" ]]; then
-    rm -v "$BASE_DIR/use-java21.sh"
-  elif [[ -f "$BASE_DIR/use-java21.sh" ]]; then
-    print_message "Moving use-java21.sh to util/scripts/java/"
-    mv -v "$BASE_DIR/use-java21.sh" "$BASE_DIR/util/scripts/java/use-java21.sh"
-  fi
-  ln -svf "util/scripts/java/use-java21.sh" "$BASE_DIR/use-java21.sh"
+# Move use-java21.sh to util/scripts/java/
+if [[ -f "$BASE_DIR/use-java21.sh" && ! -L "$BASE_DIR/use-java21.sh" ]]; then
+  print_message "Moving use-java21.sh to util/scripts/java/"
+  mkdir -p "$BASE_DIR/util/scripts/java/"
+  mv -v "$BASE_DIR/use-java21.sh" "$BASE_DIR/util/scripts/java/use-java21.sh"
+  print_message "⚠️  Warning: use-java21.sh moved to util/scripts/java/ - update any references"
+fi
+# Remove symlink if it exists
+if [[ -L "$BASE_DIR/use-java21.sh" ]]; then
+  rm -v "$BASE_DIR/use-java21.sh"
 fi
 
-# Ensure update-standardized-headers.sh points to util/scripts
-if [[ -f "$BASE_DIR/util/scripts/update-standardized-headers.sh" ]]; then
-  if [[ -L "$BASE_DIR/update-standardized-headers.sh" ]]; then
-    rm -v "$BASE_DIR/update-standardized-headers.sh"
-  elif [[ -f "$BASE_DIR/update-standardized-headers.sh" ]]; then
-    print_message "Moving update-standardized-headers.sh to util/scripts/"
-    mv -v "$BASE_DIR/update-standardized-headers.sh" "$BASE_DIR/util/scripts/update-standardized-headers.sh"
-  fi
-  ln -svf "util/scripts/update-standardized-headers.sh" "$BASE_DIR/update-standardized-headers.sh"
+# Move update-standardized-headers.sh to util/scripts/
+if [[ -f "$BASE_DIR/update-standardized-headers.sh" && ! -L "$BASE_DIR/update-standardized-headers.sh" ]]; then
+  print_message "Moving update-standardized-headers.sh to util/scripts/"
+  mv -v "$BASE_DIR/update-standardized-headers.sh" "$BASE_DIR/util/scripts/update-standardized-headers.sh"
+  print_message "⚠️  Warning: update-standardized-headers.sh moved to util/scripts/ - update any references"
+fi
+# Remove symlink if it exists
+if [[ -L "$BASE_DIR/update-standardized-headers.sh" ]]; then
+  rm -v "$BASE_DIR/update-standardized-headers.sh"
 fi
 
-# Ensure run-initializer.sh points to util/scripts
-if [[ -f "$BASE_DIR/util/scripts/initialize.sh" ]]; then
-  if [[ -L "$BASE_DIR/run-initializer.sh" ]]; then
-    rm -v "$BASE_DIR/run-initializer.sh"
-  elif [[ -f "$BASE_DIR/run-initializer.sh" ]]; then
-    print_message "Moving run-initializer.sh to util/scripts/initialize.sh"
-    mv -v "$BASE_DIR/run-initializer.sh" "$BASE_DIR/util/scripts/initialize.sh"
-  fi
-  ln -svf "util/scripts/initialize.sh" "$BASE_DIR/run-initializer.sh"
+# Move run-initializer.sh to util/scripts/initialize.sh
+if [[ -f "$BASE_DIR/run-initializer.sh" && ! -L "$BASE_DIR/run-initializer.sh" ]]; then
+  print_message "Moving run-initializer.sh to util/scripts/initialize.sh"
+  mv -v "$BASE_DIR/run-initializer.sh" "$BASE_DIR/util/scripts/initialize.sh"
+  print_message "⚠️  Warning: run-initializer.sh moved to util/scripts/initialize.sh - update any references"
+fi
+# Remove symlink if it exists
+if [[ -L "$BASE_DIR/run-initializer.sh" ]]; then
+  rm -v "$BASE_DIR/run-initializer.sh"
 fi
 
-# Create create-script-symlinks.sh in util/scripts if it doesn't exist
-if [[ -f "$BASE_DIR/create-script-symlinks.sh" && ! -f "$BASE_DIR/util/scripts/create-script-symlinks.sh" ]]; then
+# Move create-script-symlinks.sh to util/scripts/
+if [[ -f "$BASE_DIR/create-script-symlinks.sh" && ! -L "$BASE_DIR/create-script-symlinks.sh" ]]; then
   print_message "Moving create-script-symlinks.sh to util/scripts/"
   mv -v "$BASE_DIR/create-script-symlinks.sh" "$BASE_DIR/util/scripts/create-script-symlinks.sh"
   chmod +x "$BASE_DIR/util/scripts/create-script-symlinks.sh"
-  ln -svf "util/scripts/create-script-symlinks.sh" "$BASE_DIR/create-script-symlinks.sh"
-elif [[ -f "$BASE_DIR/create-script-symlinks.sh" && -f "$BASE_DIR/util/scripts/create-script-symlinks.sh" ]]; then
-  # Replace with symlink if it exists in both places
+  print_message "⚠️  Warning: create-script-symlinks.sh moved to util/scripts/ - update any references"
+fi
+# Remove symlink if it exists
+if [[ -L "$BASE_DIR/create-script-symlinks.sh" ]]; then
   rm -v "$BASE_DIR/create-script-symlinks.sh"
-  ln -svf "util/scripts/create-script-symlinks.sh" "$BASE_DIR/create-script-symlinks.sh"
 fi
 
 # 7. Check for duplicate test scripts
@@ -194,6 +190,35 @@ fi
 if [[ -L "$BASE_DIR/s8r_list" && -f "$BASE_DIR/s8r-list" ]]; then
   print_message "Removing s8r_list symlink (prefer s8r-list)"
   rm -v "$BASE_DIR/s8r_list"
+fi
+
+# 9. Organize git and config files
+print_message "Organizing git and config files..."
+
+# Create necessary directories
+mkdir -p "$BASE_DIR/util/git"
+mkdir -p "$BASE_DIR/util/config"
+
+# Git commit template
+if [[ -f "$BASE_DIR/.git-commit-template" ]]; then
+  print_message "Moving .git-commit-template to util/git/"
+  mv -v "$BASE_DIR/.git-commit-template" "$BASE_DIR/util/git/"
+  print_message "⚠️  Warning: .git-commit-template moved to util/git/ - update any references"
+fi
+
+# Config files (except docmosis.properties which needs to stay in root)
+for config_file in .actrc .editorconfig .s8r.config surefire-settings.xml; do
+  if [[ -f "$BASE_DIR/$config_file" ]]; then
+    print_message "Moving $config_file to util/config/"
+    mv -v "$BASE_DIR/$config_file" "$BASE_DIR/util/config/"
+    print_message "⚠️  Warning: $config_file moved to util/config/ - update any references"
+  fi
+done
+
+# Keep a copy of docmosis.properties in util/config but don't remove from root
+if [[ -f "$BASE_DIR/docmosis.properties" ]]; then
+  print_message "Copying docmosis.properties to util/config/ (keeping original in root)"
+  cp -v "$BASE_DIR/docmosis.properties" "$BASE_DIR/util/config/"
 fi
 
 print_success "Root directory cleanup completed!"

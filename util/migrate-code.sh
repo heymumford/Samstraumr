@@ -140,16 +140,16 @@ echo "-------------" >> "$REPORT_FILE"
 
 # Map of replacements
 declare -A IMPORT_MAP
-IMPORT_MAP["org.samstraumr.tube.Tube"]="org.s8r.component.core.Component"
-IMPORT_MAP["org.samstraumr.tube.TubeStatus"]="org.s8r.component.core.State"
-IMPORT_MAP["org.samstraumr.tube.TubeLifecycleState"]="org.s8r.component.core.State"
-IMPORT_MAP["org.samstraumr.tube.TubeIdentity"]="org.s8r.component.identity.Identity"
-IMPORT_MAP["org.samstraumr.tube.Environment"]="org.s8r.component.core.Environment"
-IMPORT_MAP["org.samstraumr.tube.TubeLogger"]="org.s8r.component.logging.Logger"
-IMPORT_MAP["org.samstraumr.tube.TubeLoggerInfo"]="org.s8r.component.logging.Logger.LoggerInfo"
-IMPORT_MAP["org.samstraumr.tube.composite.Composite"]="org.s8r.component.composite.Composite"
-IMPORT_MAP["org.samstraumr.tube.machine.Machine"]="org.s8r.component.machine.Machine"
-IMPORT_MAP["org.samstraumr.tube.exception.TubeInitializationException"]="org.s8r.component.exception.ComponentException"
+IMPORT_MAP["org.s8r.tube.Tube"]="org.s8r.component.core.Component"
+IMPORT_MAP["org.s8r.tube.TubeStatus"]="org.s8r.component.core.State"
+IMPORT_MAP["org.s8r.tube.TubeLifecycleState"]="org.s8r.component.core.State"
+IMPORT_MAP["org.s8r.tube.TubeIdentity"]="org.s8r.component.identity.Identity"
+IMPORT_MAP["org.s8r.tube.Environment"]="org.s8r.component.core.Environment"
+IMPORT_MAP["org.s8r.tube.TubeLogger"]="org.s8r.component.logging.Logger"
+IMPORT_MAP["org.s8r.tube.TubeLoggerInfo"]="org.s8r.component.logging.Logger.LoggerInfo"
+IMPORT_MAP["org.s8r.tube.composite.Composite"]="org.s8r.component.composite.Composite"
+IMPORT_MAP["org.s8r.tube.machine.Machine"]="org.s8r.component.machine.Machine"
+IMPORT_MAP["org.s8r.tube.exception.TubeInitializationException"]="org.s8r.component.exception.ComponentException"
 
 declare -A API_MAP
 API_MAP["Tube.create"]="Component.create"
@@ -179,8 +179,8 @@ for FILE in $JAVA_FILES; do
   FILE_IMPORTS=0
   FILE_APIS=0
   
-  # Check if file contains org.samstraumr
-  if grep -q "org\.samstraumr" "$FILE"; then
+  # Check if file contains org.s8r
+  if grep -q "org\.s8r" "$FILE"; then
     # Check for specific import patterns
     for OLD_IMPORT in "${!IMPORT_MAP[@]}"; do
       NEW_IMPORT="${IMPORT_MAP[$OLD_IMPORT]}"
@@ -267,15 +267,15 @@ if [ "$ENABLE_FEEDBACK" = true ]; then
   echo "" >> "$FEEDBACK_REPORT"
   
   # Check for incomplete API migrations
-  INCOMPLETE_MIGRATIONS=$(grep -r "org\.samstraumr" "$SOURCE_DIR" --include="*.java" | wc -l)
+  INCOMPLETE_MIGRATIONS=$(grep -r "org\.s8r" "$SOURCE_DIR" --include="*.java" | wc -l)
   if [ "$INCOMPLETE_MIGRATIONS" -gt 0 ]; then
     ((POTENTIAL_ISSUES++))
     echo "### Incomplete Migrations" >> "$FEEDBACK_REPORT"
     echo "" >> "$FEEDBACK_REPORT"
-    echo "Found $INCOMPLETE_MIGRATIONS references to org.samstraumr packages that were not migrated:" >> "$FEEDBACK_REPORT"
+    echo "Found $INCOMPLETE_MIGRATIONS references to org.s8r packages that were not migrated:" >> "$FEEDBACK_REPORT"
     echo "" >> "$FEEDBACK_REPORT"
     echo '```' >> "$FEEDBACK_REPORT"
-    grep -r "org\.samstraumr" "$SOURCE_DIR" --include="*.java" | head -n 10 >> "$FEEDBACK_REPORT"
+    grep -r "org\.s8r" "$SOURCE_DIR" --include="*.java" | head -n 10 >> "$FEEDBACK_REPORT"
     if [ "$INCOMPLETE_MIGRATIONS" -gt 10 ]; then
       echo "... and $(($INCOMPLETE_MIGRATIONS - 10)) more" >> "$FEEDBACK_REPORT"
     fi
@@ -353,7 +353,7 @@ EOF
     # List files with potential issues
     if [ "$INCOMPLETE_MIGRATIONS" -gt 0 ]; then
       echo -e "${YELLOW}Files with incomplete migrations:${NC}"
-      grep -l "org\.samstraumr" "$SOURCE_DIR" --include="*.java" | head -n 5
+      grep -l "org\.s8r" "$SOURCE_DIR" --include="*.java" | head -n 5
       
       read -p "Attempt to fix these files? [y/N] " -n 1 -r
       echo
@@ -361,9 +361,9 @@ EOF
         echo -e "${BLUE}Applying additional migrations...${NC}"
         # Re-run the migration with additional mappings
         # This is simplified; a real implementation would be more sophisticated
-        for FILE in $(grep -l "org\.samstraumr" "$SOURCE_DIR" --include="*.java"); do
+        for FILE in $(grep -l "org\.s8r" "$SOURCE_DIR" --include="*.java"); do
           echo "  Processing $FILE..."
-          sed -i 's/org\.samstraumr/org.s8r/g' "$FILE"
+          sed -i 's/org\.s8r/org.s8r/g' "$FILE"
         done
       fi
     fi

@@ -1,1 +1,0 @@
-util/scripts/test/run-architecture-tests.sh

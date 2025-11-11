@@ -1,0 +1,178 @@
+#!/usr/bin/env bash
+#==============================================================================
+# Filename: s8r-build-example
+# Description: Example script demonstrating the standardized output format
+#
+# This script doesn't perform any real operations but shows how the standard
+# output formatting should look for all build and test scripts.
+#==============================================================================
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+
+# Source unified common library which includes output-standard.sh
+if [ -f "${PROJECT_ROOT}/util/lib/unified-common.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/unified-common.sh"
+elif [ -f "${PROJECT_ROOT}/util/lib/output-standard.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/output-standard.sh"
+else
+  echo "Error: Required libraries not found. This script requires output-standard.sh"
+  exit 1
+fi
+
+# Initialize variables with defaults
+MODE="example"
+CLEAN=false
+VERBOSE=false
+PARALLEL=false
+
+#------------------------------------------------------------------------------
+# Parse command line arguments
+#------------------------------------------------------------------------------
+function parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -c|--clean)
+        CLEAN=true
+        shift
+        ;;
+      -v|--verbose)
+        VERBOSE=true
+        shift
+        ;;
+      -p|--parallel)
+        PARALLEL=true
+        shift
+        ;;
+      -h|--help)
+        show_help
+        exit 0
+        ;;
+      *)
+        # Check if the argument is a valid mode
+        if [[ "$1" == "example" || "$1" == "demo" || "$1" == "test" ]]; then
+          MODE="$1"
+        else
+          print_error "Unknown argument: $1"
+          show_help
+          exit 1
+        fi
+        shift
+        ;;
+    esac
+  done
+}
+
+#------------------------------------------------------------------------------
+# Display help information
+#------------------------------------------------------------------------------
+function show_help() {
+  print_header "Build Example Script"
+  echo
+  print_section "Usage"
+  echo "  ./s8r-build-example [options] [mode]"
+  echo
+  print_section "Options"
+  echo "  -c, --clean             Clean before building"
+  echo "  -v, --verbose           Enable verbose output"
+  echo "  -p, --parallel          Build in parallel where possible"
+  echo "  -h, --help              Show this help message"
+  echo
+  print_section "Modes"
+  echo "  example                 Example mode (default)"
+  echo "  demo                    Demo mode"
+  echo "  test                    Test mode"
+}
+
+#------------------------------------------------------------------------------
+# Simulate a build process
+#------------------------------------------------------------------------------
+function run_example() {
+  # Display build information
+  print_header "Example Build Process"
+  print_info "Mode: $MODE"
+  
+  if $CLEAN; then
+    print_info "Clean build enabled"
+  fi
+  
+  if $PARALLEL; then
+    print_info "Parallel build enabled"
+  fi
+  
+  # === STEP 1: Preparation ===
+  print_section "Step 1: Preparation"
+  print_info "Preparing build environment..."
+  sleep 1 # Simulate work
+  print_success "Build environment prepared"
+  
+  # Display sample task results
+  print_task "Checking Java version" "success"
+  print_task "Verifying Maven configuration" "success"
+  print_task "Checking disk space" "success"
+  
+  # === STEP 2: Compilation ===
+  print_section "Step 2: Compilation"
+  print_info "Compiling Java sources..."
+  
+  # Show progress example
+  for i in {1..10}; do
+    print_progress $i 10
+    sleep 0.2
+  done
+  
+  print_success "Compilation completed"
+  
+  # === STEP 3: Testing ===
+  print_section "Step 3: Testing"
+  print_info "Running tests..."
+  
+  # Conditional warning example
+  if [ "$MODE" == "test" ]; then
+    print_task "Running unit tests" "success"
+    print_task "Running component tests" "success"
+  else
+    print_task "Running unit tests" "success"
+    print_task "Running component tests" "warning"
+    print_warning "Some component tests were skipped in '$MODE' mode"
+  fi
+  
+  print_success "Testing completed"
+  
+  # === STEP 4: Packaging ===
+  print_section "Step 4: Packaging"
+  print_info "Creating package..."
+  sleep 1 # Simulate work
+  print_success "Package created successfully"
+  
+  # === FINAL RESULT ===
+  print_header "Build Summary"
+  print_info "Mode: $MODE"
+  print_info "Clean: $CLEAN"
+  print_info "Parallel: $PARALLEL"
+  print_success "Build completed successfully"
+}
+
+#------------------------------------------------------------------------------
+# Main function to orchestrate execution
+#------------------------------------------------------------------------------
+function main() {
+  parse_args "$@"
+  
+  # Print debug information if verbose
+  if $VERBOSE; then
+    print_debug "Build mode: $MODE"
+    print_debug "Clean: $CLEAN"
+    print_debug "Parallel: $PARALLEL"
+  fi
+  
+  # Run the example with timing
+  time_exec run_example
+}
+
+#------------------------------------------------------------------------------
+# Main Execution
+#------------------------------------------------------------------------------
+main "$@"
+exit $?

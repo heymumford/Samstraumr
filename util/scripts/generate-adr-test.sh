@@ -32,7 +32,7 @@ CURRENT_DATE=$(date +"%Y-%m-%d")
 TEST_CLASS_NAME=$(echo "$ADR_TITLE" | sed 's/[^a-zA-Z0-9]/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)} 1' | sed 's/ //g')Test
 
 # Package and directory information
-BASE_DIR="$REPO_ROOT/Samstraumr/samstraumr-core/src/test/java/org/s8r/architecture"
+BASE_DIR="$REPO_ROOT/modules/samstraumr-core/src/test/java/org/s8r/architecture"
 PACKAGE="org.s8r.architecture"
 
 # Create the test file content

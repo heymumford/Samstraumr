@@ -17,7 +17,7 @@ RESET='\033[0m'
 # Script configuration
 DRY_RUN=false
 ROOT_DIR=$(pwd)
-SRC_DIR="${ROOT_DIR}/Samstraumr/samstraumr-core/src"
+SRC_DIR="${ROOT_DIR}/modules/samstraumr-core/src"
 LOG_FILE="${ROOT_DIR}/cleanup-legacy-packages.log"
 
 # Parse command line arguments
@@ -62,22 +62,22 @@ log() {
 
 # Remove legacy samstraumr package files
 remove_samstraumr_files() {
-  log "INFO" "Removing legacy org.samstraumr package files..."
+  log "INFO" "Removing legacy org.s8r package files..."
   local count=$(find "${SRC_DIR}" -type f -path "*/org/samstraumr/*" | wc -l)
   log "INFO" "Found ${count} files to remove"
   
   if [ "$DRY_RUN" = true ]; then
-    log "INFO" "(Dry run) Would remove ${count} org.samstraumr files"
+    log "INFO" "(Dry run) Would remove ${count} org.s8r files"
     return
   fi
   
   # Remove legacy files
   find "${SRC_DIR}" -type f -path "*/org/samstraumr/*" -exec rm -f {} \;
-  log "SUCCESS" "Removed ${count} org.samstraumr files"
+  log "SUCCESS" "Removed ${count} org.s8r files"
   
   # Remove empty directories
   find "${SRC_DIR}/main/java/org/samstraumr" "${SRC_DIR}/test/java/org/samstraumr" -type d -empty -delete 2>/dev/null || true
-  log "SUCCESS" "Removed empty org.samstraumr directories"
+  log "SUCCESS" "Removed empty org.s8r directories"
 }
 
 # Remove legacy tube package files

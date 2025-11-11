@@ -1,0 +1,564 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r-test-cli: CLI acceptance tests for Samstraumr
+# Tests both positive and negative paths for the CLI commands
+#==============================================================================
+set -e
+# Run in a more predictable environment
+export LC_ALL=C
+export LANG=C
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${SCRIPT_DIR}"
+
+# Terminal colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+# Test counters
+TOTAL_TESTS=0
+PASSED_TESTS=0
+FAILED_TESTS=0
+
+# Test utilities
+function test_start() {
+  local test_name="$1"
+  echo -e "${BLUE}Starting test:${RESET} ${BOLD}$test_name${RESET}"
+  TOTAL_TESTS=$((TOTAL_TESTS + 1))
+}
+
+function test_pass() {
+  local test_name="$1"
+  echo -e "  ${GREEN}✓ PASS:${RESET} $test_name"
+  PASSED_TESTS=$((PASSED_TESTS + 1))
+}
+
+function test_fail() {
+  local test_name="$1"
+  local error_msg="$2"
+  echo -e "  ${RED}✗ FAIL:${RESET} $test_name"
+  echo -e "  ${RED}      $error_msg${RESET}"
+  FAILED_TESTS=$((FAILED_TESTS + 1))
+}
+
+function assert_contains() {
+  local output="$1"
+  local expected="$2"
+  local test_name="$3"
+  
+  if [[ "$output" == *"$expected"* ]]; then
+    test_pass "$test_name - contains '$expected'"
+  else
+    test_fail "$test_name" "Expected output to contain '$expected', but it didn't"
+    echo -e "  ${YELLOW}Actual output:${RESET}"
+    echo "$output" | sed 's/^/      /'
+  fi
+}
+
+function assert_not_contains() {
+  local output="$1"
+  local expected="$2"
+  local test_name="$3"
+  
+  if [[ "$output" != *"$expected"* ]]; then
+    test_pass "$test_name - does not contain '$expected'"
+  else
+    test_fail "$test_name" "Expected output to NOT contain '$expected', but it did"
+    echo -e "  ${YELLOW}Actual output:${RESET}"
+    echo "$output" | sed 's/^/      /'
+  fi
+}
+
+function assert_exit_success() {
+  local exit_code="$1"
+  local test_name="$2"
+  
+  if [[ "$exit_code" -eq 0 ]]; then
+    test_pass "$test_name - exit code 0"
+  else
+    test_fail "$test_name" "Expected exit code 0, but got $exit_code"
+  fi
+}
+
+function assert_exit_failure() {
+  local exit_code="$1"
+  local test_name="$2"
+  
+  if [[ "$exit_code" -ne 0 ]]; then
+    test_pass "$test_name - non-zero exit code"
+  else
+    test_fail "$test_name" "Expected non-zero exit code, but got 0"
+  fi
+}
+
+function run_command() {
+  local command="$1"
+  local output
+  local exit_code=0
+  
+  # Run the command and capture both output and exit code
+  # We use a temp file to avoid issues with command substitution
+  local tmp_file=$(mktemp)
+  
+  # Run command and capture exit code
+  # Use the command directly from the current directory
+  cd "$PROJECT_ROOT" && ./$command > "$tmp_file" 2>&1 || exit_code=$?
+  
+  # Read output from temp file
+  output=$(cat "$tmp_file")
+  rm -f "$tmp_file"
+  
+  # Return the output (for capture by the caller)
+  echo "$output"
+  
+  # Store exit code for later retrieval
+  export LAST_EXIT_CODE=$exit_code
+  
+  # Return success so we don't break the test flow
+  return 0
+}
+
+function get_last_exit_code() {
+  # Return the stored exit code from the last run_command
+  return ${LAST_EXIT_CODE:-0}
+}
+
+# Test s8r main command
+function test_s8r_main() {
+  test_start "s8r - Help command"
+  local output
+  output=$(run_command "s8r --help")
+  assert_contains "$output" "Command Interface" "Help output shows title"
+  assert_contains "$output" "init" "Help output lists init command"
+  assert_contains "$output" "component" "Help output lists component command"
+  assert_contains "$output" "machine" "Help output lists machine command"
+  assert_exit_success $LAST_EXIT_CODE "Help command"
+  
+  test_start "s8r - Unknown command"
+  local output
+  output=$(run_command "s8r non-existent-command" 2>&1)
+  assert_contains "$output" "Unknown command" "Unknown command error message"
+  assert_exit_failure $LAST_EXIT_CODE "Unknown command"
+  
+  test_start "s8r - No command redirects to help"
+  local output
+  output=$(run_command "s8r")
+  assert_contains "$output" "Command Interface" "No command shows help"
+  assert_exit_success $LAST_EXIT_CODE "No command"
+}
+
+# Test s8r-dev main command
+function test_s8r_dev_main() {
+  test_start "s8r-dev - Help command"
+  local output
+  output=$(run_command "s8r-dev --help")
+  assert_contains "$output" "Development Tools" "Help output shows title"
+  assert_contains "$output" "build" "Help output lists build command"
+  assert_contains "$output" "test" "Help output lists test command"
+  assert_contains "$output" "version" "Help output lists version command"
+  assert_exit_success $LAST_EXIT_CODE "Help command"
+  
+  test_start "s8r-dev - Unknown command"
+  local output
+  output=$(run_command "s8r-dev non-existent-command" 2>&1)
+  assert_contains "$output" "Unknown development command" "Unknown command error message"
+  assert_exit_failure $LAST_EXIT_CODE "Unknown command"
+  
+  test_start "s8r-dev - User command redirection"
+  local output
+  output=$(run_command "s8r-dev component" 2>&1)
+  assert_contains "$output" "end-user command" "User command redirection message"
+  assert_contains "$output" "Please use: ./s8r component" "Proper command suggestion"
+  assert_exit_failure $LAST_EXIT_CODE "User command redirection"
+}
+
+# Test component command
+function test_component_command() {
+  test_start "component - Help command"
+  local output
+  output=$(run_command "s8r component --help")
+  assert_contains "$output" "Component Commands" "Help output shows title"
+  assert_contains "$output" "create" "Help output lists create subcommand"
+  assert_contains "$output" "list" "Help output lists list subcommand"
+  assert_exit_success $LAST_EXIT_CODE "Help command"
+  
+  test_start "component - Create command"
+  local output
+  output=$(run_command "s8r component create TestComponent")
+  assert_contains "$output" "Creating component" "Create shows progress"
+  assert_contains "$output" "TestComponent" "Component name in output"
+  assert_contains "$output" "created successfully" "Success message"
+  assert_exit_success $LAST_EXIT_CODE "Create command"
+  
+  test_start "component - Create with type"
+  local output
+  output=$(run_command "s8r component create --type validator ValidatorComponent")
+  assert_contains "$output" "Creating component" "Create shows progress"
+  assert_contains "$output" "ValidatorComponent" "Component name in output"
+  assert_contains "$output" "validator" "Type parameter applied"
+  assert_exit_success $LAST_EXIT_CODE "Create with type command"
+  
+  test_start "component - Create without name (negative)"
+  local output
+  output=$(run_command "s8r component create" 2>&1) 
+  assert_contains "$output" "Component name is required" "Missing name error"
+  assert_exit_failure $LAST_EXIT_CODE "Create without name"
+  
+  test_start "component - List command"
+  local output
+  output=$(run_command "s8r component list")
+  assert_contains "$output" "Available components" "List shows header"
+  assert_exit_success $LAST_EXIT_CODE "List command"
+  
+  test_start "component - List with format"
+  local output
+  output=$(run_command "s8r component list --format json")
+  assert_contains "$output" "json format" "Format parameter applied"
+  assert_exit_success $LAST_EXIT_CODE "List with format command"
+  
+  test_start "component - Info command"
+  local output
+  output=$(run_command "s8r component info DataProcessor")
+  assert_contains "$output" "Component: DataProcessor" "Component info shown"
+  assert_exit_success $LAST_EXIT_CODE "Info command"
+  
+  test_start "component - Info without name (negative)"
+  local output
+  output=$(run_command "s8r component info" 2>&1)
+  assert_contains "$output" "Component name is required" "Missing name error"
+  assert_exit_failure $LAST_EXIT_CODE "Info without name"
+  
+  test_start "component - Delete command"
+  # Note: we'll handle this differently since we need to pipe yes
+  local output
+  # Use a temp file to capture the output
+  output=$(cd "$PROJECT_ROOT" && yes | ./s8r component delete DataProcessor 2>&1)
+  assert_contains "$output" "deleted successfully" "Delete success message"
+  
+  test_start "component - Delete with force"
+  local output
+  output=$(run_command "s8r component delete --force AnotherComponent")
+  assert_contains "$output" "deleted successfully" "Force delete success message"
+  assert_not_contains "$output" "Are you sure" "No confirmation with force"
+  assert_exit_success $LAST_EXIT_CODE "Delete with force"
+  
+  test_start "component - Delete without name (negative)"
+  local output
+  output=$(run_command "s8r component delete" 2>&1)
+  assert_contains "$output" "Component name is required" "Missing name error"
+  assert_exit_failure $LAST_EXIT_CODE "Delete without name"
+  
+  test_start "component - Unknown subcommand"
+  local output
+  output=$(run_command "s8r component nonexistent" 2>&1)
+  assert_contains "$output" "Unknown subcommand" "Unknown subcommand error"
+  assert_exit_failure $LAST_EXIT_CODE "Unknown subcommand"
+}
+
+# Test composite command
+function test_composite_command() {
+  test_start "composite - Help command"
+  local output
+  output=$(run_command "s8r composite --help")
+  assert_contains "$output" "Composite Commands" "Help output shows title"
+  assert_contains "$output" "create" "Help output lists create subcommand"
+  assert_contains "$output" "list" "Help output lists list subcommand"
+  assert_contains "$output" "add" "Help output lists add subcommand"
+  assert_contains "$output" "connect" "Help output lists connect subcommand"
+  assert_exit_success $LAST_EXIT_CODE "Help command"
+  
+  test_start "composite - Create command"
+  local output
+  output=$(run_command "s8r composite create TestComposite")
+  assert_contains "$output" "Creating composite" "Create shows progress"
+  assert_contains "$output" "TestComposite" "Composite name in output"
+  assert_contains "$output" "created successfully" "Success message"
+  assert_exit_success $LAST_EXIT_CODE "Create command"
+  
+  test_start "composite - Create with type"
+  local output
+  output=$(run_command "s8r composite create --type storage StorageComposite")
+  assert_contains "$output" "Creating composite" "Create shows progress"
+  assert_contains "$output" "StorageComposite" "Composite name in output"
+  assert_contains "$output" "storage" "Type parameter applied"
+  assert_exit_success $LAST_EXIT_CODE "Create with type command"
+  
+  test_start "composite - Create without name (negative)"
+  local output
+  output=$(run_command "s8r composite create" 2>&1)
+  assert_contains "$output" "Composite name is required" "Missing name error"
+  assert_exit_failure $LAST_EXIT_CODE "Create without name"
+  
+  test_start "composite - List command"
+  local output
+  output=$(run_command "s8r composite list")
+  assert_contains "$output" "Available composites" "List shows header"
+  assert_exit_success $LAST_EXIT_CODE "List command"
+  
+  test_start "composite - Add command"
+  local output
+  output=$(run_command "s8r composite add --component DataProcessor --composite DataFlow")
+  assert_contains "$output" "Adding component" "Add shows progress"
+  assert_contains "$output" "DataProcessor" "Component name in output"
+  assert_contains "$output" "DataFlow" "Composite name in output"
+  assert_contains "$output" "added" "Success message"
+  assert_exit_success $LAST_EXIT_CODE "Add command"
+  
+  test_start "composite - Add without component (negative)"
+  local output
+  output=$(run_command "s8r composite add --composite DataFlow" 2>&1)
+  assert_contains "$output" "Component name is required" "Missing component error"
+  assert_exit_failure $LAST_EXIT_CODE "Add without component"
+  
+  test_start "composite - Add without composite (negative)"
+  local output
+  output=$(run_command "s8r composite add --component DataProcessor" 2>&1)
+  assert_contains "$output" "Composite name is required" "Missing composite error"
+  assert_exit_failure $LAST_EXIT_CODE "Add without composite"
+  
+  test_start "composite - Connect command"
+  local output
+  output=$(run_command "s8r composite connect --from DataProcessor --to DataValidator --composite DataFlow")
+  assert_contains "$output" "Connecting component" "Connect shows progress"
+  assert_contains "$output" "DataProcessor" "From component in output"
+  assert_contains "$output" "DataValidator" "To component in output"
+  assert_contains "$output" "Connected" "Success message"
+  assert_exit_success $LAST_EXIT_CODE "Connect command"
+  
+  test_start "composite - Connect without from (negative)"
+  local output
+  output=$(run_command "s8r composite connect --to DataValidator --composite DataFlow" 2>&1)
+  assert_contains "$output" "Source component name is required" "Missing from error"
+  assert_exit_failure $LAST_EXIT_CODE "Connect without from"
+  
+  test_start "composite - Connect without to (negative)"
+  local output
+  output=$(run_command "s8r composite connect --from DataProcessor --composite DataFlow" 2>&1)
+  assert_contains "$output" "Target component name is required" "Missing to error"
+  assert_exit_failure $LAST_EXIT_CODE "Connect without to"
+  
+  test_start "composite - Connect without composite (negative)"
+  local output
+  output=$(run_command "s8r composite connect --from DataProcessor --to DataValidator" 2>&1)
+  assert_contains "$output" "Composite name is required" "Missing composite error"
+  assert_exit_failure $LAST_EXIT_CODE "Connect without composite"
+  
+  test_start "composite - Info command"
+  local output
+  output=$(run_command "s8r composite info DataFlow")
+  assert_contains "$output" "Composite: DataFlow" "Composite info shown"
+  assert_exit_success $LAST_EXIT_CODE "Info command"
+  
+  test_start "composite - Info without name (negative)"
+  local output
+  output=$(run_command "s8r composite info" 2>&1)
+  assert_contains "$output" "Composite name is required" "Missing name error"
+  assert_exit_failure $LAST_EXIT_CODE "Info without name"
+  
+  test_start "composite - Delete command"
+  # Note: we'll handle this differently since we need to pipe yes
+  local output
+  # Use a temp file to capture the output
+  output=$(cd "$PROJECT_ROOT" && yes | ./s8r composite delete DataFlow 2>&1)
+  assert_contains "$output" "deleted successfully" "Delete success message"
+  
+  test_start "composite - Delete with force"
+  local output
+  output=$(run_command "s8r composite delete --force AnotherComposite")
+  assert_contains "$output" "deleted successfully" "Force delete success message"
+  assert_not_contains "$output" "Are you sure" "No confirmation with force"
+  assert_exit_success $LAST_EXIT_CODE "Delete with force"
+  
+  test_start "composite - Delete without name (negative)"
+  local output
+  output=$(run_command "s8r composite delete" 2>&1)
+  assert_contains "$output" "Composite name is required" "Missing name error"
+  assert_exit_failure $LAST_EXIT_CODE "Delete without name"
+}
+
+# Test machine command
+function test_machine_command() {
+  test_start "machine - Help command"
+  local output
+  output=$(run_command "s8r machine --help")
+  assert_contains "$output" "Machine Commands" "Help output shows title"
+  assert_contains "$output" "create" "Help output lists create subcommand"
+  assert_contains "$output" "list" "Help output lists list subcommand"
+  assert_contains "$output" "add" "Help output lists add subcommand"
+  assert_contains "$output" "start" "Help output lists start subcommand"
+  assert_contains "$output" "stop" "Help output lists stop subcommand"
+  assert_exit_success $LAST_EXIT_CODE "Help command"
+  
+  test_start "machine - Create command"
+  local output
+  output=$(run_command "s8r machine create TestMachine")
+  assert_contains "$output" "Creating machine" "Create shows progress"
+  assert_contains "$output" "TestMachine" "Machine name in output"
+  assert_contains "$output" "created successfully" "Success message"
+  assert_exit_success $LAST_EXIT_CODE "Create command"
+  
+  test_start "machine - Create with template"
+  local output
+  output=$(run_command "s8r machine create --template batch BatchMachine")
+  assert_contains "$output" "Creating machine" "Create shows progress"
+  assert_contains "$output" "BatchMachine" "Machine name in output"
+  assert_contains "$output" "batch" "Template parameter applied"
+  assert_exit_success $LAST_EXIT_CODE "Create with template command"
+  
+  test_start "machine - Create without name (negative)"
+  local output
+  output=$(run_command "s8r machine create" 2>&1)
+  assert_contains "$output" "Machine name is required" "Missing name error"
+  assert_exit_failure $LAST_EXIT_CODE "Create without name"
+  
+  test_start "machine - List command"
+  local output
+  output=$(run_command "s8r machine list")
+  assert_contains "$output" "Available machines" "List shows header"
+  assert_exit_success $LAST_EXIT_CODE "List command"
+  
+  test_start "machine - Add command"
+  local output
+  output=$(run_command "s8r machine add --composite DataFlow --machine DataPipeline")
+  assert_contains "$output" "Adding composite" "Add shows progress"
+  assert_contains "$output" "DataFlow" "Composite name in output"
+  assert_contains "$output" "DataPipeline" "Machine name in output"
+  assert_contains "$output" "added" "Success message"
+  assert_exit_success $LAST_EXIT_CODE "Add command"
+  
+  test_start "machine - Add without composite (negative)"
+  local output
+  output=$(run_command "s8r machine add --machine DataPipeline" 2>&1)
+  assert_contains "$output" "Composite name is required" "Missing composite error"
+  assert_exit_failure $LAST_EXIT_CODE "Add without composite"
+  
+  test_start "machine - Add without machine (negative)"
+  local output
+  output=$(run_command "s8r machine add --composite DataFlow" 2>&1)
+  assert_contains "$output" "Machine name is required" "Missing machine error"
+  assert_exit_failure $LAST_EXIT_CODE "Add without machine"
+  
+  test_start "machine - Connect command"
+  local output
+  output=$(run_command "s8r machine connect --from DataFlow --to DataStorage --machine DataPipeline")
+  assert_contains "$output" "Connecting composite" "Connect shows progress"
+  assert_contains "$output" "DataFlow" "From composite in output"
+  assert_contains "$output" "DataStorage" "To composite in output"
+  assert_contains "$output" "Connected" "Success message"
+  assert_exit_success $LAST_EXIT_CODE "Connect command"
+  
+  test_start "machine - Connect without from (negative)"
+  local output
+  output=$(run_command "s8r machine connect --to DataStorage --machine DataPipeline" 2>&1)
+  assert_contains "$output" "Source composite name is required" "Missing from error"
+  assert_exit_failure $LAST_EXIT_CODE "Connect without from"
+  
+  test_start "machine - Connect without to (negative)"
+  local output
+  output=$(run_command "s8r machine connect --from DataFlow --machine DataPipeline" 2>&1)
+  assert_contains "$output" "Target composite name is required" "Missing to error"
+  assert_exit_failure $LAST_EXIT_CODE "Connect without to"
+  
+  test_start "machine - Connect without machine (negative)"
+  local output
+  output=$(run_command "s8r machine connect --from DataFlow --to DataStorage" 2>&1)
+  assert_contains "$output" "Machine name is required" "Missing machine error"
+  assert_exit_failure $LAST_EXIT_CODE "Connect without machine"
+  
+  test_start "machine - Start command"
+  local output
+  output=$(run_command "s8r machine start DataPipeline")
+  assert_contains "$output" "Starting machine" "Start shows progress"
+  assert_contains "$output" "started successfully" "Success message"
+  assert_exit_success $LAST_EXIT_CODE "Start command"
+  
+  test_start "machine - Start without name (negative)"
+  local output
+  output=$(run_command "s8r machine start" 2>&1)
+  assert_contains "$output" "Machine name is required" "Missing name error"
+  assert_exit_failure $LAST_EXIT_CODE "Start without name"
+  
+  test_start "machine - Stop command"
+  local output
+  output=$(run_command "s8r machine stop DataPipeline")
+  assert_contains "$output" "stopping machine" "Stop shows progress"
+  assert_contains "$output" "stopped successfully" "Success message"
+  assert_exit_success $LAST_EXIT_CODE "Stop command"
+  
+  test_start "machine - Stop with force"
+  local output
+  output=$(run_command "s8r machine stop --force DataPipeline")
+  assert_contains "$output" "Force stopping" "Force parameter applied"
+  assert_exit_success $LAST_EXIT_CODE "Stop with force"
+  
+  test_start "machine - Stop without name (negative)"
+  local output
+  output=$(run_command "s8r machine stop" 2>&1)
+  assert_contains "$output" "Machine name is required" "Missing name error"
+  assert_exit_failure $LAST_EXIT_CODE "Stop without name"
+  
+  test_start "machine - Info command"
+  local output
+  output=$(run_command "s8r machine info DataPipeline")
+  assert_contains "$output" "Machine: DataPipeline" "Machine info shown"
+  assert_exit_success $LAST_EXIT_CODE "Info command"
+  
+  test_start "machine - Info without name (negative)"
+  local output
+  output=$(run_command "s8r machine info" 2>&1)
+  assert_contains "$output" "Machine name is required" "Missing name error"
+  assert_exit_failure $LAST_EXIT_CODE "Info without name"
+  
+  test_start "machine - Delete command"
+  # Note: we'll handle this differently since we need to pipe yes
+  local output
+  # Use a temp file to capture the output
+  output=$(cd "$PROJECT_ROOT" && yes | ./s8r machine delete DataPipeline 2>&1)
+  assert_contains "$output" "deleted successfully" "Delete success message"
+  
+  test_start "machine - Delete with force"
+  local output
+  output=$(run_command "s8r machine delete --force AnotherMachine")
+  assert_contains "$output" "deleted successfully" "Force delete success message"
+  assert_not_contains "$output" "Are you sure" "No confirmation with force"
+  assert_exit_success $LAST_EXIT_CODE "Delete with force"
+  
+  test_start "machine - Delete without name (negative)"
+  local output
+  output=$(run_command "s8r machine delete" 2>&1)
+  assert_contains "$output" "Machine name is required" "Missing name error"
+  assert_exit_failure $LAST_EXIT_CODE "Delete without name"
+}
+
+# Run test suites
+echo -e "${BOLD}${CYAN}S8r CLI Acceptance Tests${RESET}"
+echo -e "${CYAN}================================${RESET}"
+echo
+
+# Run tests
+test_s8r_main
+test_s8r_dev_main
+test_component_command
+test_composite_command
+test_machine_command
+
+# Print test summary
+echo
+echo -e "${CYAN}================================${RESET}"
+echo -e "${BOLD}Test Summary:${RESET}"
+echo -e "  Total tests:  ${TOTAL_TESTS}"
+echo -e "  ${GREEN}Passed tests: ${PASSED_TESTS}${RESET}"
+if [ $FAILED_TESTS -gt 0 ]; then
+  echo -e "  ${RED}Failed tests: ${FAILED_TESTS}${RESET}"
+  exit 1
+else
+  echo -e "  Failed tests: 0"
+  echo -e "${GREEN}All tests passed!${RESET}"
+  exit 0
+fi

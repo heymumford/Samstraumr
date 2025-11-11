@@ -1,1 +1,0 @@
-util/scripts/ci/trigger-workflow.sh

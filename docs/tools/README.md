@@ -57,7 +57,7 @@ The `generate-changelog.sh` script automatically generates a changelog from git 
 ./generate-changelog.sh --update
 
 # README
-./generate-changelog.sh --output docs/CHANGELOG.md
+./generate-changelog.sh --output docs/reference/release/changelog.md
 ```
 
 ### Readme updates

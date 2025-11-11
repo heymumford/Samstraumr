@@ -14,7 +14,7 @@ BLUE='\033[0;34m'
 RESET='\033[0m' # No Color
 
 # Configuration variables
-CORE_MODULE="Samstraumr/samstraumr-core"
+CORE_MODULE="modules/samstraumr-core"
 ATL_PROFILE="atl-tests"
 CUCUMBER_REPORT="target/atl-reports/cucumber.html"
 

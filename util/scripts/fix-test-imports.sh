@@ -17,7 +17,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="${SCRIPT_DIR}"
-TEST_DIR="${ROOT_DIR}/Samstraumr/samstraumr-core/src/test/java"
+TEST_DIR="${ROOT_DIR}/modules/samstraumr-core/src/test/java"
 
 echo "==================================================================="
 echo "  Fixing Test Import Statements"
@@ -25,32 +25,32 @@ echo "==================================================================="
 echo
 
 echo "Creating symbolic links for backwards compatibility..."
-mkdir -p "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/core"
-mkdir -p "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/composite" 
-mkdir -p "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/identity"
-mkdir -p "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/machine"
-mkdir -p "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/exception"
-mkdir -p "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/logging"
+mkdir -p "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/core"
+mkdir -p "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/composite" 
+mkdir -p "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/identity"
+mkdir -p "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/machine"
+mkdir -p "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/exception"
+mkdir -p "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/logging"
 
 # Create symbolic links from old component subdirectories to main component directory
-ln -sf "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/Component.java" "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/core/Component.java"
-ln -sf "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/Environment.java" "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/core/Environment.java"
-ln -sf "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/State.java" "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/core/State.java"
+ln -sf "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/Component.java" "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/core/Component.java"
+ln -sf "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/Environment.java" "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/core/Environment.java"
+ln -sf "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/State.java" "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/core/State.java"
 
-ln -sf "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/Composite.java" "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/composite/Composite.java"
-ln -sf "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/CompositeException.java" "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/composite/CompositeException.java"
-ln -sf "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/CompositeFactory.java" "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/composite/CompositeFactory.java"
+ln -sf "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/Composite.java" "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/composite/Composite.java"
+ln -sf "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/CompositeException.java" "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/composite/CompositeException.java"
+ln -sf "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/CompositeFactory.java" "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/composite/CompositeFactory.java"
 
-ln -sf "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/Identity.java" "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/identity/Identity.java"
+ln -sf "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/Identity.java" "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/identity/Identity.java"
 
-ln -sf "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/Machine.java" "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/machine/Machine.java"
-ln -sf "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/MachineException.java" "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/machine/MachineException.java"
-ln -sf "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/MachineFactory.java" "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/machine/MachineFactory.java"
+ln -sf "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/Machine.java" "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/machine/Machine.java"
+ln -sf "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/MachineException.java" "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/machine/MachineException.java"
+ln -sf "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/MachineFactory.java" "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/machine/MachineFactory.java"
 
-ln -sf "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/ComponentException.java" "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/exception/ComponentException.java"
-ln -sf "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/InvalidStateTransitionException.java" "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/exception/InvalidStateTransitionException.java"
+ln -sf "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/ComponentException.java" "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/exception/ComponentException.java"
+ln -sf "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/InvalidStateTransitionException.java" "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/exception/InvalidStateTransitionException.java"
 
-ln -sf "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/Logger.java" "${ROOT_DIR}/Samstraumr/samstraumr-core/src/main/java/org/s8r/component/logging/Logger.java"
+ln -sf "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/Logger.java" "${ROOT_DIR}/modules/samstraumr-core/src/main/java/org/s8r/component/logging/Logger.java"
 
 echo "✓ Created symbolic links for backwards compatibility"
 

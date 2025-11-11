@@ -1,0 +1,1082 @@
+#!/usr/bin/env bash
+#==============================================================================
+# Filename: prepare-release
+# Description: Comprehensive release preparation script
+#
+# Verifies all requirements are met before tagging a new release, including
+# test coverage, documentation, version consistency, and build quality.
+#==============================================================================
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+
+# Source unified common library for consistent output formatting
+if [ -f "${PROJECT_ROOT}/util/lib/unified-common.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/unified-common.sh"
+else
+  # Fallback to minimal functionality if library not found
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  BLUE='\033[0;34m'
+  YELLOW='\033[0;33m'
+  BOLD='\033[1m'
+  RESET='\033[0m'
+  
+  print_info() { echo -e "${BLUE}→ $1${RESET}"; }
+  print_success() { echo -e "${GREEN}✓ $1${RESET}"; }
+  print_error() { echo -e "${RED}✗ $1${RESET}" >&2; exit 1; }
+  print_warning() { echo -e "${YELLOW}! $1${RESET}" >&2; }
+  print_header() { echo -e "${BLUE}${BOLD}$1${RESET}"; echo -e "${BLUE}${BOLD}$(printf '=%.0s' $(seq 1 ${#1}))${RESET}"; }
+  print_section() { echo -e "${BLUE}$1${RESET}"; }
+fi
+
+# Initialize variables
+VERBOSE=false
+GENERATE_REPORT=true
+REPORT_DIR="${PROJECT_ROOT}/release-verification"
+REPORT_PREFIX=$(date +"%Y%m%d_%H%M%S")
+COVERAGE_THRESHOLD=80
+VERSION=""
+DRY_RUN=false
+FIX_ISSUES=false
+CI_MODE=false
+SKIP_TESTS=false
+SKIP_DOCS=false
+CREATE_TAG=false
+
+# Check for s8r-version script
+S8R_VERSION_SCRIPT="${PROJECT_ROOT}/bin/s8r-version"
+if [ ! -x "$S8R_VERSION_SCRIPT" ]; then
+  S8R_VERSION_SCRIPT="${PROJECT_ROOT}/util/version"
+  if [ ! -x "$S8R_VERSION_SCRIPT" ]; then
+    print_warning "Version management script not found. Some version checks may be skipped."
+    S8R_VERSION_SCRIPT=""
+  fi
+fi
+
+# Function to display help
+show_help() {
+  print_header "Release Preparation Tool"
+  echo
+  print_section "Description"
+  echo "  This tool verifies all requirements are met before tagging a new release,"
+  echo "  including test coverage, documentation, version consistency, and build quality."
+  echo
+  print_section "Usage"
+  echo "  prepare-release [options] <version>"
+  echo
+  print_section "Options"
+  echo "  -v, --verbose           Show detailed output"
+  echo "  -n, --no-report         Do not generate verification report"
+  echo "  -d, --report-dir DIR    Specify report output directory (default: release-verification)"
+  echo "  -t, --threshold N       Set coverage threshold percentage (default: 80)"
+  echo "  -y, --dry-run           Verify everything but don't make any changes"
+  echo "  -f, --fix               Attempt to fix issues automatically"
+  echo "  -c, --ci                Run in CI mode (exit codes for automation)"
+  echo "  -s, --skip-tests        Skip running tests (use existing results)"
+  echo "  -k, --skip-docs         Skip documentation verification"
+  echo "  -g, --create-tag        Create Git tag after successful verification"
+  echo "  -h, --help              Show this help message"
+  echo
+  print_section "Examples"
+  echo "  prepare-release 2.5.0                   # Prepare version 2.5.0 release"
+  echo "  prepare-release -f -s 2.5.0             # Fix issues, skip tests for 2.5.0"
+  echo "  prepare-release -y -t 90 2.5.0          # Dry run with 90% coverage threshold"
+  echo "  prepare-release -g 2.5.0                # Create tag after verification"
+}
+
+# Parse command line arguments
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -v|--verbose)
+        VERBOSE=true
+        shift
+        ;;
+      -n|--no-report)
+        GENERATE_REPORT=false
+        shift
+        ;;
+      -d|--report-dir)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          REPORT_DIR="$2"
+          shift 2
+        else
+          print_error "Report directory path missing after -d/--report-dir"
+          show_help
+          exit 1
+        fi
+        ;;
+      -t|--threshold)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          COVERAGE_THRESHOLD="$2"
+          shift 2
+        else
+          print_error "Threshold value missing after -t/--threshold"
+          show_help
+          exit 1
+        fi
+        ;;
+      -y|--dry-run)
+        DRY_RUN=true
+        shift
+        ;;
+      -f|--fix)
+        FIX_ISSUES=true
+        shift
+        ;;
+      -c|--ci)
+        CI_MODE=true
+        shift
+        ;;
+      -s|--skip-tests)
+        SKIP_TESTS=true
+        shift
+        ;;
+      -k|--skip-docs)
+        SKIP_DOCS=true
+        shift
+        ;;
+      -g|--create-tag)
+        CREATE_TAG=true
+        shift
+        ;;
+      -h|--help)
+        show_help
+        exit 0
+        ;;
+      *)
+        if [[ -z "$VERSION" ]]; then
+          VERSION="$1"
+          shift
+        else
+          print_error "Unknown option or multiple versions specified: $1"
+          show_help
+          exit 1
+        fi
+        ;;
+    esac
+  done
+  
+  # Validate version
+  if [[ -z "$VERSION" ]]; then
+    print_error "Version parameter is required."
+    show_help
+    exit 1
+  fi
+  
+  # Validate version format
+  if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
+    print_error "Invalid version format. Expected format: X.Y.Z or X.Y.Z-SUFFIX"
+    exit 1
+  fi
+}
+
+# Create report directory and initialize report
+init_report() {
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    mkdir -p "$REPORT_DIR"
+    
+    # Create summary file
+    SUMMARY_FILE="${REPORT_DIR}/release_${VERSION}_verification.md"
+    
+    cat > "$SUMMARY_FILE" << EOF
+# Release Verification Report: ${VERSION}
+
+**Date:** $(date "+%Y-%m-%d %H:%M:%S")  
+**Coverage Threshold:** ${COVERAGE_THRESHOLD}%  
+**Dry Run Mode:** $(if [[ "$DRY_RUN" == true ]]; then echo "Enabled"; else echo "Disabled"; fi)
+
+## Verification Summary
+
+| Check | Status | Details |
+|-------|--------|---------|
+EOF
+  fi
+}
+
+# Update report with check results
+update_report() {
+  local check_name="$1"
+  local status="$2"
+  local details="$3"
+  
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    local status_icon
+    if [[ "$status" == "PASS" ]]; then
+      status_icon="✅ Pass"
+    elif [[ "$status" == "WARN" ]]; then
+      status_icon="⚠️ Warning"
+    else
+      status_icon="❌ Fail"
+    fi
+    
+    echo "| $check_name | $status_icon | $details |" >> "$SUMMARY_FILE"
+  fi
+}
+
+# Add section to report
+add_report_section() {
+  local section_name="$1"
+  local content="$2"
+  
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    cat >> "$SUMMARY_FILE" << EOF
+
+## $section_name
+
+$content
+EOF
+  fi
+}
+
+# Verify version consistency across all files
+verify_version_consistency() {
+  print_header "Verifying Version Consistency"
+  
+  local status="PASS"
+  local issues=0
+  local details=""
+  
+  # Files to check for version
+  local version_files=(
+    "${PROJECT_ROOT}/modules/version.properties"
+    "${PROJECT_ROOT}/modules/pom.xml"
+    "${PROJECT_ROOT}/modules/samstraumr-core/pom.xml"
+    "${PROJECT_ROOT}/pom.xml"
+    "${PROJECT_ROOT}/README.md"
+    "${PROJECT_ROOT}/CLAUDE.md"
+  )
+  
+  # Use version script if available
+  if [[ -n "$S8R_VERSION_SCRIPT" ]]; then
+    local current_version=$("$S8R_VERSION_SCRIPT" get)
+    
+    if [[ "$current_version" != "$VERSION" ]]; then
+      issues=$((issues + 1))
+      details="Current version ($current_version) does not match target release version ($VERSION)."
+      
+      print_warning "Version mismatch: Current=$current_version, Target=$VERSION"
+      
+      if [[ "$FIX_ISSUES" == true && "$DRY_RUN" == false ]]; then
+        print_info "Setting version to $VERSION..."
+        if "$S8R_VERSION_SCRIPT" set "$VERSION"; then
+          print_success "Version updated to $VERSION"
+          details="$details Updated version to $VERSION."
+        else
+          print_warning "Failed to update version"
+          details="$details Failed to update version automatically."
+        fi
+      fi
+    else
+      print_success "Version is consistent with target release: $VERSION"
+    fi
+  else
+    # Manual version checking in files
+    for file in "${version_files[@]}"; do
+      if [[ -f "$file" ]]; then
+        if grep -q "$VERSION" "$file"; then
+          if [[ "$VERBOSE" == true ]]; then
+            print_success "Correct version found in $file"
+          fi
+        else
+          issues=$((issues + 1))
+          print_warning "Version $VERSION not found in $file"
+          details="$details Version $VERSION not found in $file. "
+          
+          if [[ "$FIX_ISSUES" == true && "$DRY_RUN" == false ]]; then
+            # Try to fix the version
+            if [[ "$file" == *"version.properties" ]]; then
+              # Update properties file
+              if grep -q "version=" "$file"; then
+                sed -i "s/version=.*/version=$VERSION/" "$file"
+                print_success "Updated version in $file"
+                details="$details Updated version in $file. "
+              else
+                print_warning "Could not update version in $file"
+                details="$details Could not update version in $file. "
+              fi
+            elif [[ "$file" == *"pom.xml" ]]; then
+              # Update Maven POM
+              if grep -q "<version>" "$file"; then
+                sed -i "s/<version>[^<]*<\/version>/<version>$VERSION<\/version>/" "$file"
+                print_success "Updated version in $file"
+                details="$details Updated version in $file. "
+              else
+                print_warning "Could not update version in $file"
+                details="$details Could not update version in $file. "
+              fi
+            else
+              print_warning "Automatic version update not supported for $file"
+              details="$details Manual update required for $file. "
+            fi
+          fi
+        fi
+      else
+        if [[ "$VERBOSE" == true ]]; then
+          print_info "File not found: $file"
+        fi
+      fi
+    done
+    
+    if [[ $issues -eq 0 ]]; then
+      print_success "Version is consistent across all files: $VERSION"
+    else
+      status="WARN"
+      print_warning "Version inconsistencies found in $issues files"
+    fi
+  fi
+  
+  # Set status based on issues
+  if [[ $issues -gt 0 ]]; then
+    if [[ "$FIX_ISSUES" == true && "$issues" -gt 0 ]]; then
+      status="WARN"
+    else
+      status="FAIL"
+    fi
+  fi
+  
+  # Update report
+  if [[ -z "$details" ]]; then
+    details="Version $VERSION is consistent across all files."
+  fi
+  update_report "Version Consistency" "$status" "$details"
+  
+  return $(if [[ "$status" == "PASS" ]]; then echo 0; else echo 1; fi)
+}
+
+# Verify test coverage meets threshold
+verify_test_coverage() {
+  if [[ "$SKIP_TESTS" == true ]]; then
+    print_info "Skipping test verification as requested"
+    update_report "Test Coverage" "WARN" "Test verification skipped as requested."
+    return 0
+  fi
+  
+  print_header "Verifying Test Coverage"
+  
+  local test_output="${REPORT_DIR}/test_verification_output.txt"
+  local status="PASS"
+  local details=""
+  
+  # Command for test verification
+  local test_cmd="${PROJECT_ROOT}/bin/test/verify-test-suite"
+  
+  if [[ ! -x "$test_cmd" ]]; then
+    test_cmd="${PROJECT_ROOT}/bin/s8r-verify"
+    if [[ ! -x "$test_cmd" ]]; then
+      print_warning "Test verification script not found."
+      update_report "Test Coverage" "WARN" "Test verification script not found."
+      return 1
+    fi
+  fi
+  
+  # Add parameters
+  if [[ "$VERBOSE" == true ]]; then
+    test_cmd="$test_cmd --verbose"
+  fi
+  
+  test_cmd="$test_cmd --threshold $COVERAGE_THRESHOLD"
+  
+  if [[ "$FIX_ISSUES" == true ]]; then
+    test_cmd="$test_cmd --fix"
+  fi
+  
+  # Run verification
+  print_info "Running test verification..."
+  print_info "Command: $test_cmd"
+  
+  if $test_cmd > "$test_output" 2>&1; then
+    print_success "Test verification passed"
+    details="All tests pass and meet coverage threshold of ${COVERAGE_THRESHOLD}%."
+  else
+    print_warning "Test verification found issues"
+    status="FAIL"
+    
+    # Extract coverage from output
+    local coverage=$(grep -o "[0-9]\+% overall coverage" "$test_output" | head -1 | sed 's/% overall coverage//')
+    
+    if [[ -n "$coverage" ]]; then
+      if (( coverage >= COVERAGE_THRESHOLD )); then
+        details="Tests pass but there are issues with the test suite. Coverage: ${coverage}%."
+        status="WARN"
+      else
+        details="Test coverage (${coverage}%) is below the required threshold (${COVERAGE_THRESHOLD}%)."
+      fi
+    else
+      details="Test verification failed. See test output for details."
+    fi
+  fi
+  
+  # Update report
+  update_report "Test Coverage" "$status" "$details"
+  
+  # Add test output to report
+  if [[ "$GENERATE_REPORT" == true && -f "$test_output" ]]; then
+    local test_report=$(cat "$test_output" | sed 's/^/    /')
+    add_report_section "Test Verification Output" "\`\`\`\n$test_report\n\`\`\`"
+  fi
+  
+  return $(if [[ "$status" == "PASS" || "$status" == "WARN" ]]; then echo 0; else echo 1; fi)
+}
+
+# Verify build succeeds with no warnings
+verify_build() {
+  print_header "Verifying Build"
+  
+  local build_output="${REPORT_DIR}/build_verification_output.txt"
+  local status="PASS"
+  local details=""
+  
+  # Command for build
+  local build_cmd="${PROJECT_ROOT}/bin/s8r build"
+  
+  if [[ ! -x "$build_cmd" ]]; then
+    build_cmd="mvn clean package"
+  fi
+  
+  # Run build
+  print_info "Running build verification..."
+  print_info "Command: $build_cmd"
+  
+  if $build_cmd > "$build_output" 2>&1; then
+    # Check for warnings
+    local warnings=$(grep -c -i "warning" "$build_output" || echo 0)
+    
+    if [[ $warnings -eq 0 ]]; then
+      print_success "Build verification passed with no warnings"
+      details="Build succeeds with no warnings."
+    else
+      print_warning "Build succeeded with $warnings warnings"
+      status="WARN"
+      details="Build succeeds but has $warnings warnings."
+    fi
+  else
+    print_warning "Build verification failed"
+    status="FAIL"
+    details="Build fails. See build output for details."
+  fi
+  
+  # Update report
+  update_report "Build Verification" "$status" "$details"
+  
+  # Add build output to report if it failed
+  if [[ "$GENERATE_REPORT" == true && "$status" == "FAIL" && -f "$build_output" ]]; then
+    local build_report=$(tail -50 "$build_output" | sed 's/^/    /')
+    add_report_section "Build Output (Last 50 Lines)" "\`\`\`\n$build_report\n\`\`\`"
+  fi
+  
+  return $(if [[ "$status" == "PASS" || "$status" == "WARN" ]]; then echo 0; else echo 1; fi)
+}
+
+# Verify documentation is up to date
+verify_documentation() {
+  if [[ "$SKIP_DOCS" == true ]]; then
+    print_info "Skipping documentation verification as requested"
+    update_report "Documentation" "WARN" "Documentation verification skipped as requested."
+    return 0
+  fi
+  
+  print_header "Verifying Documentation"
+  
+  local status="PASS"
+  local issues=0
+  local details=""
+  
+  # Check for documentation files
+  local doc_files=(
+    "${PROJECT_ROOT}/README.md"
+    "${PROJECT_ROOT}/docs/reference/version-management.md"
+    "${PROJECT_ROOT}/docs/reference/build-and-test.md"
+    "${PROJECT_ROOT}/docs/reference/cli-reference.md"
+    "${PROJECT_ROOT}/docs/guides/getting-started.md"
+    "${PROJECT_ROOT}/docs/guides/introduction.md"
+  )
+  
+  for file in "${doc_files[@]}"; do
+    if [[ ! -f "$file" ]]; then
+      issues=$((issues + 1))
+      print_warning "Documentation file not found: $file"
+      details="$details Missing documentation file: $file. "
+    elif ! grep -q "$VERSION" "$file" && [[ "$file" != *"cli-reference.md" ]]; then
+      issues=$((issues + 1))
+      print_warning "Version $VERSION not found in $file"
+      details="$details Version $VERSION not found in $file. "
+      
+      if [[ "$FIX_ISSUES" == true && "$DRY_RUN" == false ]]; then
+        # Try to update version references
+        local old_version=""
+        
+        # Try to extract current version
+        if [[ -n "$S8R_VERSION_SCRIPT" ]]; then
+          old_version=$("$S8R_VERSION_SCRIPT" get)
+        else
+          # Try to find version in file
+          old_version=$(grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" "$file" | head -1)
+        fi
+        
+        if [[ -n "$old_version" ]]; then
+          sed -i "s/$old_version/$VERSION/g" "$file"
+          print_success "Updated version references in $file"
+          details="$details Updated version references in $file. "
+        else
+          print_warning "Could not update version references in $file"
+          details="$details Could not update version references in $file. "
+        fi
+      fi
+    fi
+  done
+  
+  # Check for scientific documentation standards
+  local scientific_doc_standards="${PROJECT_ROOT}/docs/reference/standards/scientific-documentation-standards.md"
+  if [[ -f "$scientific_doc_standards" ]]; then
+    # Check user-facing documentation for scientific accessibility
+    local user_guides=(
+      "${PROJECT_ROOT}/docs/guides/getting-started.md"
+      "${PROJECT_ROOT}/docs/guides/introduction.md"
+      "${PROJECT_ROOT}/docs/concepts/core-concepts.md"
+    )
+    
+    for guide in "${user_guides[@]}"; do
+      if [[ -f "$guide" ]]; then
+        # Check for scientific language indicators
+        local has_scientific_examples=$(grep -c -E "example|scientific|researcher|domain|analogy" "$guide" || echo 0)
+        local has_technical_jargon=$(grep -c -E "interface|implementation|instantiate|polymorphic|singleton" "$guide" || echo 0)
+        
+        if [[ $has_scientific_examples -lt 2 || $has_technical_jargon -gt 5 ]]; then
+          issues=$((issues + 1))
+          print_warning "Documentation may not be scientist-friendly: $guide"
+          details="${details}Documentation file $guide may not be accessible to scientists (low scientific examples or high technical jargon). "
+          
+          if [[ "$FIX_ISSUES" == true && "$DRY_RUN" == false ]]; then
+            echo -e "\n// TODO [P1] (DOC): Review $guide for scientific accessibility following scientific-documentation-standards\n" >> "$guide"
+            print_info "Added scientific documentation review TODO to $guide"
+            details="${details}Added documentation review TODO to $guide. "
+          fi
+        fi
+      fi
+    done
+  else
+    issues=$((issues + 1))
+    print_warning "Scientific documentation standards file not found: $scientific_doc_standards"
+    details="${details}Scientific documentation standards file not found. "
+    
+    if [[ "$FIX_ISSUES" == true && "$DRY_RUN" == false ]]; then
+      # Create directory if it doesn't exist
+      mkdir -p "$(dirname "$scientific_doc_standards")"
+      
+      # Create a template standards file
+      cat > "$scientific_doc_standards" << EOF
+# Scientific Documentation Standards
+
+Documentation should be accessible to scientists with varying technical backgrounds:
+
+1. **Use scientific analogies** to explain technical concepts
+2. **Minimize programming jargon** where possible
+3. **Include domain-specific examples** from various scientific fields
+4. **Provide visual explanations** of complex concepts
+5. **Assume minimal programming knowledge** and explain prerequisites
+
+// TODO [P1] (DOC): Expand these scientific documentation standards
+EOF
+      
+      print_info "Created template scientific documentation standards file"
+      details="${details}Created template scientific documentation standards file. "
+    fi
+  fi
+
+  # Check for changelog entry
+  local changelog_files=(
+    "${PROJECT_ROOT}/docs/reference/release/changelog.md"
+    "${PROJECT_ROOT}/CHANGELOG.md"
+  )
+  
+  local changelog_found=false
+  
+  for file in "${changelog_files[@]}"; do
+    if [[ -f "$file" ]]; then
+      changelog_found=true
+      
+      if ! grep -q "$VERSION" "$file"; then
+        issues=$((issues + 1))
+        print_warning "Version $VERSION not found in changelog: $file"
+        details="$details Version $VERSION not found in changelog: $file. "
+        
+        if [[ "$FIX_ISSUES" == true && "$DRY_RUN" == false ]]; then
+          # Try to add changelog entry
+          print_info "Creating changelog entry for version $VERSION..."
+          
+          # Get latest commits for changelog
+          local temp_commits="${REPORT_DIR}/temp_commits.txt"
+          git log --pretty=format:"- %s" -n 10 > "$temp_commits"
+          
+          # Add changelog entry
+          local today=$(date +"%Y-%m-%d")
+          local changelog_entry="## $VERSION ($today)\n\n"
+          
+          # Add commits
+          while IFS= read -r line; do
+            # Filter out merge commits and version bumps
+            if [[ ! "$line" =~ ^-\ Merge || ! "$line" =~ ^-\ [Bb]ump\ version ]]; then
+              changelog_entry="${changelog_entry}${line}\n"
+            fi
+          done < "$temp_commits"
+          
+          # Add to changelog
+          local temp_changelog="${REPORT_DIR}/temp_changelog.md"
+          
+          if [[ -f "$file" ]]; then
+            # Find the first occurrence of a previous version header
+            local header_line=$(grep -n "^##\s\+[0-9]\+\.[0-9]\+\.[0-9]\+" "$file" | head -1 | cut -d: -f1)
+            
+            if [[ -n "$header_line" ]]; then
+              # Insert changelog entry before the first version header
+              head -n $((header_line-1)) "$file" > "$temp_changelog"
+              echo -e "$changelog_entry" >> "$temp_changelog"
+              tail -n +$((header_line)) "$file" >> "$temp_changelog"
+            else
+              # No previous version header found, append to file
+              echo -e "$changelog_entry" > "$temp_changelog"
+              cat "$file" >> "$temp_changelog"
+            fi
+            
+            # Replace original file
+            mv "$temp_changelog" "$file"
+            print_success "Added changelog entry for version $VERSION to $file"
+            details="$details Added changelog entry to $file. "
+          fi
+          
+          # Clean up
+          rm -f "$temp_commits"
+        fi
+      fi
+      
+      break
+    fi
+  done
+  
+  if [[ "$changelog_found" == false ]]; then
+    issues=$((issues + 1))
+    print_warning "No changelog file found"
+    details="$details No changelog file found. "
+    
+    if [[ "$FIX_ISSUES" == true && "$DRY_RUN" == false ]]; then
+      # Create changelog file
+      local changelog_file="${PROJECT_ROOT}/CHANGELOG.md"
+      local changelog_dir=$(dirname "$changelog_file")
+      
+      mkdir -p "$changelog_dir"
+      
+      # Get latest commits for changelog
+      local temp_commits="${REPORT_DIR}/temp_commits.txt"
+      git log --pretty=format:"- %s" -n 10 > "$temp_commits"
+      
+      # Create changelog
+      local today=$(date +"%Y-%m-%d")
+      echo "# Changelog" > "$changelog_file"
+      echo >> "$changelog_file"
+      echo "## $VERSION ($today)" >> "$changelog_file"
+      echo >> "$changelog_file"
+      
+      # Add commits
+      while IFS= read -r line; do
+        # Filter out merge commits and version bumps
+        if [[ ! "$line" =~ ^-\ Merge || ! "$line" =~ ^-\ [Bb]ump\ version ]]; then
+          echo "$line" >> "$changelog_file"
+        fi
+      done < "$temp_commits"
+      
+      print_success "Created changelog file: $changelog_file"
+      details="$details Created changelog file: $changelog_file. "
+      
+      # Clean up
+      rm -f "$temp_commits"
+    fi
+  fi
+  
+  # Check release notes
+  local release_notes_file="${PROJECT_ROOT}/docs/reference/release/release-${VERSION}.md"
+  
+  if [[ ! -f "$release_notes_file" ]]; then
+    issues=$((issues + 1))
+    print_warning "Release notes file not found: $release_notes_file"
+    details="$details Missing release notes file: $release_notes_file. "
+    
+    if [[ "$FIX_ISSUES" == true && "$DRY_RUN" == false ]]; then
+      # Create release notes directory if it doesn't exist
+      local release_notes_dir=$(dirname "$release_notes_file")
+      mkdir -p "$release_notes_dir"
+      
+      # Get latest commits for release notes
+      local temp_commits="${REPORT_DIR}/temp_commits.txt"
+      git log --pretty=format:"- %s (%h)" -n 15 > "$temp_commits"
+      
+      # Create release notes
+      local today=$(date +"%Y-%m-%d")
+      cat > "$release_notes_file" << EOF
+# Samstraumr ${VERSION} Release Notes
+
+*Released on: ${today}*
+
+## Overview
+
+Samstraumr ${VERSION} includes [brief description of release]
+
+## New Features
+
+* [Feature 1]
+* [Feature 2]
+
+## Improvements
+
+* [Improvement 1]
+* [Improvement 2]
+
+## Bug Fixes
+
+* [Bug fix 1]
+* [Bug fix 2]
+
+## Breaking Changes
+
+* [Breaking change 1 (if any)]
+
+## Recent Commits
+
+$(cat "$temp_commits")
+
+## Installation
+
+\`\`\`xml
+<dependency>
+    <groupId>org.s8r</groupId>
+    <artifactId>samstraumr</artifactId>
+    <version>${VERSION}</version>
+</dependency>
+\`\`\`
+
+## Upgrading
+
+[Upgrade instructions]
+EOF
+      
+      print_success "Created release notes template: $release_notes_file"
+      details="$details Created release notes template: $release_notes_file. "
+      
+      # Clean up
+      rm -f "$temp_commits"
+    fi
+  fi
+  
+  if [[ $issues -eq 0 ]]; then
+    print_success "Documentation verification passed"
+    details="All documentation is up to date for version $VERSION."
+  else
+    if [[ "$FIX_ISSUES" == true ]]; then
+      status="WARN"
+      print_warning "Documentation had $issues issues, attempted fixes"
+    else
+      status="FAIL"
+      print_warning "Documentation verification failed with $issues issues"
+    fi
+  fi
+  
+  # Update report
+  update_report "Documentation" "$status" "$details"
+  
+  return $(if [[ "$status" == "PASS" || "$status" == "WARN" ]]; then echo 0; else echo 1; fi)
+}
+
+# Verify Git status (no uncommitted changes)
+verify_git_status() {
+  print_header "Verifying Git Status"
+  
+  local status="PASS"
+  local details=""
+  
+  # Check for uncommitted changes
+  local git_status=$(git status --porcelain)
+  
+  if [[ -n "$git_status" ]]; then
+    print_warning "Uncommitted changes found in repository"
+    status="WARN"
+    
+    # Count changes
+    local added=$(echo "$git_status" | grep -c "^A")
+    local modified=$(echo "$git_status" | grep -c "^M")
+    local deleted=$(echo "$git_status" | grep -c "^D")
+    local untracked=$(echo "$git_status" | grep -c "^??")
+    
+    details="Uncommitted changes: $added added, $modified modified, $deleted deleted, $untracked untracked files."
+    
+    if [[ "$FIX_ISSUES" == true && "$DRY_RUN" == false ]]; then
+      print_info "Attempting to commit changes..."
+      
+      # Stage and commit changes
+      git add -A
+      
+      # Create commit message
+      local commit_message="chore: prepare release $VERSION"
+      
+      if git commit -m "$commit_message"; then
+        print_success "Changes committed: $commit_message"
+        status="PASS"
+        details="Changes were automatically committed with message: \"$commit_message\""
+      else
+        print_warning "Failed to commit changes"
+        details="$details Failed to automatically commit changes."
+      fi
+    fi
+  else
+    print_success "No uncommitted changes found in repository"
+    details="Repository has no uncommitted changes."
+  fi
+  
+  # Update report
+  update_report "Git Status" "$status" "$details"
+  
+  return $(if [[ "$status" == "PASS" ]]; then echo 0; else echo 1; fi)
+}
+
+# Create Git tag for release
+create_git_tag() {
+  if [[ "$CREATE_TAG" == false ]]; then
+    print_info "Skipping tag creation as not requested"
+    return 0
+  fi
+  
+  if [[ "$DRY_RUN" == true ]]; then
+    print_info "Skipping tag creation in dry run mode"
+    update_report "Tag Creation" "WARN" "Skipped in dry run mode."
+    return 0
+  fi
+  
+  print_header "Creating Git Tag"
+  
+  local status="PASS"
+  local details=""
+  
+  # Check if tag already exists
+  if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+    print_warning "Tag v$VERSION already exists"
+    status="WARN"
+    details="Tag v$VERSION already exists."
+  else
+    print_info "Creating tag v$VERSION..."
+    
+    # Create tag message
+    local tag_message="Release v$VERSION"
+    
+    # Create annotated tag
+    if git tag -a "v$VERSION" -m "$tag_message"; then
+      print_success "Created tag v$VERSION"
+      details="Successfully created tag v$VERSION."
+    else
+      print_warning "Failed to create tag v$VERSION"
+      status="FAIL"
+      details="Failed to create tag v$VERSION."
+    fi
+  fi
+  
+  # Update report
+  update_report "Tag Creation" "$status" "$details"
+  
+  return $(if [[ "$status" == "PASS" || "$status" == "WARN" ]]; then echo 0; else echo 1; fi)
+}
+
+# Finalize report with summary
+finalize_report() {
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    # Calculate overall results
+    local total_checks=$(grep -c "^|" "$SUMMARY_FILE" | awk '{print $1-2}')
+    local passed_checks=$(grep -c "✅ Pass" "$SUMMARY_FILE")
+    local warning_checks=$(grep -c "⚠️ Warning" "$SUMMARY_FILE")
+    local failed_checks=$(grep -c "❌ Fail" "$SUMMARY_FILE")
+    
+    local overall_status="✅ PASS"
+    if [[ $failed_checks -gt 0 ]]; then
+      overall_status="❌ FAIL"
+    elif [[ $warning_checks -gt 0 ]]; then
+      overall_status="⚠️ WARNING"
+    fi
+    
+    # Create temp file for updated report
+    local temp_file="${REPORT_DIR}/temp_report.md"
+    
+    # Create new report header
+    cat > "$temp_file" << EOF
+# Release Verification Report: ${VERSION}
+
+**Date:** $(date "+%Y-%m-%d %H:%M:%S")  
+**Coverage Threshold:** ${COVERAGE_THRESHOLD}%  
+**Dry Run Mode:** $(if [[ "$DRY_RUN" == true ]]; then echo "Enabled"; else echo "Disabled"; fi)
+
+## Overall Results
+
+- **Status:** $overall_status
+- **Checks Passed:** $passed_checks/$total_checks
+- **Warnings:** $warning_checks
+- **Failures:** $failed_checks
+
+EOF
+    
+    # Add recommendations section
+    cat >> "$temp_file" << EOF
+## Recommendations
+
+EOF
+    
+    if [[ $failed_checks -gt 0 ]]; then
+      cat >> "$temp_file" << EOF
+⚠️ **Release is NOT ready for tagging**
+
+The following issues must be fixed before release:
+EOF
+      
+      # List failures
+      while IFS='|' read -r _ check status details; do
+        if [[ "$status" == *"❌ Fail"* ]]; then
+          check=$(echo "$check" | xargs)
+          echo "- Fix $check issues: ${details//|}" >> "$temp_file"
+        fi
+      done < <(grep "❌ Fail" "$SUMMARY_FILE")
+      
+    elif [[ $warning_checks -gt 0 ]]; then
+      cat >> "$temp_file" << EOF
+⚠️ **Release requires attention**
+
+The following warnings should be reviewed before release:
+EOF
+      
+      # List warnings
+      while IFS='|' read -r _ check status details; do
+        if [[ "$status" == *"⚠️ Warning"* ]]; then
+          check=$(echo "$check" | xargs)
+          echo "- Review $check: ${details//|}" >> "$temp_file"
+        fi
+      done < <(grep "⚠️ Warning" "$SUMMARY_FILE")
+      
+    else
+      cat >> "$temp_file" << EOF
+✅ **Release is ready for tagging**
+
+All verification checks have passed. You can proceed with:
+
+1. Create the release tag:
+   \`\`\`
+   git tag -a v${VERSION} -m "Release v${VERSION}"
+   \`\`\`
+
+2. Push the tag:
+   \`\`\`
+   git push origin v${VERSION}
+   \`\`\`
+
+3. Create a GitHub release (if applicable)
+EOF
+    fi
+    
+    # Add original report content
+    echo -e "\n## Verification Checks\n" >> "$temp_file"
+    sed -n '/^| Check /,$p' "$SUMMARY_FILE" >> "$temp_file"
+    
+    # Replace original report
+    mv "$temp_file" "$SUMMARY_FILE"
+    
+    print_success "Verification report finalized: $SUMMARY_FILE"
+    
+    # Create symlink for latest report
+    ln -sf "release_${VERSION}_verification.md" "${REPORT_DIR}/latest_release_verification.md"
+    print_info "Latest report symlink: ${REPORT_DIR}/latest_release_verification.md"
+  fi
+}
+
+# Main function
+main() {
+  # Parse command line arguments
+  parse_args "$@"
+  
+  print_header "Preparing Release: $VERSION"
+  if [[ "$DRY_RUN" == true ]]; then
+    print_info "Running in dry run mode (no changes will be made)"
+  fi
+  
+  # Initialize report
+  init_report
+  
+  # Track overall success
+  local overall_success=true
+  
+  # Verify version consistency
+  if ! verify_version_consistency; then
+    overall_success=false
+    if [[ "$CI_MODE" == true ]]; then
+      if [[ "$FIX_ISSUES" == false ]]; then
+        print_error "Version consistency verification failed"
+        exit 1
+      fi
+    fi
+  fi
+  
+  # Verify test coverage
+  if ! verify_test_coverage; then
+    overall_success=false
+    if [[ "$CI_MODE" == true ]]; then
+      print_error "Test coverage verification failed"
+      exit 1
+    fi
+  fi
+  
+  # Verify build
+  if ! verify_build; then
+    overall_success=false
+    if [[ "$CI_MODE" == true ]]; then
+      print_error "Build verification failed"
+      exit 1
+    fi
+  fi
+  
+  # Verify documentation
+  if ! verify_documentation; then
+    overall_success=false
+    if [[ "$CI_MODE" == true ]]; then
+      if [[ "$FIX_ISSUES" == false ]]; then
+        print_error "Documentation verification failed"
+        exit 1
+      fi
+    fi
+  fi
+  
+  # Verify Git status
+  if ! verify_git_status; then
+    overall_success=false
+    if [[ "$CI_MODE" == true ]]; then
+      if [[ "$FIX_ISSUES" == false ]]; then
+        print_error "Git status verification failed"
+        exit 1
+      fi
+    fi
+  fi
+  
+  # Create Git tag
+  if [[ "$overall_success" == true || "$FIX_ISSUES" == true ]]; then
+    create_git_tag
+  fi
+  
+  # Finalize report
+  finalize_report
+  
+  print_header "Release Preparation Complete"
+  
+  if [[ "$overall_success" == true ]]; then
+    print_success "Release $VERSION is ready for tagging"
+    exit 0
+  else
+    print_warning "Release $VERSION requires attention before tagging"
+    exit 1
+  fi
+}
+
+# Run the script
+main "$@"
