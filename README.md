@@ -1,11 +1,13 @@
 
 # Samstraumr: Adaptive Resilient Software Framework
 
-[![Version](https://img.shields.io/badge/version-2.4.5-blue)](https://github.com/heymumford/Samstraumr/releases) 
+In a world where scientific simulations and complex applications drown in tangled object hierarchies, Samstraumr emerges as a breath of fresh air—a flowing river of clarity cutting through chaotic code landscapes. It liberates researchers and engineers from the tyranny of rigid, brittle systems that collapse under their own complexity, offering instead a living architecture that breathes, adapts, and heals like natural organisms. By weaving together composable units that communicate through elegant event flows rather than tight coupling, Samstraumr empowers scientists to focus on discovery rather than debugging, enabling simulations that evolve alongside insight and code that transforms as gracefully as the natural systems it often models.
+
+[![Version](https://img.shields.io/badge/version-3.0.5-blue)](https://github.com/heymumford/Samstraumr/releases) 
 [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) 
-[![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.java.net/projects/jdk/17/) 
-[![Maven](https://img.shields.io/badge/Maven-3.6%2B-purple)](https://maven.apache.org/)
+[![Java](https://img.shields.io/badge/Java-21-orange)](https://openjdk.org/projects/jdk/21/) 
+[![Maven](https://img.shields.io/badge/Maven-3.9%2B-purple)](https://maven.apache.org/)
 
 **Samstraumr (S8r)** is an enterprise Java framework for building resilient, self-healing software systems with adaptive components and event-driven architecture. Inspired by natural systems' resilience, it enables applications that autonomously monitor, adapt, and recover from disruptions.
 
@@ -15,7 +17,7 @@
 
 | [What is S8r?](#what-is-samstraumr) | [Why Use It?](#why-use-samstraumr) | [Core Concepts](#core-concepts) | [Getting Started](#getting-started) | [Documentation](#documentation) |
 |:--:|:--:|:--:|:--:|:--:|
-| [CLI Reference](#command-line-interface--tools) | [Project Structure](#project-structure) | [Contributing](#contributing--connect) | [License](#license) | [Connect](#connect) |
+| [CLI Reference](#command-line-interface--tools) | [Project Structure](#project-structure) | [Contributing](#contributing--connect) | [License](#license) | [Project Status](./KANBAN.md) |
 
 ## What is Samstraumr?
 
@@ -30,6 +32,7 @@ The framework excels at managing complexity in distributed systems, service ecos
 - 📊 **Scale precisely**: Targeted scaling without system-wide changes
 - 🛠️ **Recover automatically**: Component-level failure recovery
 - 🌱 **Evolve continuously**: Incremental adaptation without rewrites
+- 🛡️ **Validate comprehensively**: Early error detection with clear feedback
 
 **Learn More:** [📜 Origins and Vision](./docs/concepts/origins-and-vision.md) • [🌿 Systems Theory Foundation](./docs/concepts/systems-theory-foundation.md) • [🧩 Core Concepts](./docs/concepts/core-concepts.md)
 
@@ -44,6 +47,7 @@ The framework excels at managing complexity in distributed systems, service ecos
 | **Complex Integrations** | Event-driven patterns create loosely coupled system interactions |
 | **Operational Opacity** | Comprehensive observability with built-in component monitoring |
 | **Inconsistent Recovery** | Standardized lifecycle management with predictable recovery paths |
+| **Silent Failures** | Comprehensive validation system with early failure detection |
 
 ### Benefits for Key Stakeholders
 
@@ -58,6 +62,7 @@ The framework excels at managing complexity in distributed systems, service ecos
 - Isolated components for parallel development
 - Consistent patterns across system domains
 - Self-documenting architecture with clear contracts
+- Early failure detection with detailed validation errors
 
 **💼 Business Stakeholders**
 - Lower maintenance costs via self-healing
@@ -77,6 +82,7 @@ Samstraumr implements a cohesive set of architectural concepts that work togethe
 - **➡️ Flow-Oriented**: Data and control along well-defined pathways
 - **🏷️ Identity**: Hierarchical addressing for all system elements
 - **📢 Event-Driven**: Loose coupling through publish-subscribe patterns
+- **🛡️ Validation**: Comprehensive checks at all system boundaries
 
 [📘 **Learn more about core concepts**](./docs/concepts/core-concepts.md)
 
@@ -84,8 +90,8 @@ Samstraumr implements a cohesive set of architectural concepts that work togethe
 
 ### Prerequisites
 
-- **Java**: JDK 17 or higher
-- **Maven**: 3.6 or higher
+- **Java**: JDK 21 (recommended) or JDK 17
+- **Maven**: 3.9 or higher
 - **Git**: Latest version
 
 [📋 **Setup Guide**](./docs/guides/prerequisites.md)
@@ -100,8 +106,11 @@ cd Samstraumr
 # Build project
 ./s8r-build
 
-# Run tests
+# Run all tests
 ./s8r-test all
+
+# Run tests with coverage analysis
+./s8r-test all --coverage
 ```
 
 Maven dependency:
@@ -109,7 +118,7 @@ Maven dependency:
 <dependency>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-core</artifactId>
-    <version>2.4.5</version>
+    <version>3.0.5</version>
 </dependency>
 ```
 
@@ -141,9 +150,16 @@ if (result.isValid()) {
 ### 📚 Guides
 - [Prerequisites](./docs/guides/prerequisites.md)
 - [Getting Started](./docs/guides/getting-started.md)
+- [Model Visualization](./docs/guides/model-visualization.md)
 - [Composition Strategies](./docs/guides/composition-strategies.md)
 - [Component Patterns](./docs/guides/component-patterns.md)
 - [Migration Guide](./docs/guides/migration-guide.md)
+
+### 🔬 Research
+- [Testing in the Age of AI](./docs/research/test-in-age-of-ai.md) - Eric C. Mumford
+- [AI-Enhanced Testing Integration](./docs/research/ai-enhanced-testing-integration.md) - Eric C. Mumford
+- [QA Cognitive Transformation](./docs/research/qa-cognitive-transformation-ai.md) - Eric C. Mumford
+- [Cell Activity Simulation](./docs/research/critical-components-of-simulating-and-monitoring-human-cell-activity-in-vitro.md) - Eric C. Mumford
 
 ### 🏛️ Architecture
 - [Architecture Overview](./docs/architecture/README.md)
@@ -165,8 +181,20 @@ if (result.isValid()) {
 - [Version Management](./docs/reference/version-management.md)
 - [Changelog](./docs/reference/release/changelog.md)
 - [FAQ](./docs/reference/f-a-q.md)
+- [Maven & Cucumber Standards](./modules/samstraumr-core/src/test/java/org/s8r/test/steps/alz001/MAVEN_CUCUMBER_STANDARDS.md)
 
-**🧪 Current Development**: We're using [Test-Driven Development](./docs/dev/tdd-development.md) with [BDD/Cucumber](./docs/dev/test-bdd-cucumber.md)
+**🧪 Current Development**: We're using [Test-Driven Development](./docs/dev/tdd-development.md) with [BDD/Cucumber](./docs/dev/test-bdd-cucumber.md). Recently completed lifecycle test infrastructure enhancements with specialized test runners and improved script utilities. For current status and work in progress, see our [KANBAN Board](./docs/planning/KANBAN.md) and [Test Suite Implementation Report](./docs/test-reports/test-suite-implementation-report.md).
+
+#### Maven & Cucumber Configuration Standards
+
+The project follows strict Maven and Cucumber configuration standards to ensure maintainable, reliable tests:
+
+- **Maven Configuration**: Structured POM hierarchy with inheritance and proper dependency management
+- **Cucumber Configuration**: Standardized properties files with parallel execution and proper reporting
+- **Test Organization**: Well-defined directory structure with clear separation of concerns
+- **Configuration Documentation**: Comprehensive documentation with absolute paths for all configuration files
+
+[📚 **Maven & Cucumber Standards**](./modules/samstraumr-core/src/test/java/org/s8r/test/steps/alz001/MAVEN_CUCUMBER_STANDARDS.md)
 
 ## Command-Line Interface & Tools
 
@@ -179,16 +207,21 @@ Samstraumr provides a unified CLI for all operations:
 ./s8r <command> [options] [arguments]
 
 # Example commands
-./s8r build fast --ci            # Fast build with local CI check
-./s8r test unit --parallel       # Run unit tests in parallel
-./s8r version bump minor         # Bump minor version
-./s8r docs target/docs pdf       # Generate PDF documentation
-./s8r-docs check                 # Check documentation integrity
-./s8r-ci --dry-run               # Test CI pipeline locally
+./s8r init --package com.example.model    # Initialize a new S8r model
+./s8r list --format tree                  # Visualize model in tree format
+./s8r build fast --ci                     # Fast build with local CI check
+./s8r test unit --parallel                # Run unit tests in parallel
+./s8r version bump minor                  # Bump minor version
+./s8r docs target/docs pdf                # Generate PDF documentation
 ```
 
 | Command | Description |
 |---------|-------------|
+| `./s8r init [options]` | Initialize a new S8r model repository |
+| `./s8r list [options]` | Visualize S8r models in ASCII or tree format |
+| `./s8r component <cmd>` | Manage components (create, list, info, delete) |
+| `./s8r composite <cmd>` | Manage composites (create, add, connect, list) |
+| `./s8r machine <cmd>` | Manage machines (create, add, connect, list) |
 | `./s8r build [mode]` | Build project (fast, test, package, install, full) |
 | `./s8r test <type>` | Run tests (unit, component, integration, all...) |
 | `./s8r version <cmd>` | Manage versions (get, bump, set, fix) |

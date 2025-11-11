@@ -9,7 +9,7 @@ remain exclusively with the copyright holder listed above.
 Licensed under the Mozilla Public License 2.0
 -->
 
-# Documentation Scripts
+# README
 
 This directory contains scripts for managing and maintaining the documentation in the Samstraumr project.
 
@@ -25,7 +25,7 @@ The Samstraumr project follows these documentation standards:
 
 ## Available Scripts
 
-### Standardization Scripts
+### Standardization scripts
 
 | Script | Description |
 |--------|-------------|
@@ -35,7 +35,7 @@ The Samstraumr project follows these documentation standards:
 | `standardize-feature-filenames.sh` | Standardizes Cucumber feature file names |
 | `standardize-planning-filenames.sh` | Standardizes planning document names |
 
-### Verification and Fixing Scripts
+### Verification and fixing scripts
 
 | Script | Description |
 |--------|-------------|
@@ -44,7 +44,7 @@ The Samstraumr project follows these documentation standards:
 | `fix-markdown-links.sh` | Fixes broken links in markdown files |
 | `update-markdown-headers.sh` | Updates headers to follow standardized formats |
 
-### TODO Management Scripts
+### Todo management scripts
 
 | Script | Description |
 |--------|-------------|
@@ -53,7 +53,7 @@ The Samstraumr project follows these documentation standards:
 | `check-todo-format.sh` | CI check for TODO format compliance |
 | `todo-to-issue.sh` | Creates GitHub issues from high-priority TODOs |
 
-### Conversion Scripts
+### Conversion scripts
 
 | Script | Description |
 |--------|-------------|
@@ -61,55 +61,55 @@ The Samstraumr project follows these documentation standards:
 
 ## Usage Examples
 
-### Verify Documentation Standards
+### Verify documentation standards
 
 ```bash
-# Check all documentation against standards
+# README
 ./check-documentation-standards.sh
 
-# Run a specific check only
+# README
 ./check-documentation-standards.sh --check filenames
 ./check-documentation-standards.sh --check headers
 ./check-documentation-standards.sh --check code_blocks
 ./check-documentation-standards.sh --check broken_links
 ```
 
-### Manage TODOs
+### Manage todos
 
 ```bash
-# Extract TODOs from codebase and generate a report
+# README
 ./extract-todos.sh --output todo-report.md
 
-# Check TODO format compliance
+# README
 ./check-todo-format.sh --verbose
 
-# Fix non-compliant TODOs
+# README
 ./standardize-todos.sh --fix
 
-# Create GitHub issues from high-priority TODOs (dry run)
+# README
 ./todo-to-issue.sh --priority P0,P1 --dry-run
 ```
 
-### Update Cross-References
+### Update cross-references
 
 ```bash
-# Check for broken links only
+# README
 ./update-cross-references.sh --check
 
-# Update cross-references (dry run)
+# README
 ./update-cross-references.sh --dry-run
 
-# Update cross-references in a specific directory
+# README
 ./update-cross-references.sh --path ../guides
 ```
 
-### Standardize Filenames
+### Standardize filenames
 
 ```bash
-# Run in dry-run mode (no changes made)
+# README
 ./standardize-filenames.sh --dry-run
 
-# Process a specific directory
+# README
 ./standardize-filenames.sh ../concepts
 ```
 
@@ -118,7 +118,7 @@ The Samstraumr project follows these documentation standards:
 These scripts can be integrated into the CI/CD pipeline. For example:
 
 ```yaml
-# In a CI/CD configuration file
+# README
 documentation_check:
   script:
     - docs/scripts/check-documentation-standards.sh
@@ -140,4 +140,3 @@ todo_format_check:
 - [Documentation Standards](../reference/standards/documentation-standards.md)
 - [File Organization Standards](../reference/standards/file-organization.md)
 - [Documentation Standardization Plan](../plans/active-documentation-standardization.md)
-- [TODO Standardization Plan](../plans/active-todo-standardization.md)

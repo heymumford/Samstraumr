@@ -70,41 +70,41 @@ fi
 print_header "Standardizing TBD Example Files"
 
 # Handle different formats and convert to consistent kebab-case with uppercase TBD
-if [ -f "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-AtomicBoundaryTest-Example.feature" ]; then
-  mv -v "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-AtomicBoundaryTest-Example.feature" \
-       "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-atomic-boundary-test-example.feature"
+if [ -f "modules/samstraumr-core/src/test/resources/tube/features/examples/TBD-AtomicBoundaryTest-Example.feature" ]; then
+  mv -v "modules/samstraumr-core/src/test/resources/tube/features/examples/TBD-AtomicBoundaryTest-Example.feature" \
+       "modules/samstraumr-core/src/test/resources/tube/features/examples/TBD-atomic-boundary-test-example.feature"
 fi
 
-if [ -f "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-CompositeTubeInteractionTest-Example.feature" ]; then
-  mv -v "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-CompositeTubeInteractionTest-Example.feature" \
-       "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-composite-tube-interaction-test-example.feature"
+if [ -f "modules/samstraumr-core/src/test/resources/tube/features/examples/TBD-CompositeTubeInteractionTest-Example.feature" ]; then
+  mv -v "modules/samstraumr-core/src/test/resources/tube/features/examples/TBD-CompositeTubeInteractionTest-Example.feature" \
+       "modules/samstraumr-core/src/test/resources/tube/features/examples/TBD-composite-tube-interaction-test-example.feature"
 fi
 
-if [ -f "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-InterTubeFeatureTest-Example.feature" ]; then
-  mv -v "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-InterTubeFeatureTest-Example.feature" \
-       "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-inter-tube-feature-test-example.feature"
+if [ -f "modules/samstraumr-core/src/test/resources/tube/features/examples/TBD-InterTubeFeatureTest-Example.feature" ]; then
+  mv -v "modules/samstraumr-core/src/test/resources/tube/features/examples/TBD-InterTubeFeatureTest-Example.feature" \
+       "modules/samstraumr-core/src/test/resources/tube/features/examples/TBD-inter-tube-feature-test-example.feature"
 fi
 
-if [ -f "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-MachineConstructValidationTest-Example.feature" ]; then
-  mv -v "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-MachineConstructValidationTest-Example.feature" \
-       "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-machine-construct-validation-test-example.feature"
+if [ -f "modules/samstraumr-core/src/test/resources/tube/features/examples/TBD-MachineConstructValidationTest-Example.feature" ]; then
+  mv -v "modules/samstraumr-core/src/test/resources/tube/features/examples/TBD-MachineConstructValidationTest-Example.feature" \
+       "modules/samstraumr-core/src/test/resources/tube/features/examples/TBD-machine-construct-validation-test-example.feature"
 fi
 
 # Handle duplicate kebab-case files 
-if [ -f "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/atomic-boundary-test-example.feature" ] && [ -f "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-atomic-boundary-test-example.feature" ]; then
-  rm -v "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/atomic-boundary-test-example.feature"
+if [ -f "modules/samstraumr-core/src/test/resources/tube/features/examples/atomic-boundary-test-example.feature" ] && [ -f "modules/samstraumr-core/src/test/resources/tube/features/examples/TBD-atomic-boundary-test-example.feature" ]; then
+  rm -v "modules/samstraumr-core/src/test/resources/tube/features/examples/atomic-boundary-test-example.feature"
 fi
 
-if [ -f "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/composite-tube-interaction-test-example.feature" ] && [ -f "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-composite-tube-interaction-test-example.feature" ]; then
-  rm -v "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/composite-tube-interaction-test-example.feature"
+if [ -f "modules/samstraumr-core/src/test/resources/tube/features/examples/composite-tube-interaction-test-example.feature" ] && [ -f "modules/samstraumr-core/src/test/resources/tube/features/examples/TBD-composite-tube-interaction-test-example.feature" ]; then
+  rm -v "modules/samstraumr-core/src/test/resources/tube/features/examples/composite-tube-interaction-test-example.feature"
 fi
 
-if [ -f "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/inter-tube-feature-test-example.feature" ] && [ -f "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-inter-tube-feature-test-example.feature" ]; then
-  rm -v "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/inter-tube-feature-test-example.feature"
+if [ -f "modules/samstraumr-core/src/test/resources/tube/features/examples/inter-tube-feature-test-example.feature" ] && [ -f "modules/samstraumr-core/src/test/resources/tube/features/examples/TBD-inter-tube-feature-test-example.feature" ]; then
+  rm -v "modules/samstraumr-core/src/test/resources/tube/features/examples/inter-tube-feature-test-example.feature"
 fi
 
-if [ -f "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/machine-construct-validation-test-example.feature" ] && [ -f "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/TBD-machine-construct-validation-test-example.feature" ]; then
-  rm -v "Samstraumr/samstraumr-core/src/test/resources/tube/features/examples/machine-construct-validation-test-example.feature"
+if [ -f "modules/samstraumr-core/src/test/resources/tube/features/examples/machine-construct-validation-test-example.feature" ] && [ -f "modules/samstraumr-core/src/test/resources/tube/features/examples/TBD-machine-construct-validation-test-example.feature" ]; then
+  rm -v "modules/samstraumr-core/src/test/resources/tube/features/examples/machine-construct-validation-test-example.feature"
 fi
 
 # Convert PascalCase feature files to kebab-case
@@ -118,17 +118,17 @@ if [[ "$USING_LIB" == true ]] && type standardize_directory_filenames &>/dev/nul
   fi
   
   # Standardize filenames in composites features directory
-  if [ -d "./Samstraumr/samstraumr-core/src/test/resources/composites/features" ]; then
-    standardize_directory_filenames "./Samstraumr/samstraumr-core/src/test/resources/composites/features"
+  if [ -d "./modules/samstraumr-core/src/test/resources/composites/features" ]; then
+    standardize_directory_filenames "./modules/samstraumr-core/src/test/resources/composites/features"
   fi
   
   # Standardize filenames in tube features directory
-  if [ -d "./Samstraumr/samstraumr-core/src/test/resources/tube/features" ]; then
-    standardize_directory_filenames "./Samstraumr/samstraumr-core/src/test/resources/tube/features"
+  if [ -d "./modules/samstraumr-core/src/test/resources/tube/features" ]; then
+    standardize_directory_filenames "./modules/samstraumr-core/src/test/resources/tube/features"
   fi
 else
   # Handle pattern files in composites directory
-  for file in $(find ./Samstraumr/samstraumr-core/src/test/resources/composites/features -name "*[A-Z]*.feature" 2>/dev/null || true); do
+  for file in $(find ./modules/samstraumr-core/src/test/resources/composites/features -name "*[A-Z]*.feature" 2>/dev/null || true); do
     directory=$(dirname "$file")
     filename=$(basename "$file")
     # Check if this is a PascalCase filename
@@ -141,7 +141,7 @@ else
   done
 
   # Handle regular feature files
-  for file in $(find ./Samstraumr/samstraumr-core/src/test/resources/tube/features -name "*[A-Z]*.feature" 2>/dev/null | grep -v "TBD" || true); do
+  for file in $(find ./modules/samstraumr-core/src/test/resources/tube/features -name "*[A-Z]*.feature" 2>/dev/null | grep -v "TBD" || true); do
     directory=$(dirname "$file")
     filename=$(basename "$file")
     # Check if this is a PascalCase filename

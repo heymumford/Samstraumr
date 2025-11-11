@@ -117,8 +117,8 @@ get_project_version() {
     local version
     
     # First try the version.properties file
-    if [ -f "${PROJECT_ROOT}/Samstraumr/version.properties" ]; then
-      version=$(grep "version=" "${PROJECT_ROOT}/Samstraumr/version.properties" | cut -d= -f2)
+    if [ -f "${PROJECT_ROOT}/modules/version.properties" ]; then
+      version=$(grep "version=" "${PROJECT_ROOT}/modules/version.properties" | cut -d= -f2)
     fi
     
     # If not found, try to get from pom.xml using the library function
@@ -130,8 +130,8 @@ get_project_version() {
   else
     # Fall back to original implementation
     # Try to get version from version.properties
-    if [ -f "${PROJECT_ROOT}/Samstraumr/version.properties" ]; then
-      grep "version=" "${PROJECT_ROOT}/Samstraumr/version.properties" | cut -d= -f2
+    if [ -f "${PROJECT_ROOT}/modules/version.properties" ]; then
+      grep "version=" "${PROJECT_ROOT}/modules/version.properties" | cut -d= -f2
     else
       # Fall back to extracting from pom.xml
       grep -m 1 "<version>" "${PROJECT_ROOT}/pom.xml" | sed 's/.*<version>\(.*\)<\/version>.*/\1/'

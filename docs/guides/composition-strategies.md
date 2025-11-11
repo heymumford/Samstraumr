@@ -30,14 +30,14 @@ Building complex systems from simple components is both an art and a science. In
 
 ## Foundational Principles
 
-### Single Responsibility Principle
+### Single responsibility principle
 
 Each tube should have precisely one responsibility, enabling:
 - Clear reasoning about component behavior
 - Focused testing of individual responsibilities
 - Easier maintenance and reusability
 
-### Explicit Connections
+### Explicit connections
 
 Make all connections between tubes explicit and visible:
 
@@ -57,13 +57,13 @@ composite.connect("validator", "inventory");
 composite.connect("inventory", "payment");
 ```
 
-### Loose Coupling
+### Loose coupling
 
 - **Interface-Based Connections**: Connect through well-defined interfaces
 - **Message-Based Communication**: Pass self-contained messages
 - **Avoid Shared State**: Each tube manages its own state
 
-### Hierarchical Organization
+### Hierarchical organization
 
 - **Individual Tubes**: Single-responsibility processing units
 - **Composites**: Related tubes working together
@@ -72,7 +72,7 @@ composite.connect("inventory", "payment");
 
 ## Composite Patterns
 
-### Linear Pipeline
+### Linear pipeline
 
 Connect tubes in a sequential processing chain:
 
@@ -85,7 +85,7 @@ Connect tubes in a sequential processing chain:
 - Data enrichment flows
 - ETL operations
 
-### Branching Pipeline
+### Branching pipeline
 
 Split processing into multiple parallel paths:
 
@@ -100,7 +100,7 @@ Split processing into multiple parallel paths:
 - Type-specific handling
 - Performance optimization
 
-### Feedback Loop
+### Feedback loop
 
 Include feedback mechanisms for iterative processing:
 
@@ -115,7 +115,7 @@ Include feedback mechanisms for iterative processing:
 - Optimization algorithms
 - Convergence calculations
 
-### Observer Network
+### Observer network
 
 Distribute events to multiple interested components:
 
@@ -130,7 +130,7 @@ Distribute events to multiple interested components:
 - Monitoring systems
 - Cross-cutting concerns
 
-### Layered Architecture
+### Layered architecture
 
 Organize tubes into functional layers:
 
@@ -149,21 +149,21 @@ Organize tubes into functional layers:
 
 ## Flow Management
 
-### Synchronous Flow
+### Synchronous flow
 
 **Considerations:**
 - Simplicity: Easier to understand and debug
 - Consistency: Predictable processing order
 - Throughput: May limit overall throughput
 
-### Asynchronous Flow
+### Asynchronous flow
 
 **Considerations:**
 - Responsiveness: Non-blocking operations
 - Throughput: Higher throughput for I/O-bound operations
 - Complexity: More complex error handling
 
-### Backpressure Management
+### Backpressure management
 
 Control flow when downstream components can't keep up:
 
@@ -178,7 +178,7 @@ public Object process(Object input) throws InterruptedException {
 }
 ```
 
-### Priority-Based Routing
+### Priority-based routing
 
 Route items based on priority or characteristics:
 
@@ -198,20 +198,20 @@ if (input instanceof PriorityItem) {
 
 ## State Management
 
-### Individual vs. Composite State
+### Individual vs. composite state
 
 - Individual tubes manage their internal state
 - Composites track state relevant to coordination
 - Avoid duplicating state between levels
 
-### State Propagation Patterns
+### State propagation patterns
 
 - **Upward Propagation**: Tubes notify containing composite
 - **Downward Propagation**: Composite influences constituent tubes
 - **Lateral Propagation**: Changes affect sibling tubes
 - **Conditional Propagation**: Only propagate under specific conditions
 
-### Composite-Level Monitoring
+### Composite-level monitoring
 
 Monitor health metrics across the composite:
 - Health status derived from constituent tubes
@@ -221,7 +221,7 @@ Monitor health metrics across the composite:
 
 ## Resilience Strategies
 
-### Redundancy Patterns
+### Redundancy patterns
 
 ```java
 public Object process(Object input) {
@@ -240,7 +240,7 @@ public Object process(Object input) {
 - **Active-Active**: Multiple tubes process simultaneously
 - **Diversified Redundancy**: Different implementations for same function
 
-### Circuit Breaker Pattern
+### Circuit breaker pattern
 
 Protect services from cascading failures:
 
@@ -263,7 +263,7 @@ private Tube protect(Tube tube, CircuitBreaker breaker) {
 }
 ```
 
-### Bulkhead Pattern
+### Bulkhead pattern
 
 Isolate components to contain failures:
 
@@ -283,7 +283,7 @@ private Tube isolate(Tube tube, Semaphore bulkhead) {
 }
 ```
 
-### Graceful Degradation
+### Graceful degradation
 
 Maintain core functionality when resources are constrained:
 
@@ -306,7 +306,7 @@ switch (currentMode) {
 
 ## Evolutionary Compositions
 
-### Versioned Tubes
+### Versioned tubes
 
 Support multiple versions of tubes in a composition:
 
@@ -324,7 +324,7 @@ versionRouter.setActiveVersion("v2");
 - Gradual traffic transition to new versions
 - A/B testing of different versions
 
-### Pluggable Components
+### Pluggable components
 
 Create compositions that allow plugging in different implementations:
 
@@ -338,7 +338,7 @@ for (ProcessorPlugin plugin : loader) {
 }
 ```
 
-### Adaptive Composition
+### Adaptive composition
 
 Create compositions that adapt their structure based on conditions:
 
@@ -359,21 +359,21 @@ private void analyzeAndAdapt() {
 
 ## Common Pitfalls
 
-### Excessively Complex Composites
+### Excessively complex composites
 
 **Solution:** Hierarchical organization
 - Limit composites to 7-10 tubes (cognitive limit)
 - Group related tubes into sub-composites
 - Create clear boundaries around functionality
 
-### Hidden Dependencies
+### Hidden dependencies
 
 **Solution:** Explicit connections
 - Make all connections explicit in the composite
 - Avoid shared mutable state between tubes
 - Pass all dependencies as messages
 
-### Improper State Handling
+### Improper state handling
 
 **Solution:** Consistent state patterns
 - Use the standard dual-state model consistently
@@ -381,7 +381,7 @@ private void analyzeAndAdapt() {
 - Report state changes to listeners
 - Provide clear error responses
 
-### Overcomplex Flows
+### Overcomplex flows
 
 **Solution:** Simplified flows
 - Prefer linear flows where possible
@@ -391,14 +391,14 @@ private void analyzeAndAdapt() {
 
 ## Advanced Topics
 
-### Composition Metrics and Analytics
+### Composition metrics and analytics
 
 Collect metrics at all levels:
 - Individual tube metrics (processing time, error rates)
 - Composite-level metrics (state distribution, throughput)
 - End-to-end metrics (total processing time, success rates)
 
-### Distributed Compositions
+### Distributed compositions
 
 Design compositions that span multiple systems:
 - Remote connector tubes using HTTP/REST
@@ -406,10 +406,9 @@ Design compositions that span multiple systems:
 - Distributed error handling and recovery
 - Cross-system monitoring
 
-### Dynamic Recomposition
+### Dynamic recomposition
 
 Create compositions that restructure at runtime:
 - Monitor system performance and load
 - Select optimal composition patterns
 - Apply structural changes while preserving state
-- Use pattern-based restructuring

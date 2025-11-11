@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Identity Addressing
+# Concept Identity
 
 > **⚠️ This document has been consolidated!**
 >

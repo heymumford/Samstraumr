@@ -23,7 +23,7 @@ Licensed under the Mozilla Public License 2.0
 - [Implementation Guidelines](#implementation-guidelines)
 - [Real-World Examples](#real-world-examples)
 
-## Introduction: From Cells to Organisms
+## Introduction: from Cells to Organisms
 
 Nature teaches us that complexity emerges gradually through thoughtful organization. A single cell does remarkable work, but when cells collaborate in specialized groups—forming tissues, then organs, then full systems—they create capabilities that no single cell could manifest alone.
 
@@ -37,11 +37,11 @@ This progressive composition allows systems to grow organically, maintaining cla
 
 ## Composites: Collaborative Communities
 
-### What is a Composite?
+### What is a composite?
 
 A composite is a collection of components united by a common purpose or domain responsibility. Like a heart composed of specialized chambers and valves, a composite brings together complementary components that collaborate to fulfill a shared mission.
 
-### Key Characteristics
+### Key characteristics
 
 1. **Shared Context**: Components within a composite often share resources, configuration, and state awareness
 
@@ -51,7 +51,7 @@ A composite is a collection of components united by a common purpose or domain r
 
 4. **Collective Identity**: Referenced through the `C<ID>` notation, each composite maintains its own integrity
 
-### Composite Composition
+### Composite composition
 
 Create composites by grouping components that:
 
@@ -79,18 +79,18 @@ public class AuthenticationComposite implements Composite {
 
 ## Machines: Orchestrated Systems
 
-### What is a Machine?
+### What is a machine?
 
 A machine is a cohesive system composed of multiple composites working together to provide comprehensive functionality in a specific domain. If composites are like organs, machines are like entire biological systems—the circulatory system, nervous system, or immune system.
 
-### Key Characteristics
+### Key characteristics
 
 1. **Domain Completeness**: A machine addresses a complete functional domain
 2. **Orchestration**: Coordinates the activities of multiple composites
 3. **System Boundaries**: Clear interfaces to other machines and external systems
 4. **Resource Governance**: Manages resources across all contained composites
 
-### Machine State Management
+### Machine state management
 
 Machines implement sophisticated state management:
 
@@ -109,19 +109,19 @@ Machines implement sophisticated state management:
 
 In S8r, communication follows natural pathways inspired by biological systems:
 
-### Internal to Composite Communication
+### Internal to composite communication
 
 - **Direct Pathways**: Components within a composite communicate through established, direct channels
 - **Mediated Exchange**: The composite may provide internal messaging services or shared memory spaces
 - **State Observation**: Components can observe each other's states through the composite's coordination
 
-### Composite to Composite Communication
+### Composite to composite communication
 
 - **Formal Interfaces**: Communication occurs through well-defined public interfaces
 - **Machine Mediation**: The parent machine often regulates or monitors inter-composite exchanges
 - **Protocol Enforcement**: Communication follows established protocols matching composite capabilities
 
-### Cross-Machine Communication
+### Cross-machine communication
 
 - **System Boundaries**: Clear demarcation of where one machine ends and another begins
 - **Contract-Based Exchange**: Formalized contracts define what can be exchanged and how
@@ -166,7 +166,7 @@ public void evaluateCompositeState() {
 
 ## Real-World Examples
 
-### Content Platform Machine
+### Content platform machine
 
 ```
 M0 (Content Platform)
@@ -184,7 +184,7 @@ M0 (Content Platform)
     └── CO2 (Delivery Optimizer Component)
 ```
 
-### Payment Platform Machine
+### Payment platform machine
 
 ```
 M0 (Payment Platform)

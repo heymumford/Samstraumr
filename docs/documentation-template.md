@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Document Title
+# Documentation Template
 
 > Brief description of the document's purpose and content (1-2 sentences).
 
@@ -30,7 +30,7 @@ A more detailed introduction explaining what this document covers and why it's i
 
 ## Key Concepts
 
-### Concept One
+### Concept one
 
 Explanation of the first key concept with details and context.
 
@@ -39,13 +39,13 @@ Explanation of the first key concept with details and context.
 Component component = Component.create("example", environment);
 ```
 
-### Concept Two
+### Concept two
 
 Explanation of the second key concept with details and context.
 
 ## Examples
 
-### Basic Example
+### Basic example
 
 ```java
 import org.s8r.component.core.Component;
@@ -59,7 +59,7 @@ Environment env = new Environment.Builder("demo")
 Component component = Component.create("example", env);
 ```
 
-### Advanced Example
+### Advanced example
 
 Details and code for a more complex example.
 
@@ -73,4 +73,3 @@ Details and code for a more complex example.
 
 - [Core Concepts](concepts/core-concepts.md)
 - [Component Guide](guides/component-patterns.md)
-- [API Reference](reference/api-reference.md)

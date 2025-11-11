@@ -1,0 +1,107 @@
+#!/bin/bash
+#==============================================================================
+# s8r-docs - CLI wrapper for Samstraumr documentation tools
+# This script provides a unified interface for all documentation tools
+#==============================================================================
+
+set -e
+
+# Terminal colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Functions for prettier output
+info() { echo -e "${BLUE}$1${NC}"; }
+success() { echo -e "${GREEN}$1${NC}"; }
+error() { echo -e "${RED}Error: $1${NC}" >&2; }
+warning() { echo -e "${YELLOW}Warning: $1${NC}" >&2; }
+
+# Find repository root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+TOOLS_DIR="${SCRIPT_DIR}"
+
+show_help() {
+  echo "Usage: $(basename "$0") <command> [options]"
+  echo
+  echo "Commands:"
+  echo "  changelog          Generate or update changelog"
+  echo "  readme             Update README.md"
+  echo "  api                Generate API documentation"
+  echo "  markdown           Convert Markdown to HTML"
+  echo "  all                Generate all documentation"
+  echo "  check              Check documentation integrity"
+  echo "  help               Show this help message"
+  echo
+  echo "Examples:"
+  echo "  $(basename "$0") changelog --from v1.0.0"
+  echo "  $(basename "$0") readme --sections version,badges"
+  echo "  $(basename "$0") api --packages org.s8r.component,org.s8r.domain"
+  echo "  $(basename "$0") all --output docs/site"
+}
+
+# Check if command is provided
+if [ $# -eq 0 ]; then
+  show_help
+  exit 1
+fi
+
+COMMAND="$1"
+shift
+
+# Execute appropriate tool based on command
+case "$COMMAND" in
+  changelog)
+    "${TOOLS_DIR}/generate-changelog.sh" "$@"
+    ;;
+  readme)
+    "${TOOLS_DIR}/update-readme.sh" "$@"
+    ;;
+  api)
+    "${TOOLS_DIR}/generate-javadoc.sh" "$@"
+    ;;
+  markdown)
+    "${TOOLS_DIR}/generate-javadoc.sh" --markdown "$@"
+    ;;
+  all)
+    # Parse output directory if provided
+    OUTPUT_DIR="${PROJECT_ROOT}/target/site/docs"
+    if [[ "$*" == *"--output "* ]]; then
+      OUTPUT_DIR=$(echo "$*" | sed -n 's/.*--output \([^ ]*\).*/\1/p')
+    fi
+    
+    info "Generating all documentation in ${OUTPUT_DIR}"
+    
+    # Create output directory
+    mkdir -p "${OUTPUT_DIR}"
+    
+    # Generate changelog
+    info "Generating changelog..."
+    "${TOOLS_DIR}/generate-changelog.sh" --output "${OUTPUT_DIR}/CHANGELOG.md" "$@"
+    
+    # Update README
+    info "Updating README..."
+    "${TOOLS_DIR}/update-readme.sh" --readme "${OUTPUT_DIR}/README.md" "$@"
+    
+    # Generate API docs
+    info "Generating API documentation..."
+    "${TOOLS_DIR}/generate-javadoc.sh" --output "${OUTPUT_DIR}/api" --links --markdown "$@"
+    
+    success "All documentation generated in ${OUTPUT_DIR}"
+    echo "To view the documentation, open: file://${OUTPUT_DIR}/api/index.html"
+    ;;
+  check)
+    "${TOOLS_DIR}/doc-integrity-check.sh" "$@"
+    ;;
+  help)
+    show_help
+    ;;
+  *)
+    error "Unknown command: $COMMAND"
+    show_help
+    exit 1
+    ;;
+esac

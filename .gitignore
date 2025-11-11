@@ -19,7 +19,14 @@
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 .repository/
-/bin/
+# Exclude binary directories but not our bin script directory
+/bin-temp/
+**/bin-output/
+
+# Include our bin directory with scripts
+!/bin/
+!/bin/*/
+!/bin/**/
 /build/
 /coverage/
 /dist/
@@ -161,6 +168,17 @@ Thumbs.db
 #------------------------------------------------------------------------------
 # Configuration & Security Files
 #------------------------------------------------------------------------------
+# Config directory structure is tracked, but allow specific overrides
+/config/*
+!/config/.gitkeep
+!/config/README.md
+# Explicitly track specific config files as needed
+!/config/surefire-settings.xml
+!/config/.gitattributes
+# Exclude generated and backup files
+/config/effective-pom.xml
+/config/pom.xml.bak
+/config/*.bak
 # Security files
 **/*.crt
 **/*.jks
@@ -189,7 +207,10 @@ Thumbs.db
 docmosis.properties
 
 # Build and LLM specific configuration - generated at install time
+# CLAUDE.md is now tracked in docs/config/CLAUDE.md
+!/docs/config/CLAUDE.md
 /CLAUDE.md
+**/CLAUDE.md
 # New build documentation is now tracked in git
 
 #------------------------------------------------------------------------------
@@ -288,3 +309,12 @@ backup-legacy/
 **/maven-failsafe-plugin/
 **/surefire-reports/dump*.dump*
 **/CLAUDE.local.md
+
+# Additional target subdirectories
+target/logs/
+target/test-results/
+target/test-temp/
+target/reports/
+
+# Local Maven repository dependencies
+/lib/

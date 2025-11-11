@@ -102,7 +102,7 @@ util\build-performance.bat
 ## Version Management
 
 We have consolidated all version management into a single, unified script.
-See [VERSION_SCRIPTS.md](VERSION_SCRIPTS.md) for complete documentation.
+See [version-scripts.md](../util/version-scripts.md) for complete documentation.
 
 ```bash
 # Display current version information

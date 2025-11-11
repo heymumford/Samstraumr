@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Directory Flattening Implementation Plan
+# Active Directory Flattening Implementation
 
 ## Overview
 
@@ -29,9 +29,9 @@ Our analysis has identified several key areas requiring immediate attention:
 
 ## Implementation Phasing
 
-### Phase 1: Java Test Classes (Highest Priority)
+### Phase 1: java test classes (highest priority)
 
-#### Current Structure:
+#### Current structure:
 ```
 org/s8r/tube/lifecycle/steps/adam/AdamTubeSteps.java
 org/s8r/core/tube/test/steps/TubeSteps.java
@@ -39,7 +39,7 @@ org/s8r/core/tube/test/runners/TubeTestRunner.java
 org/s8r/tube/legacy/test/steps/LegacySteps.java
 ```
 
-#### Target Structure:
+#### Target structure:
 ```
 org/s8r/test/tube/lifecycle/AdamTubeSteps.java
 org/s8r/test/tube/TubeSteps.java
@@ -47,7 +47,7 @@ org/s8r/test/tube/TubeTestRunner.java
 org/s8r/test/legacy/LegacySteps.java
 ```
 
-#### Implementation Steps:
+#### Implementation steps:
 
 1. Create the new directory structure:
 ```bash
@@ -61,16 +61,16 @@ mkdir -p Samstraumr/samstraumr-core/src/test/java/org/s8r/test/component
 
 3. Move and refactor the test classes:
 ```bash
-# Move Adam tube test steps
+# Active Directory Flattening Implementation
 git mv Samstraumr/samstraumr-core/src/test/java/org/s8r/tube/lifecycle/steps/adam/*.java Samstraumr/samstraumr-core/src/test/java/org/s8r/test/tube/lifecycle/
 
-# Move core tube test steps
+# Active Directory Flattening Implementation
 git mv Samstraumr/samstraumr-core/src/test/java/org/s8r/core/tube/test/steps/*.java Samstraumr/samstraumr-core/src/test/java/org/s8r/test/tube/
 
-# Move tube test runners
+# Active Directory Flattening Implementation
 git mv Samstraumr/samstraumr-core/src/test/java/org/s8r/core/tube/test/runners/*.java Samstraumr/samstraumr-core/src/test/java/org/s8r/test/tube/
 
-# Move legacy test steps
+# Active Directory Flattening Implementation
 git mv Samstraumr/samstraumr-core/src/test/java/org/s8r/tube/legacy/test/steps/*.java Samstraumr/samstraumr-core/src/test/java/org/s8r/test/legacy/
 ```
 
@@ -80,9 +80,9 @@ git mv Samstraumr/samstraumr-core/src/test/java/org/s8r/tube/legacy/test/steps/*
 
 6. Run tests to verify functionality remains intact.
 
-### Phase 2: Feature Files Restructuring
+### Phase 2: feature files restructuring
 
-#### Current Structure:
+#### Current structure:
 ```
 test/resources/tube/features/L0_Tube/lifecycle/childhood-phase-tests.feature
 test/resources/tube/features/L0_Tube/lifecycle/memory-identity-tests.feature
@@ -90,7 +90,7 @@ test/resources/composites/features/L1_Bundle/patterns/observer-tube-test.feature
 test/resources/composites/features/L1_Composite/patterns/transformer-tube-test.feature
 ```
 
-#### Target Structure:
+#### Target structure:
 ```
 test/resources/features/tube-lifecycle/childhood-phase-test.feature
 test/resources/features/identity/memory-identity-test.feature
@@ -98,7 +98,7 @@ test/resources/features/composite-patterns/observer-tube-test.feature
 test/resources/features/composite-patterns/transformer-tube-test.feature
 ```
 
-#### Implementation Steps:
+#### Implementation steps:
 
 1. Create the new directory structure:
 ```bash
@@ -113,20 +113,20 @@ mkdir -p Samstraumr/samstraumr-core/src/test/resources/features/system
 
 3. Move and rename feature files:
 ```bash
-# Move lifecycle feature files
+# Active Directory Flattening Implementation
 git mv Samstraumr/samstraumr-core/src/test/resources/tube/features/L0_Tube/lifecycle/*.feature Samstraumr/samstraumr-core/src/test/resources/features/tube-lifecycle/
 
-# Move identity-related feature files
+# Active Directory Flattening Implementation
 git mv Samstraumr/samstraumr-core/src/test/resources/tube/lifecycle/*identity*.feature Samstraumr/samstraumr-core/src/test/resources/features/identity/
 
-# Move pattern feature files
+# Active Directory Flattening Implementation
 git mv Samstraumr/samstraumr-core/src/test/resources/composites/features/L1_Bundle/patterns/*.feature Samstraumr/samstraumr-core/src/test/resources/features/composite-patterns/
 git mv Samstraumr/samstraumr-core/src/test/resources/composites/features/L1_Composite/patterns/*.feature Samstraumr/samstraumr-core/src/test/resources/features/composite-patterns/
 
-# Move machine feature files
+# Active Directory Flattening Implementation
 git mv Samstraumr/samstraumr-core/src/test/resources/tube/features/L2_Machine/*.feature Samstraumr/samstraumr-core/src/test/resources/features/machine/
 
-# Move system feature files
+# Active Directory Flattening Implementation
 git mv Samstraumr/samstraumr-core/src/test/resources/tube/features/L3_System/*.feature Samstraumr/samstraumr-core/src/test/resources/features/system/
 ```
 
@@ -134,7 +134,7 @@ git mv Samstraumr/samstraumr-core/src/test/resources/tube/features/L3_System/*.f
 
 5. Run tests to verify functionality remains intact.
 
-### Phase 3: Merge Redundant Test Resources
+### Phase 3: merge redundant test resources
 
 We've identified several redundant test resource paths with similar concepts:
 
@@ -149,7 +149,7 @@ We've identified several redundant test resource paths with similar concepts:
    - `/composites/patterns/`
    - `/test/patterns/`
 
-#### Implementation Steps:
+#### Implementation steps:
 
 1. Analyze files in each redundant location to understand relationships.
 
@@ -159,9 +159,9 @@ We've identified several redundant test resource paths with similar concepts:
 
 4. Update references in test runners and step definitions.
 
-### Phase 4: Documentation Directory Cleanup
+### Phase 4: documentation directory cleanup
 
-#### Current Structure:
+#### Current structure:
 ```
 docs/
   planning/
@@ -177,7 +177,7 @@ docs/
     patterns/
 ```
 
-#### Target Structure:
+#### Target structure:
 ```
 docs/
   plans/           # All planning documents with clear naming
@@ -187,28 +187,28 @@ docs/
   standards/       # Coding and documentation standards
 ```
 
-#### Implementation Steps:
+#### Implementation steps:
 
 1. Consolidate all planning documents:
 ```bash
 mkdir -p docs/plans-new
 
-# Move active plans with prefix
+# Active Directory Flattening Implementation
 for file in docs/planning/active/*.md; do
   cp "$file" "docs/plans-new/active-$(basename "$file")"
 done
 
-# Move completed plans with prefix
+# Active Directory Flattening Implementation
 for file in docs/planning/completed/*.md; do
   cp "$file" "docs/plans-new/completed-$(basename "$file")"
 done
 
-# Move archived plans with prefix
+# Active Directory Flattening Implementation
 for file in docs/planning/archived/*.md; do
   cp "$file" "docs/plans-new/archived-$(basename "$file")"
 done
 
-# Move existing plans
+# Active Directory Flattening Implementation
 cp docs/plans/*.md docs/plans-new/
 
 git mv docs/plans-new docs/plans-updated
@@ -218,9 +218,9 @@ git mv docs/plans-new docs/plans-updated
 
 3. Update cross-references between documentation files.
 
-### Phase 5: Source Code Simplification
+### Phase 5: source code simplification
 
-#### Current Structure:
+#### Current structure:
 ```
 samstraumr-core/src/main/java/org/samstraumr/
   domain/
@@ -234,7 +234,7 @@ samstraumr-core/src/main/java/org/samstraumr/
     exception/
 ```
 
-#### Target Structure:
+#### Target structure:
 ```
 samstraumr-core/src/main/java/org/samstraumr/
   domain/
@@ -243,7 +243,7 @@ samstraumr-core/src/main/java/org/samstraumr/
     exception/    # All domain exceptions
 ```
 
-#### Implementation Steps:
+#### Implementation steps:
 
 1. Identify small directories with fewer than 5 files.
 
@@ -327,4 +327,3 @@ To prevent directory structure issues in the future:
 1. Use the `flatten-directories.sh` script as part of pre-commit hooks.
 2. Add maximum directory depth checks to the CI pipeline.
 3. Update style guides and contribution guidelines.
-4. Conduct periodic directory structure audits.

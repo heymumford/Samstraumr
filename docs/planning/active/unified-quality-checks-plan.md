@@ -45,7 +45,7 @@ Currently, quality checks are scattered across multiple scripts and configuratio
 
 ## Implementation Plan
 
-### Phase 1: Inventory and Analysis
+### Phase 1: inventory and analysis
 
 1. ⬜ Inventory all existing quality check tools:
    - Checkstyle
@@ -63,7 +63,7 @@ Currently, quality checks are scattered across multiple scripts and configuratio
    - Determine common patterns
    - Plan unified structure
 
-### Phase 2: Tool Configuration Standardization
+### Phase 2: tool configuration standardization
 
 1. ⬜ Create standardized configuration files:
    - Checkstyle: `quality-tools/checkstyle/checkstyle.xml`
@@ -79,7 +79,7 @@ Currently, quality checks are scattered across multiple scripts and configuratio
    - Strict: Thorough checks for releases
    - Security: Focused on security issues
 
-### Phase 3: Script Implementation
+### Phase 3: script implementation
 
 1. ⬜ Create a unified script structure:
    - `util/bin/quality/check-quality.sh`: Main entry point
@@ -94,7 +94,7 @@ Currently, quality checks are scattered across multiple scripts and configuratio
    - Output summary to console
    - Export results to JSON for CI integration
 
-### Phase 4: Integration
+### Phase 4: integration
 
 1. ⬜ Integrate with s8r CLI:
    - Add quality commands to s8r CLI
@@ -106,7 +106,7 @@ Currently, quality checks are scattered across multiple scripts and configuratio
    - Run basic quality checks before commit
    - Allow bypassing for WIP commits
 
-### Phase 5: Documentation and Training
+### Phase 5: documentation and training
 
 1. ⬜ Create documentation:
    - Tool configuration

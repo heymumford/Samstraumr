@@ -12,7 +12,7 @@ We identified a circular dependency between:
 
 This circular dependency violated Clean Architecture principles, which require dependencies to point inward (domain ← application ← infrastructure).
 
-### Solution: Service Locator Pattern
+### Solution: service locator pattern
 
 We applied the Service Locator pattern to break this circular dependency:
 
@@ -119,7 +119,7 @@ private Samstraumr() {
 }
 ```
 
-### Breaking Dependencies in Legacy Adapters
+### Breaking dependencies in legacy adapters
 
 To address dependencies between infrastructure and adapter layers, we:
 
@@ -164,7 +164,7 @@ This approach:
 - Used the Service Locator pattern to provide framework services without creating circular dependencies
 - Applied reflection to avoid direct adapter dependencies in the infrastructure layer
 
-### Remaining Issues
+### Remaining issues
 
 The adapter layer still directly depends on legacy code from the `org.s8r.tube` and `org.s8r.core` packages. These dependencies need to be addressed by:
 - Creating domain interfaces for these legacy types
@@ -175,4 +175,3 @@ The adapter layer still directly depends on legacy code from the `org.s8r.tube` 
 
 - [Dependency Inversion Principle](https://en.wikipedia.org/wiki/Dependency_inversion_principle)
 - [Service Locator Pattern](https://en.wikipedia.org/wiki/Service_locator_pattern)
-- [Clean Architecture by Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)

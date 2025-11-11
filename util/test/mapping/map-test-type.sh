@@ -9,10 +9,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 
 # Source the configuration file
-if [ -f "${PROJECT_ROOT}/.samstraumr.config" ]; then
-  source "$(cd "$(dirname "${BASH_SOURCE[0]}")" source "${PROJECT_ROOT}/.samstraumr.configsource "${PROJECT_ROOT}/.samstraumr.config pwd)/../../.samstraumr/config.sh""
+if [ -f "${PROJECT_ROOT}/.s8r.config" ]; then
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")" source "${PROJECT_ROOT}/.s8r.configsource "${PROJECT_ROOT}/.s8r.config pwd)/../../.s8r/config.sh""
 else
-  echo "Configuration file not found: ${PROJECT_ROOT}/.samstraumr.config"
+  echo "Configuration file not found: ${PROJECT_ROOT}/.s8r.config"
   exit 1
 fi
 

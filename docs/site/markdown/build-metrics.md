@@ -26,7 +26,7 @@ This page provides quantitative measures of the Samstraumr build, offering insig
 
 ## Test Metrics
 
-### Test Categories
+### Test categories
 
 | Category  |       Count        |       Passing        |       Failing        |       Skipped        |        Success Rate        |
 |-----------|--------------------|----------------------|----------------------|----------------------|----------------------------|
@@ -34,7 +34,7 @@ This page provides quantitative measures of the Samstraumr build, offering insig
 | BTL Tests | ${btl.tests.count} | ${btl.tests.passing} | ${btl.tests.failing} | ${btl.tests.skipped} | ${btl.tests.success.rate}% |
 | **Total** | ${tests.count}     | ${tests.passing}     | ${tests.failing}     | ${tests.skipped}     | ${tests.success.rate}%     |
 
-### Test Types
+### Test types
 
 |        Type         |           Count           |           Passing           |           Failing           |           Skipped           |           Success Rate            |
 |---------------------|---------------------------|-----------------------------|-----------------------------|-----------------------------|-----------------------------------|
@@ -46,7 +46,7 @@ This page provides quantitative measures of the Samstraumr build, offering insig
 
 ## Code Quality Metrics
 
-### Checkstyle Issues
+### Checkstyle issues
 
 | Severity |         Count          |            Trend             |
 |----------|------------------------|------------------------------|
@@ -54,7 +54,7 @@ This page provides quantitative measures of the Samstraumr build, offering insig
 | Warning  | ${checkstyle.warnings} | ${checkstyle.warnings.trend} |
 | Info     | ${checkstyle.info}     | ${checkstyle.info.trend}     |
 
-### SpotBugs Issues
+### Spotbugs issues
 
 | Priority |       Count        |          Trend           |
 |----------|--------------------|--------------------------|
@@ -62,7 +62,7 @@ This page provides quantitative measures of the Samstraumr build, offering insig
 | Medium   | ${spotbugs.medium} | ${spotbugs.medium.trend} |
 | Low      | ${spotbugs.low}    | ${spotbugs.low.trend}    |
 
-### Code Complexity
+### Code complexity
 
 |           Metric            |            Value            | Threshold |               Status               |
 |-----------------------------|-----------------------------|-----------|------------------------------------|

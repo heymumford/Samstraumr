@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Systems Theory Foundation
+# Concept Systems Theory
 
 ## Table of Contents
 

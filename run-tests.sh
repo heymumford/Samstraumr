@@ -1,0 +1,1 @@
+bin/test-utils/run-tests.sh

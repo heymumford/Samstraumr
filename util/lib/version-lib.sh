@@ -15,7 +15,7 @@ fi
 
 # Default paths and settings (can be overridden by version.conf)
 : ${VERSION_CONFIG_FILE:="${PROJECT_ROOT}/.s8r/config/version.conf"}
-: ${VERSION_FILE:="${PROJECT_ROOT}/Samstraumr/version.properties"}
+: ${VERSION_FILE:="${PROJECT_ROOT}/modules/version.properties"}
 : ${VERSION_PROPERTY_NAME:="samstraumr.version"}
 : ${VERSION_DATE_PROPERTY_NAME:="samstraumr.last.updated"}
 : ${GIT_TAG_PREFIX:="v"}
@@ -144,7 +144,7 @@ load_version_config
 # Usage: get_current_version
 # Returns: Current version or fallback version if not found
 function get_current_version() {
-  local version_file="${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/Samstraumr/version.properties}"
+  local version_file="${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/modules/version.properties}"
   local fallback_version="1.0.0"
   
   # Check if version file exists
@@ -192,7 +192,7 @@ function get_current_version() {
 }
 
 function get_last_updated_date() {
-  local version_file="${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/Samstraumr/version.properties}"
+  local version_file="${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/modules/version.properties}"
   
   if [ ! -f "$version_file" ]; then
     print_error "Version properties file not found: $version_file"
@@ -268,7 +268,7 @@ function calculate_new_version() {
 function update_version_in_files() {
   local current_version="$1"
   local new_version="$2"
-  local version_file="${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/Samstraumr/version.properties}"
+  local version_file="${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/modules/version.properties}"
   
   # Validate input parameters
   if [ -z "$current_version" ]; then
@@ -341,8 +341,8 @@ function update_version_in_files() {
   # This ensures consistent version across all modules
   local pom_files=(
     "${PROJECT_ROOT}/pom.xml"
-    "${PROJECT_ROOT}/Samstraumr/pom.xml"
-    "${PROJECT_ROOT}/Samstraumr/samstraumr-core/pom.xml"
+    "${PROJECT_ROOT}/modules/pom.xml"
+    "${PROJECT_ROOT}/modules/samstraumr-core/pom.xml"
   )
   
   print_info "Updating version in POM files:"
@@ -379,8 +379,8 @@ function update_version_in_files() {
       fi
       
       # 2. Check if this is a module POM with parent
-      if [ "$pom_file" == "${PROJECT_ROOT}/Samstraumr/pom.xml" ] || 
-         [ "$pom_file" == "${PROJECT_ROOT}/Samstraumr/samstraumr-core/pom.xml" ]; then
+      if [ "$pom_file" == "${PROJECT_ROOT}/modules/pom.xml" ] || 
+         [ "$pom_file" == "${PROJECT_ROOT}/modules/samstraumr-core/pom.xml" ]; then
         print_info "  Module POM detected - updating parent and version elements"
         
         # Update parent version
@@ -718,12 +718,12 @@ function show_version_history() {
 # This ensures that the same set of files is updated, checked, and committed
 VERSION_MANAGED_FILES=(
   # Source of truth - primary version file
-  "${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/Samstraumr/version.properties}"
+  "${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/modules/version.properties}"
   
   # Maven POM files to keep in sync
   "${PROJECT_ROOT}/pom.xml"
-  "${PROJECT_ROOT}/Samstraumr/pom.xml"
-  "${PROJECT_ROOT}/Samstraumr/samstraumr-core/pom.xml"
+  "${PROJECT_ROOT}/modules/pom.xml"
+  "${PROJECT_ROOT}/modules/samstraumr-core/pom.xml"
   
   # Documentation files with version reference
   "${PROJECT_ROOT}/README.md"

@@ -13,7 +13,7 @@ Licensed under the Mozilla Public License 2.0
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-# Samstraumr Version Management Tutorial
+# Version Management Tutorial
 
 ## Command Summary
 
@@ -31,53 +31,53 @@ Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford
 
 ## Common Workflows
 
-### Standard Development
+### Standard development
 
 ```bash
-# Fix bug in code
+# Version Management Tutorial
 vim Samstraumr/samstraumr-core/src/main/java/org/s8r/component/core/Component.java
 
-# Test your fix
+# Version Management Tutorial
 ./s8r test unit
 
-# Bump patch version (auto-updates all files)
+# Version Management Tutorial
 ./s8r version bump patch
 
-# Push changes
+# Version Management Tutorial
 git push origin main --tags
 ```
 
-### Feature Release
+### Feature release
 
 ```bash
-# Get latest changes
+# Version Management Tutorial
 git checkout main
 git pull
 
-# Run tests
+# Version Management Tutorial
 ./s8r test all
 
-# Bump minor version
+# Version Management Tutorial
 ./s8r version bump minor
 
-# Update documentation
+# Version Management Tutorial
 vim CHANGELOG.md
 
-# Push release
+# Version Management Tutorial
 git push origin main --tags
 ```
 
-### Release Candidate
+### Release candidate
 
 ```bash
-# Create version branch
+# Version Management Tutorial
 git checkout -b release/v1.7.x
 
-# Set RC version
+# Version Management Tutorial
 ./s8r version set [VERSION]-RC1
 git push origin release/v1.7.x
 
-# After testing, set final version
+# Version Management Tutorial
 ./s8r version set [VERSION]
 git push origin v${samstraumr.version}
 ```
@@ -85,18 +85,18 @@ git push origin v${samstraumr.version}
 ### Hotfix
 
 ```bash
-# Create hotfix branch from tag
+# Version Management Tutorial
 git checkout v${previous.version}
 git checkout -b hotfix/issue-123
 
-# Fix code and test
+# Version Management Tutorial
 vim Samstraumr/samstraumr-core/src/main/java/org/s8r/core/tube/impl/Component.java
 ./s8r test unit
 
-# Bump patch (${previous.version} → ${previous.version})
+# Version Management Tutorial
 ./s8r version bump patch
 
-# Submit PR and after merge:
+# Version Management Tutorial
 git checkout main
 git pull
 ./s8r version fix-tag

@@ -1,4 +1,4 @@
-# 4. Test Architecture Documentation Generation
+# 0004 Test Architecture Documentation Generation
 
 Date: 2025-04-06
 
@@ -46,7 +46,7 @@ All architecture documentation tests will be tagged with the `architecture` tag 
 - Documentation becomes a first-class citizen in the development process, tested like any other component
 - Reduced risk of divergence between documented architecture and actual implementation
 
-### Challenges and Mitigations
+### Challenges and mitigations
 - **Challenge**: Tests for documentation tools may increase build time
   - **Mitigation**: Architecture tests will be in a separate Maven profile so they don't run on every build
 

@@ -26,7 +26,7 @@ RESET='\033[0m'
 DRY_RUN=false
 APPLY_DIRECTLY=false
 ROOT_DIR=$(pwd)
-SRC_DIR="${ROOT_DIR}/Samstraumr/samstraumr-core/src"
+SRC_DIR="${ROOT_DIR}/modules/samstraumr-core/src"
 TARGET_DIR="${ROOT_DIR}/target/package-migration"
 LOG_FILE="${ROOT_DIR}/package-migration.log"
 
@@ -79,9 +79,9 @@ transform_package_path() {
   local package=$1
   
   # Apply package transformation rules
-  if [[ "$package" == org.samstraumr* ]]; then
-    # Replace org.samstraumr with org.s8r
-    echo "$package" | sed 's/org\.samstraumr/org.s8r/'
+  if [[ "$package" == org.s8r* ]]; then
+    # Replace org.s8r with org.s8r
+    echo "$package" | sed 's/org\.s8r/org.s8r/'
   elif [[ "$package" == org.tube* ]]; then
     # Move org.tube to org.s8r.tube.legacy
     echo "$package" | sed 's/org\.tube/org.s8r.tube.legacy/'
@@ -158,8 +158,8 @@ process_java_file() {
     # For import statements, apply the same transformations
     /^import / {
       line = $0
-      if (line ~ /org\.samstraumr/) {
-        gsub(/org\.samstraumr/, "org.s8r", line)
+      if (line ~ /org\.s8r/) {
+        gsub(/org\.s8r/, "org.s8r", line)
       } else if (line ~ /org\.tube/) {
         gsub(/org\.tube/, "org.s8r.tube.legacy", line)
       }
@@ -169,8 +169,8 @@ process_java_file() {
     # For ConfigurationParameter with GLUE_PROPERTY_NAME, update package references
     /^\s*@ConfigurationParameter.*GLUE_PROPERTY_NAME.*value\s*=\s*".*"/ {
       line = $0
-      if (line ~ /org\.samstraumr/) {
-        gsub(/org\.samstraumr/, "org.s8r", line)
+      if (line ~ /org\.s8r/) {
+        gsub(/org\.s8r/, "org.s8r", line)
       } else if (line ~ /org\.tube/) {
         gsub(/org\.tube/, "org.s8r.tube.legacy", line)
       }
@@ -229,7 +229,7 @@ update_references() {
     local temp_file="${xml_file}.tmp"
     
     # Apply transformations
-    sed -e 's/org\.samstraumr/org.s8r/g' \
+    sed -e 's/org\.s8r/org.s8r/g' \
         -e 's/org\.tube/org.s8r.tube.legacy/g' \
         "$xml_file" > "$temp_file"
     
@@ -253,7 +253,7 @@ update_references() {
     local temp_file="${prop_file}.tmp"
     
     # Apply transformations
-    sed -e 's/org\.samstraumr/org.s8r/g' \
+    sed -e 's/org\.s8r/org.s8r/g' \
         -e 's/org\.tube/org.s8r.tube.legacy/g' \
         "$prop_file" > "$temp_file"
     
@@ -277,7 +277,7 @@ update_references() {
     local temp_file="${feature_file}.tmp"
     
     # Apply transformations
-    sed -e 's/org\.samstraumr/org.s8r/g' \
+    sed -e 's/org\.s8r/org.s8r/g' \
         -e 's/org\.tube/org.s8r.tube.legacy/g' \
         "$feature_file" > "$temp_file"
     

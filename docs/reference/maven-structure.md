@@ -22,11 +22,11 @@ Samstraumr uses a three-tiered Maven structure:
    - Serves as the project entry point
    - Contains shared configuration and properties
    - Defines quality profiles and plugin management
-2. **Modules POM (`/Samstraumr/pom.xml`)**
+2. **Modules POM (`/modules/pom.xml`)**
    - Intermediate POM for managing submodules
    - Coordinates shared configuration among modules
    - Sets up common test profiles
-3. **Core Module POM (`/Samstraumr/samstraumr-core/pom.xml`)**
+3. **Core Module POM (`/modules/samstraumr-core/pom.xml`)**
    - Implements the actual framework functionality
    - Defines specific dependencies and test configurations
    - Contains domain-specific Maven profiles
@@ -38,7 +38,7 @@ This tiered approach provides excellent flexibility for growth, allowing you to:
 
 ## Maven Profiles
 
-### Test Profiles
+### Test profiles
 
 The project includes Maven profiles for running different types of tests:
 
@@ -66,7 +66,7 @@ The project includes Maven profiles for running different types of tests:
    - `mvn test -P skip-quality-checks` (skip quality validations)
    - `mvn test -P atl-tests` (Above The Line - critical tests)
 
-### Quality Profiles
+### Quality profiles
 
 The project includes quality-related profiles:
 
@@ -77,14 +77,14 @@ The project includes quality-related profiles:
 2. **Coverage**:
    - `jacoco` for code coverage analysis
 
-## S8r Migration Plan
+## Migration Plan
 
-As part of the ongoing development, the project will migrate to a new structure using "s8r" as the official abbreviation:
+As part of the ongoing development, the project is migrating to a more standard structure:
 
-### Directory Structure
+### Directory structure
 
 ```
-/s8r/                      (Renamed from /Samstraumr/)
+/modules/                  (Renamed from /Samstraumr/)
 ├── pom.xml                (Modules POM)
 ├── s8r-core/              (Renamed from samstraumr-core)
 │   ├── pom.xml
@@ -98,7 +98,7 @@ As part of the ongoing development, the project will migrate to a new structure 
     └── ...
 ```
 
-### Maven Identifiers
+### Maven identifiers
 
 The Maven artifacts and group IDs will be updated:
 
@@ -112,14 +112,14 @@ The Maven artifacts and group IDs will be updated:
    - `groupId`: `org.s8r`
    - `artifactId`: `s8r-core`
 
-### Package Structure
+### Package structure
 
 The package structure will follow this pattern:
 - `org.s8r.component.*` for framework components
 - `org.s8r.env.*` for environment utilities
 - `org.s8r.util.*` for common utilities
 
-### Version Properties
+### Version properties
 
 Version properties will be renamed:
 - `s8r.version` instead of `samstraumr.version`

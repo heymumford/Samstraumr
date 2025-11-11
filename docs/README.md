@@ -9,7 +9,7 @@ remain exclusively with the copyright holder listed above.
 Licensed under the Mozilla Public License 2.0
 -->
 
-# Samstraumr Documentation
+# README
 
 This directory contains all documentation for the Samstraumr project. The documentation is organized into a structure that follows the project's conceptual model.
 
@@ -32,9 +32,13 @@ This directory contains all documentation for the Samstraumr project. The docume
   
 - **testing/** - Testing strategy and methodologies
   
+- **test-reports/** - Test implementation and verification reports
+  
 - **plans/** - Current planning documents
   
 - **research/** - Research documents and proposals
+  - [**Testing in the Age of AI**](research/test-in-age-of-ai.md) - Comprehensive analysis by Eric C. Mumford
+  - [**AI-Enhanced Testing Integration**](research/ai-enhanced-testing-integration.md) - Strategy by Eric C. Mumford
 
 ## Standards for Documentation
 

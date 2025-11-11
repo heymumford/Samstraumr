@@ -1,0 +1,153 @@
+#!/usr/bin/env bash
+# Script for creating a new Architecture Decision Record (ADR)
+#
+# Copyright (c) 2025 Eric C. Mumford (@heymumford)
+# This file is subject to the terms and conditions defined in
+# the LICENSE file, which is part of this source code package.
+#
+# Usage:
+#   ./bin/new-adr "Title of the decision"
+#
+# Example:
+#   ./bin/new-adr "Use PostgreSQL for persistent storage"
+#
+# This will create a new ADR with the next sequential number
+# in the docs/architecture/decisions directory.
+
+set -e
+
+# Terminal colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Determine project root
+PROJECT_ROOT=$(cd "$(dirname "$0")/.." && pwd)
+ADR_DIR="${PROJECT_ROOT}/docs/architecture/decisions"
+
+# Create the ADR directory if it doesn't exist
+mkdir -p "$ADR_DIR"
+
+# Check if title was provided
+if [ $# -eq 0 ]; then
+  echo -e "${RED}Error: Please provide a title for the ADR.${NC}"
+  echo "Usage: ./bin/new-adr \"Title of the decision\""
+  exit 1
+fi
+
+# Get title from arguments
+TITLE="$*"
+
+# Convert the title to lowercase and replace spaces with hyphens for the filename
+TITLE_SLUG=$(echo "$TITLE" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd 'a-z0-9-')
+
+# Find the next ADR number
+NEXT_NUM=1
+for file in "$ADR_DIR"/????-*.md; do
+  if [ -f "$file" ]; then
+    NUM=$(basename "$file" | cut -d'-' -f1)
+    if [[ "$NUM" =~ ^[0-9]+$ ]] && [ "$NUM" -ge "$NEXT_NUM" ]; then
+      NEXT_NUM=$((NUM + 1))
+    fi
+  fi
+done
+
+# Pad the number with zeros
+PADDED_NUM=$(printf "%04d" "$NEXT_NUM")
+
+# Create the filename
+FILENAME="${ADR_DIR}/${PADDED_NUM}-${TITLE_SLUG}.md"
+
+# Get the current date
+DATE=$(date +%Y-%m-%d)
+
+# Create the ADR file
+cat > "$FILENAME" << EOF
+# ${NEXT_NUM}. ${TITLE}
+
+Date: ${DATE}
+
+## Status
+
+Proposed
+
+## Context
+
+[Describe the context and problem statement]
+
+## Decision
+
+[Describe the decision that was made]
+
+## Consequences
+
+[Describe the resulting context after applying the decision]
+EOF
+
+# Make sure permissions are correct
+chmod 644 "$FILENAME"
+
+# Update the ADR index
+if [ -f "${ADR_DIR}/README.md" ]; then
+  echo -e "${BLUE}NOTE: Please manually update the README.md to include this ADR in the index.${NC}"
+  echo "Add the following line to the table:"
+  echo ""
+  echo "| [ADR-${PADDED_NUM}](${PADDED_NUM}-${TITLE_SLUG}.md) | ${TITLE} | Proposed |"
+  echo ""
+else
+  # Create README.md if it doesn't exist
+  cat > "${ADR_DIR}/README.md" << EOF
+# Architecture Decision Records
+
+This directory contains Architecture Decision Records (ADRs) for the Samstraumr project.
+
+## What are Architecture Decision Records?
+
+Architecture Decision Records (ADRs) are documents that capture important architectural decisions made along with their context and consequences. They provide a historical record of the technical choices made during the project development.
+
+Each ADR describes:
+- The architectural decision that was made
+- The context and forces that led to the decision
+- The rationale behind the decision
+- The consequences and trade-offs of the decision
+
+## How to Create a New ADR
+
+To create a new ADR:
+
+1. Run the ADR creation script:
+   \`\`\`bash
+   ./bin/new-adr "Title of the decision"
+   \`\`\`
+
+   For example:
+   \`\`\`bash
+   ./bin/new-adr "Use PostgreSQL for persistent storage"
+   \`\`\`
+
+2. Edit the generated file to fill in the details.
+3. Update the status when the decision is accepted or rejected.
+
+## Index of ADRs
+
+Here's a chronological list of all ADRs:
+
+| ID | Title | Status |
+|----|-------|--------|
+| [ADR-${PADDED_NUM}](${PADDED_NUM}-${TITLE_SLUG}.md) | ${TITLE} | Proposed |
+
+## Statuses
+
+- **Proposed**: The ADR is proposed and under discussion
+- **Accepted**: The ADR has been accepted and the decision is in effect
+- **Rejected**: The ADR was rejected, and the decision will not be implemented
+- **Deprecated**: The ADR was once accepted but is no longer relevant
+- **Superseded**: The ADR was accepted but has been replaced by a newer decision (link to the new ADR)
+EOF
+  echo -e "${GREEN}Created ADR index at ${ADR_DIR}/README.md${NC}"
+fi
+
+echo -e "${GREEN}Created ADR-${PADDED_NUM}: ${TITLE} at ${FILENAME}${NC}"
+echo "Please edit this file to fill in the details of the architectural decision."

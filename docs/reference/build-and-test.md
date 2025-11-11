@@ -9,217 +9,303 @@ remain exclusively with the copyright holder listed above.
 Licensed under the Mozilla Public License 2.0
 -->
 
-<\!-- 
-Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
--->
+# Samstraumr Build and Test Process
 
-# Build and Test System
+This document provides a comprehensive guide to the build and test process for the Samstraumr project. It outlines the standardized approach to building, testing, and quality checking the codebase.
 
-The Samstraumr build and test system is designed to be simple, efficient, and maintainable. It provides a straightforward interface for common build and test operations while abstracting away the complexity of the underlying Maven configuration.
+## Build and Test Sequence
 
-## Unified Command Interface
+The Samstraumr build and test process follows this standardized sequence:
 
-Samstraumr provides a single entry point for all operations through the `s8r` script.
+1. **Build**: Compile the code and create artifacts
+2. **Test**: Run tests across different categories and levels
+3. **Quality Checks**: Perform static analysis and quality verification
+4. **Coverage**: Analyze and report test coverage
 
-### Usage
+Each of these steps provides clear "going to do / doing / done" feedback to maintain visibility of the process.
 
-```bash
-./s8r <command> [options] [arguments]
-```
+## Core Scripts
 
-### Core Commands
+All build and test operations are performed using scripts in the `bin/` directory:
 
-- `build`: Build the project with various modes
-- `test`: Run tests of different types
-- `version`: Manage version information
-- `coverage`: Run and manage code coverage
-- `clean`: Clean build artifacts
+| Script | Purpose |
+|--------|---------|
+| `bin/s8r-build` | Main build script with various modes |
+| `bin/s8r-test` | Unified test runner for different test types |
+| `bin/s8r-quality-enhanced` | Run enhanced quality checks |
+| `bin/s8r-test-coverage` | Analyze and report test coverage |
+| `bin/s8r-version` | Manage version information |
 
-### Global Options
+## Standard Build Process
 
-- `--watch, -w`: Watch mode (continuous execution)
-- `--parallel, -p`: Execute in parallel where supported
-- `--help, -h`: Show help information
-
-### Command Chaining
-
-The system supports command chaining for common operations:
+### Step 1: Building the Project
 
 ```bash
-# Build and test in one command
-./s8r build-test unit
-```
+# Fast build (skips tests and quality checks)
+bin/s8r-build fast
 
-## Build System
+# Build with tests
+bin/s8r-build test
 
-The build system is accessible through the `s8r build` command, providing a simple interface to the Maven build system.
+# Build for packaging
+bin/s8r-build package
 
-### Usage
-
-```bash
-./s8r build [options] [mode]
-```
-
-### Modes
-
-- `fast`: Quick compilation with tests and quality checks skipped (default)
-- `test`: Build with tests but skip quality checks
-- `package`: Build a JAR package with tests and quality checks
-- `install`: Install the package to local Maven repository
-- `compile`: Compile only
-- `full`: Full build including tests, quality checks, and verification
-- `docs`: Generate project documentation
-- `site`: Generate the Maven site
-
-### Options
-
-- `-c, --clean`: Perform a clean build
-- `-p, --parallel`: Build in parallel where possible
-- `-v, --verbose`: Enable verbose output
-- `--skip-quality`: Skip quality checks (automatically included in 'fast' mode)
-- `-h, --help`: Display help
-
-### Examples
-
-```bash
-# Quick compilation without tests
-./s8r build
-
-# Clean build with tests
-./s8r build --clean test
+# Clean build (removes previous build artifacts first)
+bin/s8r-build -c test
 
 # Parallel build for faster execution
-./s8r build --parallel full
+bin/s8r-build -p test
 
-# Watch mode for continuous compilation during development
-./s8r build --watch
+# Skip quality checks
+bin/s8r-build test --skip-quality
+
+# Full build (includes all tests and quality checks)
+bin/s8r-build full
 ```
 
-## Test System
+For each build command, you'll see standardized output indicating:
+- Start of build process
+- Current build mode and options
+- Progress updates
+- Completion status with timing information
 
-The test system is accessible through the `s8r test` command, providing a simple interface to run different types of tests.
-
-### Usage
+### Step 2: Running Tests
 
 ```bash
-./s8r test [options] [test-type]
+# Run all tests
+bin/s8r-test all
+
+# Run specific test types
+bin/s8r-test unit           # Unit level tests
+bin/s8r-test component      # Component level tests
+bin/s8r-test identity       # Identity-specific tests
+bin/s8r-test component-identity  # Component and Identity tests (P0)
+bin/s8r-test lifecycle      # Lifecycle tests (P1)
+bin/s8r-test error-handling # Error handling tests (P1)
+bin/s8r-test integration    # Integration tests
+
+# Run port interface tests
+bin/s8r-test-port-interfaces                # Run all port interface tests
+bin/s8r-test-port-interfaces cache          # Test cache port interface
+bin/s8r-test-port-interfaces notification   # Test notification port interface
+bin/s8r-test-port-interfaces --integration  # Run port integration tests
+
+# Run with specialized test scripts
+bin/s8r-test-lifecycle             # Run basic lifecycle state tests
+bin/s8r-test-lifecycle negative    # Run lifecycle error handling tests
+bin/s8r-test-lifecycle resources   # Run lifecycle resource tests
+bin/s8r-test-lifecycle transitions # Run state transition tests
+bin/s8r-test-lifecycle comprehensive # Run all lifecycle tests
+
+# Run tests with specific options
+bin/s8r-test all --coverage  # Include coverage analysis
+bin/s8r-test all -p          # Run tests in parallel
+bin/s8r-test all -v          # Verbose output
+bin/s8r-test --verify        # Verify test suite structure
+bin/s8r-test --verify --fix  # Fix common test issues
 ```
 
-### Test Types
+The test output follows a consistent format:
+- Announcement of test type being run
+- Test execution progress
+- Summary of test results
+- Timing information
 
-- `unit`: Run unit and tube tests (fast, focused tests)
-- `component`: Run component and composite tests
-- `integration`: Run integration tests
-- `machine`: Run machine-level tests
-- `system`: Run system-level tests
-- `flow`: Run data flow tests
-- `adaptation`: Run adaptation tests
-- `all`: Run all tests
-- `acceptance`: Run acceptance tests
-- `atl`: Run Above-The-Line tests
-- `btl`: Run Below-The-Line tests
-- `adam`: Run Adam Tube tests
-- `orchestration`: Run orchestration tests
-
-### Options
-
-- `-v, --verbose`: Run with verbose output
-- `-p, --parallel`: Run tests in parallel (where supported)
-- `--coverage`: Run tests with code coverage analysis
-- `--skip-quality`: Skip quality checks
-- `-o, --output <file>`: Write test output to file
-- `-h, --help`: Display help
-
-### Examples
+### Step 3: Quality Checks
 
 ```bash
-# Run unit tests
-./s8r test unit
+# Run enhanced quality checks
+bin/s8r-quality-enhanced
 
-# Run component tests in parallel
-./s8r test --parallel component
+# Fix issues automatically where possible
+bin/s8r-quality-enhanced --fix
 
-# Run tests with code coverage analysis
-./s8r test --coverage all
-
-# Continuous testing with watch mode
-./s8r test --watch unit
+# Run quality checks for specific modules
+bin/s8r-quality-enhanced --modules core,identity
 ```
 
-## Coverage System
+Quality check output includes:
+- What checks are being performed
+- Progress for each check type
+- Issues found (if any)
+- Summary of quality status
 
-The coverage system is accessible through the `s8r coverage` command, providing tools for code coverage analysis.
-
-### Usage
+### Step 4: Coverage Analysis
 
 ```bash
-./s8r coverage <command> [options]
+# Run coverage analysis
+bin/s8r-test-coverage
+
+# Run tests with coverage and analyze
+bin/s8r-test all --coverage
 ```
 
-### Commands
+Coverage output includes:
+- Test count by category 
+- Coverage percentages
+- Gaps in test coverage
+- Recommendations for improvement
 
-- `report`: Generate coverage report (default)
-- `run [test-type]`: Run tests with coverage enabled
+## Polyglot Build Support
 
-### Examples
+The build process supports multiple technologies:
+
+1. **Java**: Primary codebase built with Maven
+2. **Shell Scripts**: Build and test automation
+3. **JavaScript/TypeScript**: For documentation and web interfaces 
+4. **Python**: For build tools and utilities
+
+The unified build scripts ensure consistent behavior across these different technologies.
+
+## Output Consistency
+
+All scripts follow these output standards:
+
+1. **Headers**: Blue, bold text for major sections
+2. **Info**: Blue arrows → for "going to do" notifications
+3. **Success**: Green checkmarks ✓ for "done" notifications
+4. **Warnings**: Yellow exclamation marks ! for cautions
+5. **Errors**: Red X marks ✗ for failures
+6. **Timing**: Yellow text for execution time information
+
+Example output:
+
+```
+============================
+  Building Samstraumr
+============================
+→ Mode: test
+→ Clean build enabled
+→ Starting Maven build process...
+  ...build output...
+✓ Build completed successfully
+Execution time: 45s
+
+============================
+  Running Samstraumr Tests
+============================
+→ Test type: component-identity
+→ Tags: @L0_Component or @L0_Identity
+→ Running Maven test process...
+  ...test output...
+✓ Tests completed successfully
+Execution time: 32s
+```
+
+## Complete Build Example
+
+A complete build and test cycle with all validations would look like:
 
 ```bash
-# Generate coverage report
-./s8r coverage
+# 1. Build with tests
+bin/s8r-build test
 
-# Run unit tests with coverage
-./s8r coverage run unit
+# 2. Run specific test suites
+bin/s8r-test component-identity
+bin/s8r-test lifecycle
+bin/s8r-test error-handling
+
+# 3. Run quality checks  
+bin/s8r-quality-enhanced
+
+# 4. Analyze test coverage
+bin/s8r-test-coverage
 ```
 
-## Simplified Architecture
+## Automated CI Process
 
-The build and test system has been significantly simplified from the previous implementation:
-
-1. **Unified Command Interface**: Single entry point (`s8r`) for all operations
-2. **Command Composability**: Commands can be naturally combined in sequences
-3. **Convention Over Configuration**: Sensible defaults reduce the need for complex configuration
-4. **Progressive Disclosure**: Simple commands for common tasks, advanced options when needed
-5. **Modern Features**: Watch mode, parallel execution, and code coverage integration
-
-This approach follows software engineering best practices including:
-- Single Responsibility Principle
-- Encapsulation
-- Command-Query Separation
-- Don't Repeat Yourself (DRY)
-
-## Improvements Over Previous System
-
-The new build and test system represents a significant improvement over the previous implementation:
-
-- **Code Reduction**: Reduced from 2,600+ lines across 14+ files to ~412 lines in 2 files (84% reduction)
-- **Unified Interface**: Single `s8r` entry point for all operations
-- **Enhanced Features**:
-  - Parallel build and test execution
-  - Code coverage analysis and reporting
-  - Watch mode for continuous development
-  - Command chaining for common workflows
-- **Improved Usability**:
-  - Consistent command structure
-  - Color-coded status messages
-  - Execution timing information
-  - Better error handling and reporting
-- **Comprehensive Documentation**: Clear examples and detailed explanations
-
-## Integration with Version Management
-
-The system provides seamless integration between build, test, and version management:
+The continuous integration process uses the same scripts to ensure consistency between local development and CI pipelines:
 
 ```bash
-# Update version and build
-./s8r version bump minor
-./s8r build package
-
-# Verify version consistency
-./s8r version fix
-
-# Combined operations
-./s8r build-test unit
-./s8r coverage run integration
+# Run full build process with local CI validation
+bin/s8r-build full --ci
 ```
 
-These features together provide a comprehensive, yet simple system for building, testing, and versioning the Samstraumr project.
+## Troubleshooting
+
+If issues occur during the build or test process:
+
+1. Check the logs for specific error messages
+2. Use verbose mode (`-v` or `--verbose`) for more detailed output
+3. Try cleaning the build (`-c` or `--clean`) to remove stale artifacts
+4. Check the Maven configuration in `pom.xml` files
+5. Verify that test dependencies are correctly configured
+
+## Specialized Test Scripts
+
+### Lifecycle Tests
+
+The project provides specialized scripts for testing different aspects of component lifecycle management:
+
+```bash
+bin/s8r-test-lifecycle [options] [mode]
+```
+
+**Modes:**
+- `states` - Test state-dependent behavior only (default)
+- `transitions` - Test state transitions only
+- `resources` - Test resource management only
+- `negative` - Test error handling and exceptional conditions
+- `comprehensive` - Run all lifecycle tests
+
+**Options:**
+- `-v, --verbose` - Show detailed output
+- `-o, --output` - Write results to file
+- `-d, --dir` - Specify custom output directory
+- `-q, --quality` - Run with quality checks (slower)
+
+### Test Verification
+
+The test verification system helps ensure test quality and completeness:
+
+```bash
+bin/s8r-test --verify
+```
+
+This command performs comprehensive checks of:
+- Feature files with proper tags
+- Step definitions for all features
+- Test runners for each category
+- Consistent organization
+
+You can also automatically fix common issues:
+
+```bash
+bin/s8r-test --verify --fix
+```
+
+And generate a detailed verification report:
+
+```bash
+bin/s8r-test --verify --report
+```
+
+## Java Compatibility
+
+Samstraumr now supports Java 21, which requires special JVM options for reflection-based code:
+
+```
+--add-opens java.base/java.lang=ALL-UNNAMED
+--add-opens java.base/java.util=ALL-UNNAMED
+--add-opens java.base/java.lang.reflect=ALL-UNNAMED
+```
+
+These options are automatically set when using the project scripts. You can switch Java versions with:
+
+```bash
+# Switch to Java 17
+java-switch 17
+
+# Switch to Java 21 (OpenJDK)
+java-switch 21
+```
+
+## Further Reading
+
+- [Maven Structure Guide](maven-structure.md)
+- [Test Strategy](../testing/test-strategy.md)
+- [Port Interface Testing](../testing/port-interface-testing.md)
+- [Quality Checks](quality-checks.md)
+- [Version Management](version-management.md)
+- [Test Suite Implementation Report](../test-reports/test-suite-implementation-report.md)
+- [Port Interface Test Report](../test-reports/port-interface-test-report.md)

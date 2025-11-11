@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Code Standards
+# Contrib Code Standards
 
 This document outlines the coding standards for contributing to Samstraumr.
 

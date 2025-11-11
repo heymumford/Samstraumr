@@ -82,5 +82,5 @@ if [[ "$SAMSTRAUMR_CLI" == "s8r" ]]; then
   echo "Encoding check complete."
 else
   # Forward to new script for normal usage
-  /home/emumford/NativeLinuxProjects/Samstraumr/util/bin/quality/check-encoding.sh "$@"
+  /home/emumford/NativeLinuxProjects/modules/util/bin/quality/check-encoding.sh "$@"
 fi

@@ -1,0 +1,1018 @@
+#!/usr/bin/env bash
+#==============================================================================
+# Filename: verify-test-suite
+# Description: Comprehensive test suite verification tool
+#
+# Analyzes and validates the entire test suite to ensure it meets quality
+# standards, including coverage, organization, and execution success.
+#==============================================================================
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+
+# Source unified common library for consistent output formatting
+if [ -f "${PROJECT_ROOT}/util/lib/unified-common.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/unified-common.sh"
+else
+  # Fallback to minimal functionality if library not found
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  BLUE='\033[0;34m'
+  YELLOW='\033[0;33m'
+  BOLD='\033[1m'
+  RESET='\033[0m'
+  
+  print_info() { echo -e "${BLUE}→ $1${RESET}"; }
+  print_success() { echo -e "${GREEN}✓ $1${RESET}"; }
+  print_error() { echo -e "${RED}✗ $1${RESET}" >&2; exit 1; }
+  print_warning() { echo -e "${YELLOW}! $1${RESET}" >&2; }
+  print_header() { echo -e "${BLUE}${BOLD}$1${RESET}"; echo -e "${BLUE}${BOLD}$(printf '=%.0s' $(seq 1 ${#1}))${RESET}"; }
+  print_section() { echo -e "${BLUE}$1${RESET}"; }
+fi
+
+# Initialize variables
+VERBOSE=false
+GENERATE_REPORT=false
+REPORT_FILE="${PROJECT_ROOT}/docs/test-reports/test-verification-report.md"
+COVERAGE_THRESHOLD=80
+EXIT_ON_FAILURE=false
+FIX_ISSUES=false
+TEST_TYPE="all"
+
+# Function to display help
+show_help() {
+  print_header "Test Suite Verification Tool"
+  echo
+  print_section "Description"
+  echo "  This tool analyzes and validates the test suite to ensure it meets quality standards."
+  echo
+  print_section "Usage"
+  echo "  verify-test-suite [options] [test-type]"
+  echo
+  print_section "Options"
+  echo "  -v, --verbose         Show detailed output"
+  echo "  -r, --report          Generate a detailed markdown report"
+  echo "  -o, --output FILE     Specify report output file (default: test-verification-report.md)"
+  echo "  -t, --threshold N     Set coverage threshold percentage (default: 80)"
+  echo "  -e, --exit-on-failure Exit immediately on any verification failure"
+  echo "  -f, --fix             Attempt to fix common issues automatically"
+  echo "  -h, --help            Show this help message"
+  echo
+  print_section "Test Types"
+  echo "  all                   Verify all tests (default)"
+  echo "  unit                  Verify unit tests"
+  echo "  component             Verify component tests"
+  echo "  composite             Verify composite tests"
+  echo "  integration           Verify integration tests"
+  echo "  lifecycle             Verify lifecycle tests"
+  echo "  identity              Verify identity tests"
+  echo "  maven-structure       Verify maven structure tests"
+  echo
+  print_section "Examples"
+  echo "  verify-test-suite                    # Verify all tests"
+  echo "  verify-test-suite -v component       # Verbose verification of component tests"
+  echo "  verify-test-suite -r -t 90           # Generate report with 90% coverage threshold"
+  echo "  verify-test-suite -f -e              # Fix issues and exit on failure"
+}
+
+# Parse command line arguments
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -v|--verbose)
+        VERBOSE=true
+        shift
+        ;;
+      -r|--report)
+        GENERATE_REPORT=true
+        shift
+        ;;
+      -o|--output)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          REPORT_FILE="$2"
+          shift 2
+        else
+          print_error "Output file path missing after -o/--output"
+          show_help
+          exit 1
+        fi
+        ;;
+      -t|--threshold)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          COVERAGE_THRESHOLD="$2"
+          shift 2
+        else
+          print_error "Threshold value missing after -t/--threshold"
+          show_help
+          exit 1
+        fi
+        ;;
+      -e|--exit-on-failure)
+        EXIT_ON_FAILURE=true
+        shift
+        ;;
+      -f|--fix)
+        FIX_ISSUES=true
+        shift
+        ;;
+      -h|--help)
+        show_help
+        exit 0
+        ;;
+      *)
+        TEST_TYPE="$1"
+        shift
+        ;;
+    esac
+  done
+}
+
+# Initializes the report file
+init_report() {
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    # Create report directory if it doesn't exist
+    local report_dir=$(dirname "$REPORT_FILE")
+    mkdir -p "$report_dir"
+
+    # Initialize report with header and timestamp
+    cat > "$REPORT_FILE" << EOF
+# Test Suite Verification Report
+
+**Generated:** $(date "+%Y-%m-%d %H:%M:%S")  
+**Coverage Threshold:** ${COVERAGE_THRESHOLD}%  
+**Test Type:** ${TEST_TYPE}
+
+## Summary
+
+| Category | Status | Issues | Coverage |
+|----------|--------|--------|----------|
+| Feature Files | 🔄 Pending | - | - |
+| Step Definitions | 🔄 Pending | - | - |
+| Test Runners | 🔄 Pending | - | - |
+| Test Tags | 🔄 Pending | - | - |
+| Test Coverage | 🔄 Pending | - | - |
+| Maven Structure | 🔄 Pending | - | - |
+
+## Detailed Results
+
+EOF
+  fi
+}
+
+# Update the report with section results
+update_report() {
+  local section="$1"
+  local status="$2"
+  local issues="$3"
+  local coverage="$4"
+  local details="$5"
+
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    # Update summary table
+    local status_icon
+    if [[ "$status" == "PASS" ]]; then
+      status_icon="✅ Pass"
+    elif [[ "$status" == "WARN" ]]; then
+      status_icon="⚠️ Warning"
+    else
+      status_icon="❌ Fail"
+    fi
+
+    # Use sed to update the summary table row for the specific category
+    sed -i "s/| ${section} | 🔄 Pending | - | - |/| ${section} | ${status_icon} | ${issues} | ${coverage} |/" "$REPORT_FILE"
+
+    # Add detailed section
+    cat >> "$REPORT_FILE" << EOF
+
+### ${section}
+
+**Status:** ${status_icon}  
+**Issues Found:** ${issues}  
+**Coverage:** ${coverage}
+
+${details}
+
+EOF
+  fi
+}
+
+# Verify feature files exist and follow conventions
+verify_feature_files() {
+  print_header "Verifying Feature Files"
+  
+  # Paths to search for feature files
+  local feature_paths=(
+    "${PROJECT_ROOT}/modules/samstraumr-core/src/test/resources/features"
+    "${PROJECT_ROOT}/Samstraumr/samstraumr-core/src/test/resources/features"
+  )
+  
+  local total_files=0
+  local valid_files=0
+  local issues=0
+  local details=""
+  
+  for path in "${feature_paths[@]}"; do
+    if [[ -d "$path" ]]; then
+      # Count feature files
+      local files=$(find "$path" -name "*.feature" 2>/dev/null | wc -l)
+      total_files=$((total_files + files))
+      
+      if [[ "$VERBOSE" == true ]]; then
+        print_info "Found $files feature files in $path"
+      fi
+      
+      # Validate feature files
+      while IFS= read -r file; do
+        if [[ -f "$file" ]]; then
+          # Check for standard tagging
+          if grep -q "@L[0-9]_" "$file"; then
+            valid_files=$((valid_files + 1))
+          else
+            issues=$((issues + 1))
+            if [[ "$VERBOSE" == true || "$GENERATE_REPORT" == true ]]; then
+              local issue="Feature file missing standard level tag: $(basename "$file")"
+              print_warning "$issue"
+              details="${details}- $issue\n"
+              
+              # Try to fix the issue if requested
+              if [[ "$FIX_ISSUES" == true ]]; then
+                # Determine appropriate level tag based on path
+                local level_tag="@L0_Unit"
+                if [[ "$file" == *"/L1_"* ]]; then
+                  level_tag="@L1_Component"
+                elif [[ "$file" == *"/L2_"* ]]; then
+                  level_tag="@L2_Integration"
+                elif [[ "$file" == *"/L3_"* ]]; then
+                  level_tag="@L3_System"
+                fi
+                
+                # Add tag to the top of the file
+                sed -i "1s/^/${level_tag} /" "$file"
+                print_info "Added tag ${level_tag} to $(basename "$file")"
+              fi
+            fi
+          fi
+        fi
+      done < <(find "$path" -name "*.feature" 2>/dev/null)
+    fi
+  done
+  
+  # Calculate coverage
+  local coverage=0
+  if [[ $total_files -gt 0 ]]; then
+    coverage=$(( (valid_files * 100) / total_files ))
+  fi
+  
+  # Determine status
+  local status="PASS"
+  if [[ $coverage -lt $COVERAGE_THRESHOLD ]]; then
+    status="FAIL"
+    if [[ "$EXIT_ON_FAILURE" == true ]]; then
+      print_error "Feature files verification failed: Coverage ${coverage}% below threshold ${COVERAGE_THRESHOLD}%"
+      exit 1
+    fi
+  elif [[ $issues -gt 0 ]]; then
+    status="WARN"
+  fi
+  
+  # Output results
+  if [[ $status == "PASS" ]]; then
+    print_success "Feature files verification passed: $valid_files/$total_files files valid ($coverage%)"
+  elif [[ $status == "WARN" ]]; then
+    print_warning "Feature files verification has warnings: $valid_files/$total_files files valid ($coverage%), $issues issues found"
+  else
+    print_warning "Feature files verification failed: $valid_files/$total_files files valid ($coverage%), $issues issues found"
+  fi
+  
+  # Update report
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    update_report "Feature Files" "$status" "$issues" "$coverage%" "$details"
+  fi
+  
+  return 0
+}
+
+# Verify step definitions match feature files
+verify_step_definitions() {
+  print_header "Verifying Step Definitions"
+  
+  # Paths to search for step definitions
+  local step_paths=(
+    "${PROJECT_ROOT}/modules/samstraumr-core/src/test/java/org/s8r/test/steps"
+    "${PROJECT_ROOT}/Samstraumr/samstraumr-core/src/test/java/org/s8r/test/steps"
+  )
+  
+  # Paths to search for feature files (to match with steps)
+  local feature_paths=(
+    "${PROJECT_ROOT}/modules/samstraumr-core/src/test/resources/features"
+    "${PROJECT_ROOT}/Samstraumr/samstraumr-core/src/test/resources/features"
+  )
+  
+  local total_steps=0
+  local matched_steps=0
+  local undefined_steps=0
+  local issues=0
+  local details=""
+  
+  # First, collect all step definitions
+  local step_definitions=()
+  for path in "${step_paths[@]}"; do
+    if [[ -d "$path" ]]; then
+      while IFS= read -r file; do
+        if [[ -f "$file" && "$file" == *Steps.java ]]; then
+          # Extract step definitions using grep
+          while IFS= read -r step; do
+            # Extract the step pattern from the annotation
+            local pattern=$(echo "$step" | sed -n 's/.*\(".*"\).*/\1/p' | tr -d '"')
+            if [[ -n "$pattern" ]]; then
+              step_definitions+=("$pattern")
+              total_steps=$((total_steps + 1))
+            fi
+          done < <(grep -E '@(Given|When|Then)' "$file")
+        fi
+      done < <(find "$path" -name "*Steps.java" 2>/dev/null)
+    fi
+  done
+  
+  if [[ "$VERBOSE" == true ]]; then
+    print_info "Found $total_steps step definitions"
+  fi
+  
+  # Next, check feature files for undefined steps
+  local all_feature_steps=()
+  
+  for path in "${feature_paths[@]}"; do
+    if [[ -d "$path" ]]; then
+      while IFS= read -r file; do
+        if [[ -f "$file" ]]; then
+          # Extract steps from feature files
+          while IFS= read -r step; do
+            # Clean up the step text
+            local step_text=$(echo "$step" | sed -e 's/^\s*\(Given\|When\|Then\|And\|But\)\s\+//' -e 's/"[^"]*"/\".*\"/g')
+            if [[ -n "$step_text" ]]; then
+              all_feature_steps+=("$step_text")
+              
+              # Check if this step matches any defined step
+              local step_matched=false
+              for defined_step in "${step_definitions[@]}"; do
+                # Convert cucumber expression to regex pattern for matching
+                local pattern=$(echo "$defined_step" | sed -e 's/{[^}]*}/[^"]*/' -e 's/\./\\./g')
+                if [[ "$step_text" =~ $pattern ]]; then
+                  step_matched=true
+                  matched_steps=$((matched_steps + 1))
+                  break
+                fi
+              done
+              
+              if [[ "$step_matched" == false ]]; then
+                undefined_steps=$((undefined_steps + 1))
+                issues=$((issues + 1))
+                if [[ "$VERBOSE" == true || "$GENERATE_REPORT" == true ]]; then
+                  local issue="Undefined step: '$step_text' in $(basename "$file")"
+                  print_warning "$issue"
+                  details="${details}- $issue\n"
+                fi
+              fi
+            fi
+          done < <(grep -E '^\s*(Given|When|Then|And|But)\s+' "$file")
+        fi
+      done < <(find "$path" -name "*.feature" 2>/dev/null)
+    fi
+  done
+  
+  # Calculate coverage
+  local total_feature_steps=${#all_feature_steps[@]}
+  local coverage=0
+  if [[ $total_feature_steps -gt 0 ]]; then
+    coverage=$(( (matched_steps * 100) / total_feature_steps ))
+  fi
+  
+  # Determine status
+  local status="PASS"
+  if [[ $coverage -lt $COVERAGE_THRESHOLD ]]; then
+    status="FAIL"
+    if [[ "$EXIT_ON_FAILURE" == true ]]; then
+      print_error "Step definitions verification failed: Coverage ${coverage}% below threshold ${COVERAGE_THRESHOLD}%"
+      exit 1
+    fi
+  elif [[ $issues -gt 0 ]]; then
+    status="WARN"
+  fi
+  
+  # Output results
+  if [[ $status == "PASS" ]]; then
+    print_success "Step definitions verification passed: $matched_steps/$total_feature_steps steps matched ($coverage%)"
+  elif [[ $status == "WARN" ]]; then
+    print_warning "Step definitions verification has warnings: $matched_steps/$total_feature_steps steps matched ($coverage%), $issues issues found"
+  else
+    print_warning "Step definitions verification failed: $matched_steps/$total_feature_steps steps matched ($coverage%), $issues issues found"
+  fi
+  
+  # Update report
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    update_report "Step Definitions" "$status" "$issues" "$coverage%" "$details"
+  fi
+  
+  return 0
+}
+
+# Verify test runners exist and are properly configured
+verify_test_runners() {
+  print_header "Verifying Test Runners"
+  
+  # Paths to search for test runners
+  local runner_paths=(
+    "${PROJECT_ROOT}/modules/samstraumr-core/src/test/java/org/s8r/test/runner"
+    "${PROJECT_ROOT}/Samstraumr/samstraumr-core/src/test/java/org/s8r/test/runner"
+  )
+  
+  # Expected test runners
+  local expected_runners=(
+    "RunComponentIdentityTests.java"
+    "RunCompositeTests.java"
+    "RunLifecycleTests.java"
+    "RunErrorHandlingTests.java"
+    "RunMachineTests.java"
+    "RunArchitectureTests.java"
+    "MavenStructureTests.java"
+    "PortIntegrationTests.java"
+  )
+  
+  local total_expected=${#expected_runners[@]}
+  local found_runners=0
+  local issues=0
+  local details=""
+  
+  # Check for each expected runner
+  for runner in "${expected_runners[@]}"; do
+    local runner_found=false
+    
+    for path in "${runner_paths[@]}"; do
+      if [[ -d "$path" ]]; then
+        if [[ -f "$path/$runner" ]]; then
+          runner_found=true
+          found_runners=$((found_runners + 1))
+          
+          # Check if runner is properly configured
+          if grep -q "@RunWith(Cucumber.class)" "$path/$runner" || grep -q "@Cucumber" "$path/$runner"; then
+            if [[ "$VERBOSE" == true ]]; then
+              print_info "Found properly configured runner: $runner"
+            fi
+          else
+            issues=$((issues + 1))
+            if [[ "$VERBOSE" == true || "$GENERATE_REPORT" == true ]]; then
+              local issue="Test runner missing proper Cucumber configuration: $runner"
+              print_warning "$issue"
+              details="${details}- $issue\n"
+            fi
+          fi
+          
+          break
+        fi
+      fi
+    done
+    
+    if [[ "$runner_found" == false ]]; then
+      issues=$((issues + 1))
+      if [[ "$VERBOSE" == true || "$GENERATE_REPORT" == true ]]; then
+        local issue="Missing expected test runner: $runner"
+        print_warning "$issue"
+        details="${details}- $issue\n"
+      fi
+    fi
+  done
+  
+  # Calculate coverage
+  local coverage=0
+  if [[ $total_expected -gt 0 ]]; then
+    coverage=$(( (found_runners * 100) / total_expected ))
+  fi
+  
+  # Determine status
+  local status="PASS"
+  if [[ $coverage -lt $COVERAGE_THRESHOLD ]]; then
+    status="FAIL"
+    if [[ "$EXIT_ON_FAILURE" == true ]]; then
+      print_error "Test runners verification failed: Coverage ${coverage}% below threshold ${COVERAGE_THRESHOLD}%"
+      exit 1
+    fi
+  elif [[ $issues -gt 0 ]]; then
+    status="WARN"
+  fi
+  
+  # Output results
+  if [[ $status == "PASS" ]]; then
+    print_success "Test runners verification passed: $found_runners/$total_expected runners found ($coverage%)"
+  elif [[ $status == "WARN" ]]; then
+    print_warning "Test runners verification has warnings: $found_runners/$total_expected runners found ($coverage%), $issues issues found"
+  else
+    print_warning "Test runners verification failed: $found_runners/$total_expected runners found ($coverage%), $issues issues found"
+  fi
+  
+  # Update report
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    update_report "Test Runners" "$status" "$issues" "$coverage%" "$details"
+  fi
+  
+  return 0
+}
+
+# Verify test tags are consistent and follow conventions
+verify_test_tags() {
+  print_header "Verifying Test Tags"
+  
+  # Paths to search for feature files
+  local feature_paths=(
+    "${PROJECT_ROOT}/modules/samstraumr-core/src/test/resources/features"
+    "${PROJECT_ROOT}/Samstraumr/samstraumr-core/src/test/resources/features"
+  )
+  
+  # Expected tag patterns
+  local level_tags=("@L0_" "@L1_" "@L2_" "@L3_")
+  local function_tags=("@Functional" "@ErrorHandling" "@Identity" "@Lifecycle" "@State" "@DataFlow")
+  
+  local total_features=0
+  local valid_tags=0
+  local issues=0
+  local details=""
+  
+  for path in "${feature_paths[@]}"; do
+    if [[ -d "$path" ]]; then
+      while IFS= read -r file; do
+        if [[ -f "$file" ]]; then
+          total_features=$((total_features + 1))
+          
+          # Check for required tags
+          local has_level_tag=false
+          local has_function_tag=false
+          
+          # Extract tags from first line of the file
+          local first_line=$(head -n 1 "$file")
+          
+          # Check for level tags
+          for tag in "${level_tags[@]}"; do
+            if [[ "$first_line" == *"$tag"* ]]; then
+              has_level_tag=true
+              break
+            fi
+          done
+          
+          # Check for function tags
+          for tag in "${function_tags[@]}"; do
+            if [[ "$first_line" == *"$tag"* ]]; then
+              has_function_tag=true
+              break
+            fi
+          done
+          
+          if [[ "$has_level_tag" == true && "$has_function_tag" == true ]]; then
+            valid_tags=$((valid_tags + 1))
+          else
+            issues=$((issues + 1))
+            if [[ "$VERBOSE" == true || "$GENERATE_REPORT" == true ]]; then
+              local issue="Feature file missing required tags: $(basename "$file")"
+              if [[ "$has_level_tag" == false ]]; then
+                issue="$issue (missing level tag)"
+              fi
+              if [[ "$has_function_tag" == false ]]; then
+                issue="$issue (missing function tag)"
+              fi
+              print_warning "$issue"
+              details="${details}- $issue\n"
+              
+              # Try to fix the issue if requested
+              if [[ "$FIX_ISSUES" == true ]]; then
+                local new_line="$first_line"
+                
+                # Add level tag if missing
+                if [[ "$has_level_tag" == false ]]; then
+                  # Determine appropriate level tag based on path
+                  local level_tag="@L0_Unit"
+                  if [[ "$file" == *"/L1_"* ]]; then
+                    level_tag="@L1_Component"
+                  elif [[ "$file" == *"/L2_"* ]]; then
+                    level_tag="@L2_Integration"
+                  elif [[ "$file" == *"/L3_"* ]]; then
+                    level_tag="@L3_System"
+                  fi
+                  
+                  new_line="$level_tag $new_line"
+                fi
+                
+                # Add function tag if missing
+                if [[ "$has_function_tag" == false ]]; then
+                  # Try to determine function tag from filename
+                  local function_tag="@Functional"
+                  if [[ "$file" == *"error"* || "$file" == *"exception"* ]]; then
+                    function_tag="@ErrorHandling"
+                  elif [[ "$file" == *"identity"* ]]; then
+                    function_tag="@Identity"
+                  elif [[ "$file" == *"lifecycle"* || "$file" == *"state"* ]]; then
+                    function_tag="@Lifecycle"
+                  elif [[ "$file" == *"flow"* || "$file" == *"data"* ]]; then
+                    function_tag="@DataFlow"
+                  fi
+                  
+                  new_line="$function_tag $new_line"
+                fi
+                
+                # Replace first line with new line
+                sed -i "1s/.*/$new_line/" "$file"
+                print_info "Updated tags in $(basename "$file")"
+              fi
+            fi
+          fi
+        fi
+      done < <(find "$path" -name "*.feature" 2>/dev/null)
+    fi
+  done
+  
+  # Calculate coverage
+  local coverage=0
+  if [[ $total_features -gt 0 ]]; then
+    coverage=$(( (valid_tags * 100) / total_features ))
+  fi
+  
+  # Determine status
+  local status="PASS"
+  if [[ $coverage -lt $COVERAGE_THRESHOLD ]]; then
+    status="FAIL"
+    if [[ "$EXIT_ON_FAILURE" == true ]]; then
+      print_error "Test tags verification failed: Coverage ${coverage}% below threshold ${COVERAGE_THRESHOLD}%"
+      exit 1
+    fi
+  elif [[ $issues -gt 0 ]]; then
+    status="WARN"
+  fi
+  
+  # Output results
+  if [[ $status == "PASS" ]]; then
+    print_success "Test tags verification passed: $valid_tags/$total_features features with valid tags ($coverage%)"
+  elif [[ $status == "WARN" ]]; then
+    print_warning "Test tags verification has warnings: $valid_tags/$total_features features with valid tags ($coverage%), $issues issues found"
+  else
+    print_warning "Test tags verification failed: $valid_tags/$total_features features with valid tags ($coverage%), $issues issues found"
+  fi
+  
+  # Update report
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    update_report "Test Tags" "$status" "$issues" "$coverage%" "$details"
+  fi
+  
+  return 0
+}
+
+# Verify the test coverage using Jacoco reports
+verify_test_coverage() {
+  print_header "Verifying Test Coverage"
+  
+  # Check if Jacoco reports exist
+  local jacoco_paths=(
+    "${PROJECT_ROOT}/modules/samstraumr-core/target/site/jacoco/index.html"
+    "${PROJECT_ROOT}/Samstraumr/samstraumr-core/target/site/jacoco/index.html"
+  )
+  
+  local report_found=false
+  local jacoco_report=""
+  
+  for path in "${jacoco_paths[@]}"; do
+    if [[ -f "$path" ]]; then
+      report_found=true
+      jacoco_report="$path"
+      break
+    fi
+  done
+  
+  if [[ "$report_found" == false ]]; then
+    # Run tests with coverage if report not found
+    print_info "No coverage report found. Generating coverage report..."
+    
+    if [[ -x "${PROJECT_ROOT}/bin/s8r-test" ]]; then
+      "${PROJECT_ROOT}/bin/s8r-test" "$TEST_TYPE" --coverage >/dev/null 2>&1
+    else
+      print_warning "s8r-test script not found. Skipping coverage verification."
+      
+      # Update report
+      if [[ "$GENERATE_REPORT" == true ]]; then
+        update_report "Test Coverage" "WARN" "N/A" "N/A" "Coverage verification skipped: s8r-test script not found"
+      fi
+      
+      return 0
+    fi
+    
+    # Check if report was generated
+    for path in "${jacoco_paths[@]}"; do
+      if [[ -f "$path" ]]; then
+        report_found=true
+        jacoco_report="$path"
+        break
+      fi
+    done
+    
+    if [[ "$report_found" == false ]]; then
+      print_warning "Failed to generate coverage report."
+      
+      # Update report
+      if [[ "$GENERATE_REPORT" == true ]]; then
+        update_report "Test Coverage" "FAIL" "N/A" "0%" "Failed to generate coverage report"
+      fi
+      
+      return 0
+    fi
+  fi
+  
+  # Parse Jacoco report for coverage statistics
+  local total_coverage=0
+  local class_coverage=0
+  local method_coverage=0
+  local line_coverage=0
+  local branch_coverage=0
+  
+  # Extract coverage data using grep and sed
+  if [[ -f "$jacoco_report" ]]; then
+    # Line coverage
+    local line_data=$(grep -A1 "Lines" "$jacoco_report" | tail -n1)
+    if [[ -n "$line_data" ]]; then
+      line_coverage=$(echo "$line_data" | sed -n 's/.*>\([0-9.]*\)%<.*/\1/p')
+    fi
+    
+    # Branch coverage
+    local branch_data=$(grep -A1 "Branches" "$jacoco_report" | tail -n1)
+    if [[ -n "$branch_data" ]]; then
+      branch_coverage=$(echo "$branch_data" | sed -n 's/.*>\([0-9.]*\)%<.*/\1/p')
+    fi
+    
+    # Method coverage
+    local method_data=$(grep -A1 "Methods" "$jacoco_report" | tail -n1)
+    if [[ -n "$method_data" ]]; then
+      method_coverage=$(echo "$method_data" | sed -n 's/.*>\([0-9.]*\)%<.*/\1/p')
+    fi
+    
+    # Class coverage
+    local class_data=$(grep -A1 "Classes" "$jacoco_report" | tail -n1)
+    if [[ -n "$class_data" ]]; then
+      class_coverage=$(echo "$class_data" | sed -n 's/.*>\([0-9.]*\)%<.*/\1/p')
+    fi
+    
+    # Calculate total coverage (average of line and branch coverage)
+    total_coverage=$(echo "scale=2; ($line_coverage + $branch_coverage) / 2" | bc)
+  fi
+  
+  # Determine status
+  local status="PASS"
+  local issues=0
+  local details=""
+  
+  if (( $(echo "$total_coverage < $COVERAGE_THRESHOLD" | bc -l) )); then
+    status="FAIL"
+    issues=1
+    if [[ "$EXIT_ON_FAILURE" == true ]]; then
+      print_error "Test coverage verification failed: Coverage ${total_coverage}% below threshold ${COVERAGE_THRESHOLD}%"
+      exit 1
+    fi
+  fi
+  
+  # Generate detailed coverage information
+  details="**Coverage Details**\n\n"
+  details="${details}| Metric | Coverage |\n"
+  details="${details}|--------|----------|\n"
+  details="${details}| Lines | ${line_coverage}% |\n"
+  details="${details}| Branches | ${branch_coverage}% |\n"
+  details="${details}| Methods | ${method_coverage}% |\n"
+  details="${details}| Classes | ${class_coverage}% |\n"
+  details="${details}| **Overall** | **${total_coverage}%** |\n"
+  
+  # Output results
+  if [[ $status == "PASS" ]]; then
+    print_success "Test coverage verification passed: ${total_coverage}% overall coverage"
+    print_info "  Lines: ${line_coverage}%, Branches: ${branch_coverage}%, Methods: ${method_coverage}%, Classes: ${class_coverage}%"
+  else
+    print_warning "Test coverage verification failed: ${total_coverage}% overall coverage (threshold: ${COVERAGE_THRESHOLD}%)"
+    print_info "  Lines: ${line_coverage}%, Branches: ${branch_coverage}%, Methods: ${method_coverage}%, Classes: ${class_coverage}%"
+  fi
+  
+  # Update report
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    update_report "Test Coverage" "$status" "$issues" "${total_coverage}%" "$details"
+  fi
+  
+  return 0
+}
+
+# Verify the Maven structure
+verify_maven_structure() {
+  print_header "Verifying Maven Structure"
+  
+  # Check if maven-structure-test.sh exists
+  local mvn_test_paths=(
+    "${PROJECT_ROOT}/util/scripts/test/maven-structure-test.sh"
+    "${PROJECT_ROOT}/bin/test/maven-structure-test.sh"
+  )
+  
+  local test_script=""
+  local script_found=false
+  
+  for path in "${mvn_test_paths[@]}"; do
+    if [[ -x "$path" ]]; then
+      script_found=true
+      test_script="$path"
+      break
+    fi
+  done
+  
+  if [[ "$script_found" == false ]]; then
+    print_warning "Maven structure test script not found. Skipping verification."
+    
+    # Update report
+    if [[ "$GENERATE_REPORT" == true ]]; then
+      update_report "Maven Structure" "WARN" "N/A" "N/A" "Maven structure verification skipped: test script not found"
+    fi
+    
+    return 0
+  fi
+  
+  # Execute maven structure test script
+  print_info "Running Maven structure test..."
+  
+  local output_file="/tmp/maven-structure-test-output.txt"
+  "$test_script" > "$output_file" 2>&1
+  local test_result=$?
+  
+  # Parse test results
+  local total_tests=0
+  local passed_tests=0
+  
+  if [[ -f "$output_file" ]]; then
+    # Count total tests
+    total_tests=$(grep -c "Testing requirement:" "$output_file" || echo 0)
+    
+    # Count passed tests
+    passed_tests=$(grep -c "✅" "$output_file" || echo 0)
+  fi
+  
+  # Calculate coverage
+  local coverage=0
+  if [[ $total_tests -gt 0 ]]; then
+    coverage=$(( (passed_tests * 100) / total_tests ))
+  fi
+  
+  # Determine status
+  local status="PASS"
+  local issues=$((total_tests - passed_tests))
+  local details=""
+  
+  if [[ $test_result -ne 0 || $coverage -lt $COVERAGE_THRESHOLD ]]; then
+    status="FAIL"
+    if [[ "$EXIT_ON_FAILURE" == true ]]; then
+      print_error "Maven structure verification failed: Coverage ${coverage}% below threshold ${COVERAGE_THRESHOLD}%"
+      exit 1
+    fi
+  elif [[ $issues -gt 0 ]]; then
+    status="WARN"
+  fi
+  
+  # Generate detailed information
+  if [[ -f "$output_file" ]]; then
+    details="**Maven Structure Test Results**\n\n"
+    
+    # Extract failed tests
+    if [[ $issues -gt 0 ]]; then
+      details="${details}**Failed Tests**\n\n"
+      while IFS= read -r line; do
+        if [[ "$line" == *"Testing requirement:"* && "$line" != *"✅"* ]]; then
+          details="${details}- ${line#*requirement: }\n"
+        fi
+      done < "$output_file"
+      details="${details}\n"
+    fi
+    
+    # Extract summary
+    details="${details}**Summary**\n\n"
+    details="${details}| Total Tests | Passed | Failed | Coverage |\n"
+    details="${details}|------------|--------|--------|----------|\n"
+    details="${details}| $total_tests | $passed_tests | $issues | ${coverage}% |\n"
+  fi
+  
+  # Output results
+  if [[ $status == "PASS" ]]; then
+    print_success "Maven structure verification passed: $passed_tests/$total_tests tests passed ($coverage%)"
+  elif [[ $status == "WARN" ]]; then
+    print_warning "Maven structure verification has warnings: $passed_tests/$total_tests tests passed ($coverage%), $issues issues found"
+  else
+    print_warning "Maven structure verification failed: $passed_tests/$total_tests tests passed ($coverage%), $issues issues found"
+  fi
+  
+  # Cleanup
+  rm -f "$output_file"
+  
+  # Update report
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    update_report "Maven Structure" "$status" "$issues" "${coverage}%" "$details"
+  fi
+  
+  return 0
+}
+
+# Finalize the report with summary
+finalize_report() {
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    # Calculate overall status
+    local fail_count=$(grep -c "❌ Fail" "$REPORT_FILE" || echo 0)
+    local warn_count=$(grep -c "⚠️ Warning" "$REPORT_FILE" || echo 0)
+    local pass_count=$(grep -c "✅ Pass" "$REPORT_FILE" || echo 0)
+    
+    local overall_status="PASS"
+    if [[ $fail_count -gt 0 ]]; then
+      overall_status="FAIL"
+    elif [[ $warn_count -gt 0 ]]; then
+      overall_status="WARN"
+    fi
+    
+    # Calculate average coverage
+    local coverage_values=$(grep -o '[0-9]\+%' "$REPORT_FILE" | sed 's/%//g')
+    local total_coverage=0
+    local coverage_count=0
+    
+    for value in $coverage_values; do
+      if [[ $value -gt 0 ]]; then
+        total_coverage=$((total_coverage + value))
+        coverage_count=$((coverage_count + 1))
+      fi
+    done
+    
+    local average_coverage=0
+    if [[ $coverage_count -gt 0 ]]; then
+      average_coverage=$((total_coverage / coverage_count))
+    fi
+    
+    # Add overall summary at the beginning of the report
+    local temp_file="/tmp/report_temp.md"
+    
+    cat > "$temp_file" << EOF
+# Test Suite Verification Report
+
+**Generated:** $(date "+%Y-%m-%d %H:%M:%S")  
+**Coverage Threshold:** ${COVERAGE_THRESHOLD}%  
+**Test Type:** ${TEST_TYPE}
+
+## Overall Summary
+
+EOF
+    
+    if [[ $overall_status == "PASS" ]]; then
+      echo "**Status: ✅ PASS**" >> "$temp_file"
+    elif [[ $overall_status == "WARN" ]]; then
+      echo "**Status: ⚠️ WARNING**" >> "$temp_file"
+    else
+      echo "**Status: ❌ FAIL**" >> "$temp_file"
+    fi
+    
+    cat >> "$temp_file" << EOF
+
+**Average Coverage:** ${average_coverage}%  
+**Categories:** $pass_count passed, $warn_count warnings, $fail_count failed
+
+EOF
+    
+    # Copy the rest of the report
+    tail -n +6 "$REPORT_FILE" >> "$temp_file"
+    mv "$temp_file" "$REPORT_FILE"
+    
+    print_success "Report generated: $REPORT_FILE"
+  fi
+}
+
+main() {
+  # Parse command line arguments
+  parse_args "$@"
+  
+  # Initialize the report
+  init_report
+  
+  # Verify feature files
+  verify_feature_files
+  
+  # Verify step definitions
+  verify_step_definitions
+  
+  # Verify test runners
+  verify_test_runners
+  
+  # Verify test tags
+  verify_test_tags
+  
+  # Verify test coverage
+  verify_test_coverage
+  
+  # Verify Maven structure
+  verify_maven_structure
+  
+  # Finalize the report
+  finalize_report
+  
+  print_header "Test Suite Verification Complete"
+}
+
+# Run the script
+main "$@"

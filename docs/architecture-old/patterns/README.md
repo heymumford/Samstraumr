@@ -2,7 +2,7 @@
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-# Integration Patterns in Samstraumr
+# README
 
 This document describes the integration patterns implemented in the Samstraumr framework using the event-driven architecture.
 
@@ -14,7 +14,7 @@ The implemented patterns are inspired by the Enterprise Integration Patterns cat
 
 ## Core Integration Patterns
 
-### Transformer Pattern
+### Transformer pattern
 
 The Transformer pattern is used to convert data from one format to another without changing its meaning.
 
@@ -50,7 +50,7 @@ transformer.addTransformation("celsius", value -> {
 });
 ```
 
-### Filter Pattern
+### Filter pattern
 
 The Filter pattern selects data based on specific conditions, allowing only data that meets the criteria to pass through.
 
@@ -89,7 +89,7 @@ filter.addFilter("location", value -> "outdoor".equals(value));
 filter.requireAllFilters(true); // AND logic - both filters must pass
 ```
 
-### Aggregator Pattern
+### Aggregator pattern
 
 The Aggregator pattern collects and combines multiple related messages into a single message.
 
@@ -136,7 +136,7 @@ AggregatorComponent timeAggregator = patternFactory.createTimeAggregator(
     "Hourly metrics", "metrics", "hourly.metrics", Duration.ofHours(1));
 ```
 
-### Router Pattern
+### Router pattern
 
 The Router pattern directs messages to different destinations based on their content or metadata.
 
@@ -206,7 +206,7 @@ public class PatternFactory {
 
 ## Advanced Integration Patterns
 
-### Pipeline Pattern
+### Pipeline pattern
 
 The Pipeline pattern processes data through a sequence of processing stages.
 
@@ -223,7 +223,7 @@ patternFactory.createPipeline(
 
 This connects the components in sequence, automatically creating channels between them.
 
-### Publish-Subscribe Pattern
+### Publish-subscribe pattern
 
 The Publish-Subscribe pattern allows components to communicate through named channels without direct references to each other.
 
@@ -241,7 +241,7 @@ dataFlowService.subscribe(receiverId, "temperature.updates", event -> {
 });
 ```
 
-### Content-Based Router Pattern
+### Content-based router pattern
 
 The Content-Based Router pattern examines message content and routes it to the appropriate channel based on the content.
 
@@ -258,7 +258,7 @@ RouterComponent router = patternFactory.createContentRouter(
     "Order router", "orders.incoming", routingRules, false);
 ```
 
-### Splitter Pattern
+### Splitter pattern
 
 The Splitter pattern breaks a composite message into multiple smaller messages.
 
@@ -282,7 +282,7 @@ splitter.addTransformation("orders", value -> {
 });
 ```
 
-### Wiretap Pattern
+### Wiretap pattern
 
 The Wiretap pattern captures message exchanges for monitoring, debugging, or testing purposes.
 

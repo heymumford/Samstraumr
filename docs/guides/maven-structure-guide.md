@@ -20,7 +20,7 @@ Starting with version ${samstraumr.version}, the project is transitioning from t
 
 ## Maven Coordinates
 
-### Old Structure
+### Old structure
 
 ```xml
 <groupId>org.samstraumr</groupId>
@@ -28,7 +28,7 @@ Starting with version ${samstraumr.version}, the project is transitioning from t
 <version>${previous.version}</version>
 ```
 
-### New Structure
+### New structure
 
 ```xml
 <groupId>org.s8r</groupId>
@@ -38,7 +38,7 @@ Starting with version ${samstraumr.version}, the project is transitioning from t
 
 ## Directory Structure
 
-### Old Structure
+### Old structure
 
 ```
 Samstraumr/
@@ -53,7 +53,7 @@ Samstraumr/
 │   │       └── test/
 ```
 
-### New Structure
+### New structure
 
 ```
 s8r/
@@ -70,7 +70,7 @@ s8r/
 
 ## Package Names
 
-### Old Structure
+### Old structure
 
 ```java
 package org.samstraumr.tube;
@@ -78,7 +78,7 @@ package org.samstraumr.tube.composite;
 package org.samstraumr.tube.machine;
 ```
 
-### New Structure
+### New structure
 
 ```java
 package org.s8r.component.core;

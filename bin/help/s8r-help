@@ -1,0 +1,170 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r-help: Help system for Samstraumr commands
+#==============================================================================
+set -e
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${SCRIPT_DIR}"
+
+# Terminal colors
+BOLD='\033[1m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+RESET='\033[0m'
+
+# Handle different help topics
+if [ $# -eq 0 ]; then
+  # No topic, show main help
+  "${PROJECT_ROOT}/s8r" --help
+  exit 0
+fi
+
+help_topic="$1"
+
+# Developer commands - refer to s8r-dev
+if [[ "$help_topic" =~ ^(build|test|version|clean|coverage|quality|report|docs|docmosis|test-docmosis|script-test|install|hooks|demo)$ ]]; then
+  echo -e "${BOLD}Development Command:${RESET} ${help_topic}"
+  echo
+  echo -e "${YELLOW}Note:${RESET} '${help_topic}' is a development command."
+  echo "Please use: ./s8r-dev help ${help_topic}"
+  echo
+  echo "For general development command help, run:"
+  echo "  ./s8r-dev --help"
+  exit 0
+fi
+
+# User commands
+case "$help_topic" in
+  init)
+    echo -e "${BOLD}S8r Init Command${RESET} - Initialize a new Samstraumr repository"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  ./s8r init [options] [target-directory]"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  -h, --help                Display this help message"
+    echo "  -v, --verbose             Enable verbose output"
+    echo "  -p, --package <n>      Specify a custom package name (default: org.example)"
+    echo "  -d, --debug               Enable debug output (additional details)"
+    echo
+    echo -e "${BOLD}ARGUMENTS:${RESET}"
+    echo "  target-directory          Directory to initialize (default: current directory)"
+    echo
+    echo -e "${BOLD}DESCRIPTION:${RESET}"
+    echo "  The init command initializes a new Samstraumr repository in the specified directory."
+    echo "  It creates the necessary directory structure, an Adam tube, and configuration files."
+    echo "  It requires a git repository to work, and will create one if necessary."
+    echo
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  ./s8r init                                # Initialize in current directory"
+    echo "  ./s8r init ~/new-project                  # Initialize in ~/new-project"
+    echo "  ./s8r init -p com.mycompany.project       # Use custom package name"
+    echo "  ./s8r init -v                             # Initialize with verbose output"
+    ;;
+  list)
+    echo -e "${BOLD}S8r List Command${RESET} - Display ASCII visualization of S8r models"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  ./s8r list [options] [directory]"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  -h, --help                Display this help message"
+    echo "  -v, --verbose             Enable verbose output"
+    echo "  -f, --format <format>     Output format: ascii, tree, json (default: ascii)"
+    echo "  -d, --detailed            Show detailed component information"
+    echo
+    echo -e "${BOLD}ARGUMENTS:${RESET}"
+    echo "  directory                 S8r model directory (default: current directory)"
+    echo
+    echo -e "${BOLD}DESCRIPTION:${RESET}"
+    echo "  The list command displays a graphical representation of your S8r model,"
+    echo "  showing machines, composites, components, and their relationships."
+    echo
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  ./s8r list                  # List model in current directory"
+    echo "  ./s8r list ~/my-model       # List model in specified directory"
+    echo "  ./s8r list -f tree          # Display as tree structure"
+    echo "  ./s8r list -d               # Show detailed information"
+    ;;
+  component)
+    echo -e "${BOLD}S8r Component Commands${RESET} - Manage components in your S8r model"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r component <subcommand> [arguments]"
+    echo
+    echo -e "${BOLD}SUBCOMMANDS:${RESET}"
+    echo "  create    Create a new component"
+    echo "  list      List all components"
+    echo "  info      Show details about a component"
+    echo "  delete    Delete a component"
+    echo
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r component create --type transformer DataProcessor"
+    echo "  s8r component list --format json"
+    ;;
+  composite)
+    echo -e "${BOLD}S8r Composite Commands${RESET} - Manage composites in your S8r model"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r composite <subcommand> [arguments]"
+    echo
+    echo -e "${BOLD}SUBCOMMANDS:${RESET}"
+    echo "  create    Create a new composite"
+    echo "  list      List all composites"
+    echo "  add       Add a component to a composite"
+    echo "  connect   Connect components within a composite"
+    echo "  info      Show details about a composite"
+    echo "  delete    Delete a composite"
+    echo
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r composite create --type processing DataFlow"
+    echo "  s8r composite add --component DataProcessor --composite DataFlow"
+    ;;
+  machine)
+    echo -e "${BOLD}S8r Machine Commands${RESET} - Manage machines in your S8r model"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r machine <subcommand> [arguments]"
+    echo
+    echo -e "${BOLD}SUBCOMMANDS:${RESET}"
+    echo "  create    Create a new machine"
+    echo "  list      List all machines"
+    echo "  add       Add a composite to a machine"
+    echo "  connect   Connect composites within a machine"
+    echo "  info      Show details about a machine"
+    echo "  delete    Delete a machine"
+    echo
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r machine create --template flow DataPipeline"
+    echo "  s8r machine add --composite DataFlow --machine DataPipeline"
+    ;;
+  help)
+    echo -e "${BOLD}S8r Help Command${RESET} - Get help for S8r commands"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  ./s8r help [command]"
+    echo
+    echo -e "${BOLD}ARGUMENTS:${RESET}"
+    echo "  command    The command to get help for"
+    echo
+    echo -e "${BOLD}DESCRIPTION:${RESET}"
+    echo "  The help command displays detailed information about a specific command,"
+    echo "  including its usage, options, and examples. If no command is specified,"
+    echo "  general help information is displayed."
+    echo
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  ./s8r help                 # Display general help"
+    echo "  ./s8r help init            # Display help for the init command"
+    echo "  ./s8r help component       # Display help for component commands"
+    echo
+    echo -e "${YELLOW}Note:${RESET} For help with development commands like build, test, and version,"
+    echo "use ./s8r-dev help [command] instead."
+    ;;
+  *)
+    # For unknown commands, just show the main help
+    "${PROJECT_ROOT}/s8r" --help
+    ;;
+esac

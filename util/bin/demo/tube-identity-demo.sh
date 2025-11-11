@@ -7,7 +7,7 @@ echo "==== Tube Identity Inspection Tool ===="
 echo "Creating sample identities to inspect their properties..."
 
 # Source project paths
-source "$(cd "$(dirname "${BASH_SOURCE[0]}")" source ./.samstraumr.configsource ./.samstraumr.config pwd)/../../.samstraumr/config.sh"
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" source ./.s8r.configsource ./.s8r.config pwd)/../../.s8r/config.sh"
 
 # Create a simple identity demo that doesn't depend on external libraries
 cat > SimpleIdentityDemo.java <<EOF

@@ -1,4 +1,4 @@
-# Samstraumr Test Pyramid and Tag Standardization
+# Test Pyramid Tags
 
 This document defines the standardized test pyramid structure and tagging conventions for Samstraumr tests, ensuring consistent organization and execution across all test levels.
 
@@ -17,7 +17,7 @@ The Samstraumr test pyramid consists of four distinct levels, each with specific
 
 Each test should use tags from the following categories to enable precise test selection:
 
-### 1. Pyramid Level Tags
+### 1. pyramid level tags
 
 These tags define the level in the test pyramid:
 
@@ -28,7 +28,7 @@ These tags define the level in the test pyramid:
 | `@L2_Integration` | L2  | Integration/machine level tests                      |
 | `@L3_System`    | L3    | System/end-to-end tests                              |
 
-### 2. Test Type Tags 
+### 2. test type tags 
 
 These tags define the type of test being performed:
 
@@ -41,7 +41,7 @@ These tags define the type of test being performed:
 | `@Performance` | Tests of timing, throughput, and resource usage    | Load tests, throughput measurement     |
 | `@Security`   | Tests of security aspects                           | Authorization, data protection         |
 
-### 3. Feature Area Tags
+### 3. feature area tags
 
 These tags identify the specific feature area being tested:
 
@@ -55,7 +55,7 @@ These tags identify the specific feature area being tested:
 | `@Monitoring`   | Observability and metrics                    | Health checks, performance monitoring    |
 | `@Resilience`   | Fault tolerance and recovery                 | Error handling, failover, circuit breaking |
 
-### 4. Pattern Tags
+### 4. pattern tags
 
 These tags identify architectural patterns being tested:
 
@@ -90,19 +90,19 @@ Example combined tags:
 Tests can be selected and executed by tag combination using Maven or the CLI:
 
 ```bash
-# Run all unit tests
+# Test Pyramid Tags
 ./s8r test unit
 
-# Run all component tests
+# Test Pyramid Tags
 ./s8r test component
 
-# Run all integration tests
+# Test Pyramid Tags
 ./s8r test integration
 
-# Run all system tests
+# Test Pyramid Tags
 ./s8r test system
 
-# Run tests with specific tag combinations
+# Test Pyramid Tags
 ./s8r test --tags="@L1_Component and @Identity"
 ./s8r test --tags="@L2_Integration and @DataFlow"
 ./s8r test --tags="@Resilience and @CircuitBreaker"
@@ -153,4 +153,3 @@ Feature: Component Connection Pipeline
 
 ## Conclusion
 
-This standardized test pyramid and tagging system provides a clear, consistent framework for organizing and executing tests at all levels. By following these conventions, we ensure that our test suite remains manageable, focused, and effective at ensuring system quality.

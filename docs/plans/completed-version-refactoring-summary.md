@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Version Refactoring Summary
+# Completed Version Refactoring Summary
 
 ## Overview
 
@@ -111,27 +111,27 @@ The refactored version management system now consists of the following files:
 All version management functions can be used through the s8r CLI:
 
 ```bash
-# Version Refactoring Summary
+# Completed Version Refactoring Summary
 ./s8r version get
 
-# Version Refactoring Summary
+# Completed Version Refactoring Summary
 ./s8r version get -v
 
-# Version Refactoring Summary
+# Completed Version Refactoring Summary
 ./s8r version bump patch
 
-# Version Refactoring Summary
+# Completed Version Refactoring Summary
 ./s8r version set 1.2.3
 
-# Version Refactoring Summary
+# Completed Version Refactoring Summary
 ./s8r version verify
 
-# Version Refactoring Summary
+# Completed Version Refactoring Summary
 ./s8r version fix-tag
 
-# Version Refactoring Summary
+# Completed Version Refactoring Summary
 ./s8r version history
 
-# Version Refactoring Summary
+# Completed Version Refactoring Summary
 ./s8r version test patch
 ```

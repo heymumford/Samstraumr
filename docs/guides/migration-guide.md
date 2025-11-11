@@ -33,7 +33,7 @@ Migration to Samstraumr is not merely a technical refactoring—it's a transform
 
 Before beginning your migration journey:
 
-### Technical Assessment
+### Technical assessment
 
 1. **Identify Existing Flows**: Map data and control flows in your application
 2. **Map Dependencies**: Understand component interactions
@@ -71,7 +71,7 @@ public class DependencyMapper {
 
 Gradually replace components of a legacy system while keeping it operational:
 
-### Key Benefits
+### Key benefits
 
 - **Risk Reduction**: Incremental changes reduce risk of system-wide failures
 - **Continuous Delivery**: System remains operational during migration
@@ -80,14 +80,14 @@ Gradually replace components of a legacy system while keeping it operational:
 
 ## Identifying Your First Tubes
 
-### Ideal Candidates
+### Ideal candidates
 
 1. **Well-Bounded Functionality**: Clear inputs, outputs, and purpose
 2. **Moderate Complexity**: Not too simple or too complex
 3. **Manageable Dependencies**: Minimal integration with other components
 4. **Good Test Coverage**: Existing tests to validate behavior
 
-### Evaluation Matrix
+### Evaluation matrix
 
 | Component | Bounded | Complexity | Dependencies | Improvement Potential | Test Coverage | Score |
 |-----------|---------|------------|--------------|----------------------|---------------|-------|
@@ -95,7 +95,7 @@ Gradually replace components of a legacy system while keeping it operational:
 | Email Notification | High | Low | Low | Medium | High | ⭐⭐⭐⭐ |
 | Report Generator | Medium | High | High | Medium | Low | ⭐⭐ |
 
-### Transformation Approach
+### Transformation approach
 
 1. **Extract Core Logic**: Identify essential transformation logic
 2. **Define Clear Interface**: Establish input/output contracts
@@ -190,7 +190,7 @@ public class PaymentProcessorTube implements Tube {
 
 ## Integration Strategies
 
-### Sidecar Pattern
+### Sidecar pattern
 
 Deploy Samstraumr components alongside existing services:
 
@@ -218,7 +218,7 @@ public class SidecarRouter {
 }
 ```
 
-### Feature Flag Integration
+### Feature flag integration
 
 Use feature flags to control which implementation handles requests:
 
@@ -238,7 +238,7 @@ public class FeatureFlagRouter {
 }
 ```
 
-### Dependency-Based Migration Order
+### Dependency-based migration order
 
 ```
 Legacy System:
@@ -254,7 +254,7 @@ Migration Order:
 
 ## Testing During Migration
 
-### Behavior Equivalence Testing
+### Behavior equivalence testing
 
 ```java
 @Test
@@ -276,7 +276,7 @@ public void shouldProduceSameResultAsLegacyImplementation() {
 }
 ```
 
-### Integration Testing
+### Integration testing
 
 Test interaction between legacy and Samstraumr components:
 
@@ -303,14 +303,14 @@ public void shouldInteractCorrectlyWithLegacyComponents() {
 
 ## Organizational Considerations
 
-### Knowledge Transfer
+### Knowledge transfer
 
 1. **Tube Development Workshops**: Hands-on sessions
 2. **Migration Pairing**: Pair engineers familiar with Samstraumr with newcomers
 3. **Documentation**: Create organization-specific guides
 4. **Champions Program**: Designate Samstraumr champions within each team
 
-### Success Metrics
+### Success metrics
 
 - **Migrated Functionality**: Percentage of system in Samstraumr
 - **Incident Reduction**: Decrease in production issues in migrated components
@@ -319,7 +319,7 @@ public void shouldInteractCorrectlyWithLegacyComponents() {
 
 ## Case Studies
 
-### E-commerce Platform Migration
+### E-commerce platform migration
 
 **Challenge:** Decade-old monolith with slow development and cascading failures
 
@@ -334,7 +334,7 @@ public void shouldInteractCorrectlyWithLegacyComponents() {
 - Payment processor automatically adapting to traffic spikes
 - Improved developer onboarding (days vs. weeks to understand code)
 
-### Microservices Consolidation
+### Microservices consolidation
 
 **Challenge:** Over 200 fragmented microservices with complex dependencies
 
@@ -351,7 +351,7 @@ public void shouldInteractCorrectlyWithLegacyComponents() {
 
 ## Common Challenges
 
-### State Synchronization
+### State synchronization
 
 ```java
 public class StateSynchronizer {
@@ -371,7 +371,7 @@ public class StateSynchronizer {
 }
 ```
 
-### Cross-cutting Concerns
+### Cross-cutting concerns
 
 ```java
 public class AspectAdapter {
@@ -404,7 +404,7 @@ public class AspectAdapter {
 
 ## Migration Roadmap
 
-### Phase 1: Foundation (3-4 months)
+### Phase 1: foundation (3-4 months)
 
 1. **Assessment** (Weeks 1-2)
    - Map architecture and dependencies
@@ -426,7 +426,7 @@ public class AspectAdapter {
    - Monitor and collect metrics
    - Document lessons learned
 
-### Phase 2: Expansion (6-9 months)
+### Phase 2: expansion (6-9 months)
 
 1. **Additional Migrations**
    - Convert 3-5 additional components to tubes
@@ -443,7 +443,7 @@ public class AspectAdapter {
    - Create internal documentation
    - Establish champions program
 
-### Phase 3: System Transformation (12-18 months)
+### Phase 3: system transformation (12-18 months)
 
 1. **Machine Formation**
    - Organize bundles into machines
@@ -459,4 +459,3 @@ public class AspectAdapter {
    - Gradually decommission legacy implementations
    - Optimize bundle and machine organization
 
-[← Return to Core Concepts](./core-concepts.md) | [Explore Testing →](./testing.md)

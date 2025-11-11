@@ -13,7 +13,7 @@ Licensed under the Mozilla Public License 2.0
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-# Test Consolidation Plan
+# Test Consolidation
 
 ## Current Testing Terminology Issues
 
@@ -50,17 +50,17 @@ We've implemented the following improvements:
 
 ## Implementation Details
 
-### 1. BTL Annotation Changes
+### 1. btl annotation changes
 - Removed `@BTL` annotation from `BasicCompositeTest.java`
 - Added proper JavaDoc to clarify test purpose
 
-### 2. Maven POM Updates
+### 2. maven pom updates
 - Removed BTL test profiles from both POM files
 - Renamed ATL profiles to simply "tests" for clarity
 - Updated test properties to reflect the simplified approach
 - Added JUnit 5 dependencies for Cucumber integration
 
-### 3. Test Runner Updates
+### 3. test runner updates
 - Updated `RunCucumberTest` and `RunATLCucumberTest` to use JUnit 5
 - Created placeholder implementations until feature files are properly formatted
 - Removed JUnit Platform Suite Engine that was causing test discovery issues
@@ -79,10 +79,10 @@ The following tasks remain:
 To run the tests with the consolidated configuration:
 
 ```bash
-# Run all tests
+# Test Consolidation
 mvn clean test
 
-# Run specific test category
+# Test Consolidation
 mvn clean test -P tube-tests
 mvn clean test -P composite-tests
 mvn clean test -P machine-tests

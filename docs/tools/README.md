@@ -2,7 +2,7 @@
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-# Documentation Tools
+# README
 
 This directory contains tools for generating, maintaining, and ensuring the integrity of the S8r documentation.
 
@@ -21,82 +21,82 @@ These tools help automate the process of creating, checking, maintaining, and im
 
 ## Usage
 
-### CLI Wrapper
+### Cli wrapper
 
 The `s8r-docs` script provides a unified interface for all documentation tools. This is also available as `/s8r-docs` in the project root and integrated with the main `s8r` CLI.
 
 ```bash
-# Generate all documentation
+# README
 ./s8r-docs all
 
-# Generate only API documentation
+# README
 ./s8r-docs api
 
-# Update README
+# README
 ./s8r-docs readme
 
-# Generate changelog
+# README
 ./s8r-docs changelog
 
-# Check documentation integrity
+# README
 ./s8r-docs check
 ```
 
-### Changelog Generation
+### Changelog generation
 
 The `generate-changelog.sh` script automatically generates a changelog from git commit history using conventional commit messages.
 
 ```bash
-# Generate changelog for the latest version
+# README
 ./generate-changelog.sh
 
-# Generate changelog from a specific tag
+# README
 ./generate-changelog.sh --from v1.0.0
 
-# Update existing changelog instead of overwriting
+# README
 ./generate-changelog.sh --update
 
-# Save to a custom location
-./generate-changelog.sh --output docs/CHANGELOG.md
+# README
+./generate-changelog.sh --output docs/reference/release/changelog.md
 ```
 
-### README Updates
+### Readme updates
 
 The `update-readme.sh` script updates the README.md file with the latest project information, including version, badges, and usage examples.
 
 ```bash
-# Update all sections
+# README
 ./update-readme.sh
 
-# Update specific sections
+# README
 ./update-readme.sh --sections version,badges
 
-# Generate from a template
+# README
 ./update-readme.sh --template docs/templates/README-template.md
 ```
 
-### JavaDoc API Documentation
+### Javadoc api documentation
 
 The `generate-javadoc.sh` script generates JavaDoc API documentation with customizations for the Samstraumr project.
 
 ```bash
-# Generate basic API documentation
+# README
 ./generate-javadoc.sh
 
-# Generate docs for specific packages
+# README
 ./generate-javadoc.sh --packages org.s8r.component,org.s8r.domain
 
-# Include GitHub links
+# README
 ./generate-javadoc.sh --links
 
-# Include Markdown documentation
+# README
 ./generate-javadoc.sh --markdown
 
-# Customize output location
+# README
 ./generate-javadoc.sh --output docs/api
 ```
 
-### Documentation Integrity Check
+### Documentation integrity check
 
 The `doc-integrity-check.sh` script performs the following checks:
 
@@ -147,4 +147,3 @@ It's recommended to run these tools:
 
 - [Documentation Standards](../reference/standards/documentation-standards.md)
 - [File Naming Conventions](../reference/standards/file-naming-conventions.md)
-- [Documentation Template](../documentation-template.md)

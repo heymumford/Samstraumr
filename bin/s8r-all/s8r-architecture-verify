@@ -1,0 +1,147 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r-architecture-verify: Run Clean Architecture compliance tests
+# This script is used to verify compliance with Clean Architecture principles
+#==============================================================================
+set -e
+
+# Terminal colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+# Functions for prettier output
+info() { echo -e "${BLUE}$1${RESET}"; }
+success() { echo -e "${GREEN}$1${RESET}"; }
+error() { echo -e "${RED}Error: $1${RESET}" >&2; exit 1; }
+warn() { echo -e "${YELLOW}Warning: $1${RESET}" >&2; }
+
+# Set important environment variables
+if command -v java -version 2>&1 | grep -q "version \"21"; then
+  export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+  export MAVEN_OPTS="$JAVA_OPTS"
+fi
+
+# Find repository root
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+cd "$REPO_ROOT" || error "Unable to change to repository root directory"
+
+# Parse arguments
+VERBOSE=false
+QUICK=false
+REPORT_OUTPUT="architecture-report.md"
+
+for arg in "$@"; do
+  case "$arg" in
+    -v|--verbose)
+      VERBOSE=true
+      ;;
+    -q|--quick)
+      QUICK=true
+      ;;
+    -o=*|--output=*)
+      REPORT_OUTPUT="${arg#*=}"
+      ;;
+    -h|--help)
+      echo "Usage: $0 [options]"
+      echo ""
+      echo "Options:"
+      echo "  -v, --verbose       Show detailed test output"
+      echo "  -q, --quick         Run only critical tests (faster)"
+      echo "  -o, --output=FILE   Output report file (default: architecture-report.md)"
+      echo "  -h, --help          Show this help message"
+      exit 0
+      ;;
+  esac
+done
+
+# Determine which test classes to run
+if $QUICK; then
+  TEST_CLASSES="CleanArchitectureComplianceTest"
+  info "Running quick architecture validation (critical tests only)..."
+else
+  TEST_CLASSES="CleanArchitectureComplianceTest,ComponentBasedArchitectureTest,AcyclicDependencyTest"
+  info "Running standard architecture validation..."
+fi
+
+# Start time measurement
+START_TIME=$(date +%s)
+
+# Run the tests
+info "Running Clean Architecture compliance tests..."
+cd "$REPO_ROOT/Samstraumr" || error "Unable to change to Samstraumr directory"
+
+if $VERBOSE; then
+  mvn test -Dtest=$TEST_CLASSES
+  RESULT=$?
+else
+  # Capture Maven output to parse and generate report
+  TEMP_OUTPUT=$(mktemp)
+  mvn test -Dtest=$TEST_CLASSES > "$TEMP_OUTPUT" 2>&1
+  RESULT=$?
+  
+  # Show summary
+  if [ $RESULT -eq 0 ]; then
+    success "Clean Architecture tests PASSED"
+  else
+    # Show most relevant errors
+    ERROR_COUNT=$(grep -c "FAILED" "$TEMP_OUTPUT" || echo "0")
+    info "Found $ERROR_COUNT test failures:"
+    grep -B1 -A3 "FAILED" "$TEMP_OUTPUT" || true
+    
+    error "Clean Architecture tests FAILED"
+  fi
+  
+  # Clean up temp file
+  rm -f "$TEMP_OUTPUT"
+fi
+
+# End time measurement
+END_TIME=$(date +%s)
+DURATION=$((END_TIME - START_TIME))
+
+# Generate a report
+REPORT_FILE="$REPO_ROOT/$REPORT_OUTPUT"
+{
+  echo "# Clean Architecture Compliance Report"
+  echo ""
+  echo "Generated: $(date '+%Y-%m-%d %H:%M:%S')"
+  echo ""
+  echo "## Summary"
+  echo ""
+  if [ $RESULT -eq 0 ]; then
+    echo "✅ **PASSED**: All Clean Architecture compliance tests passed successfully"
+  else
+    echo "❌ **FAILED**: Clean Architecture compliance tests detected issues"
+  fi
+  echo ""
+  echo "- **Test duration**: ${DURATION} seconds"
+  echo "- **Test classes**: ${TEST_CLASSES/,/, }"
+  echo ""
+  echo "## Clean Architecture Principles Verified"
+  echo ""
+  echo "1. **Dependency Rule**: Inner layers don't depend on outer layers"
+  echo "2. **Layer Isolation**: Each layer has clear responsibilities"
+  echo "3. **Interface Segregation**: Ports are defined in application layer"
+  echo "4. **Domain Independence**: Domain layer has no external dependencies"
+  echo "5. **Package Structure**: Packages follow Clean Architecture conventions"
+  echo ""
+  echo "## Next Steps"
+  echo ""
+  if [ $RESULT -eq 0 ]; then
+    echo "- Continue maintaining Clean Architecture compliance"
+    echo "- Consider adding more specific tests for new components"
+  else
+    echo "- Fix detected Clean Architecture violations"
+    echo "- Review dependencies between packages"
+    echo "- Ensure ports are properly defined and implemented"
+  fi
+} > "$REPORT_FILE"
+
+info "Generated report at: $REPORT_FILE"
+
+# Return the test result
+exit $RESULT

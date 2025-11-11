@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Migrating from Tube to Component
+# TubeToComponentMigration
 
 This guide helps you migrate from the legacy Tube-based architecture to the new Component-based structure in the S8r framework. The new structure offers improved simplicity, better organization, and a more intuitive API.
 
@@ -50,7 +50,7 @@ The refactoring changes several key aspects of the codebase:
 
 ## API Changes
 
-### Creating Components (formerly Tubes)
+### Creating components (formerly tubes)
 
 **Legacy**:
 
@@ -74,7 +74,7 @@ Component child = Component.createChild("child reason", environment, component);
 // No need to manually register - parent-child relationship established automatically
 ```
 
-### Working with State (formerly Status & LifecycleState)
+### Working with state (formerly status & lifecyclestate)
 
 **Legacy**:
 
@@ -160,7 +160,7 @@ composite.connect("source", "target");
 
 To assist with migration, S8r provides a comprehensive set of migration utilities in the `org.s8r.adapter` package. These utilities make it easier to transition from legacy code to the new architecture without breaking existing functionality.
 
-### S8rMigrationFactory
+### S8rmigrationfactory
 
 The `S8rMigrationFactory` is the main entry point for using migration utilities:
 
@@ -174,7 +174,7 @@ import org.s8r.tube.Environment;
 S8rMigrationFactory migrationFactory = new S8rMigrationFactory();
 ```
 
-### Converting Existing Tubes to Components
+### Converting existing tubes to components
 
 You can wrap your existing Tube instances to use them with new Component-based code:
 
@@ -194,7 +194,7 @@ component.activate();
 Tube originalTube = migrationFactory.extractTube(component);
 ```
 
-### Creating New Components backed by Tubes
+### Creating new components backed by tubes
 
 For a gradual migration, you can create new components that use the legacy Tube implementation:
 
@@ -205,7 +205,7 @@ env.setParameter("name", "NewComponent");
 Component component = migrationFactory.createTubeComponent("Analyzing data", env);
 ```
 
-### Converting Between Environment Types
+### Converting between environment types
 
 ```java
 // Convert Tube Environment to S8r Environment
@@ -275,7 +275,7 @@ if (tube.getStatus() == TubeStatus.READY) {
 }
 ```
 
-### During Migration (using utilities):
+### During migration (using utilities):
 
 ```java
 import org.samstraumr.tube.Environment;
@@ -351,6 +351,7 @@ tubeMachine.addComposite("flow", tubeComposite);
 
 // Convert the entire machine
 Machine convertedMachine = migrationFactory.tubeMachineToComponentMachine(tubeMachine);
+// This creates a completely new Machine with all composites and connections preserved
 
 // Option 2: Wrap a Tube machine to use with Component APIs
 Machine wrappedMachine = migrationFactory.wrapTubeMachine(tubeMachine);
@@ -363,6 +364,17 @@ wrappedMachine.connect("flow", "newFlow");
 wrappedMachine.updateState("machineStatus", "processing");
 // The underlying tubeMachine is updated too
 assert tubeMachine.getState().get("machineStatus").equals("processing");
+
+// Lifecycle management works bidirectionally
+wrappedMachine.deactivate();
+assert !tubeMachine.isActive(); // tube machine gets deactivated
+
+tubeMachine.activate();
+assert wrappedMachine.isActive(); // wrapper reflects activation
+
+// Shutdown also propagates
+wrappedMachine.shutdown();
+assert !tubeMachine.isActive(); // tube machine gets shut down properly
 ```
 
 ### After (fully migrated):

@@ -13,7 +13,7 @@ Licensed under the Mozilla Public License 2.0
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-# S8r Framework Directory Structure
+# Directory Structure
 
 This document provides a visual representation of the ideal S8r Framework directory structure, focusing on clarity, discoverability, and maintainability. It serves as the authoritative reference for organizing code and documents within the repository.
 
@@ -93,7 +93,7 @@ Files within each directory should follow consistent naming patterns:
 
 ## Folder Creation Guidelines
 
-### When to Create Folders
+### When to create folders
 
 Create a new folder only when ALL of these criteria are met:
 
@@ -103,7 +103,7 @@ Create a new folder only when ALL of these criteria are met:
 4. **Architectural Cohesion**: Files collectively belong to the same architectural layer
 5. **Significant Capability**: The files implement an important system capability
 
-### When to Flatten Folders
+### When to flatten folders
 
 Consider flattening a folder structure when:
 
@@ -116,7 +116,7 @@ Consider flattening a folder structure when:
 
 When flattening folder structures, use these techniques:
 
-### 1. File Prefixing Pattern
+### 1. file prefixing pattern
 
 ```
 Before:
@@ -136,7 +136,7 @@ After:
   creation-profile.java
 ```
 
-### 2. Package Consolidation
+### 2. package consolidation
 
 ```
 Before:

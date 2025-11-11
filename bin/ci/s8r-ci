@@ -1,0 +1,662 @@
+#!/usr/bin/env bash
+#==============================================================================
+# Filename: s8r-ci
+# Description: Local CI runner for Samstraumr
+#
+# Runs CI checks locally using the same workflow as GitHub Actions, allowing
+# developers to verify changes before pushing to the remote repository.
+#==============================================================================
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+
+# Source unified common library for consistent output formatting
+if [ -f "${PROJECT_ROOT}/util/lib/unified-common.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/unified-common.sh"
+else
+  # Fallback to minimal functionality if library not found
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  BLUE='\033[0;34m'
+  YELLOW='\033[0;33m'
+  BOLD='\033[1m'
+  RESET='\033[0m'
+  
+  print_info() { echo -e "${BLUE}→ $1${RESET}"; }
+  print_success() { echo -e "${GREEN}✓ $1${RESET}"; }
+  print_error() { echo -e "${RED}✗ $1${RESET}" >&2; exit 1; }
+  print_warning() { echo -e "${YELLOW}! $1${RESET}" >&2; }
+  print_header() { echo -e "${BLUE}${BOLD}$1${RESET}"; echo -e "${BLUE}${BOLD}$(printf '=%.0s' $(seq 1 ${#1}))${RESET}"; }
+  print_section() { echo -e "${BLUE}$1${RESET}"; }
+fi
+
+# Initialize variables
+VERBOSE=false
+SKIP_TESTS=false
+SKIP_QUALITY=false
+SKIP_PACKAGE=false
+SPECIFIC_JOB=""
+DRY_RUN=false
+USE_ACT=false
+WORKFLOW_FILE=".github/workflows/s8r-ci.yml"
+PARALLEL=false
+OUTPUT_DIR="${PROJECT_ROOT}/ci-results"
+
+# Function to display help
+show_help() {
+  print_header "S8r Local CI Runner"
+  echo
+  print_section "Description"
+  echo "  This tool runs CI checks locally using the same workflow as GitHub Actions,"
+  echo "  allowing developers to verify changes before pushing to the remote repository."
+  echo
+  print_section "Usage"
+  echo "  s8r-ci [options]"
+  echo
+  print_section "Options"
+  echo "  -v, --verbose          Show detailed output"
+  echo "  -s, --skip-tests       Skip running tests"
+  echo "  -q, --skip-quality     Skip quality checks"
+  echo "  -p, --skip-package     Skip packaging step"
+  echo "  -j, --job JOB_NAME     Run only the specified job"
+  echo "  -d, --dry-run          Show what would be run without executing"
+  echo "  -a, --act              Use 'act' tool to run GitHub Actions locally"
+  echo "  -w, --workflow FILE    Specify workflow file (default: s8r-ci.yml)"
+  echo "  -o, --output-dir DIR   Specify output directory for results"
+  echo "  -x, --parallel         Run jobs in parallel where possible"
+  echo "  -h, --help             Show this help message"
+  echo
+  print_section "Available Jobs"
+  echo "  basic-verification     Basic checks (Maven structure, circular deps)"
+  echo "  quality-checks         Static analysis (checkstyle, PMD, SpotBugs)"
+  echo "  unit-tests             Unit tests"
+  echo "  component-tests        Component tests"
+  echo "  composite-tests        Composite tests"
+  echo "  integration-tests      Integration tests"
+  echo "  coverage-analysis      Coverage analysis"
+  echo "  all                    Run all checks and tests (default)"
+  echo
+  print_section "Examples"
+  echo "  s8r-ci                           # Run all CI checks"
+  echo "  s8r-ci --job unit-tests          # Run only unit tests"
+  echo "  s8r-ci --skip-tests              # Run checks without tests"
+  echo "  s8r-ci --act                     # Use 'act' to run GitHub Actions"
+  echo "  s8r-ci --dry-run                 # Show what would run"
+}
+
+# Parse command line arguments
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -v|--verbose)
+        VERBOSE=true
+        shift
+        ;;
+      -s|--skip-tests)
+        SKIP_TESTS=true
+        shift
+        ;;
+      -q|--skip-quality)
+        SKIP_QUALITY=true
+        shift
+        ;;
+      -p|--skip-package)
+        SKIP_PACKAGE=true
+        shift
+        ;;
+      -j|--job)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          SPECIFIC_JOB="$2"
+          shift 2
+        else
+          print_error "Job name missing after -j/--job"
+          show_help
+          exit 1
+        fi
+        ;;
+      -d|--dry-run)
+        DRY_RUN=true
+        shift
+        ;;
+      -a|--act)
+        USE_ACT=true
+        shift
+        ;;
+      -w|--workflow)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          WORKFLOW_FILE="$2"
+          shift 2
+        else
+          print_error "Workflow file path missing after -w/--workflow"
+          show_help
+          exit 1
+        fi
+        ;;
+      -o|--output-dir)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          OUTPUT_DIR="$2"
+          shift 2
+        else
+          print_error "Output directory path missing after -o/--output-dir"
+          show_help
+          exit 1
+        fi
+        ;;
+      -x|--parallel)
+        PARALLEL=true
+        shift
+        ;;
+      -h|--help)
+        show_help
+        exit 0
+        ;;
+      *)
+        print_error "Unknown option: $1"
+        show_help
+        exit 1
+        ;;
+    esac
+  done
+}
+
+# Create output directory
+create_output_dir() {
+  mkdir -p "$OUTPUT_DIR"
+  mkdir -p "$OUTPUT_DIR/logs"
+  
+  # Initialize summary file
+  cat > "$OUTPUT_DIR/ci-summary.md" << EOF
+# S8r CI Results Summary
+
+**Date:** $(date "+%Y-%m-%d %H:%M:%S")  
+**Branch:** $(git rev-parse --abbrev-ref HEAD)  
+**Commit:** $(git rev-parse --short HEAD)  
+**Commit Message:** $(git log -1 --pretty=%B | head -1)
+
+## Job Results
+
+| Job | Status | Duration | Log |
+|-----|--------|----------|-----|
+EOF
+}
+
+# Run job using act
+run_job_with_act() {
+  local job_name="$1"
+  
+  if ! command -v act &> /dev/null; then
+    print_error "Act tool is not installed. Please install it from https://github.com/nektos/act"
+    exit 1
+  }
+  
+  # Build act command
+  local act_cmd="act"
+  
+  if [[ "$VERBOSE" == true ]]; then
+    act_cmd="$act_cmd -v"
+  fi
+  
+  if [[ "$DRY_RUN" == true ]]; then
+    act_cmd="$act_cmd -n"
+  fi
+  
+  # Specify the workflow file
+  act_cmd="$act_cmd -W $WORKFLOW_FILE"
+  
+  # Specify the job
+  if [[ -n "$job_name" && "$job_name" != "all" ]]; then
+    act_cmd="$act_cmd -j $job_name"
+  fi
+  
+  # Run the command
+  print_info "Running: $act_cmd"
+  $act_cmd
+  
+  return $?
+}
+
+# Run basic verification job
+run_basic_verification() {
+  print_header "Running Basic Verification"
+  local start_time=$(date +%s)
+  local log_file="$OUTPUT_DIR/logs/basic-verification.log"
+  local status="PASS"
+  
+  # Validation commands
+  local cmds=(
+    "bin/util/scripts/test/maven-structure-test.sh"
+    "bin/util/scripts/check-circular-dependencies.sh"
+    "bin/test/verify-test-suite --skip-tests --no-report"
+    "mvn clean compile"
+  )
+  
+  # Run commands
+  for cmd in "${cmds[@]}"; do
+    if [[ "$DRY_RUN" == true ]]; then
+      print_info "Would run: $cmd"
+    else
+      print_info "Running: $cmd"
+      
+      if $cmd > >(tee -a "$log_file") 2>&1; then
+        print_success "Command completed successfully: $cmd"
+      else
+        print_warning "Command failed: $cmd"
+        status="FAIL"
+      fi
+    fi
+  done
+  
+  local end_time=$(date +%s)
+  local duration=$((end_time - start_time))
+  local duration_formatted="$(printf '%02d:%02d' $((duration / 60)) $((duration % 60)))"
+  
+  # Update summary
+  if [[ "$DRY_RUN" == false ]]; then
+    local status_icon
+    if [[ "$status" == "PASS" ]]; then
+      status_icon="✅ Pass"
+    else
+      status_icon="❌ Fail"
+    fi
+    
+    echo "| Basic Verification | $status_icon | $duration_formatted | [Log](logs/basic-verification.log) |" >> "$OUTPUT_DIR/ci-summary.md"
+  fi
+  
+  return $(if [[ "$status" == "PASS" ]]; then echo 0; else echo 1; fi)
+}
+
+# Run quality checks job
+run_quality_checks() {
+  if [[ "$SKIP_QUALITY" == true ]]; then
+    print_info "Skipping quality checks as requested"
+    echo "| Quality Checks | ⏭️ Skipped | - | - |" >> "$OUTPUT_DIR/ci-summary.md"
+    return 0
+  fi
+  
+  print_header "Running Quality Checks"
+  local start_time=$(date +%s)
+  local log_file="$OUTPUT_DIR/logs/quality-checks.log"
+  local status="PASS"
+  
+  # Quality check commands
+  local cmds=(
+    "mvn checkstyle:check"
+    "mvn pmd:check"
+    "mvn spotbugs:check"
+    "mvn org.owasp:dependency-check-maven:check"
+    "bin/util/scripts/check-todo-format.sh"
+    "bin/util/scripts/check-imports.sh"
+  )
+  
+  # Run commands
+  for cmd in "${cmds[@]}"; do
+    if [[ "$DRY_RUN" == true ]]; then
+      print_info "Would run: $cmd"
+    else
+      print_info "Running: $cmd"
+      
+      if $cmd > >(tee -a "$log_file") 2>&1; then
+        print_success "Command completed successfully: $cmd"
+      else
+        print_warning "Command failed: $cmd"
+        status="FAIL"
+      fi
+    fi
+  done
+  
+  local end_time=$(date +%s)
+  local duration=$((end_time - start_time))
+  local duration_formatted="$(printf '%02d:%02d' $((duration / 60)) $((duration % 60)))"
+  
+  # Update summary
+  if [[ "$DRY_RUN" == false ]]; then
+    local status_icon
+    if [[ "$status" == "PASS" ]]; then
+      status_icon="✅ Pass"
+    else
+      status_icon="❌ Fail"
+    fi
+    
+    echo "| Quality Checks | $status_icon | $duration_formatted | [Log](logs/quality-checks.log) |" >> "$OUTPUT_DIR/ci-summary.md"
+  fi
+  
+  return $(if [[ "$status" == "PASS" ]]; then echo 0; else echo 1; fi)
+}
+
+# Run tests job
+run_tests() {
+  local test_type="$1"
+  
+  if [[ "$SKIP_TESTS" == true ]]; then
+    print_info "Skipping $test_type tests as requested"
+    echo "| $test_type Tests | ⏭️ Skipped | - | - |" >> "$OUTPUT_DIR/ci-summary.md"
+    return 0
+  fi
+  
+  print_header "Running $test_type Tests"
+  local start_time=$(date +%s)
+  local log_file="$OUTPUT_DIR/logs/${test_type,,}-tests.log"
+  local status="PASS"
+  
+  # Build test command
+  local test_cmd="bin/s8r-test ${test_type,,}"
+  
+  if [[ "$PARALLEL" == true ]]; then
+    test_cmd="$test_cmd --parallel"
+  fi
+  
+  if [[ "$VERBOSE" == true ]]; then
+    test_cmd="$test_cmd --verbose"
+  fi
+  
+  # Run the command
+  if [[ "$DRY_RUN" == true ]]; then
+    print_info "Would run: $test_cmd"
+  else
+    print_info "Running: $test_cmd"
+    
+    if $test_cmd > >(tee -a "$log_file") 2>&1; then
+      print_success "Tests completed successfully: $test_type"
+    else
+      print_warning "Tests failed: $test_type"
+      status="FAIL"
+    fi
+  fi
+  
+  local end_time=$(date +%s)
+  local duration=$((end_time - start_time))
+  local duration_formatted="$(printf '%02d:%02d' $((duration / 60)) $((duration % 60)))"
+  
+  # Update summary
+  if [[ "$DRY_RUN" == false ]]; then
+    local status_icon
+    if [[ "$status" == "PASS" ]]; then
+      status_icon="✅ Pass"
+    else
+      status_icon="❌ Fail"
+    fi
+    
+    echo "| $test_type Tests | $status_icon | $duration_formatted | [Log](logs/${test_type,,}-tests.log) |" >> "$OUTPUT_DIR/ci-summary.md"
+  fi
+  
+  return $(if [[ "$status" == "PASS" ]]; then echo 0; else echo 1; fi)
+}
+
+# Run coverage analysis job
+run_coverage_analysis() {
+  print_header "Running Coverage Analysis"
+  local start_time=$(date +%s)
+  local log_file="$OUTPUT_DIR/logs/coverage-analysis.log"
+  local status="PASS"
+  
+  # Build coverage command
+  local coverage_cmd="bin/test/analyze-test-coverage --report --output $OUTPUT_DIR/coverage-report.md"
+  
+  # Run the command
+  if [[ "$DRY_RUN" == true ]]; then
+    print_info "Would run: $coverage_cmd"
+  else
+    print_info "Running: $coverage_cmd"
+    
+    if $coverage_cmd > >(tee -a "$log_file") 2>&1; then
+      print_success "Coverage analysis completed successfully"
+    else
+      print_warning "Coverage analysis failed or coverage is below threshold"
+      status="WARN"
+    fi
+  fi
+  
+  local end_time=$(date +%s)
+  local duration=$((end_time - start_time))
+  local duration_formatted="$(printf '%02d:%02d' $((duration / 60)) $((duration % 60)))"
+  
+  # Update summary
+  if [[ "$DRY_RUN" == false ]]; then
+    local status_icon
+    if [[ "$status" == "PASS" ]]; then
+      status_icon="✅ Pass"
+    elif [[ "$status" == "WARN" ]]; then
+      status_icon="⚠️ Warning"
+    else
+      status_icon="❌ Fail"
+    fi
+    
+    echo "| Coverage Analysis | $status_icon | $duration_formatted | [Report](coverage-report.md) |" >> "$OUTPUT_DIR/ci-summary.md"
+  fi
+  
+  return $(if [[ "$status" == "FAIL" ]]; then echo 1; else echo 0; fi)
+}
+
+# Run package job
+run_package() {
+  if [[ "$SKIP_PACKAGE" == true ]]; then
+    print_info "Skipping package step as requested"
+    echo "| Package | ⏭️ Skipped | - | - |" >> "$OUTPUT_DIR/ci-summary.md"
+    return 0
+  fi
+  
+  print_header "Running Package Step"
+  local start_time=$(date +%s)
+  local log_file="$OUTPUT_DIR/logs/package.log"
+  local status="PASS"
+  
+  # Build package command
+  local pkg_cmd="mvn clean package -DskipTests"
+  
+  # Run the command
+  if [[ "$DRY_RUN" == true ]]; then
+    print_info "Would run: $pkg_cmd"
+  else
+    print_info "Running: $pkg_cmd"
+    
+    if $pkg_cmd > >(tee -a "$log_file") 2>&1; then
+      print_success "Package step completed successfully"
+      
+      # Copy artifacts
+      mkdir -p "$OUTPUT_DIR/artifacts"
+      find . -name "*.jar" -not -name "original-*.jar" -type f -path "*/target/*" -exec cp {} "$OUTPUT_DIR/artifacts/" \;
+      
+      # Verify version
+      local version_cmd="bin/s8r-version verify"
+      print_info "Verifying version consistency: $version_cmd"
+      
+      if $version_cmd >> "$log_file" 2>&1; then
+        print_success "Version consistency verified"
+      else
+        print_warning "Version consistency check failed"
+        status="WARN"
+      fi
+    else
+      print_warning "Package step failed"
+      status="FAIL"
+    fi
+  fi
+  
+  local end_time=$(date +%s)
+  local duration=$((end_time - start_time))
+  local duration_formatted="$(printf '%02d:%02d' $((duration / 60)) $((duration % 60)))"
+  
+  # Update summary
+  if [[ "$DRY_RUN" == false ]]; then
+    local status_icon
+    if [[ "$status" == "PASS" ]]; then
+      status_icon="✅ Pass"
+    elif [[ "$status" == "WARN" ]]; then
+      status_icon="⚠️ Warning"
+    else
+      status_icon="❌ Fail"
+    fi
+    
+    echo "| Package | $status_icon | $duration_formatted | [Log](logs/package.log) |" >> "$OUTPUT_DIR/ci-summary.md"
+  fi
+  
+  return $(if [[ "$status" == "FAIL" ]]; then echo 1; else echo 0; fi)
+}
+
+# Run specific job
+run_specific_job() {
+  local job="$1"
+  
+  case "$job" in
+    "basic-verification")
+      run_basic_verification
+      ;;
+    "quality-checks")
+      run_quality_checks
+      ;;
+    "unit-tests")
+      run_tests "Unit"
+      ;;
+    "component-tests")
+      run_tests "Component"
+      ;;
+    "composite-tests")
+      run_tests "Composite"
+      ;;
+    "integration-tests")
+      run_tests "Integration"
+      ;;
+    "coverage-analysis")
+      run_coverage_analysis
+      ;;
+    "package")
+      run_package
+      ;;
+    "all")
+      run_all_jobs
+      ;;
+    *)
+      print_error "Unknown job: $job"
+      exit 1
+      ;;
+  esac
+  
+  return $?
+}
+
+# Run all jobs in sequence
+run_all_jobs() {
+  local overall_success=true
+  
+  # Run in sequence
+  run_basic_verification || overall_success=false
+  
+  if [ "$overall_success" == true ] || [ "$PARALLEL" == true ]; then
+    run_quality_checks || overall_success=false
+  fi
+  
+  if [ "$overall_success" == true ] || [ "$PARALLEL" == true ]; then
+    run_tests "Unit" || overall_success=false
+  fi
+  
+  if [ "$overall_success" == true ] || [ "$PARALLEL" == true ]; then
+    run_tests "Component" || overall_success=false
+  fi
+  
+  if [ "$overall_success" == true ] || [ "$PARALLEL" == true ]; then
+    run_tests "Composite" || overall_success=false
+  fi
+  
+  if [ "$overall_success" == true ] || [ "$PARALLEL" == true ]; then
+    run_tests "Integration" || overall_success=false
+  fi
+  
+  run_coverage_analysis || overall_success=false
+  
+  if [ "$overall_success" == true ] || [ "$PARALLEL" == true ]; then
+    run_package || overall_success=false
+  fi
+  
+  # Finalize summary
+  if [[ "$DRY_RUN" == false ]]; then
+    finalize_summary "$overall_success"
+  fi
+  
+  return $(if [[ "$overall_success" == true ]]; then echo 0; else echo 1; fi)
+}
+
+# Finalize the summary report
+finalize_summary() {
+  local success="$1"
+  local overall_status
+  
+  if [[ "$success" == true ]]; then
+    overall_status="✅ All jobs completed successfully"
+  else
+    overall_status="❌ Some jobs failed"
+  fi
+  
+  # Add overall result to the beginning of the summary
+  local temp_file="$OUTPUT_DIR/temp-summary.md"
+  
+  head -4 "$OUTPUT_DIR/ci-summary.md" > "$temp_file"
+  echo -e "\n**Overall Status:** $overall_status\n" >> "$temp_file"
+  echo "## Job Results" >> "$temp_file"
+  echo "" >> "$temp_file"
+  tail -n +7 "$OUTPUT_DIR/ci-summary.md" >> "$temp_file"
+  
+  # Add link to summary at the bottom
+  echo -e "\n## Next Steps\n" >> "$temp_file"
+  echo "- Review CI results in detail" >> "$temp_file"
+  
+  if [[ "$success" == true ]]; then
+    echo "- Create a pull request if all checks are passing" >> "$temp_file"
+    echo "- Run release verification when ready to release: \`bin/s8r-release <version>\`" >> "$temp_file"
+  else
+    echo "- Fix failing jobs and re-run CI" >> "$temp_file"
+    echo "- Check job logs for details on failures" >> "$temp_file"
+  fi
+  
+  # Move the temp file to the final location
+  mv "$temp_file" "$OUTPUT_DIR/ci-summary.md"
+  
+  print_info "CI summary report generated: $OUTPUT_DIR/ci-summary.md"
+}
+
+# Main function
+main() {
+  # Parse command line arguments
+  parse_args "$@"
+  
+  print_header "S8r CI Runner"
+  
+  # Check if workflow file exists
+  if [[ ! -f "$WORKFLOW_FILE" ]]; then
+    print_error "Workflow file not found: $WORKFLOW_FILE"
+    exit 1
+  fi
+  
+  # Use act if requested
+  if [[ "$USE_ACT" == true ]]; then
+    run_job_with_act "$SPECIFIC_JOB"
+    exit $?
+  fi
+  
+  # Create output directory
+  if [[ "$DRY_RUN" == false ]]; then
+    create_output_dir
+  fi
+  
+  # Run specific job or all jobs
+  if [[ -n "$SPECIFIC_JOB" ]]; then
+    run_specific_job "$SPECIFIC_JOB"
+  else
+    run_all_jobs
+  fi
+  
+  local result=$?
+  
+  if [[ "$DRY_RUN" == false ]]; then
+    if [[ $result -eq 0 ]]; then
+      print_success "CI completed successfully. Results in: $OUTPUT_DIR"
+    else
+      print_warning "CI completed with failures. Results in: $OUTPUT_DIR"
+    fi
+  fi
+  
+  return $result
+}
+
+# Run the script
+main "$@"
