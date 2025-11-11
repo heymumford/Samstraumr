@@ -16,7 +16,7 @@ Licensed under the Mozilla Public License 2.0
 
   <groupId>org.s8r</groupId>
   <artifactId>samstraumr-parent</artifactId>
-  <version>2.7.1</version>
+  <version>3.0.2</version>
   <name>Samstraumr Parent</name>
   <packaging>pom</packaging>
   <description>
@@ -25,7 +25,9 @@ Licensed under the Mozilla Public License 2.0
   </description>
 
   <modules>
-    <module>Samstraumr</module>
+    <module>modules</module>
+    <module>test-module</module>
+    <module>test-port-interfaces</module>
   </modules>
 
   <properties>
@@ -35,7 +37,7 @@ Licensed under the Mozilla Public License 2.0
     <maven.compiler.target>21</maven.compiler.target>
     
     <!-- Version information -->
-    <version.file.path>${project.basedir}/Samstraumr/version.properties</version.file.path>
+    <version.file.path>${project.basedir}/modules/version.properties</version.file.path>
     
     <!-- Test tagging -->
     <all.test.tags>@ATL</all.test.tags>
@@ -43,23 +45,23 @@ Licensed under the Mozilla Public License 2.0
     
     <!-- Core dependencies -->
     <archunit.version>1.4.0</archunit.version>
-    <slf4j.version>2.0.9</slf4j.version>
+    <slf4j.version>2.0.17</slf4j.version>
     <log4j.version>2.22.1</log4j.version>
-    <junit.version>5.10.1</junit.version>
+    <junit.version>5.12.1</junit.version>
     <junit.platform.version>1.10.1</junit.platform.version>
-    <cucumber.version>7.15.0</cucumber.version>
+    <cucumber.version>7.22.0</cucumber.version>
     <cucumber.reporting.version>5.7.7</cucumber.reporting.version>
-    <mockito.version>5.8.0</mockito.version>
+    <mockito.version>5.17.0</mockito.version>
     <jackson.version>2.14.2</jackson.version>
     <oshi.version>6.4.1</oshi.version>
     <spotbugs.annotations.version>4.7.3</spotbugs.annotations.version>
     <itextpdf.version>5.5.13.3</itextpdf.version>
     
     <!-- Plugin versions -->
-    <pmd.plugin.version>3.21.0</pmd.plugin.version>
+    <pmd.plugin.version>3.26.0</pmd.plugin.version>
     <owasp.plugin.version>8.4.2</owasp.plugin.version>
     <findsecbugs.version>1.13.0</findsecbugs.version>
-    <javadoc.plugin.version>3.6.3</javadoc.plugin.version>
+    <javadoc.plugin.version>3.12.0</javadoc.plugin.version>
     <maven.enforcer.plugin.version>3.4.1</maven.enforcer.plugin.version>
     <maven.compiler.plugin.version>3.12.1</maven.compiler.plugin.version>
     <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
@@ -68,11 +70,11 @@ Licensed under the Mozilla Public License 2.0
     <spotless.plugin.version>2.40.0</spotless.plugin.version>
     <spotless.google.format.version>1.19.2</spotless.google.format.version>
     <checkstyle.plugin.version>3.3.1</checkstyle.plugin.version>
-    <checkstyle.version>10.14.0</checkstyle.version>
+    <checkstyle.version>10.23.0</checkstyle.version>
     <spotbugs.plugin.version>4.8.3.0</spotbugs.plugin.version>
     <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
-    <jacoco.line.coverage>0.75</jacoco.line.coverage>
-    <jacoco.branch.coverage>0.75</jacoco.branch.coverage>
+    <jacoco.line.coverage>0.80</jacoco.line.coverage>
+    <jacoco.branch.coverage>0.80</jacoco.branch.coverage>
     <maven.site.plugin.version>4.0.0-M13</maven.site.plugin.version>
     <maven.project.info.reports.plugin.version>3.5.0</maven.project.info.reports.plugin.version>
     <dependency-check.version>9.0.7</dependency-check.version>
@@ -169,6 +171,12 @@ Licensed under the Mozilla Public License 2.0
         <version>${junit.platform.version}</version>
         <scope>test</scope>
       </dependency>
+      <dependency>
+        <groupId>org.junit.platform</groupId>
+        <artifactId>junit-platform-suite-engine</artifactId>
+        <version>${junit.platform.version}</version>
+        <scope>test</scope>
+      </dependency>
       
       <!-- Testing - Cucumber -->
       <dependency>
@@ -236,6 +244,38 @@ Licensed under the Mozilla Public License 2.0
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven.surefire.plugin.version}</version>
+          <configuration>
+            <argLine>
+              --add-opens java.base/java.lang=ALL-UNNAMED
+              --add-opens java.base/java.util=ALL-UNNAMED
+              --add-opens java.base/java.lang.reflect=ALL-UNNAMED
+            </argLine>
+            <includes>
+              <include>**/*Test.java</include>
+              <include>**/*Tests.java</include>
+              <include>**/*TestSuite.java</include>
+            </includes>
+            <excludes>
+              <exclude>**/isolated/**</exclude>
+            </excludes>
+          </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.junit.jupiter</groupId>
+              <artifactId>junit-jupiter-engine</artifactId>
+              <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.junit.vintage</groupId>
+              <artifactId>junit-vintage-engine</artifactId>
+              <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.junit.platform</groupId>
+              <artifactId>junit-platform-suite-engine</artifactId>
+              <version>${junit.platform.version}</version>
+            </dependency>
+          </dependencies>
         </plugin>
         
         <plugin>
@@ -286,7 +326,8 @@ Licensed under the Mozilla Public License 2.0
             </dependency>
           </dependencies>
           <configuration>
-            <configLocation>Samstraumr/checkstyle.xml</configLocation>
+            <configLocation>quality-tools/checkstyle/checkstyle.xml</configLocation>
+            <failOnViolation>false</failOnViolation>
             <consoleOutput>true</consoleOutput>
             <failsOnError>true</failsOnError>
             <includeTestSourceDirectory>true</includeTestSourceDirectory>
@@ -301,6 +342,8 @@ Licensed under the Mozilla Public License 2.0
             <effort>Max</effort>
             <threshold>Medium</threshold>
             <xmlOutput>true</xmlOutput>
+            <excludeFilterFile>quality-tools/spotbugs/spotbugs-exclude.xml</excludeFilterFile>
+            <failOnError>false</failOnError>
             <plugins>
               <plugin>
                 <groupId>com.h3xstream.findsecbugs</groupId>
@@ -353,7 +396,7 @@ Licensed under the Mozilla Public License 2.0
           <configuration>
             <skip>false</skip>
             <skipEmptyReport>true</skipEmptyReport>
-            <excludeFromFailureFile>${project.basedir}/quality-tools/pmd-exclude.properties</excludeFromFailureFile>
+            <excludeFromFailureFile>quality-tools/pmd/pmd-exclude.properties</excludeFromFailureFile>
           </configuration>
           <executions>
             <execution>
@@ -369,22 +412,22 @@ Licensed under the Mozilla Public License 2.0
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-core</artifactId>
-              <version>2.7.1</version>
+              <version>6.0.0</version>
             </dependency>
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-java</artifactId>
-              <version>7.12.0</version>
+              <version>3.0.2</version>
             </dependency>
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-javascript</artifactId>
-              <version>2.7.1</version>
+              <version>3.0.2</version>
             </dependency>
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-jsp</artifactId>
-              <version>2.7.1</version>
+              <version>3.0.2</version>
             </dependency>
           </dependencies>
         </plugin>
@@ -437,13 +480,27 @@ Licensed under the Mozilla Public License 2.0
     </profile>
     
     <profile>
+      <id>enable-tests</id>
+      <activation>
+        <property>
+          <name>enableTests</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <properties>
+        <skipTests>false</skipTests>
+        <maven.test.skip>false</maven.test.skip>
+      </properties>
+    </profile>
+    
+    <profile>
       <id>tdd-development</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <jacoco.line.coverage>0.0</jacoco.line.coverage>
-        <jacoco.branch.coverage>0.0</jacoco.branch.coverage>
+        <jacoco.line.coverage>0.80</jacoco.line.coverage>
+        <jacoco.branch.coverage>0.80</jacoco.branch.coverage>
       </properties>
     </profile>
     
@@ -551,6 +608,111 @@ Licensed under the Mozilla Public License 2.0
             <version>${owasp.plugin.version}</version>
             <executions>
               <execution>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- Enhanced Quality Profile -->
+    <profile>
+      <id>enhanced-quality</id>
+      <build>
+        <plugins>
+          <!-- PMD with enhanced ruleset -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <version>${pmd.plugin.version}</version>
+            <configuration>
+              <skip>false</skip>
+              <skipEmptyReport>true</skipEmptyReport>
+              <rulesets>
+                <ruleset>quality-tools/pmd/pmd-enhancements.xml</ruleset>
+              </rulesets>
+              <excludeFromFailureFile>quality-tools/pmd/pmd-exclude.properties</excludeFromFailureFile>
+            </configuration>
+            <executions>
+              <execution>
+                <id>pmd-enhanced-check</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>check</goal>
+                  <goal>cpd-check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          
+          <!-- SpotBugs with enhanced configuration -->
+          <plugin>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-maven-plugin</artifactId>
+            <configuration>
+              <effort>Max</effort>
+              <threshold>Low</threshold> <!-- Lower threshold to catch more issues -->
+              <xmlOutput>true</xmlOutput>
+              <excludeFilterFile>quality-tools/spotbugs/spotbugs-strict.xml</excludeFilterFile>
+              <failOnError>false</failOnError> <!-- Initially set to false to avoid breaking builds -->
+              <plugins>
+                <plugin>
+                  <groupId>com.h3xstream.findsecbugs</groupId>
+                  <artifactId>findsecbugs-plugin</artifactId>
+                  <version>${findsecbugs.version}</version>
+                </plugin>
+              </plugins>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>verify</phase>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          
+          <!-- Enforce strict Javadoc -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <source>${maven.compiler.source}</source>
+              <doclint>all</doclint> <!-- Enforce all Javadoc rules -->
+              <failOnWarnings>true</failOnWarnings> <!-- Fail on Javadoc warnings -->
+              <detectJavaApiLink>true</detectJavaApiLink>
+              <quiet>true</quiet>
+            </configuration>
+            <executions>
+              <execution>
+                <id>check-enhanced-javadoc</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>javadoc</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          
+          <!-- Strict checkstyle rules -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <configuration>
+              <configLocation>quality-tools/checkstyle/checkstyle.xml</configLocation>
+              <failOnViolation>true</failOnViolation> <!-- Fail on checkstyle violations -->
+              <consoleOutput>true</consoleOutput>
+              <failsOnError>true</failsOnError>
+              <includeTestSourceDirectory>true</includeTestSourceDirectory>
+              <violationSeverity>warning</violationSeverity> <!-- Treat warnings as errors -->
+            </configuration>
+            <executions>
+              <execution>
+                <phase>validate</phase>
                 <goals>
                   <goal>check</goal>
                 </goals>

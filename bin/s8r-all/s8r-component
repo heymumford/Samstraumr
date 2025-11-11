@@ -1,0 +1,315 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r-component: Component management for Samstraumr
+# Command to manage components in the S8r model
+#==============================================================================
+set -e
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${SCRIPT_DIR}"
+
+# Source common library
+if [ -f "${PROJECT_ROOT}/.s8r/lib/common.sh" ]; then
+  source "${PROJECT_ROOT}/.s8r/lib/common.sh"
+else
+  # Forward to the main s8r script to ensure common library is created
+  "${PROJECT_ROOT}/s8r" --help > /dev/null
+  source "${PROJECT_ROOT}/.s8r/lib/common.sh"
+fi
+
+# Display help information
+show_help() {
+  echo -e "${BOLD}S8r Component Commands${RESET} - Manage components in your S8r model"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  s8r component <subcommand> [arguments]"
+  echo
+  echo -e "${BOLD}SUBCOMMANDS:${RESET}"
+  echo "  create    Create a new component"
+  echo "  list      List all components"
+  echo "  info      Show details about a component"
+  echo "  delete    Delete a component"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help                Display this help message"
+  echo "  -v, --verbose             Enable verbose output"
+  echo "  --type <type>             Component type: transformer, validator, observer, etc."
+  echo "  --format <format>         Output format: text, json (default: text)"
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  s8r component create --type transformer DataProcessor"
+  echo "  s8r component list --format json"
+  echo "  s8r component info DataProcessor"
+  echo "  s8r component delete DataProcessor"
+}
+
+# Create component handler
+handle_create() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Create Component${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r component create [options] <component-name>"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --type <type>      Component type: transformer, validator, observer (default: transformer)"
+    echo "  --verbose, -v      Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r component create DataProcessor"
+    echo "  s8r component create --type validator DataValidator"
+    return 0
+  fi
+
+  local component_type="transformer"
+  local verbose=false
+  local component_name=""
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --type)
+        component_type="$2"
+        shift 2
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+    return 1
+        ;;
+      *)
+        component_name="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # Validate component name
+  if [ -z "$component_name" ]; then
+    echo -e "${RED}Error: Component name is required${RESET}" >&2
+    return 1
+  fi
+
+  info "Creating component '$component_name' of type '$component_type'"
+  
+  # Call the Java API to create the component
+  # For now, simulate the behavior
+  echo "Component '$component_name' created successfully."
+  echo "Type: $component_type"
+}
+
+# List components handler
+handle_list() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}List Components${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r component list [options]"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --format <format>  Output format: text, json (default: text)"
+    echo "  --verbose, -v      Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r component list"
+    echo "  s8r component list --format json"
+    return 0
+  fi
+  
+  local format="text"
+  local verbose=false
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --format)
+        format="$2"
+        shift 2
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+    return 1
+        ;;
+      *)
+        shift
+        ;;
+    esac
+  done
+
+  info "Listing components in $format format"
+  
+  # Call the Java API to list components
+  # For now, simulate the behavior
+  echo "Available components:"
+  echo "- DataProcessor (transformer)"
+  echo "- DataValidator (validator)"
+  echo "- EventObserver (observer)"
+}
+
+# Component info handler
+handle_info() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Component Information${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r component info [options] <component-name>"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --format <format>  Output format: text, json (default: text)"
+    echo "  --verbose, -v      Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r component info DataProcessor"
+    echo "  s8r component info --format json DataValidator"
+    return 0
+  fi
+  
+  local format="text"
+  local verbose=false
+  local component_name=""
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --format)
+        format="$2"
+        shift 2
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+    return 1
+        ;;
+      *)
+        component_name="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # Validate component name
+  if [ -z "$component_name" ]; then
+    echo -e "${RED}Error: Component name is required${RESET}" >&2
+    return 1
+  fi
+
+  info "Displaying information for component '$component_name'"
+  
+  # Call the Java API to get component info
+  # For now, simulate the behavior
+  echo "Component: $component_name"
+  echo "Type: transformer"
+  echo "Status: active"
+  echo "Created: 2025-04-06"
+}
+
+# Delete component handler
+handle_delete() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Delete Component${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r component delete [options] <component-name>"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --force, -f        Force deletion without confirmation"
+    echo "  --verbose, -v      Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r component delete DataProcessor"
+    echo "  s8r component delete --force DataValidator"
+    return 0
+  fi
+  
+  local force=false
+  local verbose=false
+  local component_name=""
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -f|--force)
+        force=true
+        shift
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+    return 1
+        ;;
+      *)
+        component_name="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # Validate component name
+  if [ -z "$component_name" ]; then
+    echo -e "${RED}Error: Component name is required${RESET}" >&2
+    return 1
+  fi
+
+  # Confirm deletion if not forced
+  if [ "$force" != true ]; then
+    read -p "Are you sure you want to delete component '$component_name'? (y/N) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      echo "Deletion cancelled."
+      return 1
+    fi
+  fi
+
+  info "Deleting component '$component_name'"
+  
+  # Call the Java API to delete the component
+  # For now, simulate the behavior
+  echo "Component '$component_name' deleted successfully."
+}
+
+# Main command handler
+if [ $# -eq 0 ] || [[ "$1" == "--help" || "$1" == "-h" ]]; then
+  show_help
+  exit 0
+fi
+
+# Get subcommand
+SUBCOMMAND="$1"
+shift
+
+# Execute appropriate handler
+case "$SUBCOMMAND" in
+  create)
+    handle_create "$@"
+    ;;
+  list)
+    handle_list "$@"
+    ;;
+  info)
+    handle_info "$@"
+    ;;
+  delete)
+    handle_delete "$@"
+    ;;
+  *)
+    # Make sure we exit with error code 1 for unknown subcommands
+    echo -e "${RED}Error: Unknown subcommand: $SUBCOMMAND. Run 's8r component --help' for usage.${RESET}" >&2
+    exit 1
+    ;;
+esac
+
+exit $?

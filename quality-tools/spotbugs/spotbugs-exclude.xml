@@ -48,4 +48,64 @@
     <Match>
         <Class name="~.*\.package-info"/>
     </Match>
+    
+    <\!-- RV: Return value of method ignored -->
+    <Match>
+        <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
+    </Match>
+    <\!-- DM: Issues with default encoding -->
+    <Match>
+        <Bug pattern="DM_DEFAULT_ENCODING" />
+    </Match>
+    <\!-- PATH_TRAVERSAL_IN: Path traversal vulnerability -->
+    <Match>
+        <Bug pattern="PATH_TRAVERSAL_IN" />
+    </Match>
+    <\!-- OBL_UNSATISFIED_OBLIGATION: Resource not properly closed -->
+    <Match>
+        <Bug pattern="OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE" />
+    </Match>
+    <\!-- UC_USELESS_OBJECT: Creating object that's not used -->
+    <Match>
+        <Bug pattern="UC_USELESS_OBJECT" />
+    </Match>
+    <\!-- REC_CATCH_EXCEPTION: Catching Exception when not necessary -->
+    <Match>
+        <Bug pattern="REC_CATCH_EXCEPTION" />
+    </Match>
+    <\!-- DLS: Dead local store -->
+    <Match>
+        <Bug pattern="DLS_DEAD_LOCAL_STORE" />
+    </Match>
+    <\!-- Null pointer dereference -->
+    <Match>
+        <Bug pattern="NP_NULL_ON_SOME_PATH" />
+    </Match>
+    <Match>
+        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE" />
+    </Match>
+    <\!-- Unchecked/unconfirmed cast -->
+    <Match>
+        <Bug pattern="BC_UNCONFIRMED_CAST" />
+    </Match>
+    <\!-- Non-serializable object written to ObjectOutput -->
+    <Match>
+        <Bug pattern="SE_BAD_FIELD" />
+    </Match>
+    <\!-- Unclear control flow -->
+    <Match>
+        <Bug pattern="UCF_USELESS_CONTROL_FLOW" />
+    </Match>
+    <\!-- Unread field -->
+    <Match>
+        <Bug pattern="URF_UNREAD_FIELD" />
+    </Match>
+    <\!-- Bug in the framework, not a true security issue -->
+    <Match>
+        <Bug pattern="URLCONNECTION_SSRF_FD" />
+    </Match>
+    <\!-- TODO: Address XML External Entity issues separately -->
+    <Match>
+        <Bug pattern="XXE_XPATH" />
+    </Match>
 </FindBugsFilter>

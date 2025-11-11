@@ -34,7 +34,16 @@ Architecture Decision Records (ADRs) remain in their own directory to maintain t
 
 - [decisions/.md](decisions/.md) - Architecture Decision Records
 
-## Related Directories
+## Related Documents
 
-- [../reference/standards.md](../reference/standards.md) - Coding and documentation standards
-- [../plans.md](../plans.md) - Project plans including architecture implementation plans
+- [../reference/standards/](../reference/standards/) - Coding and documentation standards
+- [../plans/](../plans/) - Project plans including architecture implementation plans
+- [../concepts/](../concepts/) - Core concepts underlying the architecture
+
+## Related Research
+
+These research papers provide the conceptual foundation for aspects of Samstraumr's architecture:
+
+- [Testing in the Age of AI](../research/test-in-age-of-ai.md) - Eric C. Mumford's research on AI-enhanced testing architecture
+- [AI-Enhanced Testing Integration](../research/ai-enhanced-testing-integration.md) - Implementation strategy for AI capabilities
+- [Critical Components of Cell Activity Simulation](../research/critical-components-of-simulating-and-monitoring-human-cell-activity-in-vitro.md) - Biological systems research that inspired the component architecture

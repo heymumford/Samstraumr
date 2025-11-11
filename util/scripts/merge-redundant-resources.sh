@@ -27,7 +27,7 @@ PROJECT_ROOT="$SCRIPT_DIR"
 cd "$PROJECT_ROOT"
 
 # Define source and target directories
-SRC_DIR="Samstraumr/samstraumr-core/src/test/resources"
+SRC_DIR="modules/samstraumr-core/src/test/resources"
 FEATURE_DIR="$SRC_DIR/features"
 
 # Back up files before merging
@@ -303,7 +303,7 @@ update_test_runners() {
   
   # Define test runner files to update
   test_runners=(
-    "Samstraumr/samstraumr-core/src/test/java/org/s8r/test/runner/CucumberRunner.java"
+    "modules/samstraumr-core/src/test/java/org/s8r/test/runner/CucumberRunner.java"
   )
   
   for runner in "${test_runners[@]}"; do

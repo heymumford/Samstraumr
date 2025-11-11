@@ -126,7 +126,7 @@ clean_build_artifacts() {
   fi
   
   # Check for Maven subprojects
-  if [ -d "$PROJECT_ROOT/Samstraumr" ] && [ -f "$PROJECT_ROOT/Samstraumr/pom.xml" ]; then
+  if [ -d "$PROJECT_ROOT/Samstraumr" ] && [ -f "$PROJECT_ROOT/modules/pom.xml" ]; then
     info "Running Maven clean on Samstraumr subproject"
     cd "$PROJECT_ROOT/Samstraumr"
     mvn clean -q 2>/dev/null || warn "Maven clean failed for Samstraumr, continuing with manual cleanup"

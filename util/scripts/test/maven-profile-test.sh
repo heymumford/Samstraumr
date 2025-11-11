@@ -62,7 +62,7 @@ for PROFILE in "${CORE_PROFILES[@]}"; do
     
     # Just check if the profile exists in the core module POM
     echo "Checking if core module profile $PROFILE exists..."
-    if grep -q "<id>$PROFILE</id>" Samstraumr/samstraumr-core/pom.xml; then
+    if grep -q "<id>$PROFILE</id>" modules/samstraumr-core/pom.xml; then
         success "✅ Core module profile $PROFILE exists"
     else
         warn "⚠️ Core module profile $PROFILE not found"
@@ -76,9 +76,9 @@ info "Testing key property definitions..."
 
 # Check for cucumber.filter.tags property in core module profiles
 for PROFILE in "${CORE_PROFILES[@]}"; do
-    if grep -q "<id>$PROFILE</id>" Samstraumr/samstraumr-core/pom.xml; then
+    if grep -q "<id>$PROFILE</id>" modules/samstraumr-core/pom.xml; then
         # Look for cucumber.filter.tags near the profile
-        if grep -A 10 "<id>$PROFILE</id>" Samstraumr/samstraumr-core/pom.xml | grep -q "cucumber.filter.tags"; then
+        if grep -A 10 "<id>$PROFILE</id>" modules/samstraumr-core/pom.xml | grep -q "cucumber.filter.tags"; then
             success "✅ Core module profile $PROFILE defines cucumber.filter.tags property"
         else
             warn "⚠️ Core module profile $PROFILE does not define cucumber.filter.tags property"

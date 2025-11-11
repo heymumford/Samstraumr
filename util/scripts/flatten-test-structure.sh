@@ -25,23 +25,23 @@ cd "$PROJECT_ROOT"
 echo "Creating new directory structure..."
 
 # Java test class structure
-mkdir -p Samstraumr/samstraumr-core/src/test/java/org/s8r/test/tube/lifecycle
-mkdir -p Samstraumr/samstraumr-core/src/test/java/org/s8r/test/tube
-mkdir -p Samstraumr/samstraumr-core/src/test/java/org/s8r/test/legacy
-mkdir -p Samstraumr/samstraumr-core/src/test/java/org/s8r/test/component
+mkdir -p modules/samstraumr-core/src/test/java/org/s8r/test/tube/lifecycle
+mkdir -p modules/samstraumr-core/src/test/java/org/s8r/test/tube
+mkdir -p modules/samstraumr-core/src/test/java/org/s8r/test/legacy
+mkdir -p modules/samstraumr-core/src/test/java/org/s8r/test/component
 
 # Feature directories
-mkdir -p Samstraumr/samstraumr-core/src/test/resources/features/tube-lifecycle
-mkdir -p Samstraumr/samstraumr-core/src/test/resources/features/identity
-mkdir -p Samstraumr/samstraumr-core/src/test/resources/features/composite-patterns
-mkdir -p Samstraumr/samstraumr-core/src/test/resources/features/machine
-mkdir -p Samstraumr/samstraumr-core/src/test/resources/features/system
+mkdir -p modules/samstraumr-core/src/test/resources/features/tube-lifecycle
+mkdir -p modules/samstraumr-core/src/test/resources/features/identity
+mkdir -p modules/samstraumr-core/src/test/resources/features/composite-patterns
+mkdir -p modules/samstraumr-core/src/test/resources/features/machine
+mkdir -p modules/samstraumr-core/src/test/resources/features/system
 
 # Create README files for the new directories
 echo "Creating README files for the new directories..."
 
 # tube-lifecycle README
-cat > Samstraumr/samstraumr-core/src/test/resources/features/tube-lifecycle/README.md << 'EOL'
+cat > modules/samstraumr-core/src/test/resources/features/tube-lifecycle/README.md << 'EOL'
 <\!--
 Copyright (c) 2025 Eric C. Mumford (@heymumford)
 
@@ -83,7 +83,7 @@ The tube lifecycle tests verify the behavior of tubes as they progress through t
 EOL
 
 # identity README
-cat > Samstraumr/samstraumr-core/src/test/resources/features/identity/README.md << 'EOL'
+cat > modules/samstraumr-core/src/test/resources/features/identity/README.md << 'EOL'
 <\!--
 Copyright (c) 2025 Eric C. Mumford (@heymumford)
 
@@ -113,7 +113,7 @@ The identity tests verify the behavior of different identity mechanisms:
 EOL
 
 # composite-patterns README
-cat > Samstraumr/samstraumr-core/src/test/resources/features/composite-patterns/README.md << 'EOL'
+cat > modules/samstraumr-core/src/test/resources/features/composite-patterns/README.md << 'EOL'
 <\!--
 Copyright (c) 2025 Eric C. Mumford (@heymumford)
 
@@ -145,7 +145,7 @@ The composite patterns tests verify the behavior of different pattern implementa
 EOL
 
 # Java test structure READMEs
-cat > Samstraumr/samstraumr-core/src/test/java/org/s8r/test/tube/README.md << 'EOL'
+cat > modules/samstraumr-core/src/test/java/org/s8r/test/tube/README.md << 'EOL'
 <\!--
 Copyright (c) 2025 Eric C. Mumford (@heymumford)
 
@@ -177,77 +177,77 @@ echo "Moving files to new locations..."
 
 # Java test class moves
 # AdamTubeSteps from lifecycle/steps/adam to test/tube/lifecycle
-if [ -f "Samstraumr/samstraumr-core/src/test/java/org/s8r/tube/lifecycle/steps/adam/AdamTubeSteps.java" ]; then
-  cp "Samstraumr/samstraumr-core/src/test/java/org/s8r/tube/lifecycle/steps/adam/AdamTubeSteps.java" \
-     "Samstraumr/samstraumr-core/src/test/java/org/s8r/test/tube/lifecycle/AdamTubeSteps.java"
+if [ -f "modules/samstraumr-core/src/test/java/org/s8r/tube/lifecycle/steps/adam/AdamTubeSteps.java" ]; then
+  cp "modules/samstraumr-core/src/test/java/org/s8r/tube/lifecycle/steps/adam/AdamTubeSteps.java" \
+     "modules/samstraumr-core/src/test/java/org/s8r/test/tube/lifecycle/AdamTubeSteps.java"
   echo "  Moved AdamTubeSteps.java to test/tube/lifecycle"
 fi
 
 # Core tube test steps to test/tube
-if [ -d "Samstraumr/samstraumr-core/src/test/java/org/s8r/core/tube/test/steps" ]; then
-  cp Samstraumr/samstraumr-core/src/test/java/org/s8r/core/tube/test/steps/*.java \
-     Samstraumr/samstraumr-core/src/test/java/org/s8r/test/tube/
+if [ -d "modules/samstraumr-core/src/test/java/org/s8r/core/tube/test/steps" ]; then
+  cp modules/samstraumr-core/src/test/java/org/s8r/core/tube/test/steps/*.java \
+     modules/samstraumr-core/src/test/java/org/s8r/test/tube/
   echo "  Moved core tube test steps to test/tube"
 fi
 
 # Test runners to test/tube
-if [ -d "Samstraumr/samstraumr-core/src/test/java/org/s8r/core/tube/test/runners" ]; then
-  cp Samstraumr/samstraumr-core/src/test/java/org/s8r/core/tube/test/runners/*.java \
-     Samstraumr/samstraumr-core/src/test/java/org/s8r/test/tube/
+if [ -d "modules/samstraumr-core/src/test/java/org/s8r/core/tube/test/runners" ]; then
+  cp modules/samstraumr-core/src/test/java/org/s8r/core/tube/test/runners/*.java \
+     modules/samstraumr-core/src/test/java/org/s8r/test/tube/
   echo "  Moved test runners to test/tube"
 fi
 
 # Legacy test steps to test/legacy
-if [ -d "Samstraumr/samstraumr-core/src/test/java/org/s8r/tube/legacy/test/steps" ]; then
-  cp Samstraumr/samstraumr-core/src/test/java/org/s8r/tube/legacy/test/steps/*.java \
-     Samstraumr/samstraumr-core/src/test/java/org/s8r/test/legacy/
+if [ -d "modules/samstraumr-core/src/test/java/org/s8r/tube/legacy/test/steps" ]; then
+  cp modules/samstraumr-core/src/test/java/org/s8r/tube/legacy/test/steps/*.java \
+     modules/samstraumr-core/src/test/java/org/s8r/test/legacy/
   echo "  Moved legacy test steps to test/legacy"
 fi
 
 # Feature file moves
 # Lifecycle feature files to tube-lifecycle
-if [ -d "Samstraumr/samstraumr-core/src/test/resources/tube/features/L0_Tube/lifecycle" ]; then
-  cp Samstraumr/samstraumr-core/src/test/resources/tube/features/L0_Tube/lifecycle/*.feature \
-     Samstraumr/samstraumr-core/src/test/resources/features/tube-lifecycle/
+if [ -d "modules/samstraumr-core/src/test/resources/tube/features/L0_Tube/lifecycle" ]; then
+  cp modules/samstraumr-core/src/test/resources/tube/features/L0_Tube/lifecycle/*.feature \
+     modules/samstraumr-core/src/test/resources/features/tube-lifecycle/
   echo "  Moved lifecycle feature files to features/tube-lifecycle"
 fi
 
 # Identity feature files to identity
-if [ -d "Samstraumr/samstraumr-core/src/test/resources/tube/features/L0_Tube/lifecycle" ]; then
+if [ -d "modules/samstraumr-core/src/test/resources/tube/features/L0_Tube/lifecycle" ]; then
   # Move specific identity feature files
   for identity_file in memory-identity-tests.feature substrate-identity-tests.feature; do
-    if [ -f "Samstraumr/samstraumr-core/src/test/resources/tube/features/L0_Tube/lifecycle/$identity_file" ]; then
-      cp "Samstraumr/samstraumr-core/src/test/resources/tube/features/L0_Tube/lifecycle/$identity_file" \
-         "Samstraumr/samstraumr-core/src/test/resources/features/identity/"
+    if [ -f "modules/samstraumr-core/src/test/resources/tube/features/L0_Tube/lifecycle/$identity_file" ]; then
+      cp "modules/samstraumr-core/src/test/resources/tube/features/L0_Tube/lifecycle/$identity_file" \
+         "modules/samstraumr-core/src/test/resources/features/identity/"
       echo "  Moved $identity_file to features/identity"
     fi
   done
 fi
 
 # Composite pattern feature files to composite-patterns
-if [ -d "Samstraumr/samstraumr-core/src/test/resources/composites/features/L1_Bundle/patterns" ]; then
-  cp Samstraumr/samstraumr-core/src/test/resources/composites/features/L1_Bundle/patterns/*.feature \
-     Samstraumr/samstraumr-core/src/test/resources/features/composite-patterns/
+if [ -d "modules/samstraumr-core/src/test/resources/composites/features/L1_Bundle/patterns" ]; then
+  cp modules/samstraumr-core/src/test/resources/composites/features/L1_Bundle/patterns/*.feature \
+     modules/samstraumr-core/src/test/resources/features/composite-patterns/
   echo "  Moved bundle pattern features to features/composite-patterns"
 fi
 
-if [ -d "Samstraumr/samstraumr-core/src/test/resources/composites/features/L1_Composite/patterns" ]; then
-  cp Samstraumr/samstraumr-core/src/test/resources/composites/features/L1_Composite/patterns/*.feature \
-     Samstraumr/samstraumr-core/src/test/resources/features/composite-patterns/
+if [ -d "modules/samstraumr-core/src/test/resources/composites/features/L1_Composite/patterns" ]; then
+  cp modules/samstraumr-core/src/test/resources/composites/features/L1_Composite/patterns/*.feature \
+     modules/samstraumr-core/src/test/resources/features/composite-patterns/
   echo "  Moved composite pattern features to features/composite-patterns"
 fi
 
 # Machine feature files to machine
-if [ -d "Samstraumr/samstraumr-core/src/test/resources/tube/features/L2_Machine" ]; then
-  cp Samstraumr/samstraumr-core/src/test/resources/tube/features/L2_Machine/*.feature \
-     Samstraumr/samstraumr-core/src/test/resources/features/machine/
+if [ -d "modules/samstraumr-core/src/test/resources/tube/features/L2_Machine" ]; then
+  cp modules/samstraumr-core/src/test/resources/tube/features/L2_Machine/*.feature \
+     modules/samstraumr-core/src/test/resources/features/machine/
   echo "  Moved machine feature files to features/machine"
 fi
 
 # System feature files to system
-if [ -d "Samstraumr/samstraumr-core/src/test/resources/tube/features/L3_System" ]; then
-  cp Samstraumr/samstraumr-core/src/test/resources/tube/features/L3_System/*.feature \
-     Samstraumr/samstraumr-core/src/test/resources/features/system/
+if [ -d "modules/samstraumr-core/src/test/resources/tube/features/L3_System" ]; then
+  cp modules/samstraumr-core/src/test/resources/tube/features/L3_System/*.feature \
+     modules/samstraumr-core/src/test/resources/features/system/
   echo "  Moved system feature files to features/system"
 fi
 
@@ -255,14 +255,14 @@ fi
 echo "Updating package declarations in Java files..."
 
 # Update Adam tube steps
-if [ -f "Samstraumr/samstraumr-core/src/test/java/org/s8r/test/tube/lifecycle/AdamTubeSteps.java" ]; then
+if [ -f "modules/samstraumr-core/src/test/java/org/s8r/test/tube/lifecycle/AdamTubeSteps.java" ]; then
   sed -i 's/package org.s8r.tube.lifecycle.steps.adam;/package org.s8r.test.tube.lifecycle;/' \
-      "Samstraumr/samstraumr-core/src/test/java/org/s8r/test/tube/lifecycle/AdamTubeSteps.java"
+      "modules/samstraumr-core/src/test/java/org/s8r/test/tube/lifecycle/AdamTubeSteps.java"
   echo "  Updated package declaration in AdamTubeSteps.java"
 fi
 
 # Update core tube steps
-for file in Samstraumr/samstraumr-core/src/test/java/org/s8r/test/tube/*.java; do
+for file in modules/samstraumr-core/src/test/java/org/s8r/test/tube/*.java; do
   if grep -q "package org.s8r.core.tube.test" "$file"; then
     sed -i 's/package org.s8r.core.tube.test.\(steps\|runners\);/package org.s8r.test.tube;/' "$file"
     echo "  Updated package declaration in $(basename "$file")"
@@ -270,7 +270,7 @@ for file in Samstraumr/samstraumr-core/src/test/java/org/s8r/test/tube/*.java; d
 done
 
 # Update legacy steps
-for file in Samstraumr/samstraumr-core/src/test/java/org/s8r/test/legacy/*.java; do
+for file in modules/samstraumr-core/src/test/java/org/s8r/test/legacy/*.java; do
   if grep -q "package org.s8r.tube.legacy.test.steps" "$file"; then
     sed -i 's/package org.s8r.tube.legacy.test.steps;/package org.s8r.test.legacy;/' "$file"
     echo "  Updated package declaration in $(basename "$file")"
@@ -281,17 +281,17 @@ done
 echo "Updating import statements..."
 
 # Update imports in all test Java files
-find Samstraumr/samstraumr-core/src/test/java -name "*.java" -type f -exec sed -i 's/import org.s8r.tube.lifecycle.steps.adam/import org.s8r.test.tube.lifecycle/g' {} \;
-find Samstraumr/samstraumr-core/src/test/java -name "*.java" -type f -exec sed -i 's/import org.s8r.core.tube.test.steps/import org.s8r.test.tube/g' {} \;
-find Samstraumr/samstraumr-core/src/test/java -name "*.java" -type f -exec sed -i 's/import org.s8r.core.tube.test.runners/import org.s8r.test.tube/g' {} \;
-find Samstraumr/samstraumr-core/src/test/java -name "*.java" -type f -exec sed -i 's/import org.s8r.tube.legacy.test.steps/import org.s8r.test.legacy/g' {} \;
+find modules/samstraumr-core/src/test/java -name "*.java" -type f -exec sed -i 's/import org.s8r.tube.lifecycle.steps.adam/import org.s8r.test.tube.lifecycle/g' {} \;
+find modules/samstraumr-core/src/test/java -name "*.java" -type f -exec sed -i 's/import org.s8r.core.tube.test.steps/import org.s8r.test.tube/g' {} \;
+find modules/samstraumr-core/src/test/java -name "*.java" -type f -exec sed -i 's/import org.s8r.core.tube.test.runners/import org.s8r.test.tube/g' {} \;
+find modules/samstraumr-core/src/test/java -name "*.java" -type f -exec sed -i 's/import org.s8r.tube.legacy.test.steps/import org.s8r.test.legacy/g' {} \;
 
 echo "Updating feature file references in step definitions..."
 
 # Update references to feature files in step definitions
-for file in Samstraumr/samstraumr-core/src/test/java/org/s8r/test/tube/*.java \
-            Samstraumr/samstraumr-core/src/test/java/org/s8r/test/tube/lifecycle/*.java \
-            Samstraumr/samstraumr-core/src/test/java/org/s8r/test/legacy/*.java; do
+for file in modules/samstraumr-core/src/test/java/org/s8r/test/tube/*.java \
+            modules/samstraumr-core/src/test/java/org/s8r/test/tube/lifecycle/*.java \
+            modules/samstraumr-core/src/test/java/org/s8r/test/legacy/*.java; do
   if [ -f "$file" ]; then
     sed -i 's|resources/tube/features/L0_Tube/lifecycle|resources/features/tube-lifecycle|g' "$file"
     sed -i 's|resources/composites/features/L1_Bundle/patterns|resources/features/composite-patterns|g' "$file"
@@ -302,7 +302,7 @@ for file in Samstraumr/samstraumr-core/src/test/java/org/s8r/test/tube/*.java \
 done
 
 # Create a README for machine directory
-cat > Samstraumr/samstraumr-core/src/test/resources/features/machine/README.md << 'EOL'
+cat > modules/samstraumr-core/src/test/resources/features/machine/README.md << 'EOL'
 <\!--
 Copyright (c) 2025 Eric C. Mumford (@heymumford)
 
@@ -335,7 +335,7 @@ The machine tests verify the behavior of tube machines, which orchestrate and co
 EOL
 
 # Create a README for system directory
-cat > Samstraumr/samstraumr-core/src/test/resources/features/system/README.md << 'EOL'
+cat > modules/samstraumr-core/src/test/resources/features/system/README.md << 'EOL'
 <\!--
 Copyright (c) 2025 Eric C. Mumford (@heymumford)
 

@@ -28,13 +28,13 @@ info "Checking POM structure and versions..."
 
 # Get versions from POM files
 ROOT_VERSION=$(grep -oP '<version>\K[^<]+' pom.xml | head -1)
-MODULE_VERSION=$(grep -oP '<version>\K[^<]+' Samstraumr/pom.xml | head -1 || 
-                grep -oP '<parent>.*<version>\K[^<]+' Samstraumr/pom.xml)
-CORE_VERSION=$(grep -oP '<version>\K[^<]+' Samstraumr/samstraumr-core/pom.xml | head -1 || 
-              grep -oP '<parent>.*<version>\K[^<]+' Samstraumr/samstraumr-core/pom.xml)
+MODULE_VERSION=$(grep -oP '<version>\K[^<]+' modules/pom.xml | head -1 || 
+                grep -oP '<parent>.*<version>\K[^<]+' modules/pom.xml)
+CORE_VERSION=$(grep -oP '<version>\K[^<]+' modules/samstraumr-core/pom.xml | head -1 || 
+              grep -oP '<parent>.*<version>\K[^<]+' modules/samstraumr-core/pom.xml)
 
-if [[ -f "Samstraumr/version.properties" ]]; then
-    PROPS_VERSION=$(grep -oP 'version=\K.+' Samstraumr/version.properties || echo "not found")
+if [[ -f "modules/version.properties" ]]; then
+    PROPS_VERSION=$(grep -oP 'version=\K.+' modules/version.properties || echo "not found")
     
     if [[ "$ROOT_VERSION" != "$PROPS_VERSION" ]]; then
         error "Version mismatch: version.properties ($PROPS_VERSION) differs from root POM ($ROOT_VERSION)"
@@ -66,7 +66,7 @@ else
     success "Root POM correctly references Samstraumr module"
 fi
 
-MODULE_MODULE=$(grep -oP '<module>\K[^<]+' Samstraumr/pom.xml)
+MODULE_MODULE=$(grep -oP '<module>\K[^<]+' modules/pom.xml)
 if [[ "$MODULE_MODULE" != "samstraumr-core" ]]; then
     error "Module POM module reference incorrect: expected 'samstraumr-core', got '$MODULE_MODULE'"
 else
@@ -77,7 +77,7 @@ fi
 info "Checking dependency management..."
 
 # Count dependencies with explicit versions in core module
-CORE_DIRECT_VERSIONS=$(grep -c '<version>[^$]' Samstraumr/samstraumr-core/pom.xml || echo 0)
+CORE_DIRECT_VERSIONS=$(grep -c '<version>[^$]' modules/samstraumr-core/pom.xml || echo 0)
 if [[ $CORE_DIRECT_VERSIONS -gt 0 ]]; then
     warn "Core module has $CORE_DIRECT_VERSIONS direct version specifications (should use parent dependency management)"
 else
@@ -147,7 +147,7 @@ info "Checking Clean Architecture structure..."
 
 # Check for key packages
 for PKG in "domain" "application" "infrastructure" "adapter"; do
-    if [[ -d "Samstraumr/samstraumr-core/src/main/java/org/s8r/$PKG" ]]; then
+    if [[ -d "modules/samstraumr-core/src/main/java/org/s8r/$PKG" ]]; then
         success "Found $PKG package in Clean Architecture structure"
     else
         error "Missing $PKG package in Clean Architecture structure"
@@ -156,7 +156,7 @@ done
 
 # Check for package-info.java files
 for PKG in "domain" "application" "infrastructure" "adapter"; do
-    if find "Samstraumr/samstraumr-core/src/main/java/org/s8r/$PKG" -name "package-info.java" | grep -q .; then
+    if find "modules/samstraumr-core/src/main/java/org/s8r/$PKG" -name "package-info.java" | grep -q .; then
         success "Found package-info.java in $PKG package"
     else
         warn "Missing package-info.java in $PKG package"

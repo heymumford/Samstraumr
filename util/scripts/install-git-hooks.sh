@@ -72,7 +72,7 @@ fi
 
 # Verify proper test references
 echo -e "\033[34m→ Verifying test references...\033[0m"
-if [ -d "$REPO_ROOT/Samstraumr/samstraumr-core/src/test" ]; then
+if [ -d "$REPO_ROOT/modules/samstraumr-core/src/test" ]; then
     # Check that any added test classes are properly annotated
     NEW_TEST_FILES=$(git diff --cached --name-only --diff-filter=A | grep -E "Test\.java$|Tests\.java$")
     for TEST_FILE in $NEW_TEST_FILES; do

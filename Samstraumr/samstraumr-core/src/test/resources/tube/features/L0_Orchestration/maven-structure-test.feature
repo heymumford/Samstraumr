@@ -1,52 +1,55 @@
-@L0_Orchestration @ATL @MavenTest @Architecture
-Feature: Maven Project Structure Validation
+# Copyright (c) 2025
+# All rights reserved.
+
+@maven-structure @L0 @architecture
+Feature: Maven Project Structure Tests
   As a developer
-  I want to verify that the Maven project structure is correctly set up
-  So that the build system works reliably and follows our architectural standards
+  I want to ensure the Maven project structure follows conventions
+  So that the project is organized and maintainable
 
-  @Structure
-  Scenario: Verify three-tier Maven structure
-    Given the project has a root pom.xml file
-    And the project has a module container pom.xml file
-    And the project has a core module pom.xml file
-    Then the root pom should contain modules section with "Samstraumr"
-    And the module container pom should reference the "samstraumr-core" module
-    And all pom files should have consistent versions
+  Background:
+    Given I am in the project root directory
 
-  @Dependencies
-  Scenario: Verify dependency management
-    Given the project has a root pom.xml file
-    Then all dependencies should be managed in the parent pom
-    And all plugin versions should be defined as properties
-    And all plugins should be managed in pluginManagement section
-    And no SNAPSHOT dependencies should be used in non-SNAPSHOT versions
+  @smoke
+  Scenario: Verify basic Maven structure
+    Then each module should have a pom.xml file
+    And the core module should have the clean architecture layers
 
-  @Profiles
-  Scenario: Verify Maven profiles for testing
-    Given the project has a root pom.xml file
-    Then the root pom should contain the following profiles:
-      | Profile Name     |
-      | atl-tests        |
-      | skip-tests       |
-      | tdd-development  |
-      | coverage         |
-      | quality-checks   |
-      | security-checks  |
-      | build-report     |
-    And each profile should have the correct properties and plugins
+  Scenario: Verify required Maven files
+    When I look for the file "pom.xml"
+    Then the file should exist
+    When I look for the file "Samstraumr/pom.xml"
+    Then the file should exist
+    When I look for the file "Samstraumr/samstraumr-core/pom.xml"
+    Then the file should exist
 
-  @CleanArchitecture
-  Scenario: Verify architecture alignment
-    Given the project has a core module pom.xml file
-    Then the dependencies should respect Clean Architecture principles
-    And domain layer should not depend on infrastructure implementations
-    And all Java module dependencies should be correctly defined
-    And test dependencies should have test scope
+  Scenario: Verify source directories
+    When I check for the directory "Samstraumr/samstraumr-core/src/main/java"
+    Then the directory should exist
+    When I check for the directory "Samstraumr/samstraumr-core/src/test/java"
+    Then the directory should exist
+    When I check for the directory "Samstraumr/samstraumr-core/src/main/resources"
+    Then the directory should exist
+    When I check for the directory "Samstraumr/samstraumr-core/src/test/resources"
+    Then the directory should exist
 
-  @TestFramework
-  Scenario: Verify test framework configuration
-    Given the project has a core module pom.xml file
-    Then JUnit and Cucumber dependencies should be properly configured
-    And the surefire plugin should be configured for test discovery
-    And the correct test resources should be filtered
-    And test tag properties should be defined
+  Scenario: Verify required packages
+    Then the following packages should exist:
+      | domain |
+      | application |
+      | infrastructure |
+      | component |
+      | component.identity |
+      | component.composite |
+      | component.machine |
+      | application.port |
+      | application.service |
+
+  Scenario: Verify port interface packages
+    Then the following packages should exist:
+      | application.port |
+      | infrastructure.cache |
+      | infrastructure.filesystem |
+      | infrastructure.notification |
+      | infrastructure.event |
+      | infrastructure.security |

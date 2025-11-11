@@ -1,0 +1,1 @@
+All domain.component.composite tests are now passing: Total of 63 tests. Created 3 tests: ComponentConnectionTest, CompositeFactoryTest, and CompositeComponentTest.

@@ -1,77 +1,43 @@
 /*
- * Copyright (c) 2025 Eric C. Mumford (@heymumford)
- *
- * This software was developed with analytical assistance from AI tools 
- * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
- * which were used as paid services. All intellectual property rights 
- * remain exclusively with the copyright holder listed above.
- *
- * Licensed under the Mozilla Public License 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.mozilla.org/en-US/MPL/2.0/
+ * Copyright (c) 2025
+ * All rights reserved.
  */
-
 package org.s8r.application.port;
 
-import org.s8r.domain.event.DomainEvent;
+import java.util.Map;
+import java.util.function.Consumer;
 
 /**
- * Port interface for dispatching domain events.
- *
- * <p>This port follows the Clean Architecture approach by defining an outbound port in the
- * application layer, allowing the business logic to remain independent of infrastructure concerns.
+ * Port interface for event dispatching in the application layer.
+ * 
+ * <p>This interface defines the operations for registering event handlers and dispatching events,
+ * following the ports and adapters pattern from Clean Architecture.
  */
 public interface EventDispatcher {
-
-  /**
-   * Dispatches a domain event to all registered handlers.
-   *
-   * @param event The domain event to dispatch
-   */
-  void dispatch(DomainEvent event);
-
-  /**
-   * Registers a handler for a specific event type.
-   *
-   * @param <T> The type of domain event
-   * @param eventType The class of the event type
-   * @param handler The handler that will process events of this type
-   */
-  <T extends DomainEvent> void registerHandler(Class<T> eventType, EventHandler<T> handler);
-  
-  /**
-   * Registers a consumer function as a handler for a specific event type.
-   *
-   * @param <T> The type of domain event
-   * @param eventType The class of the event type
-   * @param handler The consumer function that will process events of this type
-   */
-  <T extends DomainEvent> void registerHandler(Class<T> eventType, java.util.function.Consumer<T> handler);
-
-  /**
-   * Unregisters a handler for a specific event type.
-   *
-   * @param <T> The type of domain event
-   * @param eventType The class of the event type
-   * @param handler The handler to unregister
-   */
-  <T extends DomainEvent> void unregisterHandler(Class<T> eventType, EventHandler<T> handler);
-
-  /**
-   * Functional interface for event handlers.
-   *
-   * @param <T> The type of domain event this handler can process
-   */
-  @FunctionalInterface
-  interface EventHandler<T extends DomainEvent> {
-
+    
     /**
-     * Handles a domain event.
+     * Registers a handler for a specific event type.
      *
-     * @param event The event to handle
+     * @param eventType The type of event to handle
+     * @param handler The handler function
      */
-    void handle(T event);
-  }
+    void registerHandler(String eventType, Consumer<Map<String, Object>> handler);
+    
+    /**
+     * Unregisters a handler for a specific event type.
+     *
+     * @param eventType The type of event
+     * @param handler The handler function to unregister
+     * @return true if the handler was unregistered, false otherwise
+     */
+    boolean unregisterHandler(String eventType, Consumer<Map<String, Object>> handler);
+    
+    /**
+     * Dispatches an event to all registered handlers for the event type.
+     *
+     * @param eventType The type of event to dispatch
+     * @param eventData The event data
+     * @return true if the event was dispatched successfully, false otherwise
+     */
+    boolean dispatchEvent(String eventType, Map<String, Object> eventData);
 }

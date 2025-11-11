@@ -43,8 +43,8 @@ if [[ "$USING_LIB" == true ]] && type get_maven_property &>/dev/null; then
   VERSION=""
   
   # First try the version.properties file
-  if [ -f "${PROJECT_ROOT}/Samstraumr/version.properties" ]; then
-    VERSION=$(grep "version=" "${PROJECT_ROOT}/Samstraumr/version.properties" | cut -d= -f2)
+  if [ -f "${PROJECT_ROOT}/modules/version.properties" ]; then
+    VERSION=$(grep "version=" "${PROJECT_ROOT}/modules/version.properties" | cut -d= -f2)
   fi
   
   # If not found, try to get from pom.xml using the library function
@@ -53,7 +53,7 @@ if [[ "$USING_LIB" == true ]] && type get_maven_property &>/dev/null; then
   fi
 else
   # Fall back to original implementation
-  VERSION=$(grep "version=" "${PROJECT_ROOT}/Samstraumr/version.properties" 2>/dev/null | cut -d= -f2 || grep -m 1 "<version>" "${PROJECT_ROOT}/pom.xml" | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+  VERSION=$(grep "version=" "${PROJECT_ROOT}/modules/version.properties" 2>/dev/null | cut -d= -f2 || grep -m 1 "<version>" "${PROJECT_ROOT}/pom.xml" | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
 fi
 
 # Also ensure REPORT_DIR is set if we're using the library
@@ -210,14 +210,14 @@ JAVADOC_OPTS=(
   "-d" "${OUTPUT_DIR}"
   "-quiet"
   "-source" "21"
-  "-sourcepath" "${PROJECT_ROOT}/Samstraumr/samstraumr-core/src/main/java"
+  "-sourcepath" "${PROJECT_ROOT}/modules/samstraumr-core/src/main/java"
   "-classpath" "$(mvn -q dependency:build-classpath -DincludeScope=compile -Dmdep.outputFile=/dev/stdout)"
   "-subpackages" "${PACKAGES}"
   "-windowtitle" "Samstraumr API Documentation v${VERSION}"
   "-doctitle" "Samstraumr API<br>Documentation v${VERSION}"
   "-header" "<strong>Samstraumr API Documentation</strong>"
   "-bottom" "Copyright &copy; $(date +%Y) Eric C. Mumford. Licensed under MPL 2.0."
-  "-overview" "${PROJECT_ROOT}/Samstraumr/samstraumr-core/src/main/java/overview.html"
+  "-overview" "${PROJECT_ROOT}/modules/samstraumr-core/src/main/java/overview.html"
   "-stylesheetfile" "${STYLESHEET_DIR}/custom-stylesheet.css"
   "-tag" "apiNote:a:API Note:"
   "-tag" "implNote:a:Implementation Note:"
@@ -226,10 +226,10 @@ JAVADOC_OPTS=(
 )
 
 # Create overview.html if it doesn't exist
-if [ ! -f "${PROJECT_ROOT}/Samstraumr/samstraumr-core/src/main/java/overview.html" ]; then
+if [ ! -f "${PROJECT_ROOT}/modules/samstraumr-core/src/main/java/overview.html" ]; then
   info "Creating overview.html"
-  mkdir -p "$(dirname "${PROJECT_ROOT}/Samstraumr/samstraumr-core/src/main/java/overview.html")"
-  cat > "${PROJECT_ROOT}/Samstraumr/samstraumr-core/src/main/java/overview.html" << EOF
+  mkdir -p "$(dirname "${PROJECT_ROOT}/modules/samstraumr-core/src/main/java/overview.html")"
+  cat > "${PROJECT_ROOT}/modules/samstraumr-core/src/main/java/overview.html" << EOF
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -268,7 +268,7 @@ if [ "$INCLUDE_LINKS" = true ]; then
   REPO_URL="https://github.com/emumford/Samstraumr"
   JAVADOC_OPTS+=(
     "-link" "https://docs.oracle.com/en/java/javase/21/docs/api/"
-    "-linkoffline" "${REPO_URL}/blob/main/Samstraumr/samstraumr-core/src/main/java" "${REPO_URL}/blob/main/Samstraumr/samstraumr-core/src/main/java"
+    "-linkoffline" "${REPO_URL}/blob/main/modules/samstraumr-core/src/main/java" "${REPO_URL}/blob/main/modules/samstraumr-core/src/main/java"
   )
 fi
 

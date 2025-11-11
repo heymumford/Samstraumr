@@ -1,1 +1,0 @@
-util/scripts/java/use-java21.sh

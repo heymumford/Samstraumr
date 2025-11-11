@@ -21,8 +21,8 @@ This document provides a visual representation of the ideal S8r Framework direct
 
 ```
 Samstraumr/
-├── .samstraumr/            # Configuration files and metadata
-├── Samstraumr/             # Maven project structure (core implementation)
+├── .s8r/                   # Configuration files and metadata
+├── modules/                # Maven modules (core implementation)
 │   ├── samstraumr-core/    # Core implementation modules
 │   └── src/                # Maven site configuration
 ├── docs/                   # Documentation
