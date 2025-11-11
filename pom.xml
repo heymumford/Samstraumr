@@ -51,15 +51,15 @@ Licensed under the Mozilla Public License 2.0
     <junit.platform.version>1.10.1</junit.platform.version>
     <cucumber.version>7.22.0</cucumber.version>
     <cucumber.reporting.version>5.7.7</cucumber.reporting.version>
-    <mockito.version>5.17.0</mockito.version>
-    <jackson.version>2.14.2</jackson.version>
+    <mockito.version>5.8.0</mockito.version>
+    <jackson.version>2.20.0</jackson.version>
     <oshi.version>6.4.1</oshi.version>
     <spotbugs.annotations.version>4.7.3</spotbugs.annotations.version>
     <itextpdf.version>5.5.13.3</itextpdf.version>
     
     <!-- Plugin versions -->
     <pmd.plugin.version>3.26.0</pmd.plugin.version>
-    <owasp.plugin.version>8.4.2</owasp.plugin.version>
+    <owasp.plugin.version>12.1.9</owasp.plugin.version>
     <findsecbugs.version>1.13.0</findsecbugs.version>
     <javadoc.plugin.version>3.12.0</javadoc.plugin.version>
     <maven.enforcer.plugin.version>3.4.1</maven.enforcer.plugin.version>
@@ -77,7 +77,7 @@ Licensed under the Mozilla Public License 2.0
     <jacoco.branch.coverage>0.80</jacoco.branch.coverage>
     <maven.site.plugin.version>4.0.0-M13</maven.site.plugin.version>
     <maven.project.info.reports.plugin.version>3.5.0</maven.project.info.reports.plugin.version>
-    <dependency-check.version>9.0.7</dependency-check.version>
+    <dependency-check.version>12.1.9</dependency-check.version>
   </properties>
   
   <!-- Dependency management to ensure consistent versions across modules -->
