@@ -9,7 +9,7 @@ remain exclusively with the copyright holder listed above.
 Licensed under the Mozilla Public License 2.0
 -->
 
-# Coding and Documentation Standards
+# README
 
 This directory contains all coding and documentation standards for the Samstraumr project.
 

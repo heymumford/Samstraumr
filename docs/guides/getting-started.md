@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Getting Started with S8r
+# Getting Started
 
 ## Table of Contents
 
@@ -33,7 +33,7 @@ Licensed under the Mozilla Public License 2.0
 - Maven 3.6 or higher
 - IDE with Java support
 
-### Adding S8r to your project
+### Adding s8r to your project
 
 Maven dependency:
 
@@ -76,42 +76,42 @@ S8r includes a unified CLI interface called `s8r` that simplifies common tasks l
 ### Basic commands
 
 ```bash
-# Build the project with default settings
+# Getting Started
 ./s8r build
 
-# Run all tests
+# Getting Started
 ./s8r test all
 
-# Get current version
+# Getting Started
 ./s8r version get
 ```
 
 ### Building the project
 
 ```bash
-# Fast build (skip quality checks)
+# Getting Started
 ./s8r build fast
 
-# Clean and run tests
+# Getting Started
 ./s8r build -c test
 
-# Install to local Maven repository
+# Getting Started
 ./s8r build install
 ```
 
 ### Running tests
 
 ```bash
-# Run unit tests (also called component tests)
+# Getting Started
 ./s8r test unit
 
-# Run integration tests (also called flow tests)
+# Getting Started
 ./s8r test integration
 
-# Run critical tests
+# Getting Started
 ./s8r test atl
 
-# Run flow tests with ATL profile 
+# Getting Started
 ./s8r test -p atl-tests flow
 ```
 
@@ -120,15 +120,15 @@ S8r includes a unified CLI interface called `s8r` that simplifies common tasks l
 The CLI includes a complete version management system:
 
 ```bash
-# Get current version information
+# Getting Started
 ./s8r version get
 
-# Bump versions
+# Getting Started
 ./s8r version bump patch       # Bug fixes (1.2.3 -> 1.2.4)
 ./s8r version bump minor       # New features (1.2.3 -> 1.3.0)
 ./s8r version bump major       # Breaking changes (1.2.3 -> 2.0.0)
 
-# Set a specific version
+# Getting Started
 ./s8r version set 1.5.0
 ```
 
@@ -137,10 +137,10 @@ For complete documentation of version management, see [Version Management](../re
 ### Quality checks
 
 ```bash
-# Run all quality checks
+# Getting Started
 ./s8r quality check
 
-# Run specific checks
+# Getting Started
 ./s8r quality spotless         # Code formatting
 ./s8r quality checkstyle       # Style checks
 ./s8r quality encoding         # File encoding checks
@@ -151,10 +151,10 @@ For complete documentation of version management, see [Version Management](../re
 Every command has built-in help available:
 
 ```bash
-# General help
+# Getting Started
 ./s8r help
 
-# Command-specific help
+# Getting Started
 ./s8r help build
 ./s8r help test
 ./s8r help version
@@ -162,7 +162,7 @@ Every command has built-in help available:
 
 ## Creating Your First Component
 
-### 1. Implement a basic component
+### 1. implement a basic component
 
 ```java
 package org.yourdomain.components;
@@ -270,7 +270,7 @@ public class EmailValidatorComponent implements Component {
 }
 ```
 
-### 2. Create and use a component
+### 2. create and use a component
 
 ```java
 // Create an environment
@@ -464,7 +464,7 @@ try {
 
 ## Common Patterns
 
-### Validator-Transformer-Persister
+### Validator-transformer-persister
 
 A standard processing pipeline:
 
@@ -472,7 +472,7 @@ A standard processing pipeline:
 2. **Transformer Component**: Converts valid data
 3. **Persister Component**: Stores processed data
 
-### Observer Component
+### Observer component
 
 Passive monitoring without modification:
 
@@ -491,7 +491,7 @@ public class EmailAuditComponent implements Component {
 }
 ```
 
-### Circuit Breaker Component
+### Circuit breaker component
 
 Preventing cascading failures:
 

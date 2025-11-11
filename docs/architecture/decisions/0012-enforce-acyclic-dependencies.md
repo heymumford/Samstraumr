@@ -1,4 +1,4 @@
-# 12. Enforce Acyclic Dependencies
+# 0012 Enforce Acyclic Dependencies
 
 Date: 2025-04-06
 
@@ -100,4 +100,3 @@ When refactoring to remove circular dependencies, we recommend these strategies:
 
 - [Clean Architecture by Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [Acyclic Dependencies Principle](https://en.wikipedia.org/wiki/Acyclic_dependencies_principle)
-- [Dependency Inversion Principle](https://en.wikipedia.org/wiki/Dependency_inversion_principle)

@@ -50,7 +50,7 @@ The following changes were implemented in the initial code refactoring:
 
 As part of the ongoing refactoring effort, additional updates were made to ensure consistent terminology throughout the codebase:
 
-### 1. Feature File Updates
+### 1. feature file updates
 
 1. **Renamed Directory Structure**
    - `/tube/features/L1_Bundle/` → `/tube/features/L1_Composite/`
@@ -62,19 +62,19 @@ As part of the ongoing refactoring effort, additional updates were made to ensur
    - Updated all `@L1_Bundle` tags to `@L1_Composite`
    - Updated scenario descriptions with "composite" instead of "bundle"
 
-### 2. Test Tag Ontology Updates
+### 2. test tag ontology updates
 
 1. **Updated `TagOntology.md`**
    - Changed `@BundleTest` → `@CompositeTest`
    - Changed `@L1_Bundle` → `@L1_Composite`
    - Modified test type descriptions to refer to composites instead of bundles
 
-### 3. Java File Updates
+### 3. java file updates
 
 1. **Updated JavaDoc in `CompositeConnectionSteps.java`**
    - Updated the reference to feature file from `CompositeConnectionTest.feature` to `composite-connection-test.feature`
 
-### 4. Build Configuration Updates
+### 4. build configuration updates
 
 1. **Updated Maven Profile Descriptions**
    - Changed Maven profile description from "Component (Composite/Bundle) Tests Profile" to "Component (Composite) Tests Profile"

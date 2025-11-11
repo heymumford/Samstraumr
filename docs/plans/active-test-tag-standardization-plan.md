@@ -1,4 +1,4 @@
-# Test Tag Standardization Plan
+# Active Test Tag Standardization Plan
 
 ## Overview
 
@@ -71,4 +71,3 @@ This document outlines the plan for completing the standardization of test tags 
 
 ## Owner
 
-Eric Mumford

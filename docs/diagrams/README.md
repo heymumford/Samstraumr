@@ -1,6 +1,6 @@
-# Samstraumr C4 Architecture Diagrams
+# README
 
-Last generated: Sun Apr  6 14:38:57 EDT 2025
+Last generated: Mon Apr  7 15:07:22 EDT 2025
 
 This directory contains automatically generated C4 model diagrams for the Samstraumr project architecture.
 

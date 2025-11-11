@@ -6,7 +6,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 # Create custom pom.xmls with removed PMD plugin
 mkdir -p /tmp/build-override
-cp Samstraumr/samstraumr-core/pom.xml /tmp/build-override/samstraumr-core-pom.xml
+cp modules/samstraumr-core/pom.xml /tmp/build-override/samstraumr-core-pom.xml
 
 # Use special skip profile
 MAVEN_ARGS=""
@@ -26,7 +26,7 @@ echo "Maven version: $(mvn -version 2>&1 | head -n 1)"
 echo "=======================" 
 
 # Execute Maven directly on the core module first - skipping quality checks
-cd Samstraumr/samstraumr-core
+cd modules/samstraumr-core
 echo "Building core module directly..."
 mvn clean compile test-compile $MAVEN_ARGS
 

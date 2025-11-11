@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Documentation Standards
+# Standard Documentation
 
 This document defines the standardized approach to documentation in the Samstraumr project. Following these standards ensures consistency and improves readability across all project documentation.
 

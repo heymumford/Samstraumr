@@ -18,26 +18,81 @@ NC='\033[0m' # No Color
 
 # Function to display usage information
 usage() {
-  echo "Usage: $0 <directory>"
+  echo "Usage: $0 [options] <directory>"
   echo ""
   echo "This script helps migrate Java code from Samstraumr to S8r."
   echo ""
   echo "Arguments:"
   echo "  <directory>  Path to the directory containing Java code to migrate"
   echo ""
+  echo "Options:"
+  echo "  --feedback          Enable migration feedback system"
+  echo "  --report            Generate a detailed HTML migration report"
+  echo "  --interactive       Enable interactive mode for fixing common issues"
+  echo "  --dry-run           Show what would be changed without making changes"
+  echo "  --no-backup         Skip creating a backup of the source directory"
+  echo "  -h, --help          Show this help message"
+  echo ""
   echo "Examples:"
   echo "  $0 ./my-project"
-  echo "  $0 /path/to/project/src"
+  echo "  $0 --feedback /path/to/project/src"
+  echo "  $0 --feedback --report --interactive ./my-project"
   echo ""
   exit 1
 }
 
+# Default settings
+ENABLE_FEEDBACK=false
+GENERATE_REPORT=false
+INTERACTIVE_MODE=false
+DRY_RUN=false
+BACKUP=true
+
+# Process command line arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --feedback)
+      ENABLE_FEEDBACK=true
+      shift
+      ;;
+    --report)
+      GENERATE_REPORT=true
+      ENABLE_FEEDBACK=true  # Report requires feedback
+      shift
+      ;;
+    --interactive)
+      INTERACTIVE_MODE=true
+      ENABLE_FEEDBACK=true  # Interactive mode requires feedback
+      shift
+      ;;
+    --dry-run)
+      DRY_RUN=true
+      shift
+      ;;
+    --no-backup)
+      BACKUP=false
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    -*)
+      error "Unknown option: $1"
+      ;;
+    *)
+      # Assume this is the directory parameter
+      SOURCE_DIR="$1"
+      shift
+      ;;
+  esac
+done
+
 # Check if directory parameter is provided
-if [ $# -ne 1 ]; then
+if [ -z "$SOURCE_DIR" ]; then
+  error "No source directory specified"
   usage
 fi
-
-SOURCE_DIR="$1"
 
 # Validate directory exists
 if [ ! -d "$SOURCE_DIR" ]; then
@@ -45,11 +100,15 @@ if [ ! -d "$SOURCE_DIR" ]; then
   exit 1
 fi
 
-# Create backup
+# Create backup if requested
 TIMESTAMP=$(date +%Y%m%d%H%M%S)
 BACKUP_DIR="${SOURCE_DIR}_backup_${TIMESTAMP}"
-echo -e "${BLUE}Creating backup in ${BACKUP_DIR}...${NC}"
-cp -r "$SOURCE_DIR" "$BACKUP_DIR"
+if [ "$BACKUP" = true ]; then
+  echo -e "${BLUE}Creating backup in ${BACKUP_DIR}...${NC}"
+  cp -r "$SOURCE_DIR" "$BACKUP_DIR"
+else
+  echo -e "${YELLOW}Backup disabled. No backup will be created.${NC}"
+fi
 
 # Find all Java files
 JAVA_FILES=$(find "$SOURCE_DIR" -name "*.java")
@@ -81,16 +140,16 @@ echo "-------------" >> "$REPORT_FILE"
 
 # Map of replacements
 declare -A IMPORT_MAP
-IMPORT_MAP["org.samstraumr.tube.Tube"]="org.s8r.component.core.Component"
-IMPORT_MAP["org.samstraumr.tube.TubeStatus"]="org.s8r.component.core.State"
-IMPORT_MAP["org.samstraumr.tube.TubeLifecycleState"]="org.s8r.component.core.State"
-IMPORT_MAP["org.samstraumr.tube.TubeIdentity"]="org.s8r.component.identity.Identity"
-IMPORT_MAP["org.samstraumr.tube.Environment"]="org.s8r.component.core.Environment"
-IMPORT_MAP["org.samstraumr.tube.TubeLogger"]="org.s8r.component.logging.Logger"
-IMPORT_MAP["org.samstraumr.tube.TubeLoggerInfo"]="org.s8r.component.logging.Logger.LoggerInfo"
-IMPORT_MAP["org.samstraumr.tube.composite.Composite"]="org.s8r.component.composite.Composite"
-IMPORT_MAP["org.samstraumr.tube.machine.Machine"]="org.s8r.component.machine.Machine"
-IMPORT_MAP["org.samstraumr.tube.exception.TubeInitializationException"]="org.s8r.component.exception.ComponentException"
+IMPORT_MAP["org.s8r.tube.Tube"]="org.s8r.component.core.Component"
+IMPORT_MAP["org.s8r.tube.TubeStatus"]="org.s8r.component.core.State"
+IMPORT_MAP["org.s8r.tube.TubeLifecycleState"]="org.s8r.component.core.State"
+IMPORT_MAP["org.s8r.tube.TubeIdentity"]="org.s8r.component.identity.Identity"
+IMPORT_MAP["org.s8r.tube.Environment"]="org.s8r.component.core.Environment"
+IMPORT_MAP["org.s8r.tube.TubeLogger"]="org.s8r.component.logging.Logger"
+IMPORT_MAP["org.s8r.tube.TubeLoggerInfo"]="org.s8r.component.logging.Logger.LoggerInfo"
+IMPORT_MAP["org.s8r.tube.composite.Composite"]="org.s8r.component.composite.Composite"
+IMPORT_MAP["org.s8r.tube.machine.Machine"]="org.s8r.component.machine.Machine"
+IMPORT_MAP["org.s8r.tube.exception.TubeInitializationException"]="org.s8r.component.exception.ComponentException"
 
 declare -A API_MAP
 API_MAP["Tube.create"]="Component.create"
@@ -120,8 +179,8 @@ for FILE in $JAVA_FILES; do
   FILE_IMPORTS=0
   FILE_APIS=0
   
-  # Check if file contains org.samstraumr
-  if grep -q "org\.samstraumr" "$FILE"; then
+  # Check if file contains org.s8r
+  if grep -q "org\.s8r" "$FILE"; then
     # Check for specific import patterns
     for OLD_IMPORT in "${!IMPORT_MAP[@]}"; do
       NEW_IMPORT="${IMPORT_MAP[$OLD_IMPORT]}"
@@ -174,6 +233,151 @@ echo "Total API replacements: $API_REPLACEMENTS" >> "$REPORT_FILE"
 echo "" >> "$REPORT_FILE"
 echo "Migration completed on $(date)" >> "$REPORT_FILE"
 
+# Find repository root for feedback reports
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Create migration feedback report directory if needed
+FEEDBACK_DIR="$REPO_ROOT/reports"
+mkdir -p "$FEEDBACK_DIR"
+
+# If feedback is enabled, gather and report migration issues
+if [ "$ENABLE_FEEDBACK" = true ]; then
+  FEEDBACK_REPORT="${FEEDBACK_DIR}/migration_feedback_${TIMESTAMP}.md"
+  FEEDBACK_JSON="${FEEDBACK_DIR}/migration_issues_${TIMESTAMP}.json"
+  
+  echo -e "${BLUE}Collecting migration feedback...${NC}"
+  
+  # Scan for potential issues in the migrated code
+  echo "# Migration Feedback Report" > "$FEEDBACK_REPORT"
+  echo "Generated: $(date)" >> "$FEEDBACK_REPORT"
+  echo "" >> "$FEEDBACK_REPORT"
+  echo "## Summary" >> "$FEEDBACK_REPORT"
+  echo "" >> "$FEEDBACK_REPORT"
+  echo "- Files Analyzed: $TOTAL_FILES" >> "$FEEDBACK_REPORT"
+  echo "- Files Modified: $AFFECTED_FILES" >> "$FEEDBACK_REPORT"
+  echo "- Import Replacements: $IMPORT_REPLACEMENTS" >> "$FEEDBACK_REPORT"
+  echo "- API Replacements: $API_REPLACEMENTS" >> "$FEEDBACK_REPORT"
+  echo "" >> "$FEEDBACK_REPORT"
+  
+  # Identify potential issues
+  POTENTIAL_ISSUES=0
+  
+  # Create issues section
+  echo "## Potential Issues" >> "$FEEDBACK_REPORT"
+  echo "" >> "$FEEDBACK_REPORT"
+  
+  # Check for incomplete API migrations
+  INCOMPLETE_MIGRATIONS=$(grep -r "org\.s8r" "$SOURCE_DIR" --include="*.java" | wc -l)
+  if [ "$INCOMPLETE_MIGRATIONS" -gt 0 ]; then
+    ((POTENTIAL_ISSUES++))
+    echo "### Incomplete Migrations" >> "$FEEDBACK_REPORT"
+    echo "" >> "$FEEDBACK_REPORT"
+    echo "Found $INCOMPLETE_MIGRATIONS references to org.s8r packages that were not migrated:" >> "$FEEDBACK_REPORT"
+    echo "" >> "$FEEDBACK_REPORT"
+    echo '```' >> "$FEEDBACK_REPORT"
+    grep -r "org\.s8r" "$SOURCE_DIR" --include="*.java" | head -n 10 >> "$FEEDBACK_REPORT"
+    if [ "$INCOMPLETE_MIGRATIONS" -gt 10 ]; then
+      echo "... and $(($INCOMPLETE_MIGRATIONS - 10)) more" >> "$FEEDBACK_REPORT"
+    fi
+    echo '```' >> "$FEEDBACK_REPORT"
+    echo "" >> "$FEEDBACK_REPORT"
+  fi
+  
+  # Check for potential state transition issues
+  STATE_TRANSITIONS=$(grep -r "setState" "$SOURCE_DIR" --include="*.java" | wc -l)
+  if [ "$STATE_TRANSITIONS" -gt 0 ]; then
+    ((POTENTIAL_ISSUES++))
+    echo "### State Transition Changes" >> "$FEEDBACK_REPORT"
+    echo "" >> "$FEEDBACK_REPORT"
+    echo "Found $STATE_TRANSITIONS state transitions that might need verification:" >> "$FEEDBACK_REPORT"
+    echo "" >> "$FEEDBACK_REPORT"
+    echo '```' >> "$FEEDBACK_REPORT"
+    grep -r "setState" "$SOURCE_DIR" --include="*.java" | head -n 10 >> "$FEEDBACK_REPORT"
+    if [ "$STATE_TRANSITIONS" -gt 10 ]; then
+      echo "... and $(($STATE_TRANSITIONS - 10)) more" >> "$FEEDBACK_REPORT"
+    fi
+    echo '```' >> "$FEEDBACK_REPORT"
+    echo "" >> "$FEEDBACK_REPORT"
+    echo "**Recommendation**: Verify that all state transitions comply with the S8r state model." >> "$FEEDBACK_REPORT"
+    echo "" >> "$FEEDBACK_REPORT"
+  fi
+  
+  # Generate recommendations
+  echo "## Recommendations" >> "$FEEDBACK_REPORT"
+  echo "" >> "$FEEDBACK_REPORT"
+  
+  if [ "$AFFECTED_FILES" -gt 0 ]; then
+    echo "1. **Test Migrated Components**: Test each migrated component to ensure functionality is preserved." >> "$FEEDBACK_REPORT"
+    echo "2. **Review State Transitions**: Verify that state transitions follow the correct lifecycle." >> "$FEEDBACK_REPORT"
+    echo "3. **Check Type Conversions**: Ensure all type conversions between legacy and S8r types are handled correctly." >> "$FEEDBACK_REPORT"
+    
+    # Create simple JSON with issues
+    cat > "$FEEDBACK_JSON" << EOF
+{
+  "timestamp": "$(date -Iseconds)",
+  "source_directory": "$SOURCE_DIR",
+  "stats": {
+    "total_files": $TOTAL_FILES,
+    "affected_files": $AFFECTED_FILES,
+    "import_replacements": $IMPORT_REPLACEMENTS,
+    "api_replacements": $API_REPLACEMENTS,
+    "potential_issues": $POTENTIAL_ISSUES
+  },
+  "issues": {
+    "incomplete_migrations": $INCOMPLETE_MIGRATIONS,
+    "state_transitions": $STATE_TRANSITIONS
+  }
+}
+EOF
+  else
+    echo "No files were modified during migration. No specific recommendations." >> "$FEEDBACK_REPORT"
+  fi
+  
+  # Create symbolic link to latest report
+  ln -sf "$FEEDBACK_REPORT" "${FEEDBACK_DIR}/latest_migration_feedback.md"
+  ln -sf "$FEEDBACK_JSON" "${FEEDBACK_DIR}/latest_migration_issues.json"
+  
+  # Generate a more comprehensive report if requested
+  if [ "$GENERATE_REPORT" = true ]; then
+    # If we have the migration report tool, use it
+    if [ -f "$REPO_ROOT/s8r-migration-report" ]; then
+      echo -e "${BLUE}Generating comprehensive migration report...${NC}"
+      "$REPO_ROOT/s8r-migration-report" --output="${FEEDBACK_DIR}/migration_report_${TIMESTAMP}.html" --html
+    fi
+  fi
+  
+  # If interactive mode is enabled, provide interactive fixes
+  if [ "$INTERACTIVE_MODE" = true ]; then
+    echo -e "${BLUE}Interactive mode: Checking for common migration issues to fix...${NC}"
+    
+    # List files with potential issues
+    if [ "$INCOMPLETE_MIGRATIONS" -gt 0 ]; then
+      echo -e "${YELLOW}Files with incomplete migrations:${NC}"
+      grep -l "org\.s8r" "$SOURCE_DIR" --include="*.java" | head -n 5
+      
+      read -p "Attempt to fix these files? [y/N] " -n 1 -r
+      echo
+      if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo -e "${BLUE}Applying additional migrations...${NC}"
+        # Re-run the migration with additional mappings
+        # This is simplified; a real implementation would be more sophisticated
+        for FILE in $(grep -l "org\.s8r" "$SOURCE_DIR" --include="*.java"); do
+          echo "  Processing $FILE..."
+          sed -i 's/org\.s8r/org.s8r/g' "$FILE"
+        done
+      fi
+    fi
+  fi
+  
+  # Print feedback summary
+  echo -e "${BLUE}Migration feedback summary:${NC}"
+  echo -e "  Potential issues identified: ${YELLOW}$POTENTIAL_ISSUES${NC}"
+  echo -e "  Detailed feedback saved to: ${GREEN}$FEEDBACK_REPORT${NC}"
+  if [ "$GENERATE_REPORT" = true ]; then
+    echo -e "  HTML report saved to: ${GREEN}${FEEDBACK_DIR}/migration_report_${TIMESTAMP}.html${NC}"
+  fi
+fi
+
 # Display summary to console
 echo -e "${GREEN}Migration completed!${NC}"
 echo -e "${BLUE}Summary:${NC}"
@@ -181,5 +385,7 @@ echo -e "  Files modified: ${GREEN}$AFFECTED_FILES${NC} of ${BLUE}$TOTAL_FILES${
 echo -e "  Total import replacements: ${GREEN}$IMPORT_REPLACEMENTS${NC}"
 echo -e "  Total API replacements: ${GREEN}$API_REPLACEMENTS${NC}"
 echo -e "${BLUE}Report saved to: ${GREEN}$REPORT_FILE${NC}"
-echo -e "${YELLOW}A backup of your code was created at: ${GREEN}$BACKUP_DIR${NC}"
+if [ "$BACKUP" = true ]; then
+  echo -e "${YELLOW}A backup of your code was created at: ${GREEN}$BACKUP_DIR${NC}"
+fi
 echo -e "${YELLOW}Please review the changes carefully before committing.${NC}"

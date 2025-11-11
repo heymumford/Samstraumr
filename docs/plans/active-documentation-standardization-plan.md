@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Documentation Standardization Plan
+# Active Documentation Standardization Plan
 
 This document outlines the plan for standardizing all documentation in the Samstraumr project to ensure consistency, clarity, and improved maintainability.
 
@@ -42,14 +42,14 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
 
 ## Implementation Plan
 
-### Phase 1: Inventory and Analysis (Completed)
+### Phase 1: inventory and analysis (completed)
 
 1. ✅ Create comprehensive inventory of all documentation files
 2. ✅ Analyze current inconsistencies and patterns
 3. ✅ Document standard conventions in `/docs/reference/standards/documentation-standards.md`
 4. ✅ Identify outdated planning documents for removal or archiving
 
-### Phase 2: File Naming and Organization (Completed)
+### Phase 2: file naming and organization (completed)
 
 1. ✅ Rename all documentation files to use kebab-case:
    - Update script `docs/scripts/standardize-md-filenames.sh` to handle remaining files
@@ -61,7 +61,7 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
    - Consolidate duplicate files (e.g., `FolderStructure.md` appears in multiple locations)
    - Update cross-references to reflect new file locations
 
-### Phase 3: Content Standardization (In Progress)
+### Phase 3: content standardization (in progress)
 
 1. ⬜ Update headers to follow standard conventions:
    - Level 1 headers match title case of file
@@ -76,7 +76,7 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
    - Ensure consistent tab/space usage
    - Standardize emphasis formatting (bold/italic)
 
-### Phase 4: Planning Document Cleanup (Planned)
+### Phase 4: planning document cleanup (planned)
 
 1. ⬜ Review and update current planning documents:
    - Archive completed plans with "ARCHIVED-" prefix
@@ -89,7 +89,7 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
    - Fix cross-references
    - Standardize formatting
 
-### Phase 5: Automation and Verification (Planned)
+### Phase 5: automation and verification (planned)
 
 1. ⬜ Enhance existing standardization scripts:
    - Update `standardize-md-filenames.sh` to handle additional cases

@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Testing Annotations
+# Test Annotations
 
 > **⚠️ This document has been consolidated!**
 >

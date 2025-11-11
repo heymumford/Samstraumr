@@ -1,0 +1,448 @@
+#!/usr/bin/env bash
+#==============================================================================
+# Filename: run-full-test-suite
+# Description: Comprehensive test suite runner
+#
+# Runs all tests in the test suite, generates coverage reports, and validates
+# the test suite against quality standards.
+#==============================================================================
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+
+# Source unified common library for consistent output formatting
+if [ -f "${PROJECT_ROOT}/util/lib/unified-common.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/unified-common.sh"
+else
+  # Fallback to minimal functionality if library not found
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  BLUE='\033[0;34m'
+  YELLOW='\033[0;33m'
+  BOLD='\033[1m'
+  RESET='\033[0m'
+  
+  print_info() { echo -e "${BLUE}→ $1${RESET}"; }
+  print_success() { echo -e "${GREEN}✓ $1${RESET}"; }
+  print_error() { echo -e "${RED}✗ $1${RESET}" >&2; exit 1; }
+  print_warning() { echo -e "${YELLOW}! $1${RESET}" >&2; }
+  print_header() { echo -e "${BLUE}${BOLD}$1${RESET}"; echo -e "${BLUE}${BOLD}$(printf '=%.0s' $(seq 1 ${#1}))${RESET}"; }
+  print_section() { echo -e "${BLUE}$1${RESET}"; }
+fi
+
+# Initialize variables
+VERBOSE=false
+GENERATE_REPORT=true
+REPORT_DIR="${PROJECT_ROOT}/test-results"
+REPORT_PREFIX=$(date +"%Y%m%d_%H%M%S")
+COVERAGE_THRESHOLD=80
+PARALLEL=false
+SKIP_VERIFICATION=false
+SKIP_ANALYSIS=false
+FIX_ISSUES=false
+TEST_TYPES=("unit" "component" "composite" "integration" "lifecycle" "identity" "architecture" "maven-structure")
+
+# Function to display help
+show_help() {
+  print_header "Full Test Suite Runner"
+  echo
+  print_section "Description"
+  echo "  This tool runs the entire test suite, generates coverage reports, and validates"
+  echo "  test quality against established standards."
+  echo
+  print_section "Usage"
+  echo "  run-full-test-suite [options]"
+  echo
+  print_section "Options"
+  echo "  -v, --verbose           Show detailed output"
+  echo "  -n, --no-report         Do not generate reports"
+  echo "  -d, --report-dir DIR    Specify report output directory (default: test-results)"
+  echo "  -t, --threshold N       Set coverage threshold percentage (default: 80)"
+  echo "  -p, --parallel          Run tests in parallel where supported"
+  echo "  -s, --skip-verification Skip test suite verification"
+  echo "  -a, --skip-analysis     Skip coverage analysis"
+  echo "  -f, --fix               Attempt to fix issues automatically"
+  echo "  -h, --help              Show this help message"
+  echo
+  print_section "Examples"
+  echo "  run-full-test-suite                # Run all tests with default settings"
+  echo "  run-full-test-suite -v -p          # Run tests in parallel with verbose output"
+  echo "  run-full-test-suite -t 90 -f       # Set 90% coverage threshold and fix issues"
+}
+
+# Parse command line arguments
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -v|--verbose)
+        VERBOSE=true
+        shift
+        ;;
+      -n|--no-report)
+        GENERATE_REPORT=false
+        shift
+        ;;
+      -d|--report-dir)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          REPORT_DIR="$2"
+          shift 2
+        else
+          print_error "Report directory path missing after -d/--report-dir"
+          show_help
+          exit 1
+        fi
+        ;;
+      -t|--threshold)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          COVERAGE_THRESHOLD="$2"
+          shift 2
+        else
+          print_error "Threshold value missing after -t/--threshold"
+          show_help
+          exit 1
+        fi
+        ;;
+      -p|--parallel)
+        PARALLEL=true
+        shift
+        ;;
+      -s|--skip-verification)
+        SKIP_VERIFICATION=true
+        shift
+        ;;
+      -a|--skip-analysis)
+        SKIP_ANALYSIS=true
+        shift
+        ;;
+      -f|--fix)
+        FIX_ISSUES=true
+        shift
+        ;;
+      -h|--help)
+        show_help
+        exit 0
+        ;;
+      *)
+        print_error "Unknown option: $1"
+        show_help
+        exit 1
+        ;;
+    esac
+  done
+}
+
+# Create timestamped output file path
+get_output_file() {
+  local test_type="$1"
+  echo "${REPORT_DIR}/${REPORT_PREFIX}_${test_type}_results.txt"
+}
+
+# Setup output directory
+setup_output_dir() {
+  mkdir -p "$REPORT_DIR"
+  
+  # Create summary file
+  SUMMARY_FILE="${REPORT_DIR}/${REPORT_PREFIX}_summary.md"
+  
+  cat > "$SUMMARY_FILE" << EOF
+# Full Test Suite Results
+
+**Date:** $(date "+%Y-%m-%d %H:%M:%S")  
+**Coverage Threshold:** ${COVERAGE_THRESHOLD}%  
+**Parallel Execution:** $(if [[ "$PARALLEL" == true ]]; then echo "Enabled"; else echo "Disabled"; fi)
+
+## Test Results Summary
+
+| Test Type | Status | Duration | Details |
+|-----------|--------|----------|---------|
+EOF
+}
+
+# Run tests by type
+run_tests() {
+  local test_type="$1"
+  print_header "Running $test_type Tests"
+  
+  local output_file=$(get_output_file "$test_type")
+  local start_time=$(date +%s)
+  local status="PASS"
+  
+  # Build test command
+  local test_cmd="${PROJECT_ROOT}/bin/s8r-test $test_type"
+  
+  if [[ "$PARALLEL" == true ]]; then
+    test_cmd="$test_cmd --parallel"
+  fi
+  
+  if [[ "$VERBOSE" == true ]]; then
+    test_cmd="$test_cmd --verbose"
+  fi
+  
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    test_cmd="$test_cmd --output $output_file"
+    print_info "Output will be saved to: $output_file"
+  fi
+  
+  # Run the test command
+  print_info "Running: $test_cmd"
+  if eval "$test_cmd"; then
+    status="PASS"
+    print_success "$test_type tests completed successfully"
+  else
+    status="FAIL"
+    print_warning "$test_type tests failed"
+  fi
+  
+  local end_time=$(date +%s)
+  local duration=$((end_time - start_time))
+  
+  # Update summary file
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    local duration_formatted="$(printf '%02d:%02d' $((duration / 60)) $((duration % 60)))"
+    local details="[View Results](${output_file##*/})"
+    
+    local status_icon
+    if [[ "$status" == "PASS" ]]; then
+      status_icon="✅ Pass"
+    else
+      status_icon="❌ Fail"
+    fi
+    
+    echo "| $test_type | $status_icon | $duration_formatted | $details |" >> "$SUMMARY_FILE"
+  fi
+  
+  return $(if [[ "$status" == "PASS" ]]; then echo 0; else echo 1; fi)
+}
+
+# Run coverage analysis
+run_coverage_analysis() {
+  if [[ "$SKIP_ANALYSIS" == true ]]; then
+    print_info "Skipping coverage analysis as requested"
+    return 0
+  fi
+  
+  print_header "Running Coverage Analysis"
+  
+  local coverage_report="${REPORT_DIR}/${REPORT_PREFIX}_coverage_analysis.md"
+  local start_time=$(date +%s)
+  
+  # Build analysis command
+  local analysis_cmd="${SCRIPT_DIR}/analyze-test-coverage"
+  
+  if [[ "$VERBOSE" == true ]]; then
+    analysis_cmd="$analysis_cmd --verbose"
+  fi
+  
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    analysis_cmd="$analysis_cmd --report --output $coverage_report"
+    print_info "Coverage report will be saved to: $coverage_report"
+  fi
+  
+  # Set thresholds
+  analysis_cmd="$analysis_cmd --min-threshold $COVERAGE_THRESHOLD --target-threshold $((COVERAGE_THRESHOLD + 10))"
+  
+  # Run the analysis command
+  print_info "Running: $analysis_cmd"
+  if ! eval "$analysis_cmd"; then
+    print_warning "Coverage analysis failed"
+  fi
+  
+  local end_time=$(date +%s)
+  local duration=$((end_time - start_time))
+  
+  # Update summary file
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    local duration_formatted="$(printf '%02d:%02d' $((duration / 60)) $((duration % 60)))"
+    local details="[View Coverage Analysis](${coverage_report##*/})"
+    
+    # Add coverage analysis to summary
+    cat >> "$SUMMARY_FILE" << EOF
+
+| Coverage Analysis | ℹ️ | $duration_formatted | $details |
+EOF
+  fi
+  
+  return 0
+}
+
+# Verify test suite quality
+verify_test_suite() {
+  if [[ "$SKIP_VERIFICATION" == true ]]; then
+    print_info "Skipping test suite verification as requested"
+    return 0
+  fi
+  
+  print_header "Verifying Test Suite Quality"
+  
+  local verification_report="${REPORT_DIR}/${REPORT_PREFIX}_verification_report.md"
+  local start_time=$(date +%s)
+  
+  # Build verification command
+  local verify_cmd="${SCRIPT_DIR}/verify-test-suite"
+  
+  if [[ "$VERBOSE" == true ]]; then
+    verify_cmd="$verify_cmd --verbose"
+  fi
+  
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    verify_cmd="$verify_cmd --report --output $verification_report"
+    print_info "Verification report will be saved to: $verification_report"
+  fi
+  
+  # Set threshold
+  verify_cmd="$verify_cmd --threshold $COVERAGE_THRESHOLD"
+  
+  # Set fix option if requested
+  if [[ "$FIX_ISSUES" == true ]]; then
+    verify_cmd="$verify_cmd --fix"
+  fi
+  
+  # Run the verification command
+  print_info "Running: $verify_cmd"
+  if ! eval "$verify_cmd"; then
+    print_warning "Test suite verification failed"
+  fi
+  
+  local end_time=$(date +%s)
+  local duration=$((end_time - start_time))
+  
+  # Update summary file
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    local duration_formatted="$(printf '%02d:%02d' $((duration / 60)) $((duration % 60)))"
+    local details="[View Verification Report](${verification_report##*/})"
+    
+    # Add verification to summary
+    cat >> "$SUMMARY_FILE" << EOF
+| Test Suite Verification | ℹ️ | $duration_formatted | $details |
+EOF
+  fi
+  
+  return 0
+}
+
+# Finalize report with summary
+finalize_report() {
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    print_header "Finalizing Test Reports"
+    
+    # Calculate overall results
+    local total_tests=${#TEST_TYPES[@]}
+    local passed_tests=$(grep -c "✅ Pass" "$SUMMARY_FILE" || echo 0)
+    local failed_tests=$((total_tests - passed_tests))
+    
+    local overall_status="✅ PASS"
+    if [[ $failed_tests -gt 0 ]]; then
+      overall_status="❌ FAIL"
+    fi
+    
+    # Calculate total duration
+    local total_duration=0
+    while IFS='|' read -r _ _ duration _; do
+      if [[ "$duration" =~ [0-9][0-9]:[0-9][0-9] ]]; then
+        local minutes=${duration%:*}
+        local seconds=${duration#*:}
+        total_duration=$((total_duration + minutes * 60 + seconds))
+      fi
+    done < <(grep -o "|[^|]*|[^|]*|[^|]*|" "$SUMMARY_FILE")
+    
+    local total_duration_formatted="$(printf '%02d:%02d' $((total_duration / 60)) $((total_duration % 60)))"
+    
+    # Update summary with overall results
+    local temp_file="/tmp/test_summary_temp.md"
+    
+    cat > "$temp_file" << EOF
+# Full Test Suite Results
+
+**Date:** $(date "+%Y-%m-%d %H:%M:%S")  
+**Coverage Threshold:** ${COVERAGE_THRESHOLD}%  
+**Parallel Execution:** $(if [[ "$PARALLEL" == true ]]; then echo "Enabled"; else echo "Disabled"; fi)
+
+## Overall Results
+
+- **Status:** $overall_status
+- **Tests Passed:** $passed_tests/$total_tests
+- **Total Duration:** $total_duration_formatted
+
+## Test Results Summary
+
+| Test Type | Status | Duration | Details |
+|-----------|--------|----------|---------|
+EOF
+    
+    # Copy the rest of the summary
+    tail -n +8 "$SUMMARY_FILE" >> "$temp_file"
+    
+    # Create latest test results symlink
+    ln -sf "${REPORT_PREFIX}_summary.md" "${REPORT_DIR}/latest_test_results.md"
+    
+    # Move temp file to summary file
+    mv "$temp_file" "$SUMMARY_FILE"
+    
+    print_success "Test reports finalized: $SUMMARY_FILE"
+    print_info "Latest results symlink: ${REPORT_DIR}/latest_test_results.md"
+    
+    # Create a plain text results file for quick viewing
+    local txt_results="${REPORT_DIR}/test_results_${REPORT_PREFIX}.txt"
+    
+    echo "Full Test Suite Results" > "$txt_results"
+    echo "======================" >> "$txt_results"
+    echo "" >> "$txt_results"
+    echo "Date: $(date "+%Y-%m-%d %H:%M:%S")" >> "$txt_results"
+    echo "Status: ${overall_status}" >> "$txt_results"
+    echo "Tests Passed: $passed_tests/$total_tests" >> "$txt_results"
+    echo "Total Duration: $total_duration_formatted" >> "$txt_results"
+    echo "" >> "$txt_results"
+    echo "Test Results:" >> "$txt_results"
+    
+    for test_type in "${TEST_TYPES[@]}"; do
+      local status=$(grep "| $test_type |" "$SUMMARY_FILE" | grep -o "✅ Pass\|❌ Fail" || echo "⚠️ Skipped")
+      echo "  $test_type: $status" >> "$txt_results"
+    done
+    
+    echo "" >> "$txt_results"
+    echo "Full reports available in: $REPORT_DIR" >> "$txt_results"
+    
+    print_info "Plain text results: $txt_results"
+  fi
+}
+
+main() {
+  # Parse command line arguments
+  parse_args "$@"
+  
+  # Setup output directory and initialize summary
+  setup_output_dir
+  
+  # Track overall success
+  local overall_success=true
+  
+  # Run all test types
+  for test_type in "${TEST_TYPES[@]}"; do
+    if ! run_tests "$test_type"; then
+      overall_success=false
+    fi
+  done
+  
+  # Run test coverage analysis
+  run_coverage_analysis
+  
+  # Verify test suite quality
+  verify_test_suite
+  
+  # Finalize report
+  finalize_report
+  
+  print_header "Test Suite Execution Complete"
+  
+  if [[ "$overall_success" == true ]]; then
+    print_success "All tests passed successfully"
+    return 0
+  else
+    print_warning "Some tests failed. See reports for details."
+    return 1
+  fi
+}
+
+# Run the script
+main "$@"

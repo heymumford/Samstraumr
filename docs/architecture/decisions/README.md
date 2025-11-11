@@ -1,8 +1,8 @@
-# Architecture Decision Records
+# README
 
 This directory contains Architecture Decision Records (ADRs) for the Samstraumr project.
 
-## What are Architecture Decision Records?
+## What Are Architecture Decision Records?
 
 Architecture Decision Records (ADRs) are documents that capture important architectural decisions made along with their context and consequences. They provide a historical record of the technical choices made during the project development.
 

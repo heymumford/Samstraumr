@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Script Reorganization and Refactoring Summary
+# Script Reorganization
 
 ## Overview
 
@@ -25,7 +25,7 @@ The initial reorganization involved:
 3. **Clean transition approach** - Removing old script locations entirely for a clean break
 4. **Updating documentation** - Revising README files to reflect the new organization
 
-### New Directory Structure
+### New directory structure
 
 #### Root level scripts (primary functions)
 
@@ -62,7 +62,7 @@ util/scripts/
 └── update-md-headers.sh      # Markdown header standardization
 ```
 
-### Script Mapping (Old to New)
+### Script mapping (old to new)
 
 The following table shows the mapping from old script locations to new ones. The old script locations have been completely removed for a clean break and to avoid ambiguity:
 
@@ -92,7 +92,7 @@ The following table shows the mapping from old script locations to new ones. The
 | `util/test/run-all-tests.sh`           | `util/test-run-all.sh`                |
 | `util/test/mapping/map-test-type.sh`   | `util/test-map-type.sh`               |
 
-### Naming Conventions
+### Naming conventions
 
 The new naming convention follows these principles:
 
@@ -144,16 +144,16 @@ As part of ongoing refactoring efforts, we added:
    - Ensured all scripts are properly executable (`chmod +x`)
    - Maintained compatibility with existing functionality
 
-### Demo Command Usage Examples
+### Demo command usage examples
 
 ```bash
-# List available demos
+# Script Reorganization
 ./s8r demo list
 
-# Run the tube identity demo
+# Script Reorganization
 ./s8r demo identity
 
-# Get help on demo commands
+# Script Reorganization
 ./s8r help demo
 ```
 

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Help file for build command
+
+# Terminal colors
+BOLD='\033[1m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
+RESET='\033[0m'
+
+echo -e "${BOLD}Development Command:${RESET} build"
+echo
+echo -e "${YELLOW}Note:${RESET} 'build' is a development command."
+echo "Please use: ./s8r-dev help build"
+echo
+echo "For general development command help, run:"
+echo "  ./s8r-dev --help"

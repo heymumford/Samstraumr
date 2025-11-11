@@ -1,4 +1,4 @@
-# Samstraumr Test Tag Mapping Reference
+# Test Tag Mapping
 
 This document provides a mapping between the legacy tag system and the new standardized test tag system, helping with the transition between the two taxonomies.
 
@@ -71,35 +71,35 @@ This document provides a mapping between the legacy tag system and the new stand
 
 ## Running Tests
 
-### With Legacy Tags:
+### With legacy tags:
 
 ```bash
-# Run tests by criticality
+# Test Tag Mapping
 ./s8r test atl 
 ./s8r test btl
 
-# Run tests by level
+# Test Tag Mapping
 ./s8r test tube
 ./s8r test composite
 ./s8r test machine
 ./s8r test system
 ```
 
-### With New Standardized Tags:
+### With new standardized tags:
 
 ```bash
-# Run tests by level
+# Test Tag Mapping
 ./s8r test unit
 ./s8r test component
 ./s8r test integration
 ./s8r test system
 
-# Run tests by type
+# Test Tag Mapping
 ./s8r test functional
 ./s8r test error-handling
 ./s8r test performance
 
-# Run tests by feature area
+# Test Tag Mapping
 ./s8r test identity
 ./s8r test lifecycle
 ./s8r test state
@@ -108,7 +108,7 @@ This document provides a mapping between the legacy tag system and the new stand
 
 ## Tag Combinations
 
-### Legacy Tag Combinations:
+### Legacy tag combinations:
 
 ```
 @L0_Tube @ATL @Identity @Init
@@ -116,7 +116,7 @@ This document provides a mapping between the legacy tag system and the new stand
 @L2_Machine @ATL @State @Performance
 ```
 
-### New Standardized Tag Combinations:
+### New standardized tag combinations:
 
 ```
 @L0_Unit @Functional @Identity @Lifecycle
@@ -129,10 +129,10 @@ This document provides a mapping between the legacy tag system and the new stand
 The repository includes a tool to help migrate to the new tag system:
 
 ```bash
-# Standardize tags for all feature files
+# Test Tag Mapping
 ./util/scripts/standardize-test-tags.sh
 
-# Standardize tags for specific directory
+# Test Tag Mapping
 ./util/scripts/standardize-test-tags.sh /path/to/features
 ```
 
@@ -140,4 +140,3 @@ This tool will:
 1. Create a backup of original files
 2. Update feature and scenario tags to follow the new standard
 3. Log all changes made
-4. Preserve test functionality and execution

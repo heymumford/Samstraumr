@@ -1,0 +1,128 @@
+#!/bin/bash
+
+# Copyright (c) 2025. All rights reserved.
+
+# Port interface performance testing script
+
+# Import common utilities
+source ./util/lib/common.sh
+source ./util/lib/output-standard.sh
+
+# Constants
+DEFAULT_PROFILE="smoke"
+CUCUMBER_TAGS=""
+GENERATE_REPORT=false
+OUTPUT_DIR="./test-results/performance"
+MODULE_DIR="modules/samstraumr-core"
+
+# Usage information
+usage() {
+  echo "Usage: $0 [options]"
+  echo "Run port interface performance tests."
+  echo ""
+  echo "Options:"
+  echo "  -p, --profile PROFILE   Test profile: smoke, stress, or all (default: smoke)"
+  echo "  -r, --report            Generate performance report"
+  echo "  -o, --out DIR           Output directory for reports (default: ./test-results/performance)"
+  echo "  -v, --verbose           Verbose output"
+  echo "  -h, --help              Show this help message"
+  echo ""
+  echo "Examples:"
+  echo "  $0                      Run smoke tests"
+  echo "  $0 --profile stress     Run stress tests"
+  echo "  $0 --profile all        Run all performance tests"
+  echo "  $0 --report             Run smoke tests and generate a report"
+  exit 1
+}
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -p|--profile)
+      TEST_PROFILE="$2"
+      shift 2
+      ;;
+    -r|--report)
+      GENERATE_REPORT=true
+      shift
+      ;;
+    -o|--out)
+      OUTPUT_DIR="$2"
+      shift 2
+      ;;
+    -v|--verbose)
+      VERBOSE=true
+      shift
+      ;;
+    -h|--help)
+      usage
+      ;;
+    *)
+      echo "Unknown option: $1"
+      usage
+      ;;
+  esac
+done
+
+# Set default profile if not specified
+TEST_PROFILE=${TEST_PROFILE:-$DEFAULT_PROFILE}
+
+# Configure tags based on profile
+case $TEST_PROFILE in
+  smoke)
+    CUCUMBER_TAGS="@Performance and @Smoke"
+    ;;
+  stress)
+    CUCUMBER_TAGS="@Performance and @Stress"
+    ;;
+  all)
+    CUCUMBER_TAGS="@Performance"
+    ;;
+  *)
+    echo "Invalid profile: $TEST_PROFILE"
+    usage
+    ;;
+esac
+
+# Ensure output directory exists
+mkdir -p "$OUTPUT_DIR"
+
+log_header "Running Port Interface Performance Tests"
+log_info "Profile: $TEST_PROFILE"
+log_info "Tags: $CUCUMBER_TAGS"
+log_info "Generate Report: $GENERATE_REPORT"
+log_info "Output Directory: $OUTPUT_DIR"
+echo ""
+
+# Execute tests using the optimized adapters
+log_step "Building with optimization enabled"
+cd "$MODULE_DIR" || { log_error "Failed to change to module directory"; exit 1; }
+
+# Run performance tests
+log_step "Running performance tests with profile: $TEST_PROFILE"
+mvn test -Dtest=PortPerformanceRunner -Dcucumber.filter.tags="$CUCUMBER_TAGS" -Dperformance.adapter=optimized
+
+# Check if tests passed
+if [ $? -ne 0 ]; then
+  log_error "Performance tests failed"
+  exit 1
+fi
+
+# Generate report if requested
+if [ "$GENERATE_REPORT" = true ]; then
+  log_step "Generating performance report"
+  
+  TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+  REPORT_FILE="$OUTPUT_DIR/performance_report_${TIMESTAMP}.md"
+  
+  # Run the report generator
+  mvn exec:java -Dexec.mainClass="org.s8r.test.performance.PerformanceReportGenerator" -Dexec.args="$REPORT_FILE"
+  
+  if [ $? -eq 0 ]; then
+    log_success "Performance report generated: $REPORT_FILE"
+  else
+    log_error "Failed to generate performance report"
+  fi
+fi
+
+log_success "Port interface performance tests completed successfully"

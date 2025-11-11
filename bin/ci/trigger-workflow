@@ -1,0 +1,296 @@
+#!/usr/bin/env bash
+#==============================================================================
+# Filename: trigger-workflow
+# Description: GitHub Actions workflow trigger script
+#
+# Triggers GitHub Actions workflows programmatically using the GitHub API.
+# Can be used to initiate builds, tests, or releases from outside GitHub.
+#==============================================================================
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+
+# Source unified common library for consistent output formatting
+if [ -f "${PROJECT_ROOT}/util/lib/unified-common.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/unified-common.sh"
+else
+  # Fallback to minimal functionality if library not found
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  BLUE='\033[0;34m'
+  YELLOW='\033[0;33m'
+  BOLD='\033[1m'
+  RESET='\033[0m'
+  
+  print_info() { echo -e "${BLUE}→ $1${RESET}"; }
+  print_success() { echo -e "${GREEN}✓ $1${RESET}"; }
+  print_error() { echo -e "${RED}✗ $1${RESET}" >&2; exit 1; }
+  print_warning() { echo -e "${YELLOW}! $1${RESET}" >&2; }
+  print_header() { echo -e "${BLUE}${BOLD}$1${RESET}"; echo -e "${BLUE}${BOLD}$(printf '=%.0s' $(seq 1 ${#1}))${RESET}"; }
+  print_section() { echo -e "${BLUE}$1${RESET}"; }
+fi
+
+# Initialize variables
+VERBOSE=false
+WORKFLOW="s8r-ci.yml"
+REF="main"
+REPO=""
+GITHUB_TOKEN=""
+DRY_RUN=false
+INPUTS=""
+
+# Function to display help
+show_help() {
+  print_header "GitHub Actions Workflow Trigger"
+  echo
+  print_section "Description"
+  echo "  This tool triggers GitHub Actions workflows programmatically using the GitHub API."
+  echo "  It can be used to initiate builds, tests, or releases from outside GitHub."
+  echo
+  print_section "Usage"
+  echo "  trigger-workflow [options]"
+  echo
+  print_section "Options"
+  echo "  -v, --verbose            Show detailed output"
+  echo "  -w, --workflow FILE      Workflow file to trigger (default: s8r-ci.yml)"
+  echo "  -r, --ref BRANCH/TAG     Git reference to trigger on (default: main)"
+  echo "  -o, --repo OWNER/REPO    GitHub repository (default: auto-detect)"
+  echo "  -t, --token TOKEN        GitHub personal access token"
+  echo "  -d, --dry-run            Show what would be triggered without executing"
+  echo "  -i, --input NAME=VALUE   Workflow input (can be used multiple times)"
+  echo "  -h, --help               Show this help message"
+  echo
+  print_section "Examples"
+  echo "  trigger-workflow -t \$GITHUB_TOKEN                     # Trigger default workflow"
+  echo "  trigger-workflow -w release.yml -r v2.5.0              # Trigger release workflow on tag"
+  echo "  trigger-workflow -i run_tests=true -i deploy=false     # Trigger with inputs"
+}
+
+# Parse command line arguments
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -v|--verbose)
+        VERBOSE=true
+        shift
+        ;;
+      -w|--workflow)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          WORKFLOW="$2"
+          shift 2
+        else
+          print_error "Workflow file missing after -w/--workflow"
+          show_help
+          exit 1
+        fi
+        ;;
+      -r|--ref)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          REF="$2"
+          shift 2
+        else
+          print_error "Git reference missing after -r/--ref"
+          show_help
+          exit 1
+        fi
+        ;;
+      -o|--repo)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          REPO="$2"
+          shift 2
+        else
+          print_error "Repository path missing after -o/--repo"
+          show_help
+          exit 1
+        fi
+        ;;
+      -t|--token)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          GITHUB_TOKEN="$2"
+          shift 2
+        else
+          print_error "GitHub token missing after -t/--token"
+          show_help
+          exit 1
+        fi
+        ;;
+      -d|--dry-run)
+        DRY_RUN=true
+        shift
+        ;;
+      -i|--input)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          if [[ -z "$INPUTS" ]]; then
+            INPUTS="{\"$2\"}"
+          else
+            INPUTS="${INPUTS},\"$2\""
+          fi
+          shift 2
+        else
+          print_error "Input value missing after -i/--input"
+          show_help
+          exit 1
+        fi
+        ;;
+      -h|--help)
+        show_help
+        exit 0
+        ;;
+      *)
+        print_error "Unknown option: $1"
+        show_help
+        exit 1
+        ;;
+    esac
+  done
+  
+  # Auto-detect repository if not specified
+  if [[ -z "$REPO" ]]; then
+    local origin_url=$(git remote get-url origin 2>/dev/null || echo "")
+    
+    if [[ "$origin_url" =~ github\.com[/:]([^/]+)/([^/.]+)(.git)? ]]; then
+      local owner="${BASH_REMATCH[1]}"
+      local repo="${BASH_REMATCH[2]}"
+      REPO="$owner/$repo"
+      print_info "Auto-detected repository: $REPO"
+    else
+      print_error "Could not auto-detect GitHub repository. Please specify with --repo."
+      exit 1
+    fi
+  fi
+  
+  # Check for GitHub token
+  if [[ -z "$GITHUB_TOKEN" && -n "$GH_TOKEN" ]]; then
+    GITHUB_TOKEN="$GH_TOKEN"
+  fi
+  
+  if [[ -z "$GITHUB_TOKEN" ]]; then
+    print_error "GitHub token is required. Please provide with --token or set GH_TOKEN environment variable."
+    exit 1
+  fi
+}
+
+# Format inputs for the API call
+format_inputs() {
+  if [[ -n "$INPUTS" ]]; then
+    # Parse the inputs and format them properly
+    local formatted_inputs="{}"
+    
+    while IFS= read -r input; do
+      if [[ "$input" =~ ([^=]+)=(.*) ]]; then
+        local key="${BASH_REMATCH[1]}"
+        local value="${BASH_REMATCH[2]}"
+        
+        # Add to formatted inputs
+        if [[ "$value" =~ ^(true|false)$ ]]; then
+          # Boolean values
+          formatted_inputs=$(echo "$formatted_inputs" | jq --arg k "$key" --argjson v "$value" '. + {($k): $v}')
+        elif [[ "$value" =~ ^[0-9]+$ ]]; then
+          # Number values
+          formatted_inputs=$(echo "$formatted_inputs" | jq --arg k "$key" --argjson v "$value" '. + {($k): $v}')
+        else
+          # String values
+          formatted_inputs=$(echo "$formatted_inputs" | jq --arg k "$key" --arg v "$value" '. + {($k): $v}')
+        fi
+      fi
+    done < <(echo "$INPUTS" | tr ',' '\n' | sed 's/^{//;s/}$//' | sed 's/^"//;s/"$//')
+    
+    echo "$formatted_inputs"
+  else
+    echo "{}"
+  fi
+}
+
+# Trigger the workflow
+trigger_workflow() {
+  print_header "Triggering GitHub Actions Workflow"
+  
+  # Build the API URL
+  local api_url="https://api.github.com/repos/$REPO/actions/workflows/$WORKFLOW/dispatches"
+  
+  # Format inputs
+  local formatted_inputs=$(format_inputs)
+  
+  # Create the request payload
+  local payload=$(jq -n \
+                  --arg ref "$REF" \
+                  --argjson inputs "$formatted_inputs" \
+                  '{ref: $ref, inputs: $inputs}')
+  
+  if [[ "$VERBOSE" == true ]]; then
+    print_info "API URL: $api_url"
+    print_info "Payload: $payload"
+  fi
+  
+  if [[ "$DRY_RUN" == true ]]; then
+    print_info "Dry run - would trigger workflow:"
+    print_info "  Repository: $REPO"
+    print_info "  Workflow: $WORKFLOW"
+    print_info "  Reference: $REF"
+    if [[ -n "$INPUTS" ]]; then
+      print_info "  Inputs: $formatted_inputs"
+    fi
+    return 0
+  fi
+  
+  # Make the API call
+  local response=$(curl -s -X POST \
+                  -H "Accept: application/vnd.github.v3+json" \
+                  -H "Authorization: token $GITHUB_TOKEN" \
+                  -d "$payload" \
+                  "$api_url")
+  
+  # Check for errors
+  if [[ "$response" == *"Bad credentials"* ]]; then
+    print_error "Authentication failed. Please check your GitHub token."
+    exit 1
+  elif [[ "$response" == *"Not Found"* ]]; then
+    print_error "Workflow not found: $WORKFLOW"
+    exit 1
+  elif [[ "$response" == *"Reference does not exist"* ]]; then
+    print_error "Git reference not found: $REF"
+    exit 1
+  elif [[ "$response" == *"error"* || "$response" == *"message"* ]]; then
+    print_error "Error triggering workflow: $response"
+    exit 1
+  elif [[ -z "$response" ]]; then
+    print_success "Workflow triggered successfully."
+    
+    # Get workflow runs to get the URL
+    sleep 2  # Give GitHub a moment to register the workflow run
+    local runs_url="https://api.github.com/repos/$REPO/actions/workflows/$WORKFLOW/runs?per_page=1"
+    local runs_response=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$runs_url")
+    
+    local run_url=$(echo "$runs_response" | jq -r '.workflow_runs[0].html_url')
+    
+    if [[ -n "$run_url" && "$run_url" != "null" ]]; then
+      print_info "Workflow run URL: $run_url"
+    fi
+  else
+    print_warning "Unexpected response: $response"
+  fi
+}
+
+# Main function
+main() {
+  # Parse command line arguments
+  parse_args "$@"
+  
+  # Check dependencies
+  if ! command -v jq &> /dev/null; then
+    print_error "jq is required but not installed. Please install it first."
+    exit 1
+  fi
+  
+  if ! command -v curl &> /dev/null; then
+    print_error "curl is required but not installed. Please install it first."
+    exit 1
+  fi
+  
+  # Trigger the workflow
+  trigger_workflow
+}
+
+# Run the script
+main "$@"

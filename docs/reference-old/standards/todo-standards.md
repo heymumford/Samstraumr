@@ -9,7 +9,7 @@ remain exclusively with the copyright holder listed above.
 Licensed under the Mozilla Public License 2.0
 -->
 
-# TODO Standards
+# Todo Standards
 
 This document outlines the standard format for TODOs in the Samstraumr codebase.
 
@@ -85,7 +85,7 @@ The issue number should be the actual GitHub issue number. This helps track high
 
 The following tools are available to work with TODOs:
 
-### Extract TODOs
+### Extract todos
 
 Lists all TODOs in the codebase and generates a report:
 
@@ -95,7 +95,7 @@ Lists all TODOs in the codebase and generates a report:
 
 Options include filtering by priority, category, and more.
 
-### Standardize TODOs
+### Standardize todos
 
 Automatically fixes non-compliant TODOs to follow the standard format:
 
@@ -103,7 +103,7 @@ Automatically fixes non-compliant TODOs to follow the standard format:
 ./docs/scripts/standardize-todos.sh --fix
 ```
 
-### GitHub Issue Creation
+### Github issue creation
 
 Creates GitHub issues from high-priority TODOs:
 
@@ -111,7 +111,7 @@ Creates GitHub issues from high-priority TODOs:
 ./docs/scripts/todo-to-issue.sh [--dry-run]
 ```
 
-### CI Check
+### Ci check
 
 Verifies that TODOs follow the standard format in CI:
 
@@ -135,4 +135,3 @@ Standardizing TODOs provides several benefits:
 2. **Traceability**: Links TODOs to GitHub issues for tracking
 3. **Categorization**: Organizes TODOs by type for better management
 4. **Automation**: Enables automatic extraction and reporting
-5. **Consistency**: Makes TODOs easier to read and understand

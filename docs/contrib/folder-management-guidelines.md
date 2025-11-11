@@ -58,7 +58,7 @@ Avoid creating new folders when:
 
 Instead of creating deep directory structures, use these strategies:
 
-### 1. File Prefixing Pattern
+### 1. file prefixing pattern
 
 ```
 Instead of:
@@ -72,7 +72,7 @@ Use:
   identity-format-specialized.java
 ```
 
-### 2. Package Consolidation
+### 2. package consolidation
 
 ```
 Instead of:
@@ -92,12 +92,12 @@ Use:
   ProfileEntityMapper.java
 ```
 
-### 3. README Documentation
+### 3. readme documentation
 
 Use README files to document logical groupings without creating physical folder boundaries:
 
 ```markdown
-# Validators
+# Folder Management Guidelines
 
 ## Identity Validators
 The following files handle identity validation:
@@ -110,7 +110,7 @@ The following files handle component validation:
 ...
 ```
 
-### 4. Interface Segregation
+### 4. interface segregation
 
 Split large interfaces/classes instead of grouping many small ones:
 
@@ -140,7 +140,7 @@ public interface IdentityReferenceValidator {
 
 When using file naming to replace folder structure, follow these patterns:
 
-### For Java Classes:
+### For java classes:
 
 **Pattern**: `[Domain][Entity][Concern][Type].java`
 
@@ -149,7 +149,7 @@ When using file naming to replace folder structure, follow these patterns:
 - `IdentityFormatValidator.java`
 - `MachineStateFactory.java`
 
-### For Documentation:
+### For documentation:
 
 **Pattern**: `[domain]-[concept]-[aspect].md`
 
@@ -158,7 +158,7 @@ When using file naming to replace folder structure, follow these patterns:
 - `identity-addressing-scheme.md`
 - `machine-orchestration-patterns.md`
 
-### For Test Files:
+### For test files:
 
 **Pattern**: `[Entity][Scenario]Test.java`
 
@@ -194,20 +194,20 @@ When you determine a new directory is necessary:
 The repository includes a tool to help identify opportunities for directory flattening:
 
 ```bash
-# Run the directory analysis script
+# Folder Management Guidelines
 ./util/scripts/flatten-directories.sh
 
-# Sample output:
-# Directories with fewer than 5 files:
-# /src/component/creation | 2 files | Consider flattening to /src/component with prefixes
-# /src/validation/format | 3 files | Consider flattening to /src/validation with prefixes
+# Folder Management Guidelines
+# Folder Management Guidelines
+# Folder Management Guidelines
+# Folder Management Guidelines
 ```
 
 Use this tool regularly to analyze the repository structure and identify optimization opportunities.
 
 ## Example Decision Process
 
-### Scenario 1: Component Validators
+### Scenario 1: component validators
 
 **Situation**: You have 3 validator classes for different aspects of component identity.
 
@@ -215,7 +215,7 @@ Use this tool regularly to analyze the repository structure and identify optimiz
 
 **Good Decision**: Name the files `identity-format-validator.java`, `identity-uniqueness-validator.java`, and `identity-reference-validator.java` and place them in the existing `/validators/` directory.
 
-### Scenario 2: Event Handlers
+### Scenario 2: event handlers
 
 **Situation**: You have 7 event handler classes, all related to component lifecycle events.
 
@@ -223,7 +223,7 @@ Use this tool regularly to analyze the repository structure and identify optimiz
 
 **Good Decision**: Create a single `/event/lifecycle/` directory with all 7 handlers, with README documentation explaining the relationships.
 
-### Scenario 3: Utility Methods
+### Scenario 3: utility methods
 
 **Situation**: You have 2 utility classes for string manipulation and 3 for date handling.
 
@@ -250,7 +250,7 @@ During audits:
 
 To enforce our 9-level maximum directory depth policy:
 
-### Checking for Depth Violations
+### Checking for depth violations
 
 Run the depth verification tool to identify paths that exceed the maximum:
 
@@ -260,7 +260,7 @@ Run the depth verification tool to identify paths that exceed the maximum:
 
 The tool will highlight paths that exceed our 9-level limit and mark them as requiring immediate attention.
 
-### Fixing Depth Violations
+### Fixing depth violations
 
 When you encounter paths that exceed the depth limit:
 
@@ -277,7 +277,7 @@ When you encounter paths that exceed the depth limit:
    - Use file naming conventions instead of deep nesting
    - Consolidate small, similar-purpose directories
 
-### Pre-commit Verification
+### Pre-commit verification
 
 All pull requests must pass the directory depth verification check before they can be merged. The CI pipeline includes this check to ensure no path exceeds 9 levels.
 

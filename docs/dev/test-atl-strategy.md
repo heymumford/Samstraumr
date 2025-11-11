@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# A T L B T L Strategy
+# Test Atl Strategy
 
 This document outlines the Above the Line (ATL) and Below the Line (BTL) testing strategy implemented in Samstraumr, providing guidelines for categorizing tests and ensuring efficient test execution.
 
@@ -97,16 +97,16 @@ Samstraumr implements the ATL/BTL strategy across both JUnit and Cucumber tests:
 ### Using the test runner script
 
 ```bash
-# A T L B T L Strategy
+# Test Atl Strategy
 ./util/test/run-tests.sh atl
 
-# A T L B T L Strategy
+# Test Atl Strategy
 ./util/test/run-tests.sh btl
 
-# A T L B T L Strategy
+# Test Atl Strategy
 ./util/test/run-tests.sh --parallel atl
 
-# A T L B T L Strategy
+# Test Atl Strategy
 ./util/test/run-tests.sh --skip-quality atl
 
 ## Test Categorization Guidelines

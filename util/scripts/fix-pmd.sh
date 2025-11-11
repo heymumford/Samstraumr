@@ -5,7 +5,7 @@
 
 echo "Creating minimal PMD ruleset for compatibility with PMD 7.10.0..."
 
-cat > ../Samstraumr/pmd-ruleset.xml << 'EOF'
+cat > ../modules/pmd-ruleset.xml << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <ruleset name="Custom Ruleset"
     xmlns="http://pmd.sourceforge.net/ruleset/3.0.0"

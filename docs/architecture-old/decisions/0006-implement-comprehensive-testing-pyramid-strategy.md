@@ -1,4 +1,4 @@
-# 6. Implement Comprehensive Testing Pyramid Strategy
+# 0006 Implement Comprehensive Testing Pyramid Strategy
 
 Date: 2025-04-06
 
@@ -27,7 +27,7 @@ We previously lacked a structured approach to testing, resulting in:
 
 We will implement a comprehensive testing pyramid strategy that aligns Samstraumr's domain-specific terminology with industry standards, organized in a layered approach:
 
-### Test Pyramid Structure
+### Test pyramid structure
 
 ```
            /\
@@ -45,7 +45,7 @@ We will implement a comprehensive testing pyramid strategy that aligns Samstraum
       Foundation         Orchestration Tests (Smoke)
 ```
 
-### Terminology Mapping
+### Terminology mapping
 
 We will establish clear mapping between industry-standard terms and Samstraumr terms:
 
@@ -59,14 +59,14 @@ We will establish clear mapping between industry-standard terms and Samstraumr t
 | System Test       | Stream Test        | Tests the entire system as a whole               |
 | End-to-End Test   | Acceptance Test    | Tests from the user's perspective                |
 
-### Critical vs. Non-Critical Tests
+### Critical vs. non-critical tests
 
 We will categorize tests as:
 
 - **Above The Line (ATL)**: Critical tests that must pass for the build to be considered valid
 - **Below The Line (BTL)**: Non-critical tests that provide additional confidence but are not blocking
 
-### Test Organization
+### Test organization
 
 Tests will be organized by level (L0-L4) with clear directory structure and naming conventions:
 
@@ -90,7 +90,7 @@ test/
 5. **Clear Expectations**: Developers understand what to test at each level
 6. **Training Enhancement**: Easier to train new team members on testing practices
 
-### Challenges and Mitigations
+### Challenges and mitigations
 
 1. **Challenge**: Migrating existing tests to the new structure
    - **Mitigation**: Incremental migration, starting with new tests and gradually refactoring existing ones
@@ -104,4 +104,3 @@ test/
 4. **Challenge**: Maintaining fast build times with comprehensive testing
    - **Mitigation**: Parallel test execution, ATL/BTL separation, and test optimization techniques
 
-By implementing this testing strategy, we'll improve both the quality of our testing and the system's overall quality while respecting Samstraumr's unique domain language.

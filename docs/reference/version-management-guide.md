@@ -13,7 +13,7 @@ Licensed under the Mozilla Public License 2.0
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-# Samstraumr Version Management Guide
+# Version Management Guide
 
 ## Core Strategy
 
@@ -27,13 +27,13 @@ Samstraumr uses a centralized version management approach with:
 ## Quick Command Reference
 
 ```bash
-# View versions
+# Version Management Guide
 ./s8r version get             # Current version
 ./s8r version get -v          # Detailed info
 ./s8r version history         # Version history  
 ./s8r version verify          # Check tag alignment
 
-# Change versions
+# Version Management Guide
 ./s8r version bump patch      # 1.2.3 → 1.2.4
 ./s8r version bump minor      # 1.2.3 → 1.3.0
 ./s8r version bump major      # 1.2.3 → 2.0.0
@@ -43,7 +43,7 @@ Samstraumr uses a centralized version management approach with:
 
 ## Workflow Examples
 
-### Patch Release
+### Patch release
 
 ```bash
 git status                   # Ensure clean working directory
@@ -52,7 +52,7 @@ git status                   # Ensure clean working directory
 git push origin HEAD --tags  # Push changes
 ```
 
-### Feature Release (Minor Version)
+### Feature release (minor version)
 
 ```bash
 git checkout main
@@ -62,7 +62,7 @@ git merge feature/new-component
 git push origin HEAD --tags
 ```
 
-### Breaking Change (Major Version)
+### Breaking change (major version)
 
 ```bash
 git checkout main
@@ -76,11 +76,11 @@ git push origin HEAD --tags
 
 ```bash
 git checkout -b hotfix/critical-fix v${previous.version}
-# Make fixes...
+# Version Management Guide
 ./s8r test all
 ./s8r version bump patch
 git push origin hotfix/critical-fix
-# After approval:
+# Version Management Guide
 ./s8r version fix-tag
 ```
 
@@ -94,7 +94,7 @@ git push origin hotfix/critical-fix
 
 ## Technical Details
 
-### Files Synchronized
+### Files synchronized
 
 When a version changes, these files update automatically:
 
@@ -113,19 +113,19 @@ When a version changes, these files update automatically:
 ./s8r version fix-tag            # Fix misaligned tags
 ```
 
-### Advanced Options
+### Advanced options
 
 ```bash
-# Skip committing
+# Version Management Guide
 ./s8r version bump patch --no-commit
 
-# Skip tests 
+# Version Management Guide
 ./s8r version test patch --skip-tests
 
-# All-in-one
+# Version Management Guide
 ./s8r version test patch --push
 
-# Script integration
+# Version Management Guide
 VERSION=$(./s8r version export)
 ```
 

@@ -352,7 +352,7 @@ After running quality checks, reports are available in:
 - **SpotBugs**: `target/spotbugsXml.xml`
 - **Cucumber BDD**: `target/cucumber-reports/cucumber.html`
 
-For complete details, see [Quality Checks Documentation](/docs/contribution/QualityChecks.md)
+For complete details, see [Quality Checks Documentation](/docs/contrib/contrib-quality-checks.md)
 
 ## Version Management
 

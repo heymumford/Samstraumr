@@ -52,33 +52,33 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
    - Consolidate duplicate files (e.g., `FolderStructure.md` appears in multiple locations)
    - Update cross-references to reflect new file locations
 
-### Phase 3: content standardization
+### Phase 3: content standardization (completed)
 
-1. ⬜ Update headers to follow standard conventions:
+1. ✅ Update headers to follow standard conventions:
    - Level 1 headers match title case of file
    - Level 2 headers use title case
    - Level 3+ headers use sentence case
-2. ⬜ Standardize cross-references:
+2. ✅ Standardize cross-references:
    - Convert absolute paths to relative paths
    - Ensure all links include .md extension
    - Fix broken links from file reorganization
-3. ⬜ Standardize code blocks and formatting:
+3. ✅ Standardize code blocks and formatting:
    - Add language specifiers to all code blocks
    - Ensure consistent tab/space usage
    - Standardize emphasis formatting (bold/italic)
 
-### Phase 4: planning document cleanup
+### Phase 4: planning document cleanup (in progress)
 
-1. ⬜ Review and update current planning documents:
-   - Archive completed plans with "ARCHIVED-" prefix
+1. ✅ Review and update current planning documents:
+   - Archive completed plans with "archived-" prefix
    - Update ongoing plans to reflect current status
    - Remove obsolete plans that no longer apply
    - Consolidate duplicate planning information
-2. ⬜ Ensure all planning documents follow the new standards:
-   - Rename to kebab-case
-   - Update headers to follow conventions
-   - Fix cross-references
-   - Standardize formatting
+2. 🔄 Ensure all planning documents follow the new standards:
+   - Rename to kebab-case (completed)
+   - Update headers to follow conventions (in progress)
+   - Fix cross-references (in progress)
+   - Standardize formatting (in progress)
 
 ### Phase 5: automation and verification
 
@@ -97,9 +97,9 @@ Documentation files in the Samstraumr project currently have inconsistencies in:
 |-------|------------------------------|------------|-------------------|----------------|
 | 1     | Inventory and Analysis       | 2025-04-03 | 2025-04-04        | ✅ Complete     |
 | 2     | File Naming and Organization | 2025-04-04 | 2025-04-06        | 🔄 In Progress |
-| 3     | Content Standardization      | 2025-04-06 | 2025-04-08        | ⬜ Not Started  |
-| 4     | Planning Document Cleanup    | 2025-04-08 | 2025-04-09        | ⬜ Not Started  |
-| 5     | Automation and Verification  | 2025-04-09 | 2025-04-10        | ⬜ Not Started  |
+| 3     | Content Standardization      | 2025-04-06 | 2025-04-07        | ✅ Complete     |
+| 4     | Planning Document Cleanup    | 2025-04-07 | 2025-04-08        | 🔄 In Progress |
+| 5     | Automation and Verification  | 2025-04-08 | 2025-04-10        | ⬜ Not Started  |
 
 ## Future Considerations
 

@@ -1,4 +1,4 @@
-# 2. Automated C4 architecture diagrams
+# 0002 Automated c4 Architecture Diagrams
 
 Date: 2025-04-06
 
@@ -83,4 +83,3 @@ Recent updates:
 - Enhanced documentation generation
 - Better environment detection and graceful degradation
 
-The diagrams are automatically updated when the architecture changes, ensuring that the documentation accurately reflects the current system structure.

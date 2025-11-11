@@ -1,3 +1,5 @@
+# Todo Status
+
 [0;34m→ Loaded documentation library (doc-lib.sh)[0m
 [0;34m[1mExtracting TODOs from /home/emumford/NativeLinuxProjects/Samstraumr[0m
 [0;34m[1m===================================================================[0m

@@ -38,7 +38,7 @@ The project root contains these main directories:
 
 |     Directory     |                        Purpose                         |
 |-------------------|--------------------------------------------------------|
-| **`Samstraumr/`** | Main code module containing the core library           |
+| **`modules/`**    | Maven modules containing the framework implementation  |
 | **`docs/`**       | Comprehensive documentation organized by topic         |
 | **`util/`**       | Utility scripts for building, testing, and maintenance |
 
@@ -51,25 +51,25 @@ Top-level files include:
 
 ## Core Module Structure
 
-The core implementation resides in `Samstraumr/samstraumr-core/` and follows standard Maven conventions:
+The core implementation resides in `modules/samstraumr-core/` and follows standard Maven conventions:
 
 ```
-Samstraumr/samstraumr-core/
+modules/samstraumr-core/
 ├── pom.xml                      # Module POM file
 ├── src/
 │   ├── main/
 │   │   ├── java/                # Source code
-│   │   │   └── org/samstraumr/tube/
-│   │   │       ├── bundle/      # Legacy bundle implementation
-│   │   │       ├── composite/   # Composite implementation
-│   │   │       └── ...          # Core tube classes
+│   │   │   └── org/s8r/
+│   │   │       ├── component/   # Component implementation
+│   │   │       ├── tube/        # Tube implementation
+│   │   │       └── ...          # Core classes
 │   │   └── resources/           # Configuration files
 │   │       ├── log4j2.xml       # Logging configuration
 │   │       └── ...
 │   └── test/
 │       ├── java/                # Test source code
-│       │   └── org/samstraumr/tube/
-│       │       ├── steps/       # Cucumber step definitions
+│       │   └── org/s8r/
+│       │       ├── test/steps/  # Cucumber step definitions
 │       │       ├── test/        # Test utilities
 │       │       └── ...          # Test suites and cases
 │       └── resources/           # Test resources
@@ -83,18 +83,19 @@ Samstraumr/samstraumr-core/
 
 |             Package             |             Purpose              |             Key Classes             |
 |---------------------------------|----------------------------------|-------------------------------------|
-| `org.samstraumr.tube`           | Core tube implementation         | `Tube`, `Environment`, `TubeStatus` |
-| `org.samstraumr.tube.bundle`    | Legacy bundle implementation     | `Bundle`, `BundleFactory`           |
-| `org.samstraumr.tube.composite` | Composite pattern implementation | `Composite`, `CompositeFactory`     |
+| `org.s8r.component`             | Core component implementation    | `Component`, `Environment`, `State` |
+| `org.s8r.tube`                  | Tube implementation              | `Tube`, `TubeIdentity`, `TubeStatus` |
+| `org.s8r.adapter`               | Adapter pattern implementation   | `ComponentAdapter`, `TubeComponentAdapter` |
+| `org.s8r.component.composite`   | Composite pattern implementation | `Composite`, `CompositeFactory`     |
 
 ### Test code organization
 
 |                Package                 |          Purpose          |           Key Classes            |
 |----------------------------------------|---------------------------|----------------------------------|
-| `org.samstraumr.tube.test`             | Common test utilities     | `RunTests`                       |
-| `org.samstraumr.tube.steps`            | Cucumber step definitions | `*Steps.java` classes            |
-| `org.samstraumr.tube.test.annotations` | Test annotations          | Test categorization annotations  |
-| `org.samstraumr.tube.test.runners`     | Test runners              | `ATLTestRunner`, `BTLTestRunner` |
+| `org.s8r.test`                         | Common test utilities     | `RunTests`                       |
+| `org.s8r.test.steps`                   | Cucumber step definitions | `*Steps.java` classes            |
+| `org.s8r.test.annotations`             | Test annotations          | Test categorization annotations  |
+| `org.s8r.test.runner`                  | Test runners              | `ATLTestRunner`, `BTLTestRunner` |
 
 ## Documentation Organization
 
@@ -156,9 +157,9 @@ Samstraumr follows these file and directory naming conventions:
 
 |         File         |                     Location                     |         Purpose          |
 |----------------------|--------------------------------------------------|--------------------------|
-| `log4j2.xml`         | `Samstraumr/samstraumr-core/src/main/resources/` | Logging configuration    |
-| `version.properties` | `Samstraumr/`                                    | Version information      |
-| `checkstyle.xml`     | `Samstraumr/`                                    | Code style configuration |
+| `log4j2.xml`         | `modules/samstraumr-core/src/main/resources/`    | Logging configuration    |
+| `version.properties` | `modules/`                                        | Version information      |
+| `checkstyle.xml`     | `modules/`                                        | Code style configuration |
 
 ### Important documentation files
 
@@ -184,7 +185,7 @@ Samstraumr follows these file and directory naming conventions:
 ## Directory Structure Map
 
 ```
-Samstraumr/
+samstraumr/                      # Repository root
 ├── docs/                        # Documentation
 │   ├── concepts/                # Core concepts
 │   ├── contribution/            # Contribution guidelines
@@ -195,18 +196,20 @@ Samstraumr/
 │   ├── proposals/               # Design proposals
 │   ├── compatibility/           # Compatibility information
 │   └── site/                    # Site generation templates
-├── Samstraumr/                  # Core module
+├── modules/                     # Maven modules
 │   ├── samstraumr-core/         # Core implementation
 │   │   ├── src/                 # Source code
+│   │   │   ├── main/java/org/s8r/
+│   │   │   └── test/
 │   │   └── ...
-│   ├── pom.xml                  # Module POM
+│   ├── pom.xml                  # Modules POM
 │   └── ...
 ├── util/                        # Utility scripts
-│   ├── badges/                  # Badge generation
-│   ├── build/                   # Build utilities
-│   ├── maintenance/             # Maintenance utilities
+│   ├── bin/                     # Script helpers 
+│   ├── config/                  # Configuration templates
+│   ├── lib/                     # Script libraries
 │   ├── quality/                 # Quality checks
-│   ├── test/                    # Test utilities
+│   ├── scripts/                 # Main scripts
 │   └── ...
 ├── pom.xml                      # Parent POM
 └── ...                          # Other top-level files

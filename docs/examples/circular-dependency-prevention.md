@@ -1,4 +1,4 @@
-# Circular Dependency Prevention Example
+# Circular Dependency Prevention
 
 This document provides practical examples of how to detect and prevent circular dependencies in Samstraumr projects.
 
@@ -240,4 +240,3 @@ This will run the `AcyclicDependencyTest` along with other architecture validati
 
 ## Conclusion
 
-By proactively preventing circular dependencies, we keep our code more modular, testable, and maintainable. Use these patterns and tools to ensure your code remains free of circular dependencies.

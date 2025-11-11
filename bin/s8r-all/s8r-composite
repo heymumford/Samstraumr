@@ -1,0 +1,472 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r-composite: Composite management for Samstraumr
+# Command to manage composites in the S8r model
+#==============================================================================
+set -e
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${SCRIPT_DIR}"
+
+# Source common library
+if [ -f "${PROJECT_ROOT}/.s8r/lib/common.sh" ]; then
+  source "${PROJECT_ROOT}/.s8r/lib/common.sh"
+else
+  # Forward to the main s8r script to ensure common library is created
+  "${PROJECT_ROOT}/s8r" --help > /dev/null
+  source "${PROJECT_ROOT}/.s8r/lib/common.sh"
+fi
+
+# Display help information
+show_help() {
+  echo -e "${BOLD}S8r Composite Commands${RESET} - Manage composites in your S8r model"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  s8r composite <subcommand> [arguments]"
+  echo
+  echo -e "${BOLD}SUBCOMMANDS:${RESET}"
+  echo "  create    Create a new composite"
+  echo "  list      List all composites"
+  echo "  add       Add a component to a composite"
+  echo "  connect   Connect components within a composite"
+  echo "  info      Show details about a composite"
+  echo "  delete    Delete a composite"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help                Display this help message"
+  echo "  -v, --verbose             Enable verbose output"
+  echo "  --type <type>             Composite type: processing, storage, etc."
+  echo "  --format <format>         Output format: text, json (default: text)"
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  s8r composite create --type processing DataFlow"
+  echo "  s8r composite add --component DataProcessor --composite DataFlow"
+  echo "  s8r composite connect --from DataProcessor --to DataValidator --composite DataFlow"
+}
+
+# Create composite handler
+handle_create() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Create Composite${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r composite create [options] <composite-name>"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --type <type>      Composite type: processing, storage, api (default: processing)"
+    echo "  --verbose, -v      Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r composite create DataFlow"
+    echo "  s8r composite create --type storage DataStorage"
+    return 0
+  fi
+
+  local composite_type="processing"
+  local verbose=false
+  local composite_name=""
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --type)
+        composite_type="$2"
+        shift 2
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+        return 1
+        ;;
+      *)
+        composite_name="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # Validate composite name
+  if [ -z "$composite_name" ]; then
+    echo -e "${RED}Error: Composite name is required${RESET}" >&2
+    return 1
+  fi
+
+  info "Creating composite '$composite_name' of type '$composite_type'"
+  
+  # Call the Java API to create the composite
+  # For now, simulate the behavior
+  echo "Composite '$composite_name' created successfully."
+  echo "Type: $composite_type"
+}
+
+# List composites handler
+handle_list() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}List Composites${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r composite list [options]"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --format <format>  Output format: text, json (default: text)"
+    echo "  --verbose, -v      Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r composite list"
+    echo "  s8r composite list --format json"
+    return 0
+  fi
+  
+  local format="text"
+  local verbose=false
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --format)
+        format="$2"
+        shift 2
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+        return 1
+        ;;
+      *)
+        shift
+        ;;
+    esac
+  done
+
+  info "Listing composites in $format format"
+  
+  # Call the Java API to list composites
+  # For now, simulate the behavior
+  echo "Available composites:"
+  echo "- DataFlow (processing)"
+  echo "- DataStorage (storage)"
+  echo "- ApiGateway (api)"
+}
+
+# Add component to composite handler
+handle_add() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Add Component to Composite${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r composite add [options]"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --component <name>  Component name to add"
+    echo "  --composite <name>  Composite name to add to"
+    echo "  --position <pos>    Position in the composite (optional)"
+    echo "  --verbose, -v       Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r composite add --component DataProcessor --composite DataFlow"
+    echo "  s8r composite add --component DataValidator --composite DataFlow --position 2"
+    return 0
+  fi
+  
+  local component=""
+  local composite=""
+  local position=""
+  local verbose=false
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --component)
+        component="$2"
+        shift 2
+        ;;
+      --composite)
+        composite="$2"
+        shift 2
+        ;;
+      --position)
+        position="$2"
+        shift 2
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+        return 1
+        ;;
+      *)
+        shift
+        ;;
+    esac
+  done
+
+  # Validate required arguments
+  if [ -z "$component" ]; then
+    echo -e "${RED}Error: Component name is required (--component)${RESET}" >&2
+    return 1
+  fi
+
+  if [ -z "$composite" ]; then
+    echo -e "${RED}Error: Composite name is required (--composite)${RESET}" >&2
+    return 1
+  fi
+
+  info "Adding component '$component' to composite '$composite'"
+  
+  # Call the Java API to add the component to the composite
+  # For now, simulate the behavior
+  echo "Component '$component' added to composite '$composite' successfully."
+}
+
+# Connect components handler
+handle_connect() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Connect Components in Composite${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r composite connect [options]"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --from <name>       Source component name"
+    echo "  --to <name>         Target component name"
+    echo "  --composite <name>  Composite containing the components"
+    echo "  --verbose, -v       Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r composite connect --from DataProcessor --to DataValidator --composite DataFlow"
+    return 0
+  fi
+  
+  local from=""
+  local to=""
+  local composite=""
+  local verbose=false
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --from)
+        from="$2"
+        shift 2
+        ;;
+      --to)
+        to="$2"
+        shift 2
+        ;;
+      --composite)
+        composite="$2"
+        shift 2
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+        return 1
+        ;;
+      *)
+        shift
+        ;;
+    esac
+  done
+
+  # Validate required arguments
+  if [ -z "$from" ]; then
+    echo -e "${RED}Error: Source component name is required (--from)${RESET}" >&2
+    return 1
+  fi
+
+  if [ -z "$to" ]; then
+    echo -e "${RED}Error: Target component name is required (--to)${RESET}" >&2
+    return 1
+  fi
+
+  if [ -z "$composite" ]; then
+    echo -e "${RED}Error: Composite name is required (--composite)${RESET}" >&2
+    return 1
+  fi
+
+  info "Connecting component '$from' to '$to' in composite '$composite'"
+  
+  # Call the Java API to connect the components
+  # For now, simulate the behavior
+  echo "Connected component '$from' to '$to' in composite '$composite' successfully."
+}
+
+# Composite info handler
+handle_info() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Composite Information${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r composite info [options] <composite-name>"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --format <format>  Output format: text, json (default: text)"
+    echo "  --verbose, -v      Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r composite info DataFlow"
+    echo "  s8r composite info --format json DataStorage"
+    return 0
+  fi
+  
+  local format="text"
+  local verbose=false
+  local composite_name=""
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --format)
+        format="$2"
+        shift 2
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+        return 1
+        ;;
+      *)
+        composite_name="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # Validate composite name
+  if [ -z "$composite_name" ]; then
+    echo -e "${RED}Error: Composite name is required${RESET}" >&2
+    return 1
+  fi
+
+  info "Displaying information for composite '$composite_name'"
+  
+  # Call the Java API to get composite info
+  # For now, simulate the behavior
+  echo "Composite: $composite_name"
+  echo "Type: processing"
+  echo "Status: active"
+  echo "Created: 2025-04-06"
+  echo "Components:"
+  echo "  - DataProcessor -> DataValidator"
+  echo "  - DataValidator -> DataStorage"
+}
+
+# Delete composite handler
+handle_delete() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Delete Composite${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r composite delete [options] <composite-name>"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --force, -f        Force deletion without confirmation"
+    echo "  --verbose, -v      Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r composite delete DataFlow"
+    echo "  s8r composite delete --force DataStorage"
+    return 0
+  fi
+  
+  local force=false
+  local verbose=false
+  local composite_name=""
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -f|--force)
+        force=true
+        shift
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+        return 1
+        ;;
+      *)
+        composite_name="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # Validate composite name
+  if [ -z "$composite_name" ]; then
+    echo -e "${RED}Error: Composite name is required${RESET}" >&2
+    return 1
+  fi
+
+  # Confirm deletion if not forced
+  if [ "$force" != true ]; then
+    read -p "Are you sure you want to delete composite '$composite_name'? (y/N) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      echo "Deletion cancelled."
+      return 1
+    fi
+  fi
+
+  info "Deleting composite '$composite_name'"
+  
+  # Call the Java API to delete the composite
+  # For now, simulate the behavior
+  echo "Composite '$composite_name' deleted successfully."
+}
+
+# Main command handler
+if [ $# -eq 0 ] || [[ "$1" == "--help" || "$1" == "-h" ]]; then
+  show_help
+  exit 0
+fi
+
+# Get subcommand
+SUBCOMMAND="$1"
+shift
+
+# Execute appropriate handler
+case "$SUBCOMMAND" in
+  create)
+    handle_create "$@"
+    ;;
+  list)
+    handle_list "$@"
+    ;;
+  add)
+    handle_add "$@"
+    ;;
+  connect)
+    handle_connect "$@"
+    ;;
+  info)
+    handle_info "$@"
+    ;;
+  delete)
+    handle_delete "$@"
+    ;;
+  *)
+    echo -e "${RED}Error: Unknown subcommand: $SUBCOMMAND. Run 's8r composite --help' for usage.${RESET}" >&2
+    exit 1
+    ;;
+esac
+
+exit $?

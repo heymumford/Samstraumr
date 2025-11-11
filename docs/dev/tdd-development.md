@@ -13,13 +13,13 @@ Licensed under the Mozilla Public License 2.0
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-# TDD Development Guide
+# Tdd Development
 
 ## Current Development Approach
 
 Samstraumr is currently in a Test-Driven Development (TDD) phase, focusing on building functionality incrementally with tests guiding implementation.
 
-## What is TDD?
+## What Is TDD?
 
 Test-Driven Development is an approach where you:
 
@@ -42,7 +42,7 @@ The CI pipeline has been simplified to support rapid TDD iterations:
 By default, quality checks are disabled when building the project to allow for rapid iteration:
 
 ```bash
-# Default build - quality checks are skipped
+# Tdd Development
 mvn clean compile
 ```
 
@@ -63,10 +63,10 @@ mvn clean compile -Pquality-checks
 While developing, you can run specific tests to validate your implementation:
 
 ```bash
-# Run a specific test class
+# Tdd Development
 mvn test -Dtest=MyComponentTest
 
-# Run all tests in a package
+# Tdd Development
 mvn test -Dtest="org.samstraumr.component.*Test"
 ```
 
@@ -84,13 +84,13 @@ mvn test -Dtest="org.samstraumr.component.*Test"
 While quality checks are disabled by default during the TDD phase, it's recommended to periodically run them to ensure code quality:
 
 ```bash
-# Run all quality checks
+# Tdd Development
 mvn verify -Pquality-checks
 
-# Run just spotless formatting
+# Tdd Development
 mvn spotless:check
 
-# Run just checkstyle
+# Tdd Development
 mvn checkstyle:check
 ```
 

@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Quality Checks
+# Contrib Quality Checks
 
 This document explains the quality gates and checks implemented in the Samstraumr project, both for local development and in the CI/CD pipeline.
 
@@ -34,17 +34,17 @@ Samstraumr implements a comprehensive set of quality gates that must be passed f
 The preferred way to run quality checks is using the s8r CLI:
 
 ```bash
-# Quality Checks
+# Contrib Quality Checks
 ./s8r quality check
 
-# Quality Checks
+# Contrib Quality Checks
 ./s8r quality spotless -f        # Check and fix code formatting
 ./s8r quality checkstyle         # Run checkstyle
 ./s8r quality spotbugs           # Run SpotBugs analysis
 ./s8r quality jacoco             # Generate coverage report
 ./s8r quality encoding -f        # Check and fix file encodings
 
-# Quality Checks
+# Contrib Quality Checks
 ./s8r quality check -v
 ```
 
@@ -53,16 +53,16 @@ The preferred way to run quality checks is using the s8r CLI:
 For compatibility with older workflows, you can use the legacy scripts:
 
 ```bash
-# Quality Checks
+# Contrib Quality Checks
 ./util/bin/quality/check-build-quality.sh
 
-# Quality Checks
+# Contrib Quality Checks
 ./util/bin/quality/check-build-quality.sh --skip-spotless --skip-spotbugs
 
-# Quality Checks
+# Contrib Quality Checks
 ./util/bin/quality/check-build-quality.sh --only=spotless,checkstyle
 
-# Quality Checks
+# Contrib Quality Checks
 ./util/bin/quality/check-build-quality.sh --help
 ```
 
@@ -71,25 +71,25 @@ For compatibility with older workflows, you can use the legacy scripts:
 You can also run checks directly with Maven:
 
 ```bash
-# Quality Checks
+# Contrib Quality Checks
 mvn validate -P quality-checks
 
-# Quality Checks
+# Contrib Quality Checks
 mvn clean install -P skip-quality-checks
 
-# Quality Checks
+# Contrib Quality Checks
 mvn spotless:apply
 
-# Quality Checks
+# Contrib Quality Checks
 mvn spotless:check
 
-# Quality Checks
+# Contrib Quality Checks
 mvn checkstyle:check
 
-# Quality Checks
+# Contrib Quality Checks
 mvn spotbugs:check
 
-# Quality Checks
+# Contrib Quality Checks
 mvn test jacoco:report
 ```
 
@@ -276,7 +276,7 @@ When Spotless fails, use the fix option to automatically format your code:
 
 ```bash
 ./s8r quality spotless -f
-# Quality Checks
+# Contrib Quality Checks
 mvn spotless:apply
 ```
 
@@ -292,7 +292,7 @@ For encoding issues, ensure all files are saved with UTF-8 encoding:
 
 ```bash
 ./s8r quality encoding -f
-# Quality Checks
+# Contrib Quality Checks
 ./util/bin/quality/fix-line-endings.sh
 ```
 
