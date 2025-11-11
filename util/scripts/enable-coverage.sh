@@ -103,9 +103,9 @@ echo -e "${YELLOW}Generating JaCoCo coverage report...${RESET}"
 mvn jacoco:report $MAVEN_PROPS $CUSTOM_ARGS
 
 # Report paths
-CORE_REPORT="$PROJECT_ROOT/Samstraumr/samstraumr-core/target/site/jacoco/index.html"
+CORE_REPORT="$PROJECT_ROOT/modules/samstraumr-core/target/site/jacoco/index.html"
 ROOT_REPORT="$PROJECT_ROOT/target/site/jacoco/index.html"
-MODULE_REPORT="$PROJECT_ROOT/Samstraumr/target/site/jacoco/index.html"
+MODULE_REPORT="$PROJECT_ROOT/modules/target/site/jacoco/index.html"
 
 # Display report paths
 echo -e "${CYAN}==== JaCoCo Coverage Reports ====${RESET}"

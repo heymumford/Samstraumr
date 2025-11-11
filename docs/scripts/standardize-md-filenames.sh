@@ -277,8 +277,8 @@ fi
 
 # Rename files in the Samstraumr core resources directory
 print_header "Samstraumr Core Resources"
-if [ -f "Samstraumr/samstraumr-core/src/main/resources/version-template.md" ]; then
-  mv -v "Samstraumr/samstraumr-core/src/main/resources/version-template.md" "Samstraumr/samstraumr-core/src/main/resources/VersionTemplate.md"
+if [ -f "modules/samstraumr-core/src/main/resources/version-template.md" ]; then
+  mv -v "modules/samstraumr-core/src/main/resources/version-template.md" "modules/samstraumr-core/src/main/resources/VersionTemplate.md"
 fi
 
 # Check if there are any remaining non-PascalCase files that aren't README.md or CLAUDE.md

@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# HeaderStandards
+# Header Standards
 
 ## Overview
 
@@ -38,27 +38,27 @@ This document outlines the standards for file headers in the Samstraumr project.
 ## Bash Script Headers
 
 ```bash
-# HeaderStandards
-# HeaderStandards
-# HeaderStandards
-# HeaderStandards
-# HeaderStandards
-# HeaderStandards
+# Header Standards
+# Header Standards
+# Header Standards
+# Header Standards
+# Header Standards
+# Header Standards
 #
-# HeaderStandards
-# HeaderStandards
-# HeaderStandards
+# Header Standards
+# Header Standards
+# Header Standards
 #
-# HeaderStandards
-# HeaderStandards
-# HeaderStandards
-# HeaderStandards
+# Header Standards
+# Header Standards
+# Header Standards
+# Header Standards
 ```
 
 ## Markdown File Headers
 
 ```markdown
-# HeaderStandards
+# Header Standards
 
 Brief description of the document's purpose.
 ```

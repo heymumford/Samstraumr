@@ -1,0 +1,79 @@
+#!/bin/bash
+# Run Karate L3_System tests
+# Usage: ./s8r-test-karate-l3 [options]
+#
+# Options:
+#   --verbose      Enable verbose output
+#   --feature NAME Run a specific feature file (e.g. system-integration-test)
+#   --env ENV      Set environment (dev, test, prod)
+
+# Copyright (c) 2025 Eric C. Mumford (@heymumford)
+# Licensed under the Mozilla Public License 2.0
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+# Default values
+VERBOSE=false
+FEATURE=""
+ENV="dev"
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --verbose)
+      VERBOSE=true
+      shift
+      ;;
+    --feature)
+      FEATURE="$2"
+      shift 2
+      ;;
+    --env)
+      ENV="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown option: $1"
+      exit 1
+      ;;
+  esac
+done
+
+echo -e "\033[0;34m[INFO]\033[0m Running Karate L3_System tests..."
+
+# Set system properties
+SYSTEM_PROPS="-Dkarate.env=$ENV"
+
+if [ -n "$FEATURE" ]; then
+  TEST_CLASS="org.s8r.test.karate.KarateL3SystemRunner#$FEATURE"Tests
+  echo -e "\033[0;34m[INFO]\033[0m Running specific feature: $FEATURE"
+else
+  TEST_CLASS="org.s8r.test.karate.KarateL3SystemRunner#allSystemTests"
+  echo -e "\033[0;34m[INFO]\033[0m Running all L3_System tests"
+fi
+
+# Build command
+if [ "$VERBOSE" = true ]; then
+  MAVEN_OPTS="-Xmx1024m" mvn test -f test-port-interfaces/pom.xml -Dtest=$TEST_CLASS $SYSTEM_PROPS -Dmaven.test.redirectTestOutputToFile=false
+else
+  MAVEN_OPTS="-Xmx1024m" mvn test -f test-port-interfaces/pom.xml -Dtest=$TEST_CLASS $SYSTEM_PROPS
+fi
+
+# Get report path
+REPORT_DIR="test-port-interfaces/target/karate-reports"
+
+# Check if reports exist and open summary
+if [ -f "$REPORT_DIR/karate-summary.html" ]; then
+  echo -e "\033[0;34m[INFO]\033[0m Test report available at: $REPORT_DIR/karate-summary.html"
+  
+  # Try to open report if on GUI system
+  if [ -n "$DISPLAY" ] && command -v xdg-open >/dev/null 2>&1; then
+    echo -e "\033[0;34m[INFO]\033[0m Opening test report..."
+    xdg-open "$REPORT_DIR/karate-summary.html" &
+  fi
+fi
+
+echo -e "\033[0;34m[INFO]\033[0m Karate L3_System tests completed"

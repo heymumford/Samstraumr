@@ -2,7 +2,7 @@
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-# Monitoring and Management
+# README
 
 This document outlines the monitoring and management capabilities implemented in the Samstraumr framework as part of our Clean Architecture and event-driven design.
 
@@ -18,7 +18,7 @@ The monitoring system provides observability into the runtime behavior of compon
 
 ## Core Components
 
-### MetricsCollector
+### Metricscollector
 
 The `MetricsCollector` tracks performance metrics for components and channels:
 
@@ -43,7 +43,7 @@ Key capabilities:
 - Supports custom metric definitions
 - Tracks historical trends
 
-### HealthMonitor
+### Healthmonitor
 
 The `HealthMonitor` tracks the health status of components and resources:
 
@@ -69,7 +69,7 @@ Key capabilities:
 - Provides health status API
 - Supports self-healing actions
 
-### MonitoringFactory
+### Monitoringfactory
 
 The `MonitoringFactory` creates and configures monitoring components:
 
@@ -94,7 +94,7 @@ public class MonitoringFactory {
 
 ## Integration Patterns
 
-### Monitor Decorator
+### Monitor decorator
 
 The monitor decorator wraps components to add metrics collection:
 
@@ -116,7 +116,7 @@ public class MonitoredComponent extends ComponentDecorator {
 }
 ```
 
-### Health Check Integration
+### Health check integration
 
 Components can implement the `HealthCheckable` interface:
 
@@ -129,36 +129,36 @@ public interface HealthCheckable {
 
 ## Configuration
 
-### Metrics Configuration
+### Metrics configuration
 
 Configure metrics collection through the `monitoring.properties` file:
 
 ```properties
-# General settings
+# README
 metrics.enabled=true
 metrics.publishInterval=30s
 
-# Component metrics
+# README
 metrics.component.enabled=true
 metrics.component.includePatterns=*
 metrics.component.excludePatterns=
 
-# Channel metrics
+# README
 metrics.channel.enabled=true
 metrics.channel.includePatterns=*
 metrics.channel.excludePatterns=
 ```
 
-### Health Check Configuration
+### Health check configuration
 
 Configure health checks through the `health.properties` file:
 
 ```properties
-# General settings
+# README
 health.enabled=true
 health.checkInterval=15s
 
-# Resource thresholds
+# README
 health.resource.cpu.warning=70
 health.resource.cpu.critical=90
 health.resource.memory.warning=80
@@ -166,14 +166,14 @@ health.resource.memory.critical=95
 health.resource.disk.warning=85
 health.resource.disk.critical=95
 
-# Alert settings
+# README
 alerts.enabled=true
 alerts.channel=system.alerts
 ```
 
 ## Usage Examples
 
-### Basic Metrics Collection
+### Basic metrics collection
 
 ```java
 // Create and configure metrics collector
@@ -193,7 +193,7 @@ eventDispatcher.registerHandler(
 MetricsReport report = metricsCollector.generateReport();
 ```
 
-### Health Monitoring
+### Health monitoring
 
 ```java
 // Create health monitor
@@ -216,7 +216,7 @@ if (!status.isHealthy()) {
 }
 ```
 
-### Creating Monitored Components
+### Creating monitored components
 
 ```java
 // Create a component with monitoring

@@ -21,7 +21,7 @@
 #   - Git integration functions
 #
 # DEPENDENCIES:
-#   - Requires .samstraumr.config for project configuration
+#   - Requires .s8r.config for project configuration
 #   - Uses standard Unix utilities (sed, grep, tr)
 #==============================================================================
 
@@ -34,17 +34,17 @@ SCRIPT_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_LIB_DIR}/../.." && pwd)"
 
 # Global variables initialized as undefined
-SAMSTRAUMR_CORE_MODULE=""
-SAMSTRAUMR_MEMORY_OPTS=""
+S8R_CORE_MODULE=""
+S8R_MEMORY_OPTS=""
 VERBOSE="${VERBOSE:-false}"
 
 # Source the configuration file
-if [ -f "${PROJECT_ROOT}/.samstraumr.config" ]; then
-  source "${PROJECT_ROOT}/.samstraumr.config"
-elif [ -f "${PROJECT_ROOT}/.samstraumr/config.sh" ]; then
-  source "${PROJECT_ROOT}/.samstraumr/config.sh"
+if [ -f "${PROJECT_ROOT}/.s8r.config" ]; then
+  source "${PROJECT_ROOT}/.s8r.config"
+elif [ -f "${PROJECT_ROOT}/.s8r/config.sh" ]; then
+  source "${PROJECT_ROOT}/.s8r/config.sh"
 else
-  echo "Error: Configuration file not found: ${PROJECT_ROOT}/.samstraumr.config or ${PROJECT_ROOT}/.samstraumr/config.sh"
+  echo "Error: Configuration file not found: ${PROJECT_ROOT}/.s8r.config or ${PROJECT_ROOT}/.s8r/config.sh"
   echo "The common.sh library requires a configuration file to function correctly."
   exit 1
 fi
@@ -523,7 +523,7 @@ function get_maven_property() {
 # Usage: run_maven_command [module_path] <maven_args...>
 # Returns: Maven's exit code
 function run_maven_command() {
-  local module_path="${1:-${SAMSTRAUMR_CORE_MODULE}}"
+  local module_path="${1:-${S8R_CORE_MODULE}}"
   shift
   
   if [[ -z "$module_path" ]]; then
@@ -539,8 +539,8 @@ function run_maven_command() {
   
   # Set Maven options if not already set
   if [[ -z "$MAVEN_OPTS" ]]; then
-    if [[ -n "${SAMSTRAUMR_MEMORY_OPTS}" ]]; then
-      export MAVEN_OPTS="${SAMSTRAUMR_MEMORY_OPTS}"
+    if [[ -n "${S8R_MEMORY_OPTS}" ]]; then
+      export MAVEN_OPTS="${S8R_MEMORY_OPTS}"
       print_debug "Set MAVEN_OPTS to ${MAVEN_OPTS}"
     fi
   fi
@@ -1112,10 +1112,10 @@ function initialize_script() {
   PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"  # Adjust as needed
   
   # Source configuration
-  if [[ -f "${PROJECT_ROOT}/.samstraumr.config" ]]; then
-    source "${PROJECT_ROOT}/.samstraumr.config"
+  if [[ -f "${PROJECT_ROOT}/.s8r.config" ]]; then
+    source "${PROJECT_ROOT}/.s8r.config"
   else
-    echo "Warning: Configuration file not found: ${PROJECT_ROOT}/.samstraumr.config"
+    echo "Warning: Configuration file not found: ${PROJECT_ROOT}/.s8r.config"
   fi
   
   # Set default options
@@ -1309,7 +1309,7 @@ function initialize_common_library() {
   if [[ "${VERBOSE:-false}" == "true" ]]; then
     print_debug "Loaded common.sh library"
     print_debug "PROJECT_ROOT: $PROJECT_ROOT"
-    print_debug "SAMSTRAUMR_CORE_MODULE: $SAMSTRAUMR_CORE_MODULE"
+    print_debug "S8R_CORE_MODULE: $S8R_CORE_MODULE"
     print_debug "OS type: $(get_os_type)"
     print_debug "CPU cores: $(get_cpu_count)"
   fi

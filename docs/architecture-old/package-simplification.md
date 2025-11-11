@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Package Structure Simplification
+# Package Simplification
 
 This document provides a clean, minimalist overview of the package simplification strategy for Samstraumr.
 

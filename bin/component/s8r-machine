@@ -1,0 +1,591 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r-machine: Machine management for Samstraumr
+# Command to manage machines in the S8r model
+#==============================================================================
+set -e
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${SCRIPT_DIR}"
+
+# Source common library
+if [ -f "${PROJECT_ROOT}/.s8r/lib/common.sh" ]; then
+  source "${PROJECT_ROOT}/.s8r/lib/common.sh"
+else
+  # Forward to the main s8r script to ensure common library is created
+  "${PROJECT_ROOT}/s8r" --help > /dev/null
+  source "${PROJECT_ROOT}/.s8r/lib/common.sh"
+fi
+
+# Display help information
+show_help() {
+  echo -e "${BOLD}S8r Machine Commands${RESET} - Manage machines in your S8r model"
+  echo
+  echo -e "${BOLD}USAGE:${RESET}"
+  echo "  s8r machine <subcommand> [arguments]"
+  echo
+  echo -e "${BOLD}SUBCOMMANDS:${RESET}"
+  echo "  create    Create a new machine"
+  echo "  list      List all machines"
+  echo "  add       Add a composite to a machine"
+  echo "  connect   Connect composites within a machine"
+  echo "  info      Show details about a machine"
+  echo "  delete    Delete a machine"
+  echo "  start     Start a machine"
+  echo "  stop      Stop a machine"
+  echo
+  echo -e "${BOLD}OPTIONS:${RESET}"
+  echo "  -h, --help                Display this help message"
+  echo "  -v, --verbose             Enable verbose output"
+  echo "  --template <template>     Machine template: flow, batch, api, etc."
+  echo "  --format <format>         Output format: text, json (default: text)"
+  echo
+  echo -e "${BOLD}EXAMPLES:${RESET}"
+  echo "  s8r machine create --template flow DataPipeline"
+  echo "  s8r machine add --composite DataFlow --machine DataPipeline"
+  echo "  s8r machine start DataPipeline"
+}
+
+# Create machine handler
+handle_create() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Create Machine${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r machine create [options] <machine-name>"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --template <type>   Machine template: flow, batch, api (default: flow)"
+    echo "  --verbose, -v       Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r machine create DataPipeline"
+    echo "  s8r machine create --template batch BatchProcessor"
+    return 0
+  fi
+
+  local template="flow"
+  local verbose=false
+  local machine_name=""
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --template)
+        template="$2"
+        shift 2
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+        return 1
+        ;;
+      *)
+        machine_name="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # Validate machine name
+  if [ -z "$machine_name" ]; then
+    echo -e "${RED}Error: Machine name is required${RESET}" >&2
+    return 1
+  fi
+
+  info "Creating machine '$machine_name' with template '$template'"
+  
+  # Call the Java API to create the machine
+  # For now, simulate the behavior
+  echo "Machine '$machine_name' created successfully."
+  echo "Template: $template"
+}
+
+# List machines handler
+handle_list() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}List Machines${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r machine list [options]"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --format <format>  Output format: text, json (default: text)"
+    echo "  --verbose, -v      Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r machine list"
+    echo "  s8r machine list --format json"
+    return 0
+  fi
+  
+  local format="text"
+  local verbose=false
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --format)
+        format="$2"
+        shift 2
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+        return 1
+        ;;
+      *)
+        shift
+        ;;
+    esac
+  done
+
+  info "Listing machines in $format format"
+  
+  # Call the Java API to list machines
+  # For now, simulate the behavior
+  echo "Available machines:"
+  echo "- DataPipeline (flow)"
+  echo "- BatchProcessor (batch)"
+  echo "- ApiGateway (api)"
+}
+
+# Add composite to machine handler
+handle_add() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Add Composite to Machine${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r machine add [options]"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --composite <name>  Composite name to add"
+    echo "  --machine <name>    Machine name to add to"
+    echo "  --position <pos>    Position in the machine (optional)"
+    echo "  --verbose, -v       Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r machine add --composite DataFlow --machine DataPipeline"
+    echo "  s8r machine add --composite DataStorage --machine DataPipeline --position 2"
+    return 0
+  fi
+  
+  local composite=""
+  local machine=""
+  local position=""
+  local verbose=false
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --composite)
+        composite="$2"
+        shift 2
+        ;;
+      --machine)
+        machine="$2"
+        shift 2
+        ;;
+      --position)
+        position="$2"
+        shift 2
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+        return 1
+        ;;
+      *)
+        shift
+        ;;
+    esac
+  done
+
+  # Validate required arguments
+  if [ -z "$composite" ]; then
+    echo -e "${RED}Error: Composite name is required (--composite)${RESET}" >&2
+    return 1
+  fi
+
+  if [ -z "$machine" ]; then
+    echo -e "${RED}Error: Machine name is required (--machine)${RESET}" >&2
+    return 1
+  fi
+
+  info "Adding composite '$composite' to machine '$machine'"
+  
+  # Call the Java API to add the composite to the machine
+  # For now, simulate the behavior
+  echo "Composite '$composite' added to machine '$machine' successfully."
+}
+
+# Connect composites handler
+handle_connect() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Connect Composites in Machine${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r machine connect [options]"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --from <name>       Source composite name"
+    echo "  --to <name>         Target composite name"
+    echo "  --machine <name>    Machine containing the composites"
+    echo "  --verbose, -v       Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r machine connect --from DataProcessor --to DataStorage --machine DataPipeline"
+    return 0
+  fi
+  
+  local from=""
+  local to=""
+  local machine=""
+  local verbose=false
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --from)
+        from="$2"
+        shift 2
+        ;;
+      --to)
+        to="$2"
+        shift 2
+        ;;
+      --machine)
+        machine="$2"
+        shift 2
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+        return 1
+        ;;
+      *)
+        shift
+        ;;
+    esac
+  done
+
+  # Validate required arguments
+  if [ -z "$from" ]; then
+    echo -e "${RED}Error: Source composite name is required (--from)${RESET}" >&2
+    return 1
+  fi
+
+  if [ -z "$to" ]; then
+    echo -e "${RED}Error: Target composite name is required (--to)${RESET}" >&2
+    return 1
+  fi
+
+  if [ -z "$machine" ]; then
+    echo -e "${RED}Error: Machine name is required (--machine)${RESET}" >&2
+    return 1
+  fi
+
+  info "Connecting composite '$from' to '$to' in machine '$machine'"
+  
+  # Call the Java API to connect the composites
+  # For now, simulate the behavior
+  echo "Connected composite '$from' to '$to' in machine '$machine' successfully."
+}
+
+# Machine info handler
+handle_info() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Machine Information${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r machine info [options] <machine-name>"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --format <format>  Output format: text, json (default: text)"
+    echo "  --verbose, -v      Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r machine info DataPipeline"
+    echo "  s8r machine info --format json BatchProcessor"
+    return 0
+  fi
+  
+  local format="text"
+  local verbose=false
+  local machine_name=""
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --format)
+        format="$2"
+        shift 2
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+        return 1
+        ;;
+      *)
+        machine_name="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # Validate machine name
+  if [ -z "$machine_name" ]; then
+    echo -e "${RED}Error: Machine name is required${RESET}" >&2
+    return 1
+  fi
+
+  info "Displaying information for machine '$machine_name'"
+  
+  # Call the Java API to get machine info
+  # For now, simulate the behavior
+  echo "Machine: $machine_name"
+  echo "Template: flow"
+  echo "Status: running"
+  echo "Created: 2025-04-06"
+  echo "Composites:"
+  echo "  - DataFlow -> DataStorage"
+  echo "  - DataStorage -> EventProcessing"
+}
+
+# Delete machine handler
+handle_delete() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Delete Machine${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r machine delete [options] <machine-name>"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --force, -f        Force deletion without confirmation"
+    echo "  --verbose, -v      Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r machine delete DataPipeline"
+    echo "  s8r machine delete --force BatchProcessor"
+    return 0
+  fi
+  
+  local force=false
+  local verbose=false
+  local machine_name=""
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -f|--force)
+        force=true
+        shift
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+        return 1
+        ;;
+      *)
+        machine_name="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # Validate machine name
+  if [ -z "$machine_name" ]; then
+    echo -e "${RED}Error: Machine name is required${RESET}" >&2
+    return 1
+  fi
+
+  # Confirm deletion if not forced
+  if [ "$force" != true ]; then
+    read -p "Are you sure you want to delete machine '$machine_name'? (y/N) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      echo "Deletion cancelled."
+      return 1
+    fi
+  fi
+
+  info "Deleting machine '$machine_name'"
+  
+  # Call the Java API to delete the machine
+  # For now, simulate the behavior
+  echo "Machine '$machine_name' deleted successfully."
+}
+
+# Start machine handler
+handle_start() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Start Machine${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r machine start [options] <machine-name>"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --verbose, -v       Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r machine start DataPipeline"
+    return 0
+  fi
+  
+  local verbose=false
+  local machine_name=""
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+        return 1
+        ;;
+      *)
+        machine_name="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # Validate machine name
+  if [ -z "$machine_name" ]; then
+    echo -e "${RED}Error: Machine name is required${RESET}" >&2
+    return 1
+  fi
+
+  info "Starting machine '$machine_name'"
+  
+  # Call the Java API to start the machine
+  # For now, simulate the behavior
+  echo "Machine '$machine_name' started successfully."
+}
+
+# Stop machine handler
+handle_stop() {
+  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    echo -e "${BOLD}Stop Machine${RESET}"
+    echo
+    echo -e "${BOLD}USAGE:${RESET}"
+    echo "  s8r machine stop [options] <machine-name>"
+    echo
+    echo -e "${BOLD}OPTIONS:${RESET}"
+    echo "  --force, -f         Force stop without waiting for graceful shutdown"
+    echo "  --verbose, -v       Enable verbose output"
+    echo 
+    echo -e "${BOLD}EXAMPLES:${RESET}"
+    echo "  s8r machine stop DataPipeline"
+    echo "  s8r machine stop --force BatchProcessor"
+    return 0
+  fi
+  
+  local force=false
+  local verbose=false
+  local machine_name=""
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -f|--force)
+        force=true
+        shift
+        ;;
+      -v|--verbose)
+        verbose=true
+        shift
+        ;;
+      -*)
+        echo -e "${RED}Error: Unknown option: $1${RESET}" >&2
+        return 1
+        ;;
+      *)
+        machine_name="$1"
+        shift
+        ;;
+    esac
+  done
+
+  # Validate machine name
+  if [ -z "$machine_name" ]; then
+    echo -e "${RED}Error: Machine name is required${RESET}" >&2
+    return 1
+  fi
+
+  if [ "$force" = true ]; then
+    info "Force stopping machine '$machine_name'"
+  else
+    info "Gracefully stopping machine '$machine_name'"
+  fi
+  
+  # Call the Java API to stop the machine
+  # For now, simulate the behavior
+  echo "Machine '$machine_name' stopped successfully."
+}
+
+# Main command handler
+if [ $# -eq 0 ] || [[ "$1" == "--help" || "$1" == "-h" ]]; then
+  show_help
+  exit 0
+fi
+
+# Get subcommand
+SUBCOMMAND="$1"
+shift
+
+# Execute appropriate handler
+case "$SUBCOMMAND" in
+  create)
+    handle_create "$@"
+    ;;
+  list)
+    handle_list "$@"
+    ;;
+  add)
+    handle_add "$@"
+    ;;
+  connect)
+    handle_connect "$@"
+    ;;
+  info)
+    handle_info "$@"
+    ;;
+  delete)
+    handle_delete "$@"
+    ;;
+  start)
+    handle_start "$@"
+    ;;
+  stop)
+    handle_stop "$@"
+    ;;
+  *)
+    echo -e "${RED}Error: Unknown subcommand: $SUBCOMMAND. Run 's8r machine --help' for usage.${RESET}" >&2
+    exit 1
+    ;;
+esac
+
+exit $?

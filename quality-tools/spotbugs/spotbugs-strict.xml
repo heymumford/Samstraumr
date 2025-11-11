@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter
+    xmlns="https://github.com/spotbugs/filter/3.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/3.1.0/spotbugs/etc/findbugsfilter.xsd">
+
+    <!-- Exclude test classes -->
+    <Match>
+        <Class name="~.*\.*Test" />
+    </Match>
+    <Match>
+        <Class name="~.*\.*Tests" />
+    </Match>
+    <Match>
+        <Class name="~.*\.*TestSuite" />
+    </Match>
+    <Match>
+        <Class name="~.*\.*Steps" />
+    </Match>
+
+    <!-- Exclude certain packages -->
+    <Match>
+        <Package name="~.*\.test\..*" />
+    </Match>
+    
+    <!-- Exclude package-info classes -->
+    <Match>
+        <Class name="~.*\.package-info"/>
+    </Match>
+    
+    <!-- This is a stricter version that excludes fewer bug patterns -->
+    
+    <!-- EI: May expose internal representation by returning reference to mutable object -->
+    <!-- We're keeping this check enabled in the strict version -->
+    
+    <!-- EI2: May expose internal representation by incorporating reference to mutable object -->
+    <!-- We're keeping this check enabled in the strict version -->
+    
+    <!-- NP: Load of known null value (common in test initialization and assertion scenarios) -->
+    <Match>
+        <Class name="~.*\.*Test.*"/>
+        <Bug pattern="NP_LOAD_OF_KNOWN_NULL_VALUE"/>
+    </Match>
+</FindBugsFilter>

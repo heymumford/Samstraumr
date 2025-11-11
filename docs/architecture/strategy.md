@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# S8r Strategy
+# Strategy
 
 This document outlines the high-level strategic goals and architectural principles for the S8r framework.
 

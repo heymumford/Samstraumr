@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Samstraumr Migration Guide
+# MigrationGuide
 
 This document provides a comprehensive guide to migrating from the legacy Samstraumr framework to the new S8r implementation.
 
@@ -49,14 +49,14 @@ The Samstraumr project has undergone a significant refactoring to improve its ar
    - Wrote a client migration guide with examples and API mapping
    - Updated Kanban board with migration roadmap and task tracking
 
-### Current Status
+### Current status
 
 - The new structure is set up in the temporary directory
 - Basic builds are working
 - Migration tools are in place
 - Documentation is ready for review
 
-### Next Steps
+### Next steps
 
 1. **Testing**
    - Set up and run tests in the new structure
@@ -77,7 +77,7 @@ The Samstraumr project has undergone a significant refactoring to improve its ar
 
 ## Migration Guide for Client Code
 
-### Maven Dependency Updates
+### Maven dependency updates
 
 Update your Maven dependencies:
 
@@ -89,7 +89,7 @@ Update your Maven dependencies:
 </dependency>
 ```
 
-### Package Import Updates
+### Package import updates
 
 Update your import statements:
 
@@ -106,7 +106,7 @@ import org.s8r.component.Environment;
 import org.s8r.component.State;
 ```
 
-### API Changes
+### Api changes
 
 Update your code to use the new API:
 
@@ -123,7 +123,7 @@ component.initialize();
 State state = component.getState();
 ```
 
-### Using Migration Tools
+### Using migration tools
 
 To assist with migration, use the provided migration tools:
 
@@ -140,7 +140,7 @@ To assist with migration, use the provided migration tools:
 3. Review the migrated code and make any necessary adjustments.
 4. Update your build scripts to use the new paths and dependencies.
 
-### Testing After Migration
+### Testing after migration
 
 After migration, thoroughly test your code:
 

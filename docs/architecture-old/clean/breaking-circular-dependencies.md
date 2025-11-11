@@ -1,4 +1,4 @@
-# Breaking Circular Dependencies in Clean Architecture
+# Breaking Circular Dependencies
 
 This document outlines the approach taken to break circular dependencies in the Samstraumr framework while adhering to Clean Architecture principles.
 
@@ -15,14 +15,14 @@ These circular dependencies violate Clean Architecture principles, which mandate
 
 The solution involved applying several design patterns to break these circular dependencies while maintaining the overall Clean Architecture structure:
 
-### 1. Dependency Inversion
+### 1. dependency inversion
 
 Created interfaces in the application layer that are implemented by the infrastructure layer:
 
 - Created `ServiceFactory` interface in `org.s8r.application.port`
 - Updated `DependencyContainer` to implement this interface
 
-### 2. Service Locator Pattern
+### 2. service locator pattern
 
 Used the Service Locator pattern to avoid direct dependencies on the `DependencyContainer` class:
 
@@ -30,14 +30,14 @@ Used the Service Locator pattern to avoid direct dependencies on the `Dependency
 - `ServiceLocator` provides static access to a `ServiceFactory` instance
 - The infrastructure layer registers its implementation with the `ServiceLocator`
 
-### 3. Refactoring Client Code
+### 3. refactoring client code
 
 Updated client code to use these abstractions:
 
 - Modified `CliApplication` to use `ServiceFactory` instead of directly depending on `DependencyContainer`
 - Updated `Samstraumr` to register the `DependencyContainer` with the `ServiceLocator`
 
-### 4. Package Organization
+### 4. package organization
 
 Added package-info.java files to clearly document the purpose and responsibility of each package:
 
@@ -47,7 +47,7 @@ Added package-info.java files to clearly document the purpose and responsibility
 
 ## Implementation Details
 
-### ServiceFactory Interface
+### Servicefactory interface
 
 ```java
 public interface ServiceFactory {
@@ -57,7 +57,7 @@ public interface ServiceFactory {
 }
 ```
 
-### ServiceLocator
+### Servicelocator
 
 ```java
 public final class ServiceLocator {
@@ -76,7 +76,7 @@ public final class ServiceLocator {
 }
 ```
 
-### Changes in CliApplication
+### Changes in cliapplication
 
 ```java
 public class CliApplication {
@@ -94,7 +94,7 @@ public class CliApplication {
 }
 ```
 
-### Changes in Samstraumr
+### Changes in samstraumr
 
 ```java
 private Samstraumr() {
@@ -121,4 +121,3 @@ private Samstraumr() {
 1. Move the `Samstraumr` class to the infrastructure layer as it's an implementation detail
 2. Create a proper application initialization sequence
 3. Consider using a dependency injection framework for more complex scenarios
-4. Add more tests to verify the architecture compliance

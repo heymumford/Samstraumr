@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# FileOrganization
+# Standard File Organization
 
 This document describes the standardized file organization for the Samstraumr project.
 

@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Samstraumr CLI Reference
+# Cli Reference
 
 The S8r command-line interface provides a unified way to interact with the Samstraumr framework for tasks like building, testing, and managing versions.
 
@@ -23,12 +23,111 @@ The S8r command-line interface provides a unified way to interact with the Samst
 Or use the longer form:
 
 ```bash
-./util/samstraumr <command> [options]
+./util/scripts/samstraumr <command> [options]
 ```
 
 ## Available Commands
 
-### Build Commands
+### Model management commands
+
+#### Initialize a new model
+
+```bash
+./s8r init [options] [target-directory]
+```
+
+Options:
+- `-p, --package <n>`: Specify a custom package name (default: org.example)
+- `-n, --name <n>`: Specify a model name
+- `-v, --verbose`: Enable verbose output
+- `-d, --debug`: Enable debug output (additional details)
+
+Examples:
+```bash
+./s8r init                                  # Initialize in current directory
+./s8r init ~/new-model                      # Initialize in ~/new-model
+./s8r init -p com.example.model             # Use custom package name
+./s8r init -n "Customer Data Model" -p com.example.customer  # Set model name and package
+```
+
+#### Visualize model structure
+
+```bash
+./s8r list [options] [directory]
+```
+
+Options:
+- `-f, --format <format>`: Output format: ascii, tree, json (default: ascii)
+- `-d, --detailed`: Show detailed component information
+- `-v, --verbose`: Enable verbose output
+
+Examples:
+```bash
+./s8r list                  # List model in current directory
+./s8r list ~/my-model       # List model in specified directory
+./s8r list -f tree          # Display as tree structure
+./s8r list -d               # Show detailed information
+```
+
+#### Component management
+
+```bash
+./s8r component <subcommand> [arguments]
+```
+
+Subcommands:
+- `create`: Create a new component
+- `list`: List all components
+- `info`: Show details about a component
+- `delete`: Delete a component
+
+Examples:
+```bash
+./s8r component create --type transformer DataProcessor
+./s8r component list --format json
+```
+
+#### Composite management
+
+```bash
+./s8r composite <subcommand> [arguments]
+```
+
+Subcommands:
+- `create`: Create a new composite
+- `list`: List all composites
+- `add`: Add a component to a composite
+- `connect`: Connect components within a composite
+- `info`: Show details about a composite
+- `delete`: Delete a composite
+
+Examples:
+```bash
+./s8r composite create --type processing DataFlow
+./s8r composite add --component DataProcessor --composite DataFlow
+```
+
+#### Machine management
+
+```bash
+./s8r machine <subcommand> [arguments]
+```
+
+Subcommands:
+- `create`: Create a new machine
+- `list`: List all machines
+- `add`: Add a composite to a machine
+- `connect`: Connect composites within a machine
+- `info`: Show details about a machine
+- `delete`: Delete a machine
+
+Examples:
+```bash
+./s8r machine create --template flow DataPipeline
+./s8r machine add --composite DataFlow --machine DataPipeline
+```
+
+### Build commands
 
 Build the project with various configurations:
 
@@ -62,7 +161,7 @@ Examples:
 ./s8r build -v -p test        # Run tests in parallel with verbose output
 ```
 
-### Test Commands
+### Test commands
 
 Run various types of tests:
 
@@ -101,7 +200,7 @@ Options:
 - `-p, --profile <profile>`: Use specific Maven profile
 - `-v, --verbose`: Show verbose output with detailed status
 - `--skip-quality`: Skip quality checks
-- `--cyclename <name>`: Specify a name for the test cycle (for reporting)
+- `--cyclename <n>`: Specify a name for the test cycle (for reporting)
 
 Examples:
 
@@ -112,7 +211,7 @@ Examples:
 ./s8r test -v adam             # Run Adam tube tests with verbose output
 ```
 
-### Version Commands
+### Version commands
 
 Manage project versioning:
 
@@ -140,7 +239,7 @@ Examples:
 ./s8r version test patch       # Bump patch, test, commit, tag
 ```
 
-### Quality Check Commands
+### Quality check commands
 
 Validate code quality:
 
@@ -168,7 +267,7 @@ Examples:
 ./s8r quality encoding -v      # Check encodings with verbose output
 ```
 
-### CI Commands
+### Ci commands
 
 Run GitHub Actions workflows locally:
 
@@ -205,9 +304,9 @@ You can also run CI checks after building:
 ./s8r build fast --ci           # Fast build followed by local CI check
 ```
 
-### Documentation Commands
+### Documentation commands
 
-#### Document Generation
+#### Document generation
 
 Generate documentation:
 
@@ -232,7 +331,7 @@ Examples:
 ./s8r docs ./my-docs docx          # Generate DOCX docs in ./my-docs  
 ```
 
-#### Documentation Integrity
+#### Documentation integrity
 
 Check and maintain documentation integrity:
 
@@ -289,6 +388,132 @@ The CLI uses configuration files from multiple locations:
 1. `.samstraumr.config`: Project-level configuration
 2. `.s8r/config.json`: User-level configuration
 3. Environment variables
+
+## Script Organization
+
+Starting from version 2.7.1, the CLI scripts are organized into a proper bin directory structure for better maintainability and adherence to standard practices.
+
+### Bin Directory Organization
+
+All executables are organized by functionality in the `bin` directory:
+
+```bash
+bin/
+   core/           # Core framework executables (s8r, s8r-init, s8r-list)
+   build/          # Build-related executables (s8r-build, s8r-ci)
+   test/           # Testing executables (s8r-test, s8r-test-cli)
+   component/      # Component-related executables (s8r-component, s8r-composite, s8r-machine, s8r-tube)
+   dev/            # Development executables (s8r-dev, s8r-dev-help-build)
+   migration/      # Migration tools (s8r-migration-monitor, s8r-architecture-verify)
+   help/           # Help executables (s8r-help, s8r-help-build, s8r-help-component)
+   utils/          # Utility executables (s8r-docs, s8r-quality, s8r-version)
+   ai/             # AI-related executables (s8r-ai-test)
+   setup-path.sh   # Script to add bin directory to PATH
+   create-aliases.sh # Script to create shell aliases for executables
+   remove-root-scripts.sh # Script to safely remove root directory scripts
+   setup-bin-directory.sh # Script to set up the bin directory structure
+   s8r-scripts-version # Script to manage script versions (original vs. new)
+   README.md       # Documentation for bin directory structure and usage
+```
+
+These are the canonical executables for the project. They are not symlinks or copies of files in the root directory - they ARE the primary executables that should be used for all operations.
+
+### Setting Up Your Environment
+
+You have three options for using the Samstraumr executables:
+
+#### Option 1: Add the bin directory to your PATH (Recommended)
+
+```bash
+# Run the setup script
+./bin/setup-path.sh
+
+# Then activate in current session
+source ~/.bashrc   # or ~/.zshrc, etc. depending on your shell
+```
+
+This will add the bin directory to your shell configuration and provide instructions for activating it in your current session.
+
+#### Option 2: Create shell aliases
+
+```bash
+# Run the aliases script
+./bin/create-aliases.sh
+
+# Then activate in current session
+source ~/.bashrc   # or ~/.zshrc, etc. depending on your shell
+```
+
+This will create aliases for all scripts in your shell configuration, making them accessible from anywhere.
+
+#### Option 3: Use full paths
+
+```bash
+# You can always use the full path to run a script
+/path/to/Samstraumr/bin/core/s8r
+/path/to/Samstraumr/bin/build/s8r-build
+```
+
+### Removing Root Directory Scripts
+
+For a cleaner repository structure, after setting up your PATH or aliases, you should remove the deprecated scripts from the root directory:
+
+```bash
+# Run the removal script
+bin/remove-root-scripts.sh
+```
+
+The script will:
+1. Verify that the bin directory is in your PATH or aliases are set up
+2. Check that all scripts have corresponding executables in the bin directory
+3. Safely remove the root directory scripts
+
+### Script Version Management
+
+Some scripts have both original and new versions (e.g., s8r-build and s8r-build-new). To manage these versions, use:
+
+```bash
+# List available script versions
+bin/s8r-scripts-version list
+
+# Switch to new versions of scripts
+bin/s8r-scripts-version use-new
+
+# Switch back to original versions
+bin/s8r-scripts-version use-old
+```
+
+### Utility Scripts
+
+Development-specific utility scripts are located in the `util/scripts` directory:
+
+```bash
+util/scripts/
+   archived/       # Archived scripts that are no longer actively used
+   docs/           # Documentation about scripts
+   ...other utility scripts
+```
+
+### Bin Directory Setup
+
+If you need to recreate or update the bin directory structure:
+
+```bash
+# Setup or update the bin directory structure
+bin/setup-bin-directory.sh
+```
+
+This script:
+1. Creates all necessary subdirectories
+2. Copies scripts from the root directory to appropriate subdirectories
+3. Creates management scripts (setup-path.sh, create-aliases.sh, etc.)
+4. Updates the bin directory README
+
+### Legacy Script Support (Deprecated)
+
+The scripts previously located in the root directory are deprecated and will be removed in a future version. Please update your workflows to use the bin directory executables instead.
+
+All documentation, CI/CD pipelines, and personal workflows should be updated to reference the bin directory executables rather than the root directory scripts.
 
 ## Return to Main Documentation
 

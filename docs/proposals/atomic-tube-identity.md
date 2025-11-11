@@ -12,7 +12,7 @@ Licensed under the Mozilla Public License 2.0
 
 # Atomic Tube Identity
 
-### translation from rtf performed by unrtf, version 0.21.10
+### Translation from rtf performed by unrtf, version 0.21.10
 
 ### Font table contains 102 fonts total
 

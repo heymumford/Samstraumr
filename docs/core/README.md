@@ -2,7 +2,7 @@
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-# Core Concepts
+# README
 
 This directory contains documentation on the core concepts and architectural foundations of Samstraumr.
 

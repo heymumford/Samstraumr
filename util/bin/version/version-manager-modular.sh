@@ -237,7 +237,7 @@ function run_version_diagnostics() {
   print_header "Version Management Diagnostics"
   
   # Check version file existence
-  local version_file="${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/Samstraumr/version.properties}"
+  local version_file="${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/modules/version.properties}"
   
   echo "Checking version configuration..."
   
@@ -540,7 +540,7 @@ function handle_command() {
       
       # Show paths and config
       print_info "PROJECT_ROOT: $PROJECT_ROOT"
-      print_info "VERSION_FILE: ${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/Samstraumr/version.properties}"
+      print_info "VERSION_FILE: ${VERSION_PROPERTIES_FILE:-${PROJECT_ROOT}/modules/version.properties}"
       print_info "VERSION_CONFIG_FILE: $VERSION_CONFIG_FILE"
       
       # Show loaded functions

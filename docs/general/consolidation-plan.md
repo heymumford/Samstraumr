@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# S8r Documentation Consolidation Plan
+# Consolidation Plan
 
 This plan builds upon the previous consolidation efforts while focusing on the transition from Samstraumr to S8r terminology and architecture. It specifically aims to reduce documentation file count by merging similar content and updating terminology.
 
@@ -64,7 +64,7 @@ This plan builds upon the previous consolidation efforts while focusing on the t
   - Add redirects from other files to the canonical version
   - Delete duplicate files after updating all references
 
-### BDD documentation
+### Bdd documentation
 
 - **Overlapping Files**:
   - `/docs/testing/bdd-documentation.md`
@@ -129,7 +129,7 @@ This plan builds upon the previous consolidation efforts while focusing on the t
   - Add redirects from other files to the canonical versions
   - Delete duplicate files after updating all references
 
-### API references
+### Api references
 
 - **Plan**:
   - Create `/docs/reference/s8r-api-reference.md` with Component API documentation

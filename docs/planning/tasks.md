@@ -10,13 +10,13 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Implementation Tasks
+# Tasks
 
 This document tracks specific implementation tasks for the S8r framework. It provides a consolidated view of what needs to be done, organized by priority.
 
 ## Current Tasks
 
-### P0: Critical Tasks
+### P0: critical tasks
 
 1. **Package Structure Refactoring**
    - Create simplified `org.s8r.component` structure ✅
@@ -43,7 +43,7 @@ This document tracks specific implementation tasks for the S8r framework. It pro
    - Target completion: 2025-04-12
    - Related: [Testing documentation](../architecture/testing.md)
 
-### P1: High Priority Tasks
+### P1: high priority tasks
 
 1. **Composite Component Implementation**
    - Create Composite class in new package structure ✅
@@ -62,14 +62,16 @@ This document tracks specific implementation tasks for the S8r framework. It pro
    - Completed on: 2025-04-06
    - Related: [Implementation documentation](../architecture/implementation.md)
 3. **Test Framework Consolidation**
-   - Review and update test annotations
-   - Consolidate test runners
-   - Update test execution documentation
-   - Status: Not started
+   - Review and update test annotations ✅
+   - Consolidate test runners ✅
+   - Migrate legacy tube tests to component tests 🔄
+   - Update test execution documentation ✅
+   - Status: In Progress
    - Target completion: 2025-04-20
    - Related: [Testing documentation](../architecture/testing.md)
+   - Related: [Test Migration Implementation](./completed/test-migration-implementation.md)
 
-### P2: Medium Priority Tasks
+### P2: medium priority tasks
 
 1. **Legacy Code Removal**
    - Identify legacy code to remove
@@ -110,7 +112,7 @@ This document tracks specific implementation tasks for the S8r framework. It pro
    - Streamlined documentation structure
    - Status: Complete
    - Completed on: 2025-04-04
-   - Related: [Architecture documentation](../architecture/.md)
+   - Related: [Architecture documentation](../architecture/readme.md)
 
 ## Task Dependencies
 

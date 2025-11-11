@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2025 Eric C. Mumford (@heymumford)
+
+This software was developed with analytical assistance from AI tools 
+including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+which were used as paid services. All intellectual property rights 
+remain exclusively with the copyright holder listed above.
+
+Licensed under the Mozilla Public License 2.0
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.s8r</groupId>
+    <artifactId>samstraumr-parent</artifactId>
+    <version>3.1.1</version>
+    <relativePath>..</relativePath>
+  </parent>
+
+  <artifactId>samstraumr</artifactId>
+  <name>Samstraumr</name>
+  <packaging>pom</packaging>
+  <description>
+    Module container for Samstraumr framework components.
+  </description>
+
+  <modules>
+    <module>samstraumr-core</module>
+  </modules>
+
+  <properties>
+    <!-- Version management -->
+    <version.file.path>${project.basedir}/version.properties</version.file.path>
+  </properties>
+
+  <!-- No need to duplicate other properties, plugins, or profiles here as they're inherited from parent -->
+  
+  <profiles>
+    <profile>
+      <id>tests</id>
+      <properties>
+        <cucumber.filter.tags>${test.tags}</cucumber.filter.tags>
+        <skipTests>false</skipTests>
+        <maven.test.skip>false</maven.test.skip>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>tdd-development</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <jacoco.line.coverage>0.80</jacoco.line.coverage>
+        <jacoco.branch.coverage>0.80</jacoco.branch.coverage>
+        
+        <skipTests>false</skipTests>
+        <maven.test.skip>false</maven.test.skip>
+        <testFailureIgnore>false</testFailureIgnore>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>ci-pipeline</id>
+      <properties>
+        <skipTests>false</skipTests>
+        <maven.test.skip>false</maven.test.skip>
+        <testFailureIgnore>false</testFailureIgnore>
+      </properties>
+      <build>
+        <plugins>
+          <!-- OWASP Dependency Check -->
+          <plugin>
+            <groupId>org.owasp</groupId>
+            <artifactId>dependency-check-maven</artifactId>
+            <version>${dependency-check.version}</version>
+            <configuration>
+              <!-- Run in parallel when possible -->
+              <parallelAnalysis>true</parallelAnalysis>
+              <!-- Only show vulnerabilities with at least medium severity -->
+              <failBuildOnCVSS>7</failBuildOnCVSS>
+              <!-- Output formats -->
+              <formats>
+                <format>HTML</format>
+                <format>JSON</format>
+              </formats>
+              <!-- Suppression file for false positives -->
+              <suppressionFile>${project.basedir}/owasp-suppressions.xml</suppressionFile>
+              <!-- Better handling of API rate limiting -->
+              <nvdApiWait>2000</nvdApiWait>
+              <nvdApiMaxRetries>2</nvdApiMaxRetries>
+              <skipOnError>false</skipOnError>
+              <ossindexAnalyzerEnabled>false</ossindexAnalyzerEnabled>
+              <retireJsAnalyzerEnabled>true</retireJsAnalyzerEnabled>
+              <nodeAuditAnalyzerEnabled>false</nodeAuditAnalyzerEnabled>
+              <!-- Update NVD database only if older than 24 hours -->
+              <autoUpdate>true</autoUpdate>
+              <cveValidForHours>24</cveValidForHours>
+            </configuration>
+            <!-- Don't automatically run during standard build -->
+            <!-- Will only be executed when ci-pipeline profile is activated -->
+            <executions>
+              <execution>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <profile>
+      <id>ci-pipeline-nonblocking</id>
+      <build>
+        <plugins>
+          <!-- OWASP Dependency Check in non-blocking mode -->
+          <plugin>
+            <groupId>org.owasp</groupId>
+            <artifactId>dependency-check-maven</artifactId>
+            <version>${dependency-check.version}</version>
+            <configuration>
+              <!-- Run in parallel when possible -->
+              <parallelAnalysis>true</parallelAnalysis>
+              <!-- Report only, don't fail the build -->
+              <failBuildOnCVSS>11</failBuildOnCVSS>
+              <!-- Output formats -->
+              <formats>
+                <format>HTML</format>
+                <format>JSON</format>
+              </formats>
+              <!-- Suppression file for false positives -->
+              <suppressionFile>${project.basedir}/owasp-suppressions.xml</suppressionFile>
+              <!-- Better offline support -->
+              <nvdApiWait>2000</nvdApiWait>
+              <nvdApiMaxRetries>1</nvdApiMaxRetries>
+              <skipOnError>true</skipOnError>
+              <ossindexAnalyzerEnabled>false</ossindexAnalyzerEnabled>
+              <retireJsAnalyzerEnabled>true</retireJsAnalyzerEnabled>
+              <nodeAuditAnalyzerEnabled>false</nodeAuditAnalyzerEnabled>
+              <!-- Update NVD database only if older than 7 days for dev environments -->
+              <autoUpdate>true</autoUpdate>
+              <cveValidForHours>168</cveValidForHours>
+            </configuration>
+            <!-- Don't automatically run during standard build -->
+            <!-- Will only be executed when ci-pipeline-nonblocking profile is activated -->
+            <executions>
+              <execution>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

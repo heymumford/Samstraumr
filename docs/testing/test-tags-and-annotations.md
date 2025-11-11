@@ -238,40 +238,40 @@ public @interface UnitTest {
 Tests can be run using Maven profiles or custom scripts. The enhanced tagging system supports more granular test selection:
 
 ```bash
-# Run unit tests
+# Test Tags and Annotations
 mvn test -P unit-tests
 
-# Run component tests
+# Test Tags and Annotations
 mvn test -P component-tests
 
-# Run tests with specific tag combination
+# Test Tags and Annotations
 mvn test -Dcucumber.filter.tags="@L0_Component and @Identity"
 
-# Run critical tests only
+# Test Tags and Annotations
 mvn test -P atl-tests
 
-# Run tests by lifecycle phase
+# Test Tags and Annotations
 mvn test -P conception-tests
 mvn test -P infancy-tests
 
-# Run tests by identity initiative
+# Test Tags and Annotations
 mvn test -P substrate-identity-tests
 mvn test -P memory-identity-tests
 
-# Run tests by test type
+# Test Tags and Annotations
 mvn test -P positive-tests
 mvn test -P negative-tests
 
-# Run tests with complex tag combinations
+# Test Tags and Annotations
 mvn test -Dcucumber.filter.tags="@SubstrateIdentity and @Conception and @Positive"
 mvn test -Dcucumber.filter.tags="@MemoryIdentity and @ATL and not @Negative"
 
-# Use the CLI to run tests with tags
+# Test Tags and Annotations
 ./s8r test --tags="@Conception"
 ./s8r test --tags="@SubstrateIdentity and @Positive"
 ./s8r test --tags="@MemoryIdentity and @Infancy"
 
-# Map bio tags to test types
+# Test Tags and Annotations
 ./s8r test map-tags initiative substrate  # Returns "SubstrateIdentity"
 ./s8r test map-tags phase conception      # Returns "Conception"
 ./s8r test map-tags epic uniqueidentification  # Returns "UniqueIdentification"

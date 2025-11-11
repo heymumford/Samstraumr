@@ -1,4 +1,4 @@
-# ATL Test Discovery System
+# Atl Test Discovery
 
 This document explains the Above-The-Line (ATL) test discovery system in Samstraumr.
 
@@ -14,7 +14,7 @@ ATL tests are critical tests that must pass for every build. They are discovered
 
 The ATL test discovery system consists of the following components:
 
-### 1. ATL Annotation
+### 1. atl annotation
 
 The `@ATL` annotation is defined in:
 - `src/test/java/org/s8r/test/annotation/ATL.java`
@@ -28,7 +28,7 @@ This annotation includes the JUnit `@Tag("ATL")` annotation, which allows JUnit 
 public @interface ATL {}
 ```
 
-### 2. ATL Test Runner
+### 2. atl test runner
 
 The `RunATLTests` class is a JUnit test suite configured to discover and run all tests annotated with `@ATL`. It is defined in:
 - `src/test/java/org/s8r/tube/RunATLTests.java`
@@ -48,7 +48,7 @@ The `RunATLTests` class is a JUnit test suite configured to discover and run all
 public class RunATLTests {}
 ```
 
-### 3. Maven Configuration
+### 3. maven configuration
 
 The `pom.xml` includes an `atl-tests` profile that configures Maven to run tests with the `@ATL` tag:
 
@@ -61,15 +61,15 @@ The `pom.xml` includes an `atl-tests` profile that configures Maven to run tests
 </profile>
 ```
 
-### 4. Command-Line Interface
+### 4. command-line interface
 
 Run ATL tests using either of these commands:
 
 ```bash
-# Using the s8r-test script
+# Atl Test Discovery
 ./s8r-test atl
 
-# Using the dedicated script
+# Atl Test Discovery
 ./util/test/run-atl-tests.sh
 ```
 
@@ -121,4 +121,3 @@ If ATL tests are not being discovered:
 1. Only mark truly critical tests as ATL
 2. Keep ATL tests fast and reliable
 3. Maintain a reasonable number of ATL tests (too many will slow the build)
-4. Review the distribution of ATL tests regularly to ensure good coverage

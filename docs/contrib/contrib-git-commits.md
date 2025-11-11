@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Git Commits
+# Contrib Git Commits
 
 ## Commit Message Format
 

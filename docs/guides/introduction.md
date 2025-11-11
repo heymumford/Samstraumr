@@ -10,13 +10,13 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# Introduction to S8r
+# Introduction
 
 ## From Samstraumr to S8r: Evolution of the Framework
 
 Welcome to S8r (pronounced "ess-eight-are"), the next evolution of the Samstraumr framework. This document provides an overview of S8r and explains the key changes from previous versions.
 
-### What is S8r?
+### What is s8r?
 
 S8r is a revolutionary framework for building resilient, adaptive software systems inspired by systems theory and natural processes. The framework provides a unified approach to creating software components that are:
 
@@ -31,7 +31,7 @@ The name "S8r" is an abbreviation of "Samstraumr" (Old Norse for "unified flow")
 
 The evolution from Samstraumr to S8r brings several significant improvements:
 
-### 1. Simplified Package Structure
+### 1. simplified package structure
 
 The Java package structure has been significantly simplified, with a reduction in nesting depth of over 30%. This makes the codebase more navigable and reduces the verbosity of import statements.
 
@@ -51,7 +51,7 @@ import org.s8r.component.core.State;
 import org.s8r.component.composite.Composite;
 ```
 
-### 2. Standardized Terminology
+### 2. standardized terminology
 
 We've standardized on industry-standard terminology, making the framework more intuitive for new users:
 
@@ -62,7 +62,7 @@ We've standardized on industry-standard terminology, making the framework more i
 | TubeLifecycleState | State (unified) |
 | Bundle             | Composite       |
 
-### 3. Unified State Management
+### 3. unified state management
 
 Previously, components needed to manage both a `TubeStatus` and a `TubeLifecycleState`. In S8r, we've unified these into a single `State` enum that captures both operational status and lifecycle phase:
 
@@ -74,7 +74,7 @@ if (component.getState() == State.DEGRADED) {
 }
 ```
 
-### 4. Enhanced Maven Structure
+### 4. enhanced maven structure
 
 S8r introduces a more modular Maven structure with clearer artifact naming:
 
@@ -83,7 +83,7 @@ S8r introduces a more modular Maven structure with clearer artifact naming:
 <artifactId>s8r-core</artifactId>
 ```
 
-### 5. Improved CLI
+### 5. improved cli
 
 S8r provides a simplified command-line interface for all operations:
 

@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# File Reorganization Progress
+# Completed File Reorganization Progress
 
 This document tracks the progress of the file reorganization effort in the Samstraumr project.
 

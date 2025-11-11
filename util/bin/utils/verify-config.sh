@@ -10,12 +10,12 @@ echo "Verifying Samstraumr configuration system..."
 echo "==============================================="
 
 # Check for configuration file
-if [ -f "${PROJECT_ROOT}/.samstraumr.config" ]; then
-  echo "✅ Configuration file found at: ${PROJECT_ROOT}/.samstraumr.config"
+if [ -f "${PROJECT_ROOT}/.s8r.config" ]; then
+  echo "✅ Configuration file found at: ${PROJECT_ROOT}/.s8r.config"
   # Source the configuration file
-  source "$(cd "$(dirname "${BASH_SOURCE[0]}")" source "${PROJECT_ROOT}/.samstraumr.configsource "${PROJECT_ROOT}/.samstraumr.config pwd)/../../.samstraumr/config.sh""
+  source "$(cd "$(dirname "${BASH_SOURCE[0]}")" source "${PROJECT_ROOT}/.s8r.configsource "${PROJECT_ROOT}/.s8r.config pwd)/../../.s8r/config.sh""
 else
-  echo "❌ Configuration file NOT found at: ${PROJECT_ROOT}/.samstraumr.config"
+  echo "❌ Configuration file NOT found at: ${PROJECT_ROOT}/.s8r.config"
   echo "Please ensure the configuration file exists and is readable."
   exit 1
 fi
@@ -26,14 +26,14 @@ echo "Verifying core paths:"
 echo "---------------------"
 
 paths_to_check=(
-  "${SAMSTRAUMR_PROJECT_ROOT}"
-  "${SAMSTRAUMR_CORE_MODULE}"
-  "${SAMSTRAUMR_SRC_MAIN}"
-  "${SAMSTRAUMR_SRC_TEST}"
-  "${SAMSTRAUMR_TARGET}"
-  "${SAMSTRAUMR_JAVA_MAIN}"
-  "${SAMSTRAUMR_JAVA_TEST}"
-  "${SAMSTRAUMR_RESOURCES_TEST}"
+  "${S8R_PROJECT_ROOT}"
+  "${S8R_CORE_MODULE}"
+  "${S8R_SRC_MAIN}"
+  "${S8R_SRC_TEST}"
+  "${S8R_TARGET}"
+  "${S8R_JAVA_MAIN}"
+  "${S8R_JAVA_TEST}"
+  "${S8R_RESOURCES_TEST}"
 )
 
 path_errors=0
@@ -84,7 +84,7 @@ scripts_to_test=(
 script_errors=0
 for script in "${scripts_to_test[@]}"; do
   if [ -f "$script" ]; then
-    if grep -q "source.*samstraumr.config" "$script" || grep -q "\.samstraumr\.config" "$script"; then
+    if grep -q "source.*samstraumr.config" "$script" || grep -q "\.s8r\.config" "$script"; then
       echo "✅ Script uses configuration: $(basename "$script")"
     else
       echo "❌ Script does NOT use configuration: $(basename "$script")"

@@ -2,7 +2,7 @@
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-# Clean Architecture in Samstraumr
+# README
 
 This document describes the implementation of Clean Architecture principles in the Samstraumr framework.
 
@@ -14,7 +14,7 @@ The Samstraumr framework has been refactored to follow the Clean Architecture pr
 
 Samstraumr's implementation of Clean Architecture consists of the following layers:
 
-### 1. Domain Layer
+### 1. domain layer
 
 The innermost layer containing business entities, value objects, and domain logic. This layer is independent of any frameworks, libraries, or external concerns.
 
@@ -74,7 +74,7 @@ org.samstraumr.domain
     └── MachineType.java
 ```
 
-### 2. Application Layer
+### 2. application layer
 
 Contains application-specific business rules and use cases. This layer defines interfaces (ports) for external services required by the domain.
 
@@ -103,7 +103,7 @@ org.samstraumr.application
     └── MachineService.java
 ```
 
-### 3. Infrastructure Layer
+### 3. infrastructure layer
 
 Implements the interfaces defined in the application layer, providing concrete implementations for external services.
 
@@ -132,7 +132,7 @@ org.samstraumr.infrastructure
     └── InMemoryMachineRepository.java
 ```
 
-### 4. Interface Adapters Layer
+### 4. interface adapters layer
 
 Connects the application to external agents, converting data between the application and external formats.
 
@@ -153,7 +153,7 @@ org.samstraumr.adapter
     └── InMemoryComponentRepository.java
 ```
 
-### 5. Frameworks and Drivers Layer
+### 5. frameworks and drivers layer
 
 Contains frameworks, tools, and delivery mechanisms.
 
@@ -173,7 +173,7 @@ org.samstraumr
 
 ## Key Design Principles
 
-### Dependency Rule
+### Dependency rule
 
 The most fundamental rule in Clean Architecture is the Dependency Rule: dependencies only point inward. This means that inner layers know nothing about outer layers. This is achieved through:
 
@@ -181,7 +181,7 @@ The most fundamental rule in Clean Architecture is the Dependency Rule: dependen
 2. **Dependency injection**: Dependencies are provided from outside
 3. **DTO objects**: For transferring data between layers
 
-### Separation of Concerns
+### Separation of concerns
 
 Each layer has a distinct responsibility:
 - Domain Layer: Business rules
@@ -190,15 +190,15 @@ Each layer has a distinct responsibility:
 - Interface Adapters: Conversion between formats
 - Frameworks Layer: External tools and frameworks
 
-### Domain-Centered Design
+### Domain-centered design
 
 The domain model is at the center of the application. Business rules are centralized in the domain layer, making them easy to understand and modify.
 
-### Use Case-Driven
+### Use case-driven
 
 The application behavior is defined by use cases in the application service layer. Each service method typically corresponds to a user action or system behavior.
 
-### Interface Adapters
+### Interface adapters
 
 External systems are accessed through adapters that implement domain-defined interfaces (ports). This allows the domain to remain pure while still interacting with external systems.
 

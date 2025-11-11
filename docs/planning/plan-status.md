@@ -18,34 +18,45 @@ This document provides a status overview of all planning documents in the Samstr
 
 |                                     Document                                     |                          Description                          |     Status     | Last Updated |
 |----------------------------------------------------------------------------------|---------------------------------------------------------------|----------------|--------------|
-| [documentation-standardization-plan.md](./documentation-standardization-plan.md) | Plan for standardizing documentation formats and organization | 🔄 In Progress | 2025-04-04   |
-| [kanban.md](./k-a-n-b-a-n.md)                                                    | Kanban board tracking all current tasks                       | 🔄 Active      | 2025-04-04   |
+| [documentation-standardization-plan.md](./documentation-standardization-plan.md) | Plan for standardizing documentation formats and organization | 🔄 In Progress<br>(Phase 4 in progress) | 2025-04-07   |
+| [kanban.md](./kanban.md)                                                    | Kanban board tracking all current tasks                       | 🔄 Active      | 2025-04-07   |
+| [migration-utilities-completion.md](./archived/archived-migration-utilities-completion.md) | Documentation for migration utilities | ✅ Completed | 2025-04-07 |
+| [maven-structure-migration.md](./maven-structure-migration.md) | Migration from Samstraumr/ to modules/ directory structure | ✅ Completed | 2025-04-07 |
 
 ## Completed Plans
 
+These plans have been completed and archived. See the Archived Plans section for details.
+
 |                               Document                               |                Description                | Completion Date |                     Outcome                     |
 |----------------------------------------------------------------------|-------------------------------------------|-----------------|-------------------------------------------------|
-| [version-refactoring-summary.md](./version-refactoring-summary.md)   | Summary of version management refactoring | 2025-04-03      | ✅ Implemented modular version management system |
-| [test-refactoring-summary.md](./test-refactoring-summary.md)         | Summary of test system refactoring        | 2025-04-04      | ✅ Implemented unified test runner               |
-| [file-reorganization-progress.md](./file-reorganization-progress.md) | Status of file reorganization efforts     | 2025-04-03      | ✅ Completed major file reorganization           |
-| [script-reorganization.md](./script-reorganization.md)               | Plan for reorganizing scripts             | 2025-04-03      | ✅ Simplified script structure                   |
+| [script-reorganization-summary.md](./archived/archived-script-reorganization-summary.md) | Script reorganization and cleanup | 2025-04-07 | ✅ Implemented structured bin directory organization |
+| [version-management-enhancement.md](./archived/archived-version-management-enhancement.md) | Enhanced version management system | 2025-04-07 | ✅ Implemented robust version management system |
+| [test-migration-implementation.md](./archived/archived-test-migration-implementation.md) | Test migration from Tube to Component | 2025-04-07 | ✅ Migrated tests to new Component architecture |
+| [documentation-flattening-summary.md](./archived/archived-documentation-flattening-summary.md) | Documentation reorganization | 2025-04-07 | ✅ Flattened and standardized documentation structure |
 
 ## Archived Plans
 
 These plans have been completed, superseded, or are no longer relevant, but are kept for historical reference.
 
-|                           Document                           |  Original Name   | Archival Date |                   Reason                    |
-|--------------------------------------------------------------|------------------|---------------|---------------------------------------------|
-| [archived-temp-reorg-plan.md](./archived-temp-reorg-plan.md) | TempReorgPlan.md | 2025-04-04    | Superseded by completed file reorganization |
+|                           Document                           |        Original Name       | Archival Date |                   Reason                    |
+|--------------------------------------------------------------|-----------------------------|---------------|---------------------------------------------|
+| [archived-temp-reorg-plan.md](./archived/archived-temp-reorg-plan.md) | TempReorgPlan.md | 2025-04-04 | Superseded by completed file reorganization |
+| [archived-atomic-tube-test-implementation.md](./archived/archived-atomic-tube-test-implementation.md) | atomic-tube-test-implementation.md | 2025-04-07 | Implementation completed |
+| [archived-build-process-test-implementation.md](./archived/archived-build-process-test-implementation.md) | build-process-test-implementation.md | 2025-04-07 | Implementation completed |
+| [archived-script-reorganization-plan.md](./archived/archived-script-reorganization-plan.md) | script-reorganization-plan.md | 2025-04-07 | Implementation completed |
+| [archived-documentation-flattening-summary.md](./archived/archived-documentation-flattening-summary.md) | documentation-flattening-summary.md | 2025-04-07 | Phase completed |
+| [archived-md-file-analysis-plan.md](./archived/archived-md-file-analysis-plan.md) | md-file-analysis-plan.md | 2025-04-07 | Analysis completed |
+| [archived-readme-new-draft.md](./archived/archived-readme-new-draft.md) | readme-new-draft.md | 2025-04-07 | Draft incorporated into README.md |
+| [archived-readme-implementation.md](./archived/archived-readme-implementation.md) | readme-implementation.md | 2025-04-07 | Implementation completed |
 
-## Obsolete Plans (to Be Removed)
+## Maintenance Schedule
 
-These plans are obsolete and should be removed during the next cleanup.
-
-|                        Document                        |                      Reason                       | Replacement Document |
-|--------------------------------------------------------|---------------------------------------------------|----------------------|
-| [readme-new-draft.md](./readme-new-draft.md)           | Draft has been incorporated into actual README.md | N/A                  |
-| [readme-implementation.md](./readme-implementation.md) | Implementation completed                          | N/A                  |
+| Task                                 | Frequency   | Last Done  | Next Due    |
+|--------------------------------------|-------------|------------|-------------|
+| Archive completed plans              | Monthly     | 2025-04-07 | 2025-05-07  |
+| Update plan status document          | Weekly      | 2025-04-07 | 2025-04-14  |
+| Verify cross-references              | Monthly     | 2025-04-07 | 2025-05-07  |
+| Review documentation standards       | Quarterly   | 2025-04-07 | 2025-07-07  |
 
 ## Maintenance Instructions
 

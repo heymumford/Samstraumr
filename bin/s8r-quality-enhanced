@@ -1,0 +1,421 @@
+#!/usr/bin/env bash
+#==============================================================================
+# s8r-quality-enhanced - Run enhanced quality checks for Samstraumr
+#
+# This script runs a stricter set of quality checks to identify potential
+# code issues and maintain higher quality standards.
+#==============================================================================
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Load common functions if available
+if [ -f "${PROJECT_ROOT}/util/lib/unified-common.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/unified-common.sh"
+elif [ -f "${PROJECT_ROOT}/.s8r/lib/common.sh" ]; then
+  source "${PROJECT_ROOT}/.s8r/lib/common.sh"
+else
+  # Terminal colors
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  BLUE='\033[0;34m'
+  YELLOW='\033[0;33m'
+  BOLD='\033[1m'
+  RESET='\033[0m'
+  
+  # Functions for prettier output
+  print_info() { echo -e "${BLUE}→ $1${RESET}"; }
+  print_success() { echo -e "${GREEN}✓ $1${RESET}"; }
+  print_error() { echo -e "${RED}✗ $1${RESET}" >&2; }
+  print_warning() { echo -e "${YELLOW}! $1${RESET}" >&2; }
+  print_header() { echo -e "${BLUE}${BOLD}$1${RESET}"; echo -e "${BLUE}${BOLD}$(printf '=%.0s' $(seq 1 ${#1}))${RESET}"; }
+fi
+
+# Default options
+VERBOSE=false
+SKIP_REPORTS=false
+FIX_ISSUES=false
+MODULES=""
+
+# Parse command line arguments
+function parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -v|--verbose)
+        VERBOSE=true
+        shift
+        ;;
+      --skip-reports)
+        SKIP_REPORTS=true
+        shift
+        ;;
+      --fix)
+        FIX_ISSUES=true
+        shift
+        ;;
+      -m|--module)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          MODULES="$MODULES,$2"
+          shift 2
+        else
+          print_error "Module name missing after -m/--module"
+          show_help
+          exit 1
+        fi
+        ;;
+      -h|--help)
+        show_help
+        exit 0
+        ;;
+      *)
+        print_error "Unknown option: $1"
+        show_help
+        exit 1
+        ;;
+    esac
+  done
+  
+  # Remove leading comma if any modules were specified
+  MODULES=${MODULES#,}
+}
+
+# Display help information
+function show_help() {
+  print_header "Samstraumr Enhanced Quality Checks"
+  echo
+  echo "This script runs stricter quality checks for better code quality."
+  echo
+  echo "Usage: ./s8r-quality-enhanced [options]"
+  echo
+  echo "Options:"
+  echo "  -v, --verbose       Enable verbose output"
+  echo "  --skip-reports      Skip generating HTML reports"
+  echo "  --fix               Attempt to automatically fix issues where possible"
+  echo "  -m, --module NAME   Run checks only on specified module"
+  echo "  -h, --help          Show this help message"
+  echo
+  echo "Examples:"
+  echo "  ./s8r-quality-enhanced                # Run enhanced checks on all modules"
+  echo "  ./s8r-quality-enhanced --fix          # Run checks and fix where possible"
+  echo "  ./s8r-quality-enhanced -m core        # Check only the core module"
+}
+
+# Run the PMD checks
+function run_pmd_checks() {
+  print_header "Running Enhanced PMD Checks"
+
+  local mvn_args=("pmd:pmd" "pmd:cpd" "-Penhanced-quality")
+  
+  if [ "$VERBOSE" = true ]; then
+    mvn_args+=("-e")
+  else
+    mvn_args+=("-q")
+  fi
+  
+  if [ -n "$MODULES" ]; then
+    mvn_args+=("-pl" "$MODULES")
+  fi
+  
+  # Run the check
+  if mvn "${mvn_args[@]}"; then
+    print_success "PMD enhanced checks completed successfully"
+  else
+    print_error "PMD enhanced checks failed"
+    return 1
+  fi
+  
+  # Try to fix issues if enabled
+  if [ "$FIX_ISSUES" = true ]; then
+    print_info "Attempting to fix PMD issues"
+    
+    # Common PMD issues that can be automatically fixed
+    
+    # 1. Fix import statements
+    if [ -f "${PROJECT_ROOT}/util/scripts/fix-imports.sh" ]; then
+      print_info "Fixing import statements"
+      "${PROJECT_ROOT}/util/scripts/fix-imports.sh"
+    fi
+    
+    # 2. Fix unused/unnecessary code
+    if [ -f "${PROJECT_ROOT}/util/scripts/fix-pmd.sh" ]; then
+      print_info "Fixing PMD issues"
+      "${PROJECT_ROOT}/util/scripts/fix-pmd.sh"
+    fi
+  fi
+  
+  # Open report if available and not skipping reports
+  if [ "$SKIP_REPORTS" != true ]; then
+    local report_path="${PROJECT_ROOT}/target/site/pmd.html"
+    if [ -f "$report_path" ]; then
+      print_info "PMD report available at: $report_path"
+      if command -v xdg-open >/dev/null 2>&1; then
+        xdg-open "$report_path" &>/dev/null &
+      elif command -v open >/dev/null 2>&1; then
+        open "$report_path" &>/dev/null &
+      fi
+    fi
+  fi
+}
+
+# Run SpotBugs checks
+function run_spotbugs_checks() {
+  print_header "Running Enhanced SpotBugs Checks"
+
+  local mvn_args=("spotbugs:spotbugs" "spotbugs:gui" "-Penhanced-quality")
+  
+  if [ "$VERBOSE" = true ]; then
+    mvn_args+=("-e")
+  else
+    mvn_args+=("-q")
+  fi
+  
+  if [ -n "$MODULES" ]; then
+    mvn_args+=("-pl" "$MODULES")
+  fi
+  
+  # Run the check
+  if mvn "${mvn_args[@]}"; then
+    print_success "SpotBugs enhanced checks completed successfully"
+  else
+    print_error "SpotBugs enhanced checks failed"
+    return 1
+  fi
+  
+  # Open report if available and not skipping reports
+  if [ "$SKIP_REPORTS" != true ]; then
+    local report_path="${PROJECT_ROOT}/target/site/spotbugs.html"
+    if [ -f "$report_path" ]; then
+      print_info "SpotBugs report available at: $report_path"
+      if command -v xdg-open >/dev/null 2>&1; then
+        xdg-open "$report_path" &>/dev/null &
+      elif command -v open >/dev/null 2>&1; then
+        open "$report_path" &>/dev/null &
+      fi
+    fi
+  fi
+}
+
+# Run checkstyle checks
+function run_checkstyle_checks() {
+  print_header "Running Enhanced Checkstyle Checks"
+
+  local mvn_args=("checkstyle:checkstyle" "-Penhanced-quality")
+  
+  if [ "$VERBOSE" = true ]; then
+    mvn_args+=("-e")
+  else
+    mvn_args+=("-q")
+  fi
+  
+  if [ -n "$MODULES" ]; then
+    mvn_args+=("-pl" "$MODULES")
+  fi
+  
+  # Run the check
+  if mvn "${mvn_args[@]}"; then
+    print_success "Checkstyle enhanced checks completed successfully"
+  else
+    print_error "Checkstyle enhanced checks failed"
+    return 1
+  fi
+  
+  # Try to fix issues if enabled
+  if [ "$FIX_ISSUES" = true ]; then
+    print_info "Attempting to fix Checkstyle issues"
+    
+    # Fix formatting
+    if [ -f "${PROJECT_ROOT}/util/scripts/fix-formatting.sh" ]; then
+      print_info "Fixing formatting issues"
+      "${PROJECT_ROOT}/util/scripts/fix-formatting.sh"
+    fi
+  fi
+  
+  # Open report if available and not skipping reports
+  if [ "$SKIP_REPORTS" != true ]; then
+    local report_path="${PROJECT_ROOT}/target/site/checkstyle.html"
+    if [ -f "$report_path" ]; then
+      print_info "Checkstyle report available at: $report_path"
+      if command -v xdg-open >/dev/null 2>&1; then
+        xdg-open "$report_path" &>/dev/null &
+      elif command -v open >/dev/null 2>&1; then
+        open "$report_path" &>/dev/null &
+      fi
+    fi
+  fi
+}
+
+# Run javadoc checks
+function run_javadoc_checks() {
+  print_header "Running Enhanced Javadoc Checks"
+
+  local mvn_args=("javadoc:javadoc" "-Penhanced-quality")
+  
+  if [ "$VERBOSE" = true ]; then
+    mvn_args+=("-e")
+  else
+    mvn_args+=("-q")
+  fi
+  
+  if [ -n "$MODULES" ]; then
+    mvn_args+=("-pl" "$MODULES")
+  fi
+  
+  # Run the check
+  if mvn "${mvn_args[@]}"; then
+    print_success "Javadoc enhanced checks completed successfully"
+  else
+    print_error "Javadoc enhanced checks failed"
+    return 1
+  fi
+  
+  # Open report if available and not skipping reports
+  if [ "$SKIP_REPORTS" != true ]; then
+    local report_path="${PROJECT_ROOT}/target/site/apidocs/index.html"
+    if [ -f "$report_path" ]; then
+      print_info "Javadoc report available at: $report_path"
+      if command -v xdg-open >/dev/null 2>&1; then
+        xdg-open "$report_path" &>/dev/null &
+      elif command -v open >/dev/null 2>&1; then
+        open "$report_path" &>/dev/null &
+      fi
+    fi
+  fi
+}
+
+# Generate summary report of all quality checks
+function generate_summary() {
+  print_header "Quality Checks Summary"
+  
+  local output_file="${PROJECT_ROOT}/target/quality-summary.md"
+  mkdir -p "$(dirname "$output_file")"
+  
+  # Create summary header
+  cat > "$output_file" << EOF
+# Samstraumr Enhanced Quality Check Report
+
+Report generated on: $(date '+%Y-%m-%d %H:%M:%S')
+
+## Summary of Quality Checks
+
+| Tool | Status | Issues Found |
+|------|--------|--------------|
+EOF
+  
+  # Check PMD issues
+  local pmd_issues=0
+  if [ -f "${PROJECT_ROOT}/target/pmd.xml" ]; then
+    pmd_issues=$(grep -c "<violation" "${PROJECT_ROOT}/target/pmd.xml" || echo 0)
+    local pmd_status="✅ Passed"
+    [ "$pmd_issues" -gt 0 ] && pmd_status="❌ Failed"
+    echo "| PMD | $pmd_status | $pmd_issues |" >> "$output_file"
+  else
+    echo "| PMD | ⚠️ Not Run | - |" >> "$output_file"
+  fi
+  
+  # Check SpotBugs issues
+  local spotbugs_issues=0
+  if [ -f "${PROJECT_ROOT}/target/spotbugs.xml" ]; then
+    spotbugs_issues=$(grep -c "<BugInstance" "${PROJECT_ROOT}/target/spotbugs.xml" || echo 0)
+    local spotbugs_status="✅ Passed"
+    [ "$spotbugs_issues" -gt 0 ] && spotbugs_status="❌ Failed"
+    echo "| SpotBugs | $spotbugs_status | $spotbugs_issues |" >> "$output_file"
+  else
+    echo "| SpotBugs | ⚠️ Not Run | - |" >> "$output_file"
+  fi
+  
+  # Check Checkstyle issues
+  local checkstyle_issues=0
+  if [ -f "${PROJECT_ROOT}/target/checkstyle-result.xml" ]; then
+    checkstyle_issues=$(grep -c "<error" "${PROJECT_ROOT}/target/checkstyle-result.xml" || echo 0)
+    local checkstyle_status="✅ Passed"
+    [ "$checkstyle_issues" -gt 0 ] && checkstyle_status="❌ Failed"
+    echo "| Checkstyle | $checkstyle_status | $checkstyle_issues |" >> "$output_file"
+  else
+    echo "| Checkstyle | ⚠️ Not Run | - |" >> "$output_file"
+  fi
+  
+  # Check Javadoc issues
+  local javadoc_issues=0
+  if [ -f "${PROJECT_ROOT}/target/javadoc-warnings.log" ]; then
+    javadoc_issues=$(grep -c "warning:" "${PROJECT_ROOT}/target/javadoc-warnings.log" || echo 0)
+    local javadoc_status="✅ Passed"
+    [ "$javadoc_issues" -gt 0 ] && javadoc_status="❌ Failed"
+    echo "| Javadoc | $javadoc_status | $javadoc_issues |" >> "$output_file"
+  else
+    echo "| Javadoc | ⚠️ Not Run | - |" >> "$output_file"
+  fi
+  
+  # Total issues
+  local total_issues=$((pmd_issues + spotbugs_issues + checkstyle_issues + javadoc_issues))
+  echo -e "\n## Total Issues: $total_issues\n" >> "$output_file"
+  
+  # Add links to detailed reports
+  cat >> "$output_file" << EOF
+
+## Detailed Reports
+
+* [PMD Report](./site/pmd.html)
+* [SpotBugs Report](./site/spotbugs.html)
+* [Checkstyle Report](./site/checkstyle.html)
+* [Javadoc Report](./site/apidocs/index.html)
+
+## Next Steps
+
+1. Review the issues found in the detailed reports
+2. Fix high priority issues first
+3. Run with --fix option to attempt automatic fixes
+4. Re-run quality checks to verify improvements
+EOF
+
+  print_info "Quality summary report generated at: $output_file"
+  
+  # Display summary
+  echo
+  echo "PMD Issues: $pmd_issues"
+  echo "SpotBugs Issues: $spotbugs_issues"
+  echo "Checkstyle Issues: $checkstyle_issues"
+  echo "Javadoc Issues: $javadoc_issues"
+  echo -e "${BOLD}Total Issues: $total_issues${RESET}"
+  echo
+  
+  # Open summary report if not skipping reports
+  if [ "$SKIP_REPORTS" != true ]; then
+    if command -v xdg-open >/dev/null 2>&1; then
+      xdg-open "$output_file" &>/dev/null &
+    elif command -v open >/dev/null 2>&1; then
+      open "$output_file" &>/dev/null &
+    fi
+  fi
+}
+
+# Main execution function
+function main() {
+  parse_args "$@"
+  
+  # Navigate to project root
+  cd "$PROJECT_ROOT" || { print_error "Could not navigate to project root: $PROJECT_ROOT"; exit 1; }
+  
+  # Create target directory if it doesn't exist
+  mkdir -p "${PROJECT_ROOT}/target"
+  
+  local exit_code=0
+  
+  # Run enhanced quality checks
+  run_pmd_checks || exit_code=1
+  run_spotbugs_checks || exit_code=1
+  run_checkstyle_checks || exit_code=1
+  run_javadoc_checks || exit_code=1
+  
+  # Generate summary report
+  generate_summary
+  
+  # Return exit code
+  return $exit_code
+}
+
+# Execute main function if the script is run directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  main "$@"
+  exit $?
+fi

@@ -1,0 +1,270 @@
+#!/usr/bin/env bash
+#==============================================================================
+# Filename: s8r-version
+# Description: Simplified version management for Samstraumr
+#
+# Handles version management across the project following Unix principles:
+# "Do one thing and do it well" and "Simple is better than complex"
+#==============================================================================
+# Usage: ./s8r-version <command> [options]
+#
+# Commands:
+#   get                 Show current version
+#   bump [type]         Bump version (type: major, minor, patch)
+#   set <version>       Set specific version (format: x.y.z)
+#   fix                 Fix version inconsistencies across files
+#
+# Examples:
+#   ./s8r-version get              # Show current version
+#   ./s8r-version bump patch       # Increment patch version
+#   ./s8r-version set 2.0.0        # Set version to 2.0.0
+#==============================================================================
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${SCRIPT_DIR}"
+
+# Source unified common library if available, otherwise use original
+if [ -f "${PROJECT_ROOT}/util/lib/unified-common.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/unified-common.sh"
+elif [ -f "${PROJECT_ROOT}/.s8r/lib/common.sh" ]; then
+  source "${PROJECT_ROOT}/.s8r/lib/common.sh"
+else
+  echo "Error: Required library file not found"
+  exit 1
+fi
+
+# Define constants
+VERSION_FILE="${PROJECT_ROOT}/modules/version.properties"
+VERSION_PATTERN='[0-9]+\.[0-9]+\.[0-9]+'
+
+#------------------------------------------------------------------------------
+# Functions
+#------------------------------------------------------------------------------
+
+# Get current version from source of truth
+function get_version() {
+  if [[ ! -f "$VERSION_FILE" ]]; then
+    print_error "Version file not found: $VERSION_FILE"
+    exit 1
+  fi
+  grep "samstraumr.version=" "$VERSION_FILE" | cut -d= -f2
+}
+
+# Update all files with new version
+function update_version() {
+  local old=$1
+  local new=$2
+  local today=$(date +"%Y-%m-%d")
+  local files_updated=0
+  
+  # Validate version format
+  if ! validate_semantic_version "$new"; then
+    print_error "Invalid version format: $new (must be in format x.y.z)"
+    exit 1
+  fi
+  
+  print_info "Updating version from $old to $new"
+  
+  # Update version.properties (source of truth)
+  if [[ -f "$VERSION_FILE" ]]; then
+    sed -i "s/^samstraumr.version=.*/samstraumr.version=$new/" "$VERSION_FILE"
+    sed -i "s/^samstraumr.last.updated=.*/samstraumr.last.updated=$(date +'%B %d, %Y')/" "$VERSION_FILE"
+    ((files_updated++))
+    print_success "Updated $VERSION_FILE"
+  else
+    print_error "Version properties file not found: $VERSION_FILE"
+    exit 1
+  fi
+  
+  # Update POM files
+  for pom in "$PROJECT_ROOT/pom.xml" "$PROJECT_ROOT/modules/pom.xml" "$PROJECT_ROOT/modules/samstraumr-core/pom.xml"; do
+    if [[ -f "$pom" ]]; then
+      # Update project version
+      if grep -q "<version>[0-9].*</version>" "$pom"; then
+        sed -i "s|<version>[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*</version>|<version>$new</version>|g" "$pom"
+        print_success "Updated project version in $pom"
+      fi
+      
+      # Update samstraumr.version property
+      if grep -q "<samstraumr.version>" "$pom"; then
+        sed -i "s|<samstraumr.version>[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*</samstraumr.version>|<samstraumr.version>$new</samstraumr.version>|g" "$pom"
+        print_success "Updated property in $pom"
+      fi
+      
+      # Update parent version
+      if grep -q "<parent>" "$pom"; then
+        sed -i "/<parent>/,/<\/parent>/s|<version>[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*</version>|<version>$new</version>|g" "$pom"
+        print_success "Updated parent in $pom"
+      fi
+      
+      ((files_updated++))
+    fi
+  done
+  
+  # Update README.md
+  if [[ -f "$PROJECT_ROOT/README.md" ]]; then
+    # Update badge
+    sed -i "s|version-[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*-blue|version-$new-blue|g" "$PROJECT_ROOT/README.md"
+    # Update dependency example
+    sed -i "s|<version>[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*</version>|<version>$new</version>|g" "$PROJECT_ROOT/README.md"
+    ((files_updated++))
+    print_success "Updated README.md"
+  fi
+  
+  # Update CLAUDE.md if it exists
+  if [[ -f "$PROJECT_ROOT/CLAUDE.md" ]]; then
+    # Simple replacement pattern for version references
+    sed -i "s|[0-9]\+\.[0-9]\+\.[0-9]\+|$new|g" "$PROJECT_ROOT/CLAUDE.md"
+    ((files_updated++))
+    print_success "Updated CLAUDE.md"
+  fi
+  
+  # Update changelog
+  local changelog="$PROJECT_ROOT/docs/reference/release/changelog.md"
+  if [[ -f "$changelog" ]]; then
+    # Create new entry template
+    local template=$(cat <<EOF
+## [$new] - $today
+
+### Added
+
+- 
+
+### Changed
+
+- 
+
+### Fixed
+
+- 
+
+EOF
+)
+    # Find header line and insert new entry after it
+    local header_line=$(grep -n "All notable changes to this project will be documented in this file." "$changelog" | cut -d: -f1)
+    if [[ -n "$header_line" ]]; then
+      header_line=$((header_line + 2)) # Skip to the blank line after header
+      
+      # Create temporary file with new content
+      { head -n $header_line "$changelog"; echo -e "$template"; tail -n +$((header_line+1)) "$changelog"; } > "$changelog.new"
+      mv "$changelog.new" "$changelog"
+      
+      ((files_updated++))
+      print_success "Updated changelog.md"
+    else
+      print_warning "Could not locate changelog header line"
+    fi
+  fi
+  
+  print_info "Updated $files_updated files"
+  print_success "Version successfully updated to $new"
+}
+
+# Display help message
+function show_help() {
+  print_header "Samstraumr Version Manager"
+  echo
+  print_section "Usage"
+  echo "  ./s8r-version <command> [options]"
+  echo
+  print_section "Commands"
+  echo "  get                 Show current version"
+  echo "  bump [type]         Bump version (type: major, minor, patch)"
+  echo "  set <version>       Set specific version (format: x.y.z)"
+  echo "  fix                 Fix version inconsistencies across files"
+  echo
+  print_section "Examples"
+  echo "  ./s8r-version get              # Show current version"
+  echo "  ./s8r-version bump patch       # Increment patch version"
+  echo "  ./s8r-version bump minor       # Increment minor version"
+  echo "  ./s8r-version set 2.0.0        # Set version to 2.0.0"
+}
+
+# Process bump command
+function process_bump() {
+  local type=${1:-patch}
+  local current=$(get_version)
+  
+  # Parse version components
+  IFS='.' read -r major minor patch <<< "$current"
+  
+  # Calculate new version
+  case "$type" in
+    major) new="$((major+1)).0.0" ;;
+    minor) new="${major}.$((minor+1)).0" ;;
+    patch) new="${major}.${minor}.$((patch+1))" ;;
+    *)     
+      print_error "Invalid bump type: $type (use major, minor, or patch)"
+      exit 1
+      ;;
+  esac
+  
+  update_version "$current" "$new"
+}
+
+# Process set command
+function process_set() {
+  local new=$1
+  
+  if [[ -z "$new" ]]; then
+    print_error "Version must be specified (format: x.y.z)"
+    show_help
+    exit 1
+  fi
+  
+  local current=$(get_version)
+  update_version "$current" "$new"
+}
+
+# Process fix command
+function process_fix() {
+  local current=$(get_version)
+  print_info "Fixing version inconsistencies - forcing all files to use $current"
+  update_version "$current" "$current"
+}
+
+# Process get command
+function process_get() {
+  local current=$(get_version)
+  print_header "Samstraumr Version: $current"
+}
+
+# Main function to orchestrate execution
+function main() {
+  local command=$1
+  shift || true
+  
+  case "$command" in
+    get)
+      process_get
+      ;;
+    bump)
+      process_bump "$@"
+      ;;
+    set)
+      process_set "$@"
+      ;;
+    fix)
+      process_fix
+      ;;
+    *)
+      show_help
+      exit 1
+      ;;
+  esac
+}
+
+#------------------------------------------------------------------------------
+# Main Execution
+#------------------------------------------------------------------------------
+
+# Handle missing command
+if [[ $# -eq 0 ]]; then
+  show_help
+  exit 1
+fi
+
+# Run main function with all arguments
+main "$@"
+exit $?

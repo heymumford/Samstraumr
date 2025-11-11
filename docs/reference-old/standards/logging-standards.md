@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# LoggingStandards
+# Logging Standards
 
 *Last update: April 3, 2025*
 

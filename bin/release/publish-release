@@ -1,0 +1,471 @@
+#!/usr/bin/env bash
+#==============================================================================
+# Filename: publish-release
+# Description: Release publishing and deployment script
+#
+# Tags and publishes a new release, including Maven artifacts, GitHub releases,
+# and documentation updates.
+#==============================================================================
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+
+# Source unified common library for consistent output formatting
+if [ -f "${PROJECT_ROOT}/util/lib/unified-common.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/unified-common.sh"
+else
+  # Fallback to minimal functionality if library not found
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  BLUE='\033[0;34m'
+  YELLOW='\033[0;33m'
+  BOLD='\033[1m'
+  RESET='\033[0m'
+  
+  print_info() { echo -e "${BLUE}→ $1${RESET}"; }
+  print_success() { echo -e "${GREEN}✓ $1${RESET}"; }
+  print_error() { echo -e "${RED}✗ $1${RESET}" >&2; exit 1; }
+  print_warning() { echo -e "${YELLOW}! $1${RESET}" >&2; }
+  print_header() { echo -e "${BLUE}${BOLD}$1${RESET}"; echo -e "${BLUE}${BOLD}$(printf '=%.0s' $(seq 1 ${#1}))${RESET}"; }
+  print_section() { echo -e "${BLUE}$1${RESET}"; }
+fi
+
+# Initialize variables
+VERBOSE=false
+DRY_RUN=false
+SKIP_VERIFICATION=false
+VERSION=""
+SKIP_MAVEN=false
+SKIP_GITHUB=false
+SKIP_DOCS=false
+REMOTE="origin"
+BRANCH="main"
+GITHUB_TOKEN=""
+
+# Function to display help
+show_help() {
+  print_header "Release Publishing Tool"
+  echo
+  print_section "Description"
+  echo "  This tool tags and publishes a new release, including Maven artifacts,"
+  echo "  GitHub releases, and documentation updates."
+  echo
+  print_section "Usage"
+  echo "  publish-release [options] <version>"
+  echo
+  print_section "Options"
+  echo "  -v, --verbose           Show detailed output"
+  echo "  -y, --dry-run           Verify everything but don't make any changes"
+  echo "  -s, --skip-verification Skip release verification"
+  echo "  -m, --skip-maven        Skip Maven artifact deployment"
+  echo "  -g, --skip-github       Skip GitHub release creation"
+  echo "  -d, --skip-docs         Skip documentation site updates"
+  echo "  -r, --remote NAME       Git remote to push to (default: origin)"
+  echo "  -b, --branch NAME       Git branch to push to (default: main)"
+  echo "  -t, --token TOKEN       GitHub API token for releases"
+  echo "  -h, --help              Show this help message"
+  echo
+  print_section "Examples"
+  echo "  publish-release 2.5.0                  # Publish version 2.5.0 release"
+  echo "  publish-release -y 2.5.0               # Dry run for version 2.5.0"
+  echo "  publish-release -t <token> 2.5.0       # Publish with GitHub token"
+}
+
+# Parse command line arguments
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -v|--verbose)
+        VERBOSE=true
+        shift
+        ;;
+      -y|--dry-run)
+        DRY_RUN=true
+        shift
+        ;;
+      -s|--skip-verification)
+        SKIP_VERIFICATION=true
+        shift
+        ;;
+      -m|--skip-maven)
+        SKIP_MAVEN=true
+        shift
+        ;;
+      -g|--skip-github)
+        SKIP_GITHUB=true
+        shift
+        ;;
+      -d|--skip-docs)
+        SKIP_DOCS=true
+        shift
+        ;;
+      -r|--remote)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          REMOTE="$2"
+          shift 2
+        else
+          print_error "Remote name missing after -r/--remote"
+          show_help
+          exit 1
+        fi
+        ;;
+      -b|--branch)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          BRANCH="$2"
+          shift 2
+        else
+          print_error "Branch name missing after -b/--branch"
+          show_help
+          exit 1
+        fi
+        ;;
+      -t|--token)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          GITHUB_TOKEN="$2"
+          shift 2
+        else
+          print_error "Token missing after -t/--token"
+          show_help
+          exit 1
+        fi
+        ;;
+      -h|--help)
+        show_help
+        exit 0
+        ;;
+      *)
+        if [[ -z "$VERSION" ]]; then
+          VERSION="$1"
+          shift
+        else
+          print_error "Unknown option or multiple versions specified: $1"
+          show_help
+          exit 1
+        fi
+        ;;
+    esac
+  done
+  
+  # Validate version
+  if [[ -z "$VERSION" ]]; then
+    print_error "Version parameter is required."
+    show_help
+    exit 1
+  fi
+  
+  # Validate version format
+  if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
+    print_error "Invalid version format. Expected format: X.Y.Z or X.Y.Z-SUFFIX"
+    exit 1
+  fi
+  
+  # Verify GitHub token if needed
+  if [[ "$SKIP_GITHUB" == false && -z "$GITHUB_TOKEN" ]]; then
+    # Check if token is in environment
+    if [[ -z "$GITHUB_TOKEN" && -n "$GH_TOKEN" ]]; then
+      GITHUB_TOKEN="$GH_TOKEN"
+    fi
+    
+    if [[ -z "$GITHUB_TOKEN" ]]; then
+      print_warning "No GitHub token provided. GitHub release creation may fail."
+    fi
+  fi
+}
+
+# Verify release is ready
+verify_release() {
+  if [[ "$SKIP_VERIFICATION" == true ]]; then
+    print_info "Skipping release verification as requested"
+    return 0
+  fi
+  
+  print_header "Verifying Release"
+  
+  # Check if verification script exists
+  local verify_script="${SCRIPT_DIR}/prepare-release"
+  
+  if [[ ! -x "$verify_script" ]]; then
+    print_warning "Release verification script not found: $verify_script"
+    print_info "Proceeding without verification"
+    return 0
+  fi
+  
+  # Build verification command
+  local verify_cmd="$verify_script"
+  
+  if [[ "$VERBOSE" == true ]]; then
+    verify_cmd="$verify_cmd --verbose"
+  fi
+  
+  if [[ "$DRY_RUN" == true ]]; then
+    verify_cmd="$verify_cmd --dry-run"
+  fi
+  
+  # Skip tests and tag creation in verification
+  verify_cmd="$verify_cmd --skip-tests --no-report"
+  
+  # Run verification
+  print_info "Running release verification..."
+  print_info "Command: $verify_cmd $VERSION"
+  
+  if ! $verify_cmd "$VERSION"; then
+    print_error "Release verification failed. Fix issues before publishing."
+    exit 1
+  fi
+  
+  print_success "Release verification passed"
+  return 0
+}
+
+# Create and push Git tag
+create_git_tag() {
+  print_header "Creating Git Tag"
+  
+  # Check if tag already exists
+  if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+    print_warning "Tag v$VERSION already exists"
+    
+    # Check if we should push existing tag
+    echo -n "Do you want to push the existing tag? [y/N] "
+    read -r response
+    if [[ "$response" =~ ^[Yy]$ ]]; then
+      print_info "Will push existing tag v$VERSION"
+    else
+      print_error "Aborting release. Delete the tag first if you want to recreate it."
+      exit 1
+    fi
+  else
+    if [[ "$DRY_RUN" == true ]]; then
+      print_info "Would create tag: v$VERSION (dry run)"
+    else
+      print_info "Creating tag v$VERSION..."
+      
+      # Create tag message
+      local tag_message="Release v$VERSION"
+      
+      # Create annotated tag
+      if ! git tag -a "v$VERSION" -m "$tag_message"; then
+        print_error "Failed to create tag v$VERSION"
+        exit 1
+      fi
+      
+      print_success "Created tag v$VERSION"
+    fi
+  fi
+  
+  # Push tag to remote
+  if [[ "$DRY_RUN" == true ]]; then
+    print_info "Would push tag to $REMOTE (dry run)"
+  else
+    print_info "Pushing tag v$VERSION to $REMOTE..."
+    
+    if ! git push "$REMOTE" "v$VERSION"; then
+      print_error "Failed to push tag v$VERSION to $REMOTE"
+      exit 1
+    fi
+    
+    print_success "Pushed tag v$VERSION to $REMOTE"
+  fi
+  
+  return 0
+}
+
+# Deploy Maven artifacts
+deploy_maven_artifacts() {
+  if [[ "$SKIP_MAVEN" == true ]]; then
+    print_info "Skipping Maven artifact deployment as requested"
+    return 0
+  fi
+  
+  print_header "Deploying Maven Artifacts"
+  
+  # Check if Maven build script exists
+  local build_cmd="${PROJECT_ROOT}/bin/s8r build"
+  
+  if [[ ! -x "$build_cmd" ]]; then
+    build_cmd="mvn"
+  fi
+  
+  # Build Maven command
+  local mvn_cmd="$build_cmd clean deploy -P release"
+  
+  if [[ "$DRY_RUN" == true ]]; then
+    mvn_cmd="$mvn_cmd -DdryRun=true"
+  fi
+  
+  # Run Maven deploy
+  print_info "Deploying Maven artifacts..."
+  print_info "Command: $mvn_cmd"
+  
+  if ! $mvn_cmd; then
+    print_error "Maven artifact deployment failed"
+    exit 1
+  fi
+  
+  print_success "Maven artifacts deployed successfully"
+  return 0
+}
+
+# Create GitHub release
+create_github_release() {
+  if [[ "$SKIP_GITHUB" == true ]]; then
+    print_info "Skipping GitHub release creation as requested"
+    return 0
+  fi
+  
+  print_header "Creating GitHub Release"
+  
+  # Check if gh CLI is installed
+  if ! command -v gh &> /dev/null; then
+    print_warning "GitHub CLI (gh) not found. Skipping GitHub release creation."
+    return 0
+  fi
+  
+  # Check for GitHub token
+  if [[ -n "$GITHUB_TOKEN" ]]; then
+    # Set token for gh CLI
+    export GH_TOKEN="$GITHUB_TOKEN"
+  fi
+  
+  # Get repository information
+  local repo_url=$(git remote get-url "$REMOTE")
+  local repo_owner=""
+  local repo_name=""
+  
+  if [[ "$repo_url" =~ github\.com[/:]([^/]+)/([^/.]+)(.git)? ]]; then
+    repo_owner="${BASH_REMATCH[1]}"
+    repo_name="${BASH_REMATCH[2]}"
+  else
+    print_warning "Could not determine GitHub repository from remote URL: $repo_url"
+    return 0
+  fi
+  
+  # Look for release notes file
+  local release_notes_file="${PROJECT_ROOT}/docs/reference/release/release-${VERSION}.md"
+  local release_notes=""
+  
+  if [[ -f "$release_notes_file" ]]; then
+    # Extract content without the title
+    release_notes=$(sed '1,2d' "$release_notes_file")
+  else
+    # Generate simple release notes
+    release_notes=$(cat << EOF
+## Samstraumr ${VERSION}
+
+Released on $(date +"%Y-%m-%d")
+
+### Changes
+
+$(git log --pretty=format:"* %s (%h)" -n 10)
+EOF
+)
+  fi
+  
+  # Create GitHub release
+  if [[ "$DRY_RUN" == true ]]; then
+    print_info "Would create GitHub release: v$VERSION (dry run)"
+    print_info "Repository: $repo_owner/$repo_name"
+    print_info "Release notes: $release_notes"
+  else
+    print_info "Creating GitHub release v$VERSION..."
+    
+    # Create release
+    if ! echo "$release_notes" | gh release create "v$VERSION" \
+      --repo "$repo_owner/$repo_name" \
+      --title "Samstraumr $VERSION" \
+      --notes-file -; then
+      print_warning "Failed to create GitHub release v$VERSION"
+      return 1
+    fi
+    
+    print_success "Created GitHub release v$VERSION"
+  fi
+  
+  return 0
+}
+
+# Update documentation site
+update_documentation_site() {
+  if [[ "$SKIP_DOCS" == true ]]; then
+    print_info "Skipping documentation site updates as requested"
+    return 0
+  fi
+  
+  print_header "Updating Documentation Site"
+  
+  # Check if documentation generation script exists
+  local docs_script="${PROJECT_ROOT}/bin/s8r-docs"
+  
+  if [[ ! -x "$docs_script" ]]; then
+    print_warning "Documentation generation script not found: $docs_script"
+    return 0
+  fi
+  
+  # Build docs command
+  local docs_cmd="$docs_script generate --deploy"
+  
+  if [[ "$DRY_RUN" == true ]]; then
+    docs_cmd="$docs_cmd --dry-run"
+  fi
+  
+  if [[ "$VERBOSE" == true ]]; then
+    docs_cmd="$docs_cmd --verbose"
+  fi
+  
+  # Run docs generation
+  print_info "Generating and deploying documentation..."
+  print_info "Command: $docs_cmd"
+  
+  if ! $docs_cmd; then
+    print_warning "Documentation site update failed"
+    return 1
+  fi
+  
+  print_success "Documentation site updated successfully"
+  return 0
+}
+
+# Main function
+main() {
+  # Parse command line arguments
+  parse_args "$@"
+  
+  print_header "Publishing Release: $VERSION"
+  if [[ "$DRY_RUN" == true ]]; then
+    print_info "Running in dry run mode (no changes will be made)"
+  fi
+  
+  # Verify release is ready
+  verify_release
+  
+  # Create and push Git tag
+  create_git_tag
+  
+  # Deploy Maven artifacts
+  deploy_maven_artifacts
+  
+  # Create GitHub release
+  create_github_release
+  
+  # Update documentation site
+  update_documentation_site
+  
+  print_header "Release Publication Complete"
+  print_success "Version $VERSION has been successfully published"
+  
+  # Print next steps
+  cat << EOF
+
+Next Steps:
+
+1. Announce the release to stakeholders
+2. Update project boards and issue trackers
+3. Begin planning for the next development cycle
+EOF
+  
+  return 0
+}
+
+# Run the script
+main "$@"

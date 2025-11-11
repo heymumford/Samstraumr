@@ -1,0 +1,1016 @@
+#!/usr/bin/env bash
+#==============================================================================
+# Filename: s8r-test
+# Description: Consolidated test runner for Samstraumr framework
+#
+# Provides a unified interface for running, verifying, and analyzing tests 
+# with consistent output formatting and simplified configuration.
+#==============================================================================
+
+# Determine script directory and project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+
+# Source unified common library
+if [ -f "${PROJECT_ROOT}/util/lib/unified-common.sh" ]; then
+  source "${PROJECT_ROOT}/util/lib/unified-common.sh"
+else
+  # Fallback to minimal functionality if no libraries are found
+  # Terminal colors
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  BLUE='\033[0;34m'
+  YELLOW='\033[0;33m'
+  BOLD='\033[1m'
+  RESET='\033[0m'
+  
+  # Functions for prettier output
+  print_info() { echo -e "${BLUE}→ $1${RESET}"; }
+  print_success() { echo -e "${GREEN}✓ $1${RESET}"; }
+  print_error() { echo -e "${RED}✗ $1${RESET}" >&2; exit 1; }
+  print_warning() { echo -e "${YELLOW}! $1${RESET}" >&2; }
+  print_debug() { [[ "$VERBOSE" == "true" ]] && echo -e "DEBUG: $1" >&2 || true; }
+  print_header() { echo -e "${BLUE}${BOLD}$1${RESET}"; echo -e "${BLUE}${BOLD}$(printf '=%.0s' $(seq 1 ${#1}))${RESET}"; }
+  print_section() { echo -e "${BLUE}$1${RESET}"; }
+  
+  # Set up Maven options
+  setup_maven_opts() {
+    MVN_OPTS=""
+    if [ -n "$MAVEN_MEMORY_OPTS" ]; then
+      MVN_OPTS="$MAVEN_MEMORY_OPTS"
+    else
+      MVN_OPTS="-Xmx1g"
+    fi
+    export MAVEN_OPTS="$MVN_OPTS"
+  }
+  
+  # Create directory if it doesn't exist
+  ensure_directory_exists() {
+    local dir="$1"
+    if [[ ! -d "$dir" ]]; then
+      mkdir -p "$dir"
+    fi
+  }
+fi
+
+#==============================================================================
+# Configuration Constants
+#==============================================================================
+
+# Standard test folders and file patterns
+FEATURE_DIR="${PROJECT_ROOT}/modules/samstraumr-core/src/test/resources/features"
+STEP_DEF_DIR="${PROJECT_ROOT}/modules/samstraumr-core/src/test/java/org/s8r/test/steps"
+TEST_RUNNER_DIR="${PROJECT_ROOT}/modules/samstraumr-core/src/test/java/org/s8r/test/runner"
+CUCUMBER_PROPS="${PROJECT_ROOT}/modules/samstraumr-core/src/test/resources/cucumber.properties"
+COVERAGE_THRESHOLD=80
+
+# Centralized test configuration
+declare -A TEST_CONFIG
+TEST_CONFIG=(
+  [unit]="@L0_Unit,org.s8r.test.runner.RunCucumberTest"
+  [component]="@L1_Component,org.s8r.test.runner.RunCompositeTests"
+  [integration]="@L2_Integration,org.s8r.test.runner.RunMachineTests"
+  [system]="@L3_System,org.s8r.test.runner.RunCucumberTest"
+  [lifecycle]="@Lifecycle,org.s8r.test.runner.RunComprehensiveLifecycleTests"
+  [identity]="@Identity,org.s8r.test.runner.RunComponentIdentityTests"
+  [error-handling]="@ErrorHandling,org.s8r.test.runner.RunErrorHandlingTests"
+  [functional]="@Functional,org.s8r.test.runner.RunCucumberTest"
+  [all]="not @disabled,org.s8r.test.runner.RunCucumberTest"
+)
+
+# Legacy test type mapping to modern equivalents
+declare -A LEGACY_MAPPING
+LEGACY_MAPPING=(
+  [tube]="unit"
+  [composite]="component"
+  [flow]="dataflow"
+  [machine]="integration"
+  [atl]="functional"
+  [btl]="error-handling"
+  [adam]="lifecycle"
+)
+
+#==============================================================================
+# Initialize Variables
+#==============================================================================
+
+# Test execution settings
+TEST_TYPE="all"
+VERBOSE=false
+SKIP_QUALITY=false
+OUTPUT_FILE=""
+PARALLEL=false
+COVERAGE=false
+CUSTOM_TAGS=""
+VERIFY_ONLY=false
+FIX_ISSUES=false
+GENERATE_REPORT=false
+REPORT_FILE="${PROJECT_ROOT}/docs/test-reports/test-verification-report.md"
+
+#==============================================================================
+# Functions
+#==============================================================================
+
+# Parse command line arguments
+function parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -v|--verbose)
+        VERBOSE=true
+        shift
+        ;;
+      -p|--parallel)
+        PARALLEL=true
+        shift
+        ;;
+      --coverage)
+        COVERAGE=true
+        shift
+        ;;
+      --skip-quality)
+        SKIP_QUALITY=true
+        shift
+        ;;
+      -o|--output)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          OUTPUT_FILE="$2"
+          shift 2
+        else
+          print_error "Output file path missing after -o/--output"
+          show_help
+          exit 1
+        fi
+        ;;
+      --tags)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          CUSTOM_TAGS="$2"
+          shift 2
+        else
+          print_error "Tag expression missing after --tags"
+          show_help
+          exit 1
+        fi
+        ;;
+      --verify)
+        VERIFY_ONLY=true
+        shift
+        ;;
+      --fix)
+        FIX_ISSUES=true
+        shift
+        ;;
+      --report)
+        GENERATE_REPORT=true
+        shift
+        ;;
+      --report-file)
+        if [[ -n "$2" && "$2" != -* ]]; then
+          REPORT_FILE="$2"
+          shift 2
+        else
+          print_error "Report file path missing after --report-file"
+          show_help
+          exit 1
+        fi
+        ;;
+      -h|--help)
+        show_help
+        exit 0
+        ;;
+      *)
+        # Check if this is a legacy test type
+        if [[ -n "${LEGACY_MAPPING[$1]}" ]]; then
+          print_info "Using modern equivalent '${LEGACY_MAPPING[$1]}' for legacy test type '$1'"
+          TEST_TYPE="${LEGACY_MAPPING[$1]}"
+        else
+          TEST_TYPE="$1"
+        fi
+        shift
+        ;;
+    esac
+  done
+}
+
+# Display help information
+function show_help() {
+  print_header "Samstraumr Consolidated Test Runner"
+  echo
+  print_section "Usage"
+  echo "  ./s8r-test [options] [test-type]"
+  echo
+  print_section "Options"
+  echo "  -v, --verbose           Enable verbose output"
+  echo "  -p, --parallel          Run tests in parallel"
+  echo "  --coverage              Run tests with code coverage analysis"
+  echo "  --skip-quality          Skip quality checks"
+  echo "  -o, --output <file>     Write test output to file"
+  echo "  --tags <expression>     Run tests with specific tags (e.g. \"@Functional and @Identity\")"
+  echo "  --verify                Only verify test suite without running tests"
+  echo "  --fix                   Fix common test issues automatically"
+  echo "  --report                Generate test verification report"
+  echo "  --report-file <file>    Specify report output file"
+  echo "  -h, --help              Show this help message"
+  echo
+  print_section "Test Types"
+  echo "  all                     Run all tests (default)"
+  echo "  unit                    Run unit (L0) tests"
+  echo "  component               Run component (L1) tests"
+  echo "  integration             Run integration (L2) tests"
+  echo "  system                  Run system (L3) tests"
+  echo "  functional              Run functional tests"
+  echo "  lifecycle               Run lifecycle tests"
+  echo "  identity                Run identity tests"
+  echo "  error-handling          Run error handling tests"
+  echo
+  print_section "Examples"
+  echo "  ./s8r-test                                # Run all tests"
+  echo "  ./s8r-test --verify                       # Verify test structure only"
+  echo "  ./s8r-test unit --coverage                # Run unit tests with coverage"
+  echo "  ./s8r-test --tags \"@Lifecycle and @Functional\" # Run specific tag combination"
+  echo "  ./s8r-test --verify --fix --report        # Verify, fix and generate report"
+}
+
+# Get tag expression and runner for a test type from the TEST_CONFIG map
+function get_test_config() {
+  local test_type="$1"
+  
+  if [[ -n "${TEST_CONFIG[$test_type]}" ]]; then
+    echo "${TEST_CONFIG[$test_type]}"
+  else
+    # Default to all tests if type not found
+    print_warning "Unknown test type: $test_type. Defaulting to 'all'."
+    echo "${TEST_CONFIG[all]}"
+  fi
+}
+
+# Create Maven settings file for tests
+function create_test_settings() {
+  if [ ! -f "${PROJECT_ROOT}/surefire-settings.xml" ]; then
+    print_debug "Creating custom Maven settings for tests"
+    cat > "${PROJECT_ROOT}/surefire-settings.xml" << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <activeProfiles>
+    <activeProfile>test-enabler</activeProfile>
+  </activeProfiles>
+  <profiles>
+    <profile>
+      <id>test-enabler</id>
+      <properties>
+        <skipTests>false</skipTests>
+        <maven.test.skip>false</maven.test.skip>
+      </properties>
+    </profile>
+  </profiles>
+</settings>
+EOF
+  fi
+}
+
+# Verify feature files exist and follow conventions
+function verify_feature_files() {
+  print_header "Verifying Feature Files"
+  
+  local total_files=0
+  local valid_files=0
+  local issues=0
+  local details=""
+  
+  if [[ -d "$FEATURE_DIR" ]]; then
+    # Count feature files
+    total_files=$(find "$FEATURE_DIR" -name "*.feature" 2>/dev/null | wc -l)
+    
+    if [[ "$VERBOSE" == true ]]; then
+      print_info "Found $total_files feature files in $FEATURE_DIR"
+    fi
+    
+    # Validate feature files
+    while IFS= read -r file; do
+      if [[ -f "$file" ]]; then
+        # Check for standard tagging
+        if grep -q "@L[0-9]_" "$file"; then
+          valid_files=$((valid_files + 1))
+        else
+          issues=$((issues + 1))
+          if [[ "$VERBOSE" == true || "$GENERATE_REPORT" == true ]]; then
+            local issue="Feature file missing standard level tag: $(basename "$file")"
+            print_warning "$issue"
+            details="${details}- $issue\n"
+            
+            # Try to fix the issue if requested
+            if [[ "$FIX_ISSUES" == true ]]; then
+              # Determine appropriate level tag based on path
+              local level_tag="@L0_Unit"
+              if [[ "$file" == *"/L1_"* ]]; then
+                level_tag="@L1_Component"
+              elif [[ "$file" == *"/L2_"* ]]; then
+                level_tag="@L2_Integration"
+              elif [[ "$file" == *"/L3_"* ]]; then
+                level_tag="@L3_System"
+              fi
+              
+              # Add tag to the top of the file
+              sed -i "1s/^/${level_tag} /" "$file"
+              print_info "Added tag ${level_tag} to $(basename "$file")"
+            fi
+          fi
+        fi
+      fi
+    done < <(find "$FEATURE_DIR" -name "*.feature" 2>/dev/null)
+  else
+    print_warning "Feature directory not found: $FEATURE_DIR"
+    return 1
+  fi
+  
+  # Calculate coverage
+  local coverage=0
+  if [[ $total_files -gt 0 ]]; then
+    coverage=$(( (valid_files * 100) / total_files ))
+  fi
+  
+  # Determine status
+  local status="PASS"
+  if [[ $coverage -lt $COVERAGE_THRESHOLD ]]; then
+    status="FAIL"
+  elif [[ $issues -gt 0 ]]; then
+    status="WARN"
+  fi
+  
+  # Output results
+  if [[ $status == "PASS" ]]; then
+    print_success "Feature files verification passed: $valid_files/$total_files files valid ($coverage%)"
+  elif [[ $status == "WARN" ]]; then
+    print_warning "Feature files verification has warnings: $valid_files/$total_files files valid ($coverage%), $issues issues found"
+  else
+    print_warning "Feature files verification failed: $valid_files/$total_files files valid ($coverage%), $issues issues found"
+  fi
+  
+  # Update report
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    update_report "Feature Files" "$status" "$issues" "$coverage%" "$details"
+  fi
+  
+  return 0
+}
+
+# Verify step definitions match feature files
+function verify_step_definitions() {
+  print_header "Verifying Step Definitions"
+  
+  if [[ ! -d "$STEP_DEF_DIR" ]]; then
+    print_warning "Step definitions directory not found: $STEP_DEF_DIR"
+    return 1
+  fi
+  
+  if [[ ! -d "$FEATURE_DIR" ]]; then
+    print_warning "Feature directory not found: $FEATURE_DIR"
+    return 1
+  fi
+  
+  local total_steps=0
+  local matched_steps=0
+  local undefined_steps=0
+  local issues=0
+  local details=""
+  
+  # First, collect all step definitions from all relevant directories
+  local step_definitions=()
+  
+  # Define all step definition directories to check
+  local all_step_dirs=(
+    "${PROJECT_ROOT}/modules/samstraumr-core/src/test/java/org/s8r/test/steps"
+    "${PROJECT_ROOT}/modules/samstraumr-core/src/test/java/org/s8r/test/steps/lifecycle"
+    "${PROJECT_ROOT}/modules/samstraumr-core/src/test/java/org/s8r/test/steps/identity"
+    "${PROJECT_ROOT}/modules/samstraumr-core/src/test/java/org/s8r/test/steps/component"
+    "${PROJECT_ROOT}/modules/samstraumr-core/src/test/java/org/s8r/test/steps/errorhandling"
+    "${PROJECT_ROOT}/modules/samstraumr-core/src/test/java/org/s8r/tube/steps"
+    "${PROJECT_ROOT}/modules/samstraumr-core/src/test/java/org/s8r/tube/lifecycle/steps"
+  )
+  
+  # Collect step definitions from all directories
+  for dir in "${all_step_dirs[@]}"; do
+    if [[ -d "$dir" ]]; then
+      while IFS= read -r file; do
+        if [[ -f "$file" && "$file" == *Steps.java ]]; then
+          # Extract step definitions using grep
+          while IFS= read -r step; do
+            # Extract the step pattern from the annotation
+            local pattern=$(echo "$step" | sed -n 's/.*\(".*"\).*/\1/p' | tr -d '"')
+            if [[ -n "$pattern" ]]; then
+              step_definitions+=("$pattern")
+              total_steps=$((total_steps + 1))
+            fi
+          done < <(grep -E '@(Given|When|Then|And)' "$file")
+        fi
+      done < <(find "$dir" -name "*Steps.java" 2>/dev/null)
+    fi
+  done
+  
+  if [[ "$VERBOSE" == true ]]; then
+    print_info "Found $total_steps step definitions"
+  fi
+  
+  # Next, check feature files for undefined steps
+  local all_feature_steps=()
+  
+  while IFS= read -r file; do
+    if [[ -f "$file" ]]; then
+      # Extract steps from feature files
+      while IFS= read -r step; do
+        # Clean up the step text
+        local step_text=$(echo "$step" | sed -e 's/^\s*\(Given\|When\|Then\|And\|But\)\s\+//' -e 's/"[^"]*"/\"[^"]*\"/g')
+        if [[ -n "$step_text" ]]; then
+          all_feature_steps+=("$step_text")
+          
+          # Check if this step matches any defined step
+          local step_matched=false
+          for defined_step in "${step_definitions[@]}"; do
+            # Convert cucumber expression to regex pattern for matching
+            # This is a more robust pattern matching that handles parameters better
+            local pattern=$(echo "$defined_step" | sed -e 's/{[^}]*}/[^"]*/' -e 's/\./\\./g')
+            if [[ "$step_text" =~ $pattern ]]; then
+              step_matched=true
+              matched_steps=$((matched_steps + 1))
+              break
+            fi
+          done
+          
+          if [[ "$step_matched" == false ]]; then
+            undefined_steps=$((undefined_steps + 1))
+            issues=$((issues + 1))
+            if [[ "$VERBOSE" == true || "$GENERATE_REPORT" == true ]]; then
+              local issue="Undefined step: '$step_text' in $(basename "$file")"
+              print_warning "$issue"
+              details="${details}- $issue\n"
+            fi
+          fi
+        fi
+      done < <(grep -E '^\s*(Given|When|Then|And|But)\s+' "$file")
+    fi
+  done < <(find "$FEATURE_DIR" -name "*.feature" 2>/dev/null)
+  
+  # Calculate coverage
+  local total_feature_steps=${#all_feature_steps[@]}
+  local coverage=0
+  if [[ $total_feature_steps -gt 0 ]]; then
+    coverage=$(( (matched_steps * 100) / total_feature_steps ))
+  fi
+  
+  # Determine status
+  local status="PASS"
+  if [[ $coverage -lt $COVERAGE_THRESHOLD ]]; then
+    status="FAIL"
+  elif [[ $issues -gt 0 ]]; then
+    status="WARN"
+  fi
+  
+  # Output results
+  if [[ $status == "PASS" ]]; then
+    print_success "Step definitions verification passed: $matched_steps/$total_feature_steps steps matched ($coverage%)"
+  elif [[ $status == "WARN" ]]; then
+    print_warning "Step definitions verification has warnings: $matched_steps/$total_feature_steps steps matched ($coverage%), $issues issues found"
+  else
+    print_warning "Step definitions verification failed: $matched_steps/$total_feature_steps steps matched ($coverage%), $issues issues found"
+  fi
+  
+  # Update report
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    update_report "Step Definitions" "$status" "$issues" "$coverage%" "$details"
+  fi
+  
+  return 0
+}
+
+# Verify tag consistency across feature files
+function verify_test_tags() {
+  print_header "Verifying Test Tags"
+  
+  if [[ ! -d "$FEATURE_DIR" ]]; then
+    print_warning "Feature directory not found: $FEATURE_DIR"
+    return 1
+  fi
+  
+  # Expected tag patterns
+  local level_tags=("@L0_" "@L1_" "@L2_" "@L3_")
+  local function_tags=("@Functional" "@ErrorHandling" "@Identity" "@Lifecycle" "@State" "@DataFlow")
+  
+  local total_features=0
+  local valid_tags=0
+  local issues=0
+  local details=""
+  
+  while IFS= read -r file; do
+    if [[ -f "$file" ]]; then
+      total_features=$((total_features + 1))
+      
+      # Check for required tags
+      local has_level_tag=false
+      local has_function_tag=false
+      
+      # Extract tags from first line of the file
+      local first_line=$(head -n 1 "$file")
+      
+      # Check for level tags
+      for tag in "${level_tags[@]}"; do
+        if [[ "$first_line" == *"$tag"* ]]; then
+          has_level_tag=true
+          break
+        fi
+      done
+      
+      # Check for function tags
+      for tag in "${function_tags[@]}"; do
+        if [[ "$first_line" == *"$tag"* ]]; then
+          has_function_tag=true
+          break
+        fi
+      done
+      
+      if [[ "$has_level_tag" == true && "$has_function_tag" == true ]]; then
+        valid_tags=$((valid_tags + 1))
+      else
+        issues=$((issues + 1))
+        if [[ "$VERBOSE" == true || "$GENERATE_REPORT" == true ]]; then
+          local issue="Feature file missing required tags: $(basename "$file")"
+          if [[ "$has_level_tag" == false ]]; then
+            issue="$issue (missing level tag)"
+          fi
+          if [[ "$has_function_tag" == false ]]; then
+            issue="$issue (missing function tag)"
+          fi
+          print_warning "$issue"
+          details="${details}- $issue\n"
+          
+          # Try to fix the issue if requested
+          if [[ "$FIX_ISSUES" == true ]]; then
+            local new_line="$first_line"
+            
+            # Add level tag if missing
+            if [[ "$has_level_tag" == false ]]; then
+              # Determine appropriate level tag based on path
+              local level_tag="@L0_Unit"
+              if [[ "$file" == *"/L1_"* ]]; then
+                level_tag="@L1_Component"
+              elif [[ "$file" == *"/L2_"* ]]; then
+                level_tag="@L2_Integration"
+              elif [[ "$file" == *"/L3_"* ]]; then
+                level_tag="@L3_System"
+              fi
+              
+              new_line="$level_tag $new_line"
+            fi
+            
+            # Add function tag if missing
+            if [[ "$has_function_tag" == false ]]; then
+              # Try to determine function tag from filename
+              local function_tag="@Functional"
+              if [[ "$file" == *"error"* || "$file" == *"exception"* ]]; then
+                function_tag="@ErrorHandling"
+              elif [[ "$file" == *"identity"* ]]; then
+                function_tag="@Identity"
+              elif [[ "$file" == *"lifecycle"* || "$file" == *"state"* ]]; then
+                function_tag="@Lifecycle"
+              elif [[ "$file" == *"flow"* || "$file" == *"data"* ]]; then
+                function_tag="@DataFlow"
+              fi
+              
+              new_line="$function_tag $new_line"
+            fi
+            
+            # Replace first line with new line
+            sed -i "1s/.*/$new_line/" "$file"
+            print_info "Updated tags in $(basename "$file")"
+          fi
+        fi
+      fi
+    fi
+  done < <(find "$FEATURE_DIR" -name "*.feature" 2>/dev/null)
+  
+  # Calculate coverage
+  local coverage=0
+  if [[ $total_features -gt 0 ]]; then
+    coverage=$(( (valid_tags * 100) / total_features ))
+  fi
+  
+  # Determine status
+  local status="PASS"
+  if [[ $coverage -lt $COVERAGE_THRESHOLD ]]; then
+    status="FAIL"
+  elif [[ $issues -gt 0 ]]; then
+    status="WARN"
+  fi
+  
+  # Output results
+  if [[ $status == "PASS" ]]; then
+    print_success "Test tags verification passed: $valid_tags/$total_features features with valid tags ($coverage%)"
+  elif [[ $status == "WARN" ]]; then
+    print_warning "Test tags verification has warnings: $valid_tags/$total_features features with valid tags ($coverage%), $issues issues found"
+  else
+    print_warning "Test tags verification failed: $valid_tags/$total_features features with valid tags ($coverage%), $issues issues found"
+  fi
+  
+  # Update report
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    update_report "Test Tags" "$status" "$issues" "$coverage%" "$details"
+  fi
+  
+  return 0
+}
+
+# Verify test runners exist and are properly configured
+function verify_test_runners() {
+  print_header "Verifying Test Runners"
+  
+  if [[ ! -d "$TEST_RUNNER_DIR" ]]; then
+    print_warning "Test runner directory not found: $TEST_RUNNER_DIR"
+    return 1
+  fi
+  
+  # Expected test runners from consolidated configuration
+  local expected_runners=()
+  for config in "${TEST_CONFIG[@]}"; do
+    IFS=',' read -r -a parts <<< "$config"
+    runner_class="${parts[1]}"
+    # Strip package name to get just the class name
+    runner_name="${runner_class##*.}.java"
+    expected_runners+=("$runner_name")
+  done
+  
+  # Remove duplicates
+  expected_runners=($(echo "${expected_runners[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
+  
+  local total_expected=${#expected_runners[@]}
+  local found_runners=0
+  local issues=0
+  local details=""
+  
+  # Check for each expected runner
+  for runner in "${expected_runners[@]}"; do
+    if [[ -f "$TEST_RUNNER_DIR/$runner" ]]; then
+      found_runners=$((found_runners + 1))
+      
+      # Check if runner is properly configured
+      if grep -q "@RunWith(Cucumber.class)" "$TEST_RUNNER_DIR/$runner" || grep -q "@Cucumber" "$TEST_RUNNER_DIR/$runner"; then
+        if [[ "$VERBOSE" == true ]]; then
+          print_info "Found properly configured runner: $runner"
+        fi
+      else
+        issues=$((issues + 1))
+        if [[ "$VERBOSE" == true || "$GENERATE_REPORT" == true ]]; then
+          local issue="Test runner missing proper Cucumber configuration: $runner"
+          print_warning "$issue"
+          details="${details}- $issue\n"
+        fi
+      fi
+    else
+      issues=$((issues + 1))
+      if [[ "$VERBOSE" == true || "$GENERATE_REPORT" == true ]]; then
+        local issue="Missing expected test runner: $runner"
+        print_warning "$issue"
+        details="${details}- $issue\n"
+      fi
+    fi
+  done
+  
+  # Calculate coverage
+  local coverage=0
+  if [[ $total_expected -gt 0 ]]; then
+    coverage=$(( (found_runners * 100) / total_expected ))
+  fi
+  
+  # Determine status
+  local status="PASS"
+  if [[ $coverage -lt $COVERAGE_THRESHOLD ]]; then
+    status="FAIL"
+  elif [[ $issues -gt 0 ]]; then
+    status="WARN"
+  fi
+  
+  # Output results
+  if [[ $status == "PASS" ]]; then
+    print_success "Test runners verification passed: $found_runners/$total_expected runners found ($coverage%)"
+  elif [[ $status == "WARN" ]]; then
+    print_warning "Test runners verification has warnings: $found_runners/$total_expected runners found ($coverage%), $issues issues found"
+  else
+    print_warning "Test runners verification failed: $found_runners/$total_expected runners found ($coverage%), $issues issues found"
+  fi
+  
+  # Update report
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    update_report "Test Runners" "$status" "$issues" "$coverage%" "$details"
+  fi
+  
+  return 0
+}
+
+# Initialize report file
+function init_report() {
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    # Create report directory if it doesn't exist
+    local report_dir=$(dirname "$REPORT_FILE")
+    mkdir -p "$report_dir"
+
+    # Initialize report with header and timestamp
+    cat > "$REPORT_FILE" << EOF
+# Test Suite Verification Report
+
+**Generated:** $(date "+%Y-%m-%d %H:%M:%S")  
+**Coverage Threshold:** ${COVERAGE_THRESHOLD}%  
+**Test Type:** ${TEST_TYPE}
+
+## Summary
+
+| Category | Status | Issues | Coverage |
+|----------|--------|--------|----------|
+| Feature Files | 🔄 Pending | - | - |
+| Step Definitions | 🔄 Pending | - | - |
+| Test Runners | 🔄 Pending | - | - |
+| Test Tags | 🔄 Pending | - | - |
+
+## Detailed Results
+
+EOF
+  fi
+}
+
+# Update report with section results
+function update_report() {
+  local section="$1"
+  local status="$2"
+  local issues="$3"
+  local coverage="$4"
+  local details="$5"
+
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    # Update summary table
+    local status_icon
+    if [[ "$status" == "PASS" ]]; then
+      status_icon="✅ Pass"
+    elif [[ "$status" == "WARN" ]]; then
+      status_icon="⚠️ Warning"
+    else
+      status_icon="❌ Fail"
+    fi
+
+    # Use sed to update the summary table row for the specific category
+    sed -i "s/| ${section} | 🔄 Pending | - | - |/| ${section} | ${status_icon} | ${issues} | ${coverage} |/" "$REPORT_FILE"
+
+    # Add detailed section
+    cat >> "$REPORT_FILE" << EOF
+
+### ${section}
+
+**Status:** ${status_icon}  
+**Issues Found:** ${issues}  
+**Coverage:** ${coverage}
+
+${details}
+
+EOF
+  fi
+}
+
+# Finalize report with summary
+function finalize_report() {
+  if [[ "$GENERATE_REPORT" == true ]]; then
+    # Calculate overall status
+    local fail_count=$(grep -c "❌ Fail" "$REPORT_FILE" || echo 0)
+    local warn_count=$(grep -c "⚠️ Warning" "$REPORT_FILE" || echo 0)
+    local pass_count=$(grep -c "✅ Pass" "$REPORT_FILE" || echo 0)
+    
+    local overall_status="PASS"
+    if [[ $fail_count -gt 0 ]]; then
+      overall_status="FAIL"
+    elif [[ $warn_count -gt 0 ]]; then
+      overall_status="WARN"
+    fi
+    
+    # Calculate average coverage
+    local coverage_values=$(grep -o '[0-9]\+%' "$REPORT_FILE" | sed 's/%//g')
+    local total_coverage=0
+    local coverage_count=0
+    
+    for value in $coverage_values; do
+      if [[ $value -gt 0 ]]; then
+        total_coverage=$((total_coverage + value))
+        coverage_count=$((coverage_count + 1))
+      fi
+    done
+    
+    local average_coverage=0
+    if [[ $coverage_count -gt 0 ]]; then
+      average_coverage=$((total_coverage / coverage_count))
+    fi
+    
+    # Add overall summary at the beginning of the report
+    local temp_file="/tmp/report_temp.md"
+    
+    cat > "$temp_file" << EOF
+# Test Suite Verification Report
+
+**Generated:** $(date "+%Y-%m-%d %H:%M:%S")  
+**Coverage Threshold:** ${COVERAGE_THRESHOLD}%  
+**Test Type:** ${TEST_TYPE}
+
+## Overall Summary
+
+EOF
+    
+    if [[ $overall_status == "PASS" ]]; then
+      echo "**Status: ✅ PASS**" >> "$temp_file"
+    elif [[ $overall_status == "WARN" ]]; then
+      echo "**Status: ⚠️ WARNING**" >> "$temp_file"
+    else
+      echo "**Status: ❌ FAIL**" >> "$temp_file"
+    fi
+    
+    cat >> "$temp_file" << EOF
+
+**Average Coverage:** ${average_coverage}%  
+**Categories:** $pass_count passed, $warn_count warnings, $fail_count failed
+
+EOF
+    
+    # Copy the rest of the report
+    tail -n +6 "$REPORT_FILE" >> "$temp_file"
+    mv "$temp_file" "$REPORT_FILE"
+    
+    print_success "Report generated: $REPORT_FILE"
+  fi
+}
+
+# Run the verification suite 
+function verify_test_suite() {
+  print_header "Verifying Test Suite"
+  
+  # Initialize the report
+  init_report
+  
+  # Run verification functions
+  verify_feature_files
+  verify_step_definitions
+  verify_test_runners
+  verify_test_tags
+  
+  # Finalize the report
+  finalize_report
+  
+  print_header "Test Suite Verification Complete"
+}
+
+# Run tests with the consolidated approach
+function run_tests() {
+  # Get configuration for this test type
+  local config=$(get_test_config "$TEST_TYPE")
+  IFS=',' read -r tags runner_class <<< "$config"
+  
+  # Use custom tags if specified
+  if [[ -n "$CUSTOM_TAGS" ]]; then
+    tags="$CUSTOM_TAGS"
+  fi
+  
+  # Construct Maven command based on arguments
+  local mvn_args=("test")
+  
+  # Add cucumber tags
+  if [[ -n "$tags" ]]; then
+    mvn_args+=("-Dcucumber.filter.tags=\"$tags\"")
+  fi
+  
+  # Add test runner class
+  if [[ -n "$runner_class" ]]; then
+    mvn_args+=("-Dtest=${runner_class##*.}")
+  fi
+  
+  # Add quality skip if requested
+  if $SKIP_QUALITY; then
+    mvn_args+=("-Dskip.quality.checks=true")
+  fi
+  
+  # Explicitly enable tests regardless of other profiles
+  mvn_args+=("-DskipTests=false")
+  mvn_args+=("-Dmaven.test.skip=false")
+  
+  # Add parallel execution if requested
+  if $PARALLEL; then
+    mvn_args+=("-Dsurefire.parallel=classes")
+    mvn_args+=("-Dsurefire.threadCount=4")
+    print_info "Parallel test execution enabled"
+  fi
+  
+  # Add coverage if requested
+  if $COVERAGE; then
+    mvn_args+=("jacoco:prepare-agent" "jacoco:report")
+    print_info "Code coverage analysis enabled"
+  fi
+  
+  # Add verbose flag if requested
+  if $VERBOSE; then
+    mvn_args+=("-e")
+  else
+    mvn_args+=("-q")
+  fi
+  
+  # Ensure settings file exists
+  create_test_settings
+  
+  # Display test information
+  print_header "Running $TEST_TYPE Tests"
+  print_info "Tags: $tags"
+  print_info "Runner: ${runner_class##*.}"
+  
+  # Change to project root
+  cd "$PROJECT_ROOT"
+  
+  # Display the command being executed
+  print_debug "Running: mvn ${mvn_args[*]} -s surefire-settings.xml"
+  
+  # Run the tests with appropriate output handling
+  local test_result=0
+  
+  if [[ -n "$OUTPUT_FILE" ]]; then
+    # Ensure output directory exists
+    local output_dir=$(dirname "$OUTPUT_FILE")
+    ensure_directory_exists "$output_dir"
+    
+    print_info "Writing output to: $OUTPUT_FILE"
+    
+    # Use tee to capture output while still displaying it
+    if mvn "${mvn_args[@]}" -s "${PROJECT_ROOT}/surefire-settings.xml" | tee "$OUTPUT_FILE"; then
+      test_result=0
+    else
+      test_result=1
+    fi
+  else
+    # Run tests without output redirection
+    if mvn "${mvn_args[@]}" -s "${PROJECT_ROOT}/surefire-settings.xml"; then
+      test_result=0
+    else
+      test_result=1
+    fi
+  fi
+  
+  # Report result
+  if [ $test_result -eq 0 ]; then
+    print_success "Tests completed successfully"
+  else
+    print_error "Tests failed"
+    if [[ -n "$OUTPUT_FILE" ]]; then
+      print_info "See test output in: $OUTPUT_FILE"
+    fi
+    return 1
+  fi
+  
+  return 0
+}
+
+# Main function to orchestrate execution
+function main() {
+  parse_args "$@"
+  
+  # Print a summary of what we're about to do
+  if $VERBOSE; then
+    print_debug "Test type: $TEST_TYPE"
+    print_debug "Verify only: $VERIFY_ONLY"
+    print_debug "Parallel: $PARALLEL"
+    print_debug "Coverage: $COVERAGE"
+    print_debug "Skip quality: $SKIP_QUALITY"
+    print_debug "Fix issues: $FIX_ISSUES"
+    print_debug "Generate report: $GENERATE_REPORT"
+    [ -n "$OUTPUT_FILE" ] && print_debug "Output file: $OUTPUT_FILE"
+    [ -n "$REPORT_FILE" ] && print_debug "Report file: $REPORT_FILE"
+    [ -n "$CUSTOM_TAGS" ] && print_debug "Custom tags: $CUSTOM_TAGS"
+  fi
+  
+  # Setup Maven environment
+  setup_maven_opts
+  
+  # Run in verification-only mode or normal test mode
+  if [[ "$VERIFY_ONLY" == true ]]; then
+    verify_test_suite
+  else
+    # Verify first if requested
+    if [[ "$GENERATE_REPORT" == true ]]; then
+      verify_test_suite
+    fi
+    
+    # Run tests
+    run_tests
+  fi
+}
+
+#==============================================================================
+# Main Execution
+#==============================================================================
+
+# Check if help is requested with no arguments or explicit help flag
+if [[ $# -eq 0 || "$1" == "-h" || "$1" == "--help" ]]; then
+  show_help
+  exit 0
+fi
+
+# Run main function with all arguments
+main "$@"
+exit $?

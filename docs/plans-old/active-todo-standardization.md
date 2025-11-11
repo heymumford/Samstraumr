@@ -10,7 +10,7 @@ Licensed under the Mozilla Public License 2.0
 -->
 
 
-# TODO Standardization Plan
+# Active Todo Standardization
 
 This document outlines a plan to standardize the format and tracking of TODOs across the Samstraumr codebase.
 
@@ -45,7 +45,7 @@ Currently, TODOs and FIXMEs are scattered throughout the codebase in various for
 
 ## Implementation Plan
 
-### Phase 1: Define Standards
+### Phase 1: define standards
 
 1. ✅ Define standard format for TODOs:
 
@@ -74,7 +74,7 @@ Currently, TODOs and FIXMEs are scattered throughout the codebase in various for
    - SECURITY: Security issues
    - TASK: General tasks
 
-### Phase 2: Create Tracking Tools
+### Phase 2: create tracking tools
 
 1. ✅ Create a script to extract TODOs from code:
    - Extract TODO comments with pattern matching
@@ -88,14 +88,14 @@ Currently, TODOs and FIXMEs are scattered throughout the codebase in various for
    - Verify TODOs follow the standard format
    - Require issue numbers for P0/P1 TODOs
 
-### Phase 3: Standardize Existing TODOs
+### Phase 3: standardize existing todos
 
 1. ⬜ Scan the codebase for existing TODOs
 2. ⬜ Convert high-priority TODOs to the new format
 3. ⬜ Create GitHub issues for critical TODOs
 4. ⬜ Decide which TODOs to fix immediately vs. track
 
-### Phase 4: Documentation and Training
+### Phase 4: documentation and training
 
 1. ✅ Create documentation for TODO standards
 2. ✅ Update contribution guidelines

@@ -1,4 +1,4 @@
-# 3. Adopt Clean Architecture for system design
+# 0003 Adopt Clean Architecture for System Design
 
 Date: 2025-04-06
 

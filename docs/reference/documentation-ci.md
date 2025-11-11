@@ -9,7 +9,7 @@ remain exclusively with the copyright holder listed above.
 Licensed under the Mozilla Public License 2.0
 -->
 
-# Documentation CI
+# Documentation Ci
 
 This document describes how the Documentation CI system works in the Samstraumr project.
 
@@ -50,14 +50,14 @@ The CI system is triggered by:
 
 ### Jobs
 
-#### 1. Check Documentation
+#### 1. check documentation
 
 - Verifies that documentation follows project standards
 - Checks for broken links in Markdown files
 - Validates TODO formats, especially for high-priority TODOs
 - Generates reports of any issues found
 
-#### 2. Generate Documentation
+#### 2. generate documentation
 
 - Creates API documentation using JavaDoc
 - Converts Markdown files to HTML
@@ -65,13 +65,13 @@ The CI system is triggered by:
 - Updates README with the latest project information
 - Packages everything for GitHub Pages deployment
 
-#### 3. Deploy to GitHub Pages
+#### 3. deploy to github pages
 
 - Publishes documentation to GitHub Pages
 - Only runs on the main branch, not for pull requests
 - Provides a public URL for accessing the documentation
 
-#### 4. Reporting
+#### 4. reporting
 
 - Generates a summary of all CI activities
 - Provides status of checks, generation, and deployment
@@ -104,25 +104,25 @@ The Documentation CI system uses the following configuration files:
 
 ## Usage
 
-### Running Locally
+### Running locally
 
 To run documentation checks and generation locally:
 
 ```bash
-# Check documentation standards
+# Documentation Ci
 ./docs/scripts/check-documentation-standards.sh
 
-# Generate API documentation
+# Documentation Ci
 ./docs/tools/generate-javadoc.sh --output target/site/docs/api --links --markdown
 
-# Update changelog
+# Documentation Ci
 ./docs/tools/generate-changelog.sh --update
 
-# Update README
+# Documentation Ci
 ./docs/tools/update-readme.sh
 ```
 
-### Viewing Results
+### Viewing results
 
 - Generated documentation is deployed to GitHub Pages at: `https://emumford.github.io/Samstraumr/`
 - Check reports are available as workflow artifacts in GitHub Actions
@@ -137,19 +137,19 @@ The Documentation CI system integrates with the version management system:
 
 ## Common Issues and Solutions
 
-### Broken Links
+### Broken links
 
 If the CI reports broken links:
 1. Check the link in the documentation
 2. Either fix the link or add it to the ignore patterns in `mlc_config.json`
 
-### JavaDoc Errors
+### Javadoc errors
 
 If JavaDoc generation fails:
 1. Look for errors in the JavaDoc comments
 2. Fix any malformed tags or references
 
-### Deployment Issues
+### Deployment issues
 
 If deployment to GitHub Pages fails:
 1. Ensure the repository has GitHub Pages enabled
@@ -160,4 +160,3 @@ If deployment to GitHub Pages fails:
 - Adding documentation coverage metrics
 - Automated screenshots for visual components
 - Integration with external documentation platforms
-- Better handling of code examples

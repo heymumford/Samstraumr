@@ -13,7 +13,7 @@ Licensed under the Mozilla Public License 2.0
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
 -->
 
-# Folder Structure Flattening Plan
+# Folder Flattening Plan
 
 ## Overview
 
@@ -31,26 +31,26 @@ This document outlines the plan to simplify and flatten the S8r Framework folder
 
 Our analysis has identified several paths that exceed our target maximum of 9 levels:
 
-### Java Test Classes (11 levels deep)
+### Java test classes (11 levels deep)
 - `/Samstraumr/samstraumr-core/src/test/java/org/s8r/core/tube/test/runners/`
 - `/Samstraumr/samstraumr-core/src/test/java/org/s8r/core/tube/test/steps/`
 
-### Cucumber Feature Files (10 levels deep)
+### Cucumber feature files (10 levels deep)
 - `/Samstraumr/samstraumr-core/src/test/resources/composites/features/L1_Bundle/patterns/`
 - `/Samstraumr/samstraumr-core/src/test/resources/composites/features/L1_Composite/patterns/`
 - `/Samstraumr/samstraumr-core/src/test/resources/tube/features/L0_Tube/lifecycle/`
 
 ## Folder Flattening Strategy
 
-### 1. Java Test Structure Flattening
+### 1. java test structure flattening
 
-#### Current Structure:
+#### Current structure:
 ```
 org/s8r/core/tube/test/runners/AdamTubeTestRunner.java
 org/s8r/core/tube/test/steps/AdamTubeSteps.java
 ```
 
-#### New Structure:
+#### New structure:
 ```
 org/s8r/test/tube/runners/AdamTubeTestRunner.java
 org/s8r/test/tube/steps/AdamTubeSteps.java
@@ -58,15 +58,15 @@ org/s8r/test/tube/steps/AdamTubeSteps.java
 
 **Rationale**: Simplifies the package hierarchy while maintaining logical grouping. Moves test-related classes to a dedicated test package root, eliminating the `core/tube/test` path segment redundancy.
 
-### 2. Feature Files Restructuring
+### 2. feature files restructuring
 
-#### Current Structure:
+#### Current structure:
 ```
 test/resources/composites/features/L1_Bundle/patterns/observer-tube-test.feature
 test/resources/tube/features/L0_Tube/lifecycle/childhood-phase-tests.feature
 ```
 
-#### New Structure:
+#### New structure:
 ```
 test/resources/features/composite-bundle/observer-tube-test.feature
 test/resources/features/tube-lifecycle/childhood-phase-test.feature
@@ -74,7 +74,7 @@ test/resources/features/tube-lifecycle/childhood-phase-test.feature
 
 **Rationale**: Flattens the feature directory structure while preserving test categorization through descriptive directory names. The hierarchical relationship is preserved in the directory name rather than through nesting.
 
-### 3. Documentation Simplification
+### 3. documentation simplification
 
 Current structure:
 ```
@@ -106,7 +106,7 @@ docs/
 File naming convention: `[status]-[topic]-[type].md`  
 Example: `active-documentation-generation-plan.md` instead of `active/documentation-generation-plan.md`
 
-### 4. Source Code Simplification
+### 4. source code simplification
 
 Current structure:
 ```
@@ -172,21 +172,21 @@ For each target area:
 4. Create redirects or guidance for common locations
 5. Remove empty directories
 
-### Phase 1: Create New Directory Structure
+### Phase 1: create new directory structure
 1. Create the new flattened directory structure
 2. Update relevant README files with new structure documentation
 
-### Phase 2: File Migration
+### Phase 2: file migration
 1. Move test classes to their new locations
 2. Update import statements and package declarations
 3. Move feature files to their new locations
 
-### Phase 3: Update References
+### Phase 3: update references
 1. Update test runners to reference new feature file locations
 2. Update any build scripts or configuration files with new paths
 3. Update documentation references
 
-### Phase 4: Clean Up
+### Phase 4: clean up
 1. Remove empty directories
 2. Verify all tests still pass with the new structure
 3. Update the directory structure documentation

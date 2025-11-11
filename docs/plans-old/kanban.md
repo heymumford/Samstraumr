@@ -28,7 +28,7 @@ This document tracks the current development tasks in a Kanban-style board. Each
 
 ## Current Board
 
-### 📋 TO DO
+### 📋 to do
 - [ ] **Improve documentation generation**
   - Add automatic README updates
   - Create changelog generation
@@ -45,9 +45,9 @@ This document tracks the current development tasks in a Kanban-style board. Each
   - **Plan**: [active-todo-standardization.md](./active-todo-standardization.md)
   - **Estimated completion**: 2025-04-15
 
-### 🔄 IN PROGRESS
+### 🔄 in progress
 
-### ✅ DONE
+### ✅ done
 
 - [x] **Implement unified quality checks**
   - Consolidated quality check scripts ✅

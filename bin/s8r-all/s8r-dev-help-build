@@ -1,0 +1,27 @@
+[1mSamstraumr Build[0m - Build the project with optimized settings
+
+[1mUSAGE:[0m
+  ./s8r-dev build [options] [mode]
+
+[1mOPTIONS:[0m
+  -h, --help                Display this help message
+  -v, --verbose             Enable verbose output
+  -c, --clean               Clean before building
+  -p, --parallel            Build in parallel where possible
+  --skip-quality            Skip quality checks
+
+[1mMODES:[0m
+  fast                      Fast build with quality checks skipped (default)
+  compile                   Compile only
+  test                      Compile and run tests
+  package                   Create JAR package
+  install                   Install to local repository
+  full                      Full build including tests and verification
+  docs                      Generate project documentation
+  site                      Generate the Maven site
+
+[1mEXAMPLES:[0m
+  ./s8r-dev build                     # Fast build
+  ./s8r-dev build test                # Run tests
+  ./s8r-dev build -c test             # Clean and run tests
+  ./s8r-dev build --parallel full     # Run full build in parallel

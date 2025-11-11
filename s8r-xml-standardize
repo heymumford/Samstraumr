@@ -1,0 +1,236 @@
+#\!/bin/bash
+#
+# Copyright (c) 2025 Eric C. Mumford (@heymumford)
+#
+# This software was developed with analytical assistance from AI tools 
+# including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
+# which were used as paid services. All intellectual property rights 
+# remain exclusively with the copyright holder listed above.
+#
+# Licensed under the Mozilla Public License 2.0
+#
+# Simple script to standardize XML files, focusing on POM files
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Project root
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$(pwd)")"
+
+# Show help
+function show_help {
+    echo "Usage: s8r-xml-standardize [options] [file|directory]"
+    echo ""
+    echo "Options:"
+    echo "  -h, --help       Show this help message"
+    echo "  -c, --check      Check only, don't make changes"
+    echo "  -v, --verbose    Show more detailed output"
+    echo "  -p, --pom-only   Only process POM files"
+    echo ""
+    echo "Examples:"
+    echo "  s8r-xml-standardize                  # Format all XML files in the repository"
+    echo "  s8r-xml-standardize -p               # Format only POM files in the repository"
+    echo "  s8r-xml-standardize -c path/to/file  # Check a specific file"
+    echo ""
+}
+
+# Parse arguments
+CHECK_ONLY=0
+VERBOSE=0
+POM_ONLY=0
+TARGET_PATH="${PROJECT_ROOT}"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        -c|--check)
+            CHECK_ONLY=1
+            shift
+            ;;
+        -v|--verbose)
+            VERBOSE=1
+            shift
+            ;;
+        -p|--pom-only)
+            POM_ONLY=1
+            shift
+            ;;
+        *)
+            if [[ -f "$1" || -d "$1" ]]; then
+                TARGET_PATH="$1"
+            else
+                echo -e "${RED}Error: Unknown argument or file not found: $1${NC}"
+                show_help
+                exit 1
+            fi
+            shift
+            ;;
+    esac
+done
+
+# Function to process a POM file
+function process_pom {
+    local pom_file="$1"
+    local tmp_file="$(mktemp)"
+    local issues=0
+    
+    if [[ $VERBOSE -eq 1 ]]; then
+        echo -e "${BLUE}Processing${NC}: $pom_file"
+    fi
+    
+    # Create backup
+    if [[ $CHECK_ONLY -eq 0 ]]; then
+        cp "$pom_file" "${pom_file}.bak"
+    fi
+    
+    # Format XML
+    xmlstarlet format --indent-spaces 4 "$pom_file" > "$tmp_file"
+    
+    # Check for basic required elements - handling namespaces
+    if [ -z "$(xmlstarlet sel -N pom="http://maven.apache.org/POM/4.0.0" -t -v "/pom:project/pom:modelVersion" "$tmp_file" 2>/dev/null)" ]; then
+        echo -e "${RED}Error${NC}: Missing required element <modelVersion> in $pom_file"
+        issues=$((issues + 1))
+    fi
+    
+    # Check for artifacts without versions
+    local deps_without_version=$(xmlstarlet sel -N pom="http://maven.apache.org/POM/4.0.0" -t -m "//pom:dependency[not(pom:version) and not(parent::pom:dependencyManagement)]" -v "concat(pom:groupId,':',pom:artifactId)" -n "$tmp_file")
+    if [[ \! -z "$deps_without_version" && $VERBOSE -eq 1 ]]; then
+        echo -e "${YELLOW}Note${NC}: Dependencies without explicit version in $pom_file:"
+        echo "$deps_without_version" | sed 's/^/  /'
+    fi
+    
+    # Check for plugins without versions
+    local plugins_without_version=$(xmlstarlet sel -N pom="http://maven.apache.org/POM/4.0.0" -t -m "//pom:plugin[not(pom:version)]" -v "concat(pom:groupId,':',pom:artifactId)" -n "$tmp_file")
+    if [[ \! -z "$plugins_without_version" ]]; then
+        echo -e "${YELLOW}Warning${NC}: Plugins without version in $pom_file:"
+        echo "$plugins_without_version" | sed 's/^/  /'
+        issues=$((issues + 1))
+    fi
+    
+    # Check for duplicate dependencies
+    local deps=$(xmlstarlet sel -N pom="http://maven.apache.org/POM/4.0.0" -t -m "//pom:dependency" -v "concat(pom:groupId,':',pom:artifactId)" -n "$tmp_file" | sort)
+    local dups=$(echo "$deps" | sort | uniq -d)
+    if [[ \! -z "$dups" ]]; then
+        echo -e "${YELLOW}Warning${NC}: Duplicate dependencies in $pom_file:"
+        echo "$dups" | sed 's/^/  /'
+        issues=$((issues + 1))
+    fi
+    
+    # Check for duplicate plugins
+    local plugins=$(xmlstarlet sel -N pom="http://maven.apache.org/POM/4.0.0" -t -m "//pom:plugin" -v "concat(pom:groupId,':',pom:artifactId)" -n "$tmp_file" | sort)
+    local plugin_dups=$(echo "$plugins" | sort | uniq -d)
+    if [[ \! -z "$plugin_dups" ]]; then
+        echo -e "${YELLOW}Warning${NC}: Duplicate plugins in $pom_file:"
+        echo "$plugin_dups" | sed 's/^/  /'
+        issues=$((issues + 1))
+    fi
+    
+    # Check for incorrect elements (e.g., 'n' should be 'name')
+    if xmlstarlet sel -N pom="http://maven.apache.org/POM/4.0.0" -t -v "count(//pom:n)" "$tmp_file" 2>/dev/null | grep -q '[1-9]'; then
+        echo -e "${RED}Error${NC}: Found invalid <n> element(s) in $pom_file - should be <name>"
+        issues=$((issues + 1))
+    fi
+    
+    # Update the file if not in check-only mode and there are no issues
+    if [[ $CHECK_ONLY -eq 0 && $issues -eq 0 ]]; then
+        mv "$tmp_file" "$pom_file"
+        echo -e "${GREEN}Updated${NC}: $pom_file"
+    else
+        rm "$tmp_file"
+    fi
+    
+    return $issues
+}
+
+# Function to process a generic XML file
+function process_xml {
+    local xml_file="$1"
+    local tmp_file="$(mktemp)"
+    
+    if [[ $VERBOSE -eq 1 ]]; then
+        echo -e "${BLUE}Processing${NC}: $xml_file"
+    fi
+    
+    # Create backup
+    if [[ $CHECK_ONLY -eq 0 ]]; then
+        cp "$xml_file" "${xml_file}.bak"
+    fi
+    
+    # Format XML
+    xmlstarlet format --indent-spaces 2 "$xml_file" > "$tmp_file"
+    
+    # Update the file if not in check-only mode
+    if [[ $CHECK_ONLY -eq 0 ]]; then
+        mv "$tmp_file" "$xml_file"
+        echo -e "${GREEN}Updated${NC}: $xml_file"
+    else
+        rm "$tmp_file"
+    fi
+    
+    return 0
+}
+
+# Find files to process
+if [[ -f "$TARGET_PATH" ]]; then
+    # Single file mode
+    if [[ "$TARGET_PATH" == *pom.xml ]]; then
+        process_pom "$TARGET_PATH"
+        EXIT_CODE=$?
+    elif [[ "$TARGET_PATH" == *.xml ]]; then
+        process_xml "$TARGET_PATH"
+        EXIT_CODE=$?
+    else
+        echo -e "${RED}Error${NC}: File is not an XML file: $TARGET_PATH"
+        EXIT_CODE=1
+    fi
+else
+    # Directory mode
+    echo -e "${BLUE}Scanning directory${NC}: $TARGET_PATH"
+    
+    ISSUES=0
+    FILES_PROCESSED=0
+    
+    if [[ $POM_ONLY -eq 1 ]]; then
+        # Process only POM files
+        while IFS= read -r file; do
+            process_pom "$file"
+            if [[ $? -ne 0 ]]; then
+                ISSUES=$((ISSUES + 1))
+            fi
+            FILES_PROCESSED=$((FILES_PROCESSED + 1))
+        done < <(find "$TARGET_PATH" -name "pom.xml" -type f)
+    else
+        # Process all XML files
+        while IFS= read -r file; do
+            if [[ "$file" == *pom.xml ]]; then
+                process_pom "$file"
+            else
+                process_xml "$file"
+            fi
+            
+            if [[ $? -ne 0 ]]; then
+                ISSUES=$((ISSUES + 1))
+            fi
+            FILES_PROCESSED=$((FILES_PROCESSED + 1))
+        done < <(find "$TARGET_PATH" -name "*.xml" -type f)
+    fi
+    
+    echo -e "${BLUE}Processed${NC} $FILES_PROCESSED ${BLUE}files with${NC} $ISSUES ${BLUE}issues${NC}"
+    
+    if [[ $ISSUES -gt 0 ]]; then
+        EXIT_CODE=1
+    else
+        EXIT_CODE=0
+    fi
+fi
+
+exit $EXIT_CODE

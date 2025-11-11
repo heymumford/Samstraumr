@@ -27,7 +27,7 @@ The work tracking system is organized into the following components:
 3. **Code TODOs**: Standardized format for tracking technical debt in code
 4. **GitHub Issues**: External tracking for user-facing issues and features
 
-### Directory Structure
+### Directory structure
 
 ```
 docs/
@@ -49,7 +49,7 @@ The Kanban board is the central location for tracking all work. It is maintained
 2. **In Progress**: Tasks that are currently being worked on
 3. **Done**: Completed tasks
 
-### Task Structure
+### Task structure
 
 Each task on the Kanban board should include:
 
@@ -69,13 +69,13 @@ See the templates in the Kanban board for the exact format.
 
 Planning documents provide detailed information about significant work items. They use a prefix-based naming system in the `docs/plans/` directory.
 
-### Plan Types
+### Plan types
 
 1. **Active Plans**: Current work with `active-` prefix (e.g., `active-documentation-standardization.md`)
 2. **Completed Plans**: Finished work with `complete-` prefix (e.g., `complete-version-refactoring.md`)
 3. **Archived Plans**: Historical plans with `archived-` prefix (e.g., `archived-temp-reorg-plan.md`)
 
-### Plan Structure
+### Plan structure
 
 Each planning document should include:
 
@@ -100,14 +100,14 @@ Example:
 // TODO [P2] (FEAT) (#123): Implement error handling for network failures
 ```
 
-### Priority Levels
+### Priority levels
 
 - **P0**: Critical - Must be fixed immediately
 - **P1**: High - Should be fixed soon
 - **P2**: Medium - Fix when time permits
 - **P3**: Low - Nice to have
 
-### Categories (Optional)
+### Categories (optional)
 
 Categories can be added in parentheses:
 
@@ -129,25 +129,25 @@ For user-facing issues and features, GitHub Issues should be used. These should 
 
 ## Workflow
 
-### Starting New Work
+### Starting new work
 
 1. Add the task to the **To Do** column of the Kanban board
 2. Create a planning document with `active-` prefix in `docs/plans/` if needed
 3. Create a GitHub issue if user-facing
 
-### During Work
+### During work
 
 1. Move the task to **In Progress** on the Kanban board
 2. Update the planning document with progress (check off completed items)
 3. Add TODOs in code for future improvements
 
-### Completing Work
+### Completing work
 
 1. Move the task to **Done** on the Kanban board
 2. Rename the planning document with `complete-` prefix
 3. Close the GitHub issue if applicable
 
-### Archiving Work
+### Archiving work
 
 1. After a reasonable time, rename completed planning documents with `archived-` prefix
 2. Update links in the Kanban board and other documents
