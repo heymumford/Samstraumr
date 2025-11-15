@@ -114,19 +114,6 @@ public class Component {
     return new Component(reason, environment, uniqueId, null);
   }
 
-  /** Creates a new component with environment parameter map (backward compatibility). */
-  public static Component create(String reason, Map<String, String> environmentParams) {
-    if (reason == null) throw new IllegalArgumentException("Reason cannot be null");
-    if (environmentParams == null)
-      throw new IllegalArgumentException("Environment parameters cannot be null");
-
-    Environment env = new Environment();
-    for (Map.Entry<String, String> entry : environmentParams.entrySet()) {
-      env.setParameter(entry.getKey(), entry.getValue());
-    }
-
-    return create(reason, env);
-  }
 
   /** Creates a child component with a parent reference. */
   public static Component createChild(String reason, Environment environment, Component parent) {
@@ -148,21 +135,6 @@ public class Component {
     return child;
   }
 
-  /** Creates a child component with environment parameter map (backward compatibility). */
-  public static Component createChild(
-      String reason, Map<String, String> environmentParams, Component parent) {
-    if (reason == null) throw new IllegalArgumentException("Reason cannot be null");
-    if (environmentParams == null)
-      throw new IllegalArgumentException("Environment parameters cannot be null");
-    if (parent == null) throw new IllegalArgumentException("Parent component cannot be null");
-
-    Environment env = new Environment();
-    for (Map.Entry<String, String> entry : environmentParams.entrySet()) {
-      env.setParameter(entry.getKey(), entry.getValue());
-    }
-
-    return createChild(reason, env, parent);
-  }
 
   /** Performs component initialization through lifecycle phases. */
   private void initialize() {
