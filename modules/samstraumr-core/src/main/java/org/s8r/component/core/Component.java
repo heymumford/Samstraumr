@@ -20,16 +20,15 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.s8r.component.Logger;
 import org.s8r.component.identity.Identity;
+import org.s8r.component.lifecycle.ComponentLifecycleManager;
+import org.s8r.component.logging.ComponentLogger;
+import org.s8r.component.termination.ComponentTerminationManager;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -37,26 +36,30 @@ import org.slf4j.LoggerFactory;
  *
  * <p>Implements a biological-inspired lifecycle model with state transitions and parent-child
  * relationships.
+ *
+ * <p><b>Refactoring Note:</b> Refactored as part of Phase 2 God Class decomposition. Lifecycle,
+ * logging, and termination concerns extracted to dedicated manager classes following Single
+ * Responsibility Principle (Martin Fowler refactoring).
  */
 public class Component {
   private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Component.class);
-  private static final int DEFAULT_TERMINATION_DELAY = 60; // seconds
   private static final String DIGEST_ALGORITHM = "SHA-256";
 
+  // Core identity and configuration
   private final String uniqueId;
   private final String reason;
   private final List<String> lineage;
-  private final List<String> memoryLog;
   private final Environment environment;
   private final Identity identity;
   private final Instant conceptionTime;
-  private final Logger logger;
   private final Map<String, Object> properties = new ConcurrentHashMap<>();
-
-  private volatile Timer terminationTimer;
-  private String environmentState = "normal";
-  private State state = State.CONCEPTION;
   private Identity parentIdentity;
+  private String environmentState = "normal";
+
+  // Extracted responsibilities (Composition over inheritance)
+  private final ComponentLifecycleManager lifecycleManager;
+  private final ComponentLogger componentLogger;
+  private final ComponentTerminationManager terminationManager;
 
   /** Private constructor for creating a component instance. */
   private Component(
@@ -67,29 +70,36 @@ public class Component {
     this.parentIdentity = parentIdentity;
     this.lineage = Collections.synchronizedList(new ArrayList<>());
     this.lineage.add(reason);
-    this.memoryLog = Collections.synchronizedList(new LinkedList<>());
+
     if (environment == null) {
       throw new IllegalArgumentException("Environment cannot be null");
     }
     this.environment = environment;
-    this.logger = new Logger(uniqueId);
+
+    // Initialize managers (composition)
+    this.componentLogger = new ComponentLogger(uniqueId);
+    this.lifecycleManager = new ComponentLifecycleManager(transition -> {
+      // Log state transitions
+      componentLogger.info(
+          "State changed: " + transition.getFromState() + " -> " + transition.getToState(),
+          "LIFECYCLE",
+          transition.getToState().name());
+    });
+    this.terminationManager = new ComponentTerminationManager(uniqueId, componentLogger);
 
     // Log creation
-    logToMemory("Component created with reason: " + reason);
-    logToMemory("Environment: " + environment.toString());
-    logger.info("Component created with reason: " + reason, "CREATION");
+    componentLogger.info("Component created with reason: " + reason, "CREATION");
+    componentLogger.info("Environment: " + environment.toString(), "CREATION");
 
     // Create identity
     Map<String, String> envParams = convertEnvironmentParams(environment);
     if (parentIdentity != null) {
       this.identity = Identity.createChildIdentity(reason, envParams, parentIdentity);
-      logToMemory("Created with parent identity: " + parentIdentity.getUniqueId());
-      logger.info(
+      componentLogger.info(
           "Created with parent identity: " + parentIdentity.getUniqueId(), "IDENTITY", "CHILD");
     } else {
       this.identity = Identity.createAdamIdentity(reason, envParams);
-      logToMemory("Created as Adam component (no parent)");
-      logger.info("Created as Adam component (no parent)", "IDENTITY", "ADAM");
+      componentLogger.info("Created as Adam component (no parent)", "IDENTITY", "ADAM");
     }
 
     // Initialize through lifecycle phases
@@ -138,66 +148,30 @@ public class Component {
 
   /** Performs component initialization through lifecycle phases. */
   private void initialize() {
-    logger.debug("Initializing component...", "LIFECYCLE", "INIT");
+    componentLogger.debug("Initializing component...", "LIFECYCLE", "INIT");
 
-    // Move through initial states
-    transitionToState(State.INITIALIZING);
-    setupTerminationTimer(DEFAULT_TERMINATION_DELAY);
-    proceedThroughEarlyLifecycle();
-    transitionToState(State.READY);
-
-    logToMemory("Component initialized and ready");
-    logger.info("Component initialized and ready", "LIFECYCLE", "READY");
+    // Delegate to lifecycle manager
+    lifecycleManager.initialize(() -> {
+      // Setup termination timer when ready
+      terminationManager.setupDefaultTerminationTimer(this::terminate);
+      componentLogger.info("Component initialized and ready", "LIFECYCLE", "READY");
+    });
   }
 
   /** Proceeds through the early lifecycle phases of component development. */
   public void proceedThroughEarlyLifecycle() {
-    logToMemory("Beginning early lifecycle development");
-    logger.info("Beginning early lifecycle development", "LIFECYCLE", "DEVELOPMENT");
-
-    // Move through development phases
-    transitionToState(State.CONFIGURING);
-    logToMemory("Component entering CONFIGURING phase (analog: Blastulation)");
-
-    transitionToState(State.SPECIALIZING);
-    logToMemory("Component entering SPECIALIZING phase (analog: Gastrulation)");
-
-    transitionToState(State.DEVELOPING_FEATURES);
-    logToMemory("Component entering DEVELOPING_FEATURES phase (analog: Organogenesis)");
-
-    logToMemory("Completed early lifecycle development");
-    logger.info("Completed early lifecycle development", "LIFECYCLE", "DEVELOPMENT");
+    componentLogger.info("Beginning early lifecycle development", "LIFECYCLE", "DEVELOPMENT");
+    lifecycleManager.proceedThroughEarlyLifecycle();
+    componentLogger.info("Completed early lifecycle development", "LIFECYCLE", "DEVELOPMENT");
   }
 
   /** Sets up a timer for component termination. */
   public void setupTerminationTimer(int delaySeconds) {
-    if (delaySeconds <= 0) {
-      throw new IllegalArgumentException("Termination delay must be positive");
-    }
-
     if (isTerminated()) {
       throw new IllegalStateException(
           "Cannot set termination delay: component is already terminated");
     }
-
-    synchronized (this) {
-      if (terminationTimer != null) {
-        terminationTimer.cancel();
-      }
-
-      terminationTimer = new Timer("ComponentTerminator-" + uniqueId);
-      terminationTimer.schedule(
-          new TimerTask() {
-            @Override
-            public void run() {
-              terminate();
-            }
-          },
-          delaySeconds * 1000L);
-    }
-
-    logToMemory("Termination timer set for " + delaySeconds + " seconds");
-    logger.debug("Termination timer set for " + delaySeconds + " seconds", "LIFECYCLE", "TIMER");
+    terminationManager.setupTerminationTimer(delaySeconds, this::terminate);
   }
 
   /** Sets the termination delay for this component. */
@@ -205,70 +179,54 @@ public class Component {
     setupTerminationTimer(seconds);
   }
 
-  /** Transitions the component to a new state. */
-  private void transitionToState(State newState) {
-    if (newState != this.state) {
-      State oldState = this.state;
-      this.state = newState;
-      logToMemory("State changed: " + oldState + " -> " + newState);
-      logger.info(
-          "State changed: " + oldState.name() + " -> " + newState.name(),
-          "LIFECYCLE",
-          newState.name());
-    }
-  }
-
   /** Gets the current state of this component. */
   public State getState() {
-    return state;
+    return lifecycleManager.getState();
   }
 
   /** Sets the component state to a new value. */
   public void setState(State newState) {
-    if (isTerminated()) {
-      throw new IllegalStateException("Cannot change state of terminated component");
-    }
-    transitionToState(newState);
+    lifecycleManager.transitionToState(newState);
   }
 
   /** Checks if this component is in a terminated state. */
   public boolean isTerminated() {
-    return state == State.TERMINATED || state == State.TERMINATING || state == State.ARCHIVED;
+    return lifecycleManager.isTerminated();
   }
 
   /** Checks if this component is operational. */
   public boolean isOperational() {
-    return state == State.READY || state == State.ACTIVE || state == State.STABLE;
+    return lifecycleManager.isOperational();
   }
 
   /** Checks if this component is embryonic. */
   public boolean isEmbryonic() {
-    return state == State.CONCEPTION || state == State.INITIALIZING || state == State.CONFIGURING;
+    return lifecycleManager.isEmbryonic();
   }
 
   /** Checks if this component is initializing. */
   public boolean isInitializing() {
-    return state == State.INITIALIZING;
+    return lifecycleManager.isInitializing();
   }
 
   /** Checks if this component is configuring. */
   public boolean isConfiguring() {
-    return state == State.CONFIGURING;
+    return lifecycleManager.isConfiguring();
   }
 
   /** Checks if this component is ready. */
   public boolean isReady() {
-    return state == State.READY;
+    return lifecycleManager.isReady();
   }
 
   /** Checks if this component is active. */
   public boolean isActive() {
-    return state == State.ACTIVE;
+    return lifecycleManager.isActive();
   }
 
   /** Checks if this component is in error recovery. */
   public boolean isInErrorRecovery() {
-    return state == State.RECOVERING;
+    return lifecycleManager.isInErrorRecovery();
   }
 
   /** Checks if this component has attempted recovery. */
@@ -288,63 +246,30 @@ public class Component {
       return;
     }
 
-    logToMemory("Component termination initiated");
-    logger.info("Component termination initiated", "LIFECYCLE", "TERMINATE");
-
-    // Cancel timer if active
-    synchronized (this) {
-      if (terminationTimer != null) {
-        terminationTimer.cancel();
-        terminationTimer = null;
-        logger.debug("Termination timer canceled", "LIFECYCLE", "TERMINATE");
+    // Delegate to termination manager
+    terminationManager.terminate(cleanupCallback -> {
+      // Begin termination in lifecycle
+      if (lifecycleManager.beginTermination()) {
+        // Execute cleanup
+        cleanupCallback.accept(() -> {});
+        // Complete termination
+        lifecycleManager.completeTermination();
       }
-    }
-
-    // Transition through termination states
-    transitionToState(State.TERMINATING);
-    preserveKnowledge();
-    releaseResources();
-    transitionToState(State.TERMINATED);
-
-    logToMemory("Component terminated");
-    logger.info("Component terminated", "LIFECYCLE", "TERMINATE");
-  }
-
-  /** Preserves crucial knowledge before termination for potential future use. */
-  private void preserveKnowledge() {
-    logToMemory("Preserving knowledge before termination");
-    logger.debug("Preserving knowledge before termination", "LIFECYCLE", "TERMINATE");
-    // In a full implementation, this would archive important learnings and experiences
-  }
-
-  /** Releases all resources allocated to this component. */
-  private void releaseResources() {
-    logToMemory("Releasing allocated resources");
-    logger.debug("Releasing allocated resources", "LIFECYCLE", "TERMINATE");
-    // In a full implementation, this would clean up all allocated resources
+    });
   }
 
   /** Registers a child component with this component. */
   public void registerChild(Component childComponent) {
     if (childComponent != null) {
-      logToMemory("Registering child component: " + childComponent.getUniqueId());
-      logger.info(
+      componentLogger.info(
           "Registering child component: " + childComponent.getUniqueId(), "HIERARCHY", "CHILD");
 
       // Add the child to our identity's descendants list
       if (this.identity != null && childComponent.getIdentity() != null) {
         this.identity.addChild(childComponent.getIdentity());
-        logToMemory("Added child component identity to descendants list");
-        logger.debug("Added child identity to descendants list", "HIERARCHY", "IDENTITY");
+        componentLogger.debug("Added child identity to descendants list", "HIERARCHY", "IDENTITY");
       }
     }
-  }
-
-  /** Logs a message to the memory log. */
-  private void logToMemory(String message) {
-    String logEntry = Instant.now() + " - " + message;
-    memoryLog.add(logEntry);
-    LOGGER.debug(logEntry);
   }
 
   // Getter methods
@@ -369,11 +294,11 @@ public class Component {
   }
 
   public List<String> getMemoryLog() {
-    return Collections.unmodifiableList(memoryLog);
+    return componentLogger.getMemoryLog();
   }
 
   public int getMemoryLogSize() {
-    return memoryLog.size();
+    return componentLogger.getMemoryLogSize();
   }
 
   public String getEnvironmentState() {
@@ -388,15 +313,15 @@ public class Component {
     return parentIdentity;
   }
 
-  public Logger getLogger() {
-    return logger;
+  public org.s8r.component.Logger getLogger() {
+    return componentLogger.getLogger();
   }
 
   /** Adds an entry to the component's lineage. */
   public void addToLineage(String entry) {
     if (entry != null && !entry.isEmpty()) {
       lineage.add(entry);
-      logToMemory("Added to lineage: " + entry);
+      componentLogger.info("Added to lineage: " + entry, "LINEAGE");
     }
   }
 
@@ -405,8 +330,7 @@ public class Component {
     if (newState != null && !newState.equals(environmentState)) {
       String oldState = environmentState;
       environmentState = newState;
-      logToMemory("Environment state changed: " + oldState + " -> " + newState);
-      logger.info("Environment state changed: " + oldState + " -> " + newState, "ENVIRONMENT");
+      componentLogger.info("Environment state changed: " + oldState + " -> " + newState, "ENVIRONMENT");
     }
   }
 
@@ -417,23 +341,22 @@ public class Component {
 
   /** Triggers a recoverable error condition in the component. */
   public void triggerRecoverableError() {
-    logToMemory("Recoverable error triggered");
-    logger.error("Recoverable error triggered", "ERROR");
+    componentLogger.error("Recoverable error triggered", "ERROR");
 
     // Record recovery attempt
     int attempts = getRecoveryAttempts();
     setProperty("recoveryAttempts", attempts + 1);
 
     // Set error state and begin recovery
-    transitionToState(State.ERROR);
-    transitionToState(State.RECOVERING);
+    lifecycleManager.transitionToState(State.ERROR);
+    lifecycleManager.transitionToState(State.RECOVERING);
   }
 
   /** Sets a property value on this component. */
   public void setProperty(String key, Object value) {
     if (key != null) {
       properties.put(key, value);
-      logger.debug("Property set: " + key, "PROPERTY");
+      componentLogger.debug("Property set: " + key, "PROPERTY");
     }
   }
 
