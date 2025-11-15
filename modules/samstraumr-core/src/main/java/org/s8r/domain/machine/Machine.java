@@ -75,7 +75,7 @@ public class Machine {
    */
   public void addComponent(CompositeComponent component) {
     // Validate that this operation is allowed in the current state
-    MachineStateValidator.validateOperationState(id, "addComponent", state);
+    MachineStateValidator.validateOperationState(id, MachineOperation.ADD_COMPONENT, state);
     
     // Validate that the component is a valid composite component
     org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(this, component);
@@ -93,7 +93,7 @@ public class Machine {
    */
   public void removeComponent(ComponentId componentId) {
     // Validate that this operation is allowed in the current state
-    MachineStateValidator.validateOperationState(id, "removeComponent", state);
+    MachineStateValidator.validateOperationState(id, MachineOperation.REMOVE_COMPONENT, state);
     
     // Validate that the component exists
     if (componentId == null) {
@@ -137,7 +137,7 @@ public class Machine {
    */
   public void initialize() {
     // Validate that this operation is allowed in the current state
-    MachineStateValidator.validateOperationState(id, "initialize", state);
+    MachineStateValidator.validateOperationState(id, MachineOperation.INITIALIZE, state);
 
     logActivity("Initializing machine");
 
@@ -164,7 +164,7 @@ public class Machine {
    */
   public void start() {
     // Validate that this operation is allowed in the current state
-    MachineStateValidator.validateOperationState(id, "start", state);
+    MachineStateValidator.validateOperationState(id, MachineOperation.START, state);
 
     logActivity("Starting machine");
 
@@ -196,7 +196,7 @@ public class Machine {
    */
   public void stop() {
     // Validate that this operation is allowed in the current state
-    MachineStateValidator.validateOperationState(id, "stop", state);
+    MachineStateValidator.validateOperationState(id, MachineOperation.STOP, state);
 
     logActivity("Stopping machine");
 
@@ -228,7 +228,7 @@ public class Machine {
    */
   public void pause() {
     // Validate that this operation is allowed in the current state
-    MachineStateValidator.validateOperationState(id, "pause", state);
+    MachineStateValidator.validateOperationState(id, MachineOperation.PAUSE, state);
     
     logActivity("Pausing machine");
     
@@ -263,7 +263,7 @@ public class Machine {
    */
   public void resume() {
     // Validate that this operation is allowed in the current state
-    MachineStateValidator.validateOperationState(id, "resume", state);
+    MachineStateValidator.validateOperationState(id, MachineOperation.RESUME, state);
     
     logActivity("Resuming machine");
     
@@ -297,7 +297,7 @@ public class Machine {
    */
   public void destroy() {
     // Validate that this operation is allowed in the current state
-    MachineStateValidator.validateOperationState(id, "destroy", state);
+    MachineStateValidator.validateOperationState(id, MachineOperation.DESTROY, state);
     
     logActivity("Destroying machine");
 
@@ -325,7 +325,7 @@ public class Machine {
   /** Sets the version of this machine. */
   public void setVersion(String version) {
     // Validate that this operation is allowed in the current state
-    MachineStateValidator.validateOperationState(id, "setVersion", state);
+    MachineStateValidator.validateOperationState(id, MachineOperation.SET_VERSION, state);
 
     this.version = version;
     logActivity("Version updated to: " + version);
@@ -376,7 +376,7 @@ public class Machine {
    */
   public void resetFromError() {
     // Validate using operation validation
-    MachineStateValidator.validateOperationState(id, "reset", state);
+    MachineStateValidator.validateOperationState(id, MachineOperation.RESET_FROM_ERROR, state);
     
     // Transition back to READY state
     setState(MachineState.READY, "Reset from error state");
@@ -384,7 +384,7 @@ public class Machine {
   
   /** Checks if this machine is in a modifiable state. */
   private boolean isModifiable() {
-    return MachineStateValidator.isOperationAllowed("addComponent", state);
+    return MachineStateValidator.isOperationAllowed(MachineOperation.ADD_COMPONENT, state);
   }
 
   /** Logs an activity for this machine. */
