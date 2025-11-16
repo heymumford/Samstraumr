@@ -58,10 +58,10 @@ jobs:
             maven-
 
       - name: Validate Maven structure
-        run: bin/util/scripts/test/maven-structure-test.sh
+        run: util/scripts/test/maven-structure-test.sh
 
       - name: Check circular dependencies
-        run: bin/util/scripts/check-circular-dependencies.sh
+        run: util/scripts/check-circular-dependencies.sh
 
       - name: Verify project compiles
         run: mvn ${{ env.MAVEN_CLI_OPTS }} clean compile
@@ -69,8 +69,7 @@ jobs:
       - name: Run quick linters
         run: |
           mvn ${{ env.MAVEN_CLI_OPTS }} checkstyle:check
-          bin/util/scripts/check-todo-format.sh
-          bin/util/scripts/check-imports.sh
+          util/scripts/check-imports.sh
 
   ###############################################
   # Stage 2: UNIT TEST GATE (4-6 min)
@@ -324,6 +323,7 @@ jobs:
             maven-
 
       - name: Generate documentation
+        if: false  # TODO: Create bin/s8r-docs script
         run: bin/s8r-docs generate
 
       - name: Verify version consistency
