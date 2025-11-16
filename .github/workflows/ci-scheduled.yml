@@ -1,4 +1,6 @@
 name: CI Scheduled (Weekly)
+permissions:
+  contents: read
 
 on:
   schedule:
