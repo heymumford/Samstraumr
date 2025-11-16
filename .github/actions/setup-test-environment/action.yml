@@ -1,0 +1,55 @@
+name: 'Setup Test Environment'
+description: 'Setup complete test environment for Samstraumr with Java 21 and test utilities'
+author: 'Samstraumr Team'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up JDK 21
+      uses: actions/setup-java@v5
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: 'maven'
+    
+    - name: Set Java and test options
+      shell: bash
+      run: |
+        # Java 21 module options
+        echo "JAVA_OPTS=--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED" >> $GITHUB_ENV
+        echo "JAVA_TOOL_OPTIONS=--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED" >> $GITHUB_ENV
+        
+        # Maven options
+        echo "MAVEN_OPTS=-Xmx3072m" >> $GITHUB_ENV
+        echo "MAVEN_CLI_OPTS=--batch-mode --errors --fail-at-end --show-version" >> $GITHUB_ENV
+        
+        # Test options
+        echo "TEST_PARALLEL_THREADS=$(nproc)" >> $GITHUB_ENV
+    
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.m2/repository
+          !~/.m2/repository/org/samstraumr
+        key: ${{ runner.os }}-maven-test-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-test-
+          ${{ runner.os }}-maven-
+    
+    - name: Make test scripts executable
+      shell: bash
+      run: |
+        chmod +x ./s8r-test || true
+        chmod +x ./s8r-build || true
+        chmod +x ./s8r-version || true
+        chmod +x ./run-tests.sh || true
+    
+    - name: Display test environment
+      shell: bash
+      run: |
+        echo "Test Environment Information:"
+        echo "CPU cores: $(nproc)"
+        echo "Memory: $(free -h | grep Mem: | awk '{print $2}')"
+        echo "Test parallel threads: $TEST_PARALLEL_THREADS"
+        java -version
