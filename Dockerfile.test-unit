@@ -1,0 +1,19 @@
+# Unit Test Container
+# Optimized for fast, isolated unit test execution
+FROM test-base:latest
+
+LABEL description="Container for running unit tests (@L0_Unit)"
+LABEL test-type="unit"
+
+# Optimize for parallel unit test execution
+ENV MAVEN_PARALLEL_THREADS=4
+ENV CUCUMBER_PARALLEL_FACTOR=0.75
+
+# Unit tests typically don't need as much memory
+ENV MAVEN_OPTS="${MAVEN_OPTS} -Xms512m"
+
+# Set up test execution
+WORKDIR /workspace
+
+# Default command: run unit tests with parallel execution
+CMD ["sh", "-c", "bin/s8r-test unit --parallel"]

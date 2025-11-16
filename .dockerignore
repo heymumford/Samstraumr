@@ -1,0 +1,60 @@
+# Docker ignore file to reduce build context size and speed up builds
+
+# Build outputs
+**/target/
+**/bin/
+**/build/
+**/.gradle/
+
+# IDE files
+**/.idea/
+**/.vscode/
+**/.settings/
+**/.classpath
+**/.project
+**/*.iml
+**/*.swp
+**/*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+**/.DS_Store
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation (not needed in container)
+docs/
+*.md
+!README.md
+
+# CI/CD configs (not needed in container)
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Test results and reports
+**/test-results/
+**/test-reports/
+**/coverage/
+**/*.log
+
+# Temporary files
+**/tmp/
+**/temp/
+**/*.tmp
+
+# Dependencies (will be downloaded during build)
+**/.m2/
+**/node_modules/
+
+# Security
+**/*.key
+**/*.pem
+**/*.p12
+.env
+.env.local
+**/*.secret
