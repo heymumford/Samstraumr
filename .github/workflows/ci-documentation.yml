@@ -1,0 +1,222 @@
+name: CI Documentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.md'
+      - 'docs/**'
+      - 'Samstraumr/**/src/main/java/**/*.java'
+      - '.github/workflows/ci-documentation.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '**.md'
+      - 'docs/**'
+      - 'Samstraumr/**/src/main/java/**/*.java'
+      - '.github/workflows/ci-documentation.yml'
+  workflow_dispatch:
+  release:
+    types: [published, prereleased]
+
+jobs:
+  validate-docs:
+    name: Validate Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      
+      - name: Check Markdown links
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'no'
+          use-verbose-mode: 'yes'
+          folder-path: 'docs'
+          max-depth: 5
+          config-file: '.github/workflows/mlc_config.json'
+          file-extension: '.md'
+          base-branch: 'main'
+          check-modified-files-only: 'no'
+        continue-on-error: true
+      
+      - name: Check TODO format
+        run: |
+          if [ -f "./bin/util/scripts/check-todo-format.sh" ]; then
+            ./bin/util/scripts/check-todo-format.sh
+          else
+            echo "TODO format check script not found, skipping"
+          fi
+        continue-on-error: true
+      
+      - name: Check documentation standards
+        run: |
+          if [ -f "./docs/scripts/check-documentation-standards.sh" ]; then
+            ./docs/scripts/check-documentation-standards.sh --check all --report documentation-check-report.md
+          else
+            echo "Documentation standards check script not found, skipping"
+          fi
+        continue-on-error: true
+      
+      - name: Upload documentation check results
+        uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: documentation-check-reports
+          path: |
+            documentation-check-report.md
+            todo-report.md
+          if-no-files-found: ignore
+
+  generate-docs:
+    name: Generate Documentation
+    runs-on: ubuntu-latest
+    needs: validate-docs
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      
+      - name: Setup Java 21
+        uses: ./.github/actions/setup-java-21
+      
+      - name: Get version
+        id: get_version
+        run: |
+          if [ -f "Samstraumr/version.properties" ]; then
+            VERSION=$(grep "version=" "Samstraumr/version.properties" | cut -d= -f2 | tr -d ' \t\n\r')
+          else
+            VERSION="0.0.0"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "::notice::Generating documentation for s8r v$VERSION"
+      
+      - name: Generate JavaDoc
+        run: mvn javadoc:aggregate -DskipTests
+        continue-on-error: true
+      
+      - name: Generate API documentation
+        run: |
+          if [ -f "./docs/tools/generate-javadoc.sh" ]; then
+            mkdir -p target/site/docs
+            ./docs/tools/generate-javadoc.sh --output target/site/docs/api --links --markdown
+          else
+            echo "JavaDoc generation script not found, using Maven output"
+          fi
+        continue-on-error: true
+      
+      - name: Prepare documentation site
+        run: |
+          mkdir -p target/site/pages
+          
+          # Copy generated docs
+          if [ -d "target/site/apidocs" ]; then
+            cp -R target/site/apidocs target/site/pages/api
+          fi
+          
+          # Copy markdown documentation
+          if [ -d "docs" ]; then
+            cp -R docs target/site/pages/docs
+          fi
+          
+          # Create index page
+          cat > target/site/pages/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Samstraumr Documentation</title>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 2rem; }
+              h1 { color: #0366d6; }
+              a { color: #0366d6; text-decoration: none; }
+              a:hover { text-decoration: underline; }
+              .container { max-width: 800px; margin: 0 auto; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>Samstraumr Documentation</h1>
+              <p>Welcome to the Samstraumr framework documentation.</p>
+              <h2>Documentation Sections</h2>
+              <ul>
+                <li><a href="api/">API Documentation (JavaDoc)</a></li>
+                <li><a href="docs/">Architecture & Design Documentation</a></li>
+                <li><a href="../README.md">Project README</a></li>
+              </ul>
+            </div>
+          </body>
+          </html>
+          EOF
+      
+      - name: Upload documentation artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: documentation-site
+          path: target/site/pages
+          retention-days: 90
+
+  deploy-to-pages:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: generate-docs
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download documentation site
+        uses: actions/download-artifact@v6
+        with:
+          name: documentation-site
+          path: documentation-site
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: documentation-site
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+      
+      - name: Generate deployment summary
+        run: |
+          echo "## 📚 Documentation Deployed" >> $GITHUB_STEP_SUMMARY
+          echo "Documentation has been deployed to GitHub Pages" >> $GITHUB_STEP_SUMMARY
+          echo "**URL**: ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
+
+  ci-documentation-summary:
+    name: CI Documentation Summary
+    runs-on: ubuntu-latest
+    needs: [validate-docs, generate-docs, deploy-to-pages]
+    if: always()
+    steps:
+      - name: Generate overall summary
+        run: |
+          echo "# 📄 CI Documentation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Job Results" >> $GITHUB_STEP_SUMMARY
+          echo "- Validate Docs: ${{ needs.validate-docs.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Generate Docs: ${{ needs.generate-docs.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Deploy to Pages: ${{ needs.deploy-to-pages.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.validate-docs.result }}" == "success" ]; then
+            echo "## ✅ Documentation CI Completed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ⚠️ Documentation CI Completed with Warnings" >> $GITHUB_STEP_SUMMARY
+          fi

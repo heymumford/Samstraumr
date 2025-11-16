@@ -1,0 +1,183 @@
+name: CI Fast (Primary Gate)
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-fast-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: '21'
+
+jobs:
+  quick-compile:
+    name: Quick Compile Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      
+      - name: Setup Java 21
+        uses: ./.github/actions/setup-java-21
+      
+      - name: Compile project
+        run: mvn -B clean compile -DskipTests
+      
+      - name: Generate job summary
+        run: |
+          echo "## ✅ Quick Compile Check Passed" >> $GITHUB_STEP_SUMMARY
+          echo "Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+
+  static-analysis:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    needs: quick-compile
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      
+      - name: Setup Java 21
+        uses: ./.github/actions/setup-java-21
+      
+      - name: Run quality checks
+        uses: ./.github/actions/run-quality-checks
+      
+      - name: Generate job summary
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "## ✅ Static Analysis Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ❌ Static Analysis Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: quick-compile
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-environment
+      
+      - name: Run unit tests
+        run: ./s8r-test unit --parallel --coverage
+      
+      - name: Upload test results
+        uses: ./.github/actions/upload-test-results
+        with:
+          test-type: unit
+      
+      - name: Generate job summary
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "## ✅ Unit Tests Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ❌ Unit Tests Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  component-tests:
+    name: Component Tests
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-environment
+      
+      - name: Run component tests
+        run: ./s8r-test component --parallel
+      
+      - name: Upload test results
+        uses: ./.github/actions/upload-test-results
+        with:
+          test-type: component
+      
+      - name: Generate job summary
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "## ✅ Component Tests Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ❌ Component Tests Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  architecture-verification:
+    name: Architecture Compliance
+    runs-on: ubuntu-latest
+    needs: quick-compile
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      
+      - name: Setup Java 21
+        uses: ./.github/actions/setup-java-21
+      
+      - name: Verify Clean Architecture compliance
+        run: |
+          cd Samstraumr
+          mvn test -Dtest=CleanArchitectureComplianceTest,AcyclicDependencyTest
+      
+      - name: Upload architecture report
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: architecture-report
+          path: architecture-report.md
+          if-no-files-found: ignore
+      
+      - name: Generate job summary
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "## ✅ Architecture Verification Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ❌ Architecture Verification Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  ci-fast-summary:
+    name: CI Fast Summary
+    runs-on: ubuntu-latest
+    needs: [quick-compile, static-analysis, unit-tests, component-tests, architecture-verification]
+    if: always()
+    steps:
+      - name: Generate overall summary
+        run: |
+          echo "# 🚀 CI Fast (Primary Gate) Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Job Results" >> $GITHUB_STEP_SUMMARY
+          echo "- Quick Compile: ${{ needs.quick-compile.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Static Analysis: ${{ needs.static-analysis.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Unit Tests: ${{ needs.unit-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Component Tests: ${{ needs.component-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Architecture Verification: ${{ needs.architecture-verification.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check if all jobs succeeded
+          if [ "${{ needs.quick-compile.result }}" == "success" ] && \
+             [ "${{ needs.static-analysis.result }}" == "success" ] && \
+             [ "${{ needs.unit-tests.result }}" == "success" ] && \
+             [ "${{ needs.component-tests.result }}" == "success" ] && \
+             [ "${{ needs.architecture-verification.result }}" == "success" ]; then
+            echo "## ✅ All Fast CI Checks Passed!" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          else
+            echo "## ❌ Some Fast CI Checks Failed" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi

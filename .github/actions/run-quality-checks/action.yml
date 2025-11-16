@@ -1,0 +1,54 @@
+name: 'Run Quality Checks'
+description: 'Run static analysis tools (Checkstyle, PMD, SpotBugs) and custom checks'
+author: 'Samstraumr Team'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Run Checkstyle
+      shell: bash
+      run: |
+        echo "Running Checkstyle..."
+        mvn checkstyle:check || echo "::warning::Checkstyle found issues"
+    
+    - name: Run PMD
+      shell: bash
+      run: |
+        echo "Running PMD analysis..."
+        mvn pmd:check || echo "::warning::PMD found issues"
+    
+    - name: Run SpotBugs
+      shell: bash
+      run: |
+        echo "Running SpotBugs analysis..."
+        mvn spotbugs:check || echo "::warning::SpotBugs found issues"
+    
+    - name: Verify TODO format
+      shell: bash
+      run: |
+        if [ -f "./bin/util/scripts/check-todo-format.sh" ]; then
+          echo "Checking TODO format..."
+          ./bin/util/scripts/check-todo-format.sh || echo "::warning::TODO format issues found"
+        else
+          echo "TODO format check script not found, skipping"
+        fi
+    
+    - name: Check import organization
+      shell: bash
+      run: |
+        if [ -f "./bin/util/scripts/check-imports.sh" ]; then
+          echo "Checking import organization..."
+          ./bin/util/scripts/check-imports.sh || echo "::warning::Import organization issues found"
+        else
+          echo "Import check script not found, skipping"
+        fi
+    
+    - name: Check circular dependencies
+      shell: bash
+      run: |
+        if [ -f "./bin/util/scripts/check-circular-dependencies.sh" ]; then
+          echo "Checking for circular dependencies..."
+          ./bin/util/scripts/check-circular-dependencies.sh || echo "::warning::Circular dependency issues found"
+        else
+          echo "Circular dependency check script not found, skipping"
+        fi
