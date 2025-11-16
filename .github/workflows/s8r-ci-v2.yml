@@ -1,4 +1,6 @@
 name: S8r CI/CD Pipeline v2 (Optimized with Test Stage Separation)
+permissions:
+  contents: read
 
 on:
   push:
