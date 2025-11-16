@@ -1,0 +1,18 @@
+# Integration Test Container
+# For component, composite, and integration tests
+FROM test-base:latest
+
+LABEL description="Container for running integration tests (@L1_Component, @L2_Integration)"
+LABEL test-type="integration"
+
+# Integration tests may need more memory for complex scenarios
+ENV MAVEN_OPTS="${MAVEN_OPTS} -Xms512m -Xmx2g"
+
+# Enable parallel execution where possible
+ENV MAVEN_PARALLEL_THREADS=2
+
+# Set up test execution
+WORKDIR /workspace
+
+# Default command: run integration tests
+CMD ["sh", "-c", "bin/s8r-test integration"]

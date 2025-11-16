@@ -1,0 +1,18 @@
+# Contract Test Container
+# For verifying adapter implementations adhere to port interface contracts
+FROM test-base:latest
+
+LABEL description="Container for running contract tests (adapter contracts)"
+LABEL test-type="contract"
+
+# Contract tests can run in parallel as they're independent
+ENV MAVEN_PARALLEL_THREADS=4
+
+# Contract tests need minimal memory
+ENV MAVEN_OPTS="${MAVEN_OPTS} -Xms256m -Xmx1g"
+
+# Set up test execution
+WORKDIR /workspace
+
+# Default command: run adapter contract tests
+CMD ["sh", "-c", "mvn ${MAVEN_CLI_OPTS} test -Dtest=RunAdapterContractTests"]
