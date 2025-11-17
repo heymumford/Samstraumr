@@ -89,7 +89,7 @@ Licensed under the Mozilla Public License 2.0
     <dependency>
       <groupId>org.jetbrains</groupId>
       <artifactId>annotations</artifactId>
-      <version>24.1.0</version>
+      <version>26.0.2-1</version>
     </dependency>
     <!-- Additional dependencies needed for Environment and Identity classes -->
     <dependency>
