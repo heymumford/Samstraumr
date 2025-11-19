@@ -46,16 +46,16 @@ Licensed under the Mozilla Public License 2.0
     <!-- Core dependencies -->
     <archunit.version>1.4.0</archunit.version>
     <slf4j.version>2.0.17</slf4j.version>
-    <log4j.version>2.22.1</log4j.version>
-    <junit.version>5.12.1</junit.version>
+    <log4j.version>2.25.2</log4j.version>
+    <junit.version>6.0.1</junit.version>
     <junit.platform.version>1.10.1</junit.platform.version>
-    <cucumber.version>7.22.0</cucumber.version>
+    <cucumber.version>7.31.0</cucumber.version>
     <cucumber.reporting.version>5.7.7</cucumber.reporting.version>
     <mockito.version>5.8.0</mockito.version>
     <jackson.version>2.20.0</jackson.version>
     <oshi.version>6.4.1</oshi.version>
     <spotbugs.annotations.version>4.7.3</spotbugs.annotations.version>
-    <itextpdf.version>5.5.13.3</itextpdf.version>
+    <itextpdf.version>5.5.13.4</itextpdf.version>
     
     <!-- Plugin versions -->
     <pmd.plugin.version>3.26.0</pmd.plugin.version>
@@ -71,7 +71,7 @@ Licensed under the Mozilla Public License 2.0
     <spotless.google.format.version>1.19.2</spotless.google.format.version>
     <checkstyle.plugin.version>3.3.1</checkstyle.plugin.version>
     <checkstyle.version>10.23.0</checkstyle.version>
-    <spotbugs.plugin.version>4.8.3.0</spotbugs.plugin.version>
+    <spotbugs.plugin.version>4.9.8.1</spotbugs.plugin.version>
     <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
     <jacoco.line.coverage>0.80</jacoco.line.coverage>
     <jacoco.branch.coverage>0.80</jacoco.branch.coverage>
@@ -412,22 +412,22 @@ Licensed under the Mozilla Public License 2.0
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-core</artifactId>
-              <version>7.12.0</version>
+              <version>7.18.0</version>
             </dependency>
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-java</artifactId>
-              <version>7.12.0</version>
+              <version>7.18.0</version>
             </dependency>
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-javascript</artifactId>
-              <version>7.12.0</version>
+              <version>7.18.0</version>
             </dependency>
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-jsp</artifactId>
-              <version>7.12.0</version>
+              <version>7.18.0</version>
             </dependency>
           </dependencies>
         </plugin>
