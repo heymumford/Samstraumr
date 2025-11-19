@@ -16,7 +16,6 @@
 package org.s8r.domain.identity;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -32,22 +31,33 @@ public final class ComponentId {
   private final Instant creationTime;
   private final String shortId;
   private final List<String> lineage;
-  private UUID parentId; // Can be null for root components
+  private final UUID parentId; // Can be null for root components
 
   private ComponentId(UUID id, String reason, Instant creationTime, List<String> lineage) {
     this.id = Objects.requireNonNull(id, "ID cannot be null");
     this.reason = Objects.requireNonNull(reason, "Reason cannot be null");
     this.creationTime = Objects.requireNonNull(creationTime, "Creation time cannot be null");
     this.shortId = id.toString().substring(0, 8);
-    this.lineage = lineage != null ? new ArrayList<>(lineage) : new ArrayList<>();
+    this.lineage = lineage != null ? List.copyOf(lineage) : List.of();
+    this.parentId = computeParentId(this.lineage);
+  }
 
-    // Extract parentId from lineage if available
-    if (!this.lineage.isEmpty()) {
-      try {
-        this.parentId = UUID.fromString(this.lineage.get(this.lineage.size() - 1));
-      } catch (IllegalArgumentException e) {
-        // Invalid UUID in lineage, leaving parentId as null
-      }
+  /**
+   * Computes the parent ID from lineage.
+   *
+   * @param lineage The lineage list
+   * @return The parent UUID if available in lineage, null otherwise
+   */
+  private static UUID computeParentId(List<String> lineage) {
+    if (lineage == null || lineage.isEmpty()) {
+      return null;
+    }
+
+    try {
+      return UUID.fromString(lineage.get(lineage.size() - 1));
+    } catch (IllegalArgumentException e) {
+      // Invalid UUID in lineage, return null
+      return null;
     }
   }
 
