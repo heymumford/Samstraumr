@@ -1,0 +1,79 @@
+# Pre-commit hooks for Samstraumr
+# Install: pip install pre-commit
+# Setup: pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # Code formatting
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '\.md$'
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: ['--unsafe']  # Allow custom tags in workflows
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: detect-private-key
+      - id: mixed-line-ending
+
+  # Java formatting with Spotless
+  - repo: local
+    hooks:
+      - id: spotless-check
+        name: Spotless Check (Java Format)
+        entry: mvn spotless:check -q
+        language: system
+        files: \.java$
+        pass_filenames: false
+
+      - id: maven-compile
+        name: Maven Compile Check
+        entry: mvn clean compile -DskipTests -q
+        language: system
+        files: '(\.java$|pom\.xml$)'
+        pass_filenames: false
+
+      - id: checkstyle
+        name: Checkstyle
+        entry: mvn checkstyle:check -q
+        language: system
+        files: \.java$
+        pass_filenames: false
+
+  # Security scanning (lightweight for pre-commit)
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: 'pom\.xml|\.lock$'
+
+  # YAML validation
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.33.0
+    hooks:
+      - id: yamllint
+        args: ['-d', '{extends: default, rules: {line-length: {max: 120}}}']
+        files: '\.ya?ml$'
+
+# Optional: More aggressive checks (uncomment to enable)
+# These are slower but catch more issues
+#   - repo: local
+#     hooks:
+#       - id: pmd-check
+#         name: PMD Analysis (Fast Mode)
+#         entry: mvn pmd:check -Dpmd.printFailingErrors=true -q
+#         language: system
+#         files: \.java$
+#         pass_filenames: false
+#
+#       - id: spotbugs-check
+#         name: SpotBugs Analysis (Main only)
+#         entry: mvn spotbugs:check -Dspotbugs.effort=Min -q
+#         language: system
+#         files: \.java$
+#         pass_filenames: false
