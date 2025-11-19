@@ -400,6 +400,6 @@ public class Component {
 
   @Override
   public String toString() {
-    return "Component[id=" + uniqueId + ", reason='" + reason + "', state=" + state + "]";
+    return "Component[id=" + uniqueId + ", reason='" + reason + "', state=" + getState() + "]";
   }
 }
