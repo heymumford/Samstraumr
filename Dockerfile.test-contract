@@ -15,4 +15,4 @@ ENV MAVEN_OPTS="${MAVEN_OPTS} -Xms256m -Xmx1g"
 WORKDIR /workspace
 
 # Default command: run adapter contract tests
-CMD ["sh", "-c", "mvn ${MAVEN_CLI_OPTS} test -Dtest=RunAdapterContractTests"]
+CMD ["sh", "-c", "mvn --batch-mode --errors --fail-at-end --show-version test -Dtest=RunAdapterContractTests"]

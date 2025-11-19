@@ -25,15 +25,23 @@ ENV MAVEN_OPTS="-XX:MaxRAMPercentage=75.0 \
                 -Xshare:on \
                 -Djava.security.egd=file:/dev/./urandom"
 
-# Configure Maven
-ENV MAVEN_CONFIG=/root/.m2
+# Create non-root user for security
+RUN addgroup -g 1000 maven && \
+    adduser -u 1000 -G maven -s /bin/sh -D maven
+
+# Configure Maven for maven user
+ENV MAVEN_CONFIG=/home/maven/.m2
 ENV MAVEN_CLI_OPTS="--batch-mode --errors --fail-at-end --show-version"
 
-# Create Maven directories
-RUN mkdir -p ${MAVEN_CONFIG}
+# Create Maven and workspace directories with proper ownership
+RUN mkdir -p ${MAVEN_CONFIG} /workspace && \
+    chown -R maven:maven ${MAVEN_CONFIG} /workspace
 
 # Set working directory
 WORKDIR /workspace
+
+# Switch to non-root user
+USER maven
 
 # Pre-download common Maven plugins to cache them in the layer
 # This significantly speeds up subsequent builds
