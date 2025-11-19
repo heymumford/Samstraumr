@@ -11,7 +11,48 @@ Licensed under the Mozilla Public License 2.0
 
 # GitHub Copilot Instructions for Samstraumr
 
-This file provides guidance for GitHub Copilot when working on the Samstraumr repository.
+This file provides repository-wide guidance for GitHub Copilot when working on the Samstraumr repository.
+
+## Path-Specific Instructions
+
+For more targeted guidance, refer to the path-specific instruction files in `.github/instructions/`:
+
+- **[core.instructions.md](instructions/core.instructions.md)**: Instructions for core framework code (`modules/samstraumr-core/`)
+- **[tests.instructions.md](instructions/tests.instructions.md)**: Instructions for test code (`**/src/test/**`)
+- **[docs.instructions.md](instructions/docs.instructions.md)**: Instructions for documentation (`docs/**`, `*.md`)
+- **[scripts.instructions.md](instructions/scripts.instructions.md)**: Instructions for scripts and utilities (`bin/**`, `util/**`)
+
+These path-specific instructions automatically apply when working on files in their respective directories.
+
+## Working with Copilot Coding Agent
+
+### Issue Requirements
+
+When working on issues in this repository:
+
+- **Well-Defined Tasks**: Issues should have clear acceptance criteria and scope
+- **Test Requirements**: Include tests unless explicitly stated otherwise
+- **Documentation Updates**: Update relevant documentation when changing APIs or behavior
+- **Quality Checks**: All code must pass Spotless, Checkstyle, SpotBugs, and JaCoCo checks
+- **Iterative Review**: Be prepared to iterate based on PR review feedback
+
+### Suitable Tasks
+
+Copilot coding agent works well for:
+- ✅ Bug fixes with clear reproduction steps
+- ✅ New features with defined requirements
+- ✅ Test coverage improvements
+- ✅ Documentation updates and clarifications
+- ✅ Code refactoring within established patterns
+- ✅ Quality improvements (fixing linting, coverage issues)
+
+### Tasks Requiring Human Review
+
+- ⚠️ Security-critical changes (authentication, authorization)
+- ⚠️ Core lifecycle management modifications
+- ⚠️ Breaking API changes
+- ⚠️ Performance-critical optimizations
+- ⚠️ Complex architectural decisions
 
 ## Repository Overview
 
@@ -94,6 +135,8 @@ Tests are organized by type following the testing pyramid:
 - Follow BDD approach with Cucumber for behavioral tests
 - Use appropriate test categories/tags (@ATL for all tests)
 
+For comprehensive test development guidelines, see [tests.instructions.md](instructions/tests.instructions.md).
+
 ### Running Tests
 
 ```bash
@@ -165,6 +208,8 @@ Tests are organized by type following the testing pyramid:
 - Implement comprehensive validation at boundaries
 - Design for testability and isolation
 
+For detailed architecture and implementation guidelines for core framework code, see [core.instructions.md](instructions/core.instructions.md).
+
 ## Sensitive Areas
 
 ### Do Not Modify Without Explicit Permission
@@ -227,6 +272,8 @@ Tests are organized by type following the testing pyramid:
 - Use consistent formatting and style
 - Ensure all links are valid
 
+For comprehensive documentation guidelines including style, structure, and Javadoc standards, see [docs.instructions.md](instructions/docs.instructions.md).
+
 ## CLI Tools
 
 The repository provides several CLI tools for development:
@@ -236,6 +283,7 @@ The repository provides several CLI tools for development:
 - `./s8r-version`: Version management
 - `./s8r-quality-enhanced`: Enhanced quality checks
 - See [CLI Reference](../docs/reference/cli-reference.md) for complete list
+- See [scripts.instructions.md](instructions/scripts.instructions.md) for detailed script development guidelines
 
 ## Additional Resources
 
