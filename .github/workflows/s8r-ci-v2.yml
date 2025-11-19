@@ -44,27 +44,16 @@ jobs:
       env:
         MAVEN_OPTS: ${{ env.MAVEN_OPTS }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-environment
         with:
-          fetch-depth: 1
-
-      - name: Cache Maven dependencies
-        uses: actions/cache@v4
-        with:
-          path: /root/.m2/repository
-          key: maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            maven-
+          compile: 'true'
 
       - name: Validate Maven structure
         run: util/scripts/test/maven-structure-test.sh
 
       - name: Check circular dependencies
         run: util/scripts/check-circular-dependencies.sh
-
-      - name: Verify project compiles
-        run: mvn ${{ env.MAVEN_CLI_OPTS }} clean compile
 
       - name: Run quick linters
         run: |
@@ -85,16 +74,8 @@ jobs:
       env:
         MAVEN_OPTS: ${{ env.MAVEN_OPTS }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Cache Maven dependencies
-        uses: actions/cache@v4
-        with:
-          path: /root/.m2/repository
-          key: maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            maven-
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-environment
 
       - name: Run unit tests (parallel)
         run: bin/s8r-test unit --parallel --coverage
@@ -123,19 +104,10 @@ jobs:
       env:
         MAVEN_OPTS: ${{ env.MAVEN_OPTS }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Cache Maven dependencies
-        uses: actions/cache@v4
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-environment
         with:
-          path: /root/.m2/repository
-          key: maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            maven-
-
-      - name: Compile test classes
-        run: mvn ${{ env.MAVEN_CLI_OPTS }} test-compile
+          test-compile: 'true'
 
       - name: Run adapter contract tests
         run: |
@@ -165,16 +137,8 @@ jobs:
       env:
         MAVEN_OPTS: ${{ env.MAVEN_OPTS }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Cache Maven dependencies
-        uses: actions/cache@v4
-        with:
-          path: /root/.m2/repository
-          key: maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            maven-
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-environment
 
       - name: Run PMD analysis
         run: mvn ${{ env.MAVEN_CLI_OPTS }} pmd:check
@@ -202,16 +166,8 @@ jobs:
       env:
         MAVEN_OPTS: '${{ env.MAVEN_OPTS }} -Xmx2g'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Cache Maven dependencies
-        uses: actions/cache@v4
-        with:
-          path: /root/.m2/repository
-          key: maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            maven-
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-environment
 
       - name: Run component tests
         run: bin/s8r-test component --parallel
@@ -246,16 +202,8 @@ jobs:
       env:
         MAVEN_OPTS: ${{ env.MAVEN_OPTS }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Cache Maven dependencies
-        uses: actions/cache@v4
-        with:
-          path: /root/.m2/repository
-          key: maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            maven-
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-environment
 
       - name: Download all test results
         uses: actions/download-artifact@v6
@@ -311,16 +259,8 @@ jobs:
       env:
         MAVEN_OPTS: ${{ env.MAVEN_OPTS }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Cache Maven dependencies
-        uses: actions/cache@v4
-        with:
-          path: /root/.m2/repository
-          key: maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            maven-
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-environment
 
       - name: Generate documentation
         if: false  # TODO: Create bin/s8r-docs script

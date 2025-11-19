@@ -15,7 +15,8 @@ services:
   test-base:
     build:
       context: .
-      dockerfile: Dockerfile.test-base
+      dockerfile: Dockerfile.test
+      target: test-base
       cache_from:
         - test-base:latest
     image: test-base:latest
@@ -35,7 +36,8 @@ services:
   unit:
     build:
       context: .
-      dockerfile: Dockerfile.test-unit
+      dockerfile: Dockerfile.test
+      target: test-unit
       cache_from:
         - test-base:latest
         - test-unit:latest
@@ -55,7 +57,8 @@ services:
   contract:
     build:
       context: .
-      dockerfile: Dockerfile.test-contract
+      dockerfile: Dockerfile.test
+      target: test-contract
       cache_from:
         - test-base:latest
         - test-contract:latest
@@ -67,7 +70,8 @@ services:
     environment:
       - MAVEN_OPTS=-XX:MaxRAMPercentage=75.0 -XX:+UseG1GC
       - TEST_TYPE=contract
-    command: ["sh", "-c", "mvn --batch-mode --errors --fail-at-end --show-version test -Dtest=RunAdapterContractTests"]
+      - MAVEN_CLI_OPTS=--batch-mode --errors --fail-at-end --show-version
+    command: ["sh", "-c", "mvn $$MAVEN_CLI_OPTS test -Dtest=RunAdapterContractTests"]
     networks:
       - test-network
 
@@ -75,7 +79,8 @@ services:
   integration:
     build:
       context: .
-      dockerfile: Dockerfile.test-integration
+      dockerfile: Dockerfile.test
+      target: test-integration
       cache_from:
         - test-base:latest
         - test-integration:latest
