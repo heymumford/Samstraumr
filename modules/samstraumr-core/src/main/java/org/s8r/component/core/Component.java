@@ -29,6 +29,7 @@ import org.s8r.component.identity.Identity;
 import org.s8r.component.lifecycle.ComponentLifecycleManager;
 import org.s8r.component.logging.ComponentLogger;
 import org.s8r.component.termination.ComponentTerminationManager;
+import org.s8r.domain.exception.ComponentInitializationException;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -151,15 +152,17 @@ public class Component {
     componentLogger.debug("Initializing component...", "LIFECYCLE", "INIT");
 
     // Delegate to lifecycle manager
-    // Exceptions thrown in the callback are caught and logged to prevent inconsistent component state.
+    // Exceptions thrown in the callback are logged and propagated to prevent inconsistent state.
     lifecycleManager.initialize(() -> {
       try {
         // Setup termination timer when ready
         terminationManager.setupDefaultTerminationTimer(this::terminate);
         componentLogger.info("Component initialized and ready", "LIFECYCLE", "READY");
       } catch (Exception e) {
-        componentLogger.error("Exception during component initialization: " + e.getMessage(), "LIFECYCLE", "ERROR");
-        // Optionally, rethrow or handle as needed for your lifecycle guarantees
+        String errorMessage = "Component initialization failed: " + e.getClass().getSimpleName() + ": " +
+            (e.getMessage() != null ? e.getMessage() : "No message provided");
+        componentLogger.error(errorMessage, "LIFECYCLE", "ERROR");
+        throw new ComponentInitializationException(errorMessage, e);
       }
     });
   }
