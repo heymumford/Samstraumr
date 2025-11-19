@@ -12,7 +12,7 @@
 #   --fix     Auto-fix issues where possible (formatting)
 ###############################################################################
 
-set -e  # Exit on error
+set -euo pipefail  # Exit on error, undefined variables, pipe failures
 
 # Colors for output
 RED='\033[0;31m'
