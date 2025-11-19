@@ -1,0 +1,113 @@
+# Multi-stage Dockerfile for CI test execution
+# This consolidates all test stages into a single file to reduce maintenance burden
+
+###############################################
+# BASE STAGE - Common dependencies
+###############################################
+FROM maven:3.9-eclipse-temurin-21-alpine AS test-base
+
+LABEL maintainer="Samstraumr Project"
+LABEL description="Base stage for CI test execution"
+LABEL version="2.0.0"
+
+# Install additional tools needed for testing
+RUN apk add --no-cache \
+    git \
+    bash \
+    curl
+
+# Configure JVM optimizations for container environments
+# - MaxRAMPercentage: Use 75% of container memory for heap
+# - UseG1GC: Garbage collector optimized for containers
+# - UseStringDeduplication: Reduce memory usage from duplicate strings
+# - ExitOnOutOfMemoryError: Fail fast on OOM
+# - Xshare:on: Enable class data sharing for faster startup
+ENV MAVEN_OPTS="-XX:MaxRAMPercentage=75.0 \
+                -XX:+UseG1GC \
+                -XX:+UseStringDeduplication \
+                -XX:+ExitOnOutOfMemoryError \
+                -Xshare:on \
+                -Djava.security.egd=file:/dev/./urandom"
+
+# Configure Maven
+ENV MAVEN_CONFIG=/root/.m2
+ENV MAVEN_CLI_OPTS="--batch-mode --errors --fail-at-end --show-version"
+
+# Create Maven directories
+RUN mkdir -p ${MAVEN_CONFIG}
+
+# Set working directory
+WORKDIR /workspace
+
+# Pre-download common Maven plugins to cache them in the layer
+# This significantly speeds up subsequent builds
+RUN mvn org.apache.maven.plugins:maven-help-plugin:3.4.0:evaluate \
+    -Dexpression=project.version -q -DforceStdout || true
+
+# Health check for the container
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD java -version || exit 1
+
+# Default command (can be overridden)
+CMD ["/bin/bash"]
+
+###############################################
+# UNIT TEST STAGE
+###############################################
+FROM test-base AS test-unit
+
+LABEL description="Container for running unit tests (@L0_Unit)"
+LABEL test-type="unit"
+
+# Optimize for parallel unit test execution
+ENV MAVEN_PARALLEL_THREADS=4
+ENV CUCUMBER_PARALLEL_FACTOR=0.75
+
+# Unit tests typically don't need as much memory
+ENV MAVEN_OPTS="${MAVEN_OPTS} -Xms512m"
+
+# Set up test execution
+WORKDIR /workspace
+
+# Default command: run unit tests with parallel execution
+CMD ["sh", "-c", "bin/s8r-test unit --parallel"]
+
+###############################################
+# CONTRACT TEST STAGE
+###############################################
+FROM test-base AS test-contract
+
+LABEL description="Container for running contract tests (adapter contracts)"
+LABEL test-type="contract"
+
+# Contract tests can run in parallel as they're independent
+ENV MAVEN_PARALLEL_THREADS=4
+
+# Contract tests need minimal memory
+ENV MAVEN_OPTS="${MAVEN_OPTS} -Xms256m -Xmx1g"
+
+# Set up test execution
+WORKDIR /workspace
+
+# Default command: run adapter contract tests
+CMD ["sh", "-c", "mvn ${MAVEN_CLI_OPTS} test -Dtest=RunAdapterContractTests"]
+
+###############################################
+# INTEGRATION TEST STAGE
+###############################################
+FROM test-base AS test-integration
+
+LABEL description="Container for running integration tests (@L1_Component, @L2_Integration)"
+LABEL test-type="integration"
+
+# Integration tests may need more memory for complex scenarios
+ENV MAVEN_OPTS="${MAVEN_OPTS} -Xms512m -Xmx2g"
+
+# Enable parallel execution where possible
+ENV MAVEN_PARALLEL_THREADS=2
+
+# Set up test execution
+WORKDIR /workspace
+
+# Default command: run integration tests
+CMD ["sh", "-c", "bin/s8r-test integration"]
