@@ -1,0 +1,235 @@
+name: CI Scheduled (Weekly)
+permissions:
+  contents: read
+
+on:
+  schedule:
+    - cron: '0 2 * * 0'  # Sunday 2 AM UTC
+  workflow_dispatch:
+
+env:
+  JAVA_VERSION: '21'
+
+jobs:
+  multi-java-test:
+    name: Multi-Java Testing (Java ${{ matrix.java }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ['21', '17']
+      fail-fast: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+          cache: 'maven'
+      
+      - name: Set Java options for version ${{ matrix.java }}
+        run: |
+          if [ "${{ matrix.java }}" == "21" ]; then
+            echo "JAVA_OPTS=--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED" >> $GITHUB_ENV
+          else
+            echo "JAVA_OPTS=" >> $GITHUB_ENV
+          fi
+          echo "MAVEN_OPTS=-Xmx3072m" >> $GITHUB_ENV
+      
+      - name: Get version
+        id: get_version
+        run: |
+          if [ -f "./s8r-version" ]; then
+            VERSION=$(./s8r-version get | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' || echo "0.0.0")
+          elif [ -f "Samstraumr/version.properties" ]; then
+            VERSION=$(grep "samstraumr.version=" "Samstraumr/version.properties" | cut -d= -f2 | tr -d ' \t\n\r')
+          else
+            VERSION="0.0.0"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "::notice::Testing s8r v$VERSION on Java ${{ matrix.java }}"
+      
+      - name: Run full test suite
+        run: |
+          if [ -f "./s8r-test" ]; then
+            chmod +x ./s8r-test
+            ./s8r-test all
+          else
+            mvn -B clean verify
+          fi
+      
+      - name: Publish test results
+        uses: dorny/test-reporter@v2
+        if: always()
+        with:
+          name: JUnit Tests (Java ${{ matrix.java }})
+          path: '**/target/surefire-reports/TEST-*.xml'
+          reporter: java-junit
+          fail-on-error: false
+      
+      - name: Generate summary
+        if: always()
+        run: |
+          echo "## Java ${{ matrix.java }} Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "**Version**: ${{ steps.get_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Java**: ${{ matrix.java }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "**Status**: ✅ All tests passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Status**: ❌ Some tests failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  performance-benchmarks:
+    name: Performance Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      
+      - name: Setup Java 21
+        uses: ./.github/actions/setup-java-21
+      
+      - name: Build project
+        run: mvn -B clean install -DskipTests
+      
+      - name: Run performance tests
+        run: |
+          if [ -f "./s8r-test-port-performance" ]; then
+            chmod +x ./s8r-test-port-performance
+            ./s8r-test-port-performance all --report
+          else
+            echo "Performance test script not found, skipping"
+          fi
+        continue-on-error: true
+      
+      - name: Check performance regression
+        run: |
+          if [ -f "./bin/check-performance-regression.sh" ]; then
+            ./bin/check-performance-regression.sh
+          else
+            echo "Performance regression check script not found"
+            if [ -d "test-results/port-performance" ] && grep -q "FAIL" test-results/port-performance/*.md 2>/dev/null; then
+              echo "::warning::Performance regression detected!"
+              exit 1
+            fi
+          fi
+        continue-on-error: true
+      
+      - name: Upload performance report
+        uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: performance-report
+          path: test-results/port-performance/
+          if-no-files-found: ignore
+          retention-days: 90
+      
+      - name: Update baseline metrics
+        if: success()
+        run: |
+          mkdir -p performance-baselines
+          if [ -d "test-results/port-performance" ]; then
+            cp test-results/port-performance/port-performance-report-*.md performance-baselines/baseline-$(date +%Y%m%d).md 2>/dev/null || true
+          fi
+
+  smoke-tests:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      
+      - name: Setup test environment
+        uses: ./.github/actions/setup-test-environment
+      
+      - name: Get version
+        id: get_version
+        run: |
+          if [ -f "Samstraumr/version.properties" ]; then
+            VERSION=$(grep "samstraumr.version=" "Samstraumr/version.properties" | cut -d= -f2 | tr -d ' \t\n\r')
+          else
+            VERSION="0.0.0"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "::notice::Running smoke tests for s8r v$VERSION"
+      
+      - name: Run smoke tests (orchestration)
+        run: |
+          if [ -f "./s8r" ]; then
+            ./s8r test orchestration
+          elif [ -f "./s8r-test" ]; then
+            ./s8r-test orchestration
+          else
+            echo "Smoke test runner not found"
+            exit 1
+          fi
+      
+      - name: Publish test results
+        uses: dorny/test-reporter@v2
+        if: always()
+        with:
+          name: Smoke Tests
+          path: '**/target/surefire-reports/TEST-*.xml'
+          reporter: java-junit
+          fail-on-error: false
+      
+      - name: Generate summary
+        if: always()
+        run: |
+          echo "## 🔍 Smoke Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "**Version**: ${{ steps.get_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "**Status**: ✅ All smoke tests passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Status**: ❌ Smoke tests failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  dependency-update-check:
+    name: Dependency Update Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      
+      - name: Setup Java 21
+        uses: ./.github/actions/setup-java-21
+      
+      - name: Check for dependency updates
+        run: mvn versions:display-dependency-updates versions:display-plugin-updates
+        continue-on-error: true
+      
+      - name: Generate dependency update report
+        run: |
+          echo "## 📦 Dependency Update Check" >> $GITHUB_STEP_SUMMARY
+          echo "Run \`mvn versions:display-dependency-updates\` to see available updates" >> $GITHUB_STEP_SUMMARY
+
+  ci-scheduled-summary:
+    name: CI Scheduled Summary
+    runs-on: ubuntu-latest
+    needs: [multi-java-test, performance-benchmarks, smoke-tests, dependency-update-check]
+    if: always()
+    steps:
+      - name: Generate overall summary
+        run: |
+          echo "# 📅 CI Scheduled (Weekly) Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Run Date**: $(date -u +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Job Results" >> $GITHUB_STEP_SUMMARY
+          echo "- Multi-Java Testing: ${{ needs.multi-java-test.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Performance Benchmarks: ${{ needs.performance-benchmarks.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Smoke Tests: ${{ needs.smoke-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Dependency Update Check: ${{ needs.dependency-update-check.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.multi-java-test.result }}" == "success" ] && \
+             [ "${{ needs.smoke-tests.result }}" == "success" ]; then
+            echo "## ✅ Scheduled CI Checks Completed Successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ⚠️ Some Scheduled CI Checks Failed" >> $GITHUB_STEP_SUMMARY
+          fi

@@ -1,5 +1,5 @@
-name: 'Setup Test Environment'
-description: 'Setup complete test environment for Samstraumr with Java 21 and test utilities'
+name: 'Setup Java 21'
+description: 'Setup Java 21 with Maven caching and required module options for Samstraumr'
 author: 'Samstraumr Team'
 
 runs:
@@ -12,19 +12,14 @@ runs:
         distribution: 'temurin'
         cache: 'maven'
     
-    - name: Set Java and test options
+    - name: Set Java module options
       shell: bash
       run: |
-        # Java 21 module options
+        # Java 21 requires these module options for reflection access
         echo "JAVA_OPTS=--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED" >> $GITHUB_ENV
         echo "JAVA_TOOL_OPTIONS=--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED" >> $GITHUB_ENV
-        
-        # Maven options
         echo "MAVEN_OPTS=-Xmx3072m" >> $GITHUB_ENV
         echo "MAVEN_CLI_OPTS=--batch-mode --errors --fail-at-end --show-version" >> $GITHUB_ENV
-        
-        # Test options
-        echo "TEST_PARALLEL_THREADS=$(nproc)" >> $GITHUB_ENV
     
     - name: Cache Maven packages
       uses: actions/cache@v4
@@ -32,24 +27,15 @@ runs:
         path: |
           ~/.m2/repository
           !~/.m2/repository/org/samstraumr
-        key: ${{ runner.os }}-maven-test-${{ hashFiles('**/pom.xml') }}
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
-          ${{ runner.os }}-maven-test-
           ${{ runner.os }}-maven-
     
-    - name: Make test scripts executable
+    - name: Display environment
       shell: bash
       run: |
-        chmod +x ./s8r-test || true
-        chmod +x ./s8r-build || true
-        chmod +x ./s8r-version || true
-        chmod +x ./run-tests.sh || true
-    
-    - name: Display test environment
-      shell: bash
-      run: |
-        echo "Test Environment Information:"
-        echo "CPU cores: $(nproc)"
-        echo "Memory: $(free -h | grep Mem: | awk '{print $2}')"
-        echo "Test parallel threads: $TEST_PARALLEL_THREADS"
+        echo "Java version:"
         java -version
+        echo ""
+        echo "Maven version:"
+        mvn -version
