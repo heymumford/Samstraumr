@@ -20,6 +20,11 @@ package org.s8r.domain.machine;
  *
  * <p>This enum replaces magic strings used in machine state validation, providing type-safety and
  * refactoring support.
+ *
+ * <h2>Thread Safety</h2>
+ * <p>This enum is immutable and inherently thread-safe. All instances are created at class loading time,
+ * and no mutable state is exposed. It is safe for concurrent use by multiple threads without additional
+ * synchronization.
  */
 public enum MachineOperation {
   /** Initialize the machine, transitioning from CREATED to READY. */
