@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.s8r.domain.exception.InvalidMachineStateTransitionException;
 import org.s8r.domain.identity.ComponentId;
+import org.s8r.domain.machine.MachineOperation;
 import org.s8r.domain.machine.MachineState;
 
 /**
@@ -34,9 +35,9 @@ import org.s8r.domain.machine.MachineState;
 public class MachineStateValidator {
     // Map from current state to set of valid next states
     private static final Map<MachineState, Set<MachineState>> VALID_TRANSITIONS = createValidTransitionsMap();
-    
+
     // Map from operation to array of valid states for that operation
-    private static final Map<String, MachineState[]> VALID_STATES_BY_OPERATION = createValidStatesByOperationMap();
+    private static final Map<MachineOperation, MachineState[]> VALID_STATES_BY_OPERATION = createValidStatesByOperationMap();
     
     /**
      * Validates a state transition from one state to another.
@@ -73,25 +74,25 @@ public class MachineStateValidator {
      */
     public static void validateOperationState(
             ComponentId machineId,
-            String operation, 
+            MachineOperation operation,
             MachineState currentState) {
-        
+
         MachineState[] validStates = VALID_STATES_BY_OPERATION.get(operation);
-        
+
         if (validStates == null) {
             // If operation is not defined, default to modifiable states
             validStates = getModifiableStates();
         }
-        
+
         // Check if current state is in the valid states
         for (MachineState validState : validStates) {
             if (currentState == validState) {
                 return;
             }
         }
-        
+
         // If we get here, the operation is not allowed in the current state
-        throw new InvalidMachineStateTransitionException(machineId, operation, currentState, validStates);
+        throw new InvalidMachineStateTransitionException(machineId, operation.getOperationName(), currentState, validStates);
     }
     
     /**
@@ -119,21 +120,21 @@ public class MachineStateValidator {
      * @param currentState The current state to check
      * @return true if the operation is allowed, false otherwise
      */
-    public static boolean isOperationAllowed(String operation, MachineState currentState) {
+    public static boolean isOperationAllowed(MachineOperation operation, MachineState currentState) {
         MachineState[] validStates = VALID_STATES_BY_OPERATION.get(operation);
-        
+
         if (validStates == null) {
             // If operation is not defined, default to modifiable states
             validStates = getModifiableStates();
         }
-        
+
         // Check if current state is in the valid states
         for (MachineState validState : validStates) {
             if (currentState == validState) {
                 return true;
             }
         }
-        
+
         return false;
     }
     
@@ -154,7 +155,7 @@ public class MachineStateValidator {
      * @param operation The operation to check
      * @return Array of states in which the operation is allowed
      */
-    public static MachineState[] getValidStatesForOperation(String operation) {
+    public static MachineState[] getValidStatesForOperation(MachineOperation operation) {
         MachineState[] validStates = VALID_STATES_BY_OPERATION.get(operation);
         return validStates != null ? validStates.clone() : getModifiableStates();
     }
@@ -222,32 +223,32 @@ public class MachineStateValidator {
      *
      * @return Map from operation to array of valid states
      */
-    private static Map<String, MachineState[]> createValidStatesByOperationMap() {
-        Map<String, MachineState[]> map = new HashMap<>();
-        
+    private static Map<MachineOperation, MachineState[]> createValidStatesByOperationMap() {
+        Map<MachineOperation, MachineState[]> map = new EnumMap<>(MachineOperation.class);
+
         // Define valid states for each operation
-        map.put("initialize", new MachineState[] {MachineState.CREATED});
-        map.put("start", new MachineState[] {MachineState.READY, MachineState.STOPPED});
-        map.put("stop", new MachineState[] {MachineState.RUNNING});
-        map.put("pause", new MachineState[] {MachineState.RUNNING});
-        map.put("resume", new MachineState[] {MachineState.PAUSED});
-        map.put("reset", new MachineState[] {MachineState.ERROR, MachineState.STOPPED});
-        map.put("setErrorState", new MachineState[] {
+        map.put(MachineOperation.INITIALIZE, new MachineState[] {MachineState.CREATED});
+        map.put(MachineOperation.START, new MachineState[] {MachineState.READY, MachineState.STOPPED});
+        map.put(MachineOperation.STOP, new MachineState[] {MachineState.RUNNING});
+        map.put(MachineOperation.PAUSE, new MachineState[] {MachineState.RUNNING});
+        map.put(MachineOperation.RESUME, new MachineState[] {MachineState.PAUSED});
+        map.put(MachineOperation.RESET, new MachineState[] {MachineState.ERROR, MachineState.STOPPED});
+        map.put(MachineOperation.SET_ERROR_STATE, new MachineState[] {
             MachineState.CREATED, MachineState.READY, MachineState.RUNNING,
             MachineState.PAUSED, MachineState.STOPPED
         });
-        map.put("resetFromError", new MachineState[] {MachineState.ERROR});
-        map.put("destroy", new MachineState[] {
-            MachineState.CREATED, MachineState.READY, MachineState.RUNNING, 
+        map.put(MachineOperation.RESET_FROM_ERROR, new MachineState[] {MachineState.ERROR});
+        map.put(MachineOperation.DESTROY, new MachineState[] {
+            MachineState.CREATED, MachineState.READY, MachineState.RUNNING,
             MachineState.STOPPED, MachineState.PAUSED, MachineState.ERROR
         });
-        
+
         // Operations that modify machine components
         MachineState[] modifiableStates = getModifiableStates();
-        map.put("addComponent", modifiableStates);
-        map.put("removeComponent", modifiableStates);
-        map.put("setVersion", modifiableStates);
-        
+        map.put(MachineOperation.ADD_COMPONENT, modifiableStates);
+        map.put(MachineOperation.REMOVE_COMPONENT, modifiableStates);
+        map.put(MachineOperation.SET_VERSION, modifiableStates);
+
         return Collections.unmodifiableMap(map);
     }
     
