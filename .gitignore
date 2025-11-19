@@ -316,5 +316,8 @@ target/test-results/
 target/test-temp/
 target/reports/
 
+# Build reports
+build-reports/
+
 # Local Maven repository dependencies
 /lib/
