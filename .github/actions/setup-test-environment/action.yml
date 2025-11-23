@@ -15,9 +15,20 @@ runs:
     - name: Set Java and test options
       shell: bash
       run: |
-        # Detect Java version
-        JAVA_VERSION=$("$JAVA_HOME/bin/java" -version 2>&1 | awk -F[\"\ ] '/version/ {print $3}' | tr -d '"' | cut -d. -f1)
-        echo "Detected Java version: $JAVA_VERSION"
+        # Detect Java version (extract major version number)
+        JAVA_VERSION_OUTPUT=$("$JAVA_HOME/bin/java" -version 2>&1)
+        echo "Java version output: $JAVA_VERSION_OUTPUT"
+        
+        # Extract major version (handles both "1.8" and "11", "17", "21" formats)
+        JAVA_VERSION=$(echo "$JAVA_VERSION_OUTPUT" | grep -oP 'version \"(1\.)?(\d+)' | grep -oP '\d+' | head -1)
+        
+        # Validate version is numeric and set default if detection fails
+        if ! [[ "$JAVA_VERSION" =~ ^[0-9]+$ ]]; then
+          echo "Warning: Could not detect Java version, defaulting to 21"
+          JAVA_VERSION=21
+        fi
+        
+        echo "Detected Java major version: $JAVA_VERSION"
         
         # Set --add-opens flags only for Java 17+
         if [ "$JAVA_VERSION" -ge 17 ]; then
