@@ -158,7 +158,7 @@ public class Component {
         terminationManager.setupDefaultTerminationTimer(this::terminate);
         componentLogger.info("Component initialized and ready", "LIFECYCLE", "READY");
       } catch (Exception e) {
-        componentLogger.error("Exception during component initialization: " + e.getMessage(), "LIFECYCLE", "ERROR");
+        LOGGER.error("Exception during component initialization", e);
         throw new RuntimeException("Component initialization failed", e);
       }
     });
