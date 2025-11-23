@@ -151,15 +151,15 @@ public class Component {
     componentLogger.debug("Initializing component...", "LIFECYCLE", "INIT");
 
     // Delegate to lifecycle manager
-    // Exceptions thrown in the callback are caught and logged to prevent inconsistent component state.
+    // Exceptions thrown in the callback are caught, logged, and rethrown to prevent inconsistent component state.
     lifecycleManager.initialize(() -> {
       try {
         // Setup termination timer when ready
         terminationManager.setupDefaultTerminationTimer(this::terminate);
         componentLogger.info("Component initialized and ready", "LIFECYCLE", "READY");
       } catch (Exception e) {
-        componentLogger.error("Exception during component initialization: " + e.getMessage(), "LIFECYCLE", "ERROR");
-        // Optionally, rethrow or handle as needed for your lifecycle guarantees
+        LOGGER.error("Exception during component initialization", e);
+        throw new RuntimeException("Component initialization failed", e);
       }
     });
   }
