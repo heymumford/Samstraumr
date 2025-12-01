@@ -210,7 +210,7 @@ jobs:
           cache: 'maven'
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: java, javascript, python
           queries: security-and-quality
@@ -219,7 +219,7 @@ jobs:
         run: mvn ${{ env.MAVEN_CLI_OPTS }} clean compile -DskipTests
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: "/language:java"
 
