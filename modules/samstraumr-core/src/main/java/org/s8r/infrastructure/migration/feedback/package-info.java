@@ -45,4 +45,4 @@
  * <p>This package follows Clean Architecture principles by providing a domain-focused API for
  * migration feedback that is independent of the specific migration details.
  */
-package org.s8r.migration.feedback;
+package org.s8r.infrastructure.migration.feedback;

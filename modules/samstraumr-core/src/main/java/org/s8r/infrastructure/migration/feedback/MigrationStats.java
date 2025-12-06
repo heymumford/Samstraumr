@@ -13,7 +13,7 @@
  *     https://www.mozilla.org/en-US/MPL/2.0/
  */
 
-package org.s8r.migration.feedback;
+package org.s8r.infrastructure.migration.feedback;
 
 import java.util.Collections;
 import java.util.EnumMap;
