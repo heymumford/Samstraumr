@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       
       - name: Setup Java 21
         uses: ./.github/actions/setup-java-21
@@ -41,7 +41,7 @@ jobs:
     needs: quick-compile
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       
       - name: Setup Java 21
         uses: ./.github/actions/setup-java-21
@@ -64,7 +64,7 @@ jobs:
     needs: quick-compile
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       
       - name: Setup test environment
         uses: ./.github/actions/setup-test-environment
@@ -92,7 +92,7 @@ jobs:
     needs: unit-tests
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       
       - name: Setup test environment
         uses: ./.github/actions/setup-test-environment
@@ -120,7 +120,7 @@ jobs:
     needs: quick-compile
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       
       - name: Setup Java 21
         uses: ./.github/actions/setup-java-21
