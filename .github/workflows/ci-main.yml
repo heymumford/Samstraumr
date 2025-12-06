@@ -116,7 +116,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: unit-test-results
           path: |
@@ -169,7 +169,7 @@ jobs:
 
       - name: Upload PMD results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: pmd-results
           path: '**/target/pmd.xml'
@@ -177,7 +177,7 @@ jobs:
 
       - name: Upload SpotBugs results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: spotbugs-results
           path: '**/target/spotbugsXml.xml'
@@ -229,7 +229,7 @@ jobs:
 
       - name: Upload OWASP report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: owasp-report
           path: '**/target/dependency-check-report.html'
@@ -262,7 +262,7 @@ jobs:
 
       - name: Upload integration test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: integration-test-results
           path: '**/target/surefire-reports/'
@@ -294,7 +294,7 @@ jobs:
         run: mvn ${{ env.MAVEN_CLI_OPTS }} package -DskipTests
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: application-artifacts
           path: |
@@ -309,7 +309,7 @@ jobs:
 
       - name: Upload SBOM
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: sbom
           path: '**/target/bom.xml'
