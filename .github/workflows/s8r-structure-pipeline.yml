@@ -1,18 +1,9 @@
-name: s8r-structure-ci
+name: s8r-structure-ci (DEPRECATED)
 
-run-name: S8r Structure CI
+run-name: S8r Structure CI (DEPRECATED)
 
+# DISABLED: CLI script testing moved to local pre-push hook
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 's8r*'
-      - '.github/workflows/s8r-structure-pipeline.yml'
-  pull_request:
-    types: [opened, synchronize, reopened]
-    paths:
-      - 's8r*'
-      - '.github/workflows/s8r-structure-pipeline.yml'
   workflow_dispatch: # Manual trigger
 
 jobs:

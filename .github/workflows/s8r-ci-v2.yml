@@ -1,20 +1,10 @@
-name: S8r CI/CD Pipeline v2 (Optimized with Test Stage Separation)
+name: S8r CI/CD Pipeline v2 (DEPRECATED - Use ci.yml)
 permissions:
   contents: read
 
+# DISABLED: This workflow is superseded by ci.yml
+# Kept for reference only - can be triggered manually if needed
 on:
-  push:
-    branches: [ main ]
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - '.github/ISSUE_TEMPLATE/**'
-  pull_request:
-    branches: [ main ]
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - '.github/ISSUE_TEMPLATE/**'
   workflow_dispatch:
     inputs:
       run_checks:

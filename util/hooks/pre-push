@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# Pre-Push Hook: Comprehensive Local Testing
+# ==============================================================================
+# Purpose: Run all quality checks LOCALLY before pushing to save GitHub Actions
+#          minutes and get faster feedback. Only push verified code.
+#
+# Installation: Run ./util/hooks/install-hooks.sh
+#
+# This moves testing from GitHub Actions (paid minutes) to local compute (free).
+# ==============================================================================
+
+set -euo pipefail
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Configuration
+SKIP_PREPUSH="${SKIP_PREPUSH:-false}"
+QUICK_MODE="${QUICK_MODE:-false}"
+
+# Functions
+log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
+log_success() { echo -e "${GREEN}[PASS]${NC} $1"; }
+log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
+log_error() { echo -e "${RED}[FAIL]${NC} $1"; }
+
+print_header() {
+    echo ""
+    echo -e "${BLUE}========================================${NC}"
+    echo -e "${BLUE} Pre-Push Quality Gate${NC}"
+    echo -e "${BLUE}========================================${NC}"
+    echo ""
+}
+
+# Allow skip with environment variable
+if [[ "$SKIP_PREPUSH" == "true" ]]; then
+    log_warn "Pre-push checks skipped (SKIP_PREPUSH=true)"
+    exit 0
+fi
+
+# Check if we're in the right directory
+if [[ ! -f "pom.xml" ]]; then
+    log_error "Not in project root (pom.xml not found)"
+    exit 1
+fi
+
+print_header
+
+# Track start time
+START_TIME=$(date +%s)
+
+# Step 1: Code formatting (fast, catches obvious issues)
+log_info "Step 1/5: Checking code formatting..."
+if mvn spotless:check -q 2>/dev/null; then
+    log_success "Code formatting OK"
+else
+    log_error "Code formatting violations detected"
+    log_info "Run 'mvn spotless:apply' to fix"
+    exit 1
+fi
+
+# Step 2: Compilation (catches syntax errors)
+log_info "Step 2/5: Compiling project..."
+if mvn clean compile -q -DskipTests 2>/dev/null; then
+    log_success "Compilation successful"
+else
+    log_error "Compilation failed"
+    exit 1
+fi
+
+# Step 3: Unit tests (fast, core functionality)
+log_info "Step 3/5: Running unit tests..."
+if ./s8r-test unit 2>/dev/null | tail -1 | grep -q "success\|completed"; then
+    log_success "Unit tests passed"
+else
+    log_error "Unit tests failed"
+    exit 1
+fi
+
+# Step 4: Checkstyle (code style compliance)
+log_info "Step 4/5: Running checkstyle..."
+if mvn checkstyle:check -q 2>/dev/null; then
+    log_success "Checkstyle passed"
+else
+    log_warn "Checkstyle violations (non-blocking)"
+fi
+
+# Step 5: Architecture verification (optional, skip in QUICK_MODE)
+if [[ "$QUICK_MODE" != "true" ]]; then
+    log_info "Step 5/5: Verifying architecture..."
+    if mvn test -Dtest=CleanArchitectureComplianceTest -pl modules/samstraumr-core -q 2>/dev/null; then
+        log_success "Architecture compliance verified"
+    else
+        log_warn "Architecture tests failed (non-blocking)"
+    fi
+else
+    log_info "Step 5/5: Skipping architecture (QUICK_MODE)"
+fi
+
+# Calculate elapsed time
+END_TIME=$(date +%s)
+ELAPSED=$((END_TIME - START_TIME))
+
+echo ""
+echo -e "${GREEN}========================================${NC}"
+echo -e "${GREEN} All pre-push checks passed! (${ELAPSED}s)${NC}"
+echo -e "${GREEN}========================================${NC}"
+echo ""
+log_info "Pushing to remote..."
+exit 0

@@ -1,7 +1,7 @@
-name: CI Pipeline (Primary)
+name: CI Pipeline (DEPRECATED - Use ci.yml)
 
-# Industry-standard CI/CD for Java/Maven projects
-# Follows best practices: fast feedback, comprehensive testing, quality gates
+# DEPRECATED: This workflow is superseded by ci.yml
+# Most checks now run locally via pre-push hook
 
 permissions:
   contents: read
@@ -9,18 +9,6 @@ permissions:
   pull-requests: write
 
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - '.github/ISSUE_TEMPLATE/**'
-  pull_request:
-    branches: [main]
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - '.github/ISSUE_TEMPLATE/**'
   workflow_dispatch:
     inputs:
       skip_tests:
@@ -69,14 +57,14 @@ jobs:
       - name: Validate Maven structure
         run: |
           mvn ${{ env.MAVEN_CLI_OPTS }} validate
-          if [ -f "bin/util/scripts/test/maven-structure-test.sh" ]; then
-            bin/util/scripts/test/maven-structure-test.sh
+          if [ -f "util/scripts/test/maven-structure-test.sh" ]; then
+            util/scripts/test/maven-structure-test.sh
           fi
 
       - name: Check circular dependencies
         run: |
-          if [ -f "bin/util/scripts/check-circular-dependencies.sh" ]; then
-            bin/util/scripts/check-circular-dependencies.sh
+          if [ -f "util/scripts/check-circular-dependencies.sh" ]; then
+            util/scripts/check-circular-dependencies.sh
           fi
 
       - name: Compile (verify build)

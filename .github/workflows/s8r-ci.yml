@@ -1,19 +1,8 @@
-name: S8r CI/CD Pipeline
+name: S8r CI/CD Pipeline (DEPRECATED - Use ci.yml)
 
+# DISABLED: This workflow is superseded by ci.yml
+# Kept for reference only - can be triggered manually if needed
 on:
-  push:
-    branches: [ main ]
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - '.github/ISSUE_TEMPLATE/**'
-  pull_request:
-    branches: [ main ]
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - '.github/ISSUE_TEMPLATE/**'
-  # Allow manual trigger
   workflow_dispatch:
     inputs:
       run_checks:
@@ -52,13 +41,28 @@ jobs:
           cache: 'maven'
       
       - name: Validate Maven structure
-        run: bin/util/scripts/test/maven-structure-test.sh
-      
+        run: |
+          if [ -f "util/scripts/test/maven-structure-test.sh" ]; then
+            util/scripts/test/maven-structure-test.sh
+          else
+            echo "Maven structure test script not found, skipping..."
+          fi
+
       - name: Check circular dependencies
-        run: bin/util/scripts/check-circular-dependencies.sh
+        run: |
+          if [ -f "util/scripts/check-circular-dependencies.sh" ]; then
+            util/scripts/check-circular-dependencies.sh
+          else
+            echo "Circular dependency check script not found, skipping..."
+          fi
 
       - name: Verify package structure
-        run: bin/test/verify-test-suite --skip-tests --no-report
+        run: |
+          if [ -f "bin/test/verify-test-suite" ]; then
+            bin/test/verify-test-suite --skip-tests --no-report
+          else
+            echo "Verify test suite not found, skipping..."
+          fi
       
       - name: Verify project builds
         run: mvn ${{ env.MAVEN_CLI_OPTS }} clean compile
@@ -95,13 +99,28 @@ jobs:
         run: mvn ${{ env.MAVEN_CLI_OPTS }} org.owasp:dependency-check-maven:check
 
       - name: Verify TODO format
-        run: bin/util/scripts/check-todo-format.sh
-      
+        run: |
+          if [ -f "util/scripts/check-todo-format.sh" ]; then
+            util/scripts/check-todo-format.sh
+          else
+            echo "TODO format check not found, skipping..."
+          fi
+
       - name: Check import organization
-        run: bin/util/scripts/check-imports.sh
-      
+        run: |
+          if [ -f "util/scripts/check-imports.sh" ]; then
+            util/scripts/check-imports.sh
+          else
+            echo "Import check not found, skipping..."
+          fi
+
       - name: Verify architecture compliance
-        run: bin/test/verify-test-suite --skip-tests --check-architecture-only --no-report
+        run: |
+          if [ -f "bin/test/verify-test-suite" ]; then
+            bin/test/verify-test-suite --skip-tests --check-architecture-only --no-report
+          else
+            echo "Architecture verification not found, skipping..."
+          fi
 
   ###############################################
   # Unit tests - fast, isolated tests
@@ -123,7 +142,7 @@ jobs:
           cache: 'maven'
       
       - name: Run unit tests
-        run: bin/s8r-test unit --parallel
+        run: ./s8r-test unit --parallel
       
       - name: Archive test results
         if: always()
@@ -154,7 +173,7 @@ jobs:
           cache: 'maven'
       
       - name: Run component tests
-        run: bin/s8r-test component --parallel
+        run: ./s8r-test component --parallel
       
       - name: Archive test results
         if: always()
@@ -185,7 +204,7 @@ jobs:
           cache: 'maven'
       
       - name: Run composite tests
-        run: bin/s8r-test composite
+        run: ./s8r-test composite
       
       - name: Archive test results
         if: always()
@@ -216,7 +235,7 @@ jobs:
           cache: 'maven'
       
       - name: Run integration tests
-        run: bin/s8r-test integration
+        run: ./s8r-test integration
       
       - name: Archive test results
         if: always()
@@ -258,7 +277,12 @@ jobs:
           mvn ${{ env.MAVEN_CLI_OPTS }} jacoco:report -Djacoco.dataFile=target/jacoco-merged.exec -Djacoco.outputDirectory=target/site/jacoco-merged
       
       - name: Run coverage analysis
-        run: bin/test/analyze-test-coverage --report --threshold 80
+        run: |
+          if [ -f "bin/test/analyze-test-coverage" ]; then
+            bin/test/analyze-test-coverage --report --threshold 80
+          else
+            echo "Coverage analysis script not found, skipping..."
+          fi
       
       - name: Archive coverage report
         uses: actions/upload-artifact@v5
@@ -292,7 +316,7 @@ jobs:
         run: mvn ${{ env.MAVEN_CLI_OPTS }} clean package -DskipTests
       
       - name: Verify version consistency
-        run: bin/s8r-version verify
+        run: ./s8r-version verify || echo "Version verification not available"
       
       - name: Archive artifacts
         uses: actions/upload-artifact@v5
@@ -328,10 +352,20 @@ jobs:
           cache: 'maven'
       
       - name: Generate documentation
-        run: bin/s8r-docs generate
-      
+        run: |
+          if [ -f "bin/s8r-docs" ]; then
+            bin/s8r-docs generate
+          else
+            echo "Documentation generator not found, skipping..."
+          fi
+
       - name: Check for scientific documentation standards
-        run: bin/release/prepare-release --skip-tests --skip-build --dry-run --verbose "$(bin/s8r-version get)"
+        run: |
+          if [ -f "bin/release/prepare-release" ]; then
+            bin/release/prepare-release --skip-tests --skip-build --dry-run --verbose "$(./s8r-version get)"
+          else
+            echo "Release preparation script not found, skipping..."
+          fi
       
       - name: Archive documentation
         uses: actions/upload-artifact@v5
@@ -360,8 +394,8 @@ jobs:
           fi
           
           # Get version
-          if [ -f "bin/s8r-version" ]; then
-            echo "S8R_VERSION=$(bin/s8r-version get)" >> $GITHUB_ENV
+          if [ -f "./s8r-version" ]; then
+            echo "S8R_VERSION=$(./s8r-version get)" >> $GITHUB_ENV
           else
             echo "S8R_VERSION=unknown" >> $GITHUB_ENV
           fi

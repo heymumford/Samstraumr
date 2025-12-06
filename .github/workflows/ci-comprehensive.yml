@@ -1,11 +1,11 @@
-name: CI Comprehensive (Main Branch)
+name: CI Comprehensive (DEPRECATED - Use ci.yml)
 
 permissions:
   contents: read
 
+# DISABLED: This workflow is superseded by ci.yml
+# Kept for reference only - can be triggered manually if needed
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 env:

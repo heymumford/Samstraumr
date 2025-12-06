@@ -1,13 +1,11 @@
-name: s8r-ci
+name: s8r-ci (DEPRECATED - Use ci.yml)
 
-run-name: s8r-ci
+run-name: s8r-ci (DEPRECATED)
 
+# DISABLED: This workflow is superseded by ci.yml
+# Kept for reference only - can be triggered manually if needed
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    types: [opened, synchronize, reopened]
-  workflow_dispatch: # Manual trigger
+  workflow_dispatch: # Manual trigger only
 
 jobs:
   # Basic compilation and verification - keeping it simple for TDD development

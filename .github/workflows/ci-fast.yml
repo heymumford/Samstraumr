@@ -1,8 +1,11 @@
-name: CI Fast (Primary Gate)
+name: CI Fast (Branch Validation)
 
+# Runs on all branches to validate before merge
+# Main branch uses ci.yml for full validation
 on:
   push:
-    branches: ['**']
+    branches-ignore:
+      - main  # main is validated by ci.yml
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened]
