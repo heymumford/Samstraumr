@@ -15,6 +15,25 @@ Licensed under the Mozilla Public License 2.0
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [3.1.1] - 2025-11-19
+
+### Changed
+- Documentation version alignment across all markdown and POM files
+- Updated Maven coordinates in README and examples to reflect current release
+- Synchronized CLAUDE.md with actual release version from version.properties
+
+### Fixed
+- Version drift between modules/version.properties (3.1.1) and documentation (3.0.5, 3.0.2)
+- Inconsistent version references in README.md, CLAUDE.md, and supporting documentation
+- Outdated version badge in README.md causing user confusion
+
+### Documentation
+- Created VERSION_ALIGNMENT_PLAN.md for systematic version synchronization
+- Added comprehensive validation strategy for version consistency
+- Documented version update process for future releases
+
 ## [3.0.2] - 2025-04-08
 
 ### Added

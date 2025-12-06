@@ -7,12 +7,12 @@
     <parent>
         <groupId>org.s8r</groupId>
         <artifactId>samstraumr-parent</artifactId>
-        <version>3.0.2</version>
+        <version>3.1.1</version>
         <relativePath>..</relativePath>
     </parent>
     
     <artifactId>port-interfaces-test</artifactId>
-    <version>1.0.0</version>
+    <version>3.1.1</version>
     <name>Samstraumr Port Interfaces Test Module</name>
     <description>Test module for port interface tests</description>
     
@@ -24,7 +24,7 @@
         <dependency>
             <groupId>org.s8r</groupId>
             <artifactId>samstraumr-core</artifactId>
-            <version>3.0.2</version>
+            <version>3.1.1</version>
         </dependency>
         
         <!-- Cucumber Dependencies -->

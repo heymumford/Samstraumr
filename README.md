@@ -3,7 +3,7 @@
 
 In a world where scientific simulations and complex applications drown in tangled object hierarchies, Samstraumr emerges as a breath of fresh air—a flowing river of clarity cutting through chaotic code landscapes. It liberates researchers and engineers from the tyranny of rigid, brittle systems that collapse under their own complexity, offering instead a living architecture that breathes, adapts, and heals like natural organisms. By weaving together composable units that communicate through elegant event flows rather than tight coupling, Samstraumr empowers scientists to focus on discovery rather than debugging, enabling simulations that evolve alongside insight and code that transforms as gracefully as the natural systems it often models.
 
-[![Version](https://img.shields.io/badge/version-3.0.5-blue)](https://github.com/heymumford/Samstraumr/releases) 
+[![Version](https://img.shields.io/badge/version-3.1.1-blue)](https://github.com/heymumford/Samstraumr/releases) 
 [![Build Status](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml/badge.svg)](https://github.com/heymumford/Samstraumr/actions/workflows/samstraumr-pipeline.yml) 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) 
 [![Java](https://img.shields.io/badge/Java-21-orange)](https://openjdk.org/projects/jdk/21/) 
@@ -118,7 +118,7 @@ Maven dependency:
 <dependency>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-core</artifactId>
-    <version>3.0.5</version>
+    <version>3.1.1</version>
 </dependency>
 ```
 
