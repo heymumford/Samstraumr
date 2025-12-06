@@ -18,9 +18,11 @@ package org.s8r.domain.component;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.s8r.domain.event.ComponentCreatedEvent;
 import org.s8r.domain.event.ComponentDataEvent;
@@ -42,6 +44,7 @@ public class Component {
   private final List<String> activityLog = new ArrayList<>();
   private final Instant creationTime = Instant.now();
   private final List<DomainEvent> domainEvents = new ArrayList<>();
+  private final Map<String, Object> properties = new ConcurrentHashMap<>();
 
   /**
    * Creates a new Component with the default type.
@@ -305,6 +308,16 @@ public class Component {
   public void publishData(String channel, String key, Object value) {
     logActivity("Publishing data to channel: " + channel + " with key: " + key);
     raiseEvent(ComponentDataEvent.createSingleValue(id, channel, key, value));
+  }
+
+  // Property management
+  /**
+   * Gets all properties of this component.
+   *
+   * @return An unmodifiable map of property names to values
+   */
+  public Map<String, Object> getProperties() {
+    return Collections.unmodifiableMap(properties);
   }
 
   // Object methods overrides
