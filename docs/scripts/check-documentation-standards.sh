@@ -313,10 +313,12 @@ main() {
         echo "  -h, --help     Show this help message"
         echo "  -f, --fix      Fix violations where possible"
         echo "  -c, --check CHECK Run only the specified check:"
+        echo "                   all - Run all checks (default)"
         echo "                   filenames - Check file naming conventions"
         echo "                   headers - Check header formatting"
         echo "                   code_blocks - Check code block language specifiers"
         echo "                   broken_links - Check for broken cross-references"
+        echo "  --report FILE  Write report to FILE (ignored, for CI compatibility)"
         echo ""
         exit 0
         ;;
@@ -325,13 +327,20 @@ main() {
         shift
         ;;
       -c|--check)
-        if [[ -n "$2" && "$2" =~ ^(filenames|headers|code_blocks|broken_links)$ ]]; then
-          specific_check="$2"
+        if [[ -n "$2" && "$2" =~ ^(filenames|headers|code_blocks|broken_links|all)$ ]]; then
+          # "all" means run all checks (leave specific_check empty)
+          if [[ "$2" != "all" ]]; then
+            specific_check="$2"
+          fi
           shift 2
         else
           error "Invalid or missing check name for --check option"
           exit 1
         fi
+        ;;
+      --report)
+        # Accept but ignore --report argument (for CI compatibility)
+        shift 2
         ;;
       *)
         error "Unknown option: $1"
