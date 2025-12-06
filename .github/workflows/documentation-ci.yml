@@ -1,23 +1,9 @@
 name: Documentation CI
 
+# Documentation checks run locally via pre-push hooks, not on GitHub CI
+# Use workflow_dispatch for manual runs or release triggers only
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - '**.md'
-      - 'docs/**'
-      - 'Samstraumr/samstraumr-core/src/main/java/**/*.java'
-      - '.github/workflows/documentation-ci.yml'
-      - '.github/workflows/mlc_config.json'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - '**.md'
-      - 'docs/**'
-      - 'Samstraumr/samstraumr-core/src/main/java/**/*.java'
-      - '.github/workflows/documentation-ci.yml'
-      - '.github/workflows/mlc_config.json'
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch:  # Manual trigger only
   release:
     types: [published, prereleased]  # Run on release publication
 
