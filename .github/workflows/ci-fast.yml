@@ -127,8 +127,8 @@ jobs:
       
       - name: Verify Clean Architecture compliance
         run: |
-          cd Samstraumr
-          mvn test -Dtest=CleanArchitectureComplianceTest,AcyclicDependencyTest
+          # Architecture tests are in modules/samstraumr-core
+          mvn test -Dtest=CleanArchitectureComplianceTest,AcyclicDependencyTest -pl modules/samstraumr-core
       
       - name: Upload architecture report
         if: always()
