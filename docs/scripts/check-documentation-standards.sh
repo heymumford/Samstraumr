@@ -186,8 +186,8 @@ check_code_blocks() {
     local rel_path="${file#${PROJECT_ROOT}/}"
     local file_violations=0
     
-    # Extract line numbers where code blocks start
-    grep -n "^```$" "$file" | while read -r line; do
+    # Extract line numbers where code blocks start (use single quotes for literal backticks)
+    grep -n '^```$' "$file" | while read -r line; do
       local line_num=$(echo "$line" | cut -d: -f1)
       echo "- \`$rel_path:$line_num\` - Code block without language specifier" >> "$report_file"
       file_violations=$((file_violations + 1))
