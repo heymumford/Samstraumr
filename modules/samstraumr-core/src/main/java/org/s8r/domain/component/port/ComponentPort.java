@@ -87,6 +87,13 @@ public interface ComponentPort {
   List<String> getActivityLog();
 
   /**
+   * Gets all properties of the component.
+   *
+   * @return An unmodifiable map of property names to values
+   */
+  Map<String, Object> getProperties();
+
+  /**
    * Gets the component's creation time.
    *
    * @return The instant when the component was created

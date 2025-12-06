@@ -50,7 +50,7 @@ function fn() {
   }
   
   var config = {
-    s8rVersion: '3.0.2',
+    s8rVersion: '3.1.1',
     baseUrl: 'http://localhost:8080',
     timeoutMs: 5000,
     

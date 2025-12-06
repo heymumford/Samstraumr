@@ -260,7 +260,7 @@ public class Component {
       // Begin termination in lifecycle
       if (lifecycleManager.beginTermination()) {
         // Execute cleanup
-        cleanupCallback.accept(() -> {});
+        cleanupCallback.run();
         // Complete termination
         lifecycleManager.completeTermination();
       }

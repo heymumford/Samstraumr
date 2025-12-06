@@ -15,11 +15,31 @@ runs:
     - name: Set Java and test options
       shell: bash
       run: |
-        # Java 21 module options
-        echo "JAVA_OPTS=--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED" >> $GITHUB_ENV
-        echo "JAVA_TOOL_OPTIONS=--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED" >> $GITHUB_ENV
+        # Detect Java version (extract major version number)
+        JAVA_VERSION_OUTPUT=$("$JAVA_HOME/bin/java" -version 2>&1)
+        echo "Java version output: $JAVA_VERSION_OUTPUT"
         
-        # Maven options
+        # Extract major version (handles both "1.8" and "11", "17", "21" formats)
+        JAVA_VERSION=$(echo "$JAVA_VERSION_OUTPUT" | grep -oP 'version \"(1\.)?(\d+)' | grep -oP '\d+' | head -1)
+        
+        # Validate version is numeric and set default if detection fails
+        if ! [[ "$JAVA_VERSION" =~ ^[0-9]+$ ]]; then
+          echo "Warning: Could not detect Java version, defaulting to 21"
+          JAVA_VERSION=21
+        fi
+        
+        echo "Detected Java major version: $JAVA_VERSION"
+        
+        # Set --add-opens flags only for Java 17+
+        if [ "$JAVA_VERSION" -ge 17 ]; then
+          echo "Setting --add-opens flags for Java $JAVA_VERSION"
+          echo "JAVA_OPTS=--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED" >> $GITHUB_ENV
+          echo "JAVA_TOOL_OPTIONS=--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED" >> $GITHUB_ENV
+        else
+          echo "Java version $JAVA_VERSION does not require --add-opens flags"
+        fi
+        
+        # Always set Maven options
         echo "MAVEN_OPTS=-Xmx3072m" >> $GITHUB_ENV
         echo "MAVEN_CLI_OPTS=--batch-mode --errors --fail-at-end --show-version" >> $GITHUB_ENV
         

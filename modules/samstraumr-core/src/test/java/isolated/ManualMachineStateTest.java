@@ -16,6 +16,7 @@
 package isolated;
 
 import org.s8r.domain.identity.ComponentId;
+import org.s8r.domain.machine.MachineOperation;
 import org.s8r.domain.machine.MachineState;
 import org.s8r.domain.validation.MachineStateValidator;
 
@@ -38,12 +39,12 @@ public class ManualMachineStateTest {
         testStateTransition(machineId, MachineState.DESTROYED, MachineState.READY); // Invalid
         
         System.out.println("\nOperation validation:");
-        testOperationValidation(machineId, "initialize", MachineState.CREATED);
-        testOperationValidation(machineId, "initialize", MachineState.READY); // Invalid
-        testOperationValidation(machineId, "start", MachineState.READY);
-        testOperationValidation(machineId, "start", MachineState.RUNNING); // Invalid
-        testOperationValidation(machineId, "addComponent", MachineState.CREATED);
-        testOperationValidation(machineId, "addComponent", MachineState.RUNNING); // Invalid
+        testOperationValidation(machineId, MachineOperation.INITIALIZE, MachineState.CREATED);
+        testOperationValidation(machineId, MachineOperation.INITIALIZE, MachineState.READY); // Invalid
+        testOperationValidation(machineId, MachineOperation.START, MachineState.READY);
+        testOperationValidation(machineId, MachineOperation.START, MachineState.RUNNING); // Invalid
+        testOperationValidation(machineId, MachineOperation.ADD_COMPONENT, MachineState.CREATED);
+        testOperationValidation(machineId, MachineOperation.ADD_COMPONENT, MachineState.RUNNING); // Invalid
         
         System.out.println("\nValid next states:");
         printValidNextStates(MachineState.CREATED);
@@ -51,9 +52,9 @@ public class ManualMachineStateTest {
         printValidNextStates(MachineState.DESTROYED);
         
         System.out.println("\nValid states for operations:");
-        printValidStatesForOperation("initialize");
-        printValidStatesForOperation("start");
-        printValidStatesForOperation("destroy");
+        printValidStatesForOperation(MachineOperation.INITIALIZE);
+        printValidStatesForOperation(MachineOperation.START);
+        printValidStatesForOperation(MachineOperation.DESTROY);
         
         System.out.println("\nAll tests completed.");
     }
@@ -76,10 +77,10 @@ public class ManualMachineStateTest {
     }
     
     private static void testOperationValidation(
-            ComponentId machineId, String operation, MachineState state) {
+            ComponentId machineId, MachineOperation operation, MachineState state) {
         try {
             boolean isAllowed = MachineStateValidator.isOperationAllowed(operation, state);
-            
+
             if (isAllowed) {
                 MachineStateValidator.validateOperationState(machineId, operation, state);
                 System.out.println("✓ Operation '" + operation + "' is allowed in state " + state);
@@ -87,7 +88,7 @@ public class ManualMachineStateTest {
                 System.out.println("✗ Operation '" + operation + "' is not allowed in state " + state);
             }
         } catch (Exception e) {
-            System.out.println("✓ Operation '" + operation + "' is not allowed in state " + state + 
+            System.out.println("✓ Operation '" + operation + "' is not allowed in state " + state +
                     " and throws: " + e.getMessage());
         }
     }
@@ -101,7 +102,7 @@ public class ManualMachineStateTest {
         }
     }
     
-    private static void printValidStatesForOperation(String operation) {
+    private static void printValidStatesForOperation(MachineOperation operation) {
         System.out.println("Valid states for operation '" + operation + "':");
         MachineState[] validStates = MachineStateValidator.getValidStatesForOperation(operation);
         for (MachineState state : validStates) {

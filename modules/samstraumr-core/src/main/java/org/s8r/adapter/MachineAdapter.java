@@ -433,6 +433,11 @@ public class MachineAdapter {
       public List<String> getConnectionsFrom(String sourceName) {
         return Collections.emptyList();
       }
+
+      @Override
+      public Map<String, Object> getProperties() {
+        return Collections.emptyMap(); // Domain machine properties not exposed via this anonymous adapter
+      }
     };
   }
 
@@ -748,6 +753,11 @@ public class MachineAdapter {
       Map<String, List<String>> connections = machine.getConnections();
       return connections.getOrDefault(sourceName, Collections.emptyList());
     }
+
+    @Override
+    public Map<String, Object> getProperties() {
+      return Collections.emptyMap(); // Legacy component machines don't have properties
+    }
   }
 
   /**
@@ -1048,6 +1058,11 @@ public class MachineAdapter {
       // This operation would need a custom implementation using domain machine APIs
       return java.util.Collections.emptyList();
     }
+
+    @Override
+    public Map<String, Object> getProperties() {
+      return Collections.emptyMap(); // Domain machines don't expose properties through this adapter
+    }
   }
 
   /** Adapter that wraps a Composite to provide the CompositeComponentPort interface. */
@@ -1221,6 +1236,12 @@ public class MachineAdapter {
       // Deactivate is the closest operation
       composite.deactivate();
     }
+
+    @Override
+    public Map<String, Object> getProperties() {
+      // Legacy composites don't have a centralized properties map
+      return Collections.emptyMap();
+    }
   }
 
   /** Adapter that wraps a Component to provide the ComponentPort interface. */
@@ -1329,6 +1350,16 @@ public class MachineAdapter {
     public void terminate() {
       // Terminate the component
       component.terminate();
+    }
+
+    @Override
+    public Map<String, Object> getProperties() {
+      // Legacy components expose properties via property map
+      Map<String, Object> properties = new HashMap<>();
+      for (String key : component.getPropertyKeys()) {
+        properties.put(key, component.getProperty(key));
+      }
+      return Collections.unmodifiableMap(properties);
     }
   }
 

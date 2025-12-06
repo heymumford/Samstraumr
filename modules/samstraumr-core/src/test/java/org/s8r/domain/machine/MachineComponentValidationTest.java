@@ -41,14 +41,14 @@ class MachineComponentValidationTest {
     void addComponentShouldAddValidComponent() {
         // Given
         Machine machine = Machine.create(
-                ComponentId.createNew(), 
-                MachineType.PROCESSING, 
+                ComponentId.create("test-machine"), 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "Test Description", 
                 "1.0.0");
         
         CompositeComponent component = mock(CompositeComponent.class);
-        ComponentId componentId = ComponentId.createNew();
+        ComponentId componentId = ComponentId.create("test-component");
         when(component.getId()).thenReturn(componentId);
         
         // When
@@ -64,8 +64,8 @@ class MachineComponentValidationTest {
     void addComponentShouldThrowExceptionForNullComponent() {
         // Given
         Machine machine = Machine.create(
-                ComponentId.createNew(), 
-                MachineType.PROCESSING, 
+                ComponentId.create("test-machine"), 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "Test Description", 
                 "1.0.0");
@@ -81,14 +81,14 @@ class MachineComponentValidationTest {
     void removeComponentShouldRemoveExistingComponent() {
         // Given
         Machine machine = Machine.create(
-                ComponentId.createNew(), 
-                MachineType.PROCESSING, 
+                ComponentId.create("test-machine"), 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "Test Description", 
                 "1.0.0");
         
         CompositeComponent component = mock(CompositeComponent.class);
-        ComponentId componentId = ComponentId.createNew();
+        ComponentId componentId = ComponentId.create("test-component");
         when(component.getId()).thenReturn(componentId);
         machine.addComponent(component);
         
@@ -104,13 +104,13 @@ class MachineComponentValidationTest {
     void removeComponentShouldThrowExceptionForNonExistentComponent() {
         // Given
         Machine machine = Machine.create(
-                ComponentId.createNew(), 
-                MachineType.PROCESSING, 
+                ComponentId.create("test-machine"), 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "Test Description", 
                 "1.0.0");
         
-        ComponentId nonExistentId = ComponentId.createNew();
+        ComponentId nonExistentId = ComponentId.create("non-existent");
         
         // When / Then
         assertThrows(
@@ -123,13 +123,13 @@ class MachineComponentValidationTest {
     void getComponentShouldReturnEmptyForNonExistentComponent() {
         // Given
         Machine machine = Machine.create(
-                ComponentId.createNew(), 
-                MachineType.PROCESSING, 
+                ComponentId.create("test-machine"), 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "Test Description", 
                 "1.0.0");
         
-        ComponentId nonExistentId = ComponentId.createNew();
+        ComponentId nonExistentId = ComponentId.create("non-existent");
         
         // When / Then
         assertTrue(machine.getComponent(nonExistentId).isEmpty());
@@ -140,8 +140,8 @@ class MachineComponentValidationTest {
     void getComponentShouldThrowExceptionForNullComponentId() {
         // Given
         Machine machine = Machine.create(
-                ComponentId.createNew(), 
-                MachineType.PROCESSING, 
+                ComponentId.create("test-machine"), 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "Test Description", 
                 "1.0.0");
@@ -157,15 +157,15 @@ class MachineComponentValidationTest {
     void operationsShouldValidateComponentsBeforeExecution() {
         // Given
         Machine machine = Machine.create(
-                ComponentId.createNew(), 
-                MachineType.PROCESSING, 
+                ComponentId.create("test-machine"), 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "Test Description", 
                 "1.0.0");
         
         // Add a valid component
         CompositeComponent validComponent = mock(CompositeComponent.class);
-        ComponentId validId = ComponentId.createNew();
+        ComponentId validId = ComponentId.create("valid-component");
         when(validComponent.getId()).thenReturn(validId);
         machine.addComponent(validComponent);
         
@@ -187,8 +187,8 @@ class MachineComponentValidationTest {
     void machineShouldNotAllowOperationsInDestroyedState() {
         // Given
         Machine machine = Machine.create(
-                ComponentId.createNew(), 
-                MachineType.PROCESSING, 
+                ComponentId.create("test-machine"), 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "Test Description", 
                 "1.0.0");
@@ -199,7 +199,7 @@ class MachineComponentValidationTest {
         
         // When / Then - Operations should throw exceptions
         CompositeComponent component = mock(CompositeComponent.class);
-        when(component.getId()).thenReturn(ComponentId.createNew());
+        when(component.getId()).thenReturn(ComponentId.create("mock-component"));
         
         assertThrows(InvalidOperationException.class, () -> machine.addComponent(component));
         assertThrows(InvalidOperationException.class, () -> machine.start());

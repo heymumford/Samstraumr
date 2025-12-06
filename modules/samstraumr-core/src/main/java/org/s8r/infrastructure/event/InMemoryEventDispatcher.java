@@ -7,6 +7,7 @@ package org.s8r.infrastructure.event;
 import org.s8r.application.port.EventDispatcher;
 import org.s8r.application.port.EventHandler;
 import org.s8r.application.port.LoggerPort;
+import org.s8r.domain.event.DomainEvent;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -92,7 +93,7 @@ public class InMemoryEventDispatcher implements EventDispatcher {
     
     /**
      * Utility method to dispatch an event with a map of data
-     * 
+     *
      * @param eventType The type of event
      * @param eventData The event data
      * @return true if dispatched successfully
@@ -100,7 +101,7 @@ public class InMemoryEventDispatcher implements EventDispatcher {
     public boolean dispatchEvent(String eventType, Map<String, Object> eventData) {
         String source = (String) eventData.getOrDefault("source", "system");
         String payload = (String) eventData.getOrDefault("payload", "{}");
-        
+
         // Convert to string map for properties
         Map<String, String> properties = new HashMap<>();
         for (Map.Entry<String, Object> entry : eventData.entrySet()) {
@@ -108,7 +109,24 @@ public class InMemoryEventDispatcher implements EventDispatcher {
                 properties.put(entry.getKey(), entry.getValue().toString());
             }
         }
-        
+
         return dispatchEvent(eventType, source, payload, properties) > 0;
+    }
+
+    @Override
+    public void dispatch(DomainEvent event) {
+        if (event == null) {
+            if (logger != null) {
+                logger.warn("Attempted to dispatch null event");
+            }
+            return;
+        }
+
+        Map<String, String> properties = new HashMap<>();
+        properties.put("eventId", event.getEventId());
+        properties.put("timestamp", String.valueOf(event.getOccurredOn()));
+        properties.put("entityId", event.getSourceComponentId());
+
+        dispatchEvent(event.getEventType(), event.getSourceComponentId(), "{}", properties);
     }
 }

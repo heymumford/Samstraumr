@@ -33,6 +33,7 @@ import org.s8r.domain.component.port.ComponentPort;
 import org.s8r.domain.component.port.MachinePort;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.machine.Machine;
+import org.s8r.infrastructure.event.DataFlowEventAdapter;
 import org.s8r.domain.machine.MachineType;
 import org.s8r.infrastructure.config.ConfigurationAdapter;
 import org.s8r.infrastructure.event.DataFlowEventHandler;
@@ -76,7 +77,7 @@ public class TestFixtureFactory {
    * @return A DataFlowEventPort instance
    */
   public static DataFlowEventPort getDataFlowEventPort() {
-    return getCachedInstance("dataFlowPort", () -> new DataFlowEventHandler(getLogger()));
+    return getCachedInstance("dataFlowPort", () -> new DataFlowEventAdapter(getLogger()));
   }
 
   /**

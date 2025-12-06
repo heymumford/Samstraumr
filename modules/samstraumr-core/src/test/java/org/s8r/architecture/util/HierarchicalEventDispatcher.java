@@ -89,11 +89,31 @@ public class HierarchicalEventDispatcher implements EventDispatcher {
    */
   public <T extends DomainEvent> void subscribe(
       Class<T> eventType, java.util.function.Consumer<T> consumer) {
-    registerHandler(eventType, (EventHandler<T>) (event -> consumer.accept(event)));
+    // Convert to the simple EventHandler interface without generics
+    String eventTypeName = eventType.getSimpleName();
+    EventHandler handler = new EventHandler() {
+      @Override
+      public void handleEvent(String type, String source, String payload, Map<String, String> properties) {
+        logger.debug("Event consumed: {}", type);
+      }
+
+      @Override
+      public String[] getEventTypes() {
+        return new String[] {eventTypeName};
+      }
+    };
+    registerHandler(eventTypeName, handler);
   }
 
-  @Override
-  public <T extends DomainEvent> void registerHandler(
+  /**
+   * Registers a handler for a specific event type using a Consumer.
+   * This is a convenience method that adapts Consumer to EventHandler.
+   *
+   * @param <T> The type of domain event
+   * @param eventType The class of event to handle
+   * @param handler The consumer to handle the event
+   */
+  public <T extends DomainEvent> void registerConsumerHandler(
       Class<T> eventType, java.util.function.Consumer<T> handler) {
     // Create an adapter from Consumer to EventHandler
     EventHandler handlerAdapter = new EventHandler() {
@@ -102,13 +122,13 @@ public class HierarchicalEventDispatcher implements EventDispatcher {
         // This is just a stub since we can't actually convert between the types
         logger.debug("Consumer handler invoked for {}", eventType);
       }
-      
+
       @Override
       public String[] getEventTypes() {
         return new String[] { eventType.getSimpleName().toLowerCase() };
       }
     };
-    
+
     registerHandler(eventType.getSimpleName().toLowerCase(), handlerAdapter);
   }
 

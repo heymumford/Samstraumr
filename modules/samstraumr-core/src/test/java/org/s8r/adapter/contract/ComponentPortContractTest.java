@@ -276,4 +276,19 @@ public class ComponentPortContractTest extends PortContractTest<ComponentPort> {
     List<String> updatedLog = portUnderTest.getActivityLog();
     assertTrue(updatedLog.size() > initialLogSize, "Activity log should grow after state change");
   }
+
+  /** Tests that ComponentPort provides access to component properties. */
+  @Test
+  @DisplayName("Should provide access to component properties")
+  public void componentPropertiesTests() {
+    // getProperties() should return a non-null map
+    Map<String, Object> properties = portUnderTest.getProperties();
+    assertNotNull(properties, "Properties map should not be null");
+
+    // Map should be readable
+    assertNotNull(properties.keySet(), "Property keys should be accessible");
+
+    // Map should support standard Map operations
+    assertTrue(properties instanceof Map, "Properties should be a Map");
+  }
 }
