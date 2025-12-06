@@ -14,10 +14,10 @@
  */
 
 /**
- * Provides component-specific logging and tracing capabilities.
+ * Port interfaces for notification and event delivery abstractions.
  *
- * <p>This package is part of the domain layer and contains component-centric logging abstractions
- * that integrate with SLF4J/Log4j2 while maintaining component identity and hierarchical context in
- * log output.
+ * <p>This package is part of the application layer and defines port contracts for sending
+ * notifications and delivering events, allowing adapters to implement concrete notification
+ * strategies decoupled from application logic.
  */
-package org.s8r.component.logging;
+package org.s8r.application.port.notification;

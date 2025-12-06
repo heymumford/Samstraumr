@@ -16,8 +16,8 @@
 /**
  * Infrastructure layer caching implementations and strategies.
  *
- * <p>This package is part of the infrastructure layer and provides concrete implementations
- * of caching mechanisms including in-memory caches, distributed caching adapters, and
- * cache management utilities for performance optimization.
+ * <p>This package is part of the infrastructure layer and provides concrete implementations of
+ * caching mechanisms including in-memory caches, distributed caching adapters, and cache management
+ * utilities for performance optimization.
  */
 package org.s8r.infrastructure.cache;

@@ -16,8 +16,8 @@
 /**
  * Manages component lifecycle states and transitions.
  *
- * <p>This package is part of the domain layer and defines the biological-inspired lifecycle
- * state machine (CONCEPTION → CONFIGURING → SPECIALIZING → ACTIVE → TERMINATED) with
- * validation rules and transition logic for components.
+ * <p>This package is part of the domain layer and defines the biological-inspired lifecycle state
+ * machine (CONCEPTION → CONFIGURING → SPECIALIZING → ACTIVE → TERMINATED) with validation rules and
+ * transition logic for components.
  */
 package org.s8r.component.lifecycle;

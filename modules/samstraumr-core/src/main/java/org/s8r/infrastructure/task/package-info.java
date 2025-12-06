@@ -16,8 +16,8 @@
 /**
  * Infrastructure layer task execution and scheduling implementations.
  *
- * <p>This package is part of the infrastructure layer and provides concrete implementations
- * for task execution, scheduling, and orchestration including thread pools, job schedulers,
- * and asynchronous task processing mechanisms.
+ * <p>This package is part of the infrastructure layer and provides concrete implementations for
+ * task execution, scheduling, and orchestration including thread pools, job schedulers, and
+ * asynchronous task processing mechanisms.
  */
 package org.s8r.infrastructure.task;

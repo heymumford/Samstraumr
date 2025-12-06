@@ -14,10 +14,10 @@
  */
 
 /**
- * Provides component-specific logging and tracing capabilities.
+ * Application-level services for data persistence and storage operations.
  *
- * <p>This package is part of the domain layer and contains component-centric logging abstractions
- * that integrate with SLF4J/Log4j2 while maintaining component identity and hierarchical context in
- * log output.
+ * <p>This package is part of the application layer and implements use cases for managing data
+ * storage concerns including retrieval, persistence, and lifecycle management through port/adapter
+ * abstraction to infrastructure implementations.
  */
-package org.s8r.component.logging;
+package org.s8r.application.service.storage;

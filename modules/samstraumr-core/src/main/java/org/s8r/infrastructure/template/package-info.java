@@ -16,8 +16,8 @@
 /**
  * Infrastructure layer template engines and rendering implementations.
  *
- * <p>This package is part of the infrastructure layer and contains concrete adapters for
- * template processing engines such as Freemarker, Thymeleaf, or Mustache that implement
- * the template port interfaces.
+ * <p>This package is part of the infrastructure layer and contains concrete adapters for template
+ * processing engines such as Freemarker, Thymeleaf, or Mustache that implement the template port
+ * interfaces.
  */
 package org.s8r.infrastructure.template;

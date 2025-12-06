@@ -16,8 +16,8 @@
 /**
  * Infrastructure layer messaging and event distribution implementations.
  *
- * <p>This package is part of the infrastructure layer and provides concrete adapters for
- * message brokers and event systems including RabbitMQ, Kafka, or in-process event buses
- * that support inter-component communication.
+ * <p>This package is part of the infrastructure layer and provides concrete adapters for message
+ * brokers and event systems including RabbitMQ, Kafka, or in-process event buses that support
+ * inter-component communication.
  */
 package org.s8r.infrastructure.messaging;

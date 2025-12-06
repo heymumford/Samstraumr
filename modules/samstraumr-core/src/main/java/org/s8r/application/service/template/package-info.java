@@ -14,10 +14,10 @@
  */
 
 /**
- * Provides component-specific logging and tracing capabilities.
+ * Application-level services for template processing and rendering.
  *
- * <p>This package is part of the domain layer and contains component-centric logging abstractions
- * that integrate with SLF4J/Log4j2 while maintaining component identity and hierarchical context in
- * log output.
+ * <p>This package is part of the application layer and provides use cases for template management
+ * and rendering operations through port/adapter abstraction to infrastructure template
+ * implementations.
  */
-package org.s8r.component.logging;
+package org.s8r.application.service.template;

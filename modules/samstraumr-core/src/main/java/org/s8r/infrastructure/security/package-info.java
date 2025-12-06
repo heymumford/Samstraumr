@@ -16,8 +16,8 @@
 /**
  * Infrastructure layer security implementations including authentication and encryption.
  *
- * <p>This package is part of the infrastructure layer and provides concrete adapters for
- * security mechanisms including cryptography, authentication providers, authorization handlers,
- * and other security infrastructure concerns.
+ * <p>This package is part of the infrastructure layer and provides concrete adapters for security
+ * mechanisms including cryptography, authentication providers, authorization handlers, and other
+ * security infrastructure concerns.
  */
 package org.s8r.infrastructure.security;

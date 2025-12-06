@@ -16,8 +16,8 @@
 /**
  * Infrastructure layer storage backend implementations and adapters.
  *
- * <p>This package is part of the infrastructure layer and provides concrete implementations
- * of data storage including database adapters, object storage, document stores, and other
- * persistence mechanisms that fulfill storage port contracts.
+ * <p>This package is part of the infrastructure layer and provides concrete implementations of data
+ * storage including database adapters, object storage, document stores, and other persistence
+ * mechanisms that fulfill storage port contracts.
  */
 package org.s8r.infrastructure.storage;

@@ -16,8 +16,8 @@
 /**
  * Infrastructure layer filesystem access and file operations.
  *
- * <p>This package is part of the infrastructure layer and provides concrete implementations
- * for filesystem operations including file I/O, directory management, and file system
- * monitoring that adapt to external file system resources.
+ * <p>This package is part of the infrastructure layer and provides concrete implementations for
+ * filesystem operations including file I/O, directory management, and file system monitoring that
+ * adapt to external file system resources.
  */
 package org.s8r.infrastructure.filesystem;

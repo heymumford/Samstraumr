@@ -17,7 +17,7 @@
  * Handles graceful component termination and shutdown logic.
  *
  * <p>This package is part of the domain layer and provides mechanisms for managing component
- * lifecycle termination, cleanup resources, and executing shutdown handlers during the
- * TERMINATED state transition.
+ * lifecycle termination, cleanup resources, and executing shutdown handlers during the TERMINATED
+ * state transition.
  */
 package org.s8r.component.termination;

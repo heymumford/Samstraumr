@@ -16,8 +16,8 @@
 /**
  * Infrastructure layer validation implementations and rule engines.
  *
- * <p>This package is part of the infrastructure layer and provides concrete implementations
- * of validation strategies including constraint validators, rule engines, and validation
- * middleware that enforce domain validation rules.
+ * <p>This package is part of the infrastructure layer and provides concrete implementations of
+ * validation strategies including constraint validators, rule engines, and validation middleware
+ * that enforce domain validation rules.
  */
 package org.s8r.infrastructure.validation;
