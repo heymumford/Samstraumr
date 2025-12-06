@@ -1,14 +1,14 @@
-/*
-Filename: identity-tests.feature
-Purpose: Validates the identity system for Components
-Goals:
-  - Verify identity creation for Adam (root) and child components
-  - Test hierarchical addressing and query functionality
-  - Validate lineage tracking with multiple generations
-Dependencies:
-  - BDD step definitions in org.s8r.component.test.steps package
-  - Component and Identity implementations in org.s8r.component.identity
-*/
+# Filename: identity-tests.feature
+# Purpose: Validates the identity system for Components
+# Goals:
+# - Verify identity creation for Adam (root) and child components
+# - Test hierarchical addressing and query functionality
+# - Validate lineage tracking with multiple generations
+# Dependencies:
+# - BDD step definitions in org.s8r.component.test.steps package
+# - Component and Identity implementations in org.s8r.component.identity
+#
+
 
 @L0_Unit @Identity
 Feature: Component Identity Management

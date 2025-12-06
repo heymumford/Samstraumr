@@ -1,14 +1,14 @@
-/*
-Filename: machine-orchestration-tests.feature
-Purpose: Validates the orchestration capabilities of Machines
-Goals:
-  - Verify composite management within machines
-  - Test composite connectivity through the machine
-  - Validate machine lifecycle and state management
-Dependencies:
-  - BDD step definitions in org.s8r.component.test.steps package
-  - Machine, Composite and Component implementations in org.s8r.component
-*/
+# Filename: machine-orchestration-tests.feature
+# Purpose: Validates the orchestration capabilities of Machines
+# Goals:
+# - Verify composite management within machines
+# - Test composite connectivity through the machine
+# - Validate machine lifecycle and state management
+# Dependencies:
+# - BDD step definitions in org.s8r.component.test.steps package
+# - Machine, Composite and Component implementations in org.s8r.component
+#
+
 
 @L2_Integration
 Feature: Machine Orchestration

@@ -1,14 +1,14 @@
-/*
-Filename: composite-connectivity-tests.feature
-Purpose: Validates the connectivity and data flow aspects of Composites
-Goals:
-  - Verify component connection within composites
-  - Test data processing through connected components
-  - Validate transformation and validation patterns
-Dependencies:
-  - BDD step definitions in org.s8r.component.test.steps package
-  - Composite and Component implementations in org.s8r.component
-*/
+# Filename: composite-connectivity-tests.feature
+# Purpose: Validates the connectivity and data flow aspects of Composites
+# Goals:
+# - Verify component connection within composites
+# - Test data processing through connected components
+# - Validate transformation and validation patterns
+# Dependencies:
+# - BDD step definitions in org.s8r.component.test.steps package
+# - Composite and Component implementations in org.s8r.component
+#
+
 
 @L1_Component
 Feature: Composite Component Connectivity

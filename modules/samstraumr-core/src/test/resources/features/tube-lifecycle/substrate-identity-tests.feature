@@ -1,19 +1,19 @@
-/*
-Filename: substrate-identity-tests.feature
-Purpose: Validates the Substrate Identity aspects of the Tube Lifecycle model.
-Goals:
-  - Ensure tubes establish proper identity following the biological model
-  - Validate unique identification with immutable properties
-  - Test lineage management and hierarchical addressing
-  - Verify environmental context capture
-Dependencies:
-  - BDD step definitions in org.s8r.tube.lifecycle.steps package
-  - Tube and Environment implementations in org.s8r.tube
-Assumptions:
-  - Test environment provides stable resource conditions
-  - Cucumber test runner is properly configured
-  - Test tags are consistent with the test ontology
-*/
+# Filename: substrate-identity-tests.feature
+# Purpose: Validates the Substrate Identity aspects of the Tube Lifecycle model.
+# Goals:
+# - Ensure tubes establish proper identity following the biological model
+# - Validate unique identification with immutable properties
+# - Test lineage management and hierarchical addressing
+# - Verify environmental context capture
+# Dependencies:
+# - BDD step definitions in org.s8r.tube.lifecycle.steps package
+# - Tube and Environment implementations in org.s8r.tube
+# Assumptions:
+# - Test environment provides stable resource conditions
+# - Cucumber test runner is properly configured
+# - Test tags are consistent with the test ontology
+#
+
 
 @L0_Unit @Functional @Identity
 Feature: Tube Substrate Identity (Biological Continuity Analog)
