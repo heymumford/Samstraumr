@@ -123,6 +123,11 @@ public class ComponentAdapter {
     }
 
     @Override
+    public Map<String, Object> getProperties() {
+      return component.getProperties();
+    }
+
+    @Override
     public Instant getCreationTime() {
       return component.getCreationTime();
     }

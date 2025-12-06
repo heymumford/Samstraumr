@@ -85,46 +85,11 @@ public class PortInterfaceTest {
     eventDispatcher = new InMemoryEventDispatcher(logger);
     capturedEvents = new java.util.ArrayList<>();
 
-    // Create a specific EventHandler implementation to avoid ambiguous method reference
-    org.s8r.application.port.EventDispatcher.EventHandler<DomainEvent> handler =
-        new org.s8r.application.port.EventDispatcher.EventHandler<DomainEvent>() {
-          @Override
-          public void handle(DomainEvent event) {
-            capturedEvents.add(event);
-          }
-        };
-
-    eventDispatcher.registerHandler(DomainEvent.class, handler);
-
     // Create an EventPublisherPort adapter for the EventDispatcher
     EventPublisherPort eventPublisherAdapter =
         new EventPublisherPort() {
           // Map to store subscribers by subscription ID
           private final Map<String, EventSubscriber> subscribers = new HashMap<>();
-
-          @Override
-          public void publishEvent(DomainEvent event) {
-            eventDispatcher.dispatch(event);
-          }
-
-          @Override
-          public void publishEvents(List<DomainEvent> events) {
-            for (DomainEvent event : events) {
-              eventDispatcher.dispatch(event);
-            }
-          }
-
-          @Override
-          public int publishPendingEvents(ComponentId componentId) {
-            // For test purposes, just return 0 (no pending events)
-            return 0;
-          }
-
-          @Override
-          public <T extends DomainEvent> void registerHandler(
-              Class<T> eventType, java.util.function.Consumer<T> handler) {
-            eventDispatcher.registerHandler(eventType, handler);
-          }
 
           @Override
           public boolean publishEvent(String topic, String eventType, String payload) {
@@ -139,6 +104,12 @@ public class PortInterfaceTest {
             for (EventSubscriber subscriber : subscribers.values()) {
               subscriber.onEvent(topic, eventType, payload, properties);
             }
+            return true;
+          }
+
+          @Override
+          public boolean publishEvents(List<DomainEvent> events) {
+            // For test purposes, just return true
             return true;
           }
 
@@ -210,6 +181,11 @@ public class PortInterfaceTest {
     @Override
     public Instant getCreationTime() {
       return component.getCreationTime();
+    }
+
+    @Override
+    public Map<String, Object> getProperties() {
+      return Collections.emptyMap();
     }
 
     @Override

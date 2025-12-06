@@ -5,6 +5,8 @@
 package org.s8r.test.mock;
 
 import org.s8r.application.port.TaskExecutionPort;
+import org.s8r.application.port.TaskExecutionPort.TaskStatus;
+import org.s8r.application.port.TaskExecutionPort.TaskResult;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -175,14 +177,15 @@ public class MockTaskExecutionAdapter implements TaskExecutionPort {
     }
     
     @Override
-    public <T> TaskResult<T> scheduleTask(Callable<T> task, Duration delay) {
+    public <T> TaskResult scheduleTask(Callable<T> task, Instant executionTime) {
         if (!running.get()) {
-            return TaskResult.failure("unknown", TaskStatus.FAILED, 
+            return TaskResult.failure("unknown",
                 "Task executor has been shut down", "Task executor has been shut down");
         }
         
         String taskId = UUID.randomUUID().toString();
-        
+        Duration delay = Duration.between(Instant.now(), executionTime);
+
         // Create a FutureTask that will update the task status when complete
         FutureTask<T> futureTask = new FutureTask<>(() -> {
             try {
@@ -191,19 +194,19 @@ public class MockTaskExecutionAdapter implements TaskExecutionPort {
                 if (taskInfo != null) {
                     taskInfo.status = TaskStatus.RUNNING;
                 }
-                
+
                 T result = task.call();
-                
+
                 if (taskInfo != null) {
                     taskInfo.status = TaskStatus.COMPLETED;
                     taskInfo.result = result;
                     taskInfo.completedAt = Instant.now();
                 }
-                
+
                 return result;
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Scheduled task execution failed", e);
-                
+
                 @SuppressWarnings("unchecked")
                 TaskInfo<T> taskInfo = (TaskInfo<T>) tasks.get(taskId);
                 if (taskInfo != null) {
@@ -211,35 +214,36 @@ public class MockTaskExecutionAdapter implements TaskExecutionPort {
                     taskInfo.error = e;
                     taskInfo.completedAt = Instant.now();
                 }
-                
+
                 throw e;
             }
         });
-        
-        TaskInfo<T> taskInfo = new TaskInfo<>(taskId, task, delay, Instant.now().plus(delay));
+
+        TaskInfo<T> taskInfo = new TaskInfo<>(taskId, task, delay, executionTime);
         taskInfo.status = TaskStatus.SCHEDULED;
         taskInfo.future = futureTask;
         tasks.put(taskId, taskInfo);
-        
+
         // Schedule the task for execution
         scheduledExecutor.schedule(futureTask, delay.toMillis(), TimeUnit.MILLISECONDS);
-        
+
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("scheduledAt", Instant.now().toString());
-        attributes.put("executionTime", Instant.now().plus(delay).toString());
-        
-        return TaskResult.scheduled(taskId, "Task scheduled for execution", attributes);
+        attributes.put("executionTime", executionTime.toString());
+
+        return TaskResult.success(taskId, "Task scheduled for execution", attributes);
     }
     
     @Override
-    public TaskResult<Void> scheduleTask(Runnable task, Duration delay) {
+    public TaskResult scheduleTask(Runnable task, Instant executionTime) {
         if (!running.get()) {
-            return TaskResult.failure("unknown", TaskStatus.FAILED, 
+            return TaskResult.failure("unknown",
                 "Task executor has been shut down", "Task executor has been shut down");
         }
-        
+
         String taskId = UUID.randomUUID().toString();
-        
+        Duration delay = Duration.between(Instant.now(), executionTime);
+
         // Create a FutureTask that will update the task status when complete
         FutureTask<Void> futureTask = new FutureTask<>(() -> {
             try {
@@ -247,42 +251,42 @@ public class MockTaskExecutionAdapter implements TaskExecutionPort {
                 if (taskInfo != null) {
                     taskInfo.status = TaskStatus.RUNNING;
                 }
-                
+
                 task.run();
-                
+
                 if (taskInfo != null) {
                     taskInfo.status = TaskStatus.COMPLETED;
                     taskInfo.completedAt = Instant.now();
                 }
-                
+
                 return null;
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Scheduled task execution failed", e);
-                
+
                 TaskInfo<Void> taskInfo = (TaskInfo<Void>) tasks.get(taskId);
                 if (taskInfo != null) {
                     taskInfo.status = TaskStatus.FAILED;
                     taskInfo.error = e;
                     taskInfo.completedAt = Instant.now();
                 }
-                
+
                 throw e;
             }
         });
-        
-        TaskInfo<Void> taskInfo = new TaskInfo<>(taskId, null, delay, Instant.now().plus(delay));
+
+        TaskInfo<Void> taskInfo = new TaskInfo<>(taskId, null, delay, executionTime);
         taskInfo.status = TaskStatus.SCHEDULED;
         taskInfo.future = futureTask;
         tasks.put(taskId, taskInfo);
-        
+
         // Schedule the task for execution
         scheduledExecutor.schedule(futureTask, delay.toMillis(), TimeUnit.MILLISECONDS);
-        
+
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("scheduledAt", Instant.now().toString());
-        attributes.put("executionTime", Instant.now().plus(delay).toString());
-        
-        return TaskResult.scheduled(taskId, "Task scheduled for execution", attributes);
+        attributes.put("executionTime", executionTime.toString());
+
+        return TaskResult.success(taskId, "Task scheduled for execution", attributes);
     }
     
     /**
@@ -293,9 +297,9 @@ public class MockTaskExecutionAdapter implements TaskExecutionPort {
      * @param interval The interval between executions
      * @return A TaskResult containing the ID of the recurring task
      */
-    public TaskResult<Void> scheduleRecurringTask(Runnable task, Duration initialDelay, Duration interval) {
+    public TaskResult scheduleRecurringTask(Runnable task, Duration initialDelay, Duration interval) {
         if (!running.get()) {
-            return TaskResult.failure("unknown", TaskStatus.FAILED, 
+            return TaskResult.failure("unknown",
                 "Task executor has been shut down", "Task executor has been shut down");
         }
         
@@ -324,43 +328,52 @@ public class MockTaskExecutionAdapter implements TaskExecutionPort {
         attributes.put("scheduledAt", Instant.now().toString());
         attributes.put("initialExecutionTime", Instant.now().plus(initialDelay).toString());
         attributes.put("interval", interval.toString());
-        
-        return TaskResult.scheduled(taskId, "Recurring task scheduled", attributes);
+
+        return TaskResult.success(taskId, "Recurring task scheduled", attributes);
     }
     
     @Override
-    public boolean cancelTask(String taskId) {
+    public TaskResult cancelTask(String taskId, boolean mayInterruptIfRunning) {
         // Check if it's a recurring task
         if (recurringTasks.containsKey(taskId)) {
             RecurringTask recurringTask = recurringTasks.get(taskId);
-            boolean result = recurringTask.scheduledFuture.cancel(false);
+            boolean result = recurringTask.scheduledFuture.cancel(mayInterruptIfRunning);
             if (result) {
                 recurringTask.canceled = true;
+                Map<String, Object> attributes = new HashMap<>();
+                return TaskResult.success(taskId, "Recurring task canceled", attributes);
+            } else {
+                return TaskResult.failure(taskId, "Failed to cancel recurring task",
+                    "Task may have already completed or been canceled");
             }
-            return result;
         }
-        
+
         // Check if it's a regular task
         TaskInfo<?> taskInfo = tasks.get(taskId);
         if (taskInfo == null) {
-            return false;
+            return TaskResult.failure(taskId, "Task not found",
+                "No task found with the specified ID");
         }
-        
+
         if (taskInfo.future == null) {
-            return false;
+            return TaskResult.failure(taskId, "Task has no future",
+                "Task does not have an associated future for cancellation");
         }
-        
-        boolean result = taskInfo.future.cancel(false);
+
+        boolean result = taskInfo.future.cancel(mayInterruptIfRunning);
         if (result) {
             taskInfo.status = TaskStatus.CANCELED;
             taskInfo.completedAt = Instant.now();
+            Map<String, Object> attributes = new HashMap<>();
+            return TaskResult.success(taskId, "Task canceled", attributes);
+        } else {
+            return TaskResult.failure(taskId, "Failed to cancel task",
+                "Task may have already completed or been canceled");
         }
-        
-        return result;
     }
     
     @Override
-    public TaskResult<Void> getTaskStatus(String taskId) {
+    public TaskResult getTask(String taskId) {
         // Check if it's a recurring task
         if (recurringTasks.containsKey(taskId)) {
             RecurringTask recurringTask = recurringTasks.get(taskId);
@@ -372,17 +385,17 @@ public class MockTaskExecutionAdapter implements TaskExecutionPort {
             attributes.put("interval", recurringTask.interval.toString());
             
             if (recurringTask.canceled) {
-                return TaskResult.failure(taskId, TaskStatus.CANCELED, 
-                    "Recurring task was canceled", "Task canceled by user", attributes);
+                return TaskResult.failure(taskId,
+                    "Recurring task was canceled", "Task canceled by user");
             }
-            
-            return TaskResult.success(taskId, null, "Recurring task is active", attributes);
+
+            return TaskResult.success(taskId, "Recurring task is active", attributes);
         }
-        
+
         // Check if it's a regular task
         TaskInfo<?> taskInfo = tasks.get(taskId);
         if (taskInfo == null) {
-            return TaskResult.failure(taskId, TaskStatus.FAILED, 
+            return TaskResult.failure(taskId,
                 "Task not found", "No task found with the specified ID");
         }
         
@@ -398,75 +411,89 @@ public class MockTaskExecutionAdapter implements TaskExecutionPort {
         switch (taskInfo.status) {
             case PENDING:
             case SCHEDULED:
-                return TaskResult.scheduled(taskId, "Task is scheduled", attributes);
+                return TaskResult.success(taskId, "Task is scheduled", attributes);
             case RUNNING:
-                return TaskResult.scheduled(taskId, "Task is running", attributes);
+                return TaskResult.success(taskId, "Task is running", attributes);
             case COMPLETED:
-                return TaskResult.success(taskId, null, "Task completed successfully", attributes);
+                return TaskResult.success(taskId, "Task completed successfully", attributes);
             case FAILED:
-                return TaskResult.failure(taskId, TaskStatus.FAILED, 
-                    "Task execution failed", 
-                    taskInfo.error != null ? taskInfo.error.getMessage() : "Unknown error", 
+                return TaskResult.failure(taskId,
+                    "Task execution failed",
+                    taskInfo.error != null ? taskInfo.error.getMessage() : "Unknown error",
                     attributes);
             case CANCELED:
-                return TaskResult.failure(taskId, TaskStatus.CANCELED, 
+                return TaskResult.failure(taskId,
                     "Task was canceled", "Task canceled by user", attributes);
             case TIMEOUT:
-                return TaskResult.failure(taskId, TaskStatus.TIMEOUT, 
-                    "Task execution timed out", "Task exceeded maximum execution time", 
+                return TaskResult.failure(taskId,
+                    "Task execution timed out", "Task exceeded maximum execution time",
                     attributes);
             default:
-                return TaskResult.failure(taskId, TaskStatus.FAILED, 
-                    "Unknown task status", "Task status could not be determined", 
+                return TaskResult.failure(taskId,
+                    "Unknown task status", "Task status could not be determined",
                     attributes);
         }
     }
     
     @Override
-    public TaskResult<Void> shutdown(boolean waitForTasks) {
+    public TaskResult shutdown() {
         if (!running.compareAndSet(true, false)) {
-            return TaskResult.failure("shutdown", TaskStatus.FAILED, 
+            return TaskResult.failure("shutdown",
                 "Task executor is already shut down", "Already shut down");
         }
-        
-        if (waitForTasks) {
-            // Cancel all recurring tasks
-            for (String taskId : recurringTasks.keySet()) {
-                RecurringTask recurringTask = recurringTasks.get(taskId);
-                recurringTask.scheduledFuture.cancel(false);
-                recurringTask.canceled = true;
-            }
-            
-            // Wait for completion of existing tasks
-            executor.shutdown();
-            scheduledExecutor.shutdown();
-            
-            try {
-                // Wait for tasks to complete
-                if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
-                    executor.shutdownNow();
-                }
-                if (!scheduledExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
-                    scheduledExecutor.shutdownNow();
-                }
-                
-                return TaskResult.success("shutdown", null, 
-                    "Task executor shut down gracefully", null);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+
+        // Cancel all recurring tasks
+        for (String taskId : recurringTasks.keySet()) {
+            RecurringTask recurringTask = recurringTasks.get(taskId);
+            recurringTask.scheduledFuture.cancel(false);
+            recurringTask.canceled = true;
+        }
+
+        // Immediate shutdown
+        executor.shutdownNow();
+        scheduledExecutor.shutdownNow();
+
+        Map<String, Object> attributes = new HashMap<>();
+        return TaskResult.success("shutdown", "Task executor shut down", attributes);
+    }
+
+    @Override
+    public TaskResult shutdownAndWait(Duration timeout) {
+        if (!running.compareAndSet(true, false)) {
+            return TaskResult.failure("shutdown",
+                "Task executor is already shut down", "Already shut down");
+        }
+
+        // Cancel all recurring tasks
+        for (String taskId : recurringTasks.keySet()) {
+            RecurringTask recurringTask = recurringTasks.get(taskId);
+            recurringTask.scheduledFuture.cancel(false);
+            recurringTask.canceled = true;
+        }
+
+        // Wait for completion of existing tasks
+        executor.shutdown();
+        scheduledExecutor.shutdown();
+
+        try {
+            // Wait for tasks to complete
+            long timeoutMillis = timeout.toMillis();
+            if (!executor.awaitTermination(timeoutMillis, TimeUnit.MILLISECONDS)) {
                 executor.shutdownNow();
-                scheduledExecutor.shutdownNow();
-                
-                return TaskResult.failure("shutdown", TaskStatus.FAILED, 
-                    "Task executor shutdown was interrupted", e.getMessage());
             }
-        } else {
-            // Immediate shutdown
+            if (!scheduledExecutor.awaitTermination(timeoutMillis, TimeUnit.MILLISECONDS)) {
+                scheduledExecutor.shutdownNow();
+            }
+
+            Map<String, Object> attributes = new HashMap<>();
+            return TaskResult.success("shutdown", "Task executor shut down gracefully", attributes);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             executor.shutdownNow();
             scheduledExecutor.shutdownNow();
-            
-            return TaskResult.success("shutdown", null, 
-                "Task executor shut down immediately", null);
+
+            return TaskResult.failure("shutdown",
+                "Task executor shutdown was interrupted", e.getMessage());
         }
     }
     

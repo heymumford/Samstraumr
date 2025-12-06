@@ -261,6 +261,11 @@ public class MachinePortContractTest extends PortContractTest<MachinePort> {
     }
 
     @Override
+    public Map<String, Object> getProperties() {
+      return new HashMap<>();
+    }
+
+    @Override
     public List<org.s8r.domain.event.DomainEvent> getDomainEvents() {
       return null;
     }
@@ -364,6 +369,11 @@ public class MachinePortContractTest extends PortContractTest<MachinePort> {
     @Override
     public java.time.Instant getCreationTime() {
       return null;
+    }
+
+    @Override
+    public Map<String, Object> getProperties() {
+      return new HashMap<>();
     }
 
     @Override

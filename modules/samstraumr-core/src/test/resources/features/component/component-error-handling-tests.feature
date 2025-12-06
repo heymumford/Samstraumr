@@ -1,14 +1,14 @@
-/*
-Filename: error-handling-tests.feature
-Purpose: Validates the error handling capabilities of Components
-Goals:
-  - Verify proper error handling for invalid parameters
-  - Test exception handling during state transitions
-  - Validate resource cleanup after error conditions
-Dependencies:
-  - BDD step definitions in org.s8r.component.test.steps package
-  - Component exception handlers in org.s8r.component.exception
-*/
+# Filename: error-handling-tests.feature
+# Purpose: Validates the error handling capabilities of Components
+# Goals:
+# - Verify proper error handling for invalid parameters
+# - Test exception handling during state transitions
+# - Validate resource cleanup after error conditions
+# Dependencies:
+# - BDD step definitions in org.s8r.component.test.steps package
+# - Component exception handlers in org.s8r.component.exception
+#
+
 
 @L0_Unit
 Feature: Component Error Handling and Negative Paths

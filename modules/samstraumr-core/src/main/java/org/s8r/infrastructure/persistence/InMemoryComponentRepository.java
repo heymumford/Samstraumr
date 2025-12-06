@@ -61,8 +61,8 @@ public class InMemoryComponentRepository implements ComponentRepository {
   }
 
   /**
-   * Updates an existing component. 
-   * This method should be used when you know the component already exists and you want to update it.
+   * Updates an existing component. This method should be used when you know the component already
+   * exists and you want to update it.
    *
    * @param component The component to update
    * @throws ComponentNotFoundException if the component doesn't exist
@@ -72,7 +72,7 @@ public class InMemoryComponentRepository implements ComponentRepository {
     if (!componentStore.containsKey(idString)) {
       throw new org.s8r.domain.exception.ComponentNotFoundException(component.getId());
     }
-    
+
     componentStore.put(idString, component);
     logger.debug("Updated component: {}", idString);
   }
@@ -85,7 +85,7 @@ public class InMemoryComponentRepository implements ComponentRepository {
       logger.error("Attempt to save duplicate component: {}", idString);
       throw new org.s8r.domain.exception.DuplicateComponentException(component.getId());
     }
-    
+
     componentStore.put(idString, component);
     logger.debug("Saved component: {}", idString);
   }

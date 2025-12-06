@@ -19,16 +19,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.test.annotation.UnitTest;
 
@@ -53,8 +49,8 @@ class ComponentConnectionTest {
     @DisplayName("constructor should create a valid ComponentConnection with all properties set")
     void constructorShouldCreateValidComponentConnection() {
       // When
-      ComponentConnection connection = new ComponentConnection(
-          sourceId, targetId, ConnectionType.DATA_FLOW, "Test connection");
+      ComponentConnection connection =
+          new ComponentConnection(sourceId, targetId, ConnectionType.DATA_FLOW, "Test connection");
 
       // Then
       assertNotNull(connection.getConnectionId(), "Connection ID should be generated");
@@ -76,8 +72,8 @@ class ComponentConnectionTest {
     @DisplayName("constructor should handle null description by using empty string")
     void constructorShouldHandleNullDescription() {
       // When
-      ComponentConnection connection = new ComponentConnection(
-          sourceId, targetId, ConnectionType.DATA_FLOW, null);
+      ComponentConnection connection =
+          new ComponentConnection(sourceId, targetId, ConnectionType.DATA_FLOW, null);
 
       // Then
       assertEquals("", connection.getDescription(), "Description should default to empty string");
@@ -123,7 +119,8 @@ class ComponentConnectionTest {
     @DisplayName("constructor should accept all ConnectionType values")
     void shouldAcceptAllConnectionTypes(ConnectionType type) {
       // When
-      ComponentConnection connection = new ComponentConnection(sourceId, targetId, type, "Test with " + type);
+      ComponentConnection connection =
+          new ComponentConnection(sourceId, targetId, type, "Test with " + type);
 
       // Then
       assertEquals(type, connection.getType(), "Connection type should match");
@@ -138,8 +135,8 @@ class ComponentConnectionTest {
     @DisplayName("connection should be active by default")
     void connectionShouldBeActiveByDefault() {
       // When
-      ComponentConnection connection = new ComponentConnection(
-          sourceId, targetId, ConnectionType.CONTROL, "Test connection");
+      ComponentConnection connection =
+          new ComponentConnection(sourceId, targetId, ConnectionType.CONTROL, "Test connection");
 
       // Then
       assertTrue(connection.isActive(), "Connection should be active by default");
@@ -149,8 +146,8 @@ class ComponentConnectionTest {
     @DisplayName("deactivate() should set active state to false")
     void deactivateShouldSetActiveToFalse() {
       // Given
-      ComponentConnection connection = new ComponentConnection(
-          sourceId, targetId, ConnectionType.EVENT, "Test connection");
+      ComponentConnection connection =
+          new ComponentConnection(sourceId, targetId, ConnectionType.EVENT, "Test connection");
 
       // When
       connection.deactivate();
@@ -163,8 +160,9 @@ class ComponentConnectionTest {
     @DisplayName("activate() should set active state to true")
     void activateShouldSetActiveToTrue() {
       // Given
-      ComponentConnection connection = new ComponentConnection(
-          sourceId, targetId, ConnectionType.TRANSFORMATION, "Test connection");
+      ComponentConnection connection =
+          new ComponentConnection(
+              sourceId, targetId, ConnectionType.TRANSFORMATION, "Test connection");
       connection.deactivate();
 
       // When
@@ -178,8 +176,8 @@ class ComponentConnectionTest {
     @DisplayName("multiple activation/deactivation should work correctly")
     void multipleActivationDeactivationShouldWorkCorrectly() {
       // Given
-      ComponentConnection connection = new ComponentConnection(
-          sourceId, targetId, ConnectionType.MONITORING, "Test connection");
+      ComponentConnection connection =
+          new ComponentConnection(sourceId, targetId, ConnectionType.MONITORING, "Test connection");
 
       // When/Then - sequence of activations and deactivations
       assertTrue(connection.isActive(), "Initially active");
@@ -203,15 +201,16 @@ class ComponentConnectionTest {
     @DisplayName("equals() should compare based on connectionId only")
     void equalsShouldCompareByConnectionId() throws Exception {
       // Given
-      ComponentConnection connection1 = new ComponentConnection(
-          sourceId, targetId, ConnectionType.DATA_FLOW, "First connection");
+      ComponentConnection connection1 =
+          new ComponentConnection(sourceId, targetId, ConnectionType.DATA_FLOW, "First connection");
 
       // Create a copy with same connectionId using reflection (testing purposes only)
-      ComponentConnection connection2 = new ComponentConnection(
-          ComponentId.create("Different source"), 
-          ComponentId.create("Different target"),
-          ConnectionType.CONTROL, 
-          "Different description");
+      ComponentConnection connection2 =
+          new ComponentConnection(
+              ComponentId.create("Different source"),
+              ComponentId.create("Different target"),
+              ConnectionType.CONTROL,
+              "Different description");
 
       // Get private field and set it
       java.lang.reflect.Field idField = ComponentConnection.class.getDeclaredField("connectionId");
@@ -219,13 +218,14 @@ class ComponentConnectionTest {
       idField.set(connection2, connection1.getConnectionId());
 
       // Different connection with different ID
-      ComponentConnection connection3 = new ComponentConnection(
-          sourceId, targetId, ConnectionType.DATA_FLOW, "First connection");
+      ComponentConnection connection3 =
+          new ComponentConnection(sourceId, targetId, ConnectionType.DATA_FLOW, "First connection");
 
       // Then
       assertEquals(connection1, connection1, "Connection should equal itself");
       assertEquals(connection1, connection2, "Connections with same ID should be equal");
-      assertNotEquals(connection1, connection3, "Connections with different IDs should not be equal");
+      assertNotEquals(
+          connection1, connection3, "Connections with different IDs should not be equal");
       assertNotEquals(connection1, null, "Connection should not equal null");
       assertNotEquals(connection1, "not a connection", "Connection should not equal other types");
     }
@@ -234,15 +234,16 @@ class ComponentConnectionTest {
     @DisplayName("hashCode() should be based on connectionId only")
     void hashCodeShouldBeBasedOnConnectionId() throws Exception {
       // Given
-      ComponentConnection connection1 = new ComponentConnection(
-          sourceId, targetId, ConnectionType.DATA_FLOW, "First connection");
+      ComponentConnection connection1 =
+          new ComponentConnection(sourceId, targetId, ConnectionType.DATA_FLOW, "First connection");
 
       // Create a copy with same connectionId using reflection (testing purposes only)
-      ComponentConnection connection2 = new ComponentConnection(
-          ComponentId.create("Different source"), 
-          ComponentId.create("Different target"),
-          ConnectionType.CONTROL, 
-          "Different description");
+      ComponentConnection connection2 =
+          new ComponentConnection(
+              ComponentId.create("Different source"),
+              ComponentId.create("Different target"),
+              ConnectionType.CONTROL,
+              "Different description");
 
       // Get private field and set it
       java.lang.reflect.Field idField = ComponentConnection.class.getDeclaredField("connectionId");
@@ -250,30 +251,38 @@ class ComponentConnectionTest {
       idField.set(connection2, connection1.getConnectionId());
 
       // Different connection with different ID
-      ComponentConnection connection3 = new ComponentConnection(
-          sourceId, targetId, ConnectionType.DATA_FLOW, "First connection");
+      ComponentConnection connection3 =
+          new ComponentConnection(sourceId, targetId, ConnectionType.DATA_FLOW, "First connection");
 
       // Then
-      assertEquals(connection1.hashCode(), connection2.hashCode(), "Hash codes should be equal for same ID");
-      assertNotEquals(connection1.hashCode(), connection3.hashCode(), "Hash codes should differ for different IDs");
+      assertEquals(
+          connection1.hashCode(), connection2.hashCode(), "Hash codes should be equal for same ID");
+      assertNotEquals(
+          connection1.hashCode(),
+          connection3.hashCode(),
+          "Hash codes should differ for different IDs");
     }
 
     @Test
     @DisplayName("toString() should include key fields")
     void toStringShouldIncludeKeyFields() {
       // Given
-      ComponentConnection connection = new ComponentConnection(
-          sourceId, targetId, ConnectionType.VALIDATION, "Test connection");
+      ComponentConnection connection =
+          new ComponentConnection(sourceId, targetId, ConnectionType.VALIDATION, "Test connection");
 
       // When
       String toString = connection.toString();
 
       // Then
-      assertTrue(toString.contains(connection.getConnectionId()), "toString should include connectionId");
+      assertTrue(
+          toString.contains(connection.getConnectionId()), "toString should include connectionId");
       assertTrue(toString.contains(sourceId.toString()), "toString should include sourceId");
       assertTrue(toString.contains(targetId.toString()), "toString should include targetId");
-      assertTrue(toString.contains(ConnectionType.VALIDATION.toString()), "toString should include type");
-      assertTrue(toString.contains(String.valueOf(connection.isActive())), "toString should include active state");
+      assertTrue(
+          toString.contains(ConnectionType.VALIDATION.toString()), "toString should include type");
+      assertTrue(
+          toString.contains(String.valueOf(connection.isActive())),
+          "toString should include active state");
     }
   }
 }

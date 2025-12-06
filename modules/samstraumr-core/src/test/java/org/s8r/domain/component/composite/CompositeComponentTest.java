@@ -55,16 +55,16 @@ class CompositeComponentTest {
   void setUp() {
     compositeId = ComponentId.create("Test Composite");
     composite = CompositeComponent.create(compositeId, CompositeType.STANDARD);
-    
+
     child1Id = ComponentId.create("Child Component 1");
     child1 = Component.create(child1Id);
-    
+
     child2Id = ComponentId.create("Child Component 2");
     child2 = Component.create(child2Id);
-    
+
     // Clear events that may have been generated during creation
     composite.clearEvents();
-    
+
     // Advance components to READY state for lifecycle tests
     if (composite.getLifecycleState() == LifecycleState.CONCEPTION) {
       composite.transitionTo(LifecycleState.INITIALIZING);
@@ -73,7 +73,7 @@ class CompositeComponentTest {
       composite.transitionTo(LifecycleState.DEVELOPING_FEATURES);
       composite.transitionTo(LifecycleState.READY);
     }
-    
+
     if (child1.getLifecycleState() == LifecycleState.CONCEPTION) {
       child1.transitionTo(LifecycleState.INITIALIZING);
       child1.transitionTo(LifecycleState.CONFIGURING);
@@ -81,7 +81,7 @@ class CompositeComponentTest {
       child1.transitionTo(LifecycleState.DEVELOPING_FEATURES);
       child1.transitionTo(LifecycleState.READY);
     }
-    
+
     if (child2.getLifecycleState() == LifecycleState.CONCEPTION) {
       child2.transitionTo(LifecycleState.INITIALIZING);
       child2.transitionTo(LifecycleState.CONFIGURING);
@@ -103,16 +103,18 @@ class CompositeComponentTest {
 
       // Then
       assertTrue(composite.containsComponent(child1Id), "Composite should contain the added child");
-      assertEquals(1, composite.getChildrenCount(), "Child count should be 1");
-      
+      assertEquals(1, composite.getComponents().size(), "Child count should be 1");
+
       Optional<Component> retrievedChild = composite.getComponent(child1Id);
       assertTrue(retrievedChild.isPresent(), "Should find child by ID");
       assertEquals(child1, retrievedChild.get(), "Retrieved child should match added child");
-      
+
       // Verify the COMPOSITION connection was created
-      List<ComponentConnection> connections = composite.getConnectionsByType(ConnectionType.COMPOSITION);
+      List<ComponentConnection> connections =
+          composite.getConnectionsByType(ConnectionType.COMPOSITION);
       assertEquals(1, connections.size(), "Should have one COMPOSITION connection");
-      assertEquals(compositeId, connections.get(0).getSourceId(), "Connection source should be composite");
+      assertEquals(
+          compositeId, connections.get(0).getSourceId(), "Connection source should be composite");
       assertEquals(child1Id, connections.get(0).getTargetId(), "Connection target should be child");
     }
 
@@ -158,20 +160,27 @@ class CompositeComponentTest {
 
       // Then
       assertFalse(composite.containsComponent(child1Id), "Should not contain removed component");
-      assertEquals(1, composite.getChildrenCount(), "Should have 1 child remaining");
-      
+      assertEquals(1, composite.getComponents().size(), "Should have 1 child remaining");
+
       // The DATA_FLOW connection should also be removed
-      List<ComponentConnection> dataFlowConnections = composite.getConnectionsByType(ConnectionType.DATA_FLOW);
+      List<ComponentConnection> dataFlowConnections =
+          composite.getConnectionsByType(ConnectionType.DATA_FLOW);
       assertEquals(0, dataFlowConnections.size(), "DATA_FLOW connection should be removed");
-      
+
       // One COMPOSITION connection should remain (to child2)
-      List<ComponentConnection> compositionConnections = composite.getConnectionsByType(ConnectionType.COMPOSITION);
-      assertEquals(1, compositionConnections.size(), "Should have 1 COMPOSITION connection remaining");
-      assertEquals(child2Id, compositionConnections.get(0).getTargetId(), "Remaining connection should point to child2");
+      List<ComponentConnection> compositionConnections =
+          composite.getConnectionsByType(ConnectionType.COMPOSITION);
+      assertEquals(
+          1, compositionConnections.size(), "Should have 1 COMPOSITION connection remaining");
+      assertEquals(
+          child2Id,
+          compositionConnections.get(0).getTargetId(),
+          "Remaining connection should point to child2");
     }
 
     @Test
-    @DisplayName("removeComponent() should throw ComponentNotFoundException for non-existent component")
+    @DisplayName(
+        "removeComponent() should throw ComponentNotFoundException for non-existent component")
     void removeComponentShouldThrowExceptionForNonExistentComponent() {
       // Then
       assertThrows(
@@ -193,8 +202,8 @@ class CompositeComponentTest {
       composite.addComponent(child2);
 
       // When
-      ComponentConnection connection = composite.connect(
-          child1Id, child2Id, ConnectionType.DATA_FLOW, "Test data flow");
+      ComponentConnection connection =
+          composite.connect(child1Id, child2Id, ConnectionType.DATA_FLOW, "Test data flow");
 
       // Then
       assertNotNull(connection, "Connection should be created");
@@ -203,14 +212,16 @@ class CompositeComponentTest {
       assertEquals(child2Id, connection.getTargetId(), "Target should match");
       assertEquals("Test data flow", connection.getDescription(), "Description should match");
       assertTrue(connection.isActive(), "Connection should be active by default");
-      
+
       // Verify connections are retrievable
       List<ComponentConnection> connections = composite.getConnections();
-      assertEquals(3, connections.size(), "Should have 3 connections (2 COMPOSITION + 1 DATA_FLOW)");
-      
-      List<ComponentConnection> dataFlowConnections = composite.getConnectionsByType(ConnectionType.DATA_FLOW);
+      assertEquals(
+          3, connections.size(), "Should have 3 connections (2 COMPOSITION + 1 DATA_FLOW)");
+
+      List<ComponentConnection> dataFlowConnections =
+          composite.getConnectionsByType(ConnectionType.DATA_FLOW);
       assertEquals(1, dataFlowConnections.size(), "Should have 1 DATA_FLOW connection");
-      
+
       // Event should be raised
       List<DomainEvent> events = composite.getDomainEvents();
       assertTrue(
@@ -252,18 +263,20 @@ class CompositeComponentTest {
       // Given
       composite.addComponent(child1);
       composite.addComponent(child2);
-      ComponentConnection connection = composite.connect(
-          child1Id, child2Id, ConnectionType.EVENT, "Test event");
+      ComponentConnection connection =
+          composite.connect(child1Id, child2Id, ConnectionType.EVENT, "Test event");
 
       // When
       composite.disconnect(connection.getConnectionId());
 
       // Then
-      List<ComponentConnection> eventConnections = composite.getConnectionsByType(ConnectionType.EVENT);
+      List<ComponentConnection> eventConnections =
+          composite.getConnectionsByType(ConnectionType.EVENT);
       assertEquals(0, eventConnections.size(), "Should have no EVENT connections after disconnect");
-      
+
       // COMPOSITION connections should remain
-      List<ComponentConnection> compositionConnections = composite.getConnectionsByType(ConnectionType.COMPOSITION);
+      List<ComponentConnection> compositionConnections =
+          composite.getConnectionsByType(ConnectionType.COMPOSITION);
       assertEquals(2, compositionConnections.size(), "Should still have 2 COMPOSITION connections");
     }
 
@@ -280,7 +293,10 @@ class CompositeComponentTest {
       List<ComponentConnection> child1Connections = composite.getConnectionsForComponent(child1Id);
 
       // Then
-      assertEquals(3, child1Connections.size(), "Should have 3 connections for child1 (1 COMPOSITION + 2 others)");
+      assertEquals(
+          3,
+          child1Connections.size(),
+          "Should have 3 connections for child1 (1 COMPOSITION + 2 others)");
     }
   }
 
@@ -299,10 +315,11 @@ class CompositeComponentTest {
       composite.activate();
 
       // Then
-      assertEquals(LifecycleState.ACTIVE, composite.getLifecycleState(), "Composite should be active");
+      assertEquals(
+          LifecycleState.ACTIVE, composite.getLifecycleState(), "Composite should be active");
       assertEquals(LifecycleState.ACTIVE, child1.getLifecycleState(), "Child1 should be active");
       assertEquals(LifecycleState.ACTIVE, child2.getLifecycleState(), "Child2 should be active");
-      
+
       // All connections should be active
       List<ComponentConnection> connections = composite.getConnections();
       for (ComponentConnection connection : connections) {
@@ -322,10 +339,11 @@ class CompositeComponentTest {
       composite.deactivate();
 
       // Then
-      assertEquals(LifecycleState.READY, composite.getLifecycleState(), "Composite should be ready");
+      assertEquals(
+          LifecycleState.READY, composite.getLifecycleState(), "Composite should be ready");
       assertEquals(LifecycleState.READY, child1.getLifecycleState(), "Child1 should be ready");
       assertEquals(LifecycleState.READY, child2.getLifecycleState(), "Child2 should be ready");
-      
+
       // All connections should be inactive
       List<ComponentConnection> connections = composite.getConnections();
       for (ComponentConnection connection : connections) {
@@ -344,9 +362,14 @@ class CompositeComponentTest {
       composite.terminate();
 
       // Then
-      assertEquals(LifecycleState.TERMINATED, composite.getLifecycleState(), "Composite should be terminated");
-      assertEquals(LifecycleState.TERMINATED, child1.getLifecycleState(), "Child1 should be terminated");
-      assertEquals(LifecycleState.TERMINATED, child2.getLifecycleState(), "Child2 should be terminated");
+      assertEquals(
+          LifecycleState.TERMINATED,
+          composite.getLifecycleState(),
+          "Composite should be terminated");
+      assertEquals(
+          LifecycleState.TERMINATED, child1.getLifecycleState(), "Child1 should be terminated");
+      assertEquals(
+          LifecycleState.TERMINATED, child2.getLifecycleState(), "Child2 should be terminated");
     }
   }
 
@@ -402,8 +425,8 @@ class CompositeComponentTest {
       // Given
       composite.addComponent(child1);
       composite.addComponent(child2);
-      ComponentConnection connection = composite.connect(
-          child1Id, child2Id, ConnectionType.DATA_FLOW, "Test");
+      ComponentConnection connection =
+          composite.connect(child1Id, child2Id, ConnectionType.DATA_FLOW, "Test");
       composite.activate();
 
       // Then
@@ -413,54 +436,57 @@ class CompositeComponentTest {
           "Should throw InvalidOperationException when disconnecting in active composite");
     }
   }
-  
+
   @Nested
   @DisplayName("Utility Method Tests")
   class UtilityMethodTests {
-    
+
     @Test
-    @DisplayName("getChildrenCount() should return correct number of children")
+    @DisplayName("getComponents().size() should return correct number of children")
     void getChildrenCountShouldReturnCorrectCount() {
       // Given
-      assertEquals(0, composite.getChildrenCount(), "Initial child count should be 0");
-      
+      assertEquals(0, composite.getComponents().size(), "Initial child count should be 0");
+
       // When
       composite.addComponent(child1);
-      
+
       // Then
-      assertEquals(1, composite.getChildrenCount(), "Child count should be 1 after adding one child");
-      
+      assertEquals(
+          1, composite.getComponents().size(), "Child count should be 1 after adding one child");
+
       // When
       composite.addComponent(child2);
-      
+
       // Then
-      assertEquals(2, composite.getChildrenCount(), "Child count should be 2 after adding second child");
-      
+      assertEquals(
+          2, composite.getComponents().size(), "Child count should be 2 after adding second child");
+
       // When
       composite.removeComponent(child1Id);
-      
+
       // Then
-      assertEquals(1, composite.getChildrenCount(), "Child count should be 1 after removing child");
+      assertEquals(
+          1, composite.getComponents().size(), "Child count should be 1 after removing child");
     }
-    
+
     @Test
     @DisplayName("getConnectionCount() should return correct number of connections")
     void getConnectionCountShouldReturnCorrectCount() {
       // Given - empty composite
-      assertEquals(0, composite.getConnectionCount(), "Initial connection count should be 0");
-      
+      assertEquals(0, composite.getConnections().size(), "Initial connection count should be 0");
+
       // When - adding children creates composition connections
       composite.addComponent(child1);
       composite.addComponent(child2);
-      
+
       // Then
-      assertEquals(2, composite.getConnectionCount(), "Should have 2 COMPOSITION connections");
-      
+      assertEquals(2, composite.getConnections().size(), "Should have 2 COMPOSITION connections");
+
       // When - adding explicit connections
       composite.connect(child1Id, child2Id, ConnectionType.DATA_FLOW, "Data flow");
-      
+
       // Then
-      assertEquals(3, composite.getConnectionCount(), "Should have 3 connections total");
+      assertEquals(3, composite.getConnections().size(), "Should have 3 connections total");
     }
   }
 }

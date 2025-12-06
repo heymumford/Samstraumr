@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.s8r.application.port.EventDispatcher;
-import org.s8r.domain.event.ComponentDataEvent;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.machine.Machine;
 import org.s8r.domain.machine.MachineState;
@@ -85,9 +84,10 @@ public class TestMachineFactory {
       // Fire event for the data being processed
       Map<String, Object> dataMap = new HashMap<>();
       dataMap.put("value", data);
-      ComponentDataEvent event =
-          new ComponentDataEvent(delegateMachine.getId(), "data.processed", dataMap);
-      eventDispatcher.dispatch(event);
+      Map<String, String> properties = new HashMap<>();
+      properties.put("value", String.valueOf(data));
+      eventDispatcher.dispatchEvent(
+          "data.processed", delegateMachine.getId().getShortId(), String.valueOf(data), properties);
     }
 
     /**

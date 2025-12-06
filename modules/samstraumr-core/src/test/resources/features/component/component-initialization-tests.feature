@@ -1,14 +1,14 @@
-/*
-Filename: component-initialization-tests.feature
-Purpose: Validates the initialization and early lifecycle stages of Components
-Goals:
-  - Verify basic component creation and initialization
-  - Test initialization error handling
-  - Validate environment awareness during initialization
-Dependencies:
-  - BDD step definitions in org.s8r.component.test.steps package
-  - Component and Environment implementations in org.s8r.component.core
-*/
+# Filename: component-initialization-tests.feature
+# Purpose: Validates the initialization and early lifecycle stages of Components
+# Goals:
+# - Verify basic component creation and initialization
+# - Test initialization error handling
+# - Validate environment awareness during initialization
+# Dependencies:
+# - BDD step definitions in org.s8r.component.test.steps package
+# - Component and Environment implementations in org.s8r.component.core
+#
+
 
 @L0_Unit
 Feature: Component Initialization and Early Lifecycle

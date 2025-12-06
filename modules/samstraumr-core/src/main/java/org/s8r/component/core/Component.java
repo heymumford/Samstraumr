@@ -29,6 +29,7 @@ import org.s8r.component.identity.Identity;
 import org.s8r.component.lifecycle.ComponentLifecycleManager;
 import org.s8r.component.logging.ComponentLogger;
 import org.s8r.component.termination.ComponentTerminationManager;
+import org.s8r.domain.exception.ComponentInitializationException;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -78,13 +79,15 @@ public class Component {
 
     // Initialize managers (composition)
     this.componentLogger = new ComponentLogger(uniqueId);
-    this.lifecycleManager = new ComponentLifecycleManager(transition -> {
-      // Log state transitions
-      componentLogger.info(
-          "State changed: " + transition.getFromState() + " -> " + transition.getToState(),
-          "LIFECYCLE",
-          transition.getToState().name());
-    });
+    this.lifecycleManager =
+        new ComponentLifecycleManager(
+            transition -> {
+              // Log state transitions
+              componentLogger.info(
+                  "State changed: " + transition.getFromState() + " -> " + transition.getToState(),
+                  "LIFECYCLE",
+                  transition.getToState().name());
+            });
     this.terminationManager = new ComponentTerminationManager(uniqueId, componentLogger);
 
     // Log creation
@@ -124,7 +127,6 @@ public class Component {
     return new Component(reason, environment, uniqueId, null);
   }
 
-
   /** Creates a child component with a parent reference. */
   public static Component createChild(String reason, Environment environment, Component parent) {
     if (reason == null) throw new IllegalArgumentException("Reason cannot be null");
@@ -145,28 +147,28 @@ public class Component {
     return child;
   }
 
-
   /** Performs component initialization through lifecycle phases. */
   private void initialize() {
     componentLogger.debug("Initializing component...", "LIFECYCLE", "INIT");
 
     // Delegate to lifecycle manager
-    // Exceptions in the callback are caught and logged to maintain component consistency.
-    // The component will complete initialization and reach READY state even if 
-    // termination timer setup fails. This allows the component to be operational
-    // while logging the initialization issue for diagnosis.
-    lifecycleManager.initialize(() -> {
-      try {
-        // Setup termination timer when ready
-        terminationManager.setupDefaultTerminationTimer(this::terminate);
-        componentLogger.info("Component initialized and ready", "LIFECYCLE", "READY");
-      } catch (Exception e) {
-        componentLogger.error("Exception during component initialization: " + e.getMessage(), "LIFECYCLE", "ERROR");
-        // Non-critical initialization failures (like timer setup) are logged but don't prevent
-        // the component from becoming operational. The component reaches READY state and can
-        // be used normally. Critical failures should be handled by the lifecycle manager.
-      }
-    });
+    // Exceptions thrown in the callback are logged and propagated to prevent inconsistent state.
+    lifecycleManager.initialize(
+        () -> {
+          try {
+            // Setup termination timer when ready
+            terminationManager.setupDefaultTerminationTimer(this::terminate);
+            componentLogger.info("Component initialized and ready", "LIFECYCLE", "READY");
+          } catch (Exception e) {
+            String errorMessage =
+                "Component initialization failed: "
+                    + e.getClass().getSimpleName()
+                    + ": "
+                    + (e.getMessage() != null ? e.getMessage() : "No message provided");
+            componentLogger.error(errorMessage, "LIFECYCLE", "ERROR");
+            throw new ComponentInitializationException(errorMessage, e);
+          }
+        });
   }
 
   /** Proceeds through the early lifecycle phases of component development. */
@@ -258,15 +260,16 @@ public class Component {
     }
 
     // Delegate to termination manager
-    terminationManager.terminate(cleanupCallback -> {
-      // Begin termination in lifecycle
-      if (lifecycleManager.beginTermination()) {
-        // Execute cleanup
-        cleanupCallback.accept(() -> {});
-        // Complete termination
-        lifecycleManager.completeTermination();
-      }
-    });
+    terminationManager.terminate(
+        cleanupCallback -> {
+          // Begin termination in lifecycle
+          if (lifecycleManager.beginTermination()) {
+            // Execute cleanup
+            cleanupCallback.run();
+            // Complete termination
+            lifecycleManager.completeTermination();
+          }
+        });
   }
 
   /** Registers a child component with this component. */
@@ -341,7 +344,8 @@ public class Component {
     if (newState != null && !newState.equals(environmentState)) {
       String oldState = environmentState;
       environmentState = newState;
-      componentLogger.info("Environment state changed: " + oldState + " -> " + newState, "ENVIRONMENT");
+      componentLogger.info(
+          "Environment state changed: " + oldState + " -> " + newState, "ENVIRONMENT");
     }
   }
 

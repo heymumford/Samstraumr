@@ -18,69 +18,73 @@ package org.s8r.domain.exception;
 import org.s8r.domain.identity.ComponentId;
 
 /**
- * Exception thrown when a component has an invalid type or when a component
- * type is not allowed for a specific operation.
+ * Exception thrown when a component has an invalid type or when a component type is not allowed for
+ * a specific operation.
  */
 public class InvalidComponentTypeException extends ComponentException {
-    private static final long serialVersionUID = 1L;
-    
-    private final String invalidType;
-    private final ComponentId componentId;
-    private final String operation;
-    
-    /**
-     * Creates a new InvalidComponentTypeException when the type is not recognized.
-     *
-     * @param type The invalid component type
-     * @param componentId The ID of the component with the invalid type
-     */
-    public InvalidComponentTypeException(String type, ComponentId componentId) {
-        super(String.format("Invalid component type '%s' for component %s", 
-                type, componentId.getShortId()));
-        this.invalidType = type;
-        this.componentId = componentId;
-        this.operation = null;
-    }
-    
-    /**
-     * Creates a new InvalidComponentTypeException when the type is not allowed for a specific operation.
-     *
-     * @param type The invalid component type
-     * @param componentId The ID of the component with the invalid type
-     * @param operation The operation that is not allowed for this component type
-     */
-    public InvalidComponentTypeException(String type, ComponentId componentId, String operation) {
-        super(String.format("Component type '%s' not allowed for operation '%s' (component %s)", 
-                type, operation, componentId.getShortId()));
-        this.invalidType = type;
-        this.componentId = componentId;
-        this.operation = operation;
-    }
-    
-    /**
-     * Gets the invalid component type.
-     *
-     * @return The invalid type
-     */
-    public String getInvalidType() {
-        return invalidType;
-    }
-    
-    /**
-     * Gets the ID of the component with the invalid type.
-     *
-     * @return The component ID
-     */
-    public ComponentId getComponentId() {
-        return componentId;
-    }
-    
-    /**
-     * Gets the operation that was attempted (if applicable).
-     *
-     * @return The operation, or null if not applicable
-     */
-    public String getOperation() {
-        return operation;
-    }
+  private static final long serialVersionUID = 1L;
+
+  private final String invalidType;
+  private final ComponentId componentId;
+  private final String operation;
+
+  /**
+   * Creates a new InvalidComponentTypeException when the type is not recognized.
+   *
+   * @param type The invalid component type
+   * @param componentId The ID of the component with the invalid type
+   */
+  public InvalidComponentTypeException(String type, ComponentId componentId) {
+    super(
+        String.format(
+            "Invalid component type '%s' for component %s", type, componentId.getShortId()));
+    this.invalidType = type;
+    this.componentId = componentId;
+    this.operation = null;
+  }
+
+  /**
+   * Creates a new InvalidComponentTypeException when the type is not allowed for a specific
+   * operation.
+   *
+   * @param type The invalid component type
+   * @param componentId The ID of the component with the invalid type
+   * @param operation The operation that is not allowed for this component type
+   */
+  public InvalidComponentTypeException(String type, ComponentId componentId, String operation) {
+    super(
+        String.format(
+            "Component type '%s' not allowed for operation '%s' (component %s)",
+            type, operation, componentId.getShortId()));
+    this.invalidType = type;
+    this.componentId = componentId;
+    this.operation = operation;
+  }
+
+  /**
+   * Gets the invalid component type.
+   *
+   * @return The invalid type
+   */
+  public String getInvalidType() {
+    return invalidType;
+  }
+
+  /**
+   * Gets the ID of the component with the invalid type.
+   *
+   * @return The component ID
+   */
+  public ComponentId getComponentId() {
+    return componentId;
+  }
+
+  /**
+   * Gets the operation that was attempted (if applicable).
+   *
+   * @return The operation, or null if not applicable
+   */
+  public String getOperation() {
+    return operation;
+  }
 }

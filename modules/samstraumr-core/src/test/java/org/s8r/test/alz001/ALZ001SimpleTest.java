@@ -19,9 +19,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.s8r.test.annotation.ALZ001;
 
-/**
- * Simple test to verify that the ALZ001 annotation works correctly.
- */
+/** Simple test to verify that the ALZ001 annotation works correctly. */
 @ALZ001
 public class ALZ001SimpleTest {
 

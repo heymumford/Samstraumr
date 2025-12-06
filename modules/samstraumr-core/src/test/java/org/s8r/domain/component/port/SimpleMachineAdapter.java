@@ -228,6 +228,11 @@ public class SimpleMachineAdapter implements MachinePort {
   }
 
   @Override
+  public Map<String, Object> getProperties() {
+    return Collections.emptyMap();
+  }
+
+  @Override
   public List<DomainEvent> getDomainEvents() {
     // Simple implementation doesn't track domain events
     return Collections.emptyList();

@@ -115,6 +115,11 @@ public class ComponentAdapter {
       }
 
       @Override
+      public Map<String, Object> getProperties() {
+        return component.getProperties();
+      }
+
+      @Override
       public List<DomainEvent> getDomainEvents() {
         return component.getDomainEvents();
       }
@@ -196,6 +201,11 @@ public class ComponentAdapter {
       @Override
       public Instant getCreationTime() {
         return composite.getCreationTime();
+      }
+
+      @Override
+      public Map<String, Object> getProperties() {
+        return composite.getProperties();
       }
 
       @Override

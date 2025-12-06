@@ -39,7 +39,8 @@ public class ComponentLifecycleManager {
    * @param transitionListener Callback invoked on each state transition (for logging/events)
    */
   public ComponentLifecycleManager(Consumer<StateTransition> transitionListener) {
-    this.transitionListener = Objects.requireNonNull(transitionListener, "Transition listener cannot be null");
+    this.transitionListener =
+        Objects.requireNonNull(transitionListener, "Transition listener cannot be null");
   }
 
   /**
@@ -104,9 +105,7 @@ public class ComponentLifecycleManager {
     return true;
   }
 
-  /**
-   * Completes the termination sequence.
-   */
+  /** Completes the termination sequence. */
   public void completeTermination() {
     if (state == State.TERMINATING) {
       transitionToState(State.TERMINATED);
@@ -132,9 +131,7 @@ public class ComponentLifecycleManager {
 
   /** Checks if this component is embryonic. */
   public boolean isEmbryonic() {
-    return state == State.CONCEPTION
-        || state == State.INITIALIZING
-        || state == State.CONFIGURING;
+    return state == State.CONCEPTION || state == State.INITIALIZING || state == State.CONFIGURING;
   }
 
   /** Checks if this component is initializing. */
@@ -162,9 +159,7 @@ public class ComponentLifecycleManager {
     return state == State.RECOVERING;
   }
 
-  /**
-   * Represents a state transition event.
-   */
+  /** Represents a state transition event. */
   public static class StateTransition {
     private final State fromState;
     private final State toState;

@@ -22,9 +22,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.s8r.domain.identity.ComponentId;
 import org.s8r.test.annotation.UnitTest;
 
 /**
@@ -64,8 +62,12 @@ class CompositeFactoryTest {
       // Then
       assertNotNull(composite, "Composite should be created");
       assertEquals(CompositeType.PIPELINE, composite.getCompositeType(), "Type should be PIPELINE");
-      assertTrue(composite.getId().getReason().contains(TEST_REASON), "Reason should contain original reason");
-      assertTrue(composite.getId().getReason().contains("Pipeline"), "Reason should include composite type");
+      assertTrue(
+          composite.getId().getReason().contains(TEST_REASON),
+          "Reason should contain original reason");
+      assertTrue(
+          composite.getId().getReason().contains("Pipeline"),
+          "Reason should include composite type");
     }
 
     @Test
@@ -77,8 +79,12 @@ class CompositeFactoryTest {
       // Then
       assertNotNull(composite, "Composite should be created");
       assertEquals(CompositeType.OBSERVER, composite.getCompositeType(), "Type should be OBSERVER");
-      assertTrue(composite.getId().getReason().contains(TEST_REASON), "Reason should contain original reason");
-      assertTrue(composite.getId().getReason().contains("Observer"), "Reason should include composite type");
+      assertTrue(
+          composite.getId().getReason().contains(TEST_REASON),
+          "Reason should contain original reason");
+      assertTrue(
+          composite.getId().getReason().contains("Observer"),
+          "Reason should include composite type");
     }
 
     @Test
@@ -89,9 +95,14 @@ class CompositeFactoryTest {
 
       // Then
       assertNotNull(composite, "Composite should be created");
-      assertEquals(CompositeType.TRANSFORMER, composite.getCompositeType(), "Type should be TRANSFORMER");
-      assertTrue(composite.getId().getReason().contains(TEST_REASON), "Reason should contain original reason");
-      assertTrue(composite.getId().getReason().contains("Transformer"), "Reason should include composite type");
+      assertEquals(
+          CompositeType.TRANSFORMER, composite.getCompositeType(), "Type should be TRANSFORMER");
+      assertTrue(
+          composite.getId().getReason().contains(TEST_REASON),
+          "Reason should contain original reason");
+      assertTrue(
+          composite.getId().getReason().contains("Transformer"),
+          "Reason should include composite type");
     }
 
     @Test
@@ -102,9 +113,14 @@ class CompositeFactoryTest {
 
       // Then
       assertNotNull(composite, "Composite should be created");
-      assertEquals(CompositeType.VALIDATOR, composite.getCompositeType(), "Type should be VALIDATOR");
-      assertTrue(composite.getId().getReason().contains(TEST_REASON), "Reason should contain original reason");
-      assertTrue(composite.getId().getReason().contains("Validator"), "Reason should include composite type");
+      assertEquals(
+          CompositeType.VALIDATOR, composite.getCompositeType(), "Type should be VALIDATOR");
+      assertTrue(
+          composite.getId().getReason().contains(TEST_REASON),
+          "Reason should contain original reason");
+      assertTrue(
+          composite.getId().getReason().contains("Validator"),
+          "Reason should include composite type");
     }
 
     @Test
@@ -115,9 +131,16 @@ class CompositeFactoryTest {
 
       // Then
       assertNotNull(composite, "Composite should be created");
-      assertEquals(CompositeType.CIRCUIT_BREAKER, composite.getCompositeType(), "Type should be CIRCUIT_BREAKER");
-      assertTrue(composite.getId().getReason().contains(TEST_REASON), "Reason should contain original reason");
-      assertTrue(composite.getId().getReason().contains("CircuitBreaker"), "Reason should include composite type");
+      assertEquals(
+          CompositeType.CIRCUIT_BREAKER,
+          composite.getCompositeType(),
+          "Type should be CIRCUIT_BREAKER");
+      assertTrue(
+          composite.getId().getReason().contains(TEST_REASON),
+          "Reason should contain original reason");
+      assertTrue(
+          composite.getId().getReason().contains("CircuitBreaker"),
+          "Reason should include composite type");
     }
 
     @Test
@@ -129,8 +152,12 @@ class CompositeFactoryTest {
       // Then
       assertNotNull(composite, "Composite should be created");
       assertEquals(CompositeType.MEDIATOR, composite.getCompositeType(), "Type should be MEDIATOR");
-      assertTrue(composite.getId().getReason().contains(TEST_REASON), "Reason should contain original reason");
-      assertTrue(composite.getId().getReason().contains("Mediator"), "Reason should include composite type");
+      assertTrue(
+          composite.getId().getReason().contains(TEST_REASON),
+          "Reason should contain original reason");
+      assertTrue(
+          composite.getId().getReason().contains("Mediator"),
+          "Reason should include composite type");
     }
 
     @Test
@@ -142,8 +169,12 @@ class CompositeFactoryTest {
       // Then
       assertNotNull(composite, "Composite should be created");
       assertEquals(CompositeType.ADAPTER, composite.getCompositeType(), "Type should be ADAPTER");
-      assertTrue(composite.getId().getReason().contains(TEST_REASON), "Reason should contain original reason");
-      assertTrue(composite.getId().getReason().contains("Adapter"), "Reason should include composite type");
+      assertTrue(
+          composite.getId().getReason().contains(TEST_REASON),
+          "Reason should contain original reason");
+      assertTrue(
+          composite.getId().getReason().contains("Adapter"),
+          "Reason should include composite type");
     }
   }
 
@@ -161,8 +192,12 @@ class CompositeFactoryTest {
       // Then
       assertNotNull(composite, "Composite should be created");
       assertEquals(type, composite.getCompositeType(), "Type should match specified type");
-      assertTrue(composite.getId().getReason().contains(TEST_REASON), "Reason should contain original reason");
-      assertTrue(composite.getId().getReason().contains(type.name()), "Reason should include composite type name");
+      assertTrue(
+          composite.getId().getReason().contains(TEST_REASON),
+          "Reason should contain original reason");
+      assertTrue(
+          composite.getId().getReason().contains(type.name()),
+          "Reason should include composite type name");
     }
 
     @ParameterizedTest
@@ -170,12 +205,14 @@ class CompositeFactoryTest {
     @DisplayName("createComposite() should handle empty or blank reasons")
     void createCompositeShouldHandleEmptyReasons(String reason) {
       // When
-      CompositeComponent composite = CompositeFactory.createComposite(CompositeType.STANDARD, reason);
+      CompositeComponent composite =
+          CompositeFactory.createComposite(CompositeType.STANDARD, reason);
 
       // Then
       assertNotNull(composite, "Composite should be created with empty/blank reason");
       assertEquals(CompositeType.STANDARD, composite.getCompositeType(), "Type should be correct");
-      assertTrue(composite.getId().getReason().contains(reason), "Reason should contain original reason");
+      assertTrue(
+          composite.getId().getReason().contains(reason), "Reason should contain original reason");
     }
 
     @Test
@@ -201,8 +238,8 @@ class CompositeFactoryTest {
 
       // Then - verify the composite is properly initialized
       assertNotNull(composite.getId(), "ID should be set");
-      assertEquals(0, composite.getChildrenCount(), "Should have no children initially");
-      assertEquals(0, composite.getConnectionCount(), "Should have no connections initially");
+      assertEquals(0, composite.getComponents().size(), "Should have no children initially");
+      assertEquals(0, composite.getConnections().size(), "Should have no connections initially");
     }
   }
 }

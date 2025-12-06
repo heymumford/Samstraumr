@@ -41,8 +41,8 @@ class MachineComponentValidatorTest {
     @DisplayName("validateComponentExists should throw exception for non-existent component")
     void validateComponentExistsThrowsExceptionForNonExistentComponent() {
         // Given
-        ComponentId machineId = ComponentId.createNew();
-        ComponentId componentId = ComponentId.createNew();
+        ComponentId machineId = ComponentId.create("test-machine");
+        ComponentId componentId = ComponentId.create("test-component");
         Function<ComponentId, Boolean> existsFunction = id -> false;
         
         // When / Then
@@ -59,8 +59,8 @@ class MachineComponentValidatorTest {
     @DisplayName("validateComponentExists should not throw exception for existing component")
     void validateComponentExistsDoesNotThrowForExistingComponent() {
         // Given
-        ComponentId machineId = ComponentId.createNew();
-        ComponentId componentId = ComponentId.createNew();
+        ComponentId machineId = ComponentId.create("test-machine");
+        ComponentId componentId = ComponentId.create("test-component");
         Function<ComponentId, Boolean> existsFunction = id -> true;
         
         // When / Then
@@ -72,7 +72,7 @@ class MachineComponentValidatorTest {
     @DisplayName("validateIsCompositeComponent should throw exception for non-composite component")
     void validateIsCompositeComponentThrowsExceptionForNonCompositeComponent() {
         // Given
-        ComponentId machineId = ComponentId.createNew();
+        ComponentId machineId = ComponentId.create("test-machine");
         Component component = mock(Component.class);
         
         // When / Then
@@ -88,7 +88,7 @@ class MachineComponentValidatorTest {
     @DisplayName("validateIsCompositeComponent should not throw exception for composite component")
     void validateIsCompositeComponentDoesNotThrowForCompositeComponent() {
         // Given
-        ComponentId machineId = ComponentId.createNew();
+        ComponentId machineId = ComponentId.create("test-machine");
         CompositeComponent component = mock(CompositeComponent.class);
         
         // When / Then
@@ -100,7 +100,7 @@ class MachineComponentValidatorTest {
     @DisplayName("validateIsCompositeComponent should throw exception for null component")
     void validateIsCompositeComponentThrowsExceptionForNullComponent() {
         // Given
-        ComponentId machineId = ComponentId.createNew();
+        ComponentId machineId = ComponentId.create("test-machine");
         
         // When / Then
         assertThrows(
@@ -113,14 +113,14 @@ class MachineComponentValidatorTest {
     void validateMachineComponentDoesNotThrowForValidComponent() {
         // Given
         Machine machine = Machine.create(
-                ComponentId.createNew(), 
-                MachineType.PROCESSING, 
+                ComponentId.create("test-component"), 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "Test Description", 
                 "1.0.0");
         
         CompositeComponent component = mock(CompositeComponent.class);
-        when(component.getId()).thenReturn(ComponentId.createNew());
+        when(component.getId()).thenReturn(ComponentId.create("mock-component"));
         
         // When / Then
         assertDoesNotThrow(() -> MachineComponentValidator.validateMachineComponent(machine, component));
@@ -131,8 +131,8 @@ class MachineComponentValidatorTest {
     void validateMachineComponentThrowsExceptionForNullComponent() {
         // Given
         Machine machine = Machine.create(
-                ComponentId.createNew(), 
-                MachineType.PROCESSING, 
+                ComponentId.create("test-component"), 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "Test Description", 
                 "1.0.0");
@@ -148,17 +148,17 @@ class MachineComponentValidatorTest {
     void validateMachineComponentsValidatesMultipleComponents() {
         // Given
         Machine machine = Machine.create(
-                ComponentId.createNew(), 
-                MachineType.PROCESSING, 
+                ComponentId.create("test-component"), 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "Test Description", 
                 "1.0.0");
         
         CompositeComponent component1 = mock(CompositeComponent.class);
-        when(component1.getId()).thenReturn(ComponentId.createNew());
-        
+        when(component1.getId()).thenReturn(ComponentId.create("component-1"));
+
         CompositeComponent component2 = mock(CompositeComponent.class);
-        when(component2.getId()).thenReturn(ComponentId.createNew());
+        when(component2.getId()).thenReturn(ComponentId.create("component-2"));
         
         // When / Then
         assertDoesNotThrow(
@@ -171,13 +171,13 @@ class MachineComponentValidatorTest {
     void validateComponentReferenceValidatesExistenceAndType() {
         // Given
         Machine machine = Machine.create(
-                ComponentId.createNew(), 
-                MachineType.PROCESSING, 
+                ComponentId.create("test-component"), 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "Test Description", 
                 "1.0.0");
         
-        ComponentId componentId = ComponentId.createNew();
+        ComponentId componentId = ComponentId.create("ref-component");
         CompositeComponent component = mock(CompositeComponent.class);
         
         Function<ComponentId, Boolean> existsFunction = id -> true;
@@ -194,13 +194,13 @@ class MachineComponentValidatorTest {
     void validateComponentReferenceThrowsExceptionForNonExistentComponent() {
         // Given
         Machine machine = Machine.create(
-                ComponentId.createNew(), 
-                MachineType.PROCESSING, 
+                ComponentId.create("test-component"), 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "Test Description", 
                 "1.0.0");
         
-        ComponentId componentId = ComponentId.createNew();
+        ComponentId componentId = ComponentId.create("ref-component");
         
         Function<ComponentId, Boolean> existsFunction = id -> false;
         Function<ComponentId, Object> retrieveFunction = id -> null;
@@ -217,13 +217,13 @@ class MachineComponentValidatorTest {
     void validateComponentReferenceThrowsExceptionForNonCompositeComponent() {
         // Given
         Machine machine = Machine.create(
-                ComponentId.createNew(), 
-                MachineType.PROCESSING, 
+                ComponentId.create("test-component"), 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "Test Description", 
                 "1.0.0");
         
-        ComponentId componentId = ComponentId.createNew();
+        ComponentId componentId = ComponentId.create("ref-component");
         Component component = mock(Component.class);
         when(component.getType()).thenReturn(ComponentType.ATOMIC);
         

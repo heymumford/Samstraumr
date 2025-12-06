@@ -21,6 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.s8r.domain.exception.InvalidMachineStateTransitionException;
 import org.s8r.domain.identity.ComponentId;
+import org.s8r.domain.machine.MachineOperation;
 import org.s8r.domain.machine.MachineState;
 
 import java.util.Set;
@@ -92,73 +93,62 @@ class MachineStateValidatorTest {
         assertEquals(MachineState.READY, exception.getToState());
     }
     
-    @ParameterizedTest
-    @CsvSource({
-        "initialize,CREATED,true",
-        "initialize,READY,false",
-        "start,READY,true",
-        "start,STOPPED,true",
-        "start,RUNNING,false",
-        "stop,RUNNING,true",
-        "stop,READY,false",
-        "addComponent,CREATED,true",
-        "addComponent,READY,true",
-        "addComponent,RUNNING,false",
-        "removeComponent,CREATED,true",
-        "removeComponent,RUNNING,false",
-        "destroy,CREATED,true",
-        "destroy,READY,true",
-        "destroy,RUNNING,true",
-        "destroy,DESTROYED,false"
-    })
+    @Test
     @DisplayName("Operation permissions should be correctly validated")
-    void operationPermissionsShouldBeCorrectlyValidated(
-            String operation, MachineState state, boolean shouldBeAllowed) {
-        
-        assertEquals(shouldBeAllowed, 
-                MachineStateValidator.isOperationAllowed(operation, state));
-        
-        if (shouldBeAllowed) {
-            assertDoesNotThrow(() -> 
-                MachineStateValidator.validateOperationState(testMachineId, operation, state));
-        } else {
-            InvalidMachineStateTransitionException exception = assertThrows(
-                    InvalidMachineStateTransitionException.class,
-                    () -> MachineStateValidator.validateOperationState(testMachineId, operation, state)
-            );
-            
-            assertEquals(testMachineId, exception.getMachineId());
-            assertEquals(operation, exception.getOperation());
-            assertEquals(state, exception.getFromState());
-            assertNotNull(exception.getValidStates());
-            assertTrue(exception.getValidStates().length > 0);
-        }
+    void operationPermissionsShouldBeCorrectlyValidated() {
+        // INITIALIZE operations
+        assertTrue(MachineStateValidator.isOperationAllowed(MachineOperation.INITIALIZE, MachineState.CREATED));
+        assertFalse(MachineStateValidator.isOperationAllowed(MachineOperation.INITIALIZE, MachineState.READY));
+
+        // START operations
+        assertTrue(MachineStateValidator.isOperationAllowed(MachineOperation.START, MachineState.READY));
+        assertTrue(MachineStateValidator.isOperationAllowed(MachineOperation.START, MachineState.STOPPED));
+        assertFalse(MachineStateValidator.isOperationAllowed(MachineOperation.START, MachineState.RUNNING));
+
+        // STOP operations
+        assertTrue(MachineStateValidator.isOperationAllowed(MachineOperation.STOP, MachineState.RUNNING));
+        assertFalse(MachineStateValidator.isOperationAllowed(MachineOperation.STOP, MachineState.READY));
+
+        // ADD_COMPONENT operations
+        assertTrue(MachineStateValidator.isOperationAllowed(MachineOperation.ADD_COMPONENT, MachineState.CREATED));
+        assertTrue(MachineStateValidator.isOperationAllowed(MachineOperation.ADD_COMPONENT, MachineState.READY));
+        assertFalse(MachineStateValidator.isOperationAllowed(MachineOperation.ADD_COMPONENT, MachineState.RUNNING));
+
+        // REMOVE_COMPONENT operations
+        assertTrue(MachineStateValidator.isOperationAllowed(MachineOperation.REMOVE_COMPONENT, MachineState.CREATED));
+        assertFalse(MachineStateValidator.isOperationAllowed(MachineOperation.REMOVE_COMPONENT, MachineState.RUNNING));
+
+        // DESTROY operations
+        assertTrue(MachineStateValidator.isOperationAllowed(MachineOperation.DESTROY, MachineState.CREATED));
+        assertTrue(MachineStateValidator.isOperationAllowed(MachineOperation.DESTROY, MachineState.READY));
+        assertTrue(MachineStateValidator.isOperationAllowed(MachineOperation.DESTROY, MachineState.RUNNING));
+        assertFalse(MachineStateValidator.isOperationAllowed(MachineOperation.DESTROY, MachineState.DESTROYED));
     }
     
     @Test
     @DisplayName("Operations should be validated appropriately")
     void operationsShouldBeValidatedAppropriately() {
         // Test 'initialize' operation is only allowed in CREATED state
-        assertDoesNotThrow(() -> 
+        assertDoesNotThrow(() ->
             MachineStateValidator.validateOperationState(
-                testMachineId, "initialize", MachineState.CREATED));
-        
+                testMachineId, MachineOperation.INITIALIZE, MachineState.CREATED));
+
         assertThrows(InvalidMachineStateTransitionException.class,
                 () -> MachineStateValidator.validateOperationState(
-                    testMachineId, "initialize", MachineState.READY));
-        
+                    testMachineId, MachineOperation.INITIALIZE, MachineState.READY));
+
         // Test 'start' operation is allowed in READY and STOPPED states
-        assertDoesNotThrow(() -> 
+        assertDoesNotThrow(() ->
             MachineStateValidator.validateOperationState(
-                testMachineId, "start", MachineState.READY));
-        
-        assertDoesNotThrow(() -> 
+                testMachineId, MachineOperation.START, MachineState.READY));
+
+        assertDoesNotThrow(() ->
             MachineStateValidator.validateOperationState(
-                testMachineId, "start", MachineState.STOPPED));
-        
+                testMachineId, MachineOperation.START, MachineState.STOPPED));
+
         assertThrows(InvalidMachineStateTransitionException.class,
                 () -> MachineStateValidator.validateOperationState(
-                    testMachineId, "start", MachineState.RUNNING));
+                    testMachineId, MachineOperation.START, MachineState.RUNNING));
     }
     
     @Test
