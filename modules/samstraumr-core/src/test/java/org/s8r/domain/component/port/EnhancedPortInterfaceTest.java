@@ -88,6 +88,11 @@ public class EnhancedPortInterfaceTest {
     }
 
     @Override
+    public Map<String, Object> getProperties() {
+      return java.util.Collections.emptyMap();
+    }
+
+    @Override
     public List<org.s8r.domain.event.DomainEvent> getDomainEvents() {
       return java.util.Collections.emptyList();
     }

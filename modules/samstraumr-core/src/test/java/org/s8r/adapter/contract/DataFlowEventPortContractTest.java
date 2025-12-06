@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.s8r.application.port.DataFlowEventPort;
 import org.s8r.domain.event.ComponentDataEvent;
 import org.s8r.domain.identity.ComponentId;
-import org.s8r.infrastructure.event.DataFlowEventHandler;
+import org.s8r.infrastructure.event.DataFlowEventAdapter;
 
 /**
  * Contract tests for the DataFlowEventPort interface.
@@ -52,7 +52,7 @@ public class DataFlowEventPortContractTest extends PortContractTest<DataFlowEven
     sourceId = ComponentId.create("Source component for testing");
     targetId = ComponentId.create("Target component for testing");
 
-    return new DataFlowEventHandler(logger);
+    return new DataFlowEventAdapter(logger);
   }
 
   @Override

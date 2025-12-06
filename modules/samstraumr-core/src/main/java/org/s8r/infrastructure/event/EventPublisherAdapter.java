@@ -10,11 +10,14 @@ import org.s8r.application.port.EventDispatcher;
 import org.s8r.application.port.ComponentRepository;
 import org.s8r.application.port.LoggerPort;
 import org.s8r.domain.event.DomainEvent;
+import org.s8r.domain.identity.ComponentId;
+import org.s8r.domain.component.port.ComponentPort;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -127,23 +130,72 @@ public class EventPublisherAdapter implements EventPublisherPort {
         if (entry == null) {
             return false;
         }
-        
+
         if (subscribers.containsKey(entry.topic)) {
             subscribers.get(entry.topic).remove(entry);
             if (subscribers.get(entry.topic).isEmpty()) {
                 subscribers.remove(entry.topic);
             }
         }
-        
+
         return true;
     }
-    
+
+    /**
+     * Publishes a single domain event.
+     *
+     * @param event The domain event to publish, or null
+     */
+    public void publishEvent(DomainEvent event) {
+        if (event == null) {
+            logger.warn("Attempted to publish null event");
+            return;
+        }
+
+        eventDispatcher.dispatch(event);
+    }
+
+    /**
+     * Publishes all pending events for a component.
+     *
+     * @param componentId The ID of the component whose events should be published
+     * @return The number of events published
+     */
+    public int publishPendingEvents(ComponentId componentId) {
+        if (componentId == null) {
+            logger.warn("Attempted to publish pending events for null component ID");
+            return 0;
+        }
+
+        Optional<ComponentPort> componentOpt = componentRepository.findById(componentId);
+        if (componentOpt.isEmpty()) {
+            logger.warn("Component not found: {}", componentId.getIdString());
+            return 0;
+        }
+
+        ComponentPort component = componentOpt.get();
+        List<DomainEvent> events = component.getDomainEvents();
+
+        if (events == null || events.isEmpty()) {
+            return 0;
+        }
+
+        int count = 0;
+        for (DomainEvent event : events) {
+            eventDispatcher.dispatch(event);
+            count++;
+        }
+
+        component.clearEvents();
+        return count;
+    }
+
     // Helper inner class to convert Map to HashMap
     private static class HashMap<K, V> extends java.util.HashMap<K, V> {
         public HashMap() {
             super();
         }
-        
+
         public HashMap(Map<K, V> map) {
             super(map);
         }

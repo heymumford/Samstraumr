@@ -201,8 +201,8 @@ class CompositeFactoryTest {
 
       // Then - verify the composite is properly initialized
       assertNotNull(composite.getId(), "ID should be set");
-      assertEquals(0, composite.getChildrenCount(), "Should have no children initially");
-      assertEquals(0, composite.getConnectionCount(), "Should have no connections initially");
+      assertEquals(0, composite.getComponents().size(), "Should have no children initially");
+      assertEquals(0, composite.getConnections().size(), "Should have no connections initially");
     }
   }
 }

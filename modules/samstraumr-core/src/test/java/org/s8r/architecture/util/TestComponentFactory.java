@@ -127,8 +127,10 @@ public class TestComponentFactory {
       registerHandler(eventType.getSimpleName().toLowerCase(), handler);
     }
 
-    @Override
-    public <T extends DomainEvent> void registerHandler(
+    /**
+     * Convenience method to register a Consumer as a handler (not an interface override).
+     */
+    public <T extends DomainEvent> void registerConsumerHandler(
         Class<T> eventType, java.util.function.Consumer<T> handler) {
       // Create an adapter from Consumer to EventHandler
       EventHandler handlerAdapter = new EventHandler() {

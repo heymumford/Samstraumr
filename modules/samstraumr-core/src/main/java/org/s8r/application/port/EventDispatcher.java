@@ -6,9 +6,11 @@ package org.s8r.application.port;
 
 import java.util.Map;
 
+import org.s8r.domain.event.DomainEvent;
+
 /**
  * Port interface for event dispatching in the application layer.
- * 
+ *
  * <p>This interface defines the operations for registering event handlers and dispatching events,
  * following the ports and adapters pattern from Clean Architecture.
  */
@@ -22,7 +24,7 @@ public interface EventDispatcher {
      * @return true if the handler was registered successfully, false otherwise
      */
     boolean registerHandler(String eventType, EventHandler handler);
-    
+
     /**
      * Unregisters an event handler.
      *
@@ -31,7 +33,7 @@ public interface EventDispatcher {
      * @return true if the handler was unregistered successfully, false otherwise
      */
     boolean unregisterHandler(String eventType, EventHandler handler);
-    
+
     /**
      * Dispatches an event to all registered handlers.
      *
@@ -42,4 +44,11 @@ public interface EventDispatcher {
      * @return The number of handlers that processed the event
      */
     int dispatchEvent(String eventType, String source, String payload, Map<String, String> properties);
+
+    /**
+     * Dispatches a domain event to all registered handlers.
+     *
+     * @param event The domain event to dispatch
+     */
+    void dispatch(DomainEvent event);
 }

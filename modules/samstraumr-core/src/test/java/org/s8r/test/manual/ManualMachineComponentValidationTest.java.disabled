@@ -69,17 +69,17 @@ public class ManualMachineComponentValidationTest {
         System.out.println("---------------------------");
         
         // Create a machine
-        ComponentId machineId = ComponentId.createNew();
+        ComponentId machineId = ComponentId.create("test-machine");
         Machine machine = Machine.create(
                 machineId, 
-                MachineType.PROCESSING, 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "For testing component validation", 
                 "1.0.0");
         System.out.println("Created machine: " + machine);
         
         // Create a valid composite component (using a mock/anonymous implementation)
-        ComponentId componentId = ComponentId.createNew();
+        ComponentId componentId = ComponentId.create("test-component");
         CompositeComponent component = new CompositeComponent() {
             @Override
             public ComponentId getId() {
@@ -88,7 +88,7 @@ public class ManualMachineComponentValidationTest {
             
             @Override
             public ComponentType getType() {
-                return ComponentType.COMPOSITE;
+                return ComponentType.CONNECTOR;
             }
             
             @Override
@@ -140,10 +140,10 @@ public class ManualMachineComponentValidationTest {
         System.out.println("-------------------------------");
         
         // Create a machine
-        ComponentId machineId = ComponentId.createNew();
+        ComponentId machineId = ComponentId.create("test-machine");
         Machine machine = Machine.create(
                 machineId, 
-                MachineType.PROCESSING, 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "For testing component validation", 
                 "1.0.0");
@@ -164,7 +164,7 @@ public class ManualMachineComponentValidationTest {
             
             // Create a simple atomic component (not a composite)
             Component atomicComponent = new Component() {
-                private final ComponentId id = ComponentId.createNew();
+                private final ComponentId id = ComponentId.create("atomic-component");
                 
                 @Override
                 public ComponentId getId() {
@@ -173,7 +173,7 @@ public class ManualMachineComponentValidationTest {
                 
                 @Override
                 public ComponentType getType() {
-                    return ComponentType.ATOMIC;
+                    return ComponentType.STANDARD;
                 }
                 
                 @Override
@@ -205,17 +205,17 @@ public class ManualMachineComponentValidationTest {
         System.out.println("-----------------------");
         
         // Create a machine
-        ComponentId machineId = ComponentId.createNew();
+        ComponentId machineId = ComponentId.create("test-machine");
         Machine machine = Machine.create(
                 machineId, 
-                MachineType.PROCESSING, 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "For testing component validation", 
                 "1.0.0");
         System.out.println("Created machine: " + machine);
         
         // Create a valid composite component (using a mock/anonymous implementation)
-        ComponentId componentId = ComponentId.createNew();
+        ComponentId componentId = ComponentId.create("test-component");
         CompositeComponent component = new CompositeComponent() {
             @Override
             public ComponentId getId() {
@@ -224,7 +224,7 @@ public class ManualMachineComponentValidationTest {
             
             @Override
             public ComponentType getType() {
-                return ComponentType.COMPOSITE;
+                return ComponentType.CONNECTOR;
             }
             
             @Override
@@ -274,7 +274,7 @@ public class ManualMachineComponentValidationTest {
         // Try to remove a non-existent component
         try {
             System.out.println("Attempting to remove non-existent component...");
-            machine.removeComponent(ComponentId.createNew());
+            machine.removeComponent(ComponentId.create("non-existent"));
             System.err.println("ERROR: Expected exception but none was thrown");
         } catch (ComponentNotFoundException e) {
             System.out.println("Correctly threw exception for non-existent component: " + e.getMessage());
@@ -289,17 +289,17 @@ public class ManualMachineComponentValidationTest {
         System.out.println("-----------------------------------------");
         
         // Create a machine
-        ComponentId machineId = ComponentId.createNew();
+        ComponentId machineId = ComponentId.create("test-machine");
         Machine machine = Machine.create(
                 machineId, 
-                MachineType.PROCESSING, 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "For testing component validation", 
                 "1.0.0");
         System.out.println("Created machine: " + machine);
         
         // Create a valid composite component (using a mock/anonymous implementation)
-        ComponentId componentId = ComponentId.createNew();
+        ComponentId componentId = ComponentId.create("test-component");
         CompositeComponent component = new CompositeComponent() {
             @Override
             public ComponentId getId() {
@@ -308,7 +308,7 @@ public class ManualMachineComponentValidationTest {
             
             @Override
             public ComponentType getType() {
-                return ComponentType.COMPOSITE;
+                return ComponentType.CONNECTOR;
             }
             
             @Override
@@ -375,17 +375,17 @@ public class ManualMachineComponentValidationTest {
         System.out.println("----------------------------------");
         
         // Create a machine
-        ComponentId machineId = ComponentId.createNew();
+        ComponentId machineId = ComponentId.create("test-machine");
         Machine machine = Machine.create(
                 machineId, 
-                MachineType.PROCESSING, 
+                MachineType.DATA_PROCESSOR, 
                 "Test Machine", 
                 "For testing component validation", 
                 "1.0.0");
         System.out.println("Created machine: " + machine);
         
         // Create a valid composite component (using a mock/anonymous implementation)
-        ComponentId componentId = ComponentId.createNew();
+        ComponentId componentId = ComponentId.create("test-component");
         CompositeComponent component = new CompositeComponent() {
             @Override
             public ComponentId getId() {
@@ -394,7 +394,7 @@ public class ManualMachineComponentValidationTest {
             
             @Override
             public ComponentType getType() {
-                return ComponentType.COMPOSITE;
+                return ComponentType.CONNECTOR;
             }
             
             @Override

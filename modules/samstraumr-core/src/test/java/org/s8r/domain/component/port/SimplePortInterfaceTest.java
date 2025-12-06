@@ -81,6 +81,11 @@ public class SimplePortInterfaceTest {
     }
 
     @Override
+    public Map<String, Object> getProperties() {
+      return Collections.emptyMap();
+    }
+
+    @Override
     public List<org.s8r.domain.event.DomainEvent> getDomainEvents() {
       return Collections.emptyList();
     }
