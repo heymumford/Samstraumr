@@ -19,9 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.s8r.application.port.ComponentRepository;
-import org.s8r.application.port.DataFlowEventPort;
 import org.s8r.application.port.EventDispatcher;
-import org.s8r.application.port.EventHandler;
 import org.s8r.application.port.LegacyAdapterResolver;
 import org.s8r.application.port.LoggerFactory;
 import org.s8r.application.port.LoggerPort;
@@ -33,12 +31,6 @@ import org.s8r.application.service.DataFlowService;
 import org.s8r.application.service.MachineService;
 import org.s8r.domain.component.monitoring.MonitoringFactory;
 import org.s8r.domain.component.pattern.PatternFactory;
-import org.s8r.domain.event.ComponentConnectionEvent;
-import org.s8r.domain.event.ComponentCreated;
-import org.s8r.domain.event.ComponentCreatedEvent;
-import org.s8r.domain.event.ComponentDataEvent;
-import org.s8r.domain.event.ComponentStateChangedEvent;
-import org.s8r.domain.event.MachineStateChangedEvent;
 import org.s8r.infrastructure.event.DataFlowEventAdapter;
 import org.s8r.infrastructure.event.DataFlowEventHandler;
 import org.s8r.infrastructure.event.InMemoryEventDispatcher;
@@ -324,7 +316,8 @@ public class DependencyContainer implements ServiceFactory {
     register(MachineService.class, machineService);
 
     // Create DataFlowService
-    org.s8r.application.port.DataFlowEventPort dataFlowEventPort = get(org.s8r.application.port.DataFlowEventPort.class);
+    org.s8r.application.port.DataFlowEventPort dataFlowEventPort =
+        get(org.s8r.application.port.DataFlowEventPort.class);
     DataFlowService dataFlowService =
         new DataFlowService(componentRepository, dataFlowEventPort, eventPublisherAdapter, logger);
     register(DataFlowService.class, dataFlowService);
@@ -373,18 +366,17 @@ public class DependencyContainer implements ServiceFactory {
     // Create event handlers
     LoggingEventHandler loggingHandler = new LoggingEventHandler(logger);
     register(LoggingEventHandler.class, loggingHandler);
-    
+
     // Create data flow event adapter
     DataFlowEventAdapter dataFlowEventAdapter = new DataFlowEventAdapter(logger);
     register(org.s8r.application.port.DataFlowEventPort.class, dataFlowEventAdapter);
-    
+
     // Get the data flow event handler from the adapter
     DataFlowEventHandler dataFlowHandler = dataFlowEventAdapter.getDataFlowHandler();
     register(DataFlowEventHandler.class, dataFlowHandler);
 
     // Register handlers with the dispatcher
-    eventDispatcher.registerHandler(
-        "component.created", loggingHandler.componentCreatedHandler());
+    eventDispatcher.registerHandler("component.created", loggingHandler.componentCreatedHandler());
 
     // Register the new-style ComponentCreated event handler (without Event suffix)
     // This supports the new Clean Architecture event model

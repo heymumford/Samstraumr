@@ -259,10 +259,10 @@ public class Identity {
   public boolean isAdam() {
     return isAdamComponent();
   }
-  
+
   /**
    * Checks if this identity has a parent.
-   * 
+   *
    * @return true if this identity has a parent, false otherwise
    */
   public boolean hasParent() {
@@ -353,45 +353,44 @@ public class Identity {
   }
 
   /**
-   * Gets the unique identifier for this identity.
-   * This is an alias for getUniqueId() needed by tests.
+   * Gets the unique identifier for this identity. This is an alias for getUniqueId() needed by
+   * tests.
    *
    * @return The unique identifier
    */
   public String getId() {
     return uniqueId;
   }
-  
+
   /**
-   * Gets the creation time of this identity.
-   * This is an alias for getConceptionTime() needed by tests.
+   * Gets the creation time of this identity. This is an alias for getConceptionTime() needed by
+   * tests.
    *
    * @return The creation time
    */
   public java.time.LocalDateTime getCreationTime() {
     return java.time.LocalDateTime.ofInstant(conceptionTime, java.time.ZoneId.systemDefault());
   }
-  
+
   /**
-   * Gets the purpose of this identity's creation.
-   * This is an alias for getReason() needed by tests.
+   * Gets the purpose of this identity's creation. This is an alias for getReason() needed by tests.
    *
    * @return The creation purpose
    */
   public String getPurpose() {
     return reason;
   }
-  
+
   /**
-   * Gets the address of this identity in the hierarchy.
-   * This is an alias for getHierarchicalAddress() needed by tests.
+   * Gets the address of this identity in the hierarchy. This is an alias for
+   * getHierarchicalAddress() needed by tests.
    *
    * @return The hierarchical address
    */
   public String getAddress() {
     return hierarchicalAddress;
   }
-  
+
   @Override
   public String toString() {
     return "Identity["

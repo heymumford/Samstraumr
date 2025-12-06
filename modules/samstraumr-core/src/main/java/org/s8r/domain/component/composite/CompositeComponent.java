@@ -175,12 +175,7 @@ public class CompositeComponent extends Component {
 
     // Perform comprehensive validation of the connection
     org.s8r.domain.validation.CompositeConnectionValidator.validateConnection(
-        getId(),
-        sourceId,
-        targetId,
-        type,
-        connections,
-        this::containsComponent);
+        getId(), sourceId, targetId, type, connections, this::containsComponent);
 
     ComponentConnection connection = new ComponentConnection(sourceId, targetId, type, description);
     connections.add(connection);

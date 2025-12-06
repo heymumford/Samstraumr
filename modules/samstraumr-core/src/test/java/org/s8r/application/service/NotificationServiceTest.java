@@ -71,13 +71,12 @@ public class NotificationServiceTest {
     // Setup mock
     Map<String, String> properties = new HashMap<>();
     properties.put("priority", "high");
-    when(mockNotificationPort.sendNotification(
-            anyString(), anyString(), anyString(), anyMap()))
+    when(mockNotificationPort.sendNotification(anyString(), anyString(), anyString(), anyMap()))
         .thenReturn(true);
 
     // Call the service method
-    boolean result = service.sendNotification(
-        "test@example.com", "Test Subject", "Test message", properties);
+    boolean result =
+        service.sendNotification("test@example.com", "Test Subject", "Test message", properties);
 
     // Verify the result
     assertTrue(result);
@@ -91,21 +90,31 @@ public class NotificationServiceTest {
   @Test
   void testSendAdvancedNotification() {
     // Setup mock notification result
-    NotificationResult expectedResult = NotificationResult.success("Notification sent successfully");
+    NotificationResult expectedResult =
+        NotificationResult.success("Notification sent successfully");
     Map<String, String> properties = new HashMap<>();
     properties.put("priority", "high");
 
     when(mockNotificationPort.sendAdvancedNotification(
-            anyString(), anyString(), anyString(),
-            any(NotificationSeverity.class), any(NotificationChannel.class),
-            any(ContentFormat.class), anyMap()))
+            anyString(),
+            anyString(),
+            anyString(),
+            any(NotificationSeverity.class),
+            any(NotificationChannel.class),
+            any(ContentFormat.class),
+            anyMap()))
         .thenReturn(expectedResult);
 
     // Call the service method
-    NotificationResult result = service.sendAdvancedNotification(
-        "test@example.com", "Advanced Subject", "Advanced message",
-        NotificationSeverity.INFO, NotificationChannel.EMAIL,
-        ContentFormat.TEXT, properties);
+    NotificationResult result =
+        service.sendAdvancedNotification(
+            "test@example.com",
+            "Advanced Subject",
+            "Advanced message",
+            NotificationSeverity.INFO,
+            NotificationChannel.EMAIL,
+            ContentFormat.TEXT,
+            properties);
 
     // Verify the result
     assertNotNull(result);
@@ -115,9 +124,13 @@ public class NotificationServiceTest {
     // Verify the mock interactions
     verify(mockNotificationPort)
         .sendAdvancedNotification(
-            eq("test@example.com"), eq("Advanced Subject"), eq("Advanced message"),
-            eq(NotificationSeverity.INFO), eq(NotificationChannel.EMAIL),
-            eq(ContentFormat.TEXT), anyMap());
+            eq("test@example.com"),
+            eq("Advanced Subject"),
+            eq("Advanced message"),
+            eq(NotificationSeverity.INFO),
+            eq(NotificationChannel.EMAIL),
+            eq(ContentFormat.TEXT),
+            anyMap());
     verify(mockLogger).debug(anyString(), anyString(), any());
   }
 
@@ -190,8 +203,7 @@ public class NotificationServiceTest {
   @Test
   void testRegisterUserRecipient() {
     // Setup mock
-    when(mockNotificationPort.registerRecipient(eq("user789"), any()))
-        .thenReturn(true);
+    when(mockNotificationPort.registerRecipient(eq("user789"), any())).thenReturn(true);
 
     // Call the service method
     boolean result = service.registerUserRecipient("user789", "user789@example.com", "email");
@@ -239,5 +251,4 @@ public class NotificationServiceTest {
     verify(mockLogger).debug(anyString(), anyString());
     verify(mockLogger).warn(anyString(), anyString());
   }
-
 }

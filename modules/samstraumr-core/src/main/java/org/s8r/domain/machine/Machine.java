@@ -65,7 +65,7 @@ public class Machine {
     return new Machine(id, type, name, description, version);
   }
 
-  /** 
+  /**
    * Adds a composite component to this machine.
    *
    * @param component The composite component to add
@@ -76,7 +76,7 @@ public class Machine {
   public void addComponent(CompositeComponent component) {
     // Validate that this operation is allowed in the current state
     MachineStateValidator.validateOperationState(id, MachineOperation.ADD_COMPONENT, state);
-    
+
     // Validate that the component is a valid composite component
     org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(this, component);
 
@@ -94,7 +94,7 @@ public class Machine {
   public void removeComponent(ComponentId componentId) {
     // Validate that this operation is allowed in the current state
     MachineStateValidator.validateOperationState(id, MachineOperation.REMOVE_COMPONENT, state);
-    
+
     // Validate that the component exists
     if (componentId == null) {
       throw new IllegalArgumentException("Component ID cannot be null");
@@ -121,7 +121,7 @@ public class Machine {
     if (componentId == null) {
       throw new IllegalArgumentException("Component ID cannot be null");
     }
-    
+
     return Optional.ofNullable(components.get(componentId.getIdString()));
   }
 
@@ -145,7 +145,7 @@ public class Machine {
     for (CompositeComponent component : components.values()) {
       // Validate component before initialization (redundant here but included for completeness)
       org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(this, component);
-      
+
       if (component.getLifecycleState() == LifecycleState.READY) {
         logActivity("Component already initialized: " + component.getId().getShortId());
       } else {
@@ -172,8 +172,9 @@ public class Machine {
     for (CompositeComponent component : components.values()) {
       try {
         // Validate component before activation
-        org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(this, component);
-        
+        org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(
+            this, component);
+
         component.activate();
         logActivity("Activated component: " + component.getId().getShortId());
       } catch (Exception e) {
@@ -204,8 +205,9 @@ public class Machine {
     for (CompositeComponent component : components.values()) {
       try {
         // Validate component before deactivation
-        org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(this, component);
-        
+        org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(
+            this, component);
+
         component.deactivate();
         logActivity("Deactivated component: " + component.getId().getShortId());
       } catch (Exception e) {
@@ -229,15 +231,16 @@ public class Machine {
   public void pause() {
     // Validate that this operation is allowed in the current state
     MachineStateValidator.validateOperationState(id, MachineOperation.PAUSE, state);
-    
+
     logActivity("Pausing machine");
-    
+
     // Suspend components but don't stop them completely
     for (CompositeComponent component : components.values()) {
       try {
         // Validate component before suspension
-        org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(this, component);
-        
+        org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(
+            this, component);
+
         if (component.getLifecycleState().isActive()) {
           // We deactivate here, but we could have a more specialized suspend method
           component.deactivate();
@@ -251,11 +254,11 @@ public class Machine {
                 + e.getMessage());
       }
     }
-    
+
     // Transition to PAUSED state
     setState(MachineState.PAUSED, "Machine paused");
   }
-  
+
   /**
    * Resume this machine from a paused state.
    *
@@ -264,15 +267,16 @@ public class Machine {
   public void resume() {
     // Validate that this operation is allowed in the current state
     MachineStateValidator.validateOperationState(id, MachineOperation.RESUME, state);
-    
+
     logActivity("Resuming machine");
-    
+
     // Resume components
     for (CompositeComponent component : components.values()) {
       try {
         // Validate component before resuming
-        org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(this, component);
-        
+        org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(
+            this, component);
+
         if (component.getLifecycleState().isStandby()) {
           component.activate();
           logActivity("Resumed component: " + component.getId().getShortId());
@@ -285,7 +289,7 @@ public class Machine {
                 + e.getMessage());
       }
     }
-    
+
     // Transition to RUNNING state
     setState(MachineState.RUNNING, "Machine resumed");
   }
@@ -298,15 +302,16 @@ public class Machine {
   public void destroy() {
     // Validate that this operation is allowed in the current state
     MachineStateValidator.validateOperationState(id, MachineOperation.DESTROY, state);
-    
+
     logActivity("Destroying machine");
 
     // Terminate all components
     for (CompositeComponent component : components.values()) {
       try {
         // Validate component before termination
-        org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(this, component);
-        
+        org.s8r.domain.validation.MachineComponentValidator.validateMachineComponent(
+            this, component);
+
         component.terminate();
         logActivity("Terminated component: " + component.getId().getShortId());
       } catch (Exception e) {
@@ -340,14 +345,14 @@ public class Machine {
    */
   public void setState(MachineState newState, String reason) {
     MachineStateValidator.validateStateTransition(id, state, newState);
-    
+
     MachineState oldState = state;
     state = newState;
     logActivity("State changed to " + newState + ": " + reason);
-    
+
     raiseEvent(new MachineStateChangedEvent(id, oldState, state, reason));
   }
-  
+
   /**
    * Attempts to transition the machine to the error state.
    *
@@ -359,7 +364,7 @@ public class Machine {
     if (state == MachineState.ERROR || state == MachineState.DESTROYED) {
       return false;
     }
-    
+
     try {
       setState(MachineState.ERROR, "Error: " + errorReason);
       return true;
@@ -377,11 +382,11 @@ public class Machine {
   public void resetFromError() {
     // Validate using operation validation
     MachineStateValidator.validateOperationState(id, MachineOperation.RESET_FROM_ERROR, state);
-    
+
     // Transition back to READY state
     setState(MachineState.READY, "Reset from error state");
   }
-  
+
   /** Checks if this machine is in a modifiable state. */
   private boolean isModifiable() {
     return MachineStateValidator.isOperationAllowed(MachineOperation.ADD_COMPONENT, state);

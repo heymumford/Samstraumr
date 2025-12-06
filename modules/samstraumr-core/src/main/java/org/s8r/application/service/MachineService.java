@@ -148,7 +148,7 @@ public class MachineService {
 
     // Get the machine port
     MachinePort machinePort = getMachineOrThrow(machineId);
-    
+
     // Validate that the referenced component exists
     org.s8r.domain.validation.ComponentReferenceValidator.validateComponentReference(
         "addComponentToMachine",
@@ -201,7 +201,7 @@ public class MachineService {
 
     // Get the machine port
     MachinePort machinePort = getMachineOrThrow(machineId);
-    
+
     // Validate that the referenced component exists
     org.s8r.domain.validation.ComponentReferenceValidator.validateComponentReference(
         "removeComponentFromMachine",

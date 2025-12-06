@@ -18,7 +18,6 @@ package org.s8r.domain.component;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -54,7 +53,7 @@ public class Component {
   public Component(ComponentId id) {
     this(id, ComponentType.STANDARD.getCode());
   }
-  
+
   /**
    * Creates a new Component with a specific type.
    *
@@ -64,11 +63,11 @@ public class Component {
    */
   public Component(ComponentId id, String componentType) {
     this.id = Objects.requireNonNull(id, "Component ID cannot be null");
-    
+
     // Validate component type
     ComponentTypeValidator.validateComponentType(componentType, id);
     this.componentType = componentType;
-    
+
     this.lifecycleState = LifecycleState.CONCEPTION;
     this.lineage.add(id.getReason());
 
@@ -76,7 +75,7 @@ public class Component {
     raiseEvent(new ComponentCreatedEvent(id, componentType));
   }
 
-  /** 
+  /**
    * Creates a new Component with the default component type.
    *
    * @param id The component ID
@@ -87,7 +86,7 @@ public class Component {
     component.initialize();
     return component;
   }
-  
+
   /**
    * Creates a new Component with the specified component type.
    *
@@ -101,7 +100,7 @@ public class Component {
     component.initialize();
     return component;
   }
-  
+
   /**
    * Creates a new Component with the specified ComponentType enum.
    *
@@ -234,7 +233,7 @@ public class Component {
   public boolean isOperationAllowed(String operation) {
     return ComponentTypeValidator.isAllowedForOperation(componentType, operation);
   }
-  
+
   /**
    * Validates that this component type allows a specific operation.
    *
@@ -253,7 +252,7 @@ public class Component {
   public LifecycleState getLifecycleState() {
     return lifecycleState;
   }
-  
+
   /**
    * Gets the component type code.
    *
@@ -262,12 +261,13 @@ public class Component {
   public String getComponentType() {
     return componentType;
   }
-  
+
   /**
    * Gets the component type as an enum value.
    *
    * @return The component type enum value
-   * @throws IllegalStateException if the component type is not recognized (should not happen due to validation)
+   * @throws IllegalStateException if the component type is not recognized (should not happen due to
+   *     validation)
    */
   public ComponentType getComponentTypeEnum() {
     return ComponentType.fromCode(componentType)

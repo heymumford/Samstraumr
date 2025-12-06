@@ -69,22 +69,24 @@ public class TestComponentFactory {
     }
 
     @Override
-    public int dispatchEvent(String eventType, String source, String payload, Map<String, String> properties) {
+    public int dispatchEvent(
+        String eventType, String source, String payload, Map<String, String> properties) {
       // Create a test domain event for tracking
-      DomainEvent event = new DomainEvent() {
-        @Override
-        public String getEventType() {
-          return eventType;
-        }
-      };
-      
+      DomainEvent event =
+          new DomainEvent() {
+            @Override
+            public String getEventType() {
+              return eventType;
+            }
+          };
+
       // Add to published events for verification
       publishedEvents.add(event);
       logger.debug("Dispatched event: " + eventType);
 
       // Count processed handlers
       int handlerCount = 0;
-      
+
       // Notify handlers for this event type
       List<EventHandler> eventHandlers = handlers.getOrDefault(eventType, new ArrayList<>());
       for (EventHandler handler : eventHandlers) {
@@ -95,21 +97,21 @@ public class TestComponentFactory {
           logger.error("Error handling event: " + e.getMessage(), e);
         }
       }
-      
+
       return handlerCount;
     }
-    
+
     // For backwards compatibility
     public void dispatch(DomainEvent event) {
       if (event == null) {
         return;
       }
-      
+
       // Create properties map
       Map<String, String> properties = new HashMap<>();
       properties.put("id", event.getEventId());
       properties.put("timestamp", event.getOccurredOn().toString());
-      
+
       // Dispatch using the new method
       dispatchEvent(event.getEventType(), event.getEventId(), event.toString(), properties);
     }
@@ -120,32 +122,31 @@ public class TestComponentFactory {
       logger.debug("Registered handler for event type: " + eventType);
       return true;
     }
-    
+
     // For backwards compatibility
-    public <T extends DomainEvent> void registerHandler(
-        Class<T> eventType, EventHandler handler) {
+    public <T extends DomainEvent> void registerHandler(Class<T> eventType, EventHandler handler) {
       registerHandler(eventType.getSimpleName().toLowerCase(), handler);
     }
 
-    /**
-     * Convenience method to register a Consumer as a handler (not an interface override).
-     */
+    /** Convenience method to register a Consumer as a handler (not an interface override). */
     public <T extends DomainEvent> void registerConsumerHandler(
         Class<T> eventType, java.util.function.Consumer<T> handler) {
       // Create an adapter from Consumer to EventHandler
-      EventHandler handlerAdapter = new EventHandler() {
-        @Override
-        public void handleEvent(String eventType, String source, String payload, Map<String, String> properties) {
-          // This is just a stub since we can't actually convert between the types
-          logger.debug("Consumer handler invoked for {}", eventType);
-        }
-        
-        @Override
-        public String[] getEventTypes() {
-          return new String[] { eventType.getSimpleName().toLowerCase() };
-        }
-      };
-      
+      EventHandler handlerAdapter =
+          new EventHandler() {
+            @Override
+            public void handleEvent(
+                String eventType, String source, String payload, Map<String, String> properties) {
+              // This is just a stub since we can't actually convert between the types
+              logger.debug("Consumer handler invoked for {}", eventType);
+            }
+
+            @Override
+            public String[] getEventTypes() {
+              return new String[] {eventType.getSimpleName().toLowerCase()};
+            }
+          };
+
       registerHandler(eventType.getSimpleName().toLowerCase(), handlerAdapter);
     }
 
@@ -161,7 +162,7 @@ public class TestComponentFactory {
       }
       return false;
     }
-    
+
     // For backwards compatibility
     public <T extends DomainEvent> void unregisterHandler(
         Class<T> eventType, EventHandler handler) {
@@ -215,18 +216,20 @@ public class TestComponentFactory {
     public <T extends DomainEvent> void subscribe(
         Class<T> eventType, java.util.function.Consumer<T> consumer) {
       // Create a simple handler that logs events
-      EventHandler handler = new EventHandler() {
-        @Override
-        public void handleEvent(String eventType, String source, String payload, Map<String, String> properties) {
-          logger.debug("Event handler for {} triggered from source {}", eventType, source);
-        }
-        
-        @Override
-        public String[] getEventTypes() {
-          return new String[] { eventType.getSimpleName().toLowerCase() };
-        }
-      };
-      
+      EventHandler handler =
+          new EventHandler() {
+            @Override
+            public void handleEvent(
+                String eventType, String source, String payload, Map<String, String> properties) {
+              logger.debug("Event handler for {} triggered from source {}", eventType, source);
+            }
+
+            @Override
+            public String[] getEventTypes() {
+              return new String[] {eventType.getSimpleName().toLowerCase()};
+            }
+          };
+
       registerHandler(eventType.getSimpleName().toLowerCase(), handler);
     }
   }

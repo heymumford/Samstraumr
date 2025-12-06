@@ -17,46 +17,46 @@ package org.s8r.component;
 
 /**
  * Interface for listeners that want to be notified of component state transitions.
- * 
- * <p>State transition listeners allow components to notify interested parties
- * when their lifecycle state changes, enabling reactive behavior in response to
- * lifecycle events.</p>
- * 
- * <p>To use a state transition listener:</p>
+ *
+ * <p>State transition listeners allow components to notify interested parties when their lifecycle
+ * state changes, enabling reactive behavior in response to lifecycle events.
+ *
+ * <p>To use a state transition listener:
+ *
  * <ol>
- *   <li>Implement this interface in your listener class</li>
- *   <li>Register the listener with a component using component.addStateTransitionListener()</li>
- *   <li>Handle state changes in the onStateTransition method</li>
+ *   <li>Implement this interface in your listener class
+ *   <li>Register the listener with a component using component.addStateTransitionListener()
+ *   <li>Handle state changes in the onStateTransition method
  * </ol>
  */
 @FunctionalInterface
 public interface StateTransitionListener {
-    
-    /**
-     * Called when a component's state changes.
-     *
-     * @param component The component whose state changed
-     * @param oldState The previous state
-     * @param newState The new state
-     */
-    void onStateTransition(Component component, State oldState, State newState);
-    
-    /**
-     * Checks whether this listener is interested in transitions to the given state.
-     * By default, returns true for all states.
-     *
-     * @param state The state to check
-     * @return true if this listener is interested in transitions to the given state
-     */
-    default boolean isInterestedInState(State state) {
-        return true;
-    }
-    
-    /**
-     * Called when a component is terminated and the listener is being removed.
-     * This gives the listener a chance to clean up any resources.
-     */
-    default void onTermination() {
-        // Default implementation is a no-op
-    }
+
+  /**
+   * Called when a component's state changes.
+   *
+   * @param component The component whose state changed
+   * @param oldState The previous state
+   * @param newState The new state
+   */
+  void onStateTransition(Component component, State oldState, State newState);
+
+  /**
+   * Checks whether this listener is interested in transitions to the given state. By default,
+   * returns true for all states.
+   *
+   * @param state The state to check
+   * @return true if this listener is interested in transitions to the given state
+   */
+  default boolean isInterestedInState(State state) {
+    return true;
+  }
+
+  /**
+   * Called when a component is terminated and the listener is being removed. This gives the
+   * listener a chance to clean up any resources.
+   */
+  default void onTermination() {
+    // Default implementation is a no-op
+  }
 }

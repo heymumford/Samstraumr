@@ -14,26 +14,30 @@ import org.junit.platform.suite.api.ConfigurationParameter;
 import org.junit.platform.suite.api.IncludeEngines;
 import org.junit.platform.suite.api.SelectClasspathResource;
 import org.junit.platform.suite.api.Suite;
+
 import io.cucumber.junit.platform.engine.Constants;
 
 /**
  * Test runner for Component tests.
- * 
- * <p>This suite runs all Cucumber features related to Components in isolation.
- * It filters tests using the @ComponentTest tag.
- * 
+ *
+ * <p>This suite runs all Cucumber features related to Components in isolation. It filters tests
+ * using the @ComponentTest tag.
+ *
  * <p>To run this suite, use one of these methods:
+ *
  * <ul>
- *   <li>Maven: {@code mvn test -Dtest=ComponentTests}</li>
- *   <li>s8r-test script: {@code ./s8r-test component}</li>
+ *   <li>Maven: {@code mvn test -Dtest=ComponentTests}
+ *   <li>s8r-test script: {@code ./s8r-test component}
  * </ul>
  */
 @Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features/component")
-@ConfigurationParameter(key = Constants.GLUE_PROPERTY_NAME, value = "org.s8r.test.steps,org.s8r.component.test.steps")
+@ConfigurationParameter(
+    key = Constants.GLUE_PROPERTY_NAME,
+    value = "org.s8r.test.steps,org.s8r.component.test.steps")
 @ConfigurationParameter(key = Constants.PLUGIN_PROPERTY_NAME, value = "pretty")
 @ConfigurationParameter(key = Constants.FILTER_TAGS_PROPERTY_NAME, value = "@ComponentTest")
 public class ComponentTests {
-    // This class is intentionally empty. It's used only as a holder for the annotations.
+  // This class is intentionally empty. It's used only as a holder for the annotations.
 }

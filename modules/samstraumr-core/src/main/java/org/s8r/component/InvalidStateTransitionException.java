@@ -36,13 +36,14 @@ public class InvalidStateTransitionException extends RuntimeException {
    * @param fromState The current state
    * @param toState The target state that can't be transitioned to
    */
-  public InvalidStateTransitionException(String message, String componentId, State fromState, State toState) {
+  public InvalidStateTransitionException(
+      String message, String componentId, State fromState, State toState) {
     super(message);
     this.componentId = componentId;
     this.fromState = fromState;
     this.toState = toState;
   }
-  
+
   /**
    * Creates a new InvalidStateTransitionException with default message.
    *
@@ -51,8 +52,11 @@ public class InvalidStateTransitionException extends RuntimeException {
    * @param toState The target state that can't be transitioned to
    */
   public InvalidStateTransitionException(String componentId, State fromState, State toState) {
-    this(String.format("Invalid state transition from %s to %s", fromState, toState), 
-         componentId, fromState, toState);
+    this(
+        String.format("Invalid state transition from %s to %s", fromState, toState),
+        componentId,
+        fromState,
+        toState);
   }
 
   /**
@@ -72,7 +76,7 @@ public class InvalidStateTransitionException extends RuntimeException {
   public State getTargetState() {
     return toState;
   }
-  
+
   /**
    * Gets the component ID.
    *

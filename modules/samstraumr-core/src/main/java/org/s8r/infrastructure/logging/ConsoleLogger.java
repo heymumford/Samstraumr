@@ -67,7 +67,7 @@ public class ConsoleLogger implements LoggerPort {
       log(LogLevel.TRACE, message, null);
     }
   }
-  
+
   @Override
   public void trace(String format, Object... args) {
     if (isLevelEnabled(LogLevel.TRACE)) {
@@ -81,7 +81,7 @@ public class ConsoleLogger implements LoggerPort {
       log(LogLevel.DEBUG, message, null);
     }
   }
-  
+
   @Override
   public void debug(String format, Object... args) {
     if (isLevelEnabled(LogLevel.DEBUG)) {
@@ -95,7 +95,7 @@ public class ConsoleLogger implements LoggerPort {
       log(LogLevel.INFO, message, null);
     }
   }
-  
+
   @Override
   public void info(String format, Object... args) {
     if (isLevelEnabled(LogLevel.INFO)) {
@@ -109,7 +109,7 @@ public class ConsoleLogger implements LoggerPort {
       log(LogLevel.WARN, message, null);
     }
   }
-  
+
   @Override
   public void warn(String format, Object... args) {
     if (isLevelEnabled(LogLevel.WARN)) {
@@ -123,7 +123,7 @@ public class ConsoleLogger implements LoggerPort {
       log(LogLevel.ERROR, message, null);
     }
   }
-  
+
   @Override
   public void error(String format, Object... args) {
     if (isLevelEnabled(LogLevel.ERROR)) {
@@ -137,17 +137,17 @@ public class ConsoleLogger implements LoggerPort {
       log(LogLevel.ERROR, message, e);
     }
   }
-  
+
   @Override
   public boolean isTraceEnabled() {
     return isLevelEnabled(LogLevel.TRACE);
   }
-  
+
   @Override
   public boolean isDebugEnabled() {
     return isLevelEnabled(LogLevel.DEBUG);
   }
-  
+
   @Override
   public String getName() {
     return name;

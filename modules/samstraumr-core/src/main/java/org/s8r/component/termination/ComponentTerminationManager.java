@@ -25,6 +25,7 @@ import org.s8r.component.logging.ComponentLogger;
  * Manages component termination, including scheduled termination and cleanup.
  *
  * <p>This class handles:
+ *
  * <ul>
  *   <li>Scheduled termination via timer
  *   <li>Cleanup and resource release
@@ -123,25 +124,22 @@ public class ComponentTerminationManager {
     cancelTimer();
 
     // Execute termination through lifecycle manager
-    lifecycleTerminator.accept(() -> {
-      preserveKnowledge();
-      releaseResources();
-    });
+    lifecycleTerminator.accept(
+        () -> {
+          preserveKnowledge();
+          releaseResources();
+        });
 
     logger.info("Component terminated", "LIFECYCLE", "TERMINATE");
   }
 
-  /**
-   * Preserves crucial knowledge before termination for potential future use.
-   */
+  /** Preserves crucial knowledge before termination for potential future use. */
   private void preserveKnowledge() {
     logger.debug("Preserving knowledge before termination", "LIFECYCLE", "TERMINATE");
     // In a full implementation, this would archive important learnings and experiences
   }
 
-  /**
-   * Releases all resources allocated to this component.
-   */
+  /** Releases all resources allocated to this component. */
   private void releaseResources() {
     logger.debug("Releasing allocated resources", "LIFECYCLE", "TERMINATE");
     // In a full implementation, this would clean up all allocated resources

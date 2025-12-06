@@ -1,36 +1,36 @@
 /*
  * Copyright (c) 2025 Eric C. Mumford (@heymumford)
  *
- * This software was developed with analytical assistance from AI tools 
+ * This software was developed with analytical assistance from AI tools
  * including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
- * which were used as paid services. All intellectual property rights 
+ * which were used as paid services. All intellectual property rights
  * remain exclusively with the copyright holder listed above.
  *
  * Licensed under the Mozilla Public License 2.0
  */
 package org.s8r.test.runner;
 
-import io.cucumber.junit.Cucumber;
-import io.cucumber.junit.CucumberOptions;
 import org.junit.runner.RunWith;
 
+import io.cucumber.junit.Cucumber;
+import io.cucumber.junit.CucumberOptions;
+
 /**
- * Test runner specifically for basic component lifecycle state tests.
- * This provides a focused runner for testing the state-dependent behavior
- * of components without running all lifecycle tests.
+ * Test runner specifically for basic component lifecycle state tests. This provides a focused
+ * runner for testing the state-dependent behavior of components without running all lifecycle
+ * tests.
  */
 @RunWith(Cucumber.class)
 @CucumberOptions(
     features = "src/test/resources/features/L0_Lifecycle/lifecycle-states.feature",
     glue = {"org.s8r.test.steps.lifecycle"},
     plugin = {
-        "pretty", 
-        "html:target/cucumber-reports/lifecycle-states",
-        "json:target/cucumber-reports/lifecycle-states.json"
+      "pretty",
+      "html:target/cucumber-reports/lifecycle-states",
+      "json:target/cucumber-reports/lifecycle-states.json"
     },
     tags = "@L0_Lifecycle or @Functional",
-    monochrome = true
-)
+    monochrome = true)
 public class RunBasicLifecycleStateTests {
-    // This class is empty as it's just a runner
+  // This class is empty as it's just a runner
 }
