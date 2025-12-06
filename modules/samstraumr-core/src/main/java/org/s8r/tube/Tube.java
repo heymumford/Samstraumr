@@ -499,7 +499,6 @@ public class Tube {
    * Creates a new tube with the specified reason.
    *
    * @param reason the reason for creating the tube
-   * @return a new tube instance
    */
   public Tube(String reason) {
     this(
@@ -514,7 +513,6 @@ public class Tube {
    *
    * @param reason the reason for creating the tube
    * @param parentTube the parent tube
-   * @return a new child tube instance
    */
   public Tube(String reason, Tube parentTube) {
     this(

@@ -6,8 +6,8 @@
  * complex processing structures. The tube package includes lifecycle management, identity, and
  * logging capabilities for tubes.
  *
- * @deprecated This package is part of the legacy architecture and is gradually being replaced by
- *     the org.s8r.component package in the new Clean Architecture. New code should use the
- *     component package instead.
+ * <p><b>Deprecation Notice:</b> This package is part of the legacy architecture and is gradually
+ * being replaced by the org.s8r.component package in the new Clean Architecture. New code should
+ * use the component package instead.
  */
 package org.s8r.tube;

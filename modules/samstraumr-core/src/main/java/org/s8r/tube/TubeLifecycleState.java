@@ -30,27 +30,6 @@ package org.s8r.tube;
  * <p>This enum extends the basic TubeStatus by providing more granular lifecycle states that map to
  * biological development stages, enabling a more nuanced model of tube evolution.
  */
-/**
- * Constructs a TubeLifecycleState with a description and biological analog.
- *
- * @param description A short description of the state
- * @param biologicalAnalog The corresponding biological developmental stage
- */
-/**
- * Gets the description of this lifecycle state.
- *
- * @return The state description
- */
-/**
- * Gets the biological analog for this lifecycle state.
- *
- * @return The biological analog description
- */
-/**
- * Returns a string representation of this lifecycle state.
- *
- * @return A string containing the state name, description, and biological analog
- */
 public enum TubeLifecycleState {
   // Creation & Early Development (Embryonic)
   CONCEPTION("Initial creation", "Fertilization/Zygote"),

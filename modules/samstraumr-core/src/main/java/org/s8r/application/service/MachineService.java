@@ -138,7 +138,8 @@ public class MachineService {
    * @param machineId The machine ID
    * @param componentId The component ID
    * @throws ComponentNotFoundException if either component is not found
-   * @throws NonExistentComponentReferenceException if the referenced component doesn't exist
+   * @throws org.s8r.domain.exception.NonExistentComponentReferenceException if the referenced
+   *     component doesn't exist
    * @throws InvalidOperationException if the machine is not in a valid state for adding components
    * @throws IllegalArgumentException if the component is not a composite component
    */
@@ -188,7 +189,8 @@ public class MachineService {
    * @param machineId The machine ID
    * @param componentId The component ID
    * @throws ComponentNotFoundException if either component is not found
-   * @throws NonExistentComponentReferenceException if the referenced component doesn't exist
+   * @throws org.s8r.domain.exception.NonExistentComponentReferenceException if the referenced
+   *     component doesn't exist
    * @throws InvalidOperationException if the machine is not in a valid state for removing
    *     components
    */

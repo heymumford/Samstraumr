@@ -71,8 +71,7 @@ public class MachineComponentValidator {
    *
    * @param machine The machine to which the component will be added
    * @param component The component to validate
-   * @param existsFunction Function that checks if the component exists
-   * @throws NonExistentComponentReferenceException if the component doesn't exist
+   * @throws IllegalArgumentException if the component is null
    * @throws InvalidCompositeTypeException if the component is not a composite
    */
   public static void validateMachineComponent(Machine machine, CompositeComponent component) {

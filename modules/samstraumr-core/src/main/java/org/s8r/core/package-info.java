@@ -6,8 +6,8 @@
  * system, such as environment configuration, exception handling, and tube implementation. The core
  * package is a legacy package that is gradually being migrated to the Clean Architecture design.
  *
- * @deprecated This package is part of the legacy architecture and will be gradually replaced by the
- *     domain, application, and infrastructure packages in the Clean Architecture. New code should
- *     use those packages instead.
+ * <p><b>Deprecation Notice:</b> This package is part of the legacy architecture and will be
+ * gradually replaced by the domain, application, and infrastructure packages in the Clean
+ * Architecture. New code should use those packages instead.
  */
 package org.s8r.core;

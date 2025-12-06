@@ -5,8 +5,8 @@
  * components and their interactions. It includes common base classes for tube tests, fixtures, and
  * test data generators.
  *
- * @deprecated This package is part of the legacy architecture and is gradually being replaced by
- *     the org.s8r.test package in the new Clean Architecture. New code should use the general test
- *     package instead.
+ * <p><b>Deprecation Notice:</b> This package is part of the legacy architecture and is gradually
+ * being replaced by the org.s8r.test package in the new Clean Architecture. New code should use the
+ * general test package instead.
  */
 package org.s8r.tube.test;
