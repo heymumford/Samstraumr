@@ -1,4 +1,4 @@
-/*
+#
 Filename: machine-orchestration-tests.feature
 Purpose: Validates the orchestration capabilities of Machines
 Goals:
@@ -8,7 +8,7 @@ Goals:
 Dependencies:
   - BDD step definitions in org.s8r.component.test.steps package
   - Machine, Composite and Component implementations in org.s8r.component
-*/
+#
 
 @L2_Integration @Functional
 Feature: Machine Orchestration

@@ -1,20 +1,20 @@
-/*
-Filename: tube-initialization-tests.feature
-Purpose: Validates the initialization and early lifecycle stages of Tubes
-Goals:
-  - Verify basic tube creation and initialization
-  - Test initialization error handling
-  - Validate environment awareness during initialization
-Dependencies:
-  - BDD step definitions in org.s8r.tube.lifecycle.steps package
-  - Tube and Environment implementations in org.s8r.tube
-*/
+
+# Filename: tube-initialization-tests.feature
+# Purpose: Validates the initialization and early lifecycle stages of Tubes
+# Goals:
+  # - Verify basic tube creation and initialization
+  # - Test initialization error handling
+  # - Validate environment awareness during initialization
+# Dependencies:
+  # - BDD step definitions in org.s8r.tube.lifecycle.steps package
+  # - Tube and Environment implementations in org.s8r.tube
+
 
 @ATL @L0_Tube @Lifecycle @Init
 Feature: Tube Initialization and Early Lifecycle
-  Tubes should properly initialize, establish identity, and begin their lifecycle
-  following the biological development model, focusing on the early embryonic stages
-  of creation (fertilization) and initialization (cleavage).
+  # Tubes should properly initialize, establish identity, and begin their lifecycle
+  # following the biological development model, focusing on the early embryonic stages
+  # of creation (fertilization) and initialization (cleavage).
 
   @ATL @L0_Tube @Lifecycle @Init @Creation
   Scenario: Basic tube initialization with reason

@@ -1,4 +1,4 @@
-/*
+#
 Filename: identity-tests.feature
 Purpose: Validates the identity system for Components
 Goals:
@@ -8,7 +8,7 @@ Goals:
 Dependencies:
   - BDD step definitions in org.s8r.component.test.steps package
   - Component and Identity implementations in org.s8r.component.identity
-*/
+#
 
 @L0_Unit @Identity
 Feature: Component Identity Management

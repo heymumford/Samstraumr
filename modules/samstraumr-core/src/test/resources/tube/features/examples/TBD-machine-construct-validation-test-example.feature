@@ -1,11 +1,11 @@
-/*
-Filename: TBD-MachineConstructValidationTest-Example.feature
-Purpose: Example feature file demonstrating TBD Machine Construct Validation Testing (MCVT) approach
-Goals:
-  - Show proper TBD tag usage for machine-level testing
-  - Demonstrate end-to-end testing of machine constructs
-  - Provide a template for future MCVT tests
-*/
+
+# Filename: TBD-MachineConstructValidationTest-Example.feature
+# Purpose: Example feature file demonstrating TBD Machine Construct Validation Testing (MCVT) approach
+# Goals:
+  # - Show proper TBD tag usage for machine-level testing
+  # - Demonstrate end-to-end testing of machine constructs
+  # - Provide a template for future MCVT tests
+
 
 @ATL @L2_Machine @MCVT
 Feature: TBD Machine Construct Validation Testing Example

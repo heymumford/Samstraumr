@@ -1,20 +1,18 @@
-/*
-Filename: memory-identity-tests.feature
-Purpose: Validates the Memory Identity aspects of the Tube Lifecycle model.
-Goals:
-  - Ensure tubes maintain state persistence across transitions
-  - Test experience recording and recall capabilities
-  - Validate adaptive learning from past experiences
-  - Verify performance awareness and self-monitoring
-  - Test purpose preservation during evolution
-Dependencies:
-  - BDD step definitions in org.s8r.tube.lifecycle.steps package
-  - Tube and Environment implementations in org.s8r.tube
-Assumptions:
-  - Test environment provides stable resource conditions
-  - Cucumber test runner is properly configured
-  - Test tags are consistent with the test ontology
-*/
+# Filename: memory-identity-tests.feature
+# Purpose: Validates the Memory Identity aspects of the Tube Lifecycle model.
+# Goals:
+#   - Ensure tubes maintain state persistence across transitions
+#   - Test experience recording and recall capabilities
+#   - Validate adaptive learning from past experiences
+#   - Verify performance awareness and self-monitoring
+#   - Test purpose preservation during evolution
+# Dependencies:
+#   - BDD step definitions in org.s8r.tube.lifecycle.steps package
+#   - Tube and Environment implementations in org.s8r.tube
+# Assumptions:
+#   - Test environment provides stable resource conditions
+#   - Cucumber test runner is properly configured
+#   - Test tags are consistent with the test ontology
 
 @L0_Unit @Functional @Identity
 Feature: Tube Memory Identity (Psychological Continuity Analog)

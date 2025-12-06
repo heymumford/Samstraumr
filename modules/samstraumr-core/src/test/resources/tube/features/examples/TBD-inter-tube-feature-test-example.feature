@@ -1,11 +1,11 @@
-/*
-Filename: TBD-InterTubeFeatureTest-Example.feature
-Purpose: Example feature file demonstrating TBD Inter-Tube Feature Testing (ITFT) approach
-Goals:
-  - Show proper TBD tag usage for feature interaction testing
-  - Demonstrate testing of internal tube features working together
-  - Provide a template for future ITFT tests
-*/
+
+# Filename: TBD-InterTubeFeatureTest-Example.feature
+# Purpose: Example feature file demonstrating TBD Inter-Tube Feature Testing (ITFT) approach
+# Goals:
+  # - Show proper TBD tag usage for feature interaction testing
+  # - Demonstrate testing of internal tube features working together
+  # - Provide a template for future ITFT tests
+
 
 @ATL @L0_Tube @ITFT
 Feature: TBD Inter-Tube Feature Testing Example

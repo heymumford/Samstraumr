@@ -1,4 +1,4 @@
-/*
+#
 Filename: substrate-identity-tests.feature
 Purpose: Validates the Substrate Identity aspects of the Tube Lifecycle model.
 Goals:
@@ -13,7 +13,7 @@ Assumptions:
   - Test environment provides stable resource conditions
   - Cucumber test runner is properly configured
   - Test tags are consistent with the test ontology
-*/
+#
 
 @ATL @L0_Tube @Lifecycle @Substrate @Identity
 Feature: Tube Substrate Identity (Biological Continuity Analog)

@@ -902,9 +902,12 @@ function run_tests() {
   
   # Add coverage if requested
   if $COVERAGE; then
-    mvn_args+=("jacoco:prepare-agent" "jacoco:report")
+    mvn_args+=("-Pcoverage")
     print_info "Code coverage analysis enabled"
   fi
+
+  # Target the samstraumr-core module specifically
+  mvn_args+=("-pl" "modules/samstraumr-core")
   
   # Add verbose flag if requested
   if $VERBOSE; then

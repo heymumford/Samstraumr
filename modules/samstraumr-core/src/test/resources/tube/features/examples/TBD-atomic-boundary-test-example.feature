@@ -1,11 +1,11 @@
-/*
-Filename: TBD-AtomicBoundaryTest-Example.feature
-Purpose: Example feature file demonstrating TBD Atomic Boundary Testing (ABT) approach
-Goals:
-  - Show proper TBD tag usage
-  - Demonstrate boundary testing principles
-  - Provide a template for future ABT tests
-*/
+
+# Filename: TBD-AtomicBoundaryTest-Example.feature
+# Purpose: Example feature file demonstrating TBD Atomic Boundary Testing (ABT) approach
+# Goals:
+  # - Show proper TBD tag usage
+  # - Demonstrate boundary testing principles
+  # - Provide a template for future ABT tests
+
 
 @ATL @L0_Tube @ABT
 Feature: TBD Atomic Boundary Testing Example

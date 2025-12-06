@@ -1,4 +1,4 @@
-/*
+#
 Filename: tube-initialization-tests.feature
 Purpose: Validates the initialization and early lifecycle stages of Tubes
 Goals:
@@ -8,7 +8,7 @@ Goals:
 Dependencies:
   - BDD step definitions in org.s8r.tube.lifecycle.steps package
   - Tube and Environment implementations in org.s8r.tube
-*/
+#
 
 @ATL @L0_Tube @Lifecycle @Init
 Feature: Tube Initialization and Early Lifecycle

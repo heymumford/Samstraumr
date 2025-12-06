@@ -1,4 +1,4 @@
-/*
+#
 Filename: composite-connectivity-tests.feature
 Purpose: Validates the connectivity and data flow aspects of Composites
 Goals:
@@ -8,7 +8,7 @@ Goals:
 Dependencies:
   - BDD step definitions in org.s8r.component.test.steps package
   - Composite and Component implementations in org.s8r.component
-*/
+#
 
 @L1_Component @Functional
 Feature: Composite Component Connectivity

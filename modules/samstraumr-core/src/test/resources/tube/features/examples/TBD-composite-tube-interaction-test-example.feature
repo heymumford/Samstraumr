@@ -1,11 +1,11 @@
-/*
-Filename: TBD-CompositeTubeInteractionTest-Example.feature
-Purpose: Example feature file demonstrating TBD Composite Tube Interaction Testing (CTIT) approach
-Goals:
-  - Show proper TBD tag usage for composite testing
-  - Demonstrate interaction testing between tubes
-  - Provide a template for future CTIT tests
-*/
+
+# Filename: TBD-CompositeTubeInteractionTest-Example.feature
+# Purpose: Example feature file demonstrating TBD Composite Tube Interaction Testing (CTIT) approach
+# Goals:
+  # - Show proper TBD tag usage for composite testing
+  # - Demonstrate interaction testing between tubes
+  # - Provide a template for future CTIT tests
+
 
 @ATL @L1_Composite @CTIT
 Feature: TBD Composite Tube Interaction Testing Example

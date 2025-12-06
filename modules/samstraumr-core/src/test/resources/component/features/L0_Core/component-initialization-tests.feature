@@ -1,4 +1,4 @@
-/*
+#
 Filename: component-initialization-tests.feature
 Purpose: Validates the initialization and early lifecycle stages of Components
 Goals:
@@ -8,7 +8,7 @@ Goals:
 Dependencies:
   - BDD step definitions in org.s8r.component.test.steps package
   - Component and Environment implementations in org.s8r.component.core
-*/
+#
 
 @L0_Unit
 Feature: Component Initialization and Early Lifecycle

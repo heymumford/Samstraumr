@@ -1,4 +1,4 @@
-/*
+#
 Filename: lifecycle-tests.feature
 Purpose: Validates the lifecycle states and transitions of Components
 Goals:
@@ -8,7 +8,7 @@ Goals:
 Dependencies:
   - BDD step definitions in org.s8r.component.test.steps package
   - Component and State implementations in org.s8r.component.core
-*/
+#
 
 @L0_Unit
 Feature: Component Lifecycle Management

@@ -1,14 +1,12 @@
-/*
-Filename: tube-initialization-tests.feature
-Purpose: Validates the initialization and early lifecycle stages of Tubes
-Goals:
-  - Verify basic tube creation and initialization
-  - Test initialization error handling
-  - Validate environment awareness during initialization
-Dependencies:
-  - BDD step definitions in org.s8r.tube.lifecycle.steps package
-  - Tube and Environment implementations in org.s8r.tube
-*/
+# Filename: tube-initialization-tests.feature
+# Purpose: Validates the initialization and early lifecycle stages of Tubes
+# Goals:
+#   - Verify basic tube creation and initialization
+#   - Test initialization error handling
+#   - Validate environment awareness during initialization
+# Dependencies:
+#   - BDD step definitions in org.s8r.tube.lifecycle.steps package
+#   - Tube and Environment implementations in org.s8r.tube
 
 @L0_Unit @Functional
 Feature: Tube Initialization and Early Lifecycle
