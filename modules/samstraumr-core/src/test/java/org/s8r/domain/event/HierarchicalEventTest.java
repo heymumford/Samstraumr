@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -331,24 +330,26 @@ public class HierarchicalEventTest {
   private static class TestEventHandler implements EventHandler {
     private final List<DomainEvent> receivedEvents = new ArrayList<>();
     private final String[] eventTypes;
-    
+
     public TestEventHandler(String... eventTypes) {
-      this.eventTypes = eventTypes != null ? eventTypes : new String[]{"*"};
+      this.eventTypes = eventTypes != null ? eventTypes : new String[] {"*"};
     }
 
     @Override
-    public void handleEvent(String eventType, String source, String payload, Map<String, String> properties) {
+    public void handleEvent(
+        String eventType, String source, String payload, Map<String, String> properties) {
       // Create a simple domain event to track what was received
       ComponentId componentId = ComponentId.create(source);
-      DomainEvent event = new DomainEvent() {
-        @Override
-        public String getEventType() {
-          return eventType;
-        }
-      };
+      DomainEvent event =
+          new DomainEvent() {
+            @Override
+            public String getEventType() {
+              return eventType;
+            }
+          };
       receivedEvents.add(event);
     }
-    
+
     @Override
     public String[] getEventTypes() {
       return eventTypes;

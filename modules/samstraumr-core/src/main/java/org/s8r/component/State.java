@@ -167,62 +167,63 @@ public enum State {
   public boolean isTermination() {
     return category == Category.TERMINATION;
   }
-  
+
   /**
    * Checks if this state allows recovery operations.
-   * 
+   *
    * @return true if recovery operations are allowed in this state
    */
   public boolean allowsRecoveryOperations() {
     return this == RECOVERING || this == ERROR || this == MAINTENANCE;
   }
-  
+
   /**
    * Checks if this state allows basic diagnostic operations.
-   * 
+   *
    * @return true if diagnostic operations are allowed in this state
    */
   public boolean allowsDiagnostics() {
     return this != TERMINATED && this != TERMINATING && this != DEACTIVATING;
   }
-  
+
   /**
    * Checks if this state allows data processing.
-   * 
+   *
    * @return true if data processing is allowed in this state
    */
   public boolean allowsDataProcessing() {
-    return this == ACTIVE || this == STABLE || 
-           this == RECEIVING_INPUT || this == PROCESSING_INPUT || 
-           this == OUTPUTTING_RESULT;
+    return this == ACTIVE
+        || this == STABLE
+        || this == RECEIVING_INPUT
+        || this == PROCESSING_INPUT
+        || this == OUTPUTTING_RESULT;
   }
-  
+
   /**
    * Checks if this state allows configuration changes.
-   * 
+   *
    * @return true if configuration changes are allowed in this state
    */
   public boolean allowsConfigurationChanges() {
     return this == ACTIVE || this == CONFIGURING || this == MAINTENANCE;
   }
-  
+
   /**
    * Checks if this state allows advanced configuration changes.
-   * 
+   *
    * @return true if advanced configuration changes are allowed in this state
    */
   public boolean allowsAdvancedConfigurationChanges() {
     return this == MAINTENANCE;
   }
-  
+
   /**
    * Checks if this state allows incoming connections.
-   * 
+   *
    * @return true if incoming connections are allowed in this state
    */
   public boolean allowsIncomingConnections() {
-    return this == ACTIVE || this == READY || this == WAITING || 
-           this == RECEIVING_INPUT;
+    return this == ACTIVE || this == READY || this == WAITING || this == RECEIVING_INPUT;
   }
 
   /**

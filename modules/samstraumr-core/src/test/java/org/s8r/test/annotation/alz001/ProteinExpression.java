@@ -25,8 +25,8 @@ import org.junit.jupiter.api.Tag;
 /**
  * Marks a test as part of the ALZ001 Protein Expression modeling capability.
  *
- * <p>Tests with this annotation focus on validating components, composites, and machines that
- * model protein expression patterns relevant to Alzheimer's disease, including:
+ * <p>Tests with this annotation focus on validating components, composites, and machines that model
+ * protein expression patterns relevant to Alzheimer's disease, including:
  *
  * <ul>
  *   <li>Tau protein expression and aggregation

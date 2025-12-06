@@ -17,33 +17,34 @@ import org.s8r.architecture.*;
 
 /**
  * Test runner for Architecture compliance tests.
- * 
- * <p>This suite runs all tests that verify architectural rules and constraints are followed.
- * It includes tests for clean architecture, acyclic dependencies, class structure, etc.
- * 
+ *
+ * <p>This suite runs all tests that verify architectural rules and constraints are followed. It
+ * includes tests for clean architecture, acyclic dependencies, class structure, etc.
+ *
  * <p>To run this suite, use one of these methods:
+ *
  * <ul>
- *   <li>Maven: {@code mvn test -Dtest=ArchitectureTests}</li>
- *   <li>s8r-test script: {@code ./s8r-test architecture}</li>
+ *   <li>Maven: {@code mvn test -Dtest=ArchitectureTests}
+ *   <li>s8r-test script: {@code ./s8r-test architecture}
  * </ul>
  */
 @Suite
 @SuiteDisplayName("Architecture Compliance Tests")
 @SelectClasses({
-    AcyclicDependencyTest.class,
-    ArchitectureDecisionRecordTest.class, 
-    ArchitectureToolsIntegrationTest.class,
-    CleanArchitectureComplianceTest.class,
-    ComponentBasedArchitectureTest.class,
-    DiagramGenerationTest.class,
-    EventDrivenCommunicationTest.class,
-    HierarchicalIdentitySystemTest.class,
-    LifecycleStateManagementTest.class,
-    MavenStructureTest.class,
-    PackageStructureTest.class,
-    StandardizedErrorHandlingTest.class,
-    TestingPyramidComplianceTest.class
+  AcyclicDependencyTest.class,
+  ArchitectureDecisionRecordTest.class,
+  ArchitectureToolsIntegrationTest.class,
+  CleanArchitectureComplianceTest.class,
+  ComponentBasedArchitectureTest.class,
+  DiagramGenerationTest.class,
+  EventDrivenCommunicationTest.class,
+  HierarchicalIdentitySystemTest.class,
+  LifecycleStateManagementTest.class,
+  MavenStructureTest.class,
+  PackageStructureTest.class,
+  StandardizedErrorHandlingTest.class,
+  TestingPyramidComplianceTest.class
 })
 public class ArchitectureTests {
-    // This class is intentionally empty. It's used only as a holder for the annotations.
+  // This class is intentionally empty. It's used only as a holder for the annotations.
 }

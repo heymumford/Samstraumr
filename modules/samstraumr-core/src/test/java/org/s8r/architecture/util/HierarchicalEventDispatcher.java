@@ -96,40 +96,44 @@ public class HierarchicalEventDispatcher implements EventDispatcher {
   public <T extends DomainEvent> void registerHandler(
       Class<T> eventType, java.util.function.Consumer<T> handler) {
     // Create an adapter from Consumer to EventHandler
-    EventHandler handlerAdapter = new EventHandler() {
-      @Override
-      public void handleEvent(String eventType, String source, String payload, Map<String, String> properties) {
-        // This is just a stub since we can't actually convert between the types
-        logger.debug("Consumer handler invoked for {}", eventType);
-      }
-      
-      @Override
-      public String[] getEventTypes() {
-        return new String[] { eventType.getSimpleName().toLowerCase() };
-      }
-    };
-    
+    EventHandler handlerAdapter =
+        new EventHandler() {
+          @Override
+          public void handleEvent(
+              String eventType, String source, String payload, Map<String, String> properties) {
+            // This is just a stub since we can't actually convert between the types
+            logger.debug("Consumer handler invoked for {}", eventType);
+          }
+
+          @Override
+          public String[] getEventTypes() {
+            return new String[] {eventType.getSimpleName().toLowerCase()};
+          }
+        };
+
     registerHandler(eventType.getSimpleName().toLowerCase(), handlerAdapter);
   }
 
   @Override
-  public int dispatchEvent(String eventType, String source, String payload, Map<String, String> properties) {
+  public int dispatchEvent(
+      String eventType, String source, String payload, Map<String, String> properties) {
     // Create a test domain event for tracking
-    DomainEvent event = new DomainEvent() {
-      @Override
-      public String getEventType() {
-        return eventType;
-      }
-    };
-    
+    DomainEvent event =
+        new DomainEvent() {
+          @Override
+          public String getEventType() {
+            return eventType;
+          }
+        };
+
     // Add the event to published events for test verification
     publishedEvents.add(event);
-    
+
     logger.debug("Dispatching event: {} (source: {})", eventType, source);
-    
+
     // Count how many handlers processed this event
     int handlerCount = 0;
-    
+
     // Process handlers for this event type
     List<EventHandler> eventHandlers = handlers.get(eventType);
     if (eventHandlers != null && !eventHandlers.isEmpty()) {
@@ -147,21 +151,21 @@ public class HierarchicalEventDispatcher implements EventDispatcher {
         }
       }
     }
-    
+
     return handlerCount;
   }
-  
+
   // For compatibility with the old API
   public void dispatch(DomainEvent event) {
     if (event == null) {
       return;
     }
-    
+
     // Create a simple properties map
     Map<String, String> properties = new HashMap<>();
     properties.put("id", event.getEventId());
     properties.put("timestamp", event.getOccurredOn().toString());
-    
+
     // Dispatch using the new API
     dispatchEvent(event.getEventType(), event.getEventId(), event.toString(), properties);
   }
@@ -172,17 +176,15 @@ public class HierarchicalEventDispatcher implements EventDispatcher {
 
   @Override
   public boolean registerHandler(String eventType, EventHandler handler) {
-    List<EventHandler> eventHandlers = 
+    List<EventHandler> eventHandlers =
         handlers.computeIfAbsent(eventType, k -> new CopyOnWriteArrayList<>());
 
     eventHandlers.add(handler);
     logger.debug(
-        "Registered handler {} for event type: {}",
-        handler.getClass().getSimpleName(),
-        eventType);
+        "Registered handler {} for event type: {}", handler.getClass().getSimpleName(), eventType);
     return true;
   }
-  
+
   // For compatibility with old API
   @SuppressWarnings("unchecked")
   public <T extends DomainEvent> void registerHandler(Class<T> eventType, EventHandler handler) {
@@ -204,7 +206,7 @@ public class HierarchicalEventDispatcher implements EventDispatcher {
     }
     return false;
   }
-  
+
   // For compatibility with old API
   public <T extends DomainEvent> void unregisterHandler(Class<T> eventType, EventHandler handler) {
     unregisterHandler(eventType.getSimpleName().toLowerCase(), handler);

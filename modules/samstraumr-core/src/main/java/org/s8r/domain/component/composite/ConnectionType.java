@@ -48,10 +48,10 @@ public enum ConnectionType {
 
   /** Dependency relationship where source depends on target. */
   DEPENDENCY("Source component depends on target component"),
-  
+
   /** Peer relationship between components with no hierarchy (non-directional). */
   PEER("Non-hierarchical peer relationship between components"),
-  
+
   /** Sibling relationship between components under same parent (non-directional). */
   SIBLING("Non-hierarchical sibling relationship between components");
 

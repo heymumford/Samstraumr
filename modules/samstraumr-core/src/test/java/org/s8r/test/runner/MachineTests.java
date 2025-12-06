@@ -14,26 +14,30 @@ import org.junit.platform.suite.api.ConfigurationParameter;
 import org.junit.platform.suite.api.IncludeEngines;
 import org.junit.platform.suite.api.SelectClasspathResource;
 import org.junit.platform.suite.api.Suite;
+
 import io.cucumber.junit.platform.engine.Constants;
 
 /**
  * Test runner for Machine tests.
- * 
- * <p>This suite runs all Cucumber features related to Machine components,
- * which represent higher-level composites with state and behavior.
- * 
+ *
+ * <p>This suite runs all Cucumber features related to Machine components, which represent
+ * higher-level composites with state and behavior.
+ *
  * <p>To run this suite, use one of these methods:
+ *
  * <ul>
- *   <li>Maven: {@code mvn test -Dtest=MachineTests}</li>
- *   <li>s8r-test script: {@code ./s8r-test machine}</li>
+ *   <li>Maven: {@code mvn test -Dtest=MachineTests}
+ *   <li>s8r-test script: {@code ./s8r-test machine}
  * </ul>
  */
 @Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features/machine")
-@ConfigurationParameter(key = Constants.GLUE_PROPERTY_NAME, value = "org.s8r.test.steps,org.s8r.tube.steps")
+@ConfigurationParameter(
+    key = Constants.GLUE_PROPERTY_NAME,
+    value = "org.s8r.test.steps,org.s8r.tube.steps")
 @ConfigurationParameter(key = Constants.PLUGIN_PROPERTY_NAME, value = "pretty")
 @ConfigurationParameter(key = Constants.FILTER_TAGS_PROPERTY_NAME, value = "@MachineTest")
 public class MachineTests {
-    // This class is intentionally empty. It's used only as a holder for the annotations.
+  // This class is intentionally empty. It's used only as a holder for the annotations.
 }

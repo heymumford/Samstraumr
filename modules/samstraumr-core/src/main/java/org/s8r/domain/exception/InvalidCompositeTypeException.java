@@ -19,78 +19,76 @@ import org.s8r.domain.identity.ComponentId;
 
 /**
  * Exception thrown when a component is expected to be a composite component but is not.
- * 
- * <p>This exception is typically thrown when adding a non-composite component to a machine,
- * which requires all components to be composites.
+ *
+ * <p>This exception is typically thrown when adding a non-composite component to a machine, which
+ * requires all components to be composites.
  */
 public class InvalidCompositeTypeException extends ComponentException {
-    private static final long serialVersionUID = 1L;
-    
-    private final ComponentId machineId;
-    private final String actualType;
-    
-    /**
-     * Creates a new InvalidCompositeTypeException.
-     *
-     * @param machineId The ID of the machine that requires a composite component
-     * @param actualType The actual type of the component
-     */
-    public InvalidCompositeTypeException(ComponentId machineId, String actualType) {
-        super(String.format(
-                "Invalid component type for machine %s: Expected CompositeComponent but got %s", 
-                machineId.getShortId(), 
-                actualType));
-        this.machineId = machineId;
-        this.actualType = actualType;
-    }
-    
-    /**
-     * Creates a new InvalidCompositeTypeException with a custom message.
-     *
-     * @param message The custom error message
-     * @param machineId The ID of the machine that requires a composite component
-     * @param actualType The actual type of the component
-     */
-    public InvalidCompositeTypeException(
-            String message, ComponentId machineId, String actualType) {
-        super(message);
-        this.machineId = machineId;
-        this.actualType = actualType;
-    }
-    
-    /**
-     * Creates a new InvalidCompositeTypeException with a cause.
-     *
-     * @param machineId The ID of the machine that requires a composite component
-     * @param actualType The actual type of the component
-     * @param cause The cause of the exception
-     */
-    public InvalidCompositeTypeException(
-            ComponentId machineId, String actualType, Throwable cause) {
-        super(String.format(
-                "Invalid component type for machine %s: Expected CompositeComponent but got %s", 
-                machineId.getShortId(), 
-                actualType), 
-                cause);
-        this.machineId = machineId;
-        this.actualType = actualType;
-    }
-    
-    /**
-     * Gets the ID of the machine that requires a composite component.
-     *
-     * @return The machine's ID
-     */
-    public ComponentId getMachineId() {
-        return machineId;
-    }
-    
-    /**
-     * Gets the actual type of the component.
-     *
-     * @return The component's actual type
-     */
-    public String getActualType() {
-        return actualType;
-    }
+  private static final long serialVersionUID = 1L;
+
+  private final ComponentId machineId;
+  private final String actualType;
+
+  /**
+   * Creates a new InvalidCompositeTypeException.
+   *
+   * @param machineId The ID of the machine that requires a composite component
+   * @param actualType The actual type of the component
+   */
+  public InvalidCompositeTypeException(ComponentId machineId, String actualType) {
+    super(
+        String.format(
+            "Invalid component type for machine %s: Expected CompositeComponent but got %s",
+            machineId.getShortId(), actualType));
+    this.machineId = machineId;
+    this.actualType = actualType;
+  }
+
+  /**
+   * Creates a new InvalidCompositeTypeException with a custom message.
+   *
+   * @param message The custom error message
+   * @param machineId The ID of the machine that requires a composite component
+   * @param actualType The actual type of the component
+   */
+  public InvalidCompositeTypeException(String message, ComponentId machineId, String actualType) {
+    super(message);
+    this.machineId = machineId;
+    this.actualType = actualType;
+  }
+
+  /**
+   * Creates a new InvalidCompositeTypeException with a cause.
+   *
+   * @param machineId The ID of the machine that requires a composite component
+   * @param actualType The actual type of the component
+   * @param cause The cause of the exception
+   */
+  public InvalidCompositeTypeException(ComponentId machineId, String actualType, Throwable cause) {
+    super(
+        String.format(
+            "Invalid component type for machine %s: Expected CompositeComponent but got %s",
+            machineId.getShortId(), actualType),
+        cause);
+    this.machineId = machineId;
+    this.actualType = actualType;
+  }
+
+  /**
+   * Gets the ID of the machine that requires a composite component.
+   *
+   * @return The machine's ID
+   */
+  public ComponentId getMachineId() {
+    return machineId;
+  }
+
+  /**
+   * Gets the actual type of the component.
+   *
+   * @return The component's actual type
+   */
+  public String getActualType() {
+    return actualType;
+  }
 }

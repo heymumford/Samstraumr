@@ -295,6 +295,7 @@ public class NotificationAdapterTest {
 
     assertTrue(result.isSent());
 
-    verify(mockLogger, atLeastOnce()).info(eq("Sent EMAIL notification to multi@example.com"), anyString());
+    verify(mockLogger, atLeastOnce())
+        .info(eq("Sent EMAIL notification to multi@example.com"), anyString());
   }
 }

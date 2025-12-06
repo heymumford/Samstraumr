@@ -24,13 +24,12 @@ import org.junit.jupiter.api.Tag;
 
 /**
  * Identifies tests that verify orchestration functionality.
- * 
- * <p>Orchestration tests focus on how components interact and work together
- * to achieve system-level functionality. These tests typically verify the
- * correct assembly and interaction of multiple components.
+ *
+ * <p>Orchestration tests focus on how components interact and work together to achieve system-level
+ * functionality. These tests typically verify the correct assembly and interaction of multiple
+ * components.
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Tag("orchestration")
-public @interface OrchestrationTest {
-}
+public @interface OrchestrationTest {}

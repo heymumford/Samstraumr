@@ -95,12 +95,12 @@ public enum LifecycleState {
   public boolean isTerminationStage() {
     return this == TERMINATING || this == TERMINATED || this == ARCHIVED;
   }
-  
+
   /** Checks if this state is an active operational state. */
   public boolean isActive() {
     return this == ACTIVE || this == RUNNING;
   }
-  
+
   /** Checks if this state is a standby operational state. */
   public boolean isStandby() {
     return this == READY || this == WAITING;

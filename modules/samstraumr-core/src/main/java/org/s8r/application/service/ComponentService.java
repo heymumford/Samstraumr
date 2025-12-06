@@ -32,7 +32,6 @@ import org.s8r.domain.event.DomainEvent;
 import org.s8r.domain.exception.ComponentNotFoundException;
 import org.s8r.domain.exception.DuplicateComponentException;
 import org.s8r.domain.exception.InvalidOperationException;
-import org.s8r.domain.exception.PropertyBasedDuplicateComponentException;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.validation.ComponentDuplicateDetector;
 
@@ -63,15 +62,14 @@ public class ComponentService {
     this.componentRepository = componentRepository;
     this.logger = logger;
     this.eventPublisher = eventPublisher;
-    
+
     // Initialize the duplicate detector with default settings
     this.duplicateDetector = new ComponentDuplicateDetector(componentRepository, logger);
   }
-  
+
   /**
-   * Sets whether strict duplicate detection is enabled.
-   * When enabled, components that are potential duplicates based on properties
-   * will cause exceptions to be thrown during creation.
+   * Sets whether strict duplicate detection is enabled. When enabled, components that are potential
+   * duplicates based on properties will cause exceptions to be thrown during creation.
    *
    * @param strict Whether strict duplicate detection is enabled
    */
@@ -92,18 +90,20 @@ public class ComponentService {
     logger.info("Creating new component with reason: " + reason);
 
     ComponentId id = ComponentId.create(reason);
-    
+
     // Check if component with this ID already exists
-    if (componentRepository instanceof org.s8r.infrastructure.persistence.InMemoryComponentRepository) {
-      org.s8r.infrastructure.persistence.InMemoryComponentRepository repo = 
+    if (componentRepository
+        instanceof org.s8r.infrastructure.persistence.InMemoryComponentRepository) {
+      org.s8r.infrastructure.persistence.InMemoryComponentRepository repo =
           (org.s8r.infrastructure.persistence.InMemoryComponentRepository) componentRepository;
-      
+
       if (repo.exists(id)) {
-        logger.error("Cannot create component: Component with ID {} already exists", id.getIdString());
+        logger.error(
+            "Cannot create component: Component with ID {} already exists", id.getIdString());
         throw new DuplicateComponentException(id);
       }
     }
-    
+
     Component component = Component.create(id);
 
     // Convert to ComponentPort using the adapter
@@ -116,9 +116,10 @@ public class ComponentService {
     } else {
       // In non-strict mode, just check and log potential duplicates
       List<ComponentPort> potentialDuplicates = duplicateDetector.checkForDuplicates(componentPort);
-      
+
       if (!potentialDuplicates.isEmpty()) {
-        logger.warn("Potential duplicate component(s) detected for new component {}: {}",
+        logger.warn(
+            "Potential duplicate component(s) detected for new component {}: {}",
             id.getIdString(),
             potentialDuplicates.stream()
                 .map(c -> c.getId().getIdString())
@@ -156,24 +157,27 @@ public class ComponentService {
 
     // Create child component
     ComponentId childId = ComponentId.create(reason);
-    
+
     // Check if component with this ID already exists
-    if (componentRepository instanceof org.s8r.infrastructure.persistence.InMemoryComponentRepository) {
-      org.s8r.infrastructure.persistence.InMemoryComponentRepository repo = 
+    if (componentRepository
+        instanceof org.s8r.infrastructure.persistence.InMemoryComponentRepository) {
+      org.s8r.infrastructure.persistence.InMemoryComponentRepository repo =
           (org.s8r.infrastructure.persistence.InMemoryComponentRepository) componentRepository;
-      
+
       if (repo.exists(childId)) {
-        logger.error("Cannot create child component: Component with ID {} already exists", childId.getIdString());
+        logger.error(
+            "Cannot create child component: Component with ID {} already exists",
+            childId.getIdString());
         throw new DuplicateComponentException(childId);
       }
     }
-    
+
     Component child = Component.create(childId);
     ComponentPort childPort = org.s8r.adapter.ComponentAdapter.createComponentPort(child);
 
     // Add parent's lineage to child
     parentPort.getLineage().forEach(childPort::addToLineage);
-    
+
     // Perform property-based duplicate detection
     if (strictDuplicateDetection) {
       // If strict mode is enabled, the detector will throw an exception if duplicates are found
@@ -181,9 +185,10 @@ public class ComponentService {
     } else {
       // In non-strict mode, just check and log potential duplicates
       List<ComponentPort> potentialDuplicates = duplicateDetector.checkForDuplicates(childPort);
-      
+
       if (!potentialDuplicates.isEmpty()) {
-        logger.warn("Potential duplicate component(s) detected for new child component {}: {}",
+        logger.warn(
+            "Potential duplicate component(s) detected for new child component {}: {}",
             childId.getIdString(),
             potentialDuplicates.stream()
                 .map(c -> c.getId().getIdString())
@@ -318,7 +323,7 @@ public class ComponentService {
         componentRepository.findById(id).orElseThrow(() -> new ComponentNotFoundException(id));
 
     componentPort.addToLineage(entry);
-    
+
     // Update the component
     saveOrUpdateComponent(componentPort);
 
@@ -341,14 +346,17 @@ public class ComponentService {
 
     CompositeComponent composite = CompositeFactory.createComposite(compositeType, reason);
     ComponentId compositeId = composite.getId();
-    
+
     // Check if component with this ID already exists
-    if (componentRepository instanceof org.s8r.infrastructure.persistence.InMemoryComponentRepository) {
-      org.s8r.infrastructure.persistence.InMemoryComponentRepository repo = 
+    if (componentRepository
+        instanceof org.s8r.infrastructure.persistence.InMemoryComponentRepository) {
+      org.s8r.infrastructure.persistence.InMemoryComponentRepository repo =
           (org.s8r.infrastructure.persistence.InMemoryComponentRepository) componentRepository;
-      
+
       if (repo.exists(compositeId)) {
-        logger.error("Cannot create composite: Component with ID {} already exists", compositeId.getIdString());
+        logger.error(
+            "Cannot create composite: Component with ID {} already exists",
+            compositeId.getIdString());
         throw new DuplicateComponentException(compositeId);
       }
     }
@@ -356,7 +364,7 @@ public class ComponentService {
     // Convert to CompositeComponentPort using the adapter
     CompositeComponentPort compositePort =
         org.s8r.adapter.ComponentAdapter.createCompositeComponentPort(composite);
-        
+
     // Perform property-based duplicate detection
     if (strictDuplicateDetection) {
       // If strict mode is enabled, the detector will throw an exception if duplicates are found
@@ -364,9 +372,10 @@ public class ComponentService {
     } else {
       // In non-strict mode, just check and log potential duplicates
       List<ComponentPort> potentialDuplicates = duplicateDetector.checkForDuplicates(compositePort);
-      
+
       if (!potentialDuplicates.isEmpty()) {
-        logger.warn("Potential duplicate component(s) detected for new composite {}: {}",
+        logger.warn(
+            "Potential duplicate component(s) detected for new composite {}: {}",
             compositeId.getIdString(),
             potentialDuplicates.stream()
                 .map(c -> c.getId().getIdString())
@@ -438,13 +447,14 @@ public class ComponentService {
             + componentId.getShortId()
             + " to composite "
             + compositeId.getShortId());
-            
+
     // Validate that both components exist
     org.s8r.domain.validation.ComponentReferenceValidator.validateComponentReferences(
         "addComponentToComposite",
         compositeId, // The composite is the referring component
         id -> componentRepository.findById(id).isPresent(),
-        compositeId, componentId);
+        compositeId,
+        componentId);
 
     // Get the composite port
     ComponentPort compositePort =
@@ -498,13 +508,14 @@ public class ComponentService {
             + componentId.getShortId()
             + " from composite "
             + compositeId.getShortId());
-            
+
     // Validate that both components exist
     org.s8r.domain.validation.ComponentReferenceValidator.validateComponentReferences(
         "removeComponentFromComposite",
         compositeId, // The composite is the referring component
         id -> componentRepository.findById(id).isPresent(),
-        compositeId, componentId);
+        compositeId,
+        componentId);
 
     // Get the composite port
     ComponentPort compositePort =
@@ -557,13 +568,15 @@ public class ComponentService {
       ConnectionType type,
       String description) {
     logger.info("Creating " + type + " connection in composite " + compositeId.getShortId());
-    
+
     // Validate that all components exist
     org.s8r.domain.validation.ComponentReferenceValidator.validateComponentReferences(
         "createConnection",
         compositeId, // The composite is the referring component
         id -> componentRepository.findById(id).isPresent(),
-        compositeId, sourceId, targetId);
+        compositeId,
+        sourceId,
+        targetId);
 
     // Get the composite port
     ComponentPort compositePort =
@@ -704,16 +717,17 @@ public class ComponentService {
   }
 
   /**
-   * Saves or updates a component in the repository based on whether it already exists.
-   * This helper method handles the logic of determining whether to use save() or update().
+   * Saves or updates a component in the repository based on whether it already exists. This helper
+   * method handles the logic of determining whether to use save() or update().
    *
    * @param componentPort The component port to save or update
    */
   private void saveOrUpdateComponent(ComponentPort componentPort) {
-    if (componentRepository instanceof org.s8r.infrastructure.persistence.InMemoryComponentRepository) {
-      org.s8r.infrastructure.persistence.InMemoryComponentRepository repo = 
+    if (componentRepository
+        instanceof org.s8r.infrastructure.persistence.InMemoryComponentRepository) {
+      org.s8r.infrastructure.persistence.InMemoryComponentRepository repo =
           (org.s8r.infrastructure.persistence.InMemoryComponentRepository) componentRepository;
-      
+
       if (repo.exists(componentPort.getId())) {
         // Component already exists, use update
         repo.update(componentPort);
