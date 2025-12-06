@@ -326,3 +326,10 @@ build-reports/
 
 # Local Maven repository dependencies
 /lib/
+
+# Personal agent configurations (not for repo)
+CLAUDE.md
+AGENTS.md
+CHANGELOG_COMMANDS.md
+MUMFORD_STYLE.md
+docs/reference/mcp-reference.md
