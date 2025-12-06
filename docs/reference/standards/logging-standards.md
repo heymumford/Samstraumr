@@ -11,9 +11,9 @@ Licensed under the Mozilla Public License 2.0
 
 # Logging Standards
 
-This file has been consolidated with the canonical version at:
+Logging configuration and standards have been consolidated with the Configuration Reference.
 
-[logging-standards.md](docs/reference/standards/logging-standards.md)
+See: [Configuration Reference - Logging Configuration](../configuration-reference.md#logging-configuration)
 
-Please update any links or references to use the canonical version above.
+This file will be removed in a future release.
 
