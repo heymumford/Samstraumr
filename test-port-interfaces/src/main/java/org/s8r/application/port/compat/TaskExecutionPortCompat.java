@@ -12,8 +12,8 @@
 package org.s8r.application.port.compat;
 
 import org.s8r.application.port.TaskExecutionPort;
-import org.s8r.application.port.TaskExecutionPort.TaskResult;
-import org.s8r.application.port.TaskExecutionPort.TaskStatus;
+import org.s8r.application.port.task.TaskResult;
+import org.s8r.application.port.task.TaskStatus;
 
 import java.time.Duration;
 import java.time.Instant;

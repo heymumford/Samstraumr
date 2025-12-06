@@ -6,8 +6,8 @@ package org.s8r.test.integration;
 
 import org.s8r.application.port.NotificationPort;
 import org.s8r.application.port.TaskExecutionPort;
-import org.s8r.application.port.TaskExecutionPort.TaskResult;
-import org.s8r.application.port.TaskExecutionPort.TaskStatus;
+import org.s8r.application.port.task.TaskResult;
+import org.s8r.application.port.task.TaskStatus;
 import org.s8r.application.port.notification.ContentFormat;
 import org.s8r.application.port.notification.DeliveryStatus;
 import org.s8r.application.port.notification.NotificationChannel;

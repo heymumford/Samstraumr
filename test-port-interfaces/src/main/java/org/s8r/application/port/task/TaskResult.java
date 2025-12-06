@@ -20,7 +20,7 @@ public class TaskResult {
     private final boolean success;
     private final String message;
     private final Map<String, Object> data;
-    
+
     /**
      * Creates a new task result.
      *
@@ -32,6 +32,47 @@ public class TaskResult {
         this.success = success;
         this.message = message;
         this.data = data;
+    }
+
+    /**
+     * Creates a successful task result.
+     *
+     * @param taskId The task ID.
+     * @param message The success message.
+     * @param data Additional result data.
+     * @return A successful task result.
+     */
+    public static TaskResult success(String taskId, String message, Map<String, Object> data) {
+        return new TaskResult(true, message, data);
+    }
+
+    /**
+     * Creates a failed task result.
+     *
+     * @param taskId The task ID.
+     * @param message The failure message.
+     * @param error The error message.
+     * @return A failed task result.
+     */
+    public static TaskResult failure(String taskId, String message, String error) {
+        Map<String, Object> data = new java.util.HashMap<>();
+        data.put("error", error);
+        return new TaskResult(false, message, data);
+    }
+
+    /**
+     * Creates a failed task result with additional data.
+     *
+     * @param taskId The task ID.
+     * @param message The failure message.
+     * @param error The error message.
+     * @param data Additional result data.
+     * @return A failed task result.
+     */
+    public static TaskResult failure(String taskId, String message, String error, Map<String, Object> data) {
+        Map<String, Object> resultData = new java.util.HashMap<>(data);
+        resultData.put("error", error);
+        return new TaskResult(false, message, resultData);
     }
     
     /**
