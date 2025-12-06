@@ -237,8 +237,8 @@ Licensed under the Mozilla Public License 2.0
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${maven.compiler.plugin.version}</version>
           <configuration>
-            <source>${maven.compiler.source}</source>
-            <target>${maven.compiler.target}</target>
+            <!-- Use release instead of source+target to include system modules -->
+            <release>${maven.compiler.source}</release>
             <encoding>${project.build.sourceEncoding}</encoding>
           </configuration>
         </plugin>
