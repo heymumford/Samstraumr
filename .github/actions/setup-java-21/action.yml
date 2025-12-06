@@ -31,16 +31,17 @@ runs:
         echo "Detected Java major version: $JAVA_VERSION"
         
         # Set --add-opens flags only for Java 17+
+        # NOTE: --add-opens must go in MAVEN_OPTS, NOT JAVA_TOOL_OPTIONS
+        # JAVA_TOOL_OPTIONS does not support module system options
         if [ "$JAVA_VERSION" -ge 17 ]; then
           echo "Setting --add-opens flags for Java $JAVA_VERSION"
-          echo "JAVA_OPTS=--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED" >> $GITHUB_ENV
-          echo "JAVA_TOOL_OPTIONS=--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED" >> $GITHUB_ENV
+          echo "MAVEN_OPTS=-Xmx3072m --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED" >> $GITHUB_ENV
         else
           echo "Java version $JAVA_VERSION does not require --add-opens flags"
+          echo "MAVEN_OPTS=-Xmx3072m" >> $GITHUB_ENV
         fi
-        
-        # Always set Maven options
-        echo "MAVEN_OPTS=-Xmx3072m" >> $GITHUB_ENV
+
+        # Always set Maven CLI options
         echo "MAVEN_CLI_OPTS=--batch-mode --errors --fail-at-end --show-version" >> $GITHUB_ENV
     
     - name: Cache Maven packages

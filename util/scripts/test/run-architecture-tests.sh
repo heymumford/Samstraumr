@@ -16,7 +16,8 @@ echo
 # Ensure using the correct Java version
 if command -v ./use-java21.sh &> /dev/null; then
     echo "Using Java 21 for tests..."
-    export JAVA_TOOL_OPTIONS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+    # NOTE: --add-opens must go in MAVEN_OPTS, NOT JAVA_TOOL_OPTIONS
+    export MAVEN_OPTS="${MAVEN_OPTS:--Xmx3072m} --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
 fi
 
 # Parse command line arguments

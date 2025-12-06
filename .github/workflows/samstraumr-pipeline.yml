@@ -147,8 +147,9 @@ jobs:
         run: |
           echo "Verifying Clean Architecture compliance..."
           # Add Java 21 module options required for reflection
-          export JAVA_TOOL_OPTIONS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
-          
+          # NOTE: --add-opens must go in MAVEN_OPTS, NOT JAVA_TOOL_OPTIONS
+          export MAVEN_OPTS="-Xmx3072m --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
+
           # Run the architecture verification script
           if [ -f "./s8r-architecture-verify" ]; then
             ./s8r-architecture-verify --output=architecture-report.md
