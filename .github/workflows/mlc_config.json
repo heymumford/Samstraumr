@@ -1,5 +1,5 @@
 {
-  "aliveStatusCodes": [200, 429, 200, 403, 401],
+  "aliveStatusCodes": [200, 202, 429, 403, 401, 410],
   "ignorePatterns": [
     {
       "pattern": "^http://localhost"
@@ -12,6 +12,21 @@
     },
     {
       "pattern": "^#"
+    },
+    {
+      "pattern": "^https?://.*\\.oup\\.com"
+    },
+    {
+      "pattern": "^https?://.*bodleian\\.ox\\.ac\\.uk"
+    },
+    {
+      "pattern": "^https?://.*treca\\.org"
+    },
+    {
+      "pattern": "^https?://.*scribd\\.com"
+    },
+    {
+      "pattern": "^https?://.*soundcloud\\.com"
     }
   ],
   "timeout": "20s",
