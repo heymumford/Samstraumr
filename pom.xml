@@ -16,7 +16,7 @@ Licensed under the Mozilla Public License 2.0
 
   <groupId>org.s8r</groupId>
   <artifactId>samstraumr-parent</artifactId>
-  <version>3.1.1</version>
+  <version>3.2.0</version>
   <name>Samstraumr Parent</name>
   <packaging>pom</packaging>
   <description>
@@ -74,7 +74,7 @@ Licensed under the Mozilla Public License 2.0
     <spotless.google.format.version>1.31.0</spotless.google.format.version>
     <checkstyle.plugin.version>3.3.1</checkstyle.plugin.version>
     <checkstyle.version>10.23.0</checkstyle.version>
-    <spotbugs.plugin.version>4.9.8.1</spotbugs.plugin.version>
+    <spotbugs.plugin.version>4.9.8.2</spotbugs.plugin.version>
     <jacoco.plugin.version>0.8.11</jacoco.plugin.version>
     <jacoco.line.coverage>0.80</jacoco.line.coverage>
     <jacoco.branch.coverage>0.80</jacoco.branch.coverage>
@@ -288,7 +288,35 @@ Licensed under the Mozilla Public License 2.0
             <encoding>${project.build.sourceEncoding}</encoding>
           </configuration>
         </plugin>
-        
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>${maven.enforcer.plugin.version}</version>
+          <executions>
+            <execution>
+              <id>enforce-versions</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <requireMavenVersion>
+                    <version>[3.9.0,)</version>
+                    <message>Maven 3.9.0+ required for consistent build behavior</message>
+                  </requireMavenVersion>
+                  <requireJavaVersion>
+                    <version>[21,)</version>
+                    <message>Java 21+ required for project compilation</message>
+                  </requireJavaVersion>
+                  <dependencyConvergence/>
+                  <banDuplicatePomDependencyVersions/>
+                </rules>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
         <plugin>
           <groupId>com.diffplug.spotless</groupId>
           <artifactId>spotless-maven-plugin</artifactId>
@@ -463,8 +491,16 @@ Licensed under the Mozilla Public License 2.0
         </plugin>
       </plugins>
     </pluginManagement>
+
+    <plugins>
+      <!-- Enforce Maven and Java version requirements -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+      </plugin>
+    </plugins>
   </build>
-  
+
   <profiles>
     <profile>
       <id>atl-tests</id>

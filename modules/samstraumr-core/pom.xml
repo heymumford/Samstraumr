@@ -17,7 +17,7 @@ Licensed under the Mozilla Public License 2.0
   <parent>
     <groupId>org.s8r</groupId>
     <artifactId>samstraumr</artifactId>
-    <version>3.1.1</version>
+    <version>3.2.0</version>
     <relativePath>..</relativePath>
   </parent>
 

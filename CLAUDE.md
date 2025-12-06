@@ -337,7 +337,7 @@ All PRs must pass the main pipeline before merging.
 ## Version History
 
 Project uses semantic versioning managed by `./s8r-version`:
-- Current: 3.1.1 (see `pom.xml`)
+- Current: 3.2.0 (see `pom.xml`)
 - Version tracked in `modules/version.properties`
 - Changelog in `docs/reference/release/changelog.md`
 

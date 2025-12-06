@@ -118,7 +118,7 @@ Maven dependency:
 <dependency>
     <groupId>org.samstraumr</groupId>
     <artifactId>samstraumr-core</artifactId>
-    <version>3.1.1</version>
+    <version>3.2.0</version>
 </dependency>
 ```
 

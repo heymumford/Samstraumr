@@ -27,9 +27,36 @@ import org.s8r.test.annotation.UnitTest;
 @DisplayName("Clean Architecture Compliance Tests (ADR-0003)")
 public class CleanArchitectureComplianceTest {
 
-  private static final String SRC_DIR_PATH =
-      "/home/emumford/NativeLinuxProjects/Samstraumr/Samstraumr/samstraumr-core/src/main/java/org/s8r";
-  private static final Path SRC_DIR = Paths.get(SRC_DIR_PATH);
+  // Dynamically resolve the source directory from the project structure
+  private static final Path SRC_DIR = getSrcDir();
+
+  private static Path getSrcDir() {
+    // Check if we're running from project root or module directory
+    Path userDir = Paths.get(System.getProperty("user.dir"));
+    Path candidatePath =
+        userDir
+            .resolve("modules")
+            .resolve("samstraumr-core")
+            .resolve("src")
+            .resolve("main")
+            .resolve("java")
+            .resolve("org")
+            .resolve("s8r");
+
+    if (Files.exists(candidatePath)) {
+      return candidatePath.normalize().toAbsolutePath();
+    }
+
+    // We're already in the module directory
+    candidatePath =
+        userDir.resolve("src").resolve("main").resolve("java").resolve("org").resolve("s8r");
+
+    if (Files.exists(candidatePath)) {
+      return candidatePath.normalize().toAbsolutePath();
+    }
+
+    throw new IllegalStateException("Could not locate source directory. Current dir: " + userDir);
+  }
 
   @Nested
   @DisplayName("Layer Structure Tests")
@@ -159,7 +186,7 @@ public class CleanArchitectureComplianceTest {
     void cleanArchitectureDependencyRulesShouldBeFollowed() throws IOException {
       // Use the ArchitectureAnalyzer to check for dependency violations
       Map<String, List<String>> violations =
-          ArchitectureAnalyzer.analyzePackageDependencies(SRC_DIR_PATH);
+          ArchitectureAnalyzer.analyzePackageDependencies(SRC_DIR.toString());
 
       // Collect all violations for a detailed error message
       StringBuilder errorMessage = new StringBuilder();
@@ -184,7 +211,7 @@ public class CleanArchitectureComplianceTest {
     void noCircularDependenciesShouldExist() throws IOException {
       // Use the ArchitectureAnalyzer to check for circular dependencies
       List<List<String>> circularDependencies =
-          ArchitectureAnalyzer.detectCircularDependencies(SRC_DIR_PATH);
+          ArchitectureAnalyzer.detectCircularDependencies(SRC_DIR.toString());
 
       // Collect all circular dependencies for a detailed error message
       StringBuilder errorMessage = new StringBuilder();
