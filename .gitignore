@@ -211,6 +211,11 @@ docmosis.properties
 !/docs/config/CLAUDE.md
 /CLAUDE.md
 **/CLAUDE.md
+
+# Claude Code local configuration (not tracked)
+.claude/
+!.claude/.gitkeep
+
 # New build documentation is now tracked in git
 
 #------------------------------------------------------------------------------
