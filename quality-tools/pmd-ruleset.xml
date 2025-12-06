@@ -8,17 +8,17 @@
         Custom PMD ruleset for Samstraumr project
     </description>
 
-    <\!-- Best Practices -->
+    <!-- Best Practices -->
     <rule ref="category/java/bestpractices.xml">
         <exclude name="GuardLogStatement"/>
         <exclude name="JUnitTestContainsTooManyAsserts"/>
-        <exclude name="JUnitTestsShouldIncludeAssert"/> <\!-- Cucumber tests often don't have direct asserts -->
+        <exclude name="JUnitTestsShouldIncludeAssert"/> <!-- Cucumber tests often don't have direct asserts -->
         <exclude name="JUnitAssertionsShouldIncludeMessage"/>
         <exclude name="AvoidUsingHardCodedIP"/>
         <exclude name="ConstantsInInterface"/>
     </rule>
 
-    <\!-- Code Style -->
+    <!-- Code Style -->
     <rule ref="category/java/codestyle.xml">
         <exclude name="AtLeastOneConstructor"/>
         <exclude name="LocalVariableCouldBeFinal"/>
@@ -30,12 +30,12 @@
         <exclude name="DefaultPackage"/>
         <exclude name="CallSuperInConstructor"/>
         <exclude name="UselessParentheses"/>
-        <exclude name="FieldNamingConventions"/> <\!-- We handle naming in CheckStyle -->
-        <exclude name="MethodNamingConventions"/> <\!-- We handle naming in CheckStyle -->
-        <exclude name="ClassNamingConventions"/> <\!-- We handle naming in CheckStyle -->
+        <exclude name="FieldNamingConventions"/> <!-- We handle naming in CheckStyle -->
+        <exclude name="MethodNamingConventions"/> <!-- We handle naming in CheckStyle -->
+        <exclude name="ClassNamingConventions"/> <!-- We handle naming in CheckStyle -->
     </rule>
 
-    <\!-- Design -->
+    <!-- Design -->
     <rule ref="category/java/design.xml">
         <exclude name="LawOfDemeter"/>
         <exclude name="LoosePackageCoupling"/>
@@ -43,39 +43,39 @@
         <exclude name="ExcessiveImports"/>
         <exclude name="TooManyMethods"/>
         <exclude name="TooManyFields"/>
-        <exclude name="CyclomaticComplexity"/> <\!-- We'll use JaCoCo complexity metrics instead -->
+        <exclude name="CyclomaticComplexity"/> <!-- We'll use JaCoCo complexity metrics instead -->
     </rule>
     
-    <\!-- Documentation -->
+    <!-- Documentation -->
     <rule ref="category/java/documentation.xml">
         <exclude name="CommentSize"/>
     </rule>
     
-    <\!-- Error Prone -->
+    <!-- Error Prone -->
     <rule ref="category/java/errorprone.xml">
-        <exclude name="BeanMembersShouldSerialize"/> <\!-- Too many false positives with modern frameworks -->
-        <exclude name="NullAssignment"/> <\!-- Sometimes explicitly assigning null is useful -->
-        <exclude name="AvoidFieldNameMatchingMethodName"/> <\!-- Too restrictive -->
-        <exclude name="AvoidDuplicateLiterals"/> <\!-- Too many false positives with test data -->
-        <exclude name="DataflowAnomalyAnalysis"/> <\!-- Too many false positives -->
+        <exclude name="BeanMembersShouldSerialize"/> <!-- Too many false positives with modern frameworks -->
+        <exclude name="NullAssignment"/> <!-- Sometimes explicitly assigning null is useful -->
+        <exclude name="AvoidFieldNameMatchingMethodName"/> <!-- Too restrictive -->
+        <exclude name="AvoidDuplicateLiterals"/> <!-- Too many false positives with test data -->
+        <exclude name="DataflowAnomalyAnalysis"/> <!-- Too many false positives -->
     </rule>
     
-    <\!-- Multithreading -->
+    <!-- Multithreading -->
     <rule ref="category/java/multithreading.xml">
-        <exclude name="UseConcurrentHashMap"/> <\!-- Not always appropriate -->
-        <exclude name="DoNotUseThreads"/> <\!-- We might need threads -->
+        <exclude name="UseConcurrentHashMap"/> <!-- Not always appropriate -->
+        <exclude name="DoNotUseThreads"/> <!-- We might need threads -->
     </rule>
     
-    <\!-- Performance -->
+    <!-- Performance -->
     <rule ref="category/java/performance.xml">
-        <exclude name="AvoidInstantiatingObjectsInLoops"/> <\!-- Sometimes necessary -->
-        <exclude name="ConsecutiveAppendsShouldReuse"/> <\!-- Too strict -->
+        <exclude name="AvoidInstantiatingObjectsInLoops"/> <!-- Sometimes necessary -->
+        <exclude name="ConsecutiveAppendsShouldReuse"/> <!-- Too strict -->
     </rule>
     
-    <\!-- Security -->
+    <!-- Security -->
     <rule ref="category/java/security.xml"/>
 
-    <\!-- Customize some rules -->
+    <!-- Customize some rules -->
     <rule ref="category/java/design.xml/CouplingBetweenObjects">
         <properties>
             <property name="threshold" value="25"/>

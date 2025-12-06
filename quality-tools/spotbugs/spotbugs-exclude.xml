@@ -4,7 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/3.1.0/spotbugs/etc/findbugsfilter.xsd">
 
-    <\!-- Exclude test classes -->
+    <!-- Exclude test classes -->
     <Match>
         <Class name="~.*\.*Test" />
     </Match>
@@ -18,93 +18,93 @@
         <Class name="~.*\.*Steps" />
     </Match>
 
-    <\!-- Exclude certain packages -->
+    <!-- Exclude certain packages -->
     <Match>
         <Package name="~.*\.test\..*" />
     </Match>
     
-    <\!-- Exclude certain bug patterns -->
-    <\!-- EI: May expose internal representation by returning reference to mutable object -->
+    <!-- Exclude certain bug patterns -->
+    <!-- EI: May expose internal representation by returning reference to mutable object -->
     <Match>
         <Bug pattern="EI_EXPOSE_REP" />
     </Match>
-    <\!-- EI2: May expose internal representation by incorporating reference to mutable object -->
+    <!-- EI2: May expose internal representation by incorporating reference to mutable object -->
     <Match>
         <Bug pattern="EI_EXPOSE_REP2" />
     </Match>
     
-    <\!-- NP: Load of known null value (common in test initialization and assertion scenarios) -->
+    <!-- NP: Load of known null value (common in test initialization and assertion scenarios) -->
     <Match>
         <Class name="~.*\.*Test.*"/>
         <Bug pattern="NP_LOAD_OF_KNOWN_NULL_VALUE"/>
     </Match>
     
-    <\!-- Exclude field annotations from serialization warnings (like Lombok @Builder) -->
+    <!-- Exclude field annotations from serialization warnings (like Lombok @Builder) -->
     <Match>
         <Bug pattern="SE_TRANSIENT_FIELD_NOT_RESTORED"/>
     </Match>
     
-    <\!-- Exclude package-info classes -->
+    <!-- Exclude package-info classes -->
     <Match>
         <Class name="~.*\.package-info"/>
     </Match>
     
-    <\!-- RV: Return value of method ignored -->
+    <!-- RV: Return value of method ignored -->
     <Match>
         <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
     </Match>
-    <\!-- DM: Issues with default encoding -->
+    <!-- DM: Issues with default encoding -->
     <Match>
         <Bug pattern="DM_DEFAULT_ENCODING" />
     </Match>
-    <\!-- PATH_TRAVERSAL_IN: Path traversal vulnerability -->
+    <!-- PATH_TRAVERSAL_IN: Path traversal vulnerability -->
     <Match>
         <Bug pattern="PATH_TRAVERSAL_IN" />
     </Match>
-    <\!-- OBL_UNSATISFIED_OBLIGATION: Resource not properly closed -->
+    <!-- OBL_UNSATISFIED_OBLIGATION: Resource not properly closed -->
     <Match>
         <Bug pattern="OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE" />
     </Match>
-    <\!-- UC_USELESS_OBJECT: Creating object that's not used -->
+    <!-- UC_USELESS_OBJECT: Creating object that's not used -->
     <Match>
         <Bug pattern="UC_USELESS_OBJECT" />
     </Match>
-    <\!-- REC_CATCH_EXCEPTION: Catching Exception when not necessary -->
+    <!-- REC_CATCH_EXCEPTION: Catching Exception when not necessary -->
     <Match>
         <Bug pattern="REC_CATCH_EXCEPTION" />
     </Match>
-    <\!-- DLS: Dead local store -->
+    <!-- DLS: Dead local store -->
     <Match>
         <Bug pattern="DLS_DEAD_LOCAL_STORE" />
     </Match>
-    <\!-- Null pointer dereference -->
+    <!-- Null pointer dereference -->
     <Match>
         <Bug pattern="NP_NULL_ON_SOME_PATH" />
     </Match>
     <Match>
         <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE" />
     </Match>
-    <\!-- Unchecked/unconfirmed cast -->
+    <!-- Unchecked/unconfirmed cast -->
     <Match>
         <Bug pattern="BC_UNCONFIRMED_CAST" />
     </Match>
-    <\!-- Non-serializable object written to ObjectOutput -->
+    <!-- Non-serializable object written to ObjectOutput -->
     <Match>
         <Bug pattern="SE_BAD_FIELD" />
     </Match>
-    <\!-- Unclear control flow -->
+    <!-- Unclear control flow -->
     <Match>
         <Bug pattern="UCF_USELESS_CONTROL_FLOW" />
     </Match>
-    <\!-- Unread field -->
+    <!-- Unread field -->
     <Match>
         <Bug pattern="URF_UNREAD_FIELD" />
     </Match>
-    <\!-- Bug in the framework, not a true security issue -->
+    <!-- Bug in the framework, not a true security issue -->
     <Match>
         <Bug pattern="URLCONNECTION_SSRF_FD" />
     </Match>
-    <\!-- TODO: Address XML External Entity issues separately -->
+    <!-- TODO: Address XML External Entity issues separately -->
     <Match>
         <Bug pattern="XXE_XPATH" />
     </Match>

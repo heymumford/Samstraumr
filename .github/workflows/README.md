@@ -7,7 +7,7 @@
 
 ## Quick Reference
 
-### Active Workflows (9 Total)
+### Active Workflows (8 Total)
 
 | Workflow | Purpose | Triggers | Duration | Blocking |
 |----------|---------|----------|----------|----------|
@@ -18,7 +18,6 @@
 | **ci-scheduled.yml** | Weekly comprehensive | Sunday 2 AM UTC | 45-60 min | ❌ No |
 | **port-performance.yml** | Performance tests | Port interface changes | 20-30 min | ⚠️ Perf only |
 | **s8r-structure-pipeline.yml** | CLI validation | s8r* file changes | 10-15 min | ⚠️ CLI only |
-| **pages.yml** | Deploy to Pages | Main branch (docs) | 5-10 min | ❌ No |
 | **local-pipeline.yml** | Manual testing | Manual dispatch | 10-15 min | ❌ No |
 
 ---

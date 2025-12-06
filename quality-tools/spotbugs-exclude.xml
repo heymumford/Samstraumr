@@ -4,7 +4,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/3.1.0/spotbugs/etc/findbugsfilter.xsd">
 
-    <\!-- Exclude test classes -->
+    <!-- Exclude test classes -->
     <Match>
         <Class name="~.*\.*Test" />
     </Match>
@@ -18,57 +18,57 @@
         <Class name="~.*\.*Steps" />
     </Match>
 
-    <\!-- Exclude certain packages -->
+    <!-- Exclude certain packages -->
     <Match>
         <Package name="~.*\.test\..*" />
     </Match>
     
-    <\!-- Exclude certain bug patterns -->
-    <\!-- EI: May expose internal representation by returning reference to mutable object -->
+    <!-- Exclude certain bug patterns -->
+    <!-- EI: May expose internal representation by returning reference to mutable object -->
     <Match>
         <Bug pattern="EI_EXPOSE_REP" />
     </Match>
-    <\!-- EI2: May expose internal representation by incorporating reference to mutable object -->
+    <!-- EI2: May expose internal representation by incorporating reference to mutable object -->
     <Match>
         <Bug pattern="EI_EXPOSE_REP2" />
     </Match>
-    <\!-- RV: Return value of method ignored -->
+    <!-- RV: Return value of method ignored -->
     <Match>
         <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
     </Match>
-    <\!-- DM: Issues with default encoding -->
+    <!-- DM: Issues with default encoding -->
     <Match>
         <Bug pattern="DM_DEFAULT_ENCODING" />
     </Match>
-    <\!-- PATH_TRAVERSAL_IN: Path traversal vulnerability -->
+    <!-- PATH_TRAVERSAL_IN: Path traversal vulnerability -->
     <Match>
         <Bug pattern="PATH_TRAVERSAL_IN" />
     </Match>
-    <\!-- OBL_UNSATISFIED_OBLIGATION: Resource not properly closed -->
+    <!-- OBL_UNSATISFIED_OBLIGATION: Resource not properly closed -->
     <Match>
         <Bug pattern="OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE" />
     </Match>
-    <\!-- UC_USELESS_OBJECT: Creating object that's not used -->
+    <!-- UC_USELESS_OBJECT: Creating object that's not used -->
     <Match>
         <Bug pattern="UC_USELESS_OBJECT" />
     </Match>
-    <\!-- REC_CATCH_EXCEPTION: Catching Exception when not necessary -->
+    <!-- REC_CATCH_EXCEPTION: Catching Exception when not necessary -->
     <Match>
         <Bug pattern="REC_CATCH_EXCEPTION" />
     </Match>
     
-    <\!-- NP: Load of known null value (common in test initialization and assertion scenarios) -->
+    <!-- NP: Load of known null value (common in test initialization and assertion scenarios) -->
     <Match>
         <Class name="~.*\.*Test.*"/>
         <Bug pattern="NP_LOAD_OF_KNOWN_NULL_VALUE"/>
     </Match>
     
-    <\!-- Exclude field annotations from serialization warnings (like Lombok @Builder) -->
+    <!-- Exclude field annotations from serialization warnings (like Lombok @Builder) -->
     <Match>
         <Bug pattern="SE_TRANSIENT_FIELD_NOT_RESTORED"/>
     </Match>
     
-    <\!-- Exclude package-info classes -->
+    <!-- Exclude package-info classes -->
     <Match>
         <Class name="~.*\.package-info"/>
     </Match>
