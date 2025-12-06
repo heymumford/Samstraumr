@@ -150,7 +150,7 @@ public class CompositeAdapter {
       }
     }
 
-    // TODO: Copy transformers, validators, and circuit breakers
+    // SPSOFT-36: Copy transformers, validators, and circuit breakers
     // This would require access to these elements of the tube composite
     // which might not be exposed in the current API
 
