@@ -27,6 +27,7 @@ import org.s8r.component.Logger;
  * Manages logging for a component, providing both structured logging and in-memory log retention.
  *
  * <p>This class handles all logging concerns for a component, including:
+ *
  * <ul>
  *   <li>Structured logging with tags (via Logger)
  *   <li>In-memory log retention for introspection
@@ -133,9 +134,7 @@ public class ComponentLogger {
     return logger;
   }
 
-  /**
-   * Clears the in-memory log.
-   */
+  /** Clears the in-memory log. */
   public void clearMemoryLog() {
     memoryLog.clear();
   }

@@ -19,61 +19,61 @@ import java.util.Map;
 
 /**
  * Interface for listeners that want to be notified of component events.
- * 
- * <p>Event listeners receive notifications about state changes, lifecycle
- * transitions, and other important occurrences within components. They enable
- * reactive and event-driven behavior in the system.</p>
- * 
- * <p>To use an event listener:</p>
+ *
+ * <p>Event listeners receive notifications about state changes, lifecycle transitions, and other
+ * important occurrences within components. They enable reactive and event-driven behavior in the
+ * system.
+ *
+ * <p>To use an event listener:
+ *
  * <ol>
- *   <li>Implement this interface in your listener class</li>
- *   <li>Register the listener with a component using component.addEventListener()</li>
- *   <li>Handle events in the onEvent method</li>
+ *   <li>Implement this interface in your listener class
+ *   <li>Register the listener with a component using component.addEventListener()
+ *   <li>Handle events in the onEvent method
  * </ol>
  */
 public interface EventListener {
-    
-    /**
-     * Called when a component event occurs.
-     *
-     * @param component The component that raised the event
-     * @param eventType The type of event
-     * @param data The event data
-     */
-    void onEvent(Component component, String eventType, Map<String, Object> data);
-    
-    /**
-     * Sets the event type this listener is interested in.
-     * Use "*" for receiving all events.
-     *
-     * @param eventType The event type to listen for
-     */
-    void setEventType(String eventType);
-    
-    /**
-     * Gets the event type this listener is interested in.
-     *
-     * @return The event type
-     */
-    String getEventType();
-    
-    /**
-     * Checks if this listener is interested in the specified event type.
-     * By default, this returns true if the event type matches the one this listener
-     * is registered for, or if this listener is registered for all events ("*").
-     *
-     * @param eventType The event type to check
-     * @return true if this listener is interested in the event type
-     */
-    default boolean isInterestedIn(String eventType) {
-        return getEventType().equals(eventType) || getEventType().equals("*");
-    }
-    
-    /**
-     * Called when a component is terminated and the listener is being removed.
-     * This gives the listener a chance to clean up any resources.
-     */
-    default void onTermination() {
-        // Default implementation is a no-op
-    }
+
+  /**
+   * Called when a component event occurs.
+   *
+   * @param component The component that raised the event
+   * @param eventType The type of event
+   * @param data The event data
+   */
+  void onEvent(Component component, String eventType, Map<String, Object> data);
+
+  /**
+   * Sets the event type this listener is interested in. Use "*" for receiving all events.
+   *
+   * @param eventType The event type to listen for
+   */
+  void setEventType(String eventType);
+
+  /**
+   * Gets the event type this listener is interested in.
+   *
+   * @return The event type
+   */
+  String getEventType();
+
+  /**
+   * Checks if this listener is interested in the specified event type. By default, this returns
+   * true if the event type matches the one this listener is registered for, or if this listener is
+   * registered for all events ("*").
+   *
+   * @param eventType The event type to check
+   * @return true if this listener is interested in the event type
+   */
+  default boolean isInterestedIn(String eventType) {
+    return getEventType().equals(eventType) || getEventType().equals("*");
+  }
+
+  /**
+   * Called when a component is terminated and the listener is being removed. This gives the
+   * listener a chance to clean up any resources.
+   */
+  default void onTermination() {
+    // Default implementation is a no-op
+  }
 }

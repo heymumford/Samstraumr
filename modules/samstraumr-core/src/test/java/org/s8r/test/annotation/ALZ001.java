@@ -25,9 +25,9 @@ import org.junit.jupiter.api.Tag;
 /**
  * Marks a test as part of the ALZ001 initiative for Alzheimer's disease modeling framework tests.
  *
- * <p>ALZ001 tests focus on validating complex combinations of tubes, composites, and machines 
- * for representing biological structures, processes, and measurements relevant to Alzheimer's 
- * disease research.
+ * <p>ALZ001 tests focus on validating complex combinations of tubes, composites, and machines for
+ * representing biological structures, processes, and measurements relevant to Alzheimer's disease
+ * research.
  *
  * <p>Tests with this annotation have the following characteristics:
  *

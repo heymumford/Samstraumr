@@ -25,8 +25,8 @@ import org.junit.jupiter.api.Tag;
 /**
  * Marks a test as part of the ALZ001 Environmental Factors modeling capability.
  *
- * <p>Tests with this annotation focus on validating components, composites, and machines that
- * model environmental influences on Alzheimer's disease progression, including:
+ * <p>Tests with this annotation focus on validating components, composites, and machines that model
+ * environmental influences on Alzheimer's disease progression, including:
  *
  * <ul>
  *   <li>Oxidative stress modeling

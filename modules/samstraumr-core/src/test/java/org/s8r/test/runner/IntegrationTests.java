@@ -14,18 +14,20 @@ import org.junit.platform.suite.api.ConfigurationParameter;
 import org.junit.platform.suite.api.IncludeEngines;
 import org.junit.platform.suite.api.SelectClasspathResource;
 import org.junit.platform.suite.api.Suite;
+
 import io.cucumber.junit.platform.engine.Constants;
 
 /**
  * Test runner for Integration tests.
- * 
- * <p>This suite runs all Cucumber features for integration between components,
- * including port interface tests and adapter implementations.
- * 
+ *
+ * <p>This suite runs all Cucumber features for integration between components, including port
+ * interface tests and adapter implementations.
+ *
  * <p>To run this suite, use one of these methods:
+ *
  * <ul>
- *   <li>Maven: {@code mvn test -Dtest=IntegrationTests}</li>
- *   <li>s8r-test script: {@code ./s8r-test integration}</li>
+ *   <li>Maven: {@code mvn test -Dtest=IntegrationTests}
+ *   <li>s8r-test script: {@code ./s8r-test integration}
  * </ul>
  */
 @Suite
@@ -36,5 +38,5 @@ import io.cucumber.junit.platform.engine.Constants;
 @ConfigurationParameter(key = Constants.PLUGIN_PROPERTY_NAME, value = "pretty")
 @ConfigurationParameter(key = Constants.FILTER_TAGS_PROPERTY_NAME, value = "@IntegrationTest")
 public class IntegrationTests {
-    // This class is intentionally empty. It's used only as a holder for the annotations.
+  // This class is intentionally empty. It's used only as a holder for the annotations.
 }

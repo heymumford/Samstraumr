@@ -22,12 +22,10 @@ import java.lang.annotation.Target;
 
 /**
  * Marks a test that is considered "above the line" in the ATL/BTL testing strategy.
- * 
- * <p>Above the line tests focus on validating externally visible behaviors and
- * interfaces from a black-box perspective. They evaluate what the system does,
- * rather than how it does it.
+ *
+ * <p>Above the line tests focus on validating externally visible behaviors and interfaces from a
+ * black-box perspective. They evaluate what the system does, rather than how it does it.
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AboveTheLine {
-}
+public @interface AboveTheLine {}

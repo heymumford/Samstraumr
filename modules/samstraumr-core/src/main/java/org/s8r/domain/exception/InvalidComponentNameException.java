@@ -16,15 +16,15 @@
 package org.s8r.domain.exception;
 
 /**
- * Exception thrown when a component name contains illegal characters, is too short or too long,
- * or otherwise fails to meet the component name validation requirements.
+ * Exception thrown when a component name contains illegal characters, is too short or too long, or
+ * otherwise fails to meet the component name validation requirements.
  */
 public class InvalidComponentNameException extends ComponentException {
   private static final long serialVersionUID = 1L;
-  
+
   private final String invalidName;
   private final String validationRule;
-  
+
   /**
    * Creates a new InvalidComponentNameException with details about the validation failure.
    *
@@ -37,7 +37,7 @@ public class InvalidComponentNameException extends ComponentException {
     this.invalidName = invalidName;
     this.validationRule = validationRule;
   }
-  
+
   /**
    * Returns the invalid component name that caused this exception.
    *
@@ -46,7 +46,7 @@ public class InvalidComponentNameException extends ComponentException {
   public String getInvalidName() {
     return invalidName;
   }
-  
+
   /**
    * Returns the specific validation rule that was violated.
    *

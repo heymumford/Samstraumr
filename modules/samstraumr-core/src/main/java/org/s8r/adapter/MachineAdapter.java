@@ -436,7 +436,8 @@ public class MachineAdapter {
 
       @Override
       public Map<String, Object> getProperties() {
-        return Collections.emptyMap(); // Domain machine properties not exposed via this anonymous adapter
+        return Collections
+            .emptyMap(); // Domain machine properties not exposed via this anonymous adapter
       }
     };
   }

@@ -53,7 +53,7 @@ public class Slf4jLogger implements LoggerPort {
   public void trace(String message) {
     logger.trace(message);
   }
-  
+
   @Override
   public void trace(String format, Object... args) {
     logger.trace(format, args);
@@ -63,7 +63,7 @@ public class Slf4jLogger implements LoggerPort {
   public void debug(String message) {
     logger.debug(message);
   }
-  
+
   @Override
   public void debug(String format, Object... args) {
     logger.debug(format, args);
@@ -73,7 +73,7 @@ public class Slf4jLogger implements LoggerPort {
   public void info(String message) {
     logger.info(message);
   }
-  
+
   @Override
   public void info(String format, Object... args) {
     logger.info(format, args);
@@ -83,7 +83,7 @@ public class Slf4jLogger implements LoggerPort {
   public void warn(String message) {
     logger.warn(message);
   }
-  
+
   @Override
   public void warn(String format, Object... args) {
     logger.warn(format, args);
@@ -93,7 +93,7 @@ public class Slf4jLogger implements LoggerPort {
   public void error(String message) {
     logger.error(message);
   }
-  
+
   @Override
   public void error(String format, Object... args) {
     logger.error(format, args);
@@ -113,7 +113,7 @@ public class Slf4jLogger implements LoggerPort {
   public boolean isTraceEnabled() {
     return logger.isTraceEnabled();
   }
-  
+
   @Override
   public String getName() {
     return logger.getName();

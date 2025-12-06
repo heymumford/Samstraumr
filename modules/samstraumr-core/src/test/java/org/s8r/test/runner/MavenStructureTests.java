@@ -13,18 +13,19 @@ import io.cucumber.junit.platform.engine.Constants;
 
 /**
  * Test runner for Maven structure BDD tests.
- * 
- * <p>This test runner executes the Cucumber feature tests for verifying
- * the Maven project structure in the Samstraumr project. It uses the maven-structure
- * tag to filter for the relevant feature files.
- * 
+ *
+ * <p>This test runner executes the Cucumber feature tests for verifying the Maven project structure
+ * in the Samstraumr project. It uses the maven-structure tag to filter for the relevant feature
+ * files.
+ *
  * <p>The tests verify:
+ *
  * <ul>
- *   <li>Basic Maven structure (presence of required POM files)</li>
- *   <li>Source and test directories existence</li>
- *   <li>Clean architecture layer compliance</li>
- *   <li>Package structure for domain, application and infrastructure</li>
- *   <li>Port interface packages existence</li>
+ *   <li>Basic Maven structure (presence of required POM files)
+ *   <li>Source and test directories existence
+ *   <li>Clean architecture layer compliance
+ *   <li>Package structure for domain, application and infrastructure
+ *   <li>Port interface packages existence
  * </ul>
  */
 @Suite
