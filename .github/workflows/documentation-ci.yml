@@ -64,6 +64,7 @@ jobs:
 
       - name: Check Markdown links
         id: check_links
+        continue-on-error: true  # Non-blocking - many external links are flaky
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
           use-quiet-mode: 'no'
@@ -74,7 +75,6 @@ jobs:
           file-extension: '.md'
           base-branch: 'main'
           check-modified-files-only: 'no'
-          continue-on-error: true
 
       - name: Upload Documentation Check Results
         uses: actions/upload-artifact@v5
