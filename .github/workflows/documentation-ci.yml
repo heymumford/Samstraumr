@@ -8,6 +8,7 @@ on:
       - 'docs/**'
       - 'Samstraumr/samstraumr-core/src/main/java/**/*.java'
       - '.github/workflows/documentation-ci.yml'
+      - '.github/workflows/mlc_config.json'
   pull_request:
     branches: [ main ]
     paths:
@@ -15,6 +16,7 @@ on:
       - 'docs/**'
       - 'Samstraumr/samstraumr-core/src/main/java/**/*.java'
       - '.github/workflows/documentation-ci.yml'
+      - '.github/workflows/mlc_config.json'
   workflow_dispatch:  # Manual trigger
   release:
     types: [published, prereleased]  # Run on release publication
