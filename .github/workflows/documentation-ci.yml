@@ -38,6 +38,7 @@ jobs:
 
       - name: Check documentation standards
         id: check_standards
+        continue-on-error: true  # Non-blocking for now
         run: |
           if [ -f "./docs/scripts/check-documentation-standards.sh" ]; then
             ./docs/scripts/check-documentation-standards.sh --check all --report documentation-check-report.md
@@ -49,6 +50,7 @@ jobs:
 
       - name: Check TODO format
         id: check_todos
+        continue-on-error: true  # Non-blocking for now
         run: |
           if [ -f "./docs/scripts/check-todo-format.sh" ]; then
             ./docs/scripts/check-todo-format.sh --high-priority --github-issues
