@@ -1,10 +1,10 @@
 name: GitHub Pages
 
+# Disabled: Pages not configured for this repository.
+# Enable in repo Settings → Pages → Source: "GitHub Actions" to use this workflow.
+# Then generate docs with: mvn site or set up docs/ as Jekyll source.
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+  workflow_dispatch:  # Manual trigger only
 
 permissions:
   contents: read
