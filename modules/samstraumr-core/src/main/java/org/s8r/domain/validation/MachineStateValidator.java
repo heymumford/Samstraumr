@@ -116,12 +116,12 @@ public class MachineStateValidator {
   }
 
   /**
-   * Checks if an operation is allowed in a specific state without throwing an exception.
+   * Checks if an operation is allowed in a specific state.
    *
    * @param operation The operation to check
    * @param currentState The current state to check
-   * @return true if the operation is allowed, false if operation is not defined or not allowed in
-   *     current state
+   * @return true if the operation is allowed in the current state, false if not allowed (for
+   *     defined operations only)
    * @throws IllegalArgumentException if the operation is not defined
    */
   public static boolean isOperationAllowed(MachineOperation operation, MachineState currentState) {
