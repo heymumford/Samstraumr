@@ -194,8 +194,13 @@ public class CompositeConnectionValidator {
    */
   private static List<ComponentId> findCycle(
       Map<ComponentId, Set<ComponentId>> graph, ComponentId start, ComponentId end) {
-    if (!graph.containsKey(start) || !graph.containsKey(end)) {
-      return Collections.emptyList();
+    // Ensure both start and end nodes are in the graph, even if they have no outgoing edges
+    // This is necessary to handle sparse graphs where nodes may not be keys in the map
+    if (!graph.containsKey(start)) {
+      graph.put(start, new HashSet<>());
+    }
+    if (!graph.containsKey(end)) {
+      graph.put(end, new HashSet<>());
     }
 
     Set<ComponentId> visited = new HashSet<>();
