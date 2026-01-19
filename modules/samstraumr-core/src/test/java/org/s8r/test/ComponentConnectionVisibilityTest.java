@@ -34,12 +34,10 @@ import org.s8r.domain.identity.ComponentId;
 /**
  * Detects Bug #4: Visibility issue with ComponentConnection.active field.
  *
- * <p>ComponentConnection has a mutable `active` field that is not volatile. When multiple
- * threads call activate()/deactivate() and read isActive(), the memory visibility of changes
- * is not guaranteed without volatile. This causes:
- * - Threads reading stale values of `active` field
- * - Data visibility issues with concurrent modifications
- * - Incorrect state representation across threads
+ * <p>ComponentConnection has a mutable `active` field that is not volatile. When multiple threads
+ * call activate()/deactivate() and read isActive(), the memory visibility of changes is not
+ * guaranteed without volatile. This causes: - Threads reading stale values of `active` field - Data
+ * visibility issues with concurrent modifications - Incorrect state representation across threads
  */
 @DisplayName("Bug #4: ComponentConnection visibility issue with active field")
 @Tag("L1_Component")
