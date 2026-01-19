@@ -143,6 +143,7 @@ public class Component {
     if (from == to) return true; // Allow self-transitions
 
     switch (from) {
+      // Creation & Early Development (Embryonic)
       case CONCEPTION:
         return to == LifecycleState.INITIALIZING;
       case INITIALIZING:
@@ -152,15 +153,82 @@ public class Component {
       case SPECIALIZING:
         return to == LifecycleState.DEVELOPING_FEATURES;
       case DEVELOPING_FEATURES:
-        return to == LifecycleState.READY;
+        return to == LifecycleState.INITIALIZED || to == LifecycleState.READY;
+
+      // Operational (Post-Embryonic)
+      case INITIALIZED:
+        return to == LifecycleState.READY || to == LifecycleState.CONFIGURING;
       case READY:
-        return to == LifecycleState.ACTIVE || to == LifecycleState.TERMINATING;
+        return to == LifecycleState.ACTIVE
+            || to == LifecycleState.RUNNING
+            || to == LifecycleState.TERMINATING;
       case ACTIVE:
-        return to == LifecycleState.READY || to == LifecycleState.TERMINATING;
+        return to == LifecycleState.READY
+            || to == LifecycleState.RUNNING
+            || to == LifecycleState.WAITING
+            || to == LifecycleState.ADAPTING
+            || to == LifecycleState.TRANSFORMING
+            || to == LifecycleState.TERMINATING;
+      case RUNNING:
+        return to == LifecycleState.ACTIVE
+            || to == LifecycleState.READY
+            || to == LifecycleState.WAITING
+            || to == LifecycleState.ADAPTING
+            || to == LifecycleState.TRANSFORMING
+            || to == LifecycleState.TERMINATING;
+      case WAITING:
+        return to == LifecycleState.ACTIVE
+            || to == LifecycleState.RUNNING
+            || to == LifecycleState.READY
+            || to == LifecycleState.ADAPTING
+            || to == LifecycleState.TERMINATING;
+      case ADAPTING:
+        return to == LifecycleState.ACTIVE
+            || to == LifecycleState.RUNNING
+            || to == LifecycleState.READY
+            || to == LifecycleState.WAITING
+            || to == LifecycleState.STABLE
+            || to == LifecycleState.TERMINATING;
+      case TRANSFORMING:
+        return to == LifecycleState.ACTIVE
+            || to == LifecycleState.READY
+            || to == LifecycleState.STABLE
+            || to == LifecycleState.SPAWNING
+            || to == LifecycleState.TERMINATING;
+
+      // Advanced Stages
+      case STABLE:
+        return to == LifecycleState.SPAWNING
+            || to == LifecycleState.DEGRADED
+            || to == LifecycleState.MAINTAINING
+            || to == LifecycleState.ACTIVE
+            || to == LifecycleState.READY
+            || to == LifecycleState.TERMINATING;
+      case SPAWNING:
+        return to == LifecycleState.ACTIVE
+            || to == LifecycleState.READY
+            || to == LifecycleState.STABLE
+            || to == LifecycleState.TERMINATING;
+      case DEGRADED:
+        return to == LifecycleState.MAINTAINING
+            || to == LifecycleState.ACTIVE
+            || to == LifecycleState.READY
+            || to == LifecycleState.TERMINATING;
+      case MAINTAINING:
+        return to == LifecycleState.ACTIVE
+            || to == LifecycleState.STABLE
+            || to == LifecycleState.READY
+            || to == LifecycleState.TERMINATING;
+
+      // Termination
       case TERMINATING:
         return to == LifecycleState.TERMINATED;
       case TERMINATED:
-        return false; // Cannot transition from terminated
+        return to == LifecycleState.ARCHIVED;
+      case ARCHIVED:
+        return false; // Cannot transition from archived
+
+      // Default (should not reach)
       default:
         return false;
     }
