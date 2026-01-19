@@ -44,6 +44,7 @@ import org.s8r.domain.validation.CompositeConnectionValidator;
  * detection, not just nodes with outgoing connections.
  */
 @DisplayName("Bug #7: Cycle detection in sparse component graphs")
+@Tag("ATL")
 @Tag("L1_Component")
 @Tag("validation")
 public class CycleDetectionSparseGraphTest {

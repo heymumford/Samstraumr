@@ -39,6 +39,7 @@ import org.s8r.domain.validation.MachineStateValidator;
  * operation is encountered, rather than silently falling back to modifiable states.
  */
 @DisplayName("Bug #5: MachineStateValidator silent fallback for undefined operations")
+@Tag("ATL")
 @Tag("L1_Component")
 @Tag("validation")
 public class MachineStateValidatorSilentFallbackTest {

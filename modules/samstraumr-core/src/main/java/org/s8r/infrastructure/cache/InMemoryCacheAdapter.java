@@ -23,6 +23,12 @@ import org.s8r.application.port.LoggerPort;
  *
  * <p>This adapter provides a simple in-memory cache implementation using a ConcurrentHashMap. It is
  * primarily intended for testing and development environments.
+ *
+ * <p><b>Thread-safety:</b> This class is thread-safe. It uses {@link
+ * java.util.concurrent.ConcurrentHashMap} for cache storage and {@link
+ * java.util.concurrent.atomic.AtomicLong} for all statistics counters, ensuring safe concurrent
+ * access without external synchronization. All public methods can be safely called from multiple
+ * threads concurrently. @ThreadSafe
  */
 public class InMemoryCacheAdapter implements CachePort {
 

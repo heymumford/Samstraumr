@@ -44,6 +44,7 @@ import org.s8r.domain.identity.ComponentId;
  * components
  */
 @DisplayName("Bug #3: CompositeComponent concurrent activation race condition")
+@Tag("ATL")
 @Tag("L1_Component")
 @Tag("concurrency")
 public class CompositeComponentConcurrencyTest {
@@ -147,10 +148,9 @@ public class CompositeComponentConcurrencyTest {
                   for (int j = 0; j < OPS_PER_THREAD; j++) {
                     try {
                       // Multiple concurrent reads of the children map
-                      int childCount = composite.getComponents().size();
-                      if (childCount >= 0) {
-                        successfulOps.incrementAndGet();
-                      }
+                      // This validates thread-safe iteration over ConcurrentHashMap
+                      composite.getComponents().size();
+                      successfulOps.incrementAndGet();
                     } catch (ConcurrentModificationException e) {
                       exceptions.add(
                           new AssertionError(
@@ -208,10 +208,9 @@ public class CompositeComponentConcurrencyTest {
                   for (int j = 0; j < OPS_PER_THREAD; j++) {
                     try {
                       // Iterate and read connections concurrently
-                      int connectionCount = composite.getConnections().size();
-                      if (connectionCount >= 0) {
-                        successfulOps.incrementAndGet();
-                      }
+                      // This validates thread-safe iteration over CopyOnWriteArrayList
+                      composite.getConnections().size();
+                      successfulOps.incrementAndGet();
                     } catch (ConcurrentModificationException e) {
                       exceptions.add(
                           new AssertionError(

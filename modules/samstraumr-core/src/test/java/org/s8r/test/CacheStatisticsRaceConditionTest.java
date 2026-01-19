@@ -41,6 +41,7 @@ import org.s8r.infrastructure.cache.InMemoryCacheAdapter;
  * synchronization.
  */
 @DisplayName("Bug #6: InMemoryCacheAdapter statistics race conditions")
+@Tag("ATL")
 @Tag("L1_Component")
 @Tag("cache")
 public class CacheStatisticsRaceConditionTest {

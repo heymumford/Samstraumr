@@ -87,11 +87,13 @@ public class CompositeComponent extends Component {
     }
 
     String childId = child.getId().getIdString();
-    if (children.containsKey(childId)) {
+    // Use putIfAbsent for atomic check-and-add to prevent race conditions
+    // between concurrent addComponent calls
+    Component existing = children.putIfAbsent(childId, child);
+    if (existing != null) {
       throw new DuplicateComponentException(child.getId());
     }
 
-    children.put(childId, child);
     logActivity("Added child component: " + childId);
 
     // Create a composition relationship connection

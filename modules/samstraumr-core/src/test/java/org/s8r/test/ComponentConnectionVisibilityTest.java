@@ -41,6 +41,7 @@ import org.s8r.domain.identity.ComponentId;
  * visibility issues with concurrent modifications - Incorrect state representation across threads
  */
 @DisplayName("Bug #4: ComponentConnection visibility issue with active field")
+@Tag("ATL")
 @Tag("L1_Component")
 @Tag("concurrency")
 public class ComponentConnectionVisibilityTest {

@@ -43,13 +43,13 @@ import org.s8r.domain.identity.ComponentId;
  * iteration - Data loss due to unsynchronized modifications - Corruption of aggregation state
  */
 @DisplayName("Bug #1: AggregatorComponent concurrent buffer race condition")
+@Tag("ATL")
 @Tag("L1_Component")
 @Tag("concurrency")
 public class AggregatorComponentConcurrencyTest {
 
   private AggregatorComponent aggregator;
   private ComponentId sourceComponentId;
-  private Map<String, Integer> processedCounts;
 
   @BeforeEach
   void setup() {
@@ -70,8 +70,6 @@ public class AggregatorComponentConcurrencyTest {
           }
           return b;
         });
-
-    processedCounts = new HashMap<>();
   }
 
   @Test
