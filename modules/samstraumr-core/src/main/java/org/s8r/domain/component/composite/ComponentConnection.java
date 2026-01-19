@@ -35,7 +35,7 @@ public final class ComponentConnection {
   private final ConnectionType type;
   private final String description;
   private final Instant creationTime;
-  private boolean active;
+  private volatile boolean active;
 
   /**
    * Creates a new ComponentConnection.
