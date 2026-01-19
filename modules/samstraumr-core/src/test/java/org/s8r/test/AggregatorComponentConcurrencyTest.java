@@ -38,10 +38,8 @@ import org.s8r.domain.identity.ComponentId;
  * Detects Bug #1: Race condition in AggregatorComponent buffer management.
  *
  * <p>When multiple threads call processData() concurrently, the ArrayList values in
- * aggregationBuffer are not thread-safe. This causes:
- * - ConcurrentModificationException during iteration
- * - Data loss due to unsynchronized modifications
- * - Corruption of aggregation state
+ * aggregationBuffer are not thread-safe. This causes: - ConcurrentModificationException during
+ * iteration - Data loss due to unsynchronized modifications - Corruption of aggregation state
  */
 @DisplayName("Bug #1: AggregatorComponent concurrent buffer race condition")
 @Tag("L1_Component")
@@ -63,12 +61,14 @@ public class AggregatorComponentConcurrencyTest {
             "test-aggregator", "input-channel", "output-channel", 5);
 
     // Add simple sum aggregator
-    aggregator.addAggregator("value", (a, b) -> {
-      if (a instanceof Integer && b instanceof Integer) {
-        return (Integer) a + (Integer) b;
-      }
-      return b;
-    });
+    aggregator.addAggregator(
+        "value",
+        (a, b) -> {
+          if (a instanceof Integer && b instanceof Integer) {
+            return (Integer) a + (Integer) b;
+          }
+          return b;
+        });
 
     processedCounts = new HashMap<>();
   }
@@ -86,26 +86,30 @@ public class AggregatorComponentConcurrencyTest {
 
     // Create threads
     for (int i = 0; i < THREAD_COUNT; i++) {
-      threads.add(new Thread(() -> {
-        try {
-          barrier.await(); // Synchronize all threads to start concurrently
+      threads.add(
+          new Thread(
+              () -> {
+                try {
+                  barrier.await(); // Synchronize all threads to start concurrently
 
-          for (int j = 0; j < ITEMS_PER_THREAD; j++) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("value", 1);
-            data.put("item", "item-" + j);
+                  for (int j = 0; j < ITEMS_PER_THREAD; j++) {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("value", 1);
+                    data.put("item", "item-" + j);
 
-            try {
-              aggregator.processData(new ComponentDataEvent(sourceComponentId, "input-channel", data));
-              successfulOperations.incrementAndGet();
-            } catch (ConcurrentModificationException e) {
-              exceptions.add(new AssertionError("Race condition detected: " + e.getMessage(), e));
-            }
-          }
-        } catch (Exception e) {
-          exceptions.add(e);
-        }
-      }));
+                    try {
+                      aggregator.processData(
+                          new ComponentDataEvent(sourceComponentId, "input-channel", data));
+                      successfulOperations.incrementAndGet();
+                    } catch (ConcurrentModificationException e) {
+                      exceptions.add(
+                          new AssertionError("Race condition detected: " + e.getMessage(), e));
+                    }
+                  }
+                } catch (Exception e) {
+                  exceptions.add(e);
+                }
+              }));
     }
 
     // Start all threads
@@ -142,27 +146,31 @@ public class AggregatorComponentConcurrencyTest {
 
     // Create threads
     for (int i = 0; i < THREAD_COUNT; i++) {
-      threads.add(new Thread(() -> {
-        try {
-          barrier.await();
+      threads.add(
+          new Thread(
+              () -> {
+                try {
+                  barrier.await();
 
-          for (int j = 0; j < OPS_PER_THREAD; j++) {
-            try {
-              Map<String, Object> data = new HashMap<>();
-              data.put("value", Math.random());
-              data.put("timestamp", System.nanoTime());
+                  for (int j = 0; j < OPS_PER_THREAD; j++) {
+                    try {
+                      Map<String, Object> data = new HashMap<>();
+                      data.put("value", Math.random());
+                      data.put("timestamp", System.nanoTime());
 
-              aggregator.processData(new ComponentDataEvent(sourceComponentId, "input-channel", data));
-              successfulOperations.incrementAndGet();
-            } catch (ConcurrentModificationException e) {
-              exceptions.add(
-                  new AssertionError("Race condition detected (ConcurrentModificationException)", e));
-            }
-          }
-        } catch (Exception e) {
-          exceptions.add(e);
-        }
-      }));
+                      aggregator.processData(
+                          new ComponentDataEvent(sourceComponentId, "input-channel", data));
+                      successfulOperations.incrementAndGet();
+                    } catch (ConcurrentModificationException e) {
+                      exceptions.add(
+                          new AssertionError(
+                              "Race condition detected (ConcurrentModificationException)", e));
+                    }
+                  }
+                } catch (Exception e) {
+                  exceptions.add(e);
+                }
+              }));
     }
 
     // Start all threads
@@ -186,7 +194,8 @@ public class AggregatorComponentConcurrencyTest {
   }
 
   @Test
-  @DisplayName("Should maintain data integrity during concurrent processData and triggerAggregation")
+  @DisplayName(
+      "Should maintain data integrity during concurrent processData and triggerAggregation")
   void testConcurrentProcessAndAggregation() throws InterruptedException {
     final int THREAD_COUNT = 15;
     final int OPS_PER_THREAD = 50;
@@ -198,31 +207,36 @@ public class AggregatorComponentConcurrencyTest {
 
     // Create threads
     for (int i = 0; i < THREAD_COUNT; i++) {
-      threads.add(new Thread(() -> {
-        try {
-          barrier.await(); // Synchronize all threads to start concurrently
+      threads.add(
+          new Thread(
+              () -> {
+                try {
+                  barrier.await(); // Synchronize all threads to start concurrently
 
-          for (int j = 0; j < OPS_PER_THREAD; j++) {
-            try {
-              // Mix of processData and triggerAggregation calls
-              if (processedItems.get() % 2 == 0) {
-                Map<String, Object> data = new HashMap<>();
-                data.put("value", 1);
-                aggregator.processData(new ComponentDataEvent(sourceComponentId, "input-channel", data));
-              } else {
-                aggregator.triggerAggregation();
-              }
-              processedItems.incrementAndGet();
-            } catch (ConcurrentModificationException e) {
-              exceptions.add(
-                  new AssertionError(
-                      "Race condition during concurrent process/aggregate: " + e.getMessage(), e));
-            }
-          }
-        } catch (Exception e) {
-          exceptions.add(e);
-        }
-      }));
+                  for (int j = 0; j < OPS_PER_THREAD; j++) {
+                    try {
+                      // Mix of processData and triggerAggregation calls
+                      if (processedItems.get() % 2 == 0) {
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("value", 1);
+                        aggregator.processData(
+                            new ComponentDataEvent(sourceComponentId, "input-channel", data));
+                      } else {
+                        aggregator.triggerAggregation();
+                      }
+                      processedItems.incrementAndGet();
+                    } catch (ConcurrentModificationException e) {
+                      exceptions.add(
+                          new AssertionError(
+                              "Race condition during concurrent process/aggregate: "
+                                  + e.getMessage(),
+                              e));
+                    }
+                  }
+                } catch (Exception e) {
+                  exceptions.add(e);
+                }
+              }));
     }
 
     // Start all threads
@@ -258,28 +272,31 @@ public class AggregatorComponentConcurrencyTest {
 
     // Create threads: 50 threads × 200 ops = 10,000 concurrent operations
     for (int i = 0; i < THREAD_COUNT; i++) {
-      threads.add(new Thread(() -> {
-        try {
-          barrier.await(); // Synchronize all threads to start concurrently
+      threads.add(
+          new Thread(
+              () -> {
+                try {
+                  barrier.await(); // Synchronize all threads to start concurrently
 
-          for (int j = 0; j < OPS_PER_THREAD; j++) {
-            try {
-              Map<String, Object> data = new HashMap<>();
-              data.put("value", 1);
-              aggregator.processData(new ComponentDataEvent(sourceComponentId, "input-channel", data));
-              itemsAdded.incrementAndGet();
-            } catch (ConcurrentModificationException e) {
-              exceptions.add(
-                  new AssertionError(
-                      "ConcurrentModificationException under high concurrency (Bug #1): "
-                          + e.getMessage(),
-                      e));
-            }
-          }
-        } catch (Exception e) {
-          exceptions.add(e);
-        }
-      }));
+                  for (int j = 0; j < OPS_PER_THREAD; j++) {
+                    try {
+                      Map<String, Object> data = new HashMap<>();
+                      data.put("value", 1);
+                      aggregator.processData(
+                          new ComponentDataEvent(sourceComponentId, "input-channel", data));
+                      itemsAdded.incrementAndGet();
+                    } catch (ConcurrentModificationException e) {
+                      exceptions.add(
+                          new AssertionError(
+                              "ConcurrentModificationException under high concurrency (Bug #1): "
+                                  + e.getMessage(),
+                              e));
+                    }
+                  }
+                } catch (Exception e) {
+                  exceptions.add(e);
+                }
+              }));
     }
 
     // Start all threads

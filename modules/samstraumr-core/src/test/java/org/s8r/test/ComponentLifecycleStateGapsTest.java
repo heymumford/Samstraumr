@@ -16,29 +16,26 @@
 package org.s8r.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.s8r.domain.component.Component;
-import org.s8r.domain.exception.InvalidStateTransitionException;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.lifecycle.LifecycleState;
 
 /**
  * Detects Bug #2: Missing lifecycle state transition cases.
  *
- * <p>The isValidTransition() switch statement only handles 9 of 18 LifecycleState values.
- * Missing cases fall through to default and incorrectly return false, preventing valid
- * transitions from states like INITIALIZED, RUNNING, WAITING, ADAPTING, TRANSFORMING,
- * STABLE, SPAWNING, DEGRADED, MAINTAINING, and ARCHIVED.
+ * <p>The isValidTransition() switch statement only handles 9 of 18 LifecycleState values. Missing
+ * cases fall through to default and incorrectly return false, preventing valid transitions from
+ * states like INITIALIZED, RUNNING, WAITING, ADAPTING, TRANSFORMING, STABLE, SPAWNING, DEGRADED,
+ * MAINTAINING, and ARCHIVED.
  *
- * <p>This causes:
- * - InvalidStateTransitionException for valid operational transitions
- * - Incomplete state machine coverage leaving dead states unreachable
- * - Inability to transition through all defined lifecycle states
+ * <p>This causes: - InvalidStateTransitionException for valid operational transitions - Incomplete
+ * state machine coverage leaving dead states unreachable - Inability to transition through all
+ * defined lifecycle states
  */
 @DisplayName("Bug #2: Component lifecycle state transition gaps")
 @Tag("L1_Component")

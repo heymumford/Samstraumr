@@ -17,10 +17,11 @@ package org.s8r.domain.component.composite;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import org.s8r.domain.component.Component;
@@ -41,8 +42,8 @@ import org.s8r.domain.lifecycle.LifecycleState;
  * infrastructure or frameworks.
  */
 public class CompositeComponent extends Component {
-  private final Map<String, Component> children = new HashMap<>();
-  private final List<ComponentConnection> connections = new ArrayList<>();
+  private final Map<String, Component> children = new ConcurrentHashMap<>();
+  private final List<ComponentConnection> connections = new CopyOnWriteArrayList<>();
   private final CompositeType compositeType;
 
   /**
@@ -53,7 +54,9 @@ public class CompositeComponent extends Component {
    * @return A new CompositeComponent
    */
   public static CompositeComponent create(ComponentId id, CompositeType compositeType) {
-    return new CompositeComponent(id, compositeType);
+    CompositeComponent component = new CompositeComponent(id, compositeType);
+    component.initialize();
+    return component;
   }
 
   private CompositeComponent(ComponentId id, CompositeType compositeType) {

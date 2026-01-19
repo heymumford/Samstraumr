@@ -113,7 +113,7 @@ public class Component {
   }
 
   /** Initialize the component, progressing through early lifecycle states. */
-  private void initialize() {
+  protected void initialize() {
     logActivity("Beginning initialization");
 
     // Progress through initial lifecycle states
