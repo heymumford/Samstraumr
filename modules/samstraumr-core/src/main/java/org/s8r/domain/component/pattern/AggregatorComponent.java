@@ -17,11 +17,11 @@ package org.s8r.domain.component.pattern;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiFunction;
 
 import org.s8r.domain.component.Component;
@@ -229,11 +229,16 @@ public class AggregatorComponent extends Component {
       String key = entry.getKey();
       Object value = entry.getValue();
 
-      // Initialize buffer for this key if it doesn't exist
-      aggregationBuffer.computeIfAbsent(key, k -> new ArrayList<>());
-
-      // Add the value to the buffer
-      aggregationBuffer.get(key).add(value);
+      // Initialize buffer for this key if it doesn't exist and atomically add the value
+      aggregationBuffer.compute(
+          key,
+          (k, existingList) -> {
+            if (existingList == null) {
+              existingList = new CopyOnWriteArrayList<>();
+            }
+            existingList.add(value);
+            return existingList;
+          });
 
       // Initialize last aggregation time for this key if it doesn't exist
       if (strategy == AggregationStrategy.TIME || strategy == AggregationStrategy.HYBRID) {
