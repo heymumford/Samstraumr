@@ -187,7 +187,12 @@ public class CompositeConnectionValidator {
   /**
    * Finds a cycle in the connection graph by checking if there's a path from the start to the end.
    *
-   * @param graph The connection graph
+   * <p><strong>Note:</strong> This method mutates the provided graph by inserting empty adjacency
+   * sets for start and end nodes if they do not already exist. This ensures proper cycle detection
+   * in sparse graphs where nodes may have no outgoing edges. Callers should pass a defensive copy
+   * if graph mutation is not acceptable.
+   *
+   * @param graph The connection graph (will be mutated to include start/end nodes)
    * @param start The starting component ID
    * @param end The ending component ID
    * @return A list of component IDs that form the cycle, or an empty list if no cycle is found

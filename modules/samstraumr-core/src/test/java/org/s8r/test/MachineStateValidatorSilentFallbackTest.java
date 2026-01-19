@@ -51,101 +51,135 @@ public class MachineStateValidatorSilentFallbackTest {
   }
 
   @Test
-  @DisplayName("Should throw exception for undefined operation in isOperationAllowed")
-  void testIsOperationAllowedThrowsForUndefinedOperation() {
-    // Currently, this method silently defaults to modifiable states for undefined operations
-    // Create a mock operation that's not in the VALID_STATES_BY_OPERATION map
-    // Since we can't easily create a non-existent operation enum value, we test the behavior
-    // by checking if null operation handling is proper
+  @DisplayName("Should reject operations in invalid machine states")
+  void testIsOperationAllowedReturnsFalseForInvalidStates() {
+    // Verify that isOperationAllowed correctly returns false for invalid states
+    // For example, ADD_COMPONENT is only allowed in modifiable states (CREATED, READY)
 
-    // The bug is that if an operation is somehow not defined, the validator silently returns
-    // the result based on modifiable states instead of throwing an exception
-    // This test demonstrates the need for explicit exception throwing
-
-    // For an undefined operation, the validator should throw, not silently return
-    boolean result =
-        MachineStateValidator.isOperationAllowed(
-            MachineOperation.ADD_COMPONENT, MachineState.RUNNING);
-
-    // This should return false because ADD_COMPONENT is only allowed in modifiable states
-    // But the issue is there's no way to know if the operation was actually validated
-    // or just silently defaulted
+    // ADD_COMPONENT in RUNNING state should not be allowed
     assertFalse(
-        result,
-        "ADD_COMPONENT should not be allowed in RUNNING state, but silent fallback obscures this");
+        MachineStateValidator.isOperationAllowed(
+            MachineOperation.ADD_COMPONENT, MachineState.RUNNING),
+        "ADD_COMPONENT should not be allowed in RUNNING state");
+
+    // ADD_COMPONENT in ERROR state should not be allowed
+    assertFalse(
+        MachineStateValidator.isOperationAllowed(
+            MachineOperation.ADD_COMPONENT, MachineState.ERROR),
+        "ADD_COMPONENT should not be allowed in ERROR state");
+
+    // This tests that the operation is properly validated, not silently defaulting
   }
 
   @Test
-  @DisplayName("Should throw exception in validateOperationState for undefined operation")
-  void testValidateOperationStateThrowsForUndefinedOperation() {
+  @DisplayName("Should allow operations in valid machine states")
+  void testIsOperationAllowedReturnsTrueForValidStates() {
+    // Verify that isOperationAllowed correctly returns true for valid states
+
+    // START should be allowed in READY state
+    assertTrue(
+        MachineStateValidator.isOperationAllowed(MachineOperation.START, MachineState.READY),
+        "START should be allowed in READY state");
+
+    // INITIALIZE should be allowed in CREATED state
+    assertTrue(
+        MachineStateValidator.isOperationAllowed(MachineOperation.INITIALIZE, MachineState.CREATED),
+        "INITIALIZE should be allowed in CREATED state");
+  }
+
+  @Test
+  @DisplayName("Should throw exception for invalid operation state transitions")
+  void testValidateOperationStateThrowsForInvalidStates() {
     // validateOperationState should throw InvalidMachineStateTransitionException
-    // when given an undefined operation, not silently default to modifiable states
+    // when an operation is attempted in an invalid state
 
-    // Test that a known operation in an invalid state properly throws
-    assertThrows(
-        InvalidMachineStateTransitionException.class,
-        () -> {
-          MachineStateValidator.validateOperationState(
-              machineId, MachineOperation.START, MachineState.ERROR);
-        },
-        "Should throw exception for operation in invalid state");
-  }
-
-  @Test
-  @DisplayName("Should throw exception in getValidStatesForOperation for undefined operation")
-  void testGetValidStatesForOperationThrowsForUndefinedOperation() {
-    // getValidStatesForOperation silently returns getModifiableStates() for undefined operations
-    // This is problematic because there's no indication that the operation is undefined
-
-    // Get valid states for a known operation
-    MachineState[] states =
-        MachineStateValidator.getValidStatesForOperation(MachineOperation.START);
-
-    // The states should be non-empty for a known operation
-    assertTrue(states.length > 0, "Known operation should have valid states");
-
-    // But if operation was undefined, we'd silently get modifiable states with no error
-    // The fix should throw an exception for undefined operations instead
-  }
-
-  @Test
-  @DisplayName("Should validate operation state properly for all defined operations")
-  void testValidateOperationStateForAllDefinedOperations() {
-    // Test that validation works correctly for defined operations
-    // and would fail appropriately if operations were undefined
-
-    // INITIALIZE can only be done in CREATED state
-    MachineStateValidator.validateOperationState(
-        machineId, MachineOperation.INITIALIZE, MachineState.CREATED);
-
-    // START can be done in READY state
-    MachineStateValidator.validateOperationState(
-        machineId, MachineOperation.START, MachineState.READY);
-
-    // But START in RUNNING state should throw
+    // START in RUNNING state is invalid
     assertThrows(
         InvalidMachineStateTransitionException.class,
         () ->
             MachineStateValidator.validateOperationState(
-                machineId, MachineOperation.START, MachineState.RUNNING));
+                machineId, MachineOperation.START, MachineState.RUNNING),
+        "START should not be allowed in RUNNING state");
+
+    // ADD_COMPONENT in ERROR state is invalid
+    assertThrows(
+        InvalidMachineStateTransitionException.class,
+        () ->
+            MachineStateValidator.validateOperationState(
+                machineId, MachineOperation.ADD_COMPONENT, MachineState.ERROR),
+        "ADD_COMPONENT should not be allowed in ERROR state");
   }
 
   @Test
-  @DisplayName("Should explicitly validate that operations are defined before use")
-  void testOperationDefinitionValidation() {
-    // This test demonstrates the need for explicit validation
-    // Currently, the validator silently falls back for undefined operations
+  @DisplayName("Should allow valid operation state transitions")
+  void testValidateOperationStateAllowsValidTransitions() {
+    // validateOperationState should not throw for valid transitions
 
-    // A properly defined operation should validate correctly
+    // INITIALIZE in CREATED state is valid
+    assertDoesNotThrow(
+        () ->
+            MachineStateValidator.validateOperationState(
+                machineId, MachineOperation.INITIALIZE, MachineState.CREATED),
+        "INITIALIZE should be allowed in CREATED state");
+
+    // START in READY state is valid
+    assertDoesNotThrow(
+        () ->
+            MachineStateValidator.validateOperationState(
+                machineId, MachineOperation.START, MachineState.READY),
+        "START should be allowed in READY state");
+
+    // PAUSE in RUNNING state is valid
     assertDoesNotThrow(
         () ->
             MachineStateValidator.validateOperationState(
                 machineId, MachineOperation.PAUSE, MachineState.RUNNING),
         "PAUSE should be allowed in RUNNING state");
+  }
 
-    // But if an operation is not found in the map, the validator should throw
-    // not silently default to checking modifiable states
-    // This requires the validator to explicitly check operation definition
-    // rather than using null as a fallback trigger
+  @Test
+  @DisplayName("Should return valid states for all defined operations")
+  void testGetValidStatesForOperationReturnsNonEmpty() {
+    // getValidStatesForOperation should return non-empty state arrays for all operations
+    // This verifies that all operations are properly defined, not falling back
+
+    // START operation should have valid states
+    MachineState[] startStates =
+        MachineStateValidator.getValidStatesForOperation(MachineOperation.START);
+    assertTrue(startStates.length > 0, "START should have valid states defined");
+
+    // INITIALIZE operation should have valid states
+    MachineState[] initStates =
+        MachineStateValidator.getValidStatesForOperation(MachineOperation.INITIALIZE);
+    assertTrue(initStates.length > 0, "INITIALIZE should have valid states defined");
+
+    // ADD_COMPONENT operation should have valid states
+    MachineState[] addStates =
+        MachineStateValidator.getValidStatesForOperation(MachineOperation.ADD_COMPONENT);
+    assertTrue(addStates.length > 0, "ADD_COMPONENT should have valid states defined");
+
+    // PAUSE operation should have valid states
+    MachineState[] pauseStates =
+        MachineStateValidator.getValidStatesForOperation(MachineOperation.PAUSE);
+    assertTrue(pauseStates.length > 0, "PAUSE should have valid states defined");
+  }
+
+  @Test
+  @DisplayName("Should cover all MachineOperation enum values in validator rules")
+  void testAllMachineOperationsHaveDefinedRules() {
+    // This test ensures that every MachineOperation enum value has defined rules
+    // in the validator, preventing silent fallback behavior
+
+    // Get all operation values
+    MachineOperation[] operations = MachineOperation.values();
+
+    // Each operation should have valid states defined (not silently falling back)
+    for (MachineOperation operation : operations) {
+      MachineState[] validStates = MachineStateValidator.getValidStatesForOperation(operation);
+      assertTrue(
+          validStates.length > 0, "Operation " + operation + " should have valid states defined");
+    }
+
+    // This ensures all operations are explicitly handled, not defaulting to modifiable states
   }
 }

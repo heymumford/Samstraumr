@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -63,7 +64,7 @@ public class ComponentConnectionVisibilityTest {
     final int OPS_PER_THREAD = 100;
     final AtomicInteger stateChanges = new AtomicInteger(0);
     final AtomicInteger visibilityIssues = new AtomicInteger(0);
-    final List<Throwable> exceptions = new ArrayList<>();
+    final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
 
     CyclicBarrier barrier = new CyclicBarrier(NUM_THREADS);
     List<Thread> threads = new ArrayList<>();
@@ -127,7 +128,7 @@ public class ComponentConnectionVisibilityTest {
     final int NUM_THREADS = 20;
     final int OPS_PER_THREAD = 200;
     final AtomicInteger reads = new AtomicInteger(0);
-    final List<Throwable> exceptions = new ArrayList<>();
+    final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
 
     CyclicBarrier barrier = new CyclicBarrier(NUM_THREADS + 1);
     List<Thread> readerThreads = new ArrayList<>();
@@ -211,7 +212,7 @@ public class ComponentConnectionVisibilityTest {
     final int NUM_THREADS = 15;
     final AtomicInteger threadsObservingTrue = new AtomicInteger(0);
     final AtomicInteger threadsObservingFalse = new AtomicInteger(0);
-    final List<Throwable> exceptions = new ArrayList<>();
+    final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
 
     CyclicBarrier barrier = new CyclicBarrier(NUM_THREADS + 1);
     List<Thread> threads = new ArrayList<>();

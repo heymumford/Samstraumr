@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +80,7 @@ public class AggregatorComponentConcurrencyTest {
     final int THREAD_COUNT = 10;
     final int ITEMS_PER_THREAD = 200;
     final AtomicInteger successfulOperations = new AtomicInteger(0);
-    final List<Throwable> exceptions = new ArrayList<>();
+    final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
 
     CyclicBarrier barrier = new CyclicBarrier(THREAD_COUNT);
     List<Thread> threads = new ArrayList<>();
@@ -139,7 +140,7 @@ public class AggregatorComponentConcurrencyTest {
     final int THREAD_COUNT = 20;
     final int OPS_PER_THREAD = 100;
     final AtomicInteger successfulOperations = new AtomicInteger(0);
-    final List<Throwable> exceptions = new ArrayList<>();
+    final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
 
     CyclicBarrier barrier = new CyclicBarrier(THREAD_COUNT);
     List<Thread> threads = new ArrayList<>();
@@ -200,7 +201,7 @@ public class AggregatorComponentConcurrencyTest {
     final int THREAD_COUNT = 15;
     final int OPS_PER_THREAD = 50;
     final AtomicInteger processedItems = new AtomicInteger(0);
-    final List<Throwable> exceptions = new ArrayList<>();
+    final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
 
     CyclicBarrier barrier = new CyclicBarrier(THREAD_COUNT);
     List<Thread> threads = new ArrayList<>();
@@ -265,7 +266,7 @@ public class AggregatorComponentConcurrencyTest {
     final int THREAD_COUNT = 50;
     final int OPS_PER_THREAD = 200;
     final AtomicInteger itemsAdded = new AtomicInteger(0);
-    final List<Throwable> exceptions = new ArrayList<>();
+    final List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
 
     CyclicBarrier barrier = new CyclicBarrier(THREAD_COUNT);
     List<Thread> threads = new ArrayList<>();
