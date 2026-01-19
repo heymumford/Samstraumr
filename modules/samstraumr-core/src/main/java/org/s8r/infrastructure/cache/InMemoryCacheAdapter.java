@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -22,6 +23,12 @@ import org.s8r.application.port.LoggerPort;
  *
  * <p>This adapter provides a simple in-memory cache implementation using a ConcurrentHashMap. It is
  * primarily intended for testing and development environments.
+ *
+ * <p><b>Thread-safety:</b> This class is thread-safe. It uses {@link
+ * java.util.concurrent.ConcurrentHashMap} for cache storage and {@link
+ * java.util.concurrent.atomic.AtomicLong} for all statistics counters, ensuring safe concurrent
+ * access without external synchronization. All public methods can be safely called from multiple
+ * threads concurrently. @ThreadSafe
  */
 public class InMemoryCacheAdapter implements CachePort {
 
@@ -29,11 +36,11 @@ public class InMemoryCacheAdapter implements CachePort {
   private String cacheName;
   private final LoggerPort logger;
 
-  // Statistics
-  private long hits;
-  private long misses;
-  private long puts;
-  private long removes;
+  // Statistics (using AtomicLong for thread-safe access without external synchronization)
+  private final AtomicLong hits;
+  private final AtomicLong misses;
+  private final AtomicLong puts;
+  private final AtomicLong removes;
 
   /** Creates a new InMemoryCacheAdapter instance. */
   public InMemoryCacheAdapter() {
@@ -48,10 +55,10 @@ public class InMemoryCacheAdapter implements CachePort {
   public InMemoryCacheAdapter(LoggerPort logger) {
     this.cache = new ConcurrentHashMap<>();
     this.logger = logger;
-    this.hits = 0;
-    this.misses = 0;
-    this.puts = 0;
-    this.removes = 0;
+    this.hits = new AtomicLong(0);
+    this.misses = new AtomicLong(0);
+    this.puts = new AtomicLong(0);
+    this.removes = new AtomicLong(0);
   }
 
   @Override
@@ -63,10 +70,10 @@ public class InMemoryCacheAdapter implements CachePort {
   public void initialize(String cacheName) {
     this.cacheName = cacheName;
     this.cache.clear();
-    this.hits = 0;
-    this.misses = 0;
-    this.puts = 0;
-    this.removes = 0;
+    this.hits.set(0);
+    this.misses.set(0);
+    this.puts.set(0);
+    this.removes.set(0);
 
     if (logger != null) {
       logger.info("Initialized in-memory cache: {}", cacheName);
@@ -77,7 +84,7 @@ public class InMemoryCacheAdapter implements CachePort {
   @SuppressWarnings("unchecked")
   public <T> void put(String key, T value) {
     cache.put(key, value);
-    puts++;
+    puts.incrementAndGet();
 
     if (logger != null) {
       logger.debug("Added value to cache with key: {}", key);
@@ -113,12 +120,12 @@ public class InMemoryCacheAdapter implements CachePort {
     T value = (T) cache.get(key);
 
     if (value != null) {
-      hits++;
+      hits.incrementAndGet();
       if (logger != null) {
         logger.debug("Cache hit for key: {}", key);
       }
     } else {
-      misses++;
+      misses.incrementAndGet();
       if (logger != null) {
         logger.debug("Cache miss for key: {}", key);
       }
@@ -210,7 +217,7 @@ public class InMemoryCacheAdapter implements CachePort {
   public boolean remove(String key) {
     boolean removed = cache.remove(key) != null;
     if (removed) {
-      removes++;
+      removes.incrementAndGet();
       if (logger != null) {
         logger.debug("Removed value from cache with key: {}", key);
       }
@@ -331,13 +338,15 @@ public class InMemoryCacheAdapter implements CachePort {
     try {
       Map<String, Object> stats = new HashMap<>();
 
-      long totalOperations = hits + misses;
-      double hitRatio = totalOperations > 0 ? (double) hits / totalOperations : 0.0;
+      long hitCount = hits.get();
+      long missCount = misses.get();
+      long totalOperations = hitCount + missCount;
+      double hitRatio = totalOperations > 0 ? (double) hitCount / totalOperations : 0.0;
 
-      stats.put("hits", hits);
-      stats.put("misses", misses);
-      stats.put("puts", puts);
-      stats.put("removes", removes);
+      stats.put("hits", hitCount);
+      stats.put("misses", missCount);
+      stats.put("puts", puts.get());
+      stats.put("removes", removes.get());
       stats.put("hitRatio", hitRatio);
 
       // Get counts per region

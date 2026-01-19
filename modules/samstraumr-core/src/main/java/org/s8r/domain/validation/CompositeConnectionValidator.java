@@ -187,15 +187,25 @@ public class CompositeConnectionValidator {
   /**
    * Finds a cycle in the connection graph by checking if there's a path from the start to the end.
    *
-   * @param graph The connection graph
+   * <p><strong>Note:</strong> This method mutates the provided graph by inserting empty adjacency
+   * sets for start and end nodes if they do not already exist. This ensures proper cycle detection
+   * in sparse graphs where nodes may have no outgoing edges. Callers should pass a defensive copy
+   * if graph mutation is not acceptable.
+   *
+   * @param graph The connection graph (will be mutated to include start/end nodes)
    * @param start The starting component ID
    * @param end The ending component ID
    * @return A list of component IDs that form the cycle, or an empty list if no cycle is found
    */
   private static List<ComponentId> findCycle(
       Map<ComponentId, Set<ComponentId>> graph, ComponentId start, ComponentId end) {
-    if (!graph.containsKey(start) || !graph.containsKey(end)) {
-      return Collections.emptyList();
+    // Ensure both start and end nodes are in the graph, even if they have no outgoing edges
+    // This is necessary to handle sparse graphs where nodes may not be keys in the map
+    if (!graph.containsKey(start)) {
+      graph.put(start, new HashSet<>());
+    }
+    if (!graph.containsKey(end)) {
+      graph.put(end, new HashSet<>());
     }
 
     Set<ComponentId> visited = new HashSet<>();

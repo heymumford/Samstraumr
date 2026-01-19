@@ -69,7 +69,7 @@ public class MachineStateValidator {
    * @param operation The operation to perform
    * @param currentState The current state of the machine
    * @throws InvalidMachineStateTransitionException if the operation is not allowed in the current
-   *     state
+   *     state, or if the operation is not defined
    */
   public static void validateOperationState(
       ComponentId machineId, MachineOperation operation, MachineState currentState) {
@@ -77,8 +77,12 @@ public class MachineStateValidator {
     MachineState[] validStates = VALID_STATES_BY_OPERATION.get(operation);
 
     if (validStates == null) {
-      // If operation is not defined, default to modifiable states
-      validStates = getModifiableStates();
+      // Throw exception for undefined operation instead of silently falling back
+      throw new InvalidMachineStateTransitionException(
+          machineId,
+          "Undefined operation: " + operation.getOperationName(),
+          currentState,
+          new MachineState[0]);
     }
 
     // Check if current state is in the valid states
@@ -112,18 +116,20 @@ public class MachineStateValidator {
   }
 
   /**
-   * Checks if an operation is allowed in a specific state without throwing an exception.
+   * Checks if an operation is allowed in a specific state.
    *
    * @param operation The operation to check
    * @param currentState The current state to check
-   * @return true if the operation is allowed, false otherwise
+   * @return true if the operation is allowed in the current state, false if not allowed (for
+   *     defined operations only)
+   * @throws IllegalArgumentException if the operation is not defined
    */
   public static boolean isOperationAllowed(MachineOperation operation, MachineState currentState) {
     MachineState[] validStates = VALID_STATES_BY_OPERATION.get(operation);
 
     if (validStates == null) {
-      // If operation is not defined, default to modifiable states
-      validStates = getModifiableStates();
+      // Throw exception for undefined operation instead of silently falling back
+      throw new IllegalArgumentException("Operation not defined: " + operation.getOperationName());
     }
 
     // Check if current state is in the valid states
@@ -152,10 +158,15 @@ public class MachineStateValidator {
    *
    * @param operation The operation to check
    * @return Array of states in which the operation is allowed
+   * @throws IllegalArgumentException if the operation is not defined
    */
   public static MachineState[] getValidStatesForOperation(MachineOperation operation) {
     MachineState[] validStates = VALID_STATES_BY_OPERATION.get(operation);
-    return validStates != null ? validStates.clone() : getModifiableStates();
+    if (validStates == null) {
+      // Throw exception for undefined operation instead of silently falling back
+      throw new IllegalArgumentException("Operation not defined: " + operation.getOperationName());
+    }
+    return validStates.clone();
   }
 
   /**
