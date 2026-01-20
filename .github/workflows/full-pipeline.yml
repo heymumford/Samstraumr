@@ -56,7 +56,13 @@ jobs:
 
       # Run quality checks
       - name: Quality Checks
-        run: ./s8r-quality-enhanced || mvn verify -P quality-checks -DskipTests
+        run: |
+          if [ -f "./s8r-quality-enhanced" ]; then
+            ./s8r-quality-enhanced
+          else
+            echo "::warning::s8r-quality-enhanced not found, falling back to mvn verify -P quality-checks"
+            mvn verify -P quality-checks -DskipTests
+          fi
 
       # Run full test suite
       - name: Run Tests

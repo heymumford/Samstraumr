@@ -112,8 +112,9 @@ jobs:
           if [ -f "./bin/test-architecture.sh" ]; then
             ./bin/test-architecture.sh
           else
+            echo "::warning::bin/test-architecture.sh not found - using Maven fallback which may provide less coverage"
             # Fallback to direct Maven test execution
-            cd Samstraumr && mvn test -Dtest=CleanArchitectureComplianceTest -q
+            cd Samstraumr && mvn test -Dtest=CleanArchitectureComplianceTest,AcyclicDependencyTest
           fi
 
       - name: Upload architecture report

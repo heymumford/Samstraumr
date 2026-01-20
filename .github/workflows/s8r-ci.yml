@@ -281,7 +281,7 @@ jobs:
           if [ -f "./s8r-test-coverage" ]; then
             ./s8r-test-coverage --report --threshold 80
           else
-            echo "Coverage analysis script not found, skipping..."
+            echo "::warning::Coverage analysis tool (s8r-test-coverage) not found. 80% threshold enforcement skipped!"
           fi
       
       - name: Archive coverage report
