@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Set up environment
         run: |
@@ -92,10 +92,10 @@ jobs:
     needs: basic-verification
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
@@ -109,16 +109,17 @@ jobs:
           export MAVEN_OPTS="-Xmx3072m --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
 
           # Run the architecture verification script
-          if [ -f "./s8r-architecture-verify" ]; then
-            ./s8r-architecture-verify --quick
+          if [ -f "./bin/test-architecture.sh" ]; then
+            ./bin/test-architecture.sh
           else
+            echo "::warning::bin/test-architecture.sh not found - using Maven fallback which may provide less coverage"
             # Fallback to direct Maven test execution
-            cd Samstraumr && mvn test -Dtest=CleanArchitectureComplianceTest -q
+            cd Samstraumr && mvn test -Dtest=CleanArchitectureComplianceTest,AcyclicDependencyTest
           fi
 
       - name: Upload architecture report
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         with:
           name: architecture-report
           path: architecture-report.md

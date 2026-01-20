@@ -505,7 +505,7 @@ Licensed under the Mozilla Public License 2.0
     <profile>
       <id>atl-tests</id>
       <properties>
-        <cucumber.filter.tags>${atl.test.tags}</cucumber.filter.tags>
+        <cucumber.filter.tags>${all.test.tags}</cucumber.filter.tags>
       </properties>
     </profile>
     

@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
       
       - name: Setup test environment
         uses: ./.github/actions/setup-test-environment
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
       
       - name: Setup test environment
         uses: ./.github/actions/setup-test-environment
@@ -56,13 +56,13 @@ jobs:
     needs: [integration-tests, composite-tests]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
       
       - name: Setup Java 21
         uses: ./.github/actions/setup-java-21
       
       - name: Download test artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v4
         with:
           path: artifacts
       
@@ -79,14 +79,14 @@ jobs:
       
       - name: Run coverage analysis
         run: |
-          if [ -f "./bin/test/analyze-test-coverage" ]; then
-            ./bin/test/analyze-test-coverage --report --threshold 80
+          if [ -f "./s8r-test-coverage" ]; then
+            ./s8r-test-coverage --report --threshold 80
           else
-            echo "Coverage analysis tool not found, skipping detailed analysis"
+            echo "::warning::Coverage analysis tool (s8r-test-coverage) not found. 80% threshold enforcement skipped!"
           fi
       
       - name: Upload coverage report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: |
@@ -99,7 +99,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
       
       - name: Setup Java 21
         uses: ./.github/actions/setup-java-21
@@ -111,7 +111,7 @@ jobs:
         continue-on-error: true
       
       - name: Upload OWASP report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: dependency-check-report
@@ -135,7 +135,7 @@ jobs:
     if: success()
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
       
       - name: Setup Java 21
         uses: ./.github/actions/setup-java-21
@@ -163,7 +163,7 @@ jobs:
           fi
       
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         with:
           name: s8r-artifacts-${{ steps.get_version.outputs.version }}
           path: |

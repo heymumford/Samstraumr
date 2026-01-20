@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
           java-version: 21
           distribution: 'temurin'
@@ -43,7 +43,7 @@ jobs:
         run: |
           # Add Java 21 module options required for reflection
           export JAVA_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
-          ./s8r test orchestration
+          ./s8r-test orchestration
 
       # Publish Test Results
       - name: Publish Test Results
