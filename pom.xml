@@ -69,7 +69,7 @@ Licensed under the Mozilla Public License 2.0
     <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
     <maven.surefire.plugin.version>3.5.4</maven.surefire.plugin.version>
     <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
-    <maven.exec.plugin.version>3.5.0</maven.exec.plugin.version>
+    <maven.exec.plugin.version>3.6.3</maven.exec.plugin.version>
     <spotless.plugin.version>3.1.0</spotless.plugin.version>
     <spotless.google.format.version>1.31.0</spotless.google.format.version>
     <checkstyle.plugin.version>3.3.1</checkstyle.plugin.version>
