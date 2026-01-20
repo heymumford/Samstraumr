@@ -42,7 +42,7 @@ jobs:
           ./s8r-test-port-performance smoke --report
 
       - name: Upload performance report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: port-performance-report
           path: test-results/port-performance/
@@ -83,7 +83,7 @@ jobs:
           ./s8r-test-port-performance all --report
 
       - name: Upload performance report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: full-performance-report
           path: test-results/port-performance/
