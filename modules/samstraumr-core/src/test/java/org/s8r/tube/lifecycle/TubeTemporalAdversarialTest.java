@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
  * even under hostile input and edge cases.
  *
  * <p>Test categories:
+ *
  * <ul>
  *   <li>TIMELINE: Conception time immutability and monotonicity
  *   <li>CAUSALITY: Event ordering and causal dependence
@@ -94,8 +95,7 @@ public class TubeTemporalAdversarialTest {
     // Assert - all reads return same value
     assertEquals(
         conceptionTime1, conceptionTime2, "Conception time should be immutable across calls");
-    assertEquals(
-        conceptionTime1, conceptionTime3, "Conception time should remain constant");
+    assertEquals(conceptionTime1, conceptionTime3, "Conception time should remain constant");
     LOGGER.info("✓ Conception time immutability verified: {}", conceptionTime1);
   }
 
@@ -119,8 +119,7 @@ public class TubeTemporalAdversarialTest {
 
     // Assert
     assertTrue(
-        logSizeAfter >= logSizeBefore,
-        "Mimir log should grow monotonically or stay same size");
+        logSizeAfter >= logSizeBefore, "Mimir log should grow monotonically or stay same size");
     LOGGER.info("✓ Monotonic event ordering verified: {} -> {}", logSizeBefore, logSizeAfter);
   }
 
@@ -162,9 +161,7 @@ public class TubeTemporalAdversarialTest {
 
     // Assert - verify Mimir log has causally ordered entries
     List<String> log = new ArrayList<>(tube.queryMimirLog());
-    assertTrue(
-        log.size() >= initialLogSize,
-        "Mimir log should have events");
+    assertTrue(log.size() >= initialLogSize, "Mimir log should have events");
 
     // Verify timestamps are non-decreasing
     for (int i = 1; i < log.size(); i++) {
@@ -263,10 +260,11 @@ public class TubeTemporalAdversarialTest {
     tube.terminate();
 
     // Assert - status should be retrievable after termination
-    assertDoesNotThrow(() -> {
-      TubeStatus status = tube.getStatus();
-      assertNotNull(status, "Status should be retrievable after termination");
-    });
+    assertDoesNotThrow(
+        () -> {
+          TubeStatus status = tube.getStatus();
+          assertNotNull(status, "Status should be retrievable after termination");
+        });
 
     LOGGER.info("✓ Clean termination verified");
   }
@@ -311,9 +309,7 @@ public class TubeTemporalAdversarialTest {
 
     // Assert - verify tube status is consistent after concurrent access
     assertTrue(completed, "All changes should complete within timeout");
-    assertTrue(
-        changeCount.get() > 0,
-        "At least one status change should have succeeded");
+    assertTrue(changeCount.get() > 0, "At least one status change should have succeeded");
 
     TubeStatus finalStatus = tube.getStatus();
     assertNotNull(finalStatus, "Final status should be valid after concurrent access");
@@ -355,13 +351,13 @@ public class TubeTemporalAdversarialTest {
 
     // Assert - verify tube is in a valid state even after concurrent terminations
     assertTrue(completed, "All terminations should complete within timeout");
-    assertDoesNotThrow(() -> {
-      tube.getStatus(); // Should not throw even after concurrent terminations
-    });
+    assertDoesNotThrow(
+        () -> {
+          tube.getStatus(); // Should not throw even after concurrent terminations
+        });
 
     LOGGER.info(
-        "✓ Concurrent termination handled safely: {} attempts made",
-        terminationAttempts.get());
+        "✓ Concurrent termination handled safely: {} attempts made", terminationAttempts.get());
   }
 
   // ============================================================================
@@ -384,9 +380,7 @@ public class TubeTemporalAdversarialTest {
     int logSizeAfterSecondChange = tube.getMimirLogSize();
 
     // Assert - verify log grows monotonically
-    assertTrue(
-        logSizeAfterStatusChange >= initialLogSize,
-        "Log size should not decrease");
+    assertTrue(logSizeAfterStatusChange >= initialLogSize, "Log size should not decrease");
     assertTrue(
         logSizeAfterSecondChange >= logSizeAfterStatusChange,
         "Log size should not decrease after more events");
@@ -422,9 +416,7 @@ public class TubeTemporalAdversarialTest {
     List<String> logAfterSecondChange = new ArrayList<>(tube.queryMimirLog());
 
     // Assert - verify log grows without reordering
-    assertTrue(
-        logAfterSecondChange.size() >= logAfterFirstChange.size(),
-        "Log should only grow");
+    assertTrue(logAfterSecondChange.size() >= logAfterFirstChange.size(), "Log should only grow");
     assertTrue(
         logAfterSecondChange.containsAll(logAfterFirstChange),
         "New log should contain all previous entries");
@@ -499,9 +491,7 @@ public class TubeTemporalAdversarialTest {
     String grandchildAddress = grandchild.getIdentity().getHierarchicalAddress();
 
     // Assert - verify hierarchical consistency
-    assertTrue(
-        adamAddress.startsWith("T<"),
-        "Adam should have root-level address");
+    assertTrue(adamAddress.startsWith("T<"), "Adam should have root-level address");
     assertTrue(
         child1Address.startsWith(adamAddress),
         "Child1 address should be derived from parent address");
@@ -601,14 +591,10 @@ public class TubeTemporalAdversarialTest {
     tube.setStatus(TubeStatus.READY);
 
     // Assert - verify tube still functions correctly
-    assertTrue(
-        duration.toMillis() >= 0, "Duration should be non-negative");
-    assertNotNull(
-        tube.getStatus(), "Tube should have valid status despite elapsed time");
+    assertTrue(duration.toMillis() >= 0, "Duration should be non-negative");
+    assertNotNull(tube.getStatus(), "Tube should have valid status despite elapsed time");
 
-    LOGGER.info(
-        "✓ Elapsed time handling verified: elapsed time = {}ms",
-        duration.toMillis());
+    LOGGER.info("✓ Elapsed time handling verified: elapsed time = {}ms", duration.toMillis());
   }
 
   // ============================================================================
@@ -662,8 +648,7 @@ public class TubeTemporalAdversarialTest {
     assertTrue(log.size() > 0, "Log should have entries");
 
     LOGGER.info(
-        "✓ Concurrent operations handled safely: {} operations completed",
-        successCount.get());
+        "✓ Concurrent operations handled safely: {} operations completed", successCount.get());
   }
 
   @Test

@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
  * Production controls for Tube resource management, timing, and exception handling.
  *
  * <p>Implements safeguards to prevent issues identified in adversarial testing:
+ *
  * <ul>
  *   <li>LOG SIZE: Limits unbounded Mimir log growth
  *   <li>TERMINATION TIMING: Configurable delays prevent test timeouts
@@ -90,8 +91,10 @@ public class TubeProductionControlsTest {
     // Real-world control: Set a soft limit (recommend implementing hard limit in Tube)
     int MAX_LOG_SIZE = 500; // Control threshold
     if (logEntries.size() > MAX_LOG_SIZE) {
-      LOGGER.warn("⚠️ CONTROL ALERT: Mimir log size {} exceeds recommended max {}",
-        logEntries.size(), MAX_LOG_SIZE);
+      LOGGER.warn(
+          "⚠️ CONTROL ALERT: Mimir log size {} exceeds recommended max {}",
+          logEntries.size(),
+          MAX_LOG_SIZE);
     }
 
     LOGGER.info(
@@ -137,7 +140,11 @@ public class TubeProductionControlsTest {
     int expectedMinSize = threadCount * eventsPerThread / 2;
     assertTrue(
         finalSize >= expectedMinSize,
-        "Log size should reflect all operations (expected min: " + expectedMinSize + ", got: " + finalSize + ")");
+        "Log size should reflect all operations (expected min: "
+            + expectedMinSize
+            + ", got: "
+            + finalSize
+            + ")");
 
     // Control: Growth should not be exponential
     int MAX_SIZE = threadCount * eventsPerThread * 3; // 3x overhead is acceptable
@@ -145,7 +152,8 @@ public class TubeProductionControlsTest {
         finalSize <= MAX_SIZE,
         "Log size anomaly detected: " + finalSize + " exceeds max threshold " + MAX_SIZE);
 
-    LOGGER.info("✓ Log size anomalies controlled: {} events logged by {} threads", finalSize, threadCount);
+    LOGGER.info(
+        "✓ Log size anomalies controlled: {} events logged by {} threads", finalSize, threadCount);
   }
 
   // ============================================================================
@@ -171,10 +179,11 @@ public class TubeProductionControlsTest {
 
     // Assert - verify termination completes reasonably fast for testing
     // In a real test, we can't wait 60 seconds, so the control allows configuration
-    assertDoesNotThrow(() -> {
-      TubeStatus status = tube.getStatus();
-      assertNotNull(status, "Tube should be queryable after termination");
-    });
+    assertDoesNotThrow(
+        () -> {
+          TubeStatus status = tube.getStatus();
+          assertNotNull(status, "Tube should be queryable after termination");
+        });
 
     long elapsedMs = System.currentTimeMillis() - startTime;
     LOGGER.info("✓ Termination timing controlled: completed in {}ms", elapsedMs);
@@ -224,9 +233,7 @@ public class TubeProductionControlsTest {
         "Concurrent terminations should complete much faster than sequential 60s waits");
 
     LOGGER.info(
-        "✓ Termination timeout controlled: {} tubes terminated in {}ms",
-        tubeCount,
-        totalElapsedMs);
+        "✓ Termination timeout controlled: {} tubes terminated in {}ms", tubeCount, totalElapsedMs);
   }
 
   // ============================================================================
@@ -260,9 +267,7 @@ public class TubeProductionControlsTest {
 
     // Assert - verify tube is still functional after recovery
     int logSizeAfter = tube.getMimirLogSize();
-    assertTrue(
-        logSizeAfter >= logSizeBefore,
-        "Log should continue recording despite errors");
+    assertTrue(logSizeAfter >= logSizeBefore, "Log should continue recording despite errors");
     assertNotNull(tube.getStatus(), "Tube should remain queryable");
 
     LOGGER.info("✓ Exception recovery controlled: tube remains functional");
@@ -302,16 +307,15 @@ public class TubeProductionControlsTest {
     assertTrue(successCount >= 7, "At least 70% success rate required");
 
     // Verify tube is still usable
-    assertDoesNotThrow(() -> {
-      tube.getStatus();
-      tube.getMimirLogSize();
-    });
+    assertDoesNotThrow(
+        () -> {
+          tube.getStatus();
+          tube.getMimirLogSize();
+        });
 
     LOGGER.info(
         "✓ Partial failure handling controlled: {} successes, {} failures ({}% success rate)",
-        successCount,
-        failureCount,
-        (int) (100.0 * successCount / 10));
+        successCount, failureCount, (int) (100.0 * successCount / 10));
   }
 
   @Test
@@ -355,8 +359,8 @@ public class TubeProductionControlsTest {
                   tracker.recordAttempt(false);
                   // Control: If error rate exceeds threshold, circuit breaker trips
                   if (tracker.getErrorRate() > 30) {
-                    LOGGER.warn("⚠️ CIRCUIT BREAKER ACTIVATED: Error rate {:.1f}%",
-                      tracker.getErrorRate());
+                    LOGGER.warn(
+                        "⚠️ CIRCUIT BREAKER ACTIVATED: Error rate {:.1f}%", tracker.getErrorRate());
                     break; // Stop this thread to prevent cascade
                   }
                 }
@@ -374,7 +378,9 @@ public class TubeProductionControlsTest {
     double finalErrorRate = tracker.getErrorRate();
     assertTrue(
         finalErrorRate < 50,
-        "Circuit breaker should prevent error rate from exceeding 50% (actual: " + finalErrorRate + "%)");
+        "Circuit breaker should prevent error rate from exceeding 50% (actual: "
+            + finalErrorRate
+            + "%)");
 
     LOGGER.info("✓ Circuit breaker pattern controlled: error rate {:.1f}%", finalErrorRate);
   }
