@@ -185,6 +185,10 @@ Thumbs.db
 /config/effective-pom.xml
 /config/pom.xml.bak
 /config/*.bak
+# Backup archives
+**/*_backup_*.tar.gz
+**/*_backup_*.tgz
+**/*_backup_*.zip
 # Security files
 **/*.crt
 **/*.jks
