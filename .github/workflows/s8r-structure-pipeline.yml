@@ -64,7 +64,7 @@ jobs:
 
       - name: Upload verification report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: s8r-structure-report
           path: reports/s8r-structure-report.md
