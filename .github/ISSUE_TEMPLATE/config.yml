@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/heymumford/samstraumr/security/policy
+    about: Please report security issues via the repository security policy.
