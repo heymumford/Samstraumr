@@ -58,7 +58,7 @@ Licensed under the Mozilla Public License 2.0
     <jackson.version>2.20.1</jackson.version>
     <oshi.version>6.9.1</oshi.version>
     <spotbugs.annotations.version>4.7.3</spotbugs.annotations.version>
-    <itextpdf.version>5.5.13.4</itextpdf.version>
+    <itextpdf.version>5.5.13.5</itextpdf.version>
     
     <!-- Plugin versions -->
     <pmd.plugin.version>3.26.0</pmd.plugin.version>
