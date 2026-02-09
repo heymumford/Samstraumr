@@ -55,7 +55,7 @@ Licensed under the Mozilla Public License 2.0
     <cucumber.version>7.32.0</cucumber.version>
     <cucumber.reporting.version>5.7.7</cucumber.reporting.version>
     <mockito.version>5.8.0</mockito.version>
-    <jackson.version>2.20.1</jackson.version>
+    <jackson.version>2.21.0</jackson.version>
     <oshi.version>6.9.1</oshi.version>
     <spotbugs.annotations.version>4.7.3</spotbugs.annotations.version>
     <itextpdf.version>5.5.13.4</itextpdf.version>
