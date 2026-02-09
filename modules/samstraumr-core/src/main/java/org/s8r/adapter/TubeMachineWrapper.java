@@ -27,6 +27,14 @@ import org.s8r.component.Machine;
 
 /**
  * A Component-based Machine implementation that delegates to a Tube-based Machine.
+ *
+ * <p>This class bridges the component layer (s8r.component) with the tube layer
+ * (s8r.tube.machine), enabling seamless conversion and operation across architectural
+ * boundaries. It implements the Adapter pattern to expose a consistent Machine interface.
+ *
+ * <p><b>Visibility:</b> This class is public because it extends {@link Machine} and may be
+ * instantiated by callers outside the adapter package. However, new instances should typically
+ * be created via factory methods rather than direct instantiation.
  */
 public class TubeMachineWrapper extends Machine {
 

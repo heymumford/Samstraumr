@@ -31,12 +31,19 @@ import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.lifecycle.LifecycleState;
 import org.s8r.domain.machine.MachineState;
 import org.s8r.domain.machine.MachineType;
+import org.s8r.infrastructure.logging.ConsoleLogger;
 
 /**
- * Adapter that converts from component Machine to MachinePort. This allows legacy component
- * machines to be used with the port interface.
+ * Package-private adapter that converts from component.Machine to MachinePort. This enables
+ * legacy component-layer machines to be used with domain-layer port interfaces, supporting
+ * incremental migration strategies.
+ *
+ * <p><b>Note:</b> This class is intentionally package-private and should not be referenced
+ * outside the org.s8r.adapter package. Use factory methods in {@link MachineAdapter} to obtain
+ * instances.
  */
-public class MachineToComponentPortAdapter implements MachinePort {
+class MachineToComponentPortAdapter implements MachinePort {
+  private static final ConsoleLogger logger = new ConsoleLogger("MachineToComponentPortAdapter");
   private final Machine machine;
   private final ComponentId componentId;
 
@@ -78,6 +85,7 @@ public class MachineToComponentPortAdapter implements MachinePort {
       machine.activate();
       return true;
     } catch (Exception e) {
+      logger.warn("Failed to activate machine " + getMachineId() + ": " + e.getMessage());
       return false;
     }
   }
@@ -88,6 +96,7 @@ public class MachineToComponentPortAdapter implements MachinePort {
       machine.deactivate();
       return true;
     } catch (Exception e) {
+      logger.warn("Failed to deactivate machine " + getMachineId() + ": " + e.getMessage());
       return false;
     }
   }
@@ -111,6 +120,7 @@ public class MachineToComponentPortAdapter implements MachinePort {
       }
       return false;
     } catch (Exception e) {
+      logger.warn("Failed to add composite '" + name + "' to machine " + getMachineId() + ": " + e.getMessage());
       return false;
     }
   }

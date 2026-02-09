@@ -28,12 +28,19 @@ import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.lifecycle.LifecycleState;
 import org.s8r.domain.machine.MachineState;
 import org.s8r.domain.machine.MachineType;
+import org.s8r.infrastructure.logging.ConsoleLogger;
 
 /**
- * Adapter that creates a MachinePort interface from a domain Machine implementation. This
- * provides access to the adapter while keeping the implementation details private.
+ * Package-private adapter that creates a MachinePort interface from a domain Machine
+ * implementation. This wraps domain.Machine to provide the MachinePort interface, enabling
+ * clean architecture separation between domain and component layers.
+ *
+ * <p><b>Note:</b> This class is intentionally package-private and should not be referenced
+ * outside the org.s8r.adapter package. Use factory methods in {@link MachineAdapter} to obtain
+ * instances.
  */
-public class DomainMachinePortAdapter implements MachinePort {
+class DomainMachinePortAdapter implements MachinePort {
+  private static final ConsoleLogger logger = new ConsoleLogger("DomainMachinePortAdapter");
   private final org.s8r.domain.machine.Machine machine;
 
   public DomainMachinePortAdapter(org.s8r.domain.machine.Machine machine) {
@@ -74,6 +81,7 @@ public class DomainMachinePortAdapter implements MachinePort {
       machine.start();
       return true;
     } catch (Exception e) {
+      logger.warn("Failed to start machine " + getMachineId() + ": " + e.getMessage());
       return false;
     }
   }
@@ -84,6 +92,7 @@ public class DomainMachinePortAdapter implements MachinePort {
       machine.stop();
       return true;
     } catch (Exception e) {
+      logger.warn("Failed to stop machine " + getMachineId() + ": " + e.getMessage());
       return false;
     }
   }

@@ -40,16 +40,25 @@ import org.s8r.domain.machine.MachineType;
 // Legacy types referenced using fully qualified names
 
 /**
- * Adapter for converting between legacy Tube-based Machines and new Component-based Machines.
+ * Public orchestrator for converting between legacy Tube-based Machines and new Component-based
+ * Machines.
  *
  * <p>This adapter facilitates migration from legacy code by allowing existing Tube machines to be
  * used with the new Component-based architecture. The adapter handles the conversion of composites,
  * connections, and state management.
  *
- * <p>This adapter implements the Dependency Inversion Principle by also providing conversions that
+ * <p>This adapter implements the Dependency Inversion Principle by providing conversions that
  * return MachinePort interfaces instead of concrete Machine implementations. This allows client
  * code to depend on abstractions rather than concrete implementations, facilitating a smooth
  * migration to Clean Architecture.
+ *
+ * <p><b>Package-Private Adapter Classes:</b> The actual adapter implementations (e.g.,
+ * {@code DomainMachinePortAdapter}, {@code MachineToComponentPortAdapter}) are intentionally
+ * package-private to control their visibility and prevent unintended public API expansion.
+ * Clients should use the factory methods in this class to obtain adapted instances.
+ *
+ * <p><b>Exception Handling:</b> All adapter methods that catch exceptions will log failures
+ * using the configured logger, enabling diagnosis of conversion issues.
  */
 public class MachineAdapter {
 
