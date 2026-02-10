@@ -1,0 +1,170 @@
+================================================================================
+SAMSTRAUMR TARGET DIRECTORY STRUCTURE - VISUAL SUMMARY
+================================================================================
+
+ROOT (6 files):
+  ├── README.md                    (public entry point)
+  ├── CONTRIBUTING.md              (GitHub: contribution guide)
+  ├── SUPPORTING.md                (new: code of conduct + security + manifesto)
+  ├── LICENSE
+  ├── pom.xml
+  └── .gitignore
+
+EXISTING (unchanged):
+  ├── bin/                         (shell entry points)
+  ├── util/                        (build utilities)
+  ├── modules/                     (Maven sources)
+  ├── quality-tools/               (quality configs)
+  └── .github/workflows/           (CI/CD)
+
+NEW/REORGANIZED:
+  ├── scripts/                     (4 .sh files consolidated)
+  │   ├── README.md
+  │   ├── analysis/                (test automation scripts)
+  │   └── admin/                   (ops scripts)
+  │
+  └── docs/                        (112 .md + 10 .json files)
+      ├── README.md                (master index)
+      │
+      ├── 0-START/                 (5 files) ⭐ Quick start for new users
+      │   ├── START_HERE.md
+      │   ├── QUICK_START_GUIDE.md
+      │   ├── AGENTS.md
+      │   └── ...
+      │
+      ├── architecture/            (existing) Enhanced
+      │   ├── CLEAN_ARCHITECTURE.md
+      │   ├── decisions/
+      │   └── component-lifecycle.md
+      │
+      ├── concepts/                (existing) Domain language
+      │   ├── consciousness/
+      │   ├── genealogy/
+      │   ├── port-driven-design/
+      │   └── emergent-systems/
+      │
+      ├── research/                (32 files) ⭐ All analysis work
+      │   ├── analysis/            (7 files: architecture, DDD, markets)
+      │   ├── debates/             (12 files: adversarial, metaphor)
+      │   ├── expert-synthesis/    (9 files: expert panel + iterations)
+      │   ├── rankings/            (4 files: prioritization)
+      │   └── evidence/            (4 files: supporting data)
+      │
+      ├── planning/                (60+ files) ⭐ Execution tracking
+      │   ├── phases/
+      │   │   ├── phase-1/         (28 files: hiring, budget, comms)
+      │   │   ├── phase-2/         (checklist)
+      │   │   └── phase-3/         (implementation guide)
+      │   ├── active/              (10 files: current tracking)
+      │   │   ├── task_plan.md
+      │   │   ├── WEEK_0_*.md
+      │   │   ├── ACTION_NOW.md
+      │   │   └── ...
+      │   ├── feature-tracking/    (7 files: validation, criteria)
+      │   └── decision-logs/       (major decisions)
+      │
+      ├── guides/                  (existing) How-to docs
+      │   ├── development.md
+      │   ├── testing/
+      │   └── tdd/
+      │
+      ├── testing/                 (existing) Test framework
+      │   ├── test-pyramid.md
+      │   ├── lifecycle-test/
+      │   └── features/
+      │
+      ├── reference/               (existing) Standards + API
+      │   ├── standards/
+      │   │   ├── MUMFORD_STYLE.md
+      │   │   └── ...
+      │   ├── security/
+      │   └── release/
+      │
+      ├── dev/                     (existing) Setup + CI/CD
+      │   ├── setup.md
+      │   └── ci/                  (5 files: CI-CD strategy, optimization)
+      │
+      ├── publication/             (4 files) 🎯 Research publication
+      │   ├── PUBLICATION_STRATEGY.md
+      │   └── papers/
+      │
+      ├── roadmap/                 (3 files) Long-term vision
+      │   ├── RESEARCH_ROADMAP.json
+      │   └── REFACTORING_ROADMAP.md
+      │
+      ├── tools/                   (existing) Tool docs
+      ├── site/                    (existing) Website
+      ├── reports/                 (existing) Analysis reports
+      ├── contrib/                 (existing) Contribution guides
+      │
+      ├── cleanup/                 (new) This reorganization
+      │   ├── target-structure.md  (this document)
+      │   ├── migration-plan.md    (phase 2)
+      │   └── validation-checklist.md
+      │
+      ├── archive/                 (existing) Old cycles
+      └── MANIFEST.md              (new) File inventory
+
+================================================================================
+FILE MIGRATION SUMMARY
+================================================================================
+
+FROM ROOT (112 .md + 10 .json files):
+
+→ docs/0-START/
+  5 files: START_HERE*, QUICK_START*, AGENTS.md
+
+→ docs/research/
+  32 files across 5 subdirs:
+    - analysis/: Architecture, DDD, market research
+    - debates/: Adversarial, metaphor analysis
+    - expert-synthesis/: Expert panels + iterations
+    - rankings/: Research priorities
+    - evidence/: Supporting data + findings
+
+→ docs/planning/
+  60+ files across 5 subdirs:
+    - phases/: Phase 1-3 planning (28 phase-1 files with hiring/budget/comms)
+    - active/: Current execution tracking
+    - feature-tracking/: Validation + criteria
+    - decision-logs/: Major decisions
+
+→ docs/publication/
+  4 files: Publication strategy + venues
+
+→ docs/dev/ci/
+  5 files: CI-CD strategy + optimization
+
+→ docs/roadmap/
+  3 files: Research + refactoring roadmaps
+
+→ docs/reference/standards/
+  2 files: Writing + coding standards
+
+→ scripts/analysis/
+  4 .sh files: Component/composite validation tests
+
+→ ROOT (STAYS)
+  6 files: README, CONTRIBUTING, SUPPORTING (new), LICENSE, pom.xml, .gitignore
+
+================================================================================
+ORGANIZATION PRINCIPLES
+================================================================================
+
+1. PUBLIC DOMAIN STANDARD: Root has only essential files
+2. ROLE-BASED: Sections organized by user role (developer, researcher, PM)
+3. CHRONOLOGICAL: Planning/phases reflect execution timeline
+4. HIERARCHICAL: Top-level index (docs/README.md) with detailed indexes
+5. NAVIGATION: Each folder has README.md with structure explanation
+
+================================================================================
+COMPLETION METRICS
+================================================================================
+
+Target Root Files:     ≤ 10 files     (6 required + a few exceptions)
+Files in docs/:       116            (112 .md + 10 .json + 4 readmes)
+Scripts in scripts/:   4              (all .sh files)
+Broken Links:         0              (validation required)
+Git Status:           CLEAN          (all files tracked)
+
+================================================================================

@@ -1,3 +1,10 @@
+<!--
+Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
+
+Licensed under Mozilla Public License 2.0.
+See LICENSE file for details.
+-->
+
 # Research Documents
 
 This directory contains research papers, proposals, and analysis documents related to the Samstraumr project.

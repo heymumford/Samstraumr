@@ -1,3 +1,10 @@
+<!--
+Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
+
+Licensed under Mozilla Public License 2.0.
+See LICENSE file for details.
+-->
+
 Critical Components of Simulating and Monitoring Human Cell Activity In Vitro
 Copyright © 2025 Eric C. Mumford (@heymumford)
 

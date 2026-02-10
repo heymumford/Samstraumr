@@ -1,0 +1,382 @@
+{
+  "iteration": 1,
+  "title": "Adversarial Debate: 12-Agent Critiques of Samstraumr Phase 1",
+  "date": "2026-02-06",
+  "total_agents": 12,
+  "format": "JSON array of independent critiques",
+  "agents": [
+    {
+      "id": 1,
+      "name": "Perfectionist Engineer",
+      "pov": "Quality, robustness, zero-defect execution",
+      "role": "Wants flawless execution, all edge cases covered, robust systems",
+      "critique": "The 5-day hiring timeline is dangerously compressed. Proper technical vetting requires 2-3 technical interviews per candidate, not 30-minute phone screens. For Contractor 1 (Maven plugin), you need code review, architecture discussion, and live coding challenge—30 minutes captures none of this nuance. Same for Contractor 2: reading 2-3 papers takes 6+ hours; evaluating writing quality requires detailed critique exercise. Contractor 3 (Data Sci) needs statistical methodology critique, not just credential review. The scorecard for Collaborator is reasonable but the compressed timeline forces superficial evaluation. You're hiring people who directly impact publication quality and experimental rigor at Gate 4 (existential decision)—rushing hiring trades quality for speed. The engineer recommends extending timeline to Feb 24 to allow 2-week lead time, adding 6-8 hours of technical depth evaluation per contractor, and using async portfolio review + synchronous technical depth conversations.",
+      "what_is_wrong": [
+        "30-min phone screens insufficient for technical depth evaluation",
+        "No code review for Maven plugin contractor",
+        "No detailed writing critique exercise for technical writer",
+        "Statistical methodology not vetted for data scientist",
+        "Publication quality risk if wrong hires made"
+      ],
+      "what_is_missing": [
+        "Technical depth interviews (60-120 min per contractor)",
+        "Live coding or architecture design exercises",
+        "Detailed writing critique from domain expert",
+        "Statistical methodology review with peer input",
+        "Buffer for technical interview feedback loops"
+      ],
+      "key_risks": [
+        "Hiring wrong people due to insufficient evaluation",
+        "Contractor quality issues cascade to publication delays (Weeks 16+)",
+        "Technical debt in Maven plugin implementation (Weeks 5-12)",
+        "Poor writing quality in papers (Weeks 8-20)",
+        "Statistical rigor questioned in peer review"
+      ],
+      "recommendation": "Extend hiring timeline to Feb 24. Add 6-8 hours technical evaluation per contractor. Use async portfolio review (4h each contractor, Eric reviews Friday), live technical interviews (2h each), and reference checks (1h each). Total effort: 23h (Eric) + 20h (technical subject-matter expert). Cost: +2 weeks, +$1-2K expert fees. Quality improvement: 40-50% better contractor fit.",
+      "confidence": "HIGH",
+      "go_no_go": "RISKY without timeline extension"
+    },
+    {
+      "id": 2,
+      "name": "Risk Manager",
+      "pov": "Failure scenarios, mitigation, contingency planning",
+      "role": "Focuses on failure scenarios, mitigation, contingency planning",
+      "critique": "Plan identifies contingencies but doesn't address TIMING of contingency activation. If Collaborator rejects offer Feb 13 at 5 PM, there's NO backup timeline documented—you scramble with 4 days to hire someone for Feb 17 start. That's worse than the primary path. Risk: Finance approval delayed (blocking hiring entirely). No escalation path documented if Guild Mortgage Finance says 'no' or 'review in 2 weeks.' Budget contingency is ZERO—one contractor cost overrun and whole project bleeds. Contractor 1 (Maven) might scope creep; contractor 2 (Writer) will likely need revision cycles beyond 256h estimate. Phase 2 is 'BLOCKING'—if infrastructure setup fails, entire timeline cascades. No detailed handling of Jira import failure contingency beyond 'manual import (4h, use template).' Risk Manager wants: pre-identified backup Collaborators (80% vetted by Feb 9), clear escalation path (if Finance delays >24h, activate executive sponsor immediately), contingency budget ($5-10K unallocated for overages), and pre-staged Phase 2 risk mitigation (if Jira fails, manual import script ready by Feb 12).",
+      "what_is_wrong": [
+        "No timing defined for contingency activation (when is 'too late'?)",
+        "Collaborator rejection leaves zero time for backup hiring",
+        "Finance approval bottleneck unchecked (no escalation path)",
+        "Zero budget contingency forces scope cuts if overages occur",
+        "Phase 2 blocking risks unmitigated (no fallback if Jira import fails)"
+      ],
+      "what_is_missing": [
+        "Pre-identified backup Collaborator candidates (80% vetted)",
+        "Finance approval escalation path (to whom, when, decision timeline)",
+        "Contingency budget allocation ($5-10K reserve)",
+        "Phase 2 infrastructure fallback plan (manual Jira import script pre-staged)",
+        "Trigger thresholds for contingency activation (e.g., 'if approval not by EOD Feb 10')",
+        "Cascading timeline impact assessment (if Collaborator slips, what happens to Gate 1?)"
+      ],
+      "key_risks": [
+        "Collaborator rejection Feb 13, 5 PM → no time for backup (4 days to find + hire for Feb 17)",
+        "Finance approval bottleneck → hiring cannot start without approval",
+        "Budget zero contingency → contractor overages cut from elsewhere or unfunded",
+        "Phase 2 blocking → if Jira import fails, project blocks Week 1 startup",
+        "Cascade timeline → if Phase 1 slips 1 week, all gates slip 1 week (may break publication deadlines)"
+      ],
+      "recommendation": "Add 'Contingency Planning' section: (1) Pre-identify 3 backup Collaborators, 80% vetted by Feb 9 (have them on standby). (2) Finance escalation: if approval not by EOD Feb 10, escalate to CFO with 'decision required EOD Feb 11' ultimatum. (3) Allocate $5-10K contingency reserve for contractor overages. (4) Pre-stage Phase 2 fallback: have manual Jira import script ready by Feb 12; if import fails, run manually (4h effort, pre-planned). (5) Document trigger thresholds: 'if Collaborator rejects by 2 PM Feb 13, activate backup within 2h.' Clarify: if backup start slips to Feb 24, what happens to Gate 1 (week 4 becomes week 5; cascades to all gates + publication deadlines).",
+      "confidence": "HIGH",
+      "go_no_go": "RISKY without explicit contingency triggers and backup plans"
+    },
+    {
+      "id": 3,
+      "name": "Pragmatist CEO",
+      "pov": "Speed, momentum, calculated risk acceptance",
+      "role": "Pragmatist focused on speed, momentum, and calculated risk acceptance",
+      "critique": "This plan is fundamentally GOOD—you're solving the right problem (hiring fast without losing quality). 5 days is tight but achievable IF prep work is done (scorecard exists, templates ready, candidate identification process clear). Biggest pragmatic risk: assuming Eric's phone screens are competent hiring interviews. They're not. Eric is a researcher-architect, not a recruiter—he will likely misread signals, miss red flags, and over-weight technical depth vs. cultural fit. Phone screens need structure (scorecard exists, good) BUT even with scorecard, Eric will make hiring errors at ~30% rate. Cost of error: wrong hire costs $60K (Collaborator) or delays project 2-3 weeks (contractors). Pragmatist CEO's recommendation: Hire an actual recruiter for Feb 10-14 (freelance, 20 hours, ~$1,500). They run phone screens using the scorecard you've built, Eric makes FINAL DECISION (evaluates recommendations). This transfers domain expertise (how to hire) from Eric (no recruiting background) to professional (recruiter). ROI: $1.5K for $60K+ hire improvement (2.5% cost to reduce hiring error rate 30% → 10%). Alternative: Skip second-round interviews entirely—portfolio + single 45-min call is sufficient for contractors (Contractor 1 needs code sample, Contractor 2 needs writing sample, Contractor 3 needs reference check). On budget: ZERO contingency is bold but if you track actuals DAILY, you can cut scope (defer metrics dashboard, defer philosophy expert) and stay in budget. Feb 17 kickoff CANNOT move—it cascades gates. Decision rule: either hire by Feb 13 or move scope, not timeline.",
+      "what_is_wrong": [
+        "Eric (non-recruiter) running phone screens → hiring judgment untested",
+        "30-min phone screens insufficient for assessing cultural fit / team dynamics",
+        "No recruiting expertise in room (Eric + no hiring advisor)",
+        "ZERO contingency budget forces hard choices if overages occur"
+      ],
+      "what_is_missing": [
+        "Professional recruiter / hiring consultant to run screenings",
+        "Cultural fit assessment (will Eric and Collaborator work well together?)",
+        "Contingency budget for course corrections",
+        "Daily actuals tracking (to catch overages early, cut scope before crisis)"
+      ],
+      "key_risks": [
+        "Eric's hiring judgment untested (30%+ error rate likely)",
+        "Contractor portfolio reviewed by non-expert (Eric not specialist in Maven/technical writing/statistics)",
+        "ZERO contingency forces scope cuts if overages emerge (might hurt publication quality)",
+        "Aggressive timeline leaves zero buffer for surprises (Finance delays, candidate no-shows)"
+      ],
+      "recommendation": "Hire external recruiting consultant for Feb 10-14 (20 hours, $1,500). They run phone screens + portfolio evaluation, Eric makes decisions. Cost: +$1.5K (worth it to reduce hiring error from 30% to 10%). Alternative if budget tight: skip second-round interviews for contractors (portfolio + 45-min technical call sufficient). On budget: track actuals daily; if overages emerge, cut in priority order: (1) Philosophy expert ($500-1K, deferrable to Week 4), (2) Metrics dashboard ($0, use spreadsheets, defer to Week 2), (3) Multi-venue publication scouting ($0, use default venues). Go/No-Go: this plan is executable but risks wrong hires without recruiting expertise.",
+      "confidence": "MEDIUM",
+      "go_no_go": "GO with external recruiter; RISKY without"
+    },
+    {
+      "id": 4,
+      "name": "Philosopher",
+      "pov": "First principles, assumptions, core logic",
+      "role": "Questions core assumptions, explores first principles, challenges logic",
+      "critique": "The plan assumes hiring determines project success, but really it's SCOPE CLARITY that determines hiring success. You're asking Collaborator to design AND execute experiments whose outcome is UNKNOWN—that's not a normal hire, it's hiring under radical uncertainty. The plan doesn't ask: Are you hiring for 'execute experiments' (engineer mindset) or 'help navigate ambiguity' (philosopher mindset)? These are different people. Collaborator description emphasizes statistics (40% research design, 30% instrumentation, 20% analysis) but skips 'philosophical rigor'—can a statistician validate falsifiability claims about consciousness? Contractor 2 (Writer) problem: you're asking academic writer to co-author papers on consciousness WHILE the project executes. That's backwards epistemically. Papers should be written POST-data, but you're paying them Weeks 8-20 (before Gate 4 data finalizes Week 15). What are they writing Weeks 8-15 when data isn't ready? Contractor timing contradiction: payment schedule says Contractor 2 starts Week 8, but scope says they need onboarding Week 1. These are CONTRACTUAL CONTRADICTIONS. Same issue: you're paying Contractor 3 (Data Sci) for 48h but critical analysis (Gate 4) doesn't happen until Week 15. When does statistician actually work? The 'payment schedule' shows Contractor 2 bi-weekly invoices Weeks 8-20, but scope document says data readiness isn't until Week 15. Philosopher wants: (1) Clarify project's CORE LOGIC: What does 'success' mean for each role? (2) Refactor contractor timelines to match actual work windows (Data Sci peak effort Weeks 12-16, Writer peak effort Weeks 16-20). (3) Hire Collaborator for 'philosophical partner, not just statistician'—different candidate profile. (4) Write out project's EPISTEMIC ASSUMPTIONS: What counts as evidence? What if data contradicts design assumptions? How do we frame 'failure' as publishable?",
+      "what_is_wrong": [
+        "Role confusion: is Collaborator a 'data analyst' or 'philosophical partner'?",
+        "Contractor timelines don't match actual work windows (Writer paid weeks 8-15 before data exists)",
+        "Falsifiability claims not validated philosophically (no rigor check)",
+        "Contractual contradictions between documents (scope vs. payment schedule)"
+      ],
+      "what_is_missing": [
+        "Clarity on project's epistemic assumptions (what counts as evidence?)",
+        "Philosophical validation of experimental design (falsifiability review)",
+        "Contractor timeline alignment with data availability (don't pay before you have work)",
+        "Role expectations for philosophical partnership vs. technical analysis",
+        "Framework for publishing 'failure' scenarios (if recovery <70%, what's the narrative?)"
+      ],
+      "key_risks": [
+        "Hiring wrong person (statistician without philosophical rigor) for philosophical project",
+        "Writer drafts papers before data is ready (wasteful work + revisions)",
+        "Contractual ambiguity leads to disputes (when does Writer actually work?)",
+        "Gate 4 outcome might invalidate Weeks 8-15 Writer work (if recovery <70%, narrative changes)"
+      ],
+      "recommendation": "(1) Define project success explicitly: 'We publish peer-reviewed papers on consciousness-aware systems, regardless of whether recovery ≥70% (outcome determines narrative, not viability).' (2) Hire Collaborator as 'philosophical partner' + statistician (different interview questions: 'How do you think about failure? What makes an experiment's failure interesting?'). (3) Refactor contractor timelines: Data Sci Weeks 1-8 (review protocol, prep analysis), Weeks 12-16 (analyze recovery data), Weeks 16-20 (review papers). Writer Weeks 1-7 (literature review + outline), Weeks 15-20 (write after data). Move from 256h Weeks 8-20 to 50h Weeks 1-7 + 206h Weeks 15-20. (4) Add philosophical review task: Week 1-2, validate that experimental design actually tests falsifiable claims. (5) Write epistemic framework: 'If recovery ≥70%, publish as self-healing architectures. If recovery <70%, publish as recovery-enabling mechanisms. Either way, publishable contribution.' Clarify this BEFORE hiring, so Collaborator knows the stakes.",
+      "confidence": "HIGH",
+      "go_no_go": "RISKY without scope clarity and epistemic framework"
+    },
+    {
+      "id": 5,
+      "name": "Talent Recruiter",
+      "pov": "Hiring quality, culture fit, long-term team health",
+      "role": "Focuses on hiring quality, culture fit, long-term team health",
+      "critique": "Red flags everywhere from a recruiter perspective. (1) Collaborator: Job description is excellent (clear roles, responsibilities, success metrics), but SCORECARD is too narrow. You're testing statistics knowledge, not assessing ability to handle PHILOSOPHICAL AMBIGUITY, PUBLICATION PRESSURE, or FAILURE. Q3 on scorecard ('comfort with ambiguity') is 5-minute conversation—not enough. Need 2-hour assessment including peer feedback, work-style compatibility, and reference call with previous advisors. (2) Organizational structure risk: Collaborator reports to Eric (the design lead), with no skip-level interviews, no peer review, no organizational buffer. If Eric and Collaborator clash Week 3-5, Collaborator has no escalation path. Who does Collaborator talk to if Eric's feedback feels unfair? 'Report to Eric' (the only manager) creates power imbalance and morale risk. Expected outcome: morale issues Week 3-5, productivity drops 20-30% by Gate 1. (3) Contractors: ZERO focus on long-term working relationship. Writer (256h over 12 weeks) is heavy engagement—Writer and Eric need to click on revisions, feedback cycles, deadline pressure. Single 30-min phone call won't surface compatibility. (4) Timeline: 5 days is TOO FAST for good hiring. You'll pick the FIRST ACCEPTABLE candidate (70th percentile), not the BEST candidate (90th percentile). Time pressure creates biases: you'll overweight first impression, underweight red flags, miss cultural fit questions. (5) Onboarding: 4 hours walkthrough + 'pre-work reading' for a new FTE is insufficient. Collaborator needs 2-week onboarding (50% of Week 1, 25% of Week 2) to build relationship with Eric, understand team norms, get up to speed on architectural philosophy.",
+      "what_is_wrong": [
+        "Scorecard tests technical skills, not philosophical ambiguity tolerance",
+        "No skip-level interview or peer input on Collaborator",
+        "Eric as sole manager creates power imbalance and escalation risks",
+        "Contractors: no assessment of working relationship fit (Writer-Eric dynamics)",
+        "5-day timeline forces first-acceptable pick, not best-fit pick",
+        "Onboarding timeline unrealistic (4 hours for FTE is too short)"
+      ],
+      "what_is_missing": [
+        "2-hour assessment for Collaborator (peer input, work-style compatibility)",
+        "Skip-level interview or organizational escalation path",
+        "Working relationship compatibility assessment (especially Writer-Eric)",
+        "Extended onboarding (2 weeks, not 4 hours)",
+        "Reference calls from previous collaborators (not just names)",
+        "Cultural fit question: 'Tell about a time you worked on high-stakes research with ambiguous outcomes.'"
+      ],
+      "key_risks": [
+        "Rushed hiring picks acceptable, not great people (70th vs. 90th percentile)",
+        "No peer input on Collaborator selection → risk of bad cultural fit",
+        "Eric's management style untested with new hire → Week 3-5 friction",
+        "Writer-Eric revision cycle not validated → publication delays from feedback loops",
+        "Onboarding too short → Collaborator needs extra 40h mentoring Week 1-2 (budget overrun)"
+      ],
+      "recommendation": "(1) Extend hiring to Feb 24 (2-week lead time) for deeper assessment. (2) Add peer panel for Collaborator (include 1-2 technical collaborators from Eric's network; make 30-min peer interview part of process). (3) For contractors, require: Tooling = code sample review (Eric + external engineer), Writer = detailed writing critique (peer academic editor reads 10-page sample + provides 1-page feedback), Data Sci = reference call from actual peer (not candidate-provided names). (4) Add cultural fit question to all interviews: 'Tell us about a time you worked on high-stakes research with ambiguous outcomes. How did you stay motivated?' (5) Allocate 2 weeks onboarding, not 4 hours (50% Week 1, 25% Week 2). Budget: 40h Eric mentoring Week 1-2 (costs $2K, covered by contingency). Expected outcome: right-fit people, lower turnover risk, faster ramp.",
+      "confidence": "HIGH",
+      "go_no_go": "RISKY with 5-day timeline; GO with 2-week timeline (defer kickoff to Feb 24)"
+    },
+    {
+      "id": 6,
+      "name": "CFO",
+      "pov": "Cost scrutiny, ROI, budget efficiency, financial risk",
+      "role": "Scrutinizes costs, ROI, budget efficiency, and financial risk",
+      "critique": "Budget is LOCKED at $156,100 with ZERO contingency. This is financially reckless for R&D project with unknowns. (1) Collaborator cost ($3K/week = $60K total): market rate for senior data scientist, acceptable. BUT no flexibility if timeline slips (Gate delays, experiment overruns = budget overrun). Pro-rata extension? Not budgeted. (2) Contractors: 'Time-and-materials' for Writer is DANGEROUS. $75/hr × 256h = $19.2K estimate, but T&M contracts consistently overrun 25-30%. Why? Because revision cycles. Writer drafts paper, Eric reviews, requests 'big revisions' (20% rewrite = +50h), Writer bills for time. Expected actual cost: $24-28K (overrun: $5-8K). WHERE does that come from? Nowhere—budget overrun triggers scope cuts or funding gaps. (3) Contractor 1 (Tooling, fixed-price $4.8K): You save money but transfer risk to contractor. $4.8K for 96h = $50/hr. Market rate for Maven expertise: $75-100/hr. Contractor will either (a) cut corners (delivers low-quality plugin, needs rewrites Week 13+, cascades delays), or (b) turn down job (you lose contractor). Expected outcome: underbid contractor accepts but delivers mediocre work OR contractor declines. (4) Contractor 3 (Data Sci, $2.1K fixed): $2.1K / 48h = $43.75/hr. Market rate for publication-ready statistical analysis: $100-150/hr. Underpay by 66%. Expect junior statistician (less reliable, more supervision needed = Eric's time costs $175/hr). ROI: lose $15/hr × 48h = -$720 to save $1K (net: lose $280 + quality risk). (5) NO BUDGET for publication costs. Open-access fees: $1-3K per paper × 5 papers = $5-15K. Guild Mortgage pays how? Via contingency (which doesn't exist) or via scope cuts or via new PO (delays publication). (6) Contingency: Industry standard for R&D: 15-20% contingency. You have 0%. For project with unknowns (experiments might fail, timelines might slip), 0% contingency = high financial risk. CFO wants: (1) Increase Collaborator to $55K (give 1-week flex for timeline slips, pro-rata). (2) Writer: switch to FIXED-PRICE per paper ($5-7K per paper × 3 = $15-21K total, save $2.7K vs. T&M, control scope). (3) Contractor 1: $65/hr ($6K total, +$1.2K but attracts real talent). (4) Contractor 3: $65/hr ($3.1K, +$1K but attracts senior statistician, reduces supervision). (5) Allocate $5K contingency for publication costs + Contractor overages. (6) Lock budget at $164-166K (reasonable R&D budget with contingency). Benefit: better contractor quality, controlled scope, financial flexibility.",
+      "what_is_wrong": [
+        "Zero contingency buffer (industry standard is 15-20%)",
+        "Contractor rates underpay market (50% low for Maven, 66% low for Data Sci)",
+        "Writer T&M structure incentivizes scope creep (revision cycles overrun)",
+        "No budget for publication costs ($5-15K, not included)",
+        "Collaborator cost locked with no flexibility for timeline slips"
+      ],
+      "what_is_missing": [
+        "Contingency buffer ($5-10K for overruns)",
+        "Fixed-price structure for Writer (controls scope + cost)",
+        "Market-adjusted contractor rates (attract better talent, reduce defects)",
+        "Publication cost budget ($2-5K allocation)",
+        "Flexible Collaborator terms (pro-rata extension if timeline slips)"
+      ],
+      "key_risks": [
+        "Writer T&M overrun: $5-8K (no budget, triggers scope cut or funding gap)",
+        "Contractor 1 low quality: underbid contractor delivers mediocre plugin (defects cascade to Week 13+)",
+        "Contractor 3 junior quality: underpay attracts junior statistician (more Eric supervision = hidden cost)",
+        "Publication costs unfunded: $5-15K gap (must apply for funds mid-project or cut publishing)",
+        "Timeline slip unaffordable: any delay adds Collaborator cost (no cushion in budget)"
+      ],
+      "recommendation": "(1) Increase Writer rate/structure: fixed-price per paper ($5.5K × 3 = $16.5K, controls scope, saves $2.7K vs T&M). (2) Adjust contractor rates: Tooling $60/hr ($5.8K), Data Sci $65/hr ($3.1K). Total contractor cost: $25.4K (+$1.3K vs. original, worth it for quality). (3) Collaborator: negotiate pro-rata extension option (if timeline slips 1-2 weeks, extend at $3K/week; no additional budget needed if slip ≤2 weeks). (4) Allocate contingency: $6K reserve for publication costs ($2K), Writer revisions ($2K), Contractor overages ($2K). (5) Lock budget at $164.1K ($130K FTE + $25.4K contractors + $1.5K recruiting + $6K contingency). Explain to Finance: +$8K budget buys down financial risk (contingency eliminates scope-cut forcing, publication costs covered, contractor quality improved). Expected ROI: avoid $5-8K Writer overrun + avoid quality issues from underpaid contractors. (6) Track actuals weekly: if actual costs running high, cut scope immediately (defer Philosophy expert or Metrics dashboard) rather than letting overruns creep.",
+      "confidence": "HIGH",
+      "go_no_go": "RISKY with zero contingency; GO with $164K revised budget"
+    },
+    {
+      "id": 7,
+      "name": "Contractor Advocate",
+      "pov": "Fairness, scope clarity, sustainable rates",
+      "role": "Advocates for contractor fairness, scope clarity, sustainable rates",
+      "critique": "Contractors are getting screwed. (1) Contractor 1 (Tooling, $4.8K fixed-price): Maven plugin development is COMPLEX—complex toolchain, edge cases, integration surprises. $4.8K for 96h assumes $50/hr. Market rate for senior Maven expertise: $75-100/hr. You're underpaying by 33-50%. They'll take it because the project is interesting, but they'll either (a) cut quality (skip edge case testing, integration is rough) or (b) work inefficiently to hit profitability (96h becomes 130h, they eat the cost). Result: plugin has bugs, architect detection misses edge cases, delays to Week 13+ (timeline slip cascades). (2) Contractor 2 (Writer, $75/hr T&M): Academic writers bill $80-120/hr. Bottom of market at $75. Problem: T&M contract with revision-heavy work (papers require 3-4 revision rounds) means Writer's incentive is to charge MORE (more hours = more revenue). Creates perverse incentive structure. Better: fixed-price PER PAPER ($5-7K per paper × 3 = $15-21K), which incentivizes clean first draft and limits revision rounds. Current T&M contract likely overruns 25-30% ($24-28K), Writer gets blamed for 'slow work' when really it's revision cycles. (3) Contractor 3 (Data Sci, $2.1K fixed): $2.1K / 48h = $43.75/hr. Market rate for publication-ready statistical analysis: $100-150/hr. Underpay by 66%. Expect junior statistician (grad student doing side gig, not reliable for critical Gate 4 analysis). Expected outcome: (a) statistician declines or (b) accepts but quality is uneven. (4) SCOPE DOCUMENTS lack critical clarity. Contractors don't know: What's the format of deliverables? How many revision rounds are 'included'? Who owns the analysis notebooks / code? Will contractors get authorship credit on papers if they contribute significantly? If I write 30% of a paper, do I get second authorship or acknowledgment? These ambiguities create disputes mid-project. (5) CONFIDENTIALITY clause: 'don't disclose publicly until publication' is reasonable, but too broad. Does this prevent contractor from discussing project internally (with spouse, accountant, tax preparer)? Can they list project on their resume? Use project in case studies? Clause needs refinement. (6) PAYMENT TERMS unclear: When are invoices due? 'Net 15' (due 15 days after invoice) is standard, but when does 'invoice' get issued? Upon completion? Weekly? If Contractor 2 takes 4 weeks to complete first paper, do they wait 4 weeks + 15 days to get paid? Cash flow problem for smaller contractors. Advocate wants: (1) Increase rates to market-appropriate: Tooling $65-75/hr ($6K-7.2K), Data Sci $65-75/hr ($3.1K-3.6K). (2) Writer: fixed-price per paper ($5-7K each), with clear revision limit (2 revision rounds included, additional rounds billed separately). (3) Scope documents: spell out (a) deliverable formats + acceptance criteria, (b) revision round limits, (c) IP ownership (contractor retains code ownership? rights to talk about project?), (d) publication authorship policy (when does contributor get authorship vs. acknowledgment?). (4) Payment terms: invoice upon each milestone (e.g., Writer invoices for Paper 1 outline when outline is accepted, then again for first draft, then for final draft). More frequent invoices = better cash flow. (5) Confidentiality clause: refine to 'don't share project results publicly or with competitors until publication approved by Eric. Internal discussions with spouse/tax preparer OK.'",
+      "what_is_wrong": [
+        "Contractor rates underpay market (50% low for Maven, 66% low for Data Sci)",
+        "Writer T&M structure incentivizes scope creep (more revisions = more revenue)",
+        "Scope documents lack clarity on revision rounds, IP ownership, authorship",
+        "Payment terms unclear (when are invoices issued? when paid?)",
+        "Confidentiality clause too broad (prevents normal business discussions)"
+      ],
+      "what_is_missing": [
+        "Market-rate contractor compensation",
+        "Fixed-price per paper (Writer) to control scope",
+        "Deliverable acceptance criteria + revision round limits",
+        "IP ownership clarity + authorship policy",
+        "Clear payment schedule (invoices upon milestone, Net 15 from invoice date)"
+      ],
+      "key_risks": [
+        "Underpaid contractors deliver low-quality work (bugs, poor writing, weak analysis)",
+        "Writer T&M overrun if revision cycles exceed estimate",
+        "Contractor dissatisfaction mid-project (low rates + unclear terms) → quits or phones it in",
+        "IP disputes (who owns the code? can contractor use project in portfolio?)",
+        "Authorship disputes (contractor expected authorship but got acknowledgment only)"
+      ],
+      "recommendation": "(1) Increase rates to market: Tooling $65/hr ($6.2K, +33%), Data Sci $70/hr ($3.4K, +60%). (2) Writer: fixed-price per paper ($5.5K × 3 = $16.5K, slightly lower than T&M estimate but controls scope + revision rounds). (3) Scope clarity: add to contracts (a) deliverable format examples (paper format: LaTeX, .docx, or Overleaf link?), (b) revision round limits (2 rounds 'free', additional rounds at $75/hr), (c) IP ownership (contractor retains right to discuss in case studies post-publication, Guild owns the work itself), (d) authorship policy (contributor ≥20% of final text = authorship; <20% = acknowledgment). (4) Payment terms: milestone-based invoices. Writer example: Outline acceptance ($3K) + First draft acceptance ($6K) + Final draft acceptance ($7.5K). Each invoice due Net 15 from acceptance. Contractor gets paid sooner, cash flow better. (5) Confidentiality: 'Don't share results publicly or with direct competitors until publication approved. Internal discussion (spouse, accountant, etc.) OK. Can list project on resume after publication.' (6) Reference contractors from previous happy collaborations (to validate they're sustainable collaborators, not mercenaries).",
+      "confidence": "MEDIUM",
+      "go_no_go": "UNFAIR to contractors with current rates; GO with adjusted rates"
+    },
+    {
+      "id": 8,
+      "name": "Systems Thinker",
+      "pov": "Ecosystem perspective, interdependencies, second-order effects",
+      "role": "Thinks about ecosystem perspective, interdependencies, second-order effects",
+      "critique": "Phase 1 success is LOCAL (hire people on time); Phase 2-4 success is SYSTEMIC (people working together). You're optimizing for Feb 17 kickoff (local), but missing critical ecosystem effects. (1) Collaborator-Eric relationship: Eric is design lead AND Collaborator's manager. Single point of failure. If they clash Week 3-5, Collaborator has no organizational support. Who does Collaborator escalate to? Eric (the problem). Who mediates conflict? No one. Expected outcome: morale issues, productivity dips 20-30%, Week 8 Gate might slip. Mitigation: add peer/skip-level check-in (Eric's manager or peer architect checks in with Collaborator Week 3, asks 'how's it going?'). (2) Contractor parallelization: Timeline shows Contractor 3 (Data Sci, Weeks 3-8) and Contractor 2 (Writer, Weeks 8-20) are SEQUENTIAL. Data Sci finishes analysis Week 8, Writer starts Week 8. Result: 1-day handoff window. Writer gets statistical summary from Data Sci, tries to understand methodology in 1 day, starts writing. Misunderstandings accumulate. Writer drafts with wrong assumptions about statistical power. Eric reviews draft Week 10, says 'this is wrong, needs rewrite' (20% of 256h = 50h extra). Scheduled 256h becomes 306h (overrun $3.8K). Alternative: Data Sci and Writer OVERLAP. Weeks 15-20, Data Sci produces analysis (40h), Writer drafts papers based on LIVE analysis (206h), they sync weekly. No handoff gap. Cost same ($3.1K + $16.5K = $19.6K), but quality better, revisions fewer. (3) Publication pressure (Gate 4 outcome): If recovery ≥70%, papers drafted Weeks 8-15 (assuming this outcome) are correct. If recovery <70%, papers drafted Weeks 8-15 are WRONG (narrative flips from 'self-healing' to 'recovery-enabling'). Entire paper reconstruction needed. Not budgeted. Mitigation: Writer produces OUTLINE Weeks 1-7, not full drafts. After Gate 4 data (Week 15), Writer writes final papers Weeks 15-20. Draft only AFTER data is locked. Cost shifts from 256h Weeks 8-20 to 50h Weeks 1-7 + 206h Weeks 15-20 (total same, timing better). (4) Philosophical review (Week 3-4): Plan says 'schedule expert, Week 3-4,' but doesn't specify WHEN expert delivers findings. If findings say 'your falsifiability assumptions are problematic,' this cascades to Collaborator's experimental design (Week 4+). But Phase 1 is 'done' by Feb 14—philosophical feedback comes AFTER Phase 1 sign-off. By then, experimental design is locked. Mitigation: Accelerate philosophical review to Week 1-2. Hire 'philosophical advisor' (not full expert consultation, just 10-12 hours). Advisor reviews experimental design assumptions Week 1, provides feedback Week 2, impacts Week 3+ design. (5) Knowledge management fragmentation: Plan creates GitHub repo (code + docs) + shared drive (data, papers) + Jira (tasks). Multiple sources of truth by Week 5. Collaborator works in GitHub, Eric reviews in shared drive, Jira tasks don't sync with GitHub PRs. Information fragmentation. Mitigation: Pick ONE source of truth. GitHub for everything (code + docs + notebooks + papers as .md), Jira for task tracking only (link back to GitHub). Shared drive for archival only (read-only copies of final results). (6) Timeline interdependencies: Gate 1 (Week 4) depends on Collaborator measurement design. If Collaborator is still ramping Week 3, Gate 1 slips to Week 5. Gate 1 slip cascades: Gate 2 (Week 8 → Week 9), Gate 4 (Week 15 → Week 16). Publication deadlines are firm (ESEM deadline Aug 1, likely fixed). 1-week slip = papers might miss ESEM, shift to next year. Systems Thinker wants: (1) Assign 'Project Manager' role—someone (Collaborator) owns phase execution, Eric owns architecture decisions, they sync weekly to surface blockers. (2) Refactor contractor timeline: Data Sci Weeks 1-8 (design review) + Weeks 12-16 (analysis), Writer Weeks 1-7 (outline) + Weeks 15-20 (write). Overlap during analysis phase. (3) Accelerate philosophical review to Week 1-2 (smaller engagement, $1-2K). (4) Knowledge management: GitHub is source of truth, Jira is secondary, shared drive is archival only. (5) Gate dependency: explicitly document 'if Gate N slips 1 week, Gates N+1..4 slip 1 week, publication deadlines at risk.' Decision: is a 1-week timeline slip acceptable? When do you pivot to 'defer publication'?",
+      "what_is_wrong": [
+        "Collaborator-Eric single-point-of-failure relationship (no peer support, escalation only to Eric)",
+        "Contractor sequence (Data Sci → Writer) creates 1-day handoff gap",
+        "Writer drafts before Gate 4 data → wrong-result rework needed",
+        "Philosophical review Week 3-4 (too late to impact Week 1 design)",
+        "Multi-system knowledge management → fragmentation by Week 5"
+      ],
+      "what_is_missing": [
+        "Project Manager role (Collaborator owns execution, Eric owns decisions)",
+        "Contractor overlap (Data Sci + Writer sync during analysis phase)",
+        "Pre-Gate-4 work: Writer produces outline (not full draft) Weeks 1-7",
+        "Accelerated philosophical review (Week 1-2, not Week 3-4)",
+        "Single source of truth for knowledge management (GitHub primary)"
+      ],
+      "key_risks": [
+        "Collaborator morale issue (lonely position, no peer support) → productivity 20-30% down",
+        "Writer-Data Sci handoff gap → misunderstandings → rework → budget overrun ($3-5K)",
+        "Publication narrative mismatch (papers drafted before outcome known) → entire rewrites",
+        "Gate cascade (1-week slip → all subsequent gates slip) → publication deadlines at risk",
+        "Knowledge fragmentation (GitHub vs. shared drive vs. Jira) → coordination overhead"
+      ],
+      "recommendation": "(1) Add 'Project Manager' role: Collaborator takes ownership of Phase execution (infrastructure, timelines, blockers), Eric is architect guide (decisions, scope, risk). Weekly sync (30 min) to surface issues early. (2) Refactor contractor timeline: Data Sci Weeks 1-8 (protocol review + design support) + Weeks 12-16 (critical analysis), Writer Weeks 1-7 (literature + outline, not full draft) + Weeks 15-20 (write after data locked). Cost same, but overlap eliminates handoff gap. (3) Collaborator feedback: weekly 15-min check-in with peer architect (not Eric) to surface issues early. (4) Knowledge management: GitHub is source of truth (code + docs + notebooks + papers), Jira is task tracker (linked to GitHub), shared drive is archive. (5) Gate cascade mitigation: Document that 1-week slip cascades to all gates + publication deadlines. Decision by Week 2: if Phase 1 runs 1+ week late, do you (a) compress Weeks 5-15 (aggressive), (b) defer publication to next year (accept schedule slip), or (c) reduce scope (cut some experiments)?",
+      "confidence": "HIGH",
+      "go_no_go": "RISKY without systemic redesign (single-point-of-failure relationships, contractor sequence, knowledge fragmentation)"
+    },
+    {
+      "id": 9,
+      "name": "Devil's Advocate",
+      "pov": "Challenging everything, contrarian, punching holes in logic",
+      "role": "Challenges everything, punches holes in logic, contrarian perspective",
+      "critique": "This plan is optimistic fiction. Let me punch holes. (1) Hiring timeline: 5 days works IF candidates are pre-qualified. But ACTUAL timeline: Feb 10 candidates identified (1h), emails sent (1h), wait 24-48h for responses (no control), portfolio arrives Feb 11 EVENING (if they respond same day—unlikely, many will respond Feb 12). Portfolio review Feb 11-12 (10-15h actual). Phone screens Feb 12 (4h talk time). Offers Feb 13. This is TIGHT with zero delays. ONE candidate no-show (cancels call = 1h slot empty, no backup), timeline breaks. Probability of zero delays: <30%. (2) Eric's availability: Plan assumes Eric is full-time on hiring Feb 10-14. But Eric also: sends recruitment emails (personalize each = 5-10 min × 7 = 1h), reviews portfolios (10-15h), does 10+ phone screens (4-5h talk + prep), makes offers (2h), customizes contracts (3h), etc. Total: 43h in 5 days = 8.6h/day (realistic with sleep? No). Expected: partial prep by Eric (50%), hiring consultant does 50%. Recommendation in original plan: ZERO consulting support. It pretends Eric does all. (3) Financial approval: Plan says 'get approval by EOD Feb 10.' This is MAGIC. Guild Mortgage Finance teams don't move that fast. Expect: request submitted Feb 10 morning (1h Eric's time), acknowledgment Feb 10 afternoon, review Feb 11, approval Feb 12 (if no questions). If Finance asks 'why Collaborator $60K when market is $55K?' you've lost 1 day explaining. If they ask 'is there backup vendor for contractors?' you've lost 2 days. Realistic: approval Feb 12-13, not Feb 10. (4) Onboarding readiness by Feb 14: Plan says 'onboarding packets created Feb 14-15.' Collaborator starts Feb 17 (2 days). Packets include: GitHub access, Jira access, Slack, reading materials, 4h walkthrough. Collaborator will be OVERWHELMED. They should have 1 WEEK to review before starting. Realistic: allocate 40h Collaborator onboarding Week 1 (not 4h), which means Week 1 productivity = 50%, not 100%. Cost: $1.5K (covered by contingency). (5) Success criteria: Plan says 'All staffing confirmed + available for Week 1 + contracts signed.' This is OPTIMISTIC. What if Collaborator confirms availability Feb 13 but then gets counter-offer from previous employer? Changes mind Feb 16? No enforcement mechanism. Recommendation: Ask for commitment in WRITING (signed offer letter Feb 13, counter-offer clause: rescind by Feb 15 only). (6) Alternative scenario: What if you CAN'T hire by Feb 13? Plan says 'activate backup, extend timeline 1 week.' But extending timeline 1 week cascades to Gate 1 (Week 4 → Week 5), Gate 4 (Week 15 → Week 16), publication deadlines. You don't address this cascade explicitly. Is a 1-week slip acceptable? Cost: publications might miss submission deadlines (OOPSLA deadline Aug 1, fixed). Recommendation: Make this a DECISION by Feb 12 EOD: 'We hire by Feb 13 OR we rescope Phase 1 to defer Collaborator to Feb 24 (accept 1-week gate cascade and potential publication delays).' No middle ground. (7) Probability analysis: 5-day hiring has multiple failure points. Assuming: P(Finance approval on-time) = 85%, P(candidates respond by deadline) = 90%, P(interviews complete as scheduled) = 90%, P(offers accepted) = 80%. Joint probability: 0.85 × 0.90 × 0.90 × 0.80 = 55%. So plan has ~55% chance of on-time delivery, NOT 64% (original confidence). With external recruiter (reducing interview delay risk to 95%): 0.85 × 0.95 × 0.95 × 0.80 = 61%. Still <65%. Only way to get to 80%+ confidence: (a) external recruiter (95% interview completion), (b) Finance pre-approval (100%), (c) candidate pre-screening (95% response rate). (8) What's missing: daily execution tracking. If you had daily standup (Eric + Recruiter + Finance contact, 15 min), you'd catch Finance delays by EOD Feb 10 (not EOD Feb 14). Early detection = time to escalate. Devil's Advocate wants: (1) Hire external recruiter (20h, $1.5K) to run screenings + portfolio review. Reduces Eric overload + increases hiring success rate. (2) Pre-approve budget with Finance (send request Feb 9, get verbal approval Feb 10 morning, formal by EOD Feb 11). (3) Daily standup (15 min) Feb 10-14 to surface blockers real-time. (4) Go/No-Go checkpoint: EOD Feb 12. If <6/7 candidates ready for offers, activate contingency (extend to Feb 17 start or reduce scope). (5) Clear decision rules: 'Feb 13 hiring success = all 4 offers accepted by 5 PM. Feb 14 success = all contracts signed. Feb 17 success = all people onboarded + ready. If any fails, contingency activates (explicit trigger, not vague).'",
+      "what_is_wrong": [
+        "Hiring timeline assumes zero delays (unrealistic: <30% probability)",
+        "Eric overbooked (43h in 60h work week + strategic decisions)",
+        "Finance approval optimistically scheduled (realistically Feb 12-13, not Feb 10)",
+        "Onboarding time unrealistic (2 days for FTE walkthrough; reality: 1 week)",
+        "No contingency trigger thresholds (when to activate backup plan?)"
+      ],
+      "what_is_missing": [
+        "External recruiting support (20h consultant to de-risk hiring)",
+        "Daily execution tracking (standup to surface blockers real-time)",
+        "Go/No-Go checkpoints (EOD Feb 12: if <6/7 interviews done, activate contingency)",
+        "Probability analysis (5-day plan is ~55% likely; with recruiter ~61%; need to get to 75%+)",
+        "Clear contingency triggers (explicit 'if X happens, activate Y within Z hours')"
+      ],
+      "key_risks": [
+        "Hiring timeline <30% probability of zero delays (actually 55% with all uncertainties)",
+        "Eric overbooked (errors in evaluation, shortcuts in assessment)",
+        "Finance approval delay (bottleneck unchecked; no escalation path)",
+        "Onboarding shortfall (Collaborator needs 1 week, plan allocates 4 hours)",
+        "No trigger-based contingency (when do you activate backup plan?)"
+      ],
+      "recommendation": "(1) Hire external recruiting consultant (20h, $1.5K). Consultant runs portfolio review + phone screen logistics, Eric makes decisions. Increases hiring success from 55% to 75%+. (2) Pre-approve budget: send request Feb 9, phone call to Finance Feb 10 morning ('need decision by EOD Feb 11'), get verbal approval by EOD Feb 11, formal docs by EOD Feb 12. De-risks approval bottleneck. (3) Daily standup (15 min, 9 AM): Eric + Recruiter + Finance contact. Update: candidates responses received, portfolio quality, interviews scheduled, Finance approval status. Enables real-time issue surfacing. (4) Go/No-Go checkpoint (EOD Feb 12): Have 6+/7 candidates completed interviews? If YES, proceed with offers (80% confidence of success). If NO, activate contingency immediately (extend hiring to Feb 17-20, reduce scope, or defer kickoff). (5) Contingency triggers: 'If Finance approval not by EOD Feb 11, escalate to CFO (decision required EOD Feb 12). If Collaborator rejects by 2 PM Feb 13, activate backup within 2h. If <6 interviews done by EOD Feb 12, activate parallel backup hiring track.' Clear, trigger-based. (6) Probability analysis: Update confidence from 64% to 78% with recruiter + daily tracking + pre-approval. Still <80%, so expect surprises; contingency must be ready.",
+      "confidence": "HIGH",
+      "go_no_go": "<30% feasible without external help; GO with recruiter + daily tracking (78% confidence)"
+    },
+    {
+      "id": 10,
+      "name": "Data Analyst",
+      "pov": "Metrics, measurement, KPIs, what gets measured gets managed",
+      "role": "Focuses on metrics, measurement, KPIs, what gets measured gets managed",
+      "critique": "Plan has ZERO measurement criteria for hiring success or execution. You'll know 'Phase 1 complete' if checkboxes are checked, but won't know if you hired WELL until Week 10+ (Gate 2 data shows Collaborator can run A/B tests correctly). By then, it's too late to recover if wrong hire. Recommendation: Define SUCCESS METRICS for hiring and execution. (1) COLLABORATOR QUALITY: Score ≥3.5/5.0 on scorecard (not minimum 2.5). Why? Because scorecard measures capability. <3.5 predicts onboarding trouble (Week 3-5 ramp time = 80h, not 40h; productivity loss = $2.4K = overrun). If Collaborator scores 2.5, hire but budget an extra 40h onboarding. (2) CONTRACTOR QUALITY: Define 'Portfolio quality score' (1-5 scale). Contractor 1 code sample: score <3 (poor code quality) = PASS (don't hire). Contractor 2 papers: read 2 samples, score <3.5 (weak writing) = PASS. Contractor 3 credentials: score <4 (weak expertise) = PASS. Why? Because low-quality contractors add revision burden. (3) TIMELINE EXECUTION: Track 'hiring cycle duration' daily. Target: 5 days (Feb 10-14). If Feb 10-15, you've lost 1 day. If Feb 10-16, Phase 1 overlaps Week 1 (tight). Threshold: if hiring extends past Feb 13, activate contingency (already-vetted backup). (4) RISK METRICS: Track 'Phase 1 blockers' (tasks blocked by dependencies). Currently: Finance approval blocks everything. Daily update: Finance approval status (done/pending/delayed), candidate response rate (7/7 confirmed by EOD Feb 11?), interview completion rate (X/7 completed by EOD Feb 12?). (5) EXECUTION TRACKING: Daily update log. Feb 10: 'candidates identified: 7 total, 5 responded to recruitment email.' Feb 11: 'portfolios received: 4/5 (1 no-show), review 80% complete.' Feb 12: 'phone screens scheduled: 3/3 Collaborators, 2/2 Tooling, 1/1 Writer, 1/1 Data Sci.' Feb 13: 'offers sent: 4/4, responses pending EOD.' Feb 14: 'contracts signed: 3/4, 1 pending Friday morning.' (6) SUCCESS THRESHOLD: By EOD Feb 12, if you've completed phone screens for 7/7 candidates (no delays), probability of on-time hiring is 75%+. If <6/7, activate contingency (start backup hiring track in parallel). (7) DAILY SCORECARD: 1-page format. Columns: Task | Target | Actual | Status | Risk | Mitigation. Example row: 'Candidate responses | 7 by EOD Feb 10 | 5 by EOD Feb 10 | ✓ OK | Low | Reach out to 2 non-responders Feb 11 morning.' (8) GO/NO-GO GATES: EOD Feb 10: Finance approval status (green/red). EOD Feb 11: Candidate response rate (7/7 = green, <5/7 = yellow). EOD Feb 12: Interview completion (7/7 = green, <6/7 = yellow). EOD Feb 13: Offer acceptance (4/4 = green, <3/4 = yellow). EOD Feb 14: Contract signature (4/4 = green, <4/4 = red).",
+      "what_is_wrong": [
+        "No go/no-go criteria for hiring quality (what score = 'hire'?)",
+        "No daily execution tracking (surface blockers real-time)",
+        "No success thresholds (when is hiring 'on track' vs. 'at risk'?)",
+        "Onboarding time undefined by candidate ability (budget variable, not fixed)"
+      ],
+      "what_is_missing": [
+        "Hiring quality metrics (Collaborator ≥3.5/5.0, Contractors ≥3-4/5.0)",
+        "Daily execution scorecard (track: Finance approval, candidate responses, interview completion)",
+        "Go/No-Go checkpoints (EOD Feb 10/11/12/13/14 with green/red/yellow status)",
+        "Risk triggers (if Finance delayed >24h, escalate; if <6 interviews done by EOD Feb 12, activate backup)",
+        "Onboarding cost model (if Collaborator <3.5/5.0, budget +40h mentoring = +$1.5K)"
+      ],
+      "key_risks": [
+        "No early warning system (don't know hiring is slipping until Feb 14)",
+        "Onboarding time variable (depends on hire quality, not planned upfront)",
+        "Phase 1 completion criteria procedural, not outcome-based ('people signed' ≠ 'right people')",
+        "Success unmeasured until Week 10+ (too late to recover if wrong hire)"
+      ],
+      "recommendation": "(1) Define hiring quality thresholds: Collaborator ≥3.5/5.0 (above 'good', approaching 'excellent'). Any <3.5 accepted only if you budget +40h onboarding Week 1 (cost +$1.5K, within contingency). Contractors ≥3-4/5.0 (code quality, writing clarity, statistical rigor). (2) Create 'Daily Scorecard' (1-page, updated 5 PM daily Feb 10-14): Columns: Task | Target | Actual | Status | Issue | Mitigation. Example rows: 'Candidate responses | 7 | 5 | ⚠️ YELLOW | 2 not responding | Follow up Feb 11, 10 AM' / 'Finance approval | Done | Pending | 🔴 RED | Finance reviewing | Escalate to CFO Feb 11' / 'Interview completion | 7/7 | 5/7 | ⚠️ YELLOW | 2 interviews Feb 12 PM | Track completion EOD Feb 12'. (3) Go/No-Go checkpoints (daily): EOD Feb 10 (Finance approval), EOD Feb 11 (candidate response rate ≥7/7), EOD Feb 12 (interview completion ≥6/7), EOD Feb 13 (offer acceptance ≥3/4), EOD Feb 14 (contract signature = 4/4). If any go RED (can't proceed), escalate immediately. (4) Trigger-based contingency: 'If interview completion <6/7 by EOD Feb 12, activate backup hiring: assign Recruiter to start parallel track for remaining candidates. Target: backup interviews completed by EOD Feb 13 (extends hiring 1 day).' (5) Onboarding cost model: 'If Collaborator scores <3.5/5.0, plan +40h Eric mentoring Week 1 (cost +$1.5K contingency). If scores ≥3.5, standard 4h walkthrough sufficient.' (6) Weekly review (every Sunday): 'Phase 1 is on track if hiring cycle stays 5 days and all 4 people confirmed available Feb 17.'",
+      "confidence": "MEDIUM",
+      "go_no_go": "GO if metrics defined; RISKY without tracking system"
+    },
+    {
+      "id": 11,
+      "name": "Product Manager",
+      "pov": "User/customer POV, feature clarity, success criteria",
+      "role": "Focuses on user/customer POV, feature clarity, success criteria",
+      "critique": "This plan is INTERNAL-focused (hiring, budgets, timelines). It doesn't articulate WHO BENEFITS from this project or WHAT SUCCESS MEANS TO THEM. (1) User clarity: Who's the end user? If 'researchers reading papers,' then success = publishable empirical papers at top venues (ESEM, TSE, ICSE). If 'software architects adopting the pattern,' then success = evidence the pattern works better than alternatives (recovery ≥70% AND produces papers architects cite). If 'Guild Mortgage,' then success = business benefit (operational cost reduction, resilience improvement). The plan never specifies. Gate 4 decision (Week 15) is 'recovery ≥70%'—but 70% of WHAT? Recovery rate in lab conditions? Real production? For Guild Mortgage's infrastructure? If researchers review this paper in 5 years, will 70% mean anything? Will they trust the result? Success metric is ambiguous. (2) SUCCESS CRITERIA are VAGUE. 'Empirical validation paper ready for submission' is not a success criteria—it's a deliverable. Success criteria: 'Paper accepted at ESEM with >3 reviewer score' or 'Paper gets 10+ citations in first year' or 'Guild Mortgage adopts pattern in production, reducing MTTR by 20%'. None of these are articulated in Phase 1 plan. (3) CUSTOMER DISCOVERY: You're writing 5 papers but for WHO? OOPSLA readers (architecture patterns)? SREcon readers (operational concerns)? Philosophy journals (consciousness claims)? Each venue has different success criteria. OOPSLA cares about 'novelty in design pattern.' SREcon cares about 'operational impact.' Philosophy journals care about 'epistemological rigor.' Your papers can't be all things to all audiences. (4) USER RESEARCH: Plan doesn't include 'what do target readers actually care about?' Interview 3 ESEM chairs/editors: 'What makes a paper on software architecture patterns valuable?' Interview 3 SREcon speakers: 'What operational evidence would convince you to adopt a new pattern?' Interview 3 SIGCSE instructors: 'What would make this pattern useful for teaching cognitive load reduction?' Use feedback to shape Collaborator's experiments. Maybe target readers care more about 'recovery time reduction' than 'failure rate,' so Collaborator should measure different things. (5) GATE 4 REFRAMING: Current decision: 'recovery ≥70% → self-healing narrative.' But what if data shows recovery ≥70% in lab but 45% in production? Do you publish? Frame as 'lab results vs. real-world risk'? Or pivot to 'recovery-enabling mechanisms'? Plan doesn't specify how to handle mismatch between lab + real-world. Product Manager wants: (1) Define PRIMARY USER: (a) Guild Mortgage (operational resilience), (b) Software architects (design pattern adoption), or (c) Academic researchers (consciousness formalization). Build Phase 1 hiring + experiments around primary user. (2) Define success metrics PER USER: Guild = MTTR reduction ≥20% in production + cost savings ≥$100K/year. Architects = paper accepted + 2+ adoption stories within 2 years. Academics = 5 papers published + 20+ citations year 1. (3) Add USER RESEARCH task (Week 2, 4h): Conduct 3 interviews with target readers (ESEM editor, SREcon speaker, SIGCSE instructor). Ask: 'What would make this valuable to you?' Use feedback to refocus Collaborator's measurement priorities. (4) Reframe Gate 4 decision: Instead of 'recovery ≥70%,' use 'Do we have enough evidence to claim the pattern is an advance over current practice?' This works for ANY outcome: if recovery ≥70% + low cost, claim is 'self-healing.' If recovery ≥70% but high complexity, claim is 'recovery-enabling.' If recovery <70%, claim is 'what we learned about limits of autonomous recovery' (still publishable, different venue).",
+      "what_is_wrong": [
+        "No primary user defined (papers might miss all audiences)",
+        "Success criteria are deliverables, not outcomes (papers exist ≠ papers valuable)",
+        "No voice-of-customer input into research priorities",
+        "Experimental design not validated against user needs",
+        "Gate 4 decision logic disconnected from actual use case"
+      ],
+      "what_is_missing": [
+        "Primary user definition (Guild, architects, academics, or combination)",
+        "User-centric success metrics (citations, adoption, business impact)",
+        "Voice-of-customer input (interviews with ESEM, SREcon, SIGCSE audiences)",
+        "User research task (Week 2, 4h to shape measurement priorities)",
+        "Publication narrative tie-breaker (how to frame findings regardless of outcome)"
+      ],
+      "key_risks": [
+        "Papers published but irrelevant to target audience (high visibility, low impact)",
+        "Experimental design measures wrong things (labs vs. production gap, wrong metrics)",
+        "Publication rejected because reviewers see flaws in user assumptions",
+        "Gate 4 outcome triggers narrative crisis (recovery <70%, papers invalid)"
+      ],
+      "recommendation": "(1) Define primary user by Week 1: Is this for Guild Mortgage (business case), architects (design pattern), or researchers (consciousness formalization)? Make a choice; you can't optimize for all three. (2) Define user-centric success metrics: If Guild = 'adopted in production + MTTR reduced ≥20%.' If architects = 'paper accepted + 2+ adoption stories year 2.' If academics = '5 papers published + 20+ citations year 1.' (3) Add Week 2 task (4h): Conduct 3 interviews with target readers. ESEM editor: 'What architecture papers do you accept? What makes one impactful?' SREcon speaker: 'What operational evidence would convince you?' SIGCSE instructor: 'How would you teach this?' Use feedback to adjust Collaborator's measurement design. (4) Reframe Gate 4: 'Do we have publishable evidence of pattern value, regardless of recovery rate?' If recovery ≥70%, papers frame as 'self-healing.' If recovery <70% but cost-effective, papers frame as 'smart recovery.' If recovery <70% + expensive, papers frame as 'what we learned about limits.' (5) Publication strategy: decide venue BEFORE experiments (not after data). ESEM: 'empirical validation of pattern.' SREcon: 'operational impact for practitioners.' Philosophy journals: 'consciousness formalization.' Experiments measure toward these stories.",
+      "confidence": "MEDIUM",
+      "go_no_go": "GO but with understanding that success criteria are internal-focused (defer user research to Week 2)"
+    },
+    {
+      "id": 12,
+      "name": "Legal/Compliance",
+      "pov": "Risk, contracts, IP, liability, regulatory perspective",
+      "role": "Focuses on risk, contracts, IP, liability, and regulatory perspective",
+      "critique": "Contract template is INCOMPLETE and HIGH-RISK in several areas. (1) IP OWNERSHIP: Template says 'All work product belongs to Guild Mortgage Company.' But Collaborator is FTE, not contractor. FTE IP assignment must be spelled out in OFFER LETTER, not contractor agreement. Current plan doesn't include 'Offer letter IP clause.' Guild Mortgage should require: 'All inventions, software, writing, and data created during this employment belong to Guild Mortgage, except pre-existing IP listed in Appendix A (candidate provides list before start date).' If you don't do this, Collaborator could claim co-ownership of patents on 'consciousness-aware systems' architecture (worth $$ if it becomes industry standard). Risk: IP dispute, potential loss of patent rights. (2) CONFIDENTIALITY: Contract says 'don't disclose publicly until publication.' But what about internal Guild presentations? Can Collaborator talk to Guild Mortgage CTO about findings? Can Eric present interim results at internal Guild meetings? Clause is too broad (blocks internal sharing) and too narrow (only blocks public sharing). Should be: 'Confidential = all project data, designs, results. Sharing allowed (a) within Guild Mortgage on need-to-know basis, (b) with contractors under NDA, (c) publicly after publication approved by Eric.' (3) CONTRACTOR TAX CLASSIFICATION: Template references W-9 / W-8BEN (independent contractor forms), but doesn't verify contractor STATUS. In USA, 'independent contractor' has IRS '7-factor test' (degree of control, right to hire helpers, equipment ownership, hours, permanence, etc.). If contractor works >35 hrs/week on-site, follows Eric's direction, can't hire deputies, uses company equipment → IRS might reclassify as EMPLOYEE (not contractor). Triggering: payroll taxes, FICA, workers comp, unemployment insurance. Risk: IRS reclassifies, back taxes + penalties on Guild Mortgage (20%+ of contractor cost). Mitigation: Before hiring, send contractor classification questionnaire. Ask: (a) will you work for other clients during this project? (b) will you use your own equipment/software? (c) can you control your hours (or will I dictate schedule)? If answers are 'no, no, no,' they should be employees, not contractors. (4) LIABILITY: Template has 'limitation of liability' (Guild's liability capped at amounts paid) but NO PERFORMANCE WARRANTIES. What if Contractor 1's plugin breaks the build? What if Contractor 2's paper has plagiarism (violation of academic ethics)? What if Contractor 3's analysis is statistically invalid (gets ripped apart in peer review)? No recourse. Mitigation: Add 'Performance standards' section. Contractor 1: plugin must pass all existing unit tests + detect 5 known violations with <5% false positives. Contractor 2: all text original (Turnitin check <5% match), statistical claims verified. Contractor 3: statistical methods peer-review defensible, code reproducible. (5) TERMINATION: Template allows 14-day termination with payment for 'work completed.' But what's 'completed'? If Writer is mid-paper (50% draft), do they get paid for 50% of milestone? Define MILESTONES with explicit sign-off. Example: Contractor 2, Paper 1: Milestone 1 = Outline + literature review draft (due Week 7, payment $6K upon sign-off). Milestone 2 = First draft (due Week 15, payment $6K). Milestone 3 = Final draft (due Week 17, payment $4.5K). If Eric doesn't like Milestone 1, he pays for it (can terminate) but doesn't owe Milestones 2-3. (6) AUTHORSHIP: No clause on authorship rights. Academic convention: major contributors get authorship; minor contributors get acknowledgment. Contractor 2 (Writer) might expect authorship on 3 papers (25% of written word count?). Guild Mortgage might want author list to be 'Eric Mumford + Team.' Mismatch causes disputes. Mitigation: Define UPFRONT. Example: 'Contractor authorship on Paper X if they contribute ≥20% of final text + ≥2 rounds of revision. Otherwise, acknowledgment.' Get written agreement before work starts. (7) PAYMENT SCHEDULE: No clarity on invoice schedule. When is 'work completed'? When does invoice get issued? When is it due? Standard is 'Net 15' (due 15 days after invoice), but if invoice isn't issued until AFTER work is done + reviewed + approved, contractor might wait 6 weeks for payment. Clarify: 'Contractor invoices upon completion of each milestone (with proof of completion). Guild Mortgage pays within 15 days of invoice receipt.' (8) CONFLICT OF INTEREST: No clause preventing contractor from sharing project insights with competitors. If Contractor 1 (Maven plugin developer) uses your 'architecture violation detection' rules for a competitor's product, that's a problem. Mitigation: Add 'non-compete' clause (if competitive industry) or 'confidentiality + non-use' clause (sharing OK, but can't use for competing products for 2 years post-project).",
+      "what_is_wrong": [
+        "FTE IP assignment not in offer letter (exposes guild to patent ownership disputes)",
+        "Confidentiality clause too broad (blocks internal sharing)",
+        "Contractor classification untested (tax reclassification risk)",
+        "No performance standards (recourse limited if deliverables defective)",
+        "Authorship expectations undefined (dispute risk mid-project)"
+      ],
+      "what_is_missing": [
+        "FTE offer letter with IP assignment clause",
+        "Confidentiality scope refined (internal vs. public sharing distinguished)",
+        "Contractor tax classification questionnaire (IRS 7-factor test)",
+        "Performance standards + acceptance criteria per deliverable",
+        "Milestone-based payments (not lump-sum)",
+        "Authorship policy (when does contributor get authorship vs. acknowledgment?)",
+        "Payment schedule (invoice upon milestone, due within 15 days)",
+        "Non-compete / non-use clause (prevent sharing with competitors)"
+      ],
+      "key_risks": [
+        "IRS reclassifies contractors as employees (back taxes + penalties on Guild)",
+        "FTE claims co-ownership of IP (patent disputes if architecture becomes valuable)",
+        "Confidentiality breach (contractors share insights with competitors)",
+        "Performance disputes (contractor delivers low-quality work, Guild has no recourse)",
+        "Authorship disputes (contractor expected co-authorship, Guild says acknowledgment only)"
+      ],
+      "recommendation": "(1) Create FTE OFFER LETTER (separate from contractor agreements) with clause: 'Collaborator grants Guild Mortgage Company sole ownership of all inventions, software, writing, and data created during this employment, except pre-existing IP listed in Appendix A.' Require Appendix A (background IP disclosure) within 3 days of offer acceptance. (2) Refine CONFIDENTIALITY clause: 'Confidential info = all project data, designs, results. Sharing allowed: (a) within Guild on need-to-know, (b) with contractors under NDA, (c) publicly after publication approved by Eric. Contractor cannot disclose to competitors or use for competing products for 2 years post-project.' (3) Contractor CLASSIFICATION QUESTIONNAIRE (before signing): Ask (a) will you work for other clients? (b) own your equipment? (c) control your hours? Based on answers, confirm contractor vs. employee classification (consult tax accountant if borderline). (4) Add PERFORMANCE STANDARDS section to each contractor agreement. Example Contractor 1: 'Deliverable = Maven plugin that passes all existing unit tests + detects ≥5 known violations with <5% false positives. Acceptance criteria: Eric approves in writing. Payment due upon acceptance.' (5) Shift to MILESTONE-BASED payments (not lump-sum). Contractor 2 example: $6K (outline), $6K (first draft), $4.5K (final). Payment upon milestone sign-off. If Eric doesn't sign off, contractor must revise (no additional payment). (6) Define AUTHORSHIP POLICY in writing: 'Contractor receives authorship on Paper X if they contribute ≥20% of final text + participate in ≥2 revision rounds. Otherwise, acknowledgment only.' Get agreement before work starts. (7) Clarify PAYMENT SCHEDULE: 'Contractor invoices upon completion of each milestone (with evidence). Guild Mortgage pays Net 15 from invoice receipt.' (8) Add NON-COMPETE clause (if industry competitive): 'Contractor cannot use project insights for competing products for 2 years post-project. Confidentiality survives contract termination indefinitely.'",
+      "confidence": "HIGH",
+      "go_no_go": "RISKY without contract clarifications; GO after legal review"
+    }
+  ],
+  "synthesis": "All 12 agents point to common themes: (1) Hiring timeline compressed but achievable with external recruiter; (2) Budget has zero contingency, risky; (3) Contractor timeline misaligned with actual work windows; (4) Scope clarity lacking; (5) Success criteria unmeasured. Refined plan addresses all 12 critiques via: external recruiter, budget increase to $164K (with $6K contingency), contractor timeline refactoring, explicit success metrics, daily tracking, and trigger-based contingencies.",
+  "confidence_original_plan": "64%",
+  "confidence_refined_plan": "82%"
+}

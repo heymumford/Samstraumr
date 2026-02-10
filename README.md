@@ -1,3 +1,10 @@
+<!--
+Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
+
+This file is part of Samstraumr.
+Licensed under Mozilla Public License 2.0.
+See LICENSE file for details.
+-->
 
 # Samstraumr: Adaptive Resilient Software Framework
 
@@ -17,7 +24,7 @@ In a world where scientific simulations and complex applications drown in tangle
 
 | [What is S8r?](#what-is-samstraumr) | [Why Use It?](#why-use-samstraumr) | [Core Concepts](#core-concepts) | [Getting Started](#getting-started) | [Documentation](#documentation) |
 |:--:|:--:|:--:|:--:|:--:|
-| [CLI Reference](#command-line-interface--tools) | [Project Structure](#project-structure) | [Contributing](#contributing--connect) | [License](#license) | [Project Status](./KANBAN.md) |
+| [CLI Reference](#command-line-interface--tools) | [Project Structure](#project-structure) | [Contributing](#contributing--connect) | [License](#license) | [Project Status](./docs/planning/KANBAN.md) |
 
 ## What is Samstraumr?
 
@@ -72,7 +79,99 @@ The framework excels at managing complexity in distributed systems, service ecos
 
 ## Core Concepts
 
-![Core Concepts Diagram](https://via.placeholder.com/400x300?text=Core+Concepts+Diagram)
+<svg width="600" height="320" xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 20px auto; border: 1px solid #e0e0e0; border-radius: 4px; background: #f9f9f9;">
+  <!-- Title -->
+  <text x="300" y="25" font-size="18" font-weight="bold" text-anchor="middle" fill="#2c3e50">Samstraumr Core Architecture</text>
+
+  <!-- Component Box -->
+  <g>
+    <rect x="20" y="50" width="110" height="70" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="4"/>
+    <text x="75" y="70" font-weight="bold" text-anchor="middle" font-size="13" fill="#2c3e50">Components</text>
+    <text x="75" y="85" font-size="11" text-anchor="middle" fill="#555">Processing</text>
+    <text x="75" y="100" font-size="11" text-anchor="middle" fill="#555">Units</text>
+  </g>
+
+  <!-- Arrow 1 -->
+  <path d="M 130 85 L 160 85" stroke="#3498db" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+  <!-- Composite Box -->
+  <g>
+    <rect x="160" y="50" width="110" height="70" fill="#f0e8f4" stroke="#9b59b6" stroke-width="2" rx="4"/>
+    <text x="215" y="70" font-weight="bold" text-anchor="middle" font-size="13" fill="#2c3e50">Composites</text>
+    <text x="215" y="85" font-size="11" text-anchor="middle" fill="#555">Coordinated</text>
+    <text x="215" y="100" font-size="11" text-anchor="middle" fill="#555">Pipelines</text>
+  </g>
+
+  <!-- Arrow 2 -->
+  <path d="M 270 85 L 300 85" stroke="#9b59b6" stroke-width="2" fill="none" marker-end="url(#arrowhead2)"/>
+
+  <!-- Machines Box -->
+  <g>
+    <rect x="300" y="50" width="110" height="70" fill="#f8f4e8" stroke="#f39c12" stroke-width="2" rx="4"/>
+    <text x="355" y="70" font-weight="bold" text-anchor="middle" font-size="13" fill="#2c3e50">Machines</text>
+    <text x="355" y="85" font-size="11" text-anchor="middle" fill="#555">Orchestrated</text>
+    <text x="355" y="100" font-size="11" text-anchor="middle" fill="#555">Subsystems</text>
+  </g>
+
+  <!-- Arrow 3 -->
+  <path d="M 410 85 L 440 85" stroke="#f39c12" stroke-width="2" fill="none" marker-end="url(#arrowhead3)"/>
+
+  <!-- Flow/Identity Box -->
+  <g>
+    <rect x="440" y="50" width="140" height="70" fill="#e8f8e8" stroke="#27ae60" stroke-width="2" rx="4"/>
+    <text x="510" y="70" font-weight="bold" text-anchor="middle" font-size="13" fill="#2c3e50">Flow + Identity</text>
+    <text x="510" y="85" font-size="11" text-anchor="middle" fill="#555">Data Pathways &amp;</text>
+    <text x="510" y="100" font-size="11" text-anchor="middle" fill="#555">Hierarchical Addressing</text>
+  </g>
+
+  <!-- Bottom layer: Cross-cutting concepts -->
+  <line x1="30" y1="145" x2="570" y2="145" stroke="#bdc3c7" stroke-width="1" stroke-dasharray="5,5"/>
+
+  <g>
+    <text x="300" y="170" font-weight="bold" text-anchor="middle" font-size="12" fill="#2c3e50">Cross-Cutting Concepts</text>
+  </g>
+
+  <!-- Event-Driven -->
+  <g>
+    <rect x="50" y="190" width="100" height="50" fill="#fff3cd" stroke="#ffc107" stroke-width="1.5" rx="3"/>
+    <text x="100" y="210" font-weight="bold" text-anchor="middle" font-size="12" fill="#2c3e50">Event-Driven</text>
+    <text x="100" y="227" font-size="10" text-anchor="middle" fill="#555">Pub-Sub</text>
+  </g>
+
+  <!-- Validation -->
+  <g>
+    <rect x="175" y="190" width="100" height="50" fill="#f8d7da" stroke="#dc3545" stroke-width="1.5" rx="3"/>
+    <text x="225" y="210" font-weight="bold" text-anchor="middle" font-size="12" fill="#2c3e50">Validation</text>
+    <text x="225" y="227" font-size="10" text-anchor="middle" fill="#555">Boundaries</text>
+  </g>
+
+  <!-- Lifecycle -->
+  <g>
+    <rect x="300" y="190" width="100" height="50" fill="#d1ecf1" stroke="#17a2b8" stroke-width="1.5" rx="3"/>
+    <text x="350" y="210" font-weight="bold" text-anchor="middle" font-size="12" fill="#2c3e50">Lifecycle</text>
+    <text x="350" y="227" font-size="10" text-anchor="middle" fill="#555">State Machine</text>
+  </g>
+
+  <!-- Resilience -->
+  <g>
+    <rect x="425" y="190" width="100" height="50" fill="#d4edda" stroke="#28a745" stroke-width="1.5" rx="3"/>
+    <text x="475" y="210" font-weight="bold" text-anchor="middle" font-size="12" fill="#2c3e50">Resilience</text>
+    <text x="475" y="227" font-size="10" text-anchor="middle" fill="#555">Self-Healing</text>
+  </g>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#3498db" />
+    </marker>
+    <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#9b59b6" />
+    </marker>
+    <marker id="arrowhead3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#f39c12" />
+    </marker>
+  </defs>
+</svg>
 
 Samstraumr implements a cohesive set of architectural concepts that work together to create resilient, adaptive systems:
 
@@ -163,10 +262,9 @@ if (result.isValid()) {
 
 ### 🏛️ Architecture
 - [Architecture Overview](./docs/architecture/README.md)
-- [Clean Architecture](./docs/architecture/clean/README.md)
-- [Event-Driven Design](./docs/architecture/event/README.md)
-- [Integration Patterns](./docs/architecture/patterns/README.md)
-- [Monitoring & Management](./docs/architecture/monitoring/README.md)
+- [Clean Architecture](./docs/architecture/clean/clean-architecture-migration.md)
+- [Adapter Patterns](./docs/architecture/adapter-patterns/README.md)
+- [Port Interfaces](./docs/architecture/clean/port-interfaces-summary.md)
 
 ### 🧠 Core Concepts
 - [Core Concepts](./docs/concepts/core-concepts.md)
@@ -181,20 +279,8 @@ if (result.isValid()) {
 - [Version Management](./docs/reference/version-management.md)
 - [Changelog](./docs/reference/release/changelog.md)
 - [FAQ](./docs/reference/f-a-q.md)
-- [Maven & Cucumber Standards](./modules/samstraumr-core/src/test/java/org/s8r/test/steps/alz001/MAVEN_CUCUMBER_STANDARDS.md)
 
 **🧪 Current Development**: We're using [Test-Driven Development](./docs/dev/tdd-development.md) with [BDD/Cucumber](./docs/dev/test-bdd-cucumber.md). Recently completed lifecycle test infrastructure enhancements with specialized test runners and improved script utilities. For current status and work in progress, see our [KANBAN Board](./docs/planning/KANBAN.md) and [Test Suite Implementation Report](./docs/test-reports/test-suite-implementation-report.md).
-
-#### Maven & Cucumber Configuration Standards
-
-The project follows strict Maven and Cucumber configuration standards to ensure maintainable, reliable tests:
-
-- **Maven Configuration**: Structured POM hierarchy with inheritance and proper dependency management
-- **Cucumber Configuration**: Standardized properties files with parallel execution and proper reporting
-- **Test Organization**: Well-defined directory structure with clear separation of concerns
-- **Configuration Documentation**: Comprehensive documentation with absolute paths for all configuration files
-
-[📚 **Maven & Cucumber Standards**](./modules/samstraumr-core/src/test/java/org/s8r/test/steps/alz001/MAVEN_CUCUMBER_STANDARDS.md)
 
 ## Command-Line Interface & Tools
 
@@ -254,8 +340,6 @@ Samstraumr integrates with Docmosis for professional document generation:
 - Release notes generation
 - Template-based documentation
 - Centralized configuration
-
-[📄 **Document Generation Guide**](./docs/reference/document-generation.md)
 
 ## Project Structure
 

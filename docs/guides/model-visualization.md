@@ -1,13 +1,11 @@
 <!--
-Copyright (c) 2025 Eric C. Mumford (@heymumford)
+Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
 
-This software was developed with analytical assistance from AI tools 
-including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
-which were used as paid services. All intellectual property rights 
-remain exclusively with the copyright holder listed above.
-
-Licensed under the Mozilla Public License 2.0
+Licensed under Mozilla Public License 2.0.
+See LICENSE file for details.
 -->
+
+
 
 # Model Visualization
 
@@ -132,9 +130,6 @@ Composites:
   [DataOutput: standard]
 
 Connections:
-  [DataInput] --> [DataValidator]
-  [DataValidator] --> [DataEnricher]
-  [DataEnricher] --> [DataOutput]
 ```
 
 Tree format (with `--format tree`):
@@ -221,4 +216,3 @@ Machines orchestrate composites to form complete processing systems:
 | Visualization shows no components | Verify that components are properly registered in your code |
 | Cannot find commands | Make sure S8r CLI tools are executable (`chmod +x s8r*`) |
 | Java errors during initialization | Check that you're using Java 17 or higher |
-

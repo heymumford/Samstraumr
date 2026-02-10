@@ -1,13 +1,11 @@
 <!--
-Copyright (c) 2025 Eric C. Mumford (@heymumford)
+Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
 
-This software was developed with analytical assistance from AI tools 
-including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
-which were used as paid services. All intellectual property rights 
-remain exclusively with the copyright holder listed above.
-
-Licensed under the Mozilla Public License 2.0
+Licensed under Mozilla Public License 2.0.
+See LICENSE file for details.
 -->
+
+
 
 # Test in Age of Ai
 
@@ -191,4 +189,3 @@ Develop metrics specifically for evaluating AI-generated tests:
 ## Conclusion
 
 The integration of AI into testing practices offers significant potential for improving the quality and coverage of Samstraumr's test suite. By thoughtfully adapting our testing strategy, we can leverage AI capabilities while maintaining the integrity and meaning of our tests.
-

@@ -1,19 +1,16 @@
+<!--
+Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
+
+Licensed under Mozilla Public License 2.0.
+See LICENSE file for details.
+-->
+
+
 # Qa Cognitive Transformation Ai
 
-<!--
-Copyright (c) 2025 Eric C. Mumford (@heymumford)
-
-This software was developed with analytical assistance from AI tools 
-including Claude 3.7 Sonnet, Claude Code, and Google Gemini Deep Research,
-which were used as paid services. All intellectual property rights 
-remain exclusively with the copyright holder listed above.
-
-Licensed under the Mozilla Public License 2.0
--->
 
 <\!-- 
 Copyright (c) 2025 [Eric C. Mumford (@heymumford)](https://github.com/heymumford), Gemini Deep Research, Claude 3.7.
--->
 
 The Transformation of Cognitive Work in the Age of AI: A Focus on Quality Assurance and Test Automation
 Eric C. Mumford (@heymumford)

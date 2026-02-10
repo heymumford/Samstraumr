@@ -1,0 +1,222 @@
+Feature_ID,Rank,Title,Type,Effort_Hours,Effort_Days,Owner,Start_Week,End_Week,Dependencies,Gate,Status,Acceptance_Criteria
+36.1,36,Create consciousness-logger-adapter module structure,Code,20,3,Eric,1,1,None,1,Pending,Module exists; package structure clear; README written
+36.2,36,Implement ConsciousnessEvent class hierarchy,Code,25,3,Eric,1,2,36.1,1,Pending,5+ event types; serializable
+36.3,36,Write 7 Cucumber feature files (scenarios),Testing,30,4,Eric,1,2,36.2,1,Pending,All 7 files written; 50+ scenarios; all executable
+36.4,36,Implement lifecycle observation methods,Code,30,4,Eric,2,3,36.2 36.3,1,Pending,Observations logged for each state transition
+36.5,36,Write unit tests (state transitions + assertions),Testing,20,3,Eric,3,3,36.4,1,Pending,50+ unit tests; 85%+ coverage; all passing
+36.6,36,Integration tests with component lifecycle,Testing,15,2,Eric,3,4,36.4,1,Pending,20+ integration scenarios; component-consciousness interaction verified
+36.7,36,Performance testing (consciousness overhead < 5%),Testing,10,1,Eric,4,4,36.6,1,Pending,Latency impact measured; < 5% overhead confirmed
+36.8,36,Documentation + usage guide,Documentation,10,1,Eric,4,4,All,1,Pending,JavaDoc complete; usage guide written; examples provided
+1.1,1,Literature review (Hofstadter IIT Maturana-Varela),Research,25,3,Eric,1,1,None,1,Pending,20+ papers reviewed; key concepts extracted; synthesis document written
+1.2,1,Draft 3-5 temporal logic formulas (LTL),Research,30,4,Eric,1,2,1.1,1,Pending,Multiple candidate formulas written; comparison analysis completed
+1.3,1,Define falsifiability criteria for each formula,Research,15,2,Eric,2,2,1.2,1,Pending,Each formula has explicit falsification conditions
+1.4,1,Implement consciousness state machine in code,Code,35,4,Eric,2,3,1.3,1,Pending,State machine enforces temporal property; all states reachable
+1.5,1,Write 10+ trace examples proving property,Testing,20,3,Eric,3,3,1.4,1,Pending,Example traces cover all state transitions
+1.6,1,Validate formula with philosophy expert review,Research,10,1,Eric,3,3,1.5,1,Pending,Expert review completed; feedback incorporated
+1.7,1,Gate 1 presentation slides + stakeholder brief,Documentation,5,1,Eric,4,4,1.6,1,Pending,Slides prepared; 30-min presentation ready
+6.1,6,Identify all consciousness code in Component.java,Code,10,1,Eric,1,1,None,1,Pending,All 768 lines of consciousness logic identified and marked
+6.2,6,Create org.s8r.component.consciousness package,Code,5,1,Eric,1,1,6.1,1,Pending,Package structure created; clean separation from core component
+6.3,6,Extract consciousness logic into new classes,Code,35,4,Eric,1,2,6.2,1,Pending,All consciousness code moved; 4-5 cohesive classes created
+6.4,6,Write unit tests for extracted classes (50+ tests),Testing,25,3,Eric,2,2,6.3,1,Pending,50+ tests written; all passing; 85%+ coverage
+6.5,6,Verify zero imports of consciousness from core,Code,10,1,Eric,2,2,6.4,1,Pending,Maven analyzer confirms no core→consciousness imports
+6.6,6,Documentation + architecture diagram,Documentation,10,1,Eric,2,2,6.5,1,Pending,Architecture diagram shows clean separation
+8.1,8,Conduct 3 domain expert interviews,Research,15,2,Collaborator,1,1,None,1,Pending,3 stakeholders interviewed; key domain concepts extracted
+8.2,8,Draft context map (identify 5 bounded contexts),Research,20,3,Collaborator,1,1,8.1,1,Pending,5 contexts identified; context names and responsibilities drafted
+8.3,8,Document each context's responsibility (detailed),Documentation,20,3,Collaborator,1,2,8.2,1,Pending,Each context has: name responsibility key entities aggregates
+8.4,8,Map integration points between contexts,Documentation,20,3,Collaborator,2,2,8.3,1,Pending,Context map shows all integration events; anti-corruption layers identified
+8.5,8,Create visual context map diagram (C4 level 2),Documentation,15,2,Collaborator,2,2,8.4,1,Pending,Diagram shows 5 contexts integration events data flow
+8.6,8,Validate context map with stakeholders (review meeting),Research,10,1,Collaborator,2,2,8.5,1,Pending,Stakeholder sign-off obtained; feedback incorporated
+8.7,8,Position consciousness as cross-cutting concern,Research,15,2,Collaborator,2,3,8.6,1,Pending,Consciousness placement documented; integration points with each context clear
+8.8,8,Create context map architecture reference doc,Documentation,10,1,Collaborator,3,3,8.7,1,Pending,Reference document written; context interaction patterns documented
+9.1,9,Define Consciousness aggregate (DDD pattern),Code,20,3,Eric,2,2,6.3 8.3,1,Pending,Consciousness class created; root entity clear; value objects identified
+9.2,9,Write 2-3 aggregate invariants (business rules),Code,15,2,Eric,2,2,9.1,1,Pending,Invariants written as Java assertions; rules document expectations
+9.3,9,Implement Repository pattern for Consciousness,Code,25,3,Eric,2,3,9.2,1,Pending,Repository interface defined; in-memory + persistence implementations working
+9.4,9,Define lifecycle events (CREATED OBSERVED etc.),Code,20,3,Eric,3,3,9.3,1,Pending,5 lifecycle events defined; events published at state transitions
+9.5,9,Write property-based tests for invariants,Testing,30,4,Eric,3,3,9.4,1,Pending,jqwik properties written; 100+ generated test cases passing
+9.6,9,Implement factory/builder for aggregate creation,Code,20,3,Eric,3,3,9.5,1,Pending,Builder pattern implemented; all invariants checked before creation
+9.7,9,Write aggregate documentation (DDD reference),Documentation,15,2,Eric,3,4,9.6,1,Pending,Aggregate structure documented; invariants explained
+9.8,9,Create aggregate lifecycle state machine diagram,Documentation,15,2,Eric,4,4,9.7,1,Pending,State diagram shows all transitions; invalid transitions clearly marked
+7.1,7,Audit all ports in system (identify 12+ ports),Research,15,2,Eric,2,2,6.3,1,Pending,12+ ports identified; list with responsibilities documented
+7.2,7,Choose formal specification method (Z Alloy TLA+),Research,10,1,Eric,2,2,7.1,1,Pending,Method selected with rationale; documentation link provided
+7.3,7,Specify 3 exemplar ports formally,Code,25,3,Eric,2,3,7.2,1,Pending,3 ports formally specified; preconditions/postconditions written
+7.4,7,Create contract test generator,Code,30,4,Eric,3,3,7.3,1,Pending,Test generator creates contract tests from specs; first 5 ports covered
+7.5,7,Write contract tests for 12 ports,Testing,40,5,Eric,3,4,7.4,1,Pending,12 ports have contract tests; all tests passing
+7.6,7,Formally specify all 12 ports,Code,30,4,Eric,3,4,7.5,1,Pending,All 12 ports formally specified; specification consistent
+7.7,7,Verify contract test coverage (100% ports covered),Testing,15,2,Eric,4,4,7.6,1,Pending,All 12 ports tested; contract violations caught by tests
+7.8,7,Create port contract reference documentation,Documentation,10,1,Eric,4,4,7.7,1,Pending,Formal specs documented; contract semantics explained
+7.9,7,Set up automatic contract test validation in CI/CD,Tooling,5,1,Eric,4,4,7.8,1,Pending,CI/CD pipeline includes contract tests; failures block merges
+7.10,7,Review port contracts with architecture team,Research,10,1,Eric,4,4,7.9,1,Pending,Architecture review completed; feedback incorporated
+11.1,11,Design study protocol (2 treatment conditions),Research,15,2,Collaborator,1,1,None,1 2,Pending,Protocol written; metaphor-present vs. neutral conditions defined
+11.2,11,Create task scenarios (3-4 representative scenarios),Research,15,2,Collaborator,1,1,11.1,1 2,Pending,Task scenarios written; each takes 15-30 min; comparable difficulty
+11.3,11,Design measurement instruments (NASA-TLX error rate),Research,10,1,Collaborator,1,1,11.2,1 2,Pending,Measurement tools selected; pre/post instruments designed
+11.4,11,Recruit 50+ developers (coordinate with partners),Research,30,4,Collaborator,1,3,11.3,1 2,Pending,50+ developers recruited; informed consent obtained
+11.5,11,Execute A/B test with developer cohorts,Research,40,5,Collaborator,3,4,11.4,1 2,Pending,Study runs with 50+ developers; data collected
+11.6,11,Conduct statistical analysis (p-values effect size),Research,20,3,Collaborator,4,5,11.5,1 2,Pending,Statistical tests completed; p-values < 0.05 (or not); Cohen's d calculated
+11.7,11,Write A/B test results report (publication-ready),Documentation,10,1,Collaborator,5,5,11.6,2,Pending,Report written; tables/figures included
+13.1,13,Instrument state machine for transition counting,Code,15,2,Collaborator,1,1,None,1,Pending,State machine instrumented; transition counter added
+13.2,13,Run full test suite and capture transition data,Testing,10,1,Collaborator,1,1,13.1,1,Pending,Test suite executes; all transition data logged
+13.3,13,Analyze coverage: tested vs. possible transitions,Analysis,20,3,Collaborator,1,1,13.2,1,Pending,Coverage analysis completed; gap analysis generated
+13.4,13,Report: State Transition Coverage Findings,Documentation,15,2,Collaborator,1,1,13.3,1,Pending,Report written with visualization
+16.1,16,Research property-based testing frameworks,Research,10,1,Collaborator,2,2,None,1,Pending,Comparison analysis completed; jqwik selected
+16.2,16,Design 5 property-based test cases (state machine),Research,15,2,Collaborator,2,2,16.1,1,Pending,5 properties written in first-order logic
+16.3,16,Implement jqwik integration into Maven build,Code,15,2,Collaborator,2,2,16.2,1,Pending,jqwik dependency added; test runner configured
+16.4,16,Write 20+ property-based tests,Code,40,5,Collaborator,2,3,16.3,1,Pending,20+ property tests implemented
+16.5,16,Run property-based tests and debug failures,Testing,30,4,Contractor 1,3,3,16.4,1,Pending,All 20+ tests passing; shrinking works
+16.6,16,Integrate property tests into CI/CD pipeline,Tooling,15,2,Contractor 1,3,3,16.5,1,Pending,CI/CD includes property test execution
+16.7,16,Document property-based testing strategy,Documentation,15,2,Collaborator,4,4,16.6,1,Pending,Documentation written; examples provided
+20.1,20,Design developer study protocol (comprehensive),Research,20,3,Collaborator,2,3,11.1,2,Pending,Extended study design; baseline cognitive load measurement defined
+20.2,20,Recruit 30+ developers for extended study,Research,30,4,Collaborator,2,4,20.1,2,Pending,30+ developers committed; diverse backgrounds
+20.3,20,Develop task suite (10+ diverse scenarios),Research,20,3,Collaborator,3,3,20.2,2,Pending,10+ task scenarios representing different complexity levels
+20.4,20,Execute developer study (data collection phase),Research,40,5,Collaborator,3,8,20.3,2,Pending,Study runs with developer cohorts; 50+ developer-hours of data collected
+20.5,20,Collect baseline cognitive load metrics,Measurement,25,3,Contractor 3,4,6,20.4,2,Pending,NASA-TLX scores error rates task completion times logged
+20.6,20,Statistical analysis of cognitive load data,Research,30,4,Contractor 3,6,8,20.5,2,Pending,Descriptive statistics calculated; distributions visualized
+20.7,20,ML modeling (identify burden patterns),Research,20,3,Contractor 3,7,8,20.6,2,Pending,Clustering analysis on cognitive load vectors
+20.8,20,Write Cognitive Load Baseline Report,Documentation,15,2,Collaborator,8,8,20.7,2,Pending,Report written; baseline metrics clearly stated
+21.1,21,Conduct root cause analysis on cognitive load data,Analysis,20,3,Contractor 3,6,7,20.7,2,Pending,Analysis identifies which code patterns cause burden
+21.2,21,Map burden to source components (ranking),Analysis,25,3,Contractor 3,7,7,21.1,2,Pending,Components ranked by burden; burden% per component identified
+21.3,21,Identify refactoring candidates (priority 1-5),Research,20,3,Collaborator,7,7,21.2,2,Pending,Top 5 refactoring opportunities identified
+21.4,21,Draft refactoring proposals (for Ranks 22-25),Documentation,25,3,Collaborator,7,8,21.3,2,Pending,Detailed proposals written; Component.java strategy clear
+21.5,21,Calculate refactoring ROI (effort vs. benefit),Research,15,2,Collaborator,8,8,21.4,2,Pending,ROI calculated; benefit-to-effort ratio clear
+21.6,21,Write Cognitive Burden Attribution Report,Documentation,10,1,Collaborator,8,8,21.5,2,Pending,Report written; burden attribution diagrams included
+34.1,34,Design JMH benchmark scenarios (10+ scenarios),Research,15,2,Collaborator,5,5,None,2,Pending,10+ benchmark scenarios identified
+34.2,34,Implement JMH infrastructure and baseline tests,Code,25,3,Collaborator,5,5,34.1,2,Pending,JMH framework integrated; 10 benchmark stubs created
+34.3,34,Write 15+ JMH microbenchmarks,Code,40,5,Collaborator,5,6,34.2,2,Pending,15+ benchmarks implemented
+34.4,34,Run benchmarks and establish baselines,Measurement,25,3,Collaborator,6,7,34.3,2,Pending,All 15+ benchmarks execute; variance < 10%
+34.5,34,Validate benchmark stability (re-runs consistent),Testing,15,2,Collaborator,7,7,34.4,2,Pending,5 re-runs show <10% variance
+34.6,34,Archive benchmark baselines to version control,Tooling,10,1,Collaborator,7,7,34.5,2,Pending,Baseline data committed; metadata stored
+34.7,34,Create Performance Benchmark Report,Documentation,10,1,Collaborator,8,8,34.6,2,Pending,Report written; tables/graphs show baseline performance
+29.1,29,List all architecture rules to enforce,Research,15,2,Contractor 1,5,5,6.5 8.8,2,Pending,8+ rules identified; each rule stated clearly
+29.2,29,Design AST analyzer approach (tool + method),Research,15,2,Contractor 1,5,5,29.1,2,Pending,AST analysis method chosen; tool identified
+29.3,29,Implement linter rules 1-3,Code,40,5,Contractor 1,5,6,29.2,2,Pending,First 3 rules implemented; violations detected
+29.4,29,Implement linter rules 4-5,Code,30,4,Contractor 1,6,6,29.3,2,Pending,Rules 4-5 working; detects cross-context imports
+29.5,29,Implement linter rules 6-8,Code,30,4,Contractor 1,6,7,29.4,2,Pending,Rules 6-8 working; complete linter feature set
+29.6,29,Integrate linter into Maven build,Tooling,15,2,Contractor 1,7,7,29.5,2,Pending,Maven plugin created; linter runs on mvn verify
+29.7,29,Run linter on full codebase; measure baseline compliance,Measurement,15,2,Contractor 1,7,7,29.6,2,Pending,Linter runs on entire codebase; baseline compliance measured: 98.8%
+29.8,29,Integrate linter into CI/CD pipeline,Tooling,10,1,Contractor 1,7,7,29.7,2,Pending,CI/CD pipeline includes linter; failures block merges
+29.9,29,Write Smart Linter Documentation & Usage Guide,Documentation,10,1,Contractor 1,8,8,29.8,2,Pending,Documentation complete; linter rules explained
+14.1,14,Design failure injection scenarios (30+ scenarios),Research,20,3,Collaborator,6,7,None,3,Pending,30+ distinct failure scenarios identified
+14.2,14,Implement chaos test harness (framework),Code,30,4,Collaborator,7,7,14.1,3,Pending,Harness created; failure injection API defined
+14.3,14,Implement 10+ failure injection plugins,Code,25,3,Collaborator,7,7,14.2,3,Pending,10 failure modes implemented
+14.4,14,Implement 20+ additional failure injection plugins,Code,25,3,Collaborator,8,8,14.3,3,Pending,Total 30+ failure modes fully implemented
+14.5,14,Write chaos test scenarios (30+ executable tests),Testing,30,4,Collaborator,8,8,14.4,3,Pending,30+ chaos test cases written
+14.6,14,Integrate chaos framework into automated testing,Tooling,15,2,Collaborator,8,8,14.5,3,Pending,Chaos tests runnable in CI/CD
+14.7,14,Run baseline chaos tests (collect failure data),Measurement,10,1,Collaborator,8,8,14.6,3,Pending,Baseline chaos test run; failure/recovery data captured
+14.8,14,Write Chaos Engineering Framework Guide,Documentation,5,1,Collaborator,8,8,14.7,3,Pending,Documentation complete; failure injection patterns explained
+26.1,26,Finalize experiment design (50+ failure scenarios),Research,20,3,Collaborator,8,9,14.7,4,Pending,Experiment protocol finalized; 50+ single-point failures defined
+26.2,26,Implement failure injection harness for Rank 26,Code,20,3,Collaborator,9,9,14.8 26.1,4,Pending,Specialized harness for single-point failures created
+26.3,26,Run 10 pilot failure scenarios (validate setup),Testing,15,2,Collaborator,9,9,26.2,4,Pending,10 pilot failures executed; data collection working
+26.4,26,Execute 25 failure scenarios; collect recovery data,Measurement,30,4,Collaborator,10,10,26.3,4,Pending,25 failures injected; recovery success recorded
+26.5,26,Execute 25 additional failures (reach 50 total),Measurement,30,4,Collaborator,10,11,26.4,4,Pending,25 more failures executed; total 50 scenarios completed
+26.6,26,Analyze recovery success rate,Analysis,15,2,Collaborator,11,11,26.5,4,Pending,Success rate calculated: X% (threshold >=70% for PASS)
+26.7,26,Compare against baseline (plain Java implementation),Analysis,20,3,Collaborator,11,12,26.6,4,Pending,Baseline plain Java implementation tested; recovery rates compared
+26.8,26,Measure MTTR (mean time to recovery),Measurement,15,2,Collaborator,12,12,26.7,4,Pending,MTTR calculated; threshold check: MTTR < 2 seconds?
+26.9,26,Identify recovery patterns and failure modes,Analysis,15,2,Collaborator,12,12,26.8,4,Pending,Failures analyzed; categories identified; recovery patterns documented
+26.10,26,Statistical significance testing + reporting,Analysis,20,3,Collaborator,12,12,26.9,4,Pending,P-values confidence intervals effect sizes calculated
+26.11,26,Gate 4 preparation: Results summary + decision brief,Documentation,15,2,Collaborator,13,14,26.10,4,Pending,Results summary prepared; Gate 4 presentation slides created
+26.12,26,Write Experiment 1 Results Report (publication-ready),Documentation,15,2,Collaborator,14,15,26.11,4,Pending,Report written; figures/tables show recovery rates
+27.1,27,Finalize cascade prevention experiment design,Research,15,2,Collaborator,8,9,14.7,4,Pending,Experiment protocol defined; isolation metrics clear
+27.2,27,Implement isolation measurement instrumentation,Code,20,3,Collaborator,9,9,27.1,4,Pending,Component dependencies tracked; failure propagation measurable
+27.3,27,Run 10 pilot cascade scenarios,Testing,15,2,Collaborator,9,9,27.2,4,Pending,10 pilot cascades executed; isolation measurements collected
+27.4,27,Execute 20 cascade prevention scenarios,Measurement,25,3,Collaborator,10,10,27.3,4,Pending,20 cascades injected; measure: % of other components affected
+27.5,27,Execute 20 additional cascades (reach 40 total),Measurement,25,3,Collaborator,10,11,27.4,4,Pending,20 more cascades executed; total 40 scenarios completed
+27.6,27,Analyze cascade isolation (% components affected),Analysis,15,2,Collaborator,11,12,27.5,4,Pending,Isolation metric calculated: X% affected (threshold <=30% for PASS)
+27.7,27,Create failure propagation tree / dependency graph,Analysis,20,3,Collaborator,12,12,27.6,4,Pending,Propagation patterns visualized; critical coupling points identified
+27.8,27,Write Experiment 2 Results Report (publication-ready),Documentation,15,2,Collaborator,14,15,27.7,4,Pending,Report written; cascade isolation metrics clearly presented
+28.1,28,Finalize event queue semantics experiment design,Research,15,2,Collaborator,8,8,14.7,4,Pending,Experiment defined; event ordering requirements clear
+28.2,28,Instrument event queue logging (complete trace),Code,20,3,Collaborator,9,9,28.1,4,Pending,Event queue instrumented; full event trace logged
+28.3,28,Run 10 pilot event scenarios under failures,Testing,15,2,Collaborator,9,9,28.2,4,Pending,10 pilot scenarios executed; event traces collected
+28.4,28,Execute 30 concurrent failure + event scenarios,Measurement,30,4,Collaborator,10,10,28.3,4,Pending,30 scenarios with concurrent failures; event ordering verified
+28.5,28,Analyze event ordering (FIFO maintained?),Analysis,15,2,Collaborator,10,11,28.4,4,Pending,Event trace analysis: Were events processed in order? (YES/NO)
+28.6,28,Verify idempotent event processing (no duplicates),Analysis,15,2,Collaborator,11,11,28.5,4,Pending,Duplicate detection: Are events processed multiple times?
+28.7,28,Write Experiment 3 Results Report,Documentation,15,2,Collaborator,13,13,28.6,4,Pending,Report written; event ordering results presented
+17.1,17,Define resilience metrics (MTTF MTTR MTBF),Research,10,1,Collaborator,3,3,None,1,Pending,Metrics defined formally; measurement procedures documented
+17.2,17,Implement resilience metrics collection infrastructure,Code,20,3,Collaborator,3,3,17.1,1,Pending,Metrics infrastructure created
+17.3,17,Run baseline resilience measurement (10 days),Measurement,30,4,Collaborator,3,5,17.2,1,Pending,System runs for 10 operational days; all failures logged
+17.4,17,Calculate baseline resilience statistics,Analysis,20,3,Collaborator,5,5,17.3,1,Pending,MTTF MTTR MTBF calculated
+17.5,17,Create Resilience Benchmark Report,Documentation,15,2,Collaborator,5,5,17.4,1,Pending,Report written; baseline metrics clearly stated
+18.1,18,Design consciousness logging impact experiment,Research,15,2,Collaborator,7,8,None,4,Pending,Experiment protocol: measure recovery WITH consciousness vs. WITHOUT
+18.2,18,Implement feature flag for consciousness logging,Code,20,3,Collaborator,8,8,18.1,4,Pending,Feature flag added to codebase; consciousness logging toggleable
+18.3,18,Run recovery experiments WITH consciousness enabled,Measurement,25,3,Collaborator,9,10,18.2,4,Pending,30 failure scenarios executed with consciousness enabled
+18.4,18,Run recovery experiments WITHOUT consciousness enabled,Measurement,25,3,Collaborator,10,11,18.3,4,Pending,30 failure scenarios executed with consciousness disabled
+18.5,18,Measure consciousness overhead (CPU memory latency),Measurement,20,3,Collaborator,11,12,18.4,4,Pending,Overhead quantified: CPU % memory increase latency impact
+18.6,18,Write Consciousness Impact Report,Documentation,15,2,Collaborator,13,13,18.5,4,Pending,Report written; ROI analysis complete
+19.1,19,Design RCA speedup experiment,Research,15,2,Collaborator,3,3,None,1,Pending,Experiment protocol: measure time to identify root cause
+19.2,19,Prepare 10 representative failure scenarios,Research,15,2,Collaborator,3,3,19.1,1,Pending,10 realistic failures selected; complexity varied
+19.3,19,Execute RCA analysis with genealogy enabled,Research,20,3,Collaborator,3,3,19.2,1,Pending,Developer subjects perform RCA with genealogy visible
+19.4,19,Execute RCA analysis without genealogy,Research,20,3,Collaborator,3,3,19.3,1,Pending,Developer subjects perform RCA with plain stack traces
+19.5,19,Write Genealogy Utility Report,Documentation,15,2,Collaborator,5,5,19.4,1,Pending,Report written; RCA speedup quantified
+12.1,12,Research plain Clean Architecture best practices,Research,15,2,Collaborator,5,5,None,2,Pending,Review 5+ Clean Architecture references
+12.2,12,Research Actor model frameworks (Akka virtual actors),Research,15,2,Collaborator,5,5,12.1,2,Pending,Research Akka; identify comparison points
+12.3,12,Draft comparison article outline (positioning),Documentation,15,2,Collaborator,5,6,12.2,2,Pending,Outline written: when to choose Samstraumr vs. alternatives
+12.4,12,Write comparison article draft (3000+ words),Documentation,40,5,Collaborator,6,7,12.3,2,Pending,Full draft written
+12.5,12,Add case studies / real-world examples,Documentation,20,3,Collaborator,7,7,12.4,2,Pending,2-3 case studies added
+12.6,12,Polish and finalize article draft,Documentation,15,2,Collaborator,7,8,12.5,2,Pending,Grammar/clarity review; citations added
+12.7,12,Identify target publication venues + prepare submission,Documentation,10,1,Collaborator,8,8,12.6,2,Pending,Target venues identified; submission format prepared
+22.1,22,Analyze Component.java (identify cohesion issues),Research,15,2,Eric,7,7,21.5,2,Pending,Code analysis: which methods can be grouped?
+22.2,22,Design Component refactoring (break into 3-5 cohesive classes),Design,20,3,Eric,7,7,22.1,2,Pending,Design document: new class structure; migration strategy
+22.3,22,Measure baseline cognitive load (Component.java),Measurement,10,1,Eric,7,7,22.2,2,Pending,Baseline metric collected
+22.4,22,Execute refactoring (extract new classes),Code,50,6,Eric,7,9,22.3,2,Pending,Refactoring executed; new classes created; tests passing
+22.5,22,Update tests (ensure 85%+ coverage maintained),Testing,30,4,Eric,8,9,22.4,2,Pending,Tests refactored; coverage maintained
+22.6,22,Measure post-refactoring cognitive load,Measurement,10,1,Eric,9,9,22.5,2,Pending,Post-refactoring metric collected; improvement calculated
+22.7,22,Document refactoring changes,Documentation,15,2,Eric,9,9,22.6,2,Pending,Refactoring rationale documented
+22.8,22,Code review + stakeholder approval,Research,10,1,Eric,10,10,22.7,2,Pending,Code review completed; refactoring approved
+22.9,22,Update project documentation,Documentation,15,2,Eric,10,10,22.8,2,Pending,Project docs updated
+3.1,3,Consciousness as Recursive Self-Model (CSM) — Literature review,Research,15,2,Eric,5,5,1.6,1,Pending,Review: Hofstadter strange loops; notes extracted
+3.2,3,Design CSM architectural pattern,Research,20,3,Eric,5,5,3.1,1,Pending,CSM pattern defined: self-model → introspection
+3.3,3,Implement consciousness recursive observer,Code,25,3,Eric,5,6,3.2,1,Pending,Observer implementation: consciousness observes itself
+4.1,4,Autopoiesis formal model (Maturana-Varela theory),Research,20,3,Eric,5,6,3.1,1,Pending,Literature review: Maturana-Varela autopoiesis
+4.2,4,Map Samstraumr architecture to autopoiesis theory,Research,15,2,Eric,6,6,4.1,1,Pending,Architecture analysis: Does Samstraumr self-produce?
+4.3,4,Implement autopoiesis validation checks (in code),Code,20,3,Eric,6,6,4.2,1,Pending,Code checks: Does system maintain self-reference?
+5.1,5,Formal proof: Consciousness fixed-point is reachable,Research,25,3,Eric,6,7,1.6 3.3,1,Pending,Mathematical proof (sketch): Fixed-point is reachable
+5.2,5,Formal proof: Consciousness fixed-point is unique,Research,20,3,Eric,6,7,5.1,1,Pending,Mathematical proof: Fixed-point is unique
+5.3,5,Implement consciousness stability checks,Code,15,2,Eric,7,7,5.2,1,Pending,Code implementation: Verify consciousness converges
+5.4,5,Write Recursive Models + Autopoiesis documentation,Documentation,20,3,Eric,7,7,5.3,1,Pending,Documentation complete: CSM explained autopoiesis mapping
+5.5,5,Review with domain experts (philosophy systems theory),Research,10,1,Eric,7,7,5.4,1,Pending,Expert review session; feedback integrated
+5.6,5,Gate 1 alternative: If formalization fails use CSM/autopoiesis as fallback,Research,5,1,Eric,4,4,3.1 4.1,1,Pending,Contingency: If Rank 1 temporal logic unfalsifiable pivot to CSM
+41.1,41,Gather key papers (biology consciousness architecture resilience),Research,20,3,Eric,7,7,None,4 5,Pending,30+ seminal papers identified; PDFs collected
+41.2,41,Outline Grand Synthesis paper (structure + flow),Documentation,20,3,Eric,7,7,41.1,4 5,Pending,Paper outline: 6-8 sections; unifying thesis clear
+41.3,41,Write Section 1-3 (Biological Systems Theory → Software),Writing,40,5,Eric,7,9,41.2,4 5,Pending,Sections 1-3 drafted: cellular biology mapping
+41.4,41,Write Section 4-5 (Samstraumr Architecture),Writing,35,5,Eric,9,10,41.3,4 5,Pending,Sections 4-5: Samstraumr structure through biological lens
+41.5,41,Write Section 6 (Empirical Validation + Results),Writing,30,4,Eric,11,13,26.12 27.8 28.7,4 5,Pending,Section 6: Experiments 1-3 results integrated
+41.6,41,Write Section 7-8 (Implications + Future Work),Writing,25,3,Eric,13,14,41.5,4 5,Pending,Sections 7-8: Educational implications philosophical insights
+41.7,41,Complete first draft; comprehensive revision,Writing,25,3,Eric,14,14,41.6,4 5,Pending,First complete draft finished; self-edited
+41.8,41,Final edits + Contractor 2 polish; submit,Writing,15,2,Contractor 2,15,16,41.7,4 5,Pending,Final polish: grammar clarity citations
+42.1,42,Design paper structure (methods + results sections),Documentation,15,2,Contractor 2,10,10,26.12 27.8 28.7,4 5,Pending,Paper outline: abstract intro methods results
+42.2,42,Write Methods section (experiments 1-3 description),Writing,25,3,Contractor 2,10,11,42.1,4 5,Pending,Methods section: detailed experimental protocols
+42.3,42,Prepare Results visualizations (tables figures),Documentation,20,3,Contractor 2,11,12,26.12 27.8 28.7,4 5,Pending,Results figures: recovery rate graphs
+42.4,42,Write Results section (experiments 1-3 findings),Writing,30,4,Contractor 2,12,13,42.3,4 5,Pending,Results section: data presented clearly
+42.5,42,Write Discussion section (implications limitations),Writing,25,3,Contractor 2,13,13,42.4,4 5,Pending,Discussion: What do results mean?
+42.6,42,Handle Gate 4 outcome (PASS / MODIFIED / PIVOT),Writing,20,3,Contractor 2,14,15,42.5,4 5,Pending,IF PASS: narrative finalized
+42.7,42,Complete first draft + incorporate experiment data,Writing,25,3,Contractor 2,15,15,42.6,4 5,Pending,First complete draft: 8000+ words
+42.8,42,Final edits + statistical validation,Writing,20,3,Contractor 2,15,16,42.7,4 5,Pending,Statistical rigor verified
+42.9,42,Prepare supplementary materials (raw data code scripts),Documentation,15,2,Contractor 2,16,16,42.8,4 5,Pending,Supplementary package: raw data CSV scripts
+42.10,42,Submit Rank 42 paper to target venue,Writing,5,1,Contractor 2,16,16,42.9,4 5,Pending,Paper submitted to ESEM/TSE or ICSE
+43.1,43,Design education paper structure (pedagogy focus),Documentation,15,2,Contractor 2,13,13,11.7,5,Pending,Paper outline: why metaphors matter in architecture education
+43.2,43,Write Introduction + Literature Review,Writing,25,3,Contractor 2,13,13,43.1,5,Pending,Introduction: learning science metaphor theory
+43.3,43,Write Methods section,Writing,20,3,Contractor 2,13,14,11.7,5,Pending,Methods: study design developer recruitment
+43.4,43,Write Results section,Writing,25,3,Contractor 2,14,14,42.3,5,Pending,Results: statistical findings effect sizes
+43.5,43,Write Discussion + Implications,Writing,25,3,Contractor 2,14,14,43.4,5,Pending,Discussion: pedagogy-focused implications
+43.6,43,Complete first draft + integrate data,Writing,20,3,Contractor 2,14,15,43.5,5,Pending,Complete draft: 6000+ words
+43.7,43,Final edits + submit to education venue,Writing,10,1,Contractor 2,17,18,43.6,5,Pending,Submitted to SIGCSE or ITiCSE
+44.1,44,Design consciousness philosophy paper,Documentation,15,2,Eric,16,16,1.6,5,Pending,Paper outline: consciousness definition temporal logic
+44.2,44,Write Introduction + Consciousness Philosophy Background,Writing,25,3,Eric,16,17,44.1,5,Pending,Introduction: history of consciousness definitions
+44.3,44,Write Section on Temporal Logic Formalization,Writing,30,4,Eric,17,17,44.2,5,Pending,Technical section: temporal logic formula explained
+44.4,44,Write Philosophical Implications section,Writing,25,3,Eric,17,18,44.3,5,Pending,Implications: What does formalization tell us?
+44.5,44,Complete first draft + internal review,Writing,20,3,Eric,18,18,44.4,5,Pending,Complete draft: 6000+ words
+44.6,44,Final edits + Contractor 2 prose polish,Writing,15,2,Contractor 2,19,19,44.5,5,Pending,Clarity and prose quality enhanced
+44.7,44,Submit to philosophy journal,Writing,10,1,Eric,20,20,44.6,5,Pending,Submitted to Journal of Consciousness Studies
+38.1,38,Incorporate Rank 12 comparison article as foundation,Documentation,10,1,Contractor 2,8,8,12.7,2,Pending,Rank 12 draft serves as starting point
+38.2,38,Expand with additional case studies,Documentation,20,3,Contractor 2,8,8,38.1,2,Pending,2-3 more case studies added
+38.3,38,Polish and finalize for publication,Documentation,20,3,Contractor 2,9,9,38.2,2,Pending,Publication-ready draft created
+38.4,38,Identify target venue + prepare submission,Documentation,15,2,Contractor 2,9,9,38.3,2,Pending,Target venue identified; format prepared
+38.5,38,Submit Rank 38 article,Writing,5,1,Contractor 2,10,10,38.4,2,Pending,Article submitted to target venue
+X.1,X,Weekly progress tracking + gate checkpoint logs,Measurement,30,2,Eric + Collaborator,1,20,None,All,Pending,Weekly status updates; gate completion tracking
+X.2,X,Experiment data versioning + reproducibility manifest,Tooling,20,3,Collaborator,8,20,All experiments,All,Pending,All raw data in version control
+X.3,X,Statistical analysis code + visualization,Tooling,25,3,Contractor 3,6,12,13 20 26-28,All,Pending,Statistical scripts written; figures generated
+X.4,X,Publication submission coordination + venue tracking,Tooling,15,2,Contractor 2,15,20,41-44,All,Pending,Submission tracker; venue deadlines
+X.5,X,Contingency response documentation,Documentation,10,1,Eric,4 8 12 15,All,Pending,Pre-written alternative narratives
+X.6,X,Architecture compliance enforcement (Maven build),Tooling,15,2,Contractor 1,1,20,6 8 9,All,Pending,Maven plugin configured
+X.7,X,Code quality baseline + trend monitoring,Tooling,15,2,Collaborator,1,20,None,All,Pending,JaCoCo coverage tracking
+X.8,X,Developer communication (weekly all-hands + updates),Documentation,20,2,Eric,1,20,None,All,Pending,Weekly 30-min sync
+X.9,X,Risk mitigation response,Documentation,10,As-needed,Eric,Throughout,All,Pending,Blocker mitigation plan
+X.10,X,Final synthesis + Year 2 planning,Documentation,20,5,Eric,19,20,41-44,All,Pending,Synthesis report prepared
