@@ -457,7 +457,7 @@ Licensed under the Mozilla Public License 2.0
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-jsp</artifactId>
-              <version>7.18.0</version>
+              <version>7.21.0</version>
             </dependency>
           </dependencies>
         </plugin>
