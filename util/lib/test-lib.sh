@@ -1,4 +1,10 @@
-#!/usr/bin/env bash
+#!/bin/bash
+# Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
+#
+# This file is part of Samstraumr.
+# Licensed under Mozilla Public License 2.0.
+# See LICENSE file for details.
+
 #==============================================================================
 # Test Library - Consolidated test-related functions
 # This library contains functions for running tests across the codebase

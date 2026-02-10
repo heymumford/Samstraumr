@@ -1,4 +1,10 @@
-#!/usr/bin/env bash
+#!/bin/bash
+# Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
+#
+# This file is part of Samstraumr.
+# Licensed under Mozilla Public License 2.0.
+# See LICENSE file for details.
+
 #==============================================================================
 # Filename: generate-diagrams.sh
 # Description: Script for generating C4 diagrams for the Samstraumr project

@@ -1,4 +1,10 @@
 #!/bin/bash
+# Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
+#
+# This file is part of Samstraumr.
+# Licensed under Mozilla Public License 2.0.
+# See LICENSE file for details.
+
 # This script sets up compatibility options for using Java 21 with Java 17 source code
 # It should be sourced before running Maven commands
 

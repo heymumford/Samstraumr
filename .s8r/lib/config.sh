@@ -1,4 +1,10 @@
 #!/bin/bash
+# Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
+#
+# This file is part of Samstraumr.
+# Licensed under Mozilla Public License 2.0.
+# See LICENSE file for details.
+
 # Samstraumr Configuration File
 # This file centralizes all path and configuration settings for the Samstraumr project
 # Source this file in all scripts to ensure consistent settings across the build system

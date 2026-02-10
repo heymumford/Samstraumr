@@ -1,4 +1,10 @@
-#!/usr/bin/env bash
+#!/bin/bash
+# Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
+#
+# This file is part of Samstraumr.
+# Licensed under Mozilla Public License 2.0.
+# See LICENSE file for details.
+
 #==============================================================================
 # cleanup-scripts.sh: Remove outdated scripts and temporary files
 # This script helps clean up unused scripts and temporary files after the

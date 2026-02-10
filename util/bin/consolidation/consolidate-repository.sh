@@ -1,4 +1,10 @@
 #!/bin/bash
+# Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
+#
+# This file is part of Samstraumr.
+# Licensed under Mozilla Public License 2.0.
+# See LICENSE file for details.
+
 #==============================================================================
 # consolidate-repository.sh: Master script to clean up and organize the repository
 # This script runs all consolidation scripts to clean up duplicated or temporary files

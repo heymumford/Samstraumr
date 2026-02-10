@@ -1,4 +1,10 @@
 #!/bin/bash
+# Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
+#
+# This file is part of Samstraumr.
+# Licensed under Mozilla Public License 2.0.
+# See LICENSE file for details.
+
 #==============================================================================
 # check-todo-format.sh - CI check for TODO format compliance
 # This script validates that TODOs follow the standard format
