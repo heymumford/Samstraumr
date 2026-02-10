@@ -29,12 +29,11 @@ import org.s8r.domain.lifecycle.LifecycleState;
 import org.s8r.infrastructure.logging.ConsoleLogger;
 
 /**
- * Package-private adapter that wraps a component.Component to provide the ComponentPort
- * interface, enabling conversion between component and domain architectural layers.
+ * Package-private adapter that wraps a component.Component to provide the ComponentPort interface,
+ * enabling conversion between component and domain architectural layers.
  *
- * <p><b>Note:</b> This class is intentionally package-private and should not be referenced
- * outside the org.s8r.adapter package. Use factory methods in {@link MachineAdapter} to obtain
- * instances.
+ * <p><b>Note:</b> This class is intentionally package-private and should not be referenced outside
+ * the org.s8r.adapter package. Use factory methods in {@link MachineAdapter} to obtain instances.
  */
 class ComponentToPortAdapter implements ComponentPort {
   private static final ConsoleLogger logger = new ConsoleLogger("ComponentToPortAdapter");

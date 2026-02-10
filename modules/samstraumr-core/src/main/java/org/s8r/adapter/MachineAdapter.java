@@ -15,27 +15,13 @@
 
 package org.s8r.adapter;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.s8r.application.port.LoggerPort;
-import org.s8r.component.Component;
 import org.s8r.component.Composite;
-import org.s8r.component.Environment;
 import org.s8r.component.Machine;
-import org.s8r.component.State;
-import org.s8r.domain.component.port.ComponentPort;
-import org.s8r.domain.component.port.CompositeComponentPort;
 import org.s8r.domain.component.port.MachinePort;
-import org.s8r.domain.event.DomainEvent;
-import org.s8r.domain.identity.ComponentId;
-import org.s8r.domain.lifecycle.LifecycleState;
-import org.s8r.domain.machine.MachineState;
-import org.s8r.domain.machine.MachineType;
 
 // Legacy types referenced using fully qualified names
 
@@ -52,13 +38,13 @@ import org.s8r.domain.machine.MachineType;
  * code to depend on abstractions rather than concrete implementations, facilitating a smooth
  * migration to Clean Architecture.
  *
- * <p><b>Package-Private Adapter Classes:</b> The actual adapter implementations (e.g.,
- * {@code DomainMachinePortAdapter}, {@code MachineToComponentPortAdapter}) are intentionally
- * package-private to control their visibility and prevent unintended public API expansion.
- * Clients should use the factory methods in this class to obtain adapted instances.
+ * <p><b>Package-Private Adapter Classes:</b> The actual adapter implementations (e.g., {@code
+ * DomainMachinePortAdapter}, {@code MachineToComponentPortAdapter}) are intentionally
+ * package-private to control their visibility and prevent unintended public API expansion. Clients
+ * should use the factory methods in this class to obtain adapted instances.
  *
- * <p><b>Exception Handling:</b> All adapter methods that catch exceptions will log failures
- * using the configured logger, enabling diagnosis of conversion issues.
+ * <p><b>Exception Handling:</b> All adapter methods that catch exceptions will log failures using
+ * the configured logger, enabling diagnosis of conversion issues.
  */
 public class MachineAdapter {
 

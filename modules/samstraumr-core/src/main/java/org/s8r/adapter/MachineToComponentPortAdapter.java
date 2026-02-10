@@ -23,8 +23,8 @@ import java.util.Optional;
 
 import org.s8r.component.Composite;
 import org.s8r.component.Machine;
-import org.s8r.domain.component.port.CompositeComponentPort;
 import org.s8r.domain.component.port.ComponentPort;
+import org.s8r.domain.component.port.CompositeComponentPort;
 import org.s8r.domain.component.port.MachinePort;
 import org.s8r.domain.event.DomainEvent;
 import org.s8r.domain.identity.ComponentId;
@@ -34,13 +34,12 @@ import org.s8r.domain.machine.MachineType;
 import org.s8r.infrastructure.logging.ConsoleLogger;
 
 /**
- * Package-private adapter that converts from component.Machine to MachinePort. This enables
- * legacy component-layer machines to be used with domain-layer port interfaces, supporting
- * incremental migration strategies.
+ * Package-private adapter that converts from component.Machine to MachinePort. This enables legacy
+ * component-layer machines to be used with domain-layer port interfaces, supporting incremental
+ * migration strategies.
  *
- * <p><b>Note:</b> This class is intentionally package-private and should not be referenced
- * outside the org.s8r.adapter package. Use factory methods in {@link MachineAdapter} to obtain
- * instances.
+ * <p><b>Note:</b> This class is intentionally package-private and should not be referenced outside
+ * the org.s8r.adapter package. Use factory methods in {@link MachineAdapter} to obtain instances.
  */
 class MachineToComponentPortAdapter implements MachinePort {
   private static final ConsoleLogger logger = new ConsoleLogger("MachineToComponentPortAdapter");
@@ -120,7 +119,13 @@ class MachineToComponentPortAdapter implements MachinePort {
       }
       return false;
     } catch (Exception e) {
-      logger.warn("Failed to add composite '" + name + "' to machine " + getMachineId() + ": " + e.getMessage());
+      logger.warn(
+          "Failed to add composite '"
+              + name
+              + "' to machine "
+              + getMachineId()
+              + ": "
+              + e.getMessage());
       return false;
     }
   }

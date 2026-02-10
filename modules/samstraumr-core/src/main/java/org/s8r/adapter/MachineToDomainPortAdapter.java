@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.s8r.domain.component.port.CompositeComponentPort;
 import org.s8r.domain.component.port.ComponentPort;
+import org.s8r.domain.component.port.CompositeComponentPort;
 import org.s8r.domain.component.port.MachinePort;
 import org.s8r.domain.event.DomainEvent;
 import org.s8r.domain.identity.ComponentId;
@@ -33,14 +33,13 @@ import org.s8r.infrastructure.logging.ConsoleLogger;
 /**
  * Package-private adapter that wraps a domain Machine to provide the MachinePort interface.
  *
- * <p><b>Consolidated Responsibility:</b> This adapter handles domain.Machine→MachinePort
- * conversion exclusively. It was consolidated with DomainMachinePortAdapter as they shared
- * identical implementations of core state-management methods, eliminating redundancy while
- * preserving the adapter pattern semantics.
+ * <p><b>Consolidated Responsibility:</b> This adapter handles domain.Machine→MachinePort conversion
+ * exclusively. It was consolidated with DomainMachinePortAdapter as they shared identical
+ * implementations of core state-management methods, eliminating redundancy while preserving the
+ * adapter pattern semantics.
  *
- * <p><b>Note:</b> This class is intentionally package-private and should not be referenced
- * outside the org.s8r.adapter package. Use factory methods in {@link MachineAdapter} to obtain
- * instances.
+ * <p><b>Note:</b> This class is intentionally package-private and should not be referenced outside
+ * the org.s8r.adapter package. Use factory methods in {@link MachineAdapter} to obtain instances.
  */
 class MachineToDomainPortAdapter implements MachinePort {
   private static final ConsoleLogger logger = new ConsoleLogger("MachineToDomainPortAdapter");

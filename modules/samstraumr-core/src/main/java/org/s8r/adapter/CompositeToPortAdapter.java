@@ -22,8 +22,8 @@ import java.util.Map;
 
 import org.s8r.component.Component;
 import org.s8r.component.Composite;
-import org.s8r.domain.component.port.CompositeComponentPort;
 import org.s8r.domain.component.port.ComponentPort;
+import org.s8r.domain.component.port.CompositeComponentPort;
 import org.s8r.domain.event.DomainEvent;
 import org.s8r.domain.identity.ComponentId;
 import org.s8r.domain.lifecycle.LifecycleState;
@@ -33,9 +33,8 @@ import org.s8r.infrastructure.logging.ConsoleLogger;
  * Package-private adapter that wraps a component.Composite to provide the CompositeComponentPort
  * interface, enabling conversion between component and domain architectural layers.
  *
- * <p><b>Note:</b> This class is intentionally package-private and should not be referenced
- * outside the org.s8r.adapter package. Use factory methods in {@link MachineAdapter} to obtain
- * instances.
+ * <p><b>Note:</b> This class is intentionally package-private and should not be referenced outside
+ * the org.s8r.adapter package. Use factory methods in {@link MachineAdapter} to obtain instances.
  */
 class CompositeToPortAdapter implements CompositeComponentPort {
   private static final ConsoleLogger logger = new ConsoleLogger("CompositeToPortAdapter");
