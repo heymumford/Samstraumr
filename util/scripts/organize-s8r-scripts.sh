@@ -1,10 +1,4 @@
 #!/bin/bash
-# Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
-#
-# This file is part of Samstraumr.
-# Licensed under Mozilla Public License 2.0.
-# See LICENSE file for details.
-
 # 
 # S8r scripts organization script
 # This script organizes s8r script files into appropriate categories

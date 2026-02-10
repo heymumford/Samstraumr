@@ -1,10 +1,4 @@
 #!/bin/bash
-# Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
-#
-# This file is part of Samstraumr.
-# Licensed under Mozilla Public License 2.0.
-# See LICENSE file for details.
-
 # 
 # Samstraumr root directory cleanup script
 # This script moves files from the root directory to their appropriate locations

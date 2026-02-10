@@ -1,9 +1,3 @@
-# Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
-#
-# This file is part of Samstraumr.
-# Licensed under Mozilla Public License 2.0.
-# See LICENSE file for details.
-
 #!/usr/bin/env python3
 """
 Generate C4 model diagrams for the Samstraumr project

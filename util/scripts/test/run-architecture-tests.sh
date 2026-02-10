@@ -1,9 +1,4 @@
 #!/bin/bash
-# Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
-#
-# This file is part of Samstraumr.
-# Licensed under Mozilla Public License 2.0.
-# See LICENSE file for details.
 
 # Script to run architecture validation tests
 # This validates that all our architectural decisions are implemented correctly

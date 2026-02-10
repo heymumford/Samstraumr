@@ -1,10 +1,4 @@
 #!/bin/bash
-# Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
-#
-# This file is part of Samstraumr.
-# Licensed under Mozilla Public License 2.0.
-# See LICENSE file for details.
-
 # Script to compile and run the isolated test directly without Maven
 
 # Set colors for output

@@ -1,11 +1,3 @@
-/*
- * Copyright (c) 2026 Eric C. Mumford <ericmumford@outlook.com>
- *
- * This file is part of Samstraumr.
- * Licensed under Mozilla Public License 2.0.
- * See LICENSE file for details.
- */
-
 package org.s8r.test.simple;
 
 import static org.junit.jupiter.api.Assertions.*;
